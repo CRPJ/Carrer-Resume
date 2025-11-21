@@ -1,0 +1,770 @@
+// Font imports
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@font-face {
+  font-family: 'Cafe24Anemone';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cafe24AnemoneAir';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HakgyoansimTuho';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimTuhoR.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Eutman';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKCHAN.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GanaChocolate';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Main content width adjustment
+.col-xxl-9 {
+  max-width: calc(100% - 520px) !important;
+  padding-left: 70px !important;
+  padding-right: 0 !important;
+}
+
+.col-xxl-3 {
+  padding-right: 20px !important;
+}
+
+// Resume Card - Exact Design Match
+.resume-card {
+  width: 474px !important;
+  min-width: 474px !important;
+  max-width: 474px !important;
+  height: 810px !important;
+  border: 1px solid #313F11;
+  border-radius: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  // Header
+  .resume-header {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    margin-bottom: -20px;
+    gap: 0;
+
+    .resume-photo {
+      flex-shrink: 0;
+      width: 240px;
+      height: 273px;
+      border-radius: 0;
+      overflow: visible;
+      background: transparent;
+      margin: -20px 0 0 -15px;
+      padding: 0;
+      position: relative;
+      -webkit-mask-image: url('/images/0/shape.png');
+      -webkit-mask-size: cover;
+      -webkit-mask-position: center;
+      mask-image: url('/images/0/shape.png');
+      mask-size: cover;
+      mask-position: center;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .resume-info {
+      flex: 1;
+      display: flex;
+      padding: 0 25px 0 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      margin: 0;
+
+      .resume-icons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+        justify-content: flex-end;
+
+        .icon-item {
+          font-size: 20px;
+          cursor: pointer;
+        }
+      }
+
+      .resume-name {
+        color: #FFF;
+        font-family: 'Cafe24Anemone', sans-serif;
+        font-size: 25px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 34px;
+        margin-bottom: 16px;
+        margin-left: -5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+
+        .back-arrow {
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .name-eng {
+          font-family: 'Cafe24AnemoneAir', sans-serif;
+          font-size: 13px;
+          font-weight: 400;
+          color: #999;
+        }
+      }
+
+      .resume-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .detail-row {
+          display: flex;
+          gap: 10px;
+          font-size: 14px;
+          line-height: 1;
+          color: #FFFFFF;
+          align-items: center;
+
+          .icon {
+            flex-shrink: 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+          }
+
+          .text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            line-height: 1.5;
+
+            .sub-text {
+              font-size: 12px;
+              color: #999;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Introduction
+  .resume-intro {
+    width: 474px;
+    height: 104px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/17.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-left: 2px solid #FFC300;
+    font-family: 'HakgyoansimTuho', sans-serif;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    color: #FFF;
+    margin: 0;
+    padding: 16px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    position: relative;
+
+    .intro-icon {
+      position: absolute;
+      top: -8px;
+      right: 12px;
+    }
+  }
+
+  // Three Column Container - 영역 4, 5, 6
+  .resume-three-column {
+    display: flex;
+    gap: 15px;
+    padding: 16px 20px;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  // Stats - 영역 4
+  .resume-stats {
+    flex-shrink: 0;
+    width: 170px;
+
+    .stat-item {
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+
+      .stat-label {
+        font-size: 14px;
+        color: #999;
+        white-space: nowrap;
+      }
+
+      .stat-value {
+        font-family: 'Black Ops One', cursive;
+        font-size: 22px;
+        font-weight: 400;
+        color: #FFEC8F;
+        white-space: nowrap;
+
+        .stat-unit {
+          font-family: 'Black Ops One', cursive;
+          font-size: 14px;
+          font-weight: 400;
+          color: #FFEC8F;
+        }
+      }
+    }
+
+    .progress-bar {
+      width: 124.2px;
+      height: 3px;
+      background: #555555;
+      border: none;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+
+      .progress-fill {
+        height: 100%;
+        background: #FFEC8F;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        display: block;
+      }
+    }
+  }
+
+  // Badges - 영역 5
+  .resume-badges {
+    flex-shrink: 0;
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+
+    .badge-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: center;
+
+      .badge-icon {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+
+        &.icon-graphic10 {
+          background-image: url('/images/0/Graphic10.png');
+        }
+
+        &.icon-shield {
+          background-image: url('/images/0/Shield.png');
+        }
+
+        &.icon-graphic13 {
+          background-image: url('/images/0/Graphic13.png');
+        }
+      }
+
+      .badge-num {
+        font-family: 'Black Ops One', cursive;
+        font-size: 18px;
+        font-weight: 400;
+        color: #FFEC8F;
+        min-width: 80px;
+        text-align: center;
+
+        &.red {
+          color: #FFEC8F;
+        }
+      }
+    }
+  }
+
+  // Medal - 영역 6
+  .resume-medal {
+    flex-shrink: 0;
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 14px;
+
+    .medal-image-wrapper {
+      position: relative;
+      width: 98px;
+      height: 98px;
+      margin-left: -35px;
+      border-radius: 512px;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: calc(50% - 7px);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 87%;
+        height: 87%;
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 512px;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      img {
+        width: 98px;
+        height: 98px;
+        display: block;
+        object-fit: contain;
+        box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
+        border-radius: 512px;
+        position: relative;
+        z-index: 0;
+      }
+    }
+
+    .medal-text {
+      position: absolute;
+      bottom: 5px;
+      right: 20px;
+      z-index: 2;
+      width: 70px;
+      height: 25px;
+      padding: 0;
+      font-family: 'Cafe24Anemone', sans-serif;
+      font-size: 14px;
+      color: #FFEC8F;
+      font-weight: 400;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-8deg);
+      background-image: url('/images/0/ribon box.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+
+  // Activities
+  .resume-activities {
+    width: 474px;
+    height: 95px;
+    max-height: 95px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    display: block;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
+      display: block;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #2a2a2a;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #FFEC8F;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #FFD700;
+    }
+
+    // Remove scrollbar arrows
+    &::-webkit-scrollbar-button {
+      display: none;
+      height: 0;
+      width: 0;
+    }
+
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: #FFEC8F #2a2a2a;
+
+    .activity-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+      border-bottom: 0;
+      width: 471px;
+      height: 36px;
+      background-color: #1C242F;
+      margin-bottom: 0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .activity-avatar {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 0;
+        overflow: hidden;
+
+        img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .activity-content {
+        flex: 1;
+        padding-left: 2px;
+
+        .activity-line {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 5px;
+          align-items: center;
+          justify-content: flex-start;
+          font-size: 14px;
+
+          .activity-season {
+            color: #fff;
+            font-weight: 400;
+            width: 90px;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-align: center;
+          }
+
+          .activity-period {
+            color: #fff;
+            font-weight: 400;
+            width: 75px;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-align: center;
+          }
+
+          .activity-role {
+            color: #fff;
+            font-weight: 400;
+            width: 110px;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-align: center;
+          }
+
+          .activity-badge {
+            font-size: 14px;
+            font-weight: 400;
+            width: 55px;
+            flex-shrink: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: center;
+
+            &.active {
+              color: #FFEC8F;
+            }
+
+            &.complete {
+              color: #FFEC8F;
+            }
+          }
+
+          .activity-check {
+            font-weight: 400;
+            width: 55px;
+            flex-shrink: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: center;
+            margin-left: 8px;
+
+            &.pending {
+              color: #999;
+            }
+
+            &.approved {
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Bottom section wrapper with background
+  .resume-bottom-section {
+    position: relative;
+    width: 474px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      background-image: url('/images/0/OK 섹션89.png');
+      background-size: cover;
+      background-position: center -30px;
+      background-repeat: no-repeat;
+      z-index: 1;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 2;
+    }
+  }
+
+  // Skills
+  .resume-skills {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 0;
+    padding-top: 30px;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    width: 474px;
+    position: relative;
+    z-index: 3;
+
+    .skill-card {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      padding-top: 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 50px;
+      overflow: visible;
+
+      &:nth-child(1) {
+        background-image: url('/images/0/Sheriff Badge1 2.png');
+        background-size: 34px 34px;
+        background-repeat: no-repeat;
+        background-position: calc(50% - 25px) calc(50% - 10px);
+      }
+
+      &:nth-child(2) {
+        background-image: url('/images/0/Sheriff Badge1.png');
+        background-size: 34px 34px;
+        background-repeat: no-repeat;
+        background-position: calc(50% - 25px) calc(50% - 10px);
+      }
+
+      &:nth-child(3) {
+        background-image: url('/images/0/Sheriff Badge1 3.png');
+        background-size: 34px 34px;
+        background-repeat: no-repeat;
+        background-position: calc(50% - 25px) calc(50% - 10px);
+      }
+
+      &:nth-child(4) {
+        background-image: url('/images/0/Sheriff Badge1 4.png');
+        background-size: 34px 34px;
+        background-repeat: no-repeat;
+        background-position: calc(50% - 25px) calc(50% - 10px);
+      }
+
+      .skill-num {
+        font-family: 'Black Ops One', cursive;
+        font-size: 30px;
+        font-weight: 400;
+        color: #FFEC8F;
+        line-height: 1;
+        margin-bottom: 0;
+        margin-top: 5px;
+        position: relative;
+        z-index: 10;
+      }
+
+      .skill-label {
+        font-size: 15px;
+        color: #FFF;
+        line-height: 1.2;
+        position: relative;
+        z-index: 10;
+      }
+    }
+  }
+
+  // Notices
+  .resume-notices {
+    padding: 25px 20px 20px 0;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: relative;
+    z-index: 3;
+
+    .notice-box {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0;
+      border-radius: 0;
+      margin-bottom: 0;
+      font-size: 11px;
+      background: transparent;
+      border: none;
+      text-align: right;
+
+      &:first-child {
+        margin-top: 5px;
+        margin-right: 10px;
+        transform: translateX(25px);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+        margin-right: 10px;
+        transform: translateX(25px);
+      }
+
+      .notice-icon-img {
+        flex-shrink: 0;
+        width: 25px;
+        height: 25px;
+        order: 1;
+        position: relative;
+        z-index: 10;
+        margin-right: -5px;
+      }
+
+      .notice-text {
+        flex: 1;
+        line-height: 1.4;
+        order: 2;
+        text-align: left;
+        font-size: 14px;
+        position: relative;
+        z-index: 10;
+        color: #FFF;
+
+        &.notice-text-top {
+          font-family: 'Eutman', sans-serif;
+          margin-right: -15px;
+        }
+      }
+
+      &.green .notice-text {
+        font-family: 'GanaChocolate', sans-serif;
+        margin-right: -15px;
+      }
+
+      .notice-stamp {
+        flex-shrink: 0;
+        order: 3;
+        width: 46px;
+        height: 46px;
+        position: relative;
+        z-index: 10;
+        margin-left: -5px;
+      }
+
+      &.yellow {
+        background: transparent;
+        border: none;
+        color: #FFD700;
+      }
+
+      &.green {
+        background: transparent;
+        border: none;
+        color: #21E786;
+      }
+    }
+  }
+}
