@@ -110,56 +110,54 @@ const Sidebar = () => {
           {/* Hexagon Buttons */}
           <div style={{
             position: 'absolute',
-            left: '218px',
+            left: '213px',
             top: '10px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
+            gap: '8px',
             zIndex: 10
           }}>
             <button style={{
-              width: '28px',
+              width: '24px',
               height: '24px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              overflow: 'visible'
+              overflow: 'visible',
+              position: 'relative'
             }} aria-label="hexagon button 1">
-              <svg width="28" height="24" viewBox="0 0 28 24" style={{ display: 'block', overflow: 'visible' }}>
-                <polyline points="14,2 26,8 26,16 14,22 2,16 2,8 14,2" style={{ stroke: '#FFEC8F', strokeWidth: '1', fill: 'none', strokeLinejoin: 'miter' }}/>
-                <polygon points="14,8 15.5,11 18.5,11 16,13 17,16 14,14 11,16 12,13 9.5,11 12.5,11" fill="#FFEC8F"/>
-              </svg>
+              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button style={{
-              width: '28px',
+              width: '24px',
               height: '24px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              overflow: 'visible'
+              overflow: 'visible',
+              position: 'relative'
             }} aria-label="hexagon button 2">
-              <svg width="28" height="24" viewBox="0 0 28 24" style={{ display: 'block', overflow: 'visible' }}>
-                <polyline points="14,2 26,8 26,16 14,22 2,16 2,8 14,2" style={{ stroke: '#FFEC8F', strokeWidth: '1', fill: 'none', strokeLinejoin: 'miter' }}/>
-                <polyline points="10,12 12.5,14.5 18,9" style={{ stroke: '#FFEC8F', strokeWidth: '1.5', fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }}/>
-              </svg>
+              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button style={{
-              width: '28px',
+              width: '24px',
               height: '24px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              overflow: 'visible'
+              overflow: 'visible',
+              position: 'relative',
+              marginTop: '-3px'
             }} aria-label="hexagon button 3">
-              <svg width="28" height="24" viewBox="0 0 28 24" style={{ display: 'block', overflow: 'visible' }}>
-                <polyline points="14,2 26,8 26,16 14,22 2,16 2,8 14,2" style={{ stroke: '#FFEC8F', strokeWidth: '1', fill: 'none', strokeLinejoin: 'miter' }}/>
-                <path d="M14,9 C11,9 9,11 9,13 C9,16 14,18 14,18 C14,18 19,16 19,13 C19,11 17,9 14,9 Z" fill="#FFEC8F"/>
-              </svg>
+              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
           </div>
 
