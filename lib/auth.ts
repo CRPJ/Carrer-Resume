@@ -63,17 +63,17 @@ export const authConfig: NextAuthConfig = {
     error: "/sign-in",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.accessToken = (user as any).accessToken;
+        token.accessToken = (user as { accessToken?: string }).accessToken;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        (session as any).accessToken = token.accessToken;
+        (session as { accessToken?: string }).accessToken = token.accessToken as string;
       }
       return session;
     },
