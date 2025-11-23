@@ -45,10 +45,22 @@ export async function GET(
 
     console.log('Reliability data:', reliabilityData)
 
-    // 두 데이터를 합치기 (reliability_rate가 없으면 null)
+    // user_cumulative_points 조회 (데이터가 없어도 에러 처리 안함)
+    const { data: pointsData } = await supabase
+      .from('user_cumulative_points')
+      .select('total_stars, total_shields, total_lightnings')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    console.log('Points data:', pointsData)
+
+    // 모든 데이터를 합치기 (데이터가 없으면 null)
     const responseData = {
       ...profileData,
-      reliability_rat: reliabilityData?.reliability_rate ?? null
+      reliability_rat: reliabilityData?.reliability_rate ?? null,
+      total_stars: pointsData?.total_stars ?? null,
+      total_shields: pointsData?.total_shields ?? null,
+      total_lightnings: pointsData?.total_lightnings ?? null
     }
 
     return NextResponse.json({

@@ -25,6 +25,9 @@ interface UserProfile {
   profile_photo_url: string | null;
   club: string | null;
   reliability_rat: number | null;
+  total_stars: number | null;
+  total_shields: number | null;
+  total_lightnings: number | null;
 }
 
 const Sidebar = ({ userId }: SidebarProps) => {
@@ -231,15 +234,15 @@ const Sidebar = ({ userId }: SidebarProps) => {
           <div className="resume-badges">
             <div className="badge-group">
               <span className="badge-icon icon-graphic10"></span>
-              <span className="badge-num">99999</span>
+              <span className="badge-num">{userProfile?.total_stars ?? 0}</span>
             </div>
             <div className="badge-group">
               <span className="badge-icon icon-shield"></span>
-              <span className="badge-num">99999</span>
+              <span className="badge-num">{userProfile?.total_shields ?? 0}</span>
             </div>
             <div className="badge-group">
               <span className="badge-icon icon-graphic13"></span>
-              <span className="badge-num red">-9999</span>
+              <span className="badge-num red">{userProfile?.total_lightnings ? -Math.abs(userProfile.total_lightnings) : 0}</span>
             </div>
           </div>
 
