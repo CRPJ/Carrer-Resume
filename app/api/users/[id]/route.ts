@@ -9,23 +9,51 @@ export async function GET(
     const supabase = createAdminClient()
     const userId = (await params).id
 
-    const { data, error } = await supabase
+    console.log('Fetching profile for userId:', userId)
+
+    // user_profiles 조회
+    const { data: profileData, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle() // single 대신 maybeSingle 사용
 
-    if (error) {
-      console.error('Error fetching user profile:', error)
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError)
       return NextResponse.json(
-        { error: '사용자 정보를 가져오는데 실패했습니다.', details: error.message },
+        { error: '사용자 정보를 가져오는데 실패했습니다.', details: profileError.message },
+        { status: 500 }
+      )
+    }
+
+    if (!profileData) {
+      console.error('User profile not found for userId:', userId)
+      return NextResponse.json(
+        { error: '사용자를 찾을 수 없습니다.', details: 'User profile not found' },
         { status: 404 }
       )
     }
 
+    console.log('Profile data found:', profileData.id, profileData.display_name)
+
+    // user_reliability_rates 조회 (데이터가 없어도 에러 처리 안함)
+    const { data: reliabilityData } = await supabase
+      .from('user_reliability_rates')
+      .select('reliability_rate')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    console.log('Reliability data:', reliabilityData)
+
+    // 두 데이터를 합치기 (reliability_rate가 없으면 null)
+    const responseData = {
+      ...profileData,
+      reliability_rat: reliabilityData?.reliability_rate ?? null
+    }
+
     return NextResponse.json({
       success: true,
-      data
+      data: responseData
     })
 
   } catch (error) {

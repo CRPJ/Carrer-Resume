@@ -24,6 +24,7 @@ interface UserProfile {
   bio: string | null;
   profile_photo_url: string | null;
   club: string | null;
+  reliability_rat: number | null;
 }
 
 const Sidebar = ({ userId }: SidebarProps) => {
@@ -42,9 +43,12 @@ const Sidebar = ({ userId }: SidebarProps) => {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
+      console.log('Fetching user profile for userId:', userId);
 
       const response = await fetch(`/api/users/${userId}`);
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response result:', result);
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch user profile');
@@ -206,10 +210,10 @@ const Sidebar = ({ userId }: SidebarProps) => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label">· 일정 신뢰도</span>
-                <span className="stat-value">100<span className="stat-unit">%</span></span>
+                <span className="stat-value">{userProfile?.reliability_rat ?? 0}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: '100%' }}></div>
+                <div className="progress-fill" style={{ width: `${userProfile?.reliability_rat ?? 0}%` }}></div>
               </div>
             </div>
             <div className="stat-item">
