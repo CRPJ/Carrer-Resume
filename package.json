@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
+    "@supabase/supabase-js": "^2.84.0",
     "@tabler/icons-webfont": "^3.16.0",
     "@types/matter-js": "^0.19.7",
     "@types/react-modal-video": "^1.2.3",

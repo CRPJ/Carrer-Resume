@@ -1,7 +1,102 @@
 "use client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const Sidebar = () => {
+interface SidebarProps {
+  userId?: string;
+}
+
+interface UserProfile {
+  id: string;
+  display_name: string;
+  eng_name: string | null;
+  gender: string | null;
+  birth_date: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  university: string | null;
+  major_first: string | null;
+  univ_admission_date: string | null;
+  univ_graduation_date: string | null;
+  univ_status: string | null;
+  univ_gpa: string | null;
+  bio: string | null;
+  profile_photo_url: string | null;
+  club: string | null;
+}
+
+const Sidebar = ({ userId }: SidebarProps) => {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userId) {
+      fetchUserProfile();
+    } else {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(`/api/users/${userId}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch user profile');
+      }
+
+      setUserProfile(result.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch user profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 전화번호 마스킹 함수: 010-1234-5678 -> 010-1***-****
+  const maskPhoneNumber = (phone: string | null | undefined) => {
+    if (!phone) return '010-****-****';
+
+    // 하이픈 제거
+    const cleaned = phone.replace(/-/g, '');
+
+    // 010-1***-**** 형태로 변환
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.charAt(3)}***-****`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.charAt(3)}***-****`;
+    }
+
+    return '010-****-****';
+  };
+
+  if (loading) {
+    return (
+      <div className="col-xxl-3 order-xxl-first">
+        <div className="resume-card">
+          <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="col-xxl-3 order-xxl-first">
+        <div className="resume-card">
+          <div style={{ padding: '40px', textAlign: 'center', color: '#ff4444' }}>
+            Error: {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="col-xxl-3 order-xxl-first">
       <style dangerouslySetInnerHTML={{__html: `
@@ -26,7 +121,7 @@ const Sidebar = () => {
         <div className="resume-header">
           <div className="resume-photo">
             <Image
-              src="/images/0/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp"
+              src={userProfile?.profile_photo_url || "/images/0/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp"}
               alt="Profile"
               width={240}
               height={273}
@@ -38,22 +133,25 @@ const Sidebar = () => {
             <h1 className="resume-name">
               <span className="back-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Image src="/images/0/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
-              </span>정이안 <span className="name-eng">Jung Ian</span>
+
+
+              </span>
+              {userProfile?.display_name || '이름'} <span className="name-eng">{userProfile?.eng_name || 'name'}</span>
             </h1>
 
             <div className="resume-details">
               <div className="detail-row">
                 <Image src="/images/0/small icon/User_01.png" alt="" width={16} height={16} />
-                <span>· 여 <Image src="/images/0/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> · 2002.02.02</span>
+                <span>·  {userProfile?.gender || '성별'} <Image src="/images/0/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> · {userProfile?.birth_date || '1999.01.01'}</span>
               </div>
               <div className="detail-row">
                 <Image src="/images/0/small icon/House_01.png" alt="" width={16} height={16} />
-                <span>· 서울특별시 강남구</span>
+                <span>· {userProfile?.address || '주소'}</span>
               </div>
               <div className="detail-row">
                 <Image src="/images/0/small icon/Mobile_Button.png" alt="" width={16} height={16} />
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  · 010-1***-****
+                  · {maskPhoneNumber(userProfile?.phone)}
                   <span style={{
                     color: '#FFC300',
                     fontSize: '14px',
@@ -64,7 +162,7 @@ const Sidebar = () => {
               </div>
               <div className="detail-row">
                 <Image src="/images/0/small icon/Mail.png" alt="" width={16} height={16} />
-                <span>· gildong@naver.com</span>
+                <span>· {userProfile?.email || 'example@gmail.com'}</span>
               </div>
               <div className="detail-row">
                 <Image src="/images/0/small icon/Building_03.png" alt="" width={16} height={16} />
@@ -73,15 +171,17 @@ const Sidebar = () => {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   maxWidth: '180px'
-                }}>· 성균관대학교 <span style={{ color: '#FFEC8F' }}>미디어커뮤니케이션학과</span></span>
+                }}>· {userProfile?.university || '한국대학교'} <span style={{ color: '#FFEC8F' }}>{userProfile?.major_first || '학과'}</span></span>
               </div>
               <div className="detail-row">
                 <span style={{ width: '16px' }}></span>
-                <span className="sub-text" style={{ color: '#FFEC8F' }}>· 2025.03 ~ 재학중</span>
+                <span className="sub-text" style={{ color: '#FFEC8F' }}>
+                  · {userProfile?.univ_admission_date || '2020.02'} ~ {userProfile?.univ_graduation_date || userProfile?.univ_status || '재학중'}
+                </span>
               </div>
               <div className="detail-row">
                 <span style={{ width: '16px' }}></span>
-                <span className="sub-text">· 3.0 <span style={{ color: '#999999' }}>/4.5</span></span>
+                <span className="sub-text">· {userProfile?.univ_gpa || '0.0'} <span style={{ color: '#999999' }}>/4.5</span></span>
               </div>
             </div>
           </div>
@@ -96,7 +196,7 @@ const Sidebar = () => {
             height={24}
             className="intro-icon"
           />
-          가장 어두운 순간에도 빛을 향해 용기 있게 한 걸음 내딛는 자에게는 언제나 반드시 새로운 길이 열리고 밝은 희망이 찾아온다
+          {userProfile?.bio || '한줄소개'}
         </div>
 
         {/* Three Column Section - 영역 4, 5, 6 side by side */}
