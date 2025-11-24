@@ -117,45 +117,57 @@ const Sidebar = () => {
             gap: '8px',
             zIndex: 10
           }}>
-            <button style={{
-              width: '24px',
-              height: '24px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-              overflow: 'visible',
-              position: 'relative'
-            }} aria-label="hexagon button 1">
+            <button
+              onClick={() => window.open('https://www.google.com/search?q=%ED%96%84%EB%B2%84%EA%B1%B0+%EC%82%AC%EC%A7%84&sca_esv=40968150e120a79c&udm=2&biw=1381&bih=788&sxsrf=AE3TifOFgqJNtdzBJSxlq7HqwOfJp2t41w%3A1763963847262&ei=x_MjaYDdD9LR1e8P34ba6QQ&ved=0ahUKEwjA3Iy0jYqRAxXSaPUHHV-DNk0Q4dUDCBI&uact=5&oq=%ED%96%84%EB%B2%84%EA%B1%B0+%EC%82%AC%EC%A7%84&gs_lp=Egtnd3Mtd2l6LWltZyIQ7ZaE67KE6rGwIOyCrOynhDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgARIvzFQoQNY1zBwBHgAkAECmAGcAqABhxSqAQYxLjEyLjO4AQPIAQD4AQGYAgugApgIqAIEwgIGEAAYBxgewgIHECMYJxjJAsICCBAAGIAEGLEDwgIKECMYJxjJAhjqAsICCxAAGIAEGLEDGIMBwgIEEAAYA5gDBIgGAZIHAzUuNqAHzkqyBwMxLja4B_UHwgcFMi05LjLIB0k&sclient=gws-wiz-img', '_blank')}
+              style={{
+                width: '24px',
+                height: '24px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                overflow: 'visible',
+                position: 'relative'
+              }}
+              aria-label="hexagon button 1"
+            >
               <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
               <Image src="/images/0/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
-            <button style={{
-              width: '24px',
-              height: '24px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-              overflow: 'visible',
-              position: 'relative'
-            }} aria-label="hexagon button 2">
+            <button
+              onClick={() => window.open('https://youtu.be/xf6q5dgn1hU?si=tNK3I1-QIsJ9JmvF', '_blank')}
+              style={{
+                width: '24px',
+                height: '24px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                overflow: 'visible',
+                position: 'relative'
+              }}
+              aria-label="hexagon button 2"
+            >
               <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
               <Image src="/images/0/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
-            <button style={{
-              width: '24px',
-              height: '24px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-              overflow: 'visible',
-              position: 'relative',
-              marginTop: '-3px'
-            }} aria-label="hexagon button 3">
+            <button
+              onClick={() => window.open('https://www.naver.com/', '_blank')}
+              style={{
+                width: '24px',
+                height: '24px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                overflow: 'visible',
+                position: 'relative',
+                marginTop: '-3px'
+              }}
+              aria-label="hexagon button 3"
+            >
               <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
               <Image src="/images/0/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
@@ -344,20 +356,40 @@ const Sidebar = () => {
           {/* Skill Cards */}
           <div className="resume-skills">
             <div className="skill-card">
-              <div className="skill-num">{skill1}</div>
-              <div className="skill-label">실무 역량 성장</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                  <span className="skill-num">{skill1}</span>
+                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999' }}>unit</span>
+                </div>
+                <div className="skill-label">실무 역량 성장</div>
+              </div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">{skill2}</div>
-              <div className="skill-label">실무 경험 축적</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                  <span className="skill-num">{skill2}</span>
+                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999' }}>건</span>
+                </div>
+                <div className="skill-label">실무 경험 축적</div>
+              </div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">{skill3}</div>
-              <div className="skill-label">실무 정보 습득</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                  <span className="skill-num">{skill3}</span>
+                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999' }}>회</span>
+                </div>
+                <div className="skill-label">실무 정보 습득</div>
+              </div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">{skill4}</div>
-              <div className="skill-label">실무 경력 누적</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                  <span className="skill-num">{skill4}</span>
+                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999' }}>proj</span>
+                </div>
+                <div className="skill-label">실무 경력 누적</div>
+              </div>
             </div>
           </div>
 
