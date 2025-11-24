@@ -58,14 +58,6 @@ const Sidebar = ({ userId }: SidebarProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (userId) {
-      fetchUserData();
-    } else {
-      setLoading(false);
-    }
-  }, [userId]);
-
   const fetchUserData = async () => {
     try {
       setLoading(true);
@@ -96,6 +88,15 @@ const Sidebar = ({ userId }: SidebarProps) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (userId) {
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   // 전화번호 마스킹 함수: 010-1234-5678 -> 010-1***-****
   const maskPhoneNumber = (phone: string | null | undefined) => {

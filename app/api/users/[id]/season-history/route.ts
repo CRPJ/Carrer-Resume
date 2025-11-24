@@ -49,7 +49,7 @@ export async function GET(
     }
 
     // 클라이언트 사이드에서 정렬 (년도 내림차순, 시즌 순서 내림차순)
-    const sortedData = historyData.sort((a: any, b: any) => {
+    const sortedData = historyData.sort((a, b) => {
       const yearDiff = parseInt(b.seasons.year) - parseInt(a.seasons.year)
       if (yearDiff !== 0) return yearDiff
       return b.seasons.season_order - a.seasons.season_order
