@@ -24,10 +24,14 @@ interface UserProfile {
   bio: string | null;
   profile_photo_url: string | null;
   club: string | null;
-  reliability_rat: number | null;
+  reliability_rate: number | null;
   total_stars: number | null;
   total_shields: number | null;
   total_lightnings: number | null;
+  practical_info_participated: number;
+  practical_competency_participated: number;
+  practical_experience_participated: number;
+  practical_career_participated: number;
 }
 
 interface Season {
@@ -313,10 +317,10 @@ const Sidebar = ({ userId }: SidebarProps) => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label">· 일정 신뢰도</span>
-                <span className="stat-value">{userProfile?.reliability_rat ?? 0}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{userProfile?.reliability_rate ?? 0}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${userProfile?.reliability_rat ?? 0}%` }}></div>
+                <div className="progress-fill" style={{ width: `${userProfile?.reliability_rate ?? 0}%` }}></div>
               </div>
             </div>
             <div className="stat-item">
@@ -411,19 +415,19 @@ const Sidebar = ({ userId }: SidebarProps) => {
           {/* Skill Cards */}
           <div className="resume-skills">
             <div className="skill-card">
-              <div className="skill-num">21</div>
+              <div className="skill-num">{userProfile?.practical_competency_participated ?? 0}</div>
               <div className="skill-label">실무 역량 성장</div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">21</div>
+              <div className="skill-num">{userProfile?.practical_experience_participated ?? 0}</div>
               <div className="skill-label">실무 경험 축적</div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">21</div>
+              <div className="skill-num">{userProfile?.practical_info_participated ?? 0}</div>
               <div className="skill-label">실무 정보 습득</div>
             </div>
             <div className="skill-card">
-              <div className="skill-num">21</div>
+              <div className="skill-num">{userProfile?.practical_career_participated ?? 0}</div>
               <div className="skill-label">실무 경력 누적</div>
             </div>
           </div>

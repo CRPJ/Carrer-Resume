@@ -54,13 +54,26 @@ export async function GET(
 
     console.log('Points data:', pointsData)
 
+    // user_cumulative_compliance_rates 조회 (데이터가 없어도 에러 처리 안함)
+    const { data: complianceData } = await supabase
+      .from('user_cumulative_compliance_rates')
+      .select('practical_info_participated, practical_competency_participated, practical_experience_participated, practical_career_participated')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    console.log('Compliance data:', complianceData)
+
     // 모든 데이터를 합치기 (데이터가 없으면 null)
     const responseData = {
       ...profileData,
-      reliability_rat: reliabilityData?.reliability_rate ?? null,
+      reliability_rate: reliabilityData?.reliability_rate ?? null,
       total_stars: pointsData?.total_stars ?? null,
       total_shields: pointsData?.total_shields ?? null,
-      total_lightnings: pointsData?.total_lightnings ?? null
+      total_lightnings: pointsData?.total_lightnings ?? null,
+      practical_info_participated: complianceData?.practical_info_participated ?? 0,
+      practical_competency_participated: complianceData?.practical_competency_participated ?? 0,
+      practical_experience_participated: complianceData?.practical_experience_participated ?? 0,
+      practical_career_participated: complianceData?.practical_career_participated ?? 0
     }
 
     return NextResponse.json({
