@@ -30,36 +30,64 @@ interface UserProfile {
   total_lightnings: number | null;
 }
 
+interface Season {
+  year: string;
+  name: string;
+  season_order: number;
+}
+
+interface SeasonHistory {
+  id: string;
+  user_id: string;
+  season_id: string;
+  role_in_season: string;
+  approved_weeks: string;
+  total_weeks: string;
+  progress_status: string;
+  review_status: string;
+  seasons: Season;
+}
+
 const Sidebar = ({ userId }: SidebarProps) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [seasonHistory, setSeasonHistory] = useState<SeasonHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (userId) {
-      fetchUserProfile();
+      fetchUserData();
     } else {
       setLoading(false);
     }
   }, [userId]);
 
-  const fetchUserProfile = async () => {
+  const fetchUserData = async () => {
     try {
       setLoading(true);
-      console.log('Fetching user profile for userId:', userId);
+      console.log('Fetching user data for userId:', userId);
 
-      const response = await fetch(`/api/users/${userId}`);
-      console.log('Response status:', response.status);
-      const result = await response.json();
-      console.log('Response result:', result);
+      // 프로필과 시즌 히스토리를 병렬로 가져오기
+      const [profileResponse, historyResponse] = await Promise.all([
+        fetch(`/api/users/${userId}`),
+        fetch(`/api/users/${userId}/season-history`)
+      ]);
 
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch user profile');
+      const profileResult = await profileResponse.json();
+      const historyResult = await historyResponse.json();
+
+      if (!profileResult.success) {
+        throw new Error(profileResult.error || 'Failed to fetch user profile');
       }
 
-      setUserProfile(result.data);
+      setUserProfile(profileResult.data);
+
+      if (historyResult.success) {
+        setSeasonHistory(historyResult.data || []);
+      }
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch user profile');
+      setError(err instanceof Error ? err.message : 'Failed to fetch user data');
     } finally {
       setLoading(false);
     }
@@ -80,6 +108,78 @@ const Sidebar = ({ userId }: SidebarProps) => {
     }
 
     return '010-****-****';
+  };
+
+  // 시즌 이름 한글 변환
+  const getSeasonNameKorean = (seasonName: string) => {
+    const seasonMap: { [key: string]: string } = {
+      'spring': '봄',
+      'summer': '여름',
+      'fall': '가을',
+      'winter': '겨울'
+    };
+    return seasonMap[seasonName] || seasonName;
+  };
+
+  // 역할 한글 변환
+  const getRoleKorean = (role: string) => {
+    const roleMap: { [key: string]: string } = {
+      'crew_regular': '일반(정규)',
+      'crew_advanced_agent': '심화(에이전트)',
+      'crew_advanced_part_leader': '심화(파트장)',
+      'admin_team_leader': '운영진(팀장)',
+      'admin_ambassador': '운영진(앰배서더)',
+      'admin_club_leader': '운영진(클럽장)'
+    };
+    return roleMap[role] || role;
+  };
+
+  // 진행 상태 한글 변환
+  const getProgressStatusKorean = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'in_progress': '진행 중',
+      'completed': '정상 완료',
+      'full_rest': '통합 휴식',
+      'discontinued': '활동 중단',
+      'graduated': '정상 졸업'
+    };
+    return statusMap[status] || status;
+  };
+
+  // 검수 상태 한글 변환
+  const getReviewStatusKorean = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'reviewing': '검수 중',
+      'approved': '승인 완료'
+    };
+    return statusMap[status] || status;
+  };
+
+  // 진행 상태별 CSS 클래스
+  const getProgressStatusClass = (status: string) => {
+    const classMap: { [key: string]: string } = {
+      'in_progress': 'active',
+      'completed': 'complete',
+      'full_rest': 'rest',
+      'discontinued': 'stopped',
+      'graduated': 'graduated'
+    };
+    return classMap[status] || '';
+  };
+
+  // 검수 상태별 CSS 클래스
+  const getReviewStatusClass = (status: string) => {
+    const classMap: { [key: string]: string } = {
+      'reviewing': 'pending',
+      'approved': 'approved'
+    };
+    return classMap[status] || '';
+  };
+
+  // 시즌별 아바타 이미지 (순서대로 순환)
+  const getAvatarImage = (index: number) => {
+    const avatars = ['/images/0/01.png', '/images/0/02.png', '/images/0/03.png'];
+    return avatars[index % avatars.length];
   };
 
   if (loading) {
@@ -273,50 +373,37 @@ const Sidebar = ({ userId }: SidebarProps) => {
           display: 'block',
           position: 'relative'
         } as React.CSSProperties}>
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/01.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">운영진(앰베서더)</span>
-                <span className="activity-badge active">진행중</span>
-                <span className="activity-check pending">검수중</span>
+          {seasonHistory.length > 0 ? (
+            seasonHistory.map((history, index) => (
+              <div className="activity-row" key={history.id}>
+                <div className="activity-avatar">
+                  <Image src={getAvatarImage(index)} alt="" width={36} height={36} />
+                </div>
+                <div className="activity-content">
+                  <div className="activity-line">
+                    <span className="activity-season">
+                      {String(history.seasons.year).slice(2)}, {getSeasonNameKorean(history.seasons.name)}
+                      <span style={{ color: '#999' }}>시즌</span>
+                    </span>
+                    <span className="activity-period">
+                      {history.approved_weeks}주 <span style={{ color: '#999' }}>/ {history.total_weeks}주</span>
+                    </span>
+                    <span className="activity-role">{getRoleKorean(history.role_in_season)}</span>
+                    <span className={`activity-badge ${getProgressStatusClass(history.progress_status)}`}>
+                      {getProgressStatusKorean(history.progress_status)}
+                    </span>
+                    <span className={`activity-check ${getReviewStatusClass(history.review_status)}`}>
+                      {getReviewStatusKorean(history.review_status)}
+                    </span>
+                  </div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+              시즌 히스토리가 없습니다
             </div>
-          </div>
-
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/02.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
-                <span className="activity-role">심화(파트장)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/03.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">12주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">일반(정규)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Skill Cards and Footer Notices - with background */}
