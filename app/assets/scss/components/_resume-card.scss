@@ -26,6 +26,14 @@
 }
 
 @font-face {
+  font-family: 'Tenada';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/Tenada.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Eutman';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKCHAN.woff2') format('woff2');
   font-weight: normal;
@@ -36,6 +44,14 @@
 @font-face {
   font-family: 'GanaChocolate';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jeongmeokbawi';
+  src: url('https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/SangSangRockOTF.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -114,6 +130,7 @@
       align-items: flex-start;
       gap: 5px;
       margin: 0;
+      margin-top: 5px;
       position: relative;
 
       .resume-icons {
@@ -135,8 +152,9 @@
         font-style: normal;
         font-weight: 400;
         line-height: 34px;
-        margin-bottom: 16px;
+        margin-bottom: 6px;
         margin-left: -5px;
+        padding-right: 35px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -158,13 +176,13 @@
       .resume-details {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 9px;
 
         .detail-row {
           display: flex;
           gap: 10px;
           font-size: 14px;
-          line-height: 1;
+          line-height: 1.4;
           color: #FFFFFF;
           align-items: center;
 
@@ -323,15 +341,17 @@
         background-position: center;
 
         &.icon-graphic10 {
-          background-image: url('/images/0/Graphic10.png');
+          background-image: url('/images/0/Ok01.png');
+          width: 19px;
+          height: 19px;
         }
 
         &.icon-shield {
-          background-image: url('/images/0/Shield.png');
+          background-image: url('/images/0/OK02.png');
         }
 
         &.icon-graphic13 {
-          background-image: url('/images/0/Graphic13.png');
+          background-image: url('/images/0/Ok03.png');
         }
       }
 
@@ -443,10 +463,26 @@
     &::-webkit-scrollbar-thumb {
       background: #FFEC8F;
       border-radius: 4px;
+
+      .resume-card.px-theme & {
+        background: #B2FF8F !important;
+      }
+
+      .resume-card.ec-theme & {
+        background: #FF98A6 !important;
+      }
     }
 
     &::-webkit-scrollbar-thumb:hover {
       background: #FFD700;
+
+      .resume-card.px-theme & {
+        background: #90EE90 !important;
+      }
+
+      .resume-card.ec-theme & {
+        background: #FF6B8A !important;
+      }
     }
 
     // Remove scrollbar arrows
@@ -629,60 +665,21 @@
       height: 50px;
       overflow: visible;
 
-      &:nth-child(1)::before {
-        content: '';
-        position: absolute;
-        width: 27.54px;
-        height: 27.54px;
-        background-image: url('/images/0/Sheriff Badge1 2.png');
-        background-size: 27.54px 27.54px;
-        background-repeat: no-repeat;
-        left: calc(50% - 40px);
-        top: 5px;
-        opacity: 0.8;
-        z-index: 1;
+      .skill-num-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        position: relative;
+        z-index: 2;
       }
 
-      &:nth-child(2)::before {
-        content: '';
-        position: absolute;
-        width: 27.54px;
-        height: 27.54px;
-        background-image: url('/images/0/Sheriff Badge1.png');
-        background-size: 27.54px 27.54px;
-        background-repeat: no-repeat;
-        left: calc(50% - 40px);
-        top: 5px;
-        opacity: 0.8;
-        z-index: 1;
-      }
-
-      &:nth-child(3)::before {
-        content: '';
-        position: absolute;
-        width: 27.54px;
-        height: 27.54px;
-        background-image: url('/images/0/Sheriff Badge1 3.png');
-        background-size: 27.54px 27.54px;
-        background-repeat: no-repeat;
-        left: calc(50% - 40px);
-        top: 5px;
-        opacity: 0.8;
-        z-index: 1;
-      }
-
-      &:nth-child(4)::before {
-        content: '';
-        position: absolute;
-        width: 27.54px;
-        height: 27.54px;
-        background-image: url('/images/0/Sheriff Badge1 4.png');
-        background-size: 27.54px 27.54px;
-        background-repeat: no-repeat;
-        left: calc(50% - 40px);
-        top: 5px;
-        opacity: 0.8;
-        z-index: 1;
+      .skill-icon {
+        width: 27px;
+        height: 27px;
+        flex-shrink: 0;
+        object-fit: contain;
+        margin-right: -6px;
       }
 
       .skill-num {
@@ -692,7 +689,6 @@
         color: #FFEC8F;
         line-height: 1;
         margin-bottom: 0;
-        margin-top: 5px;
         position: relative;
         z-index: 2;
       }
@@ -801,4 +797,294 @@
       }
     }
   }
+}
+
+// EC Theme - Pink Color Scheme
+.resume-card.ec-theme {
+  // Resume intro border
+  .resume-intro {
+    border-left: 2px solid #FF4B70 !important;
+  }
+
+  // Badges - 영역 5 아이콘
+  .resume-badges {
+    .badge-group {
+      .badge-icon {
+        &.icon-graphic10 {
+          background-image: url('/images/0/Graphic10.png') !important;
+        }
+        &.icon-shield {
+          background-image: url('/images/0/pX02.png') !important;
+        }
+        &.icon-graphic13 {
+          background-image: url('/images/0/Graphic13.png') !important;
+        }
+      }
+    }
+  }
+
+  // Stats - 영역 4
+  .resume-stats {
+    .stat-item {
+      .stat-row {
+        .stat-value {
+          color: #FF98A6 !important;
+
+          .stat-unit {
+            color: #FF98A6 !important;
+          }
+        }
+      }
+
+      .progress-bar {
+        .progress-fill {
+          background: #FF98A6 !important;
+        }
+      }
+    }
+  }
+
+  // Badges - 영역 5
+  .resume-badges {
+    .badge-group {
+      .badge-num {
+        color: #FF98A6 !important;
+
+        &.red {
+          color: #FF98A6 !important;
+        }
+      }
+    }
+  }
+
+  // Activity badge colors
+  .resume-activities {
+    scrollbar-color: #FF98A6 #2a2a2a !important;
+
+    .activity-row {
+      .activity-content {
+        .activity-line {
+          .activity-season {
+            color: #fff !important;
+          }
+
+          .activity-period {
+            color: #fff !important;
+          }
+
+          .activity-role {
+            color: #fff !important;
+          }
+
+          .activity-badge {
+            &.active {
+              color: #FF98A6 !important;
+            }
+
+            &.complete {
+              color: #FF98A6 !important;
+            }
+          }
+
+          .activity-check {
+            &.pending {
+              color: #999 !important;
+            }
+
+            &.approved {
+              color: #fff !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Skill numbers
+  .resume-skills {
+    .skill-card {
+      .skill-num {
+        color: #FF98A6 !important;
+      }
+    }
+  }
+
+  // Notice box yellow - Section 7
+  .resume-notices {
+    .notice-box {
+      &.yellow {
+        color: #FF98A6 !important;
+
+        .notice-text {
+          &.notice-text-top {
+            font-family: 'Tenada', sans-serif !important;
+            font-size: 15px !important;
+            position: relative;
+            top: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  // Bottom section background - Section 8, 9
+  .resume-bottom-section {
+    &::before {
+      background-image: url('/images/0/EC02 (2).png') !important;
+      background-position: center -70px !important;
+    }
+  }
+}
+
+// PX Theme - Green color scheme
+.resume-card.px-theme {
+  // Section 3 - intro border
+  .resume-intro {
+    border-left: 2px solid #36DA60 !important;
+  }
+
+  // Section 4 - stats
+  .resume-stats {
+    .stat-item {
+      .stat-row {
+        .stat-value {
+          color: #B2FF8F !important;
+
+          .stat-unit {
+            color: #B2FF8F !important;
+          }
+        }
+      }
+    }
+
+    .progress-bar {
+      .progress-fill {
+        background: #B2FF8F !important;
+      }
+    }
+  }
+
+  // Section 5 - badges
+  .resume-badges {
+    .badge-group {
+      .badge-icon {
+        &.icon-graphic10 {
+          background-image: url('/images/0/PX01.png') !important;
+        }
+        &.icon-shield {
+          background-image: url('/images/0/pX02.png') !important;
+        }
+        &.icon-graphic13 {
+          background-image: url('/images/0/PX03.png') !important;
+        }
+      }
+
+      .badge-num {
+        color: #B2FF8F !important;
+
+        &.red {
+          color: #B2FF8F !important;
+        }
+      }
+    }
+  }
+
+  // Section 7 - activities
+  .resume-activities {
+    .activity-row {
+      .activity-season,
+      .activity-period,
+      .activity-role {
+        color: #fff !important;
+      }
+
+      .activity-badge {
+        &.active,
+        &.complete {
+          color: #B2FF8F !important;
+        }
+      }
+
+      .activity-check {
+        &.pending {
+          color: #999 !important;
+        }
+        &.approved {
+          color: #fff !important;
+        }
+      }
+    }
+  }
+
+  // Section 8 - skills
+  .resume-skills {
+    .skill-card {
+      .skill-num {
+        color: #B2FF8F !important;
+      }
+    }
+  }
+
+  // Section 6 - medal
+  .resume-medal {
+    .medal-text {
+      color: #B2FF8F !important;
+    }
+  }
+
+  // Section 9 - notices (yellow box)
+  .resume-notices {
+    .notice-box {
+      &.yellow {
+        color: #B2FF8F !important;
+
+        .notice-text.notice-text-top {
+          font-family: 'Jeongmeokbawi', sans-serif !important;
+          font-size: 15px !important;
+          position: relative;
+          top: 2px;
+        }
+      }
+    }
+  }
+
+  // Section 7 - activities scroll
+  .resume-activities {
+    scrollbar-color: #B2FF8F #2a2a2a !important;
+
+    &::-webkit-scrollbar-thumb {
+      background: #B2FF8F !important;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #90EE90 !important;
+    }
+  }
+
+  // Bottom section background - Section 8, 9
+  .resume-bottom-section {
+    &::before {
+      background-image: url('/images/0/PX05.jpg') !important;
+      background-position: center -100px !important;
+    }
+  }
+}
+
+// PX theme scrollbar - must be outside nested rules
+.resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb {
+  background: #B2FF8F !important;
+  border-radius: 4px !important;
+}
+
+.resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb:hover {
+  background: #90EE90 !important;
+}
+
+// EC theme scrollbar
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb {
+  background: #FF98A6 !important;
+  border-radius: 4px !important;
+}
+
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb:hover {
+  background: #FF6B8A !important;
 }
