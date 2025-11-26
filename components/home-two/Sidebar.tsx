@@ -74,7 +74,7 @@ const Sidebar = () => {
   const [debugProfileType, setDebugProfileType] = useState<'본인' | '타크루'>('본인');
   const [debugPanelType, setDebugPanelType] = useState<'OK' | 'EC' | 'PX'>('OK');
   const [isArrowShaking, setIsArrowShaking] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState<'email' | 'school' | null>(null);
+  const [tooltipVisible, setTooltipVisible] = useState<'email' | 'school' | 'hexagon1' | 'hexagon2' | 'hexagon3' | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   // 커스텀 스크롤바
@@ -404,7 +404,7 @@ const Sidebar = () => {
           background: rgba(30, 32, 40, 0.95);
           border-radius: 4px;
           padding: 6px 10px;
-          font-size: 12px;
+          font-size: 14px;
           color: #fff;
           white-space: nowrap;
           z-index: 9999;
@@ -496,6 +496,9 @@ const Sidebar = () => {
                 position: 'relative'
               }}
               aria-label="hexagon button 1"
+              onMouseEnter={() => setTooltipVisible('hexagon1')}
+              onMouseLeave={() => setTooltipVisible(null)}
+              onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
               <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
               <Image src="/images/0/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
@@ -514,6 +517,9 @@ const Sidebar = () => {
                 position: 'relative'
               }}
               aria-label="hexagon button 2"
+              onMouseEnter={() => setTooltipVisible('hexagon2')}
+              onMouseLeave={() => setTooltipVisible(null)}
+              onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
               <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
               <Image src="/images/0/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
@@ -532,6 +538,9 @@ const Sidebar = () => {
                 position: 'relative'
               }}
               aria-label="hexagon button 3"
+              onMouseEnter={() => setTooltipVisible('hexagon3')}
+              onMouseLeave={() => setTooltipVisible(null)}
+              onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
               <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
               <Image src="/images/0/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
@@ -3097,7 +3106,11 @@ const Sidebar = () => {
             top: tooltipPosition.y
           }}
         >
-          {tooltipVisible === 'email' ? currentProfile.email : `${currentProfile.school} ${currentProfile.major}`}
+          {tooltipVisible === 'email' && currentProfile.email}
+          {tooltipVisible === 'school' && `${currentProfile.school} ${currentProfile.major}`}
+          {tooltipVisible === 'hexagon1' && 'Club Community'}
+          {tooltipVisible === 'hexagon2' && 'Life Resume'}
+          {tooltipVisible === 'hexagon3' && 'Portfolio Files'}
         </div>
       )}
     </div>
