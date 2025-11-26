@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 const Sidebar = () => {
   const [stat1, setStat1] = useState(0);
@@ -73,6 +73,17 @@ const Sidebar = () => {
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<'본인' | '타크루'>('본인');
   const [debugPanelType, setDebugPanelType] = useState<'OK' | 'EC' | 'PX'>('OK');
+  const [isArrowShaking, setIsArrowShaking] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState<'email' | 'school' | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  // 커스텀 스크롤바
+  const activitiesRef = useRef<HTMLDivElement>(null);
+  const [scrollThumbTop, setScrollThumbTop] = useState(0);
+  const [scrollThumbHeight, setScrollThumbHeight] = useState(30);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartY = useRef(0);
+  const dragStartScrollTop = useRef(0);
 
   // OK/EC/PX별 프로필 데이터
   const profileData = {
@@ -298,26 +309,116 @@ const Sidebar = () => {
     };
   }, [debugPanelType]);
 
+  // 커스텀 스크롤바 업데이트
+  const updateScrollbar = useCallback(() => {
+    const container = activitiesRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const trackHeight = clientHeight;
+    const thumbHeight = Math.max((clientHeight / scrollHeight) * trackHeight, 20);
+    const maxScrollTop = scrollHeight - clientHeight;
+    const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * (trackHeight - thumbHeight) : 0;
+
+    setScrollThumbHeight(thumbHeight);
+    setScrollThumbTop(thumbTop);
+  }, []);
+
+  // 스크롤 이벤트 핸들러
+  useEffect(() => {
+    const container = activitiesRef.current;
+    if (!container) return;
+
+    // 테마 변경 시 스크롤 위치 리셋
+    container.scrollTop = 0;
+
+    // 약간의 지연 후 스크롤바 업데이트 (DOM 업데이트 대기)
+    const timer = setTimeout(() => {
+      updateScrollbar();
+    }, 50);
+
+    container.addEventListener('scroll', updateScrollbar);
+
+    return () => {
+      clearTimeout(timer);
+      container.removeEventListener('scroll', updateScrollbar);
+    };
+  }, [updateScrollbar, debugPanelType]);
+
+  // 드래그 핸들러
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    dragStartY.current = e.clientY;
+    dragStartScrollTop.current = activitiesRef.current?.scrollTop || 0;
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !activitiesRef.current) return;
+
+      const container = activitiesRef.current;
+      const { scrollHeight, clientHeight } = container;
+      const trackHeight = clientHeight;
+      const thumbHeight = Math.max((clientHeight / scrollHeight) * trackHeight, 20);
+      const maxThumbTop = trackHeight - thumbHeight;
+      const maxScrollTop = scrollHeight - clientHeight;
+
+      const deltaY = e.clientY - dragStartY.current;
+      const scrollRatio = maxScrollTop / maxThumbTop;
+      const newScrollTop = dragStartScrollTop.current + deltaY * scrollRatio;
+
+      container.scrollTop = Math.max(0, Math.min(maxScrollTop, newScrollTop));
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
   return (
-    <div className="col-xxl-3 order-xxl-first">
+    <div className="home-two-sidebar-col">
       <style dangerouslySetInnerHTML={{__html: `
-        .resume-activities::-webkit-scrollbar {
-          width: 4px !important;
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-3px); }
+          40% { transform: translateX(3px); }
+          60% { transform: translateX(-3px); }
+          80% { transform: translateX(3px); }
         }
-        .resume-activities::-webkit-scrollbar-button {
+        .arrow-shake {
+          animation: shake 0.4s ease-in-out;
+        }
+        .custom-tooltip {
+          position: fixed;
+          background: rgba(30, 32, 40, 0.95);
+          border-radius: 4px;
+          padding: 6px 10px;
+          font-size: 12px;
+          color: #fff;
+          white-space: nowrap;
+          z-index: 9999;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+          font-family: 'Pretendard', sans-serif;
+          pointer-events: none;
+        }
+        .resume-activities::-webkit-scrollbar {
           display: none !important;
-          height: 0 !important;
           width: 0 !important;
         }
-        .resume-activities::-webkit-scrollbar-track {
-          background: #2a2a2a !important;
-        }
-        .resume-activities::-webkit-scrollbar-thumb {
-          background: ${debugPanelType === 'PX' ? '#B2FF8F' : debugPanelType === 'EC' ? '#FF98A6' : '#FFEC8F'} !important;
-          border-radius: 4px !important;
-        }
-        .resume-activities::-webkit-scrollbar-thumb:hover {
-          background: ${debugPanelType === 'PX' ? '#90EE90' : debugPanelType === 'EC' ? '#FF6B8A' : '#FFD700'} !important;
+        .resume-activities {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
         }
         .modal-input::placeholder {
           color: #6b6e7a !important;
@@ -439,7 +540,14 @@ const Sidebar = () => {
 
           <div className="resume-info">
             <h1 className="resume-name">
-              <span className="back-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <span
+                className={`back-arrow ${isArrowShaking ? 'arrow-shake' : ''}`}
+                style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}
+                onClick={() => {
+                  setIsArrowShaking(true);
+                  setTimeout(() => setIsArrowShaking(false), 400);
+                }}
+              >
                 <Image src="/images/0/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
               </span>{currentProfile.name} <span className="name-eng">{currentProfile.nameEng}</span>
             </h1>
@@ -470,21 +578,37 @@ const Sidebar = () => {
               </div>
               <div className="detail-row">
                 <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Mail -ec.png" : debugPanelType === 'PX' ? "/images/0/small icon/Mail-px.png" : "/images/0/small icon/Mail.png"} alt="" width={16} height={16} className="detail-icon" />
-                <span style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '180px'
-                }}><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.email}</span>
+                <span
+                  onMouseEnter={() => setTooltipVisible('email')}
+                  onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 })}
+                  onMouseLeave={() => setTooltipVisible(null)}
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '180px',
+                    cursor: 'default'
+                  }}
+                >
+                  <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.email}
+                </span>
               </div>
               <div className="detail-row">
                 <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Building_03-ec (1).png" : debugPanelType === 'PX' ? "/images/0/small icon/Building_03-px.png" : "/images/0/small icon/Building_03.png"} alt="" width={16} height={16} className="detail-icon" />
-                <span style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '180px'
-                }}><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school} <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span></span>
+                <span
+                  onMouseEnter={() => setTooltipVisible('school')}
+                  onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 })}
+                  onMouseLeave={() => setTooltipVisible(null)}
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '180px',
+                    cursor: 'default'
+                  }}
+                >
+                  <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school} <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
+                </span>
               </div>
               <div className="detail-row">
                 <span style={{ width: '16px' }}></span>
@@ -525,7 +649,7 @@ const Sidebar = () => {
             </div>
             <div className="stat-item">
               <div className="stat-row">
-                <span className="stat-label">· 활동 완료율</span>
+                <span className="stat-label">· 활동 이행율</span>
                 <span className="stat-value">{stat2}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
@@ -565,61 +689,246 @@ const Sidebar = () => {
         </div>
 
         {/* Activities */}
-        <div className="resume-activities" style={{
-          width: '474px',
-          height: '95px',
-          maxHeight: '95px',
-          minHeight: '95px',
-          overflowY: 'scroll',
-          overflowX: 'hidden',
-          padding: 0,
-          margin: 0,
-          display: 'block',
-          position: 'relative'
-        } as React.CSSProperties}>
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/01.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">운영진(앰베서더)</span>
-                <span className="activity-badge active">진행중</span>
-                <span className="activity-check pending">검수중</span>
+        <div style={{ position: 'relative', width: '474px', height: '95px' }}>
+          <div
+            ref={activitiesRef}
+            className="resume-activities"
+            style={{
+              width: '100%',
+              height: '100%',
+              overflowY: 'scroll',
+              overflowX: 'hidden',
+              padding: 0,
+              margin: 0,
+              display: 'block',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            } as React.CSSProperties}
+          >
+            {/* OK: 3개 */}
+            {debugPanelType === 'OK' && (
+              <>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">운영진(앰베서더)</span>
+                      <span className="activity-badge active">진행중</span>
+                      <span className="activity-check pending">검수중</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 가을<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
+                      <span className="activity-role">심화(파트장)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">12주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* EC: 1개 */}
+            {debugPanelType === 'EC' && (
+              <div className="activity-row">
+                <div className="activity-avatar">
+                  <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                </div>
+                <div className="activity-content">
+                  <div className="activity-line">
+                    <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
+                    <span className="activity-period">5주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                    <span className="activity-role">일반(정규)</span>
+                    <span className="activity-badge active">진행중</span>
+                    <span className="activity-check pending">검수중</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* PX: 9개 */}
+            {debugPanelType === 'PX' && (
+              <>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">운영진(앰베서더)</span>
+                      <span className="activity-badge active">진행중</span>
+                      <span className="activity-check pending">검수중</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 가을<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
+                      <span className="activity-role">심화(파트장)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">25, 봄<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">심화(파트장)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">24, 겨울<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">24, 가을<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">24, 여름<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">24, 봄<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="activity-row">
+                  <div className="activity-avatar">
+                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">23, 겨울<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
+                      <span className="activity-role">일반(정규)</span>
+                      <span className="activity-badge complete">정상 완료</span>
+                      <span className="activity-check approved">승인 완료</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/02.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
-                <span className="activity-role">심화(파트장)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/03.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">12주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">일반(정규)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
-              </div>
-            </div>
+          {/* 커스텀 스크롤바 */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              width: '2px',
+              height: '100%',
+              background: '#2a2a2a',
+              borderRadius: '2px'
+            }}
+          >
+            <div
+              onMouseDown={handleMouseDown}
+              style={{
+                position: 'absolute',
+                top: scrollThumbTop,
+                width: '100%',
+                height: scrollThumbHeight,
+                background: debugPanelType === 'PX' ? '#36DA60' : debugPanelType === 'EC' ? '#FF4B70' : '#FFA500',
+                borderRadius: '2px',
+                cursor: 'pointer',
+                transition: isDragging ? 'none' : 'top 0.1s ease'
+              }}
+            />
           </div>
         </div>
 
@@ -632,7 +941,7 @@ const Sidebar = () => {
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/Sheriff Badge1 2.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill1}</span>
-                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999', alignSelf: 'flex-end', marginBottom: '4px' }}>unit</span>
+                  <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>unit</span>
                 </div>
                 <div className="skill-label">실무 역량 성장</div>
               </div>
@@ -642,7 +951,7 @@ const Sidebar = () => {
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/Sheriff Badge1.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill2}</span>
-                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999', alignSelf: 'flex-end', marginBottom: '4px' }}>건</span>
+                  <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>건</span>
                 </div>
                 <div className="skill-label">실무 경험 축적</div>
               </div>
@@ -652,7 +961,7 @@ const Sidebar = () => {
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/Sheriff Badge1 3.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill3}</span>
-                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999', alignSelf: 'flex-end', marginBottom: '4px' }}>회</span>
+                  <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>회</span>
                 </div>
                 <div className="skill-label">실무 정보 습득</div>
               </div>
@@ -662,7 +971,7 @@ const Sidebar = () => {
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/Sheriff Badge1 4.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill4}</span>
-                  <span style={{ fontSize: '10.8px', fontFamily: 'Pretendard, sans-serif', color: '#999', alignSelf: 'flex-end', marginBottom: '4px' }}>proj</span>
+                  <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>proj</span>
                 </div>
                 <div className="skill-label">실무 경력 누적</div>
               </div>
@@ -680,7 +989,7 @@ const Sidebar = () => {
             </div>
             <div className="notice-box green">
               <Image src="/images/0/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
-              <span className="notice-text">전국청춘성장 클럽, 실무/기업 관리 후원회</span>
+              <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
               <Image src="/images/0/실무기업 도장.png" alt="" width={46} height={46} className="notice-stamp" />
             </div>
           </div>
@@ -2446,7 +2755,7 @@ const Sidebar = () => {
                 marginTop: '16px'
               }}
             >
-              <p style={{ color: '#8a8d98', fontSize: '14px', margin: 0, lineHeight: 1.6, fontFamily: 'Pretendard, sans-serif' }}>
+              <p style={{ color: '#ffffff', fontSize: '16px', margin: 0, lineHeight: 1.6, fontFamily: 'Pretendard, sans-serif', wordBreak: 'keep-all' }}>
                 저는 평일 9~23시까지 언제든 연락이 가능합니다 :)<br />
                 주말에는 10~24시까지 연락이 가능합니다. 수요일 5시는 어려워요!
               </p>
@@ -2776,6 +3085,19 @@ const Sidebar = () => {
               }, null, 2)}
             </pre>
           </div>
+        </div>
+      )}
+
+      {/* 커스텀 툴팁 */}
+      {tooltipVisible && (
+        <div
+          className="custom-tooltip"
+          style={{
+            left: tooltipPosition.x,
+            top: tooltipPosition.y
+          }}
+        >
+          {tooltipVisible === 'email' ? currentProfile.email : `${currentProfile.school} ${currentProfile.major}`}
         </div>
       )}
     </div>

@@ -16,7 +16,7 @@ const HomePageTwo = () => {
       <div className="container-fluid">
         <div className="row">
           <Sidebar />
-          <div className="col-12 col-xxl-9">
+          <div className="home-two-content-col">
             <div className="home-two-content">
               {/* <!-- ==== banner section ==== --> */}
               <Banner />

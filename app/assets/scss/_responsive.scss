@@ -1,6 +1,64 @@
-/* ==== 
+/* ====
  --------- (6.0) responsive styles start ---------
  ==== */
+
+// Home two layout - 사이드바와 메인콘텐츠 고정 레이아웃
+.nftg-content-home {
+  > .container-fluid {
+    max-width: 100% !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+
+    > .row {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      flex-direction: row !important;
+      margin: 0 !important;
+      width: 100% !important;
+
+      // 사이드바 고정 너비
+      .home-two-sidebar-col {
+        flex: 0 0 520px !important;
+        max-width: 520px !important;
+        width: 520px !important;
+        min-width: 520px !important;
+        position: relative !important;
+        z-index: 10 !important;
+        padding: 0 !important;
+      }
+
+      // 메인콘텐츠 - 사이드바 옆에 배치, 너비 제한
+      .home-two-content-col {
+        flex: 1 1 auto !important;
+        width: calc(100% - 520px) !important;
+        max-width: calc(100% - 520px) !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        margin-left: -30px !important; // 사이드 패널과의 여백 줄이기
+
+        // 배너 padding 조정 (좌우 동일)
+        .banner-two {
+          padding-left: 15px !important;
+          padding-right: 15px !important;
+        }
+
+        .home-two-content {
+          overflow: hidden !important;
+          max-width: 100% !important;
+        }
+
+        // 모든 섹션 container-fluid 너비 제한 (좌우 동일)
+        .container-fluid {
+          max-width: 100% !important;
+          padding-left: 15px !important;
+          padding-right: 15px !important;
+        }
+      }
+    }
+  }
+}
 
 @media only screen and (min-width: 1400px) {
   .tournaments,
