@@ -15,7 +15,6 @@ const Sidebar = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isCustomAddress, setIsCustomAddress] = useState(false);
-  const [schoolSearchQuery, setSchoolSearchQuery] = useState('');
 
   // 현재 브라우저 높이 저장 (기준점으로 사용)
   const [baseViewportHeight, setBaseViewportHeight] = useState<number | null>(null);
