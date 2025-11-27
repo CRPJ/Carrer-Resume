@@ -1,11 +1,11 @@
-import Banner from "@/components/home-two/Banner";
-import Countdown from "@/components/home-two/Countdown";
-import Feature from "@/components/home-two/Feature";
-import LastStream from "@/components/home-two/LastStream";
-import Platform from "@/components/home-two/Platform";
-import Sidebar from "@/components/home-two/Sidebar";
-import Streamer from "@/components/home-two/Streamer";
-import TrendingNFT from "@/components/home-two/TrendingNFT";
+import Banner from "@/components/home-career/Banner";
+import Countdown from "@/components/home-career/Countdown";
+import Feature from "@/components/home-career/Feature";
+import LastStream from "@/components/home-career/LastStream";
+import Platform from "@/components/home-career/Platform";
+import Sidebar from "@/components/home-career/Sidebar";
+import Streamer from "@/components/home-career/Streamer";
+import TrendingNFT from "@/components/home-career/TrendingNFT";
 import Cta from "@/components/home/Cta";
 import Secure from "@/components/home/Secure";
 import Animations from "@/components/shared/Animations";
@@ -16,7 +16,7 @@ const HomePageTwo = () => {
       <div className="container-fluid">
         <div className="row">
           <Sidebar />
-          <div className="col-12 col-xxl-9">
+          <div className="home-two-content-col">
             <div className="home-two-content">
               {/* <!-- ==== banner section ==== --> */}
               <Banner />

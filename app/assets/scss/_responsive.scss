@@ -16,12 +16,12 @@
       margin: 0 !important;
       width: 100% !important;
 
-      // 사이드바 고정 너비
+      // 사이드바 - CSS 변수로 동적 너비
       .home-two-sidebar-col {
-        flex: 0 0 520px !important;
-        max-width: 520px !important;
-        width: 520px !important;
-        min-width: 520px !important;
+        flex: 0 0 var(--sidebar-width, 520px) !important;
+        max-width: var(--sidebar-width, 520px) !important;
+        width: var(--sidebar-width, 520px) !important;
+        min-width: var(--sidebar-width, 520px) !important;
         position: relative !important;
         z-index: 10 !important;
         padding: 0 !important;
@@ -30,8 +30,8 @@
       // 메인콘텐츠 - 사이드바 옆에 배치, 너비 제한
       .home-two-content-col {
         flex: 1 1 auto !important;
-        width: calc(100% - 520px) !important;
-        max-width: calc(100% - 520px) !important;
+        width: calc(100% - var(--sidebar-width, 520px)) !important;
+        max-width: calc(100% - var(--sidebar-width, 520px)) !important;
         min-width: 0 !important;
         overflow: hidden !important;
         padding: 0 !important;

@@ -74,6 +74,8 @@
   min-width: 474px !important;
   max-width: 474px !important;
   height: 810px !important;
+  min-height: 810px !important;
+  max-height: 810px !important;
   border: 1px solid #999 !important;
   border-radius: 0 !important;
   overflow-y: auto;
@@ -710,7 +712,7 @@
       }
 
       .skill-label {
-        font-size: 15px;
+        font-size: 14px;
         color: #FFF;
         line-height: 1.2;
         position: relative;

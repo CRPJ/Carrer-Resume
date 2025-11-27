@@ -13,6 +13,11 @@ import MouseCursor from "./MouseCursor";
 
 const menu = [
   {
+    id: "0",
+    title: "Career",
+    url: "/career",
+  },
+  {
     id: "1",
     title: "Home",
     submenus: [
@@ -23,7 +28,7 @@ const menu = [
       },
       {
         id: "1.2",
-        title: "Home Two",
+        title: "Home 2",
         url: "/index-two",
       },
     ],
