@@ -16,26 +16,20 @@ const Sidebar = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
-  // 현재 브라우저 높이 저장 (기준점으로 사용)
-  const [baseViewportHeight, setBaseViewportHeight] = useState<number | null>(null);
+  // 브라우저 배율 감지 및 카드 스케일 조절
   const [cardScale, setCardScale] = useState(1);
 
   useEffect(() => {
     const calculateScale = () => {
-      const currentHeight = window.innerHeight;
+      // 브라우저/OS 배율 감지 (100% = 1, 125% = 1.25, 150% = 1.5 등)
+      const devicePixelRatio = window.devicePixelRatio || 1;
 
-      // 첫 로드 시 현재 높이를 기준점으로 저장
-      if (baseViewportHeight === null) {
-        setBaseViewportHeight(currentHeight);
-        setCardScale(1);
-        document.documentElement.style.setProperty('--sidebar-width', '520px');
-        return;
-      }
+      // 100% 배율(devicePixelRatio=1)을 기준으로 역스케일 적용
+      // 배율이 높으면 카드를 작게, 배율이 낮으면 카드를 크게
+      let scale = 1 / devicePixelRatio;
 
-      // 기준 높이 대비 현재 높이로 스케일 계산
-      let scale = currentHeight / baseViewportHeight;
-
-      // 최소 0.7, 최대 1.5로 제한
+      // 70% ~ 110% 배율 범위 지원 (devicePixelRatio 0.7 ~ 1.1)
+      // scale 범위: 약 0.91 ~ 1.43
       scale = Math.max(0.7, Math.min(1.5, scale));
 
       setCardScale(scale);
@@ -43,9 +37,18 @@ const Sidebar = () => {
     };
 
     calculateScale();
+
+    // 배율 변경 감지 (matchMedia 사용)
+    const mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    const handleChange = () => calculateScale();
+    mediaQuery.addEventListener('change', handleChange);
     window.addEventListener('resize', calculateScale);
-    return () => window.removeEventListener('resize', calculateScale);
-  }, [baseViewportHeight]);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      window.removeEventListener('resize', calculateScale);
+    };
+  }, []);
 
   // 한국 시/도 및 구/군 데이터
   const koreaRegions: { [key: string]: string[] } = {
