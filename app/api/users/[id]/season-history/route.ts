@@ -14,22 +14,21 @@ export async function GET(
 
     console.log('Fetching season history for userId:', userId)
 
-    // user_season_histories와 seasons를 JOIN해서 조회 (휴식 시즌 제외)
+    // user_season_histories와 seasons를 JOIN해서 조회
     const { data: historyData, error: historyError } = await supabase
       .from('user_season_histories')
       .select(`
         *,
-        seasons!inner (
+        seasons (
+          id,
           year,
           name,
-          season_order,
-          is_break
+          start_date
         )
       `)
       .eq('user_id', userId)
-      .eq('seasons.is_break', false)
 
-    console.log('Query result - data:', historyData)
+    console.log('Query result - data:', JSON.stringify(historyData, null, 2))
     console.log('Query result - error:', historyError)
 
     if (historyError) {
@@ -48,11 +47,20 @@ export async function GET(
       })
     }
 
-    // 클라이언트 사이드에서 정렬 (년도 내림차순, 시즌 순서 내림차순)
-    const sortedData = historyData.sort((a, b) => {
-      const yearDiff = parseInt(b.seasons.year) - parseInt(a.seasons.year)
+    // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
+    const seasonOrderMap: { [key: string]: number } = {
+      'spring': 1,
+      'summer': 2,
+      'fall': 3,
+      'winter': 4
+    }
+
+    // seasons 데이터가 없는 항목 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)
+    const validData = historyData.filter(item => item.seasons !== null)
+    const sortedData = validData.sort((a, b) => {
+      const yearDiff = b.seasons.year - a.seasons.year
       if (yearDiff !== 0) return yearDiff
-      return b.seasons.season_order - a.seasons.season_order
+      return (seasonOrderMap[b.seasons.name] || 0) - (seasonOrderMap[a.seasons.name] || 0)
     })
 
     console.log('Season history data found:', sortedData.length, 'records')

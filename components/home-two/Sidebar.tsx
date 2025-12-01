@@ -35,9 +35,10 @@ interface UserProfile {
 }
 
 interface Season {
-  year: string;
+  id: string;
+  year: number;
   name: string;
-  season_order: number;
+  start_date: string;
 }
 
 interface SeasonHistory {
