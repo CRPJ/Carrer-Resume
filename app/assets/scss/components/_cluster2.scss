@@ -6,12 +6,31 @@
 
   // PROFILE 타이틀
   .cluster2-title {
-    font-family: var(--black-ops-one), 'Black Ops One', cursive;
-    font-size: 36px;
-    color: #FED402;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
     text-align: center;
     letter-spacing: 6px;
-    margin: 0 0 25px 0;
+    margin: 20px 0 25px 0;
+    position: relative;
+
+    .title-front {
+      color: #fff;
+      position: relative;
+      z-index: 2;
+    }
+
+    .title-back {
+      color: #000;
+      -webkit-text-stroke: 2px #45F882;
+      text-stroke: 2px #45F882;
+      opacity: 0.5;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(calc(-50% - 5px), calc(-50% - 3px));
+      z-index: 1;
+    }
   }
 
   // 상단 연결 프레임
@@ -20,6 +39,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 25px;
+    margin-top: 120px;
     padding: 30px 40px;
     background-image: url('/images/0/cluster 2/section 01.png');
     background-size: 100% 100%;
@@ -78,7 +98,7 @@
 
           .hex-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 20px;
             color: #fff;
           }
         }
@@ -97,11 +117,11 @@
           align-items: center;
 
           .hex-avatar {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             overflow: hidden;
-            margin-left: -15px;
+            margin-left: -10px;
             background: #333;
 
             &:first-child {
@@ -116,23 +136,24 @@
           }
 
           .hex-more {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             background: #F5A623;
             color: #000;
-            font-size: 14px;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 16px;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: -15px;
+            margin-left: -10px;
           }
         }
 
         .avatar-count {
-          font-family: var(--black-ops-one), 'Black Ops One', cursive;
-          font-size: 24px;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 16px;
           color: #F5A623;
           font-weight: 500;
           display: flex;
@@ -140,8 +161,8 @@
           gap: 8px;
 
           .joined-text {
-            font-family: inherit;
-            font-size: 20px;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 16px;
             color: #fff;
           }
         }

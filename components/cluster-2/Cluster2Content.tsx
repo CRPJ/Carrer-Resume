@@ -4,7 +4,10 @@ const Cluster2Content = () => {
   return (
     <div className="cluster2-content">
       {/* PROFILE 헤더 */}
-      <h1 className="cluster2-title">PROFILE</h1>
+      <h1 className="cluster2-title">
+        <span className="title-front">PROFILE</span>
+        <span className="title-back">PROFILE</span>
+      </h1>
 
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame">
