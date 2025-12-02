@@ -1,0 +1,656 @@
+// Cluster 2 - Club Final Index Styles
+
+.cluster2-content {
+  padding: 0 0 40px;
+  color: #fff;
+
+  // PROFILE 타이틀
+  .cluster2-title {
+    font-family: var(--black-ops-one), 'Black Ops One', cursive;
+    font-size: 36px;
+    color: #FED402;
+    text-align: center;
+    letter-spacing: 6px;
+    margin: 0 0 25px 0;
+  }
+
+  // 상단 연결 프레임
+  .cluster2-top-frame {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    padding: 30px 40px;
+    background-image: url('/images/0/cluster 2/section 01.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    max-width: 1325px;
+    height: 570px;
+    position: relative;
+
+    // 왼쪽 영역
+    .frame-left {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-self: flex-end;
+      margin-bottom: 80px;
+
+      .adventure-title {
+        font-family: var(--black-ops-one), 'Black Ops One', cursive;
+        font-size: 40px;
+        color: #fff;
+        margin: 0;
+        position: absolute;
+        top: 137px;
+        left: 127px;
+      }
+
+      // 큰 육각형 이미지 row
+      .hexagon-large-row {
+        display: flex;
+        gap: 15px;
+        position: absolute;
+        top: 200px;
+        left: 127px;
+
+        .hexagon-large-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+
+          .hex-large {
+            width: 80px;
+            height: 80px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            overflow: hidden;
+            background: #333;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .hex-label {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            color: #fff;
+          }
+        }
+      }
+
+      .avatar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: absolute;
+        top: 400px;
+        left: 127px;
+
+        .hexagon-stack {
+          display: flex;
+          align-items: center;
+
+          .hex-avatar {
+            width: 60px;
+            height: 60px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            overflow: hidden;
+            margin-left: -15px;
+            background: #333;
+
+            &:first-child {
+              margin-left: 0;
+            }
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .hex-more {
+            width: 60px;
+            height: 60px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: #F5A623;
+            color: #000;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: -15px;
+          }
+        }
+
+        .avatar-count {
+          font-family: var(--black-ops-one), 'Black Ops One', cursive;
+          font-size: 24px;
+          color: #F5A623;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .joined-text {
+            font-family: inherit;
+            font-size: 20px;
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    // 중앙 프로필 사진
+    .frame-center {
+      width: 399px;
+      height: 573px;
+      flex-shrink: 0;
+      position: absolute;
+      left: 550px;
+      top: -48px;
+      z-index: 10;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+      }
+    }
+
+    // 오른쪽 영역
+    .frame-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 5px;
+      align-self: flex-end;
+      margin-bottom: 80px;
+
+      .mascot-icon {
+        width: 90px;
+        height: 90px;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+
+      .progress-label {
+        font-size: 10px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .progress-value {
+        font-family: var(--black-ops-one), 'Black Ops One', cursive;
+        font-size: 28px;
+        color: #F5A623;
+      }
+
+      .with-us-btn {
+        background: #F5A623;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 28px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 10px;
+
+        &:hover {
+          background: #e69a1f;
+        }
+      }
+    }
+  }
+
+  // 인용문 섹션
+  .cluster2-quotes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .quote-card {
+      display: flex;
+      background: rgba(28, 36, 47, 0.5);
+      border: 1px solid #FED402;
+      border-radius: 12px;
+      overflow: hidden;
+
+      .quote-left {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        gap: 10px;
+
+        .quote-mark {
+          font-family: Georgia, serif;
+          font-size: 60px;
+          color: #FED402;
+          line-height: 0.8;
+          flex-shrink: 0;
+        }
+
+        .quote-body {
+          .quote-badge {
+            display: inline-block;
+            background: rgba(254, 212, 2, 0.15);
+            color: #FED402;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+          }
+
+          .quote-text {
+            font-size: 13px;
+            color: #ddd;
+            line-height: 1.7;
+            margin: 0 0 15px 0;
+          }
+
+          .quote-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            img {
+              width: 28px;
+              height: 28px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+
+            span {
+              font-size: 12px;
+              color: #888;
+            }
+          }
+        }
+      }
+
+      .quote-image {
+        width: 160px;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
+  // 학력 섹션
+  .cluster2-education {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+
+    .edu-card {
+      background: rgba(28, 36, 47, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+
+      .edu-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        i {
+          font-size: 16px;
+          color: #FED402;
+        }
+
+        span {
+          font-size: 13px;
+          font-weight: 600;
+          color: #fff;
+        }
+      }
+
+      .edu-period {
+        font-size: 11px;
+        color: #888;
+        margin-bottom: 12px;
+      }
+
+      .edu-details {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 11px;
+          color: #aaa;
+
+          i {
+            font-size: 12px;
+            color: #FED402;
+          }
+        }
+      }
+
+      .edu-bg {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 70px;
+        height: 70px;
+        opacity: 0.25;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 0 0 10px 0;
+        }
+      }
+    }
+  }
+
+  // 리뷰 섹션
+  .cluster2-review {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .review-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .review-main {
+        background: linear-gradient(135deg, rgba(40, 50, 65, 0.8), rgba(28, 36, 47, 0.8));
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('/images/0/cluster 1/bg image/03.png') center/cover no-repeat;
+          opacity: 0.15;
+          z-index: 0;
+        }
+
+        .review-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 2px solid #FED402;
+          position: relative;
+          z-index: 1;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .review-date {
+          font-size: 12px;
+          color: #888;
+          position: relative;
+          z-index: 1;
+        }
+      }
+
+      .review-quotes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .review-quote-item {
+          background: rgba(28, 36, 47, 0.6);
+          border-left: 3px solid #FED402;
+          border-radius: 0 8px 8px 0;
+          padding: 14px 16px;
+
+          p {
+            font-size: 12px;
+            color: #bbb;
+            line-height: 1.6;
+            margin: 0;
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    .review-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .total-complete {
+        background: linear-gradient(135deg, rgba(254, 212, 2, 0.12), rgba(254, 212, 2, 0.05));
+        border: 1px solid #FED402;
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        .complete-badge {
+          width: 70px;
+          height: 70px;
+          object-fit: contain;
+        }
+
+        .complete-info {
+          .complete-label {
+            font-size: 10px;
+            color: #888;
+            display: block;
+            margin-bottom: 4px;
+          }
+
+          h3 {
+            font-family: var(--black-ops-one), 'Black Ops One', cursive;
+            font-size: 20px;
+            color: #FED402;
+            margin: 0 0 10px 0;
+          }
+
+          button {
+            background: transparent;
+            border: 1px solid #FED402;
+            color: #FED402;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: #FED402;
+              color: #000;
+            }
+          }
+        }
+      }
+
+      .review-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+
+        .review-item {
+          background: rgba(28, 36, 47, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          overflow: hidden;
+
+          > img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+          }
+
+          .review-tags {
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+
+            .tag {
+              font-size: 9px;
+              padding: 3px 8px;
+              border-radius: 8px;
+
+              &.yellow {
+                background: rgba(254, 212, 2, 0.2);
+                color: #FED402;
+              }
+
+              &.gray {
+                background: rgba(255, 255, 255, 0.1);
+                color: #888;
+              }
+
+              &.green {
+                background: rgba(33, 231, 134, 0.2);
+                color: #21E786;
+              }
+
+              &.pink {
+                background: rgba(255, 152, 166, 0.2);
+                color: #FF98A6;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 자기소개서 섹션
+  .cluster2-intro {
+    background: linear-gradient(180deg, rgba(0, 40, 70, 0.95) 0%, rgba(0, 25, 45, 0.98) 100%);
+    border-radius: 12px;
+    padding: 35px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('/images/0/cluster 1/bg image/17.png') center/cover no-repeat;
+      opacity: 0.15;
+      z-index: 0;
+    }
+
+    h2 {
+      font-family: var(--black-ops-one), 'Black Ops One', cursive;
+      font-size: 32px;
+      color: #fff;
+      margin: 0 0 5px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-sub {
+      font-size: 11px;
+      color: #FED402;
+      letter-spacing: 3px;
+      margin: 0 0 25px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-cards {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+
+      .intro-card {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 18px 14px;
+        width: 155px;
+        text-align: left;
+        position: relative;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 15px;
+          left: 14px;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+        }
+
+        &.orange::before { background: #FF9500; }
+        &.yellow::before { background: #FED402; }
+        &.green::before { background: #21E786; }
+        &.blue::before { background: #4A90D9; }
+        &.purple::before { background: #9B59B6; }
+
+        h4 {
+          font-size: 13px;
+          color: #fff;
+          margin: 20px 0 8px 0;
+          font-weight: 600;
+        }
+
+        p {
+          font-size: 10px;
+          color: #888;
+          line-height: 1.5;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
