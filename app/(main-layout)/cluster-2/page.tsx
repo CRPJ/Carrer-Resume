@@ -10,7 +10,7 @@ import TrendingNFT from "@/components/home-career/TrendingNFT";
 import Cta from "@/components/home/Cta";
 import Secure from "@/components/home/Secure";
 import Animations from "@/components/shared/Animations";
-const HomePageTwo = () => {
+const Cluster2Page = () => {
   return (
     <main className="nftg-content nftg-content-home">
       <Animations />
@@ -46,4 +46,4 @@ const HomePageTwo = () => {
   );
 };
 
-export default HomePageTwo;
+export default Cluster2Page;

@@ -99,7 +99,7 @@ const Sidebar = () => {
         <div className="resume-header" style={{ position: 'relative' }}>
           <div className="resume-photo">
             <Image
-              src="/images/0/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp"
+              src="/images/0/cluster 1/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp"
               alt="Profile"
               width={240}
               height={273}
@@ -131,8 +131,8 @@ const Sidebar = () => {
               }}
               aria-label="hexagon button 1"
             >
-              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
-              <Image src="/images/0/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src="/images/0/cluster 1/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button
@@ -149,8 +149,8 @@ const Sidebar = () => {
               }}
               aria-label="hexagon button 2"
             >
-              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
-              <Image src="/images/0/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src="/images/0/cluster 1/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button
@@ -168,29 +168,29 @@ const Sidebar = () => {
               }}
               aria-label="hexagon button 3"
             >
-              <Image src="/images/0/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
-              <Image src="/images/0/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src="/images/0/cluster 1/00.png" alt="" width={24} height={24} style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
           </div>
 
           <div className="resume-info">
             <h1 className="resume-name">
               <span className="back-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <Image src="/images/0/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
+                <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
               </span>정이안 <span className="name-eng">Jung Ian</span>
             </h1>
 
             <div className="resume-details">
               <div className="detail-row">
-                <Image src="/images/0/small icon/User_01.png" alt="" width={16} height={16} />
-                <span><span style={{ color: '#FFEC8F' }}>·</span> 여 <Image src="/images/0/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: '#FFEC8F' }}>·</span> 2002.02.02</span>
+                <Image src="/images/0/cluster 1/small icon/User_01.png" alt="" width={16} height={16} />
+                <span><span style={{ color: '#FFEC8F' }}>·</span> 여 <Image src="/images/0/cluster 1/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: '#FFEC8F' }}>·</span> 2002.02.02</span>
               </div>
               <div className="detail-row">
-                <Image src="/images/0/small icon/House_01.png" alt="" width={16} height={16} />
+                <Image src="/images/0/cluster 1/small icon/House_01.png" alt="" width={16} height={16} />
                 <span><span style={{ color: '#FFEC8F' }}>·</span> 서울특별시 강남구</span>
               </div>
               <div className="detail-row">
-                <Image src="/images/0/small icon/Mobile_Button.png" alt="" width={16} height={16} />
+                <Image src="/images/0/cluster 1/small icon/Mobile_Button.png" alt="" width={16} height={16} />
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ color: '#FFEC8F' }}>·</span> 010-1***-****
                   <span style={{
@@ -202,7 +202,7 @@ const Sidebar = () => {
                 </span>
               </div>
               <div className="detail-row">
-                <Image src="/images/0/small icon/Mail.png" alt="" width={16} height={16} />
+                <Image src="/images/0/cluster 1/small icon/Mail.png" alt="" width={16} height={16} />
                 <span style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -211,7 +211,7 @@ const Sidebar = () => {
                 }}><span style={{ color: '#FFEC8F' }}>·</span> wkwkwkwkwkwkk@naver.com</span>
               </div>
               <div className="detail-row">
-                <Image src="/images/0/small icon/Building_03.png" alt="" width={16} height={16} />
+                <Image src="/images/0/cluster 1/small icon/Building_03.png" alt="" width={16} height={16} />
                 <span style={{
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -234,7 +234,7 @@ const Sidebar = () => {
         {/* Introduction Box */}
         <div className="resume-intro">
           <Image
-            src="/images/0/Image.png"
+            src="/images/0/cluster 1/Image.png"
             alt=""
             width={24}
             height={24}
@@ -287,7 +287,7 @@ const Sidebar = () => {
           <div className="resume-medal">
             <div className="medal-image-wrapper">
               <Image
-                src="/images/0/금장_OK.png"
+                src="/images/0/cluster 1/금장_OK.png"
                 alt="Medal"
                 width={98}
                 height={98}
@@ -312,7 +312,7 @@ const Sidebar = () => {
         } as React.CSSProperties}>
           <div className="activity-row">
             <div className="activity-avatar">
-              <Image src="/images/0/01.png" alt="" width={36} height={36} />
+              <Image src="/images/0/cluster 1/01.png" alt="" width={36} height={36} />
             </div>
             <div className="activity-content">
               <div className="activity-line">
@@ -327,7 +327,7 @@ const Sidebar = () => {
 
           <div className="activity-row">
             <div className="activity-avatar">
-              <Image src="/images/0/02.png" alt="" width={36} height={36} />
+              <Image src="/images/0/cluster 1/02.png" alt="" width={36} height={36} />
             </div>
             <div className="activity-content">
               <div className="activity-line">
@@ -342,7 +342,7 @@ const Sidebar = () => {
 
           <div className="activity-row">
             <div className="activity-avatar">
-              <Image src="/images/0/03.png" alt="" width={36} height={36} />
+              <Image src="/images/0/cluster 1/03.png" alt="" width={36} height={36} />
             </div>
             <div className="activity-content">
               <div className="activity-line">
@@ -401,14 +401,14 @@ const Sidebar = () => {
           {/* Footer Notices */}
           <div className="resume-notices">
             <div className="notice-box yellow">
-              <Image src="/images/0/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
+              <Image src="/images/0/cluster 1/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text notice-text-top">전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐</span>
-              <Image src="/images/0/오랑캐 도장.png" alt="" width={46} height={46} className="notice-stamp" />
+              <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} className="notice-stamp" />
             </div>
             <div className="notice-box green">
-              <Image src="/images/0/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
+              <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text">전국청춘성장 클럽, 실무/기업 관리 후원회</span>
-              <Image src="/images/0/실무기업 도장.png" alt="" width={46} height={46} className="notice-stamp" />
+              <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} className="notice-stamp" />
             </div>
           </div>
         </div>

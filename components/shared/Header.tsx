@@ -15,7 +15,53 @@ const menu = [
   {
     id: "0",
     title: "Career",
-    url: "/career",
+    submenus: [
+      {
+        id: "0.1",
+        title: "Cluster 1",
+        url: "/career",
+      },
+      {
+        id: "0.2",
+        title: "Cluster 2",
+        url: "/cluster-2",
+      },
+      {
+        id: "0.3",
+        title: "Cluster 3",
+        url: "/cluster-3",
+      },
+      {
+        id: "0.4",
+        title: "Cluster 4",
+        url: "/cluster-4",
+      },
+      {
+        id: "0.5",
+        title: "Cluster 5",
+        url: "/cluster-5",
+      },
+      {
+        id: "0.6",
+        title: "Cluster 6",
+        url: "/cluster-6",
+      },
+      {
+        id: "0.7",
+        title: "Cluster 7",
+        url: "/cluster-7",
+      },
+      {
+        id: "0.8",
+        title: "Cluster 8",
+        url: "/cluster-8",
+      },
+      {
+        id: "0.9",
+        title: "Cluster 9",
+        url: "/cluster-9",
+      },
+    ],
   },
   {
     id: "1",

@@ -136,7 +136,7 @@ const Sidebar = () => {
       graduationStatus: '재학중',
       gpa: '3.0',
       gpaMax: '4.5',
-      photo: '/images/0/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp',
+      photo: '/images/0/cluster 1/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp',
       quote: '가장 어두운 순간에도 빛을 향해 용기 있게 한 걸음 내딛는 자에게는 언제나 반드시 새로운 길이 열리고 밝은 희망이 찾아온다',
       lightColor: '#FFEC8F',
       accentColor: '#FFC300'
@@ -156,7 +156,7 @@ const Sidebar = () => {
       graduationStatus: '졸업',
       gpa: '3.8',
       gpaMax: '4.5',
-      photo: '/images/0/EC00.png',
+      photo: '/images/0/cluster 1/EC00.png',
       quote: '디자인은 단순한 외형이 아니라 사용자의 경험을 설계하는 것이다. 좋은 디자인은 보이지 않는 곳에서 빛난다',
       lightColor: '#FF98A6',
       accentColor: '#FF4B70'
@@ -176,7 +176,7 @@ const Sidebar = () => {
       graduationStatus: '졸업',
       gpa: '4.1',
       gpaMax: '4.5',
-      photo: '/images/0/PX00.png',
+      photo: '/images/0/cluster 1/PX00.png',
       quote: '코드 한 줄 한 줄에 사용자를 향한 진심을 담는다. 기술은 사람을 위해 존재해야 한다',
       lightColor: '#B2FF8F',
       accentColor: '#36DA60'
@@ -534,8 +534,8 @@ const Sidebar = () => {
               onMouseLeave={() => setTooltipVisible(null)}
               onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
-              <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
-              <Image src="/images/0/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/001.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button
@@ -555,8 +555,8 @@ const Sidebar = () => {
               onMouseLeave={() => setTooltipVisible(null)}
               onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
-              <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
-              <Image src="/images/0/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/002.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
 
             <button
@@ -576,8 +576,8 @@ const Sidebar = () => {
               onMouseLeave={() => setTooltipVisible(null)}
               onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
             >
-              <Image src={debugPanelType === 'EC' ? "/images/0/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/PX06.png" : "/images/0/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
-              <Image src="/images/0/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: 'block' }} />
+              <Image src="/images/0/cluster 1/003.png" alt="" width={12} height={12} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
             </button>
           </div>
 
@@ -591,21 +591,21 @@ const Sidebar = () => {
                   setTimeout(() => setIsArrowShaking(false), 400);
                 }}
               >
-                <Image src="/images/0/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
+                <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
               </span>{currentProfile.name} <span className="name-eng">{currentProfile.nameEng}</span>
             </h1>
 
             <div className="resume-details">
               <div className="detail-row">
-                <Image src={debugPanelType === 'EC' ? "/images/0/small icon/User_01-ec.png" : debugPanelType === 'PX' ? "/images/0/small icon/User_01-px.png" : "/images/0/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
-                <span><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gender} <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Gift-ec.png" : debugPanelType === 'PX' ? "/images/0/small icon/Gift-px.png" : "/images/0/small icon/Gift.png"} alt="" width={13} height={13} className="detail-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}</span>
+                <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/User_01-ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/User_01-px.png" : "/images/0/cluster 1/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
+                <span><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gender} <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Gift-ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/Gift-px.png" : "/images/0/cluster 1/small icon/Gift.png"} alt="" width={13} height={13} className="detail-icon" style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}</span>
               </div>
               <div className="detail-row">
-                <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Building_03-ec (2).png" : debugPanelType === 'PX' ? "/images/0/small icon/House_01-px.png" : "/images/0/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
+                <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
                 <span><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.city} {currentProfile.district}</span>
               </div>
               <div className="detail-row">
-                <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Mobile_Button-ec.png" : debugPanelType === 'PX' ? "/images/0/small icon/Mobile_Button-px.png" : "/images/0/small icon/Mobile_Button.png"} alt="" width={16} height={16} className="detail-icon" />
+                <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"} alt="" width={16} height={16} className="detail-icon" />
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.phone}
                   <span
@@ -620,7 +620,7 @@ const Sidebar = () => {
                 </span>
               </div>
               <div className="detail-row">
-                <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Mail -ec.png" : debugPanelType === 'PX' ? "/images/0/small icon/Mail-px.png" : "/images/0/small icon/Mail.png"} alt="" width={16} height={16} className="detail-icon" />
+                <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Mail -ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/Mail-px.png" : "/images/0/cluster 1/small icon/Mail.png"} alt="" width={16} height={16} className="detail-icon" />
                 <span
                   onMouseEnter={() => setTooltipVisible('email')}
                   onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 })}
@@ -637,7 +637,7 @@ const Sidebar = () => {
                 </span>
               </div>
               <div className="detail-row">
-                <Image src={debugPanelType === 'EC' ? "/images/0/small icon/Building_03-ec (1).png" : debugPanelType === 'PX' ? "/images/0/small icon/Building_03-px.png" : "/images/0/small icon/Building_03.png"} alt="" width={16} height={16} className="detail-icon" />
+                <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Building_03-ec (1).png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/Building_03-px.png" : "/images/0/cluster 1/small icon/Building_03.png"} alt="" width={16} height={16} className="detail-icon" />
                 <span
                   onMouseEnter={() => setTooltipVisible('school')}
                   onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 })}
@@ -668,7 +668,7 @@ const Sidebar = () => {
         {/* Introduction Box */}
         <div className="resume-intro">
           <Image
-            src="/images/0/Image.png"
+            src="/images/0/cluster 1/Image.png"
             alt=""
             width={24}
             height={24}
@@ -721,7 +721,7 @@ const Sidebar = () => {
           <div className="resume-medal">
             <div className="medal-image-wrapper">
               <Image
-                src={debugPanelType === 'EC' ? "/images/0/금장_EC.png" : debugPanelType === 'PX' ? "/images/0/금장_PX.png" : "/images/0/금장_OK.png"}
+                src={debugPanelType === 'EC' ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"}
                 alt="Medal"
                 width={98}
                 height={98}
@@ -753,7 +753,7 @@ const Sidebar = () => {
               <>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -767,7 +767,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -781,7 +781,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -800,7 +800,7 @@ const Sidebar = () => {
             {debugPanelType === 'EC' && (
               <div className="activity-row">
                 <div className="activity-avatar">
-                  <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                  <Image src="/images/0/cluster 1/bg image/EC02 (2).png" alt="" width={36} height={36} />
                 </div>
                 <div className="activity-content">
                   <div className="activity-line">
@@ -819,7 +819,7 @@ const Sidebar = () => {
               <>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -833,7 +833,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -847,7 +847,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -861,7 +861,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -875,7 +875,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -889,7 +889,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -903,7 +903,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/01.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -917,7 +917,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/02.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -931,7 +931,7 @@ const Sidebar = () => {
                 </div>
                 <div className="activity-row">
                   <div className="activity-avatar">
-                    <Image src="/images/0/03.png" alt="" width={36} height={36} />
+                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
                   </div>
                   <div className="activity-content">
                     <div className="activity-line">
@@ -982,7 +982,7 @@ const Sidebar = () => {
             <div className="skill-card">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
-                  <Image src="/images/0/Sheriff Badge1 2.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
+                  <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill1}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>unit</span>
                 </div>
@@ -992,7 +992,7 @@ const Sidebar = () => {
             <div className="skill-card">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
-                  <Image src="/images/0/Sheriff Badge1.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
+                  <Image src="/images/0/cluster 1/Sheriff Badge1.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill2}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>건</span>
                 </div>
@@ -1002,7 +1002,7 @@ const Sidebar = () => {
             <div className="skill-card">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
-                  <Image src="/images/0/Sheriff Badge1 3.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
+                  <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill3}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>회</span>
                 </div>
@@ -1012,7 +1012,7 @@ const Sidebar = () => {
             <div className="skill-card">
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
-                  <Image src="/images/0/Sheriff Badge1 4.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
+                  <Image src="/images/0/cluster 1/Sheriff Badge1 4.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
                   <span className="skill-num">{skill4}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>proj</span>
                 </div>
@@ -1024,21 +1024,21 @@ const Sidebar = () => {
           {/* Footer Notices */}
           <div className="resume-notices">
             <div className="notice-box yellow">
-              <Image src="/images/0/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
+              <Image src="/images/0/cluster 1/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text notice-text-top">
                 {debugPanelType === 'EC' ? '전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레' : debugPanelType === 'PX' ? '전국청춘연합 기획/컨설팅 클럽, 팔랑크스' : '전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐'}
               </span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                <Image src="/images/0/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
+                <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
             <div className="notice-box green">
-              <Image src="/images/0/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
+              <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                <Image src="/images/0/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
+                <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
           </div>
@@ -1067,7 +1067,7 @@ const Sidebar = () => {
             style={{ position: 'relative' }}
           >
             <Image
-              src="/images/0/card01.png"
+              src="/images/0/cluster 1/card01.png"
               alt="Contact Info"
               width={540}
               height={150}
@@ -2221,7 +2221,7 @@ const Sidebar = () => {
                 justifyContent: 'center',
                 flexShrink: 0
               }}>
-                <Image src="/images/0/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
+                <Image src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{
@@ -2308,7 +2308,7 @@ const Sidebar = () => {
                 justifyContent: 'center',
                 flexShrink: 0
               }}>
-                <Image src="/images/0/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
+                <Image src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
               </div>
               <div>
                 <h3 style={{
