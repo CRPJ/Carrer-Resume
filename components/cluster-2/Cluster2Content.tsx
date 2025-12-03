@@ -1,9 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const Cluster2Content = () => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [isWiggling, setIsWiggling] = useState(false);
+
+  // 드래그 관련 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  const handleWithUsClick = () => {
+    setIsWiggling(true);
+    setTimeout(() => setIsWiggling(false), 1000);
+  };
+
+  // 드래그 시작
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+    setDragOffset(0);
+  };
+
+  // 드래그 중
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const diff = e.clientX - dragStartX;
+    setDragOffset(diff);
+  };
+
+  // 드래그 종료
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    // 드래그 거리에 따라 페이지 변경
+    if (dragOffset < -100 && currentPage < 1) {
+      setCurrentPage(currentPage + 1);
+    } else if (dragOffset > 100 && currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+    setDragOffset(0);
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleMouseUp();
+    }
+  };
 
   return (
     <div className="cluster2-content">
@@ -65,7 +111,7 @@ const Cluster2Content = () => {
           </div>
           <span className="progress-label">OH, MY DREAM</span>
           <span className="progress-value">99.9%</span>
-          <button className="with-us-btn">
+          <button className={`with-us-btn ${isWiggling ? 'wiggle' : ''}`} onClick={handleWithUsClick}>
             <img src="/images/0/cluster 2/button box.png" alt="" />
             <span>Wiht us</span>
           </button>
@@ -80,7 +126,7 @@ const Cluster2Content = () => {
         <div className="quotes-cards">
           <div className="quote-card">
             <img className="diamond-icon" src="/images/0/cluster 2/icon/diamond.png" alt="" />
-            <span className="quote-mark">"</span>
+            <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
               <p className="quote-text">
@@ -104,7 +150,7 @@ const Cluster2Content = () => {
 
           <div className="quote-card">
             <img className="diamond-icon" src="/images/0/cluster 2/icon/diamond.png" alt="" />
-            <span className="quote-mark">"</span>
+            <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
               <p className="quote-text">
@@ -129,14 +175,29 @@ const Cluster2Content = () => {
       </div>
 
       {/* 학력 섹션 */}
-      <div className="cluster2-education">
+      <div
+        className="cluster2-education"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      >
         <div className="edu-bg-image">
           <img src="/images/0/cluster 2/bg04.png" alt="" />
         </div>
         <div className="edu-center-line">
           <img src="/images/0/cluster 2/section 03.png" alt="" />
         </div>
-        <div className="edu-cards-wrapper" style={{ transform: `translateX(-${currentPage * 350}px)`, transition: 'transform 0.4s ease' }}>
+        <div
+          className="edu-cards-wrapper"
+          ref={cardsRef}
+          style={{
+            transform: `translateX(calc(-${currentPage * 350}px + ${dragOffset}px))`,
+            transition: isDragging ? 'none' : 'transform 0.4s ease',
+            userSelect: 'none'
+          }}
+        >
           <div className="edu-card first">
             <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
             <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
