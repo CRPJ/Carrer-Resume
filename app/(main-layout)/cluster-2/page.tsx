@@ -24,7 +24,6 @@ const Cluster2Page = () => {
 
       const footerRect = footer.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const sidebarHeight = 800; // 사이드바 대략적 높이
 
       // 푸터가 화면에 보이기 시작하면 - 사이드바를 위로 이동
       if (footerRect.top < windowHeight) {
