@@ -1,0 +1,429 @@
+// Cluster 3 - Club Final Index Styles
+
+.cluster3-content {
+  padding: 0 0 40px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  // Section 1: CLUB FINAL INDEX
+  .cluster3-section1 {
+    width: 100%;
+    max-width: 1325px;
+    background: linear-gradient(180deg, rgba(30, 35, 50, 0.9) 0%, rgba(20, 25, 40, 0.95) 100%);
+    border: 1px solid #21E786;
+    border-radius: 20px;
+    padding: 30px 40px;
+    margin-bottom: 30px;
+    position: relative;
+
+    .section1-header {
+      margin-bottom: 20px;
+
+      .section1-title {
+        font-family: var(--black-ops-one), 'Black Ops One', cursive;
+        font-size: 28px;
+        color: #fff;
+        margin: 0;
+        letter-spacing: 2px;
+      }
+    }
+
+    .section1-main {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 30px;
+
+      .section1-image {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #21E786;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .section1-progress {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+
+        .progress-circle {
+          position: relative;
+          width: 200px;
+          height: 200px;
+
+          svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+
+            .progress-bg {
+              stroke: #333;
+            }
+
+            .progress-bar {
+              stroke: #21E786;
+              transition: stroke-dashoffset 1s ease;
+            }
+          }
+
+          .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+
+            .progress-percent {
+              display: block;
+              font-family: var(--black-ops-one), 'Black Ops One', cursive;
+              font-size: 48px;
+              color: #21E786;
+              line-height: 1;
+            }
+
+            .progress-label {
+              display: block;
+              font-family: 'Pretendard', sans-serif;
+              font-size: 14px;
+              color: #888;
+              margin-top: 5px;
+            }
+          }
+        }
+      }
+    }
+
+    .section1-stats {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(33, 231, 134, 0.1);
+        border: 1px solid rgba(33, 231, 134, 0.3);
+        border-radius: 12px;
+        padding: 15px 25px;
+        flex: 1;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(33, 231, 134, 0.2);
+          border-color: #21E786;
+          transform: translateY(-3px);
+        }
+
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+        }
+
+        .stat-label {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 14px;
+          color: #fff;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Section 2: 졸업 자격 조건
+  .cluster3-section2 {
+    width: 100%;
+    max-width: 1325px;
+    background: url('/images/0/cluster 3/section2-bg.png') center/cover no-repeat;
+    background-color: rgba(20, 25, 40, 0.95);
+    border: 1px solid #21E786;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .section2-content {
+      text-align: center;
+
+      .section2-title {
+        font-family: 'Cafe24Ohsquare', sans-serif;
+        font-size: 36px;
+        color: #fff;
+        margin: 0;
+        background: linear-gradient(135deg, #21E786 0%, #AAF7FF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+  }
+
+  // Section 3: 포트폴리오 마케팅 Channel
+  .cluster3-section3 {
+    width: 100%;
+    max-width: 1325px;
+    margin-bottom: 30px;
+
+    .section3-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+
+      .section3-title {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 20px;
+        color: #fff;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .section3-subtitle {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        color: #888;
+      }
+    }
+
+    .channel-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+
+      .channel-card {
+        background: linear-gradient(180deg, rgba(30, 35, 50, 0.9) 0%, rgba(20, 25, 40, 0.95) 100%);
+        border: 1px solid #21E786;
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px rgba(33, 231, 134, 0.3);
+
+          .card-image img {
+            transform: scale(1.05);
+          }
+        }
+
+        .card-image {
+          position: relative;
+          width: 100%;
+          height: 200px;
+          overflow: hidden;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+
+          .card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: #21E786;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--black-ops-one), 'Black Ops One', cursive;
+            font-size: 18px;
+            color: #000;
+            font-weight: 700;
+          }
+        }
+
+        .card-content {
+          padding: 15px;
+
+          .card-title {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            color: #fff;
+            margin: 0;
+            line-height: 1.5;
+          }
+        }
+      }
+    }
+  }
+
+  // Section 4: 포트폴리오 마케팅 Output - World Of Top Works
+  .cluster3-section4 {
+    width: 100%;
+    max-width: 1325px;
+    margin-bottom: 40px;
+    text-align: center;
+
+    .section4-header {
+      margin-bottom: 25px;
+
+      .section4-subtitle {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        color: #888;
+        margin: 0 0 5px 0;
+      }
+
+      .section4-title {
+        font-family: var(--black-ops-one), 'Black Ops One', cursive;
+        font-size: 42px;
+        color: #fff;
+        margin: 0 0 10px 0;
+        letter-spacing: 2px;
+      }
+
+      .section4-desc {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+      }
+    }
+
+    .section4-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+
+      .tab-btn {
+        background: transparent;
+        border: 1px solid #555;
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        color: #888;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #21E786;
+          color: #21E786;
+        }
+
+        &.active {
+          background: #21E786;
+          border-color: #21E786;
+          color: #000;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .top-works-slider {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 20px 0;
+
+      .slider-item {
+        width: 180px;
+        height: 240px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 2px solid #555;
+        transition: all 0.4s ease;
+        opacity: 0.6;
+        transform: scale(0.9);
+
+        &:hover {
+          opacity: 0.8;
+          transform: scale(0.95);
+        }
+
+        &.active {
+          width: 280px;
+          height: 350px;
+          border-color: #21E786;
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 40px rgba(33, 231, 134, 0.4);
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
+  // Section 5: The Detail 10
+  .cluster3-section5 {
+    width: 100%;
+    max-width: 1325px;
+    margin-bottom: 40px;
+
+    .section5-title {
+      font-family: var(--black-ops-one), 'Black Ops One', cursive;
+      font-size: 28px;
+      color: #fff;
+      margin: 0 0 25px 0;
+      text-align: center;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+
+      .detail-item {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #21E786;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 5px 20px rgba(33, 231, 134, 0.3);
+
+          img {
+            transform: scale(1.1);
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+      }
+    }
+  }
+}
