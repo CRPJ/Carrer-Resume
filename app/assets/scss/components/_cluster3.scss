@@ -1,5 +1,33 @@
 // Cluster 3 - Club Final Index Styles
 
+@font-face {
+  font-family: 'Cafe24Ohsquare';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinBurst {
+  0% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .cluster3-content {
   padding: 0 0 40px;
   color: #fff;
@@ -7,144 +35,392 @@
   flex-direction: column;
   align-items: center;
 
-  // Section 1: CLUB FINAL INDEX
+  // Section 1: CLUB FINAL INDEX - 새 디자인
   .cluster3-section1 {
     width: 100%;
     max-width: 1325px;
-    background: linear-gradient(180deg, rgba(30, 35, 50, 0.9) 0%, rgba(20, 25, 40, 0.95) 100%);
-    border: 1px solid #21E786;
-    border-radius: 20px;
-    padding: 30px 40px;
-    margin-bottom: 30px;
     position: relative;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
 
-    .section1-header {
-      margin-bottom: 20px;
+    // 배경 이미지
+    .section1-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1330px;
+      height: 500px;
+      z-index: 0;
+      overflow: hidden;
 
-      .section1-title {
-        font-family: var(--black-ops-one), 'Black Ops One', cursive;
-        font-size: 28px;
-        color: #fff;
-        margin: 0;
-        letter-spacing: 2px;
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center calc(50% - 300px);
+        opacity: 0.3;
       }
-    }
 
-    .section1-main {
-      display: flex;
-      align-items: center;
-      gap: 40px;
-      margin-bottom: 30px;
-
-      .section1-image {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid #21E786;
-        flex-shrink: 0;
+      .char-left {
+        position: absolute;
+        left: 150px;
+        top: calc(50% - 70px);
+        transform: translateY(-50%);
+        width: 100px;
+        height: 100px;
 
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
+          opacity: 1;
+          animation: spin 8s linear infinite;
         }
       }
 
-      .section1-progress {
-        flex: 1;
-        display: flex;
-        justify-content: center;
+      .char-right {
+        position: absolute;
+        right: 170px;
+        top: calc(50% - 50px);
+        transform: translateY(-50%);
+        width: 100px;
+        height: 100px;
 
-        .progress-circle {
-          position: relative;
-          width: 200px;
-          height: 200px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          opacity: 1;
+          animation: spin 10s linear infinite;
+          animation-delay: -3s;
+        }
+      }
+    }
 
-          svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
+    // 타이틀 wrapper
+    .section1-title-wrapper {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding-top: 30px;
 
-            .progress-bg {
-              stroke: #333;
-            }
+      .title-inner {
+        position: relative;
+        display: inline-block;
+      }
+    }
 
-            .progress-bar {
-              stroke: #21E786;
-              transition: stroke-dashoffset 1s ease;
-            }
+    // 타이틀 그림자
+    .section1-title-shadow {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      color: #111;
+      -webkit-text-stroke: 1px #21E786;
+      text-stroke: 1px #21E786;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      z-index: 0;
+      white-space: nowrap;
+    }
+
+    // 타이틀
+    .section1-title {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      color: #FFF;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    // 프로그레스 영역
+    .progress-area {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      margin: 30px 0 40px;
+
+      .progress-semi-circle {
+        position: relative;
+        width: 400px;
+        height: 230px;
+
+        svg {
+          width: 100%;
+          height: 100%;
+
+          .progress-bg {
+            stroke: #333;
           }
 
-          .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+          .progress-bar {
+            transition: stroke-dashoffset 1s ease;
+          }
+        }
 
-            .progress-percent {
-              display: block;
-              font-family: var(--black-ops-one), 'Black Ops One', cursive;
-              font-size: 48px;
-              color: #21E786;
-              line-height: 1;
-            }
+        .progress-text {
+          position: absolute;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          text-align: center;
 
-            .progress-label {
-              display: block;
-              font-family: 'Pretendard', sans-serif;
-              font-size: 14px;
-              color: #888;
-              margin-top: 5px;
-            }
+          .progress-percent {
+            display: block;
+            font-family: var(--black-ops-one), 'Black Ops One', cursive;
+            font-size: 48px;
+            color: #FAAB07;
+            line-height: 1;
+          }
+
+          .progress-label {
+            display: block;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            color: #888;
+            margin-top: 8px;
           }
         }
       }
     }
 
-    .section1-stats {
+    // 스탯 카드들
+    .stats-cards {
+      position: relative;
+      z-index: 1;
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       gap: 20px;
+      padding: 0 20px;
 
-      .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(33, 231, 134, 0.1);
-        border: 1px solid rgba(33, 231, 134, 0.3);
-        border-radius: 12px;
-        padding: 15px 25px;
-        flex: 1;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      .stat-card {
+        background: transparent;
+        border: none;
+        border-radius: 16px;
+        padding: 40px;
+        width: 380px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
 
-        &:hover {
-          background: rgba(33, 231, 134, 0.2);
-          border-color: #21E786;
-          transform: translateY(-3px);
+        // 노란 박스 (맨 뒤)
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 330px;
+          height: 70px;
+          background: #FAC600;
+          border-radius: 16px;
+          z-index: 0;
         }
 
-        .stat-icon {
-          width: 40px;
-          height: 40px;
+        // 카드 배경 (노란 박스 위)
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(34, 34, 34, 0.9);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border-radius: 16px;
+          z-index: 1;
+        }
+
+        // 카드 내용은 배경 위에
+        > * {
+          position: relative;
+          z-index: 2;
+        }
+
+        &.wide {
+          width: 380px;
+        }
+
+        &:nth-child(1),
+        &:nth-child(2) {
+          height: 298px;
+        }
+
+        .card-header {
           display: flex;
           align-items: center;
-          justify-content: center;
+          gap: 12px;
+          margin-bottom: 18px;
+          min-height: 44px;
 
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+          .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+
+            &.pink {
+              background: transparent;
+            }
+
+            &.green {
+              background: transparent;
+            }
+
+            &.purple {
+              background: transparent;
+            }
+
+            img {
+              width: 60px;
+              height: 60px;
+              object-fit: contain;
+              transform: scale(1.4);
+            }
+          }
+
+          .card-title {
+            font-family: 'Cafe24Ohsquare', sans-serif;
+            font-size: 25px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
           }
         }
 
-        .stat-label {
-          font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
-          color: #fff;
-          font-weight: 500;
+        .card-body {
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0;
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &.separator {
+              margin-top: 10px;
+              padding-top: 10px;
+              border-top: 1px solid #FFEC8F;
+            }
+
+            .info-label {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 14px;
+              color: #fff;
+
+              .dot {
+                color: #FAAB07;
+              }
+            }
+
+            .info-value {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 16px;
+              font-weight: 700;
+              color: #FFEC8F;
+              text-align: right;
+
+              &.highlight {
+                color: #FFEC8F;
+                font-weight: 700;
+              }
+
+              &.number {
+                font-weight: 700;
+                color: #FFEC8F;
+              }
+
+              &.negative {
+                color: #FFEC8F;
+              }
+
+              &.week {
+                color: #FFEC8F;
+                font-weight: 700;
+              }
+
+              &.season {
+                color: #FFEC8F;
+              }
+
+              .unit {
+                color: #fff;
+                font-size: 14px;
+              }
+            }
+          }
+        }
+
+        .card-footer {
+          margin-top: 15px;
+          padding-top: 12px;
+          border-top: none;
+
+          .watch-pricing {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover {
+              color: #FAAB07;
+
+              img {
+                animation: spinBurst 0.8s ease-in-out infinite;
+              }
+            }
+
+            img {
+              width: 16px;
+              height: 16px;
+              object-fit: contain;
+            }
+          }
+
+          .progress-bar-small {
+            margin-top: 10px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+
+            &::after {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 70%;
+              background: linear-gradient(90deg, #FAAB07, #FFC919);
+              border-radius: 2px;
+            }
+          }
         }
       }
     }
@@ -154,29 +430,39 @@
   .cluster3-section2 {
     width: 100%;
     max-width: 1325px;
-    background: url('/images/0/cluster 3/section2-bg.png') center/cover no-repeat;
-    background-color: rgba(20, 25, 40, 0.95);
-    border: 1px solid #21E786;
+    height: 300px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
     border-radius: 20px;
-    padding: 40px;
-    margin-bottom: 30px;
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    .section2-content {
-      text-align: center;
+    .section2-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
 
-      .section2-title {
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.5;
+      }
+    }
+
+    .section2-text {
+      position: absolute;
+      top: 50%;
+      right: 80px;
+      transform: translateY(-50%);
+      z-index: 1;
+
+      .handwriting {
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 36px;
+        font-size: 48px;
         color: #fff;
-        margin: 0;
-        background: linear-gradient(135deg, #21E786 0%, #AAF7FF 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
     }
   }
@@ -185,26 +471,37 @@
   .cluster3-section3 {
     width: 100%;
     max-width: 1325px;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
 
     .section3-header {
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      padding: 0 10px;
 
-      .section3-title {
-        font-family: 'Pretendard', sans-serif;
-        font-size: 20px;
-        color: #fff;
-        font-weight: 600;
-        margin: 0;
-      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
 
-      .section3-subtitle {
-        font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
-        color: #888;
+        .subtitle {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 18px;
+          color: #fff;
+          font-weight: 600;
+
+          &::before {
+            content: '⚡';
+            margin-right: 8px;
+          }
+        }
+
+        .click-link {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 13px;
+          color: #888;
+        }
       }
     }
 
@@ -214,7 +511,7 @@
       gap: 20px;
 
       .channel-card {
-        background: linear-gradient(180deg, rgba(30, 35, 50, 0.9) 0%, rgba(20, 25, 40, 0.95) 100%);
+        background: linear-gradient(180deg, rgba(30, 35, 50, 0.95) 0%, rgba(20, 25, 40, 0.98) 100%);
         border: 1px solid #21E786;
         border-radius: 16px;
         overflow: hidden;
@@ -243,21 +540,17 @@
             transition: transform 0.3s ease;
           }
 
-          .card-badge {
+          .card-tag {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 35px;
-            height: 35px;
-            background: #21E786;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 18px;
+            top: 12px;
+            left: 12px;
+            background: #FAAB07;
             color: #000;
-            font-weight: 700;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
           }
         }
 
@@ -268,8 +561,59 @@
             font-family: 'Pretendard', sans-serif;
             font-size: 14px;
             color: #fff;
-            margin: 0;
-            line-height: 1.5;
+            margin: 0 0 12px 0;
+            line-height: 1.4;
+          }
+
+          .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .card-author {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .author-avatar {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                overflow: hidden;
+                border: 1px solid #21E786;
+
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                }
+              }
+
+              .author-name {
+                font-family: 'Pretendard', sans-serif;
+                font-size: 12px;
+                color: #888;
+              }
+            }
+
+            .card-price {
+              display: flex;
+              align-items: baseline;
+              gap: 4px;
+
+              .price-value {
+                font-family: 'Pretendard', sans-serif;
+                font-size: 16px;
+                color: #FAAB07;
+                font-weight: 700;
+              }
+
+              .price-unit {
+                font-family: 'Pretendard', sans-serif;
+                font-size: 11px;
+                color: #888;
+              }
+            }
           }
         }
       }
@@ -280,24 +624,30 @@
   .cluster3-section4 {
     width: 100%;
     max-width: 1325px;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     text-align: center;
 
     .section4-header {
-      margin-bottom: 25px;
+      margin-bottom: 30px;
 
       .section4-subtitle {
+        display: block;
         font-family: 'Pretendard', sans-serif;
         font-size: 14px;
         color: #888;
-        margin: 0 0 5px 0;
+        margin-bottom: 8px;
+
+        &::before {
+          content: '⚡';
+          margin-right: 8px;
+        }
       }
 
       .section4-title {
         font-family: var(--black-ops-one), 'Black Ops One', cursive;
-        font-size: 42px;
+        font-size: 48px;
         color: #fff;
-        margin: 0 0 10px 0;
+        margin: 0 0 15px 0;
         letter-spacing: 2px;
       }
 
@@ -306,20 +656,22 @@
         font-size: 14px;
         color: #666;
         margin: 0;
+        max-width: 600px;
+        margin: 0 auto;
       }
     }
 
     .section4-tabs {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
+      gap: 15px;
+      margin-bottom: 35px;
 
       .tab-btn {
         background: transparent;
         border: 1px solid #555;
         border-radius: 8px;
-        padding: 10px 25px;
+        padding: 12px 30px;
         font-family: 'Pretendard', sans-serif;
         font-size: 14px;
         color: #888;
@@ -344,31 +696,32 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
-      padding: 20px 0;
+      gap: 20px;
+      padding: 30px 0;
 
       .slider-item {
-        width: 180px;
-        height: 240px;
-        border-radius: 16px;
+        width: 200px;
+        height: 280px;
+        border-radius: 20px;
         overflow: hidden;
         border: 2px solid #555;
         transition: all 0.4s ease;
-        opacity: 0.6;
-        transform: scale(0.9);
+        opacity: 0.5;
+        transform: scale(0.85);
+        flex-shrink: 0;
 
         &:hover {
-          opacity: 0.8;
-          transform: scale(0.95);
+          opacity: 0.7;
+          transform: scale(0.9);
         }
 
         &.active {
-          width: 280px;
-          height: 350px;
+          width: 300px;
+          height: 400px;
           border-color: #21E786;
           opacity: 1;
           transform: scale(1);
-          box-shadow: 0 0 40px rgba(33, 231, 134, 0.4);
+          box-shadow: 0 0 50px rgba(33, 231, 134, 0.4);
         }
 
         img {
@@ -390,8 +743,9 @@
       font-family: var(--black-ops-one), 'Black Ops One', cursive;
       font-size: 28px;
       color: #fff;
-      margin: 0 0 25px 0;
-      text-align: center;
+      margin: 0 0 30px 0;
+      text-align: left;
+      padding-left: 10px;
     }
 
     .detail-grid {
@@ -409,7 +763,7 @@
         transition: all 0.3s ease;
 
         &:hover {
-          transform: scale(1.05);
+          transform: scale(1.03);
           box-shadow: 0 5px 20px rgba(33, 231, 134, 0.3);
 
           img {
