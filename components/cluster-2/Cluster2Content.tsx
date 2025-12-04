@@ -1,16 +1,107 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
+
+// 학력 데이터 타입
+interface EduData {
+  school: string;
+  status: string;
+  category: string;
+  major1: string;
+  major2: string;
+  major3: string;
+  period: string;
+  grade: string;
+  description: string;
+  isFinal?: boolean;
+}
+
+// 학력 데이터
+const educationData: EduData[] = [
+  {
+    school: "고려 대학교",
+    status: "재학",
+    category: "사회",
+    major1: "콘텐츠전략학",
+    major2: "디지털마케팅학",
+    major3: "-",
+    period: "2025. 03 ~ 재학중",
+    grade: "3.8 / 4.5",
+    description: "석사 과정에서 더 깊이 있는 연구와 전문성을 쌓고 있습니다. 학부 때 배운 이론을 바탕으로 실제 현장에서 적용 가능한 연구를 진행하며, 지도교수님과 연구실 동료들과 함께 새로운 가치를 창출하고 있습니다. 학문적 성장뿐 아니라 후배들을 이끌며 리더십도 키워가고 있습니다.",
+    isFinal: true
+  },
+  {
+    school: "연세 대학교",
+    status: "졸업",
+    category: "예체능",
+    major1: "미디어커뮤니케이션학과",
+    major2: "-",
+    major3: "-",
+    period: "2021. 03 ~ 2025. 02",
+    grade: "4.0 / 4.3",
+    description: "대학 4년간 전공 수업과 다양한 프로젝트를 통해 미디어와 커뮤니케이션에 대한 깊은 이해를 쌓았습니다. 학회 활동, 공모전 참여, 인턴십 경험을 통해 이론과 실무를 연결하는 법을 배웠고, 평생의 동료가 될 소중한 친구들을 만났습니다."
+  },
+  {
+    school: "서울과학 고등학교",
+    status: "졸업",
+    category: "기타",
+    major1: "-",
+    major2: "-",
+    major3: "-",
+    period: "2018. 03 ~ 2021. 02",
+    grade: "2등급 / 9등급",
+    description: "진로를 탐색하고 꿈을 구체화했던 시기입니다. 다양한 동아리 활동과 봉사활동을 통해 협동심과 리더십을 기르고, 열정적인 선생님들 덕분에 학업에 대한 흥미를 잃지 않을 수 있었습니다. 대학 진학의 기반을 다진 소중한 시간이었습니다."
+  },
+  {
+    school: "용산 중학교",
+    status: "졸업",
+    category: "상경",
+    major1: "-",
+    major2: "-",
+    major3: "-",
+    period: "2015. 03 ~ 2018. 02",
+    grade: "15%",
+    description: "호기심 가득했던 시절, 다양한 과목을 접하며 세상에 대한 시야를 넓혔습니다. 처음으로 친한 친구들과 우정을 쌓고, 학교 행사와 체육대회에서 즐거운 추억을 만들었습니다. 꿈을 키우기 시작한 순수했던 시간입니다."
+  }
+];
+
+// 물결 파동 타입
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+}
 
 const Cluster2Content = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isWiggling, setIsWiggling] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEdu, setSelectedEdu] = useState<EduData | null>(null);
 
   // 드래그 관련 상태
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const cardsRef = useRef<HTMLDivElement>(null);
+
+  // 섹션 5 물결 파동 상태
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const introRef = useRef<HTMLDivElement>(null);
+  const rippleIdRef = useRef(0);
+  const lastRippleTime = useRef(0);
+
+  // 모달 열기
+  const openModal = (edu: EduData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedEdu(edu);
+    setModalOpen(true);
+  };
+
+  // 모달 닫기
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedEdu(null);
+  };
 
   const handleWithUsClick = () => {
     setIsWiggling(true);
@@ -51,6 +142,57 @@ const Cluster2Content = () => {
     }
   };
 
+  // 명언 카드 틸트 효과
+  const handleCardTilt = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+  }, []);
+
+  const handleCardTiltReset = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+  }, []);
+
+  // 섹션 5 물결 파동 핸들러
+  const handleIntroMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!introRef.current) return;
+
+    // 카드 영역 위에서는 물결 생성 안함
+    const target = e.target as HTMLElement;
+    if (target.closest('.intro-card')) return;
+
+    // 쓰로틀링: 150ms 간격으로만 물결 생성
+    const now = Date.now();
+    if (now - lastRippleTime.current < 150) return;
+    lastRippleTime.current = now;
+
+    const rect = introRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const newRipple: Ripple = {
+      id: rippleIdRef.current++,
+      x,
+      y
+    };
+
+    setRipples(prev => [...prev.slice(-5), newRipple]); // 최대 6개만 유지
+
+    // 2초 후 물결 제거
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+    }, 2000);
+  }, []);
+
   return (
     <div className="cluster2-content">
       {/* PROFILE 헤더 */}
@@ -62,7 +204,11 @@ const Cluster2Content = () => {
       </div>
 
       {/* 상단 섹션: 연결된 프레임 */}
-      <div className="cluster2-top-frame">
+      <div className="cluster2-top-frame" style={{ position: 'relative' }}>
+        {/* Edit Button */}
+        <button className="section-edit-btn">
+          <i className="ti ti-pencil"></i>
+        </button>
         {/* 왼쪽 카드 */}
         <div className="frame-left">
           <h2 className="adventure-title">Adventure With Us</h2>
@@ -119,7 +265,11 @@ const Cluster2Content = () => {
       </div>
 
       {/* 인용문 섹션 */}
-      <div className="cluster2-quotes">
+      <div className="cluster2-quotes" style={{ position: 'relative' }}>
+        {/* Edit Button */}
+        <button className="section-edit-btn">
+          <i className="ti ti-pencil"></i>
+        </button>
         <div className="quotes-bg-image">
           <img src="/images/0/cluster 2/bg00.png" alt="" />
         </div>
@@ -177,12 +327,12 @@ const Cluster2Content = () => {
       {/* 학력 섹션 */}
       <div
         className="cluster2-education"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        style={{ position: 'relative' }}
       >
+        {/* Edit Button */}
+        <button className="section-edit-btn">
+          <i className="ti ti-pencil"></i>
+        </button>
         <div className="edu-bg-image">
           <img src="/images/0/cluster 2/bg04.png" alt="" />
         </div>
@@ -192,117 +342,62 @@ const Cluster2Content = () => {
         <div
           className="edu-cards-wrapper"
           ref={cardsRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
           style={{
             transform: `translateX(calc(-${currentPage * 350}px + ${dragOffset}px))`,
             transition: isDragging ? 'none' : 'transform 0.4s ease',
-            userSelect: 'none'
+            userSelect: 'none',
+            cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
-          <div className="edu-card first">
-            <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
-            <div className="edu-header">
-              <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">고려 대학교</span></h3>
-            </div>
-            <ul className="edu-details">
-              <li><span className="dot">·</span><span className="label">상태</span><span className="value">재학</span></li>
-              <li><span className="dot">·</span><span className="label">계열</span><span className="value">사회</span></li>
-              <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">콘텐츠전략학</span></li>
-              <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">디지털마케팅학</span></li>
-              <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">2025. 03 ~ 재학중</span></li>
-              <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">3.8 / 4.5</span></li>
-            </ul>
-            <div className="edu-footer">
-              <div className="edu-description">
-                <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
-                <p className="desc-text">나는 우리학교를 다니면서 너무너무너무너무 많은 것들을 배웠어요. 함께 한 친구들이 너무 고맙고 교수님들과 선배들에게 항상 감사하고 존경한다는 말을 하고 싶어요!</p>
-                <span className="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
+          {educationData.map((edu, index) => (
+            <div className={`edu-card ${edu.isFinal ? 'first' : ''}`} key={index}>
+              <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
+              <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
+              <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
+              <div className="edu-header">
+                <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">{edu.school}</span></h3>
               </div>
-            </div>
-            <div className="final-badge">
-              <img className="final-star" src="/images/0/cluster 2/icon/trophy.png" alt="" />
-              <div className="final-label">
-                <span>FINAL</span>
+              <ul className="edu-details">
+                <li><span className="dot">·</span><span className="label">상태</span><span className="value">{edu.status}</span></li>
+                <li><span className="dot">·</span><span className="label">계열</span><span className="value">{edu.category}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">{edu.major1}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{edu.major2}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{edu.major3}</span></li>
+                <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period}</span></li>
+                <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">{edu.grade}</span></li>
+              </ul>
+              <div
+                className="edu-footer"
+                onClick={(e) => openModal(edu, e)}
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseMove={(e) => e.stopPropagation()}
+                onMouseUp={(e) => e.stopPropagation()}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="edu-description">
+                  <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
+                  <p className="desc-text">{edu.description.substring(0, 80)}...</p>
+                  <span className="arrow">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
               </div>
+              {edu.isFinal && (
+                <div className="final-badge">
+                  <img className="final-star" src="/images/0/cluster 2/icon/trophy.png" alt="" />
+                  <div className="final-label">
+                    <span>FINAL</span>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-
-          <div className="edu-card">
-            <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
-            <div className="edu-header">
-              <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">연세 대학교</span></h3>
-            </div>
-            <ul className="edu-details">
-              <li><span className="dot">·</span><span className="label">상태</span><span className="value">졸업</span></li>
-              <li><span className="dot">·</span><span className="label">계열</span><span className="value">예체능</span></li>
-              <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">미디어커뮤니케이션학과</span></li>
-              <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">2021. 03 ~ 2025. 02</span></li>
-              <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">4.0 / 4.3</span></li>
-            </ul>
-            <div className="edu-footer">
-              <div className="edu-description">
-                <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
-                <p className="desc-text">나는 우리학교를 다니면서 너무너무너무너무 많은 것들을 배웠어요. 함께 한 친구들이 너무 고맙고 교수님들과 선배들에게 항상 감사하고 존경한다는 말을 하고 싶어요!</p>
-                <span className="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="edu-card">
-            <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
-            <div className="edu-header">
-              <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">서울과학 고등학교</span></h3>
-            </div>
-            <ul className="edu-details">
-              <li><span className="dot">·</span><span className="label">상태</span><span className="value">졸업</span></li>
-              <li><span className="dot">·</span><span className="label">계열</span><span className="value">기타</span></li>
-              <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">2018. 03 ~ 2021. 02</span></li>
-              <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">2등급 / 9등급</span></li>
-            </ul>
-            <div className="edu-footer">
-              <div className="edu-description">
-                <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
-                <p className="desc-text">나는 우리학교를 다니면서 너무너무너무너무 많은 것들을 배웠어요. 함께 한 친구들이 너무 고맙고 교수님들과 선배들에게 항상 감사하고 존경한다는 말을 하고 싶어요!</p>
-                <span className="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="edu-card">
-            <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
-            <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
-            <div className="edu-header">
-              <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">용산 중학교</span></h3>
-            </div>
-            <ul className="edu-details">
-              <li><span className="dot">·</span><span className="label">상태</span><span className="value">졸업</span></li>
-              <li><span className="dot">·</span><span className="label">계열</span><span className="value">상경</span></li>
-              <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">-</span></li>
-              <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">2015. 03 ~</span></li>
-              <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">15%</span></li>
-            </ul>
-            <div className="edu-footer">
-              <div className="edu-description">
-                <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
-                <p className="desc-text">나는 우리학교를 다니면서 너무너무너무너무 많은 것들을 배웠어요. 함께 한 친구들이 너무 고맙고 교수님들과 선배들에게 항상 감사하고 존경한다는 말을 하고 싶어요!</p>
-                <span className="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
         <div className="edu-pagination">
           {[0, 1].map((index) => (
@@ -316,10 +411,20 @@ const Cluster2Content = () => {
       </div>
 
       {/* 섹션 4 - Cluving Review */}
-      <div className="cluster2-section4">
+      <div className="cluster2-section4" style={{ position: 'relative' }}>
+        {/* Edit Button */}
+        <button
+          className="section-edit-btn"
+        >
+          <i className="ti ti-pencil"></i>
+        </button>
         {/* 왼쪽 - 명언 카드 3개 */}
         <div className="section4-left">
-          <div className="quote-card-item card-1">
+          <div
+            className="quote-card-item card-1"
+            onMouseMove={handleCardTilt}
+            onMouseLeave={handleCardTiltReset}
+          >
             <img className="quote-bg" src="/images/0/cluster 2/명언 1-1.png" alt="" />
             <div className="quote-overlay">
               <div className="quote-author-badge">
@@ -336,7 +441,11 @@ const Cluster2Content = () => {
               <p className="quote-text">"누구나 덮어놓고 '시작' 할 수 있지만, 목표한 바 대로 '마무리' 하는 것은 누구나 할 수 있는 것이 아니다."</p>
             </div>
           </div>
-          <div className="quote-card-item card-2">
+          <div
+            className="quote-card-item card-2"
+            onMouseMove={handleCardTilt}
+            onMouseLeave={handleCardTiltReset}
+          >
             <img className="quote-bg" src="/images/0/cluster 2/명언 2-1.png" alt="" />
             <div className="quote-overlay">
               <div className="quote-author-badge">
@@ -353,7 +462,11 @@ const Cluster2Content = () => {
               <p className="quote-text">"끝을 맺기를 처음과 같이 하면 실패가 없다"</p>
             </div>
           </div>
-          <div className="quote-card-item card-3">
+          <div
+            className="quote-card-item card-3"
+            onMouseMove={handleCardTilt}
+            onMouseLeave={handleCardTiltReset}
+          >
             <img className="quote-bg" src="/images/0/cluster 2/명언 3-1.png" alt="" />
             <div className="quote-overlay">
               <div className="quote-author-badge">
@@ -456,7 +569,27 @@ const Cluster2Content = () => {
       </div>
 
       {/* 자기소개서 섹션 */}
-      <div className="cluster2-intro">
+      <div
+        className="cluster2-intro"
+        style={{ position: 'relative' }}
+        ref={introRef}
+        onMouseMove={handleIntroMouseMove}
+      >
+        {/* 물결 파동 효과 */}
+        {ripples.map(ripple => (
+          <div
+            key={ripple.id}
+            className="ripple-effect"
+            style={{
+              left: ripple.x,
+              top: ripple.y
+            }}
+          />
+        ))}
+        {/* Edit Button */}
+        <button className="section-edit-btn">
+          <i className="ti ti-pencil"></i>
+        </button>
         <div className="intro-bg">
           <img src="/images/0/cluster 2/bg05.png" alt="" />
         </div>
@@ -474,7 +607,7 @@ const Cluster2Content = () => {
                 <img src="/images/0/cluster 2/icon/01성장 과정.png" alt="" className="card-icon" />
                 <div className="title-row">
                   <h4>성장 과정</h4>
-                  <button className="card-arrow">
+                  <button className="card-arrow" data-tooltip="성장과정 자세히 보기">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -490,7 +623,7 @@ const Cluster2Content = () => {
                 <img src="/images/0/cluster 2/icon/02커리어 방향.png" alt="" className="card-icon" />
                 <div className="title-row">
                   <h4>커리어 방향</h4>
-                  <button className="card-arrow">
+                  <button className="card-arrow" data-tooltip="커리어 방향 자세히 보기">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -506,7 +639,7 @@ const Cluster2Content = () => {
                 <img src="/images/0/cluster 2/icon/03사회 경험.png" alt="" className="card-icon" />
                 <div className="title-row">
                   <h4>사회 경험</h4>
-                  <button className="card-arrow">
+                  <button className="card-arrow" data-tooltip="사회 경험 자세히 보기">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -524,7 +657,7 @@ const Cluster2Content = () => {
                 <img src="/images/0/cluster 2/icon/04실무 스타일.png" alt="" className="card-icon" />
                 <div className="title-row">
                   <h4>실무 스타일</h4>
-                  <button className="card-arrow">
+                  <button className="card-arrow" data-tooltip="실무 스타일 자세히 보기">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -540,7 +673,7 @@ const Cluster2Content = () => {
                 <img src="/images/0/cluster 2/icon/05퍼스널 스토리.png" alt="" className="card-icon" />
                 <div className="title-row">
                   <h4>퍼스널 스토리</h4>
-                  <button className="card-arrow">
+                  <button className="card-arrow" data-tooltip="퍼스널 스토리 자세히 보기">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -556,6 +689,64 @@ const Cluster2Content = () => {
           </div>
         </div>
       </div>
+
+      {/* 학력 상세 모달 */}
+      {modalOpen && selectedEdu && (
+        <div className="edu-modal-overlay" onClick={closeModal}>
+          <div className="edu-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <div className="modal-header">
+              <img className="modal-border-tl" src="/images/0/cluster 2/border.png" alt="" />
+              <img className="modal-border-br" src="/images/0/cluster 2/border.png" alt="" />
+              <div className="modal-school-info">
+                <span className="school-circle"></span>
+                <h2>{selectedEdu.school}</h2>
+                {selectedEdu.isFinal && <span className="final-tag">FINAL</span>}
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="modal-info-grid">
+                <div className="info-item">
+                  <span className="info-label">상태</span>
+                  <span className="info-value">{selectedEdu.status}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">계열</span>
+                  <span className="info-value">{selectedEdu.category}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">전공 1</span>
+                  <span className="info-value">{selectedEdu.major1}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">전공 2</span>
+                  <span className="info-value">{selectedEdu.major2}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">전공 3</span>
+                  <span className="info-value">{selectedEdu.major3}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">기간</span>
+                  <span className="info-value highlight">{selectedEdu.period}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">학점</span>
+                  <span className="info-value highlight">{selectedEdu.grade}</span>
+                </div>
+              </div>
+              <div className="modal-description">
+                <img className="scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
+                <p>{selectedEdu.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
