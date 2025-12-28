@@ -1,0 +1,2514 @@
+// Cluster 4 - Club Challenge Growth Styles
+
+@font-face {
+  font-family: 'Cafe24Ohsquare';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HakgyoansimTuho';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimTuhoR.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.cluster4-content {
+  padding: 0;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1330px;
+
+  // Section 1: CLUB CHALLENGE GROWTH
+  .cluster4-section1 {
+    width: 100%;
+    max-width: 1330px;
+    height: 1118px;
+    padding: 40px 0 0;
+    text-align: left;
+    background-image: url('/images/0/cluster 4/img 01.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    position: relative;
+    margin-bottom: -500px;
+
+    .section1-title-wrapper {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding-top: 60px;
+      margin-bottom: 40px;
+
+      .title-inner {
+        position: relative;
+        display: inline-block;
+      }
+    }
+
+    // 타이틀 그림자
+    .section1-title-shadow {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      color: #111;
+      -webkit-text-stroke: 1px #21E786;
+      text-stroke: 1px #21E786;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      z-index: 0;
+      white-space: nowrap;
+    }
+
+    // 타이틀
+    .section1-title {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      color: #FFF;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    .section1-description {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+      line-height: 1.8;
+
+      p {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #FFF;
+        border-left: none;
+        padding-left: 0;
+
+        &.small-text {
+          font-family: 'HakgyoansimTuho', sans-serif;
+          font-size: 20px;
+          color: #FFF;
+          margin-top: 20px;
+          border-left: none !important;
+          padding-left: 0 !important;
+        }
+
+        &.quote-text {
+          font-family: 'HakgyoansimTuho', sans-serif;
+          font-size: 20px;
+          line-height: 1.9;
+          color: #FFF;
+          margin-top: 25px;
+          font-style: italic;
+          border-left: none !important;
+          padding-left: 0 !important;
+        }
+      }
+    }
+  }
+
+  // Section 2: SEASON GROWTH 카드
+  .cluster4-section2 {
+    width: 100%;
+    max-width: 1330px;
+    padding: 0;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+
+    .season-growth-card {
+      position: relative;
+      width: 100%;
+      max-width: 1320px;
+      height: 600px;
+      background-image: url('/images/0/cluster 4/bg img +Linear.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+
+      &.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      // 보더 이미지 레이어
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/0/cluster 4/bg border.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      .card-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .card-left {
+        position: relative;
+        z-index: 2;
+        padding: 40px 40px 40px 60px;
+        width: 55%;
+
+        .season-header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+
+        .season-title-wrapper {
+          position: relative;
+          display: inline-block;
+        }
+
+        .season-title-shadow {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 60px;
+          font-weight: 900;
+          color: #111;
+          -webkit-text-stroke: 1px rgba(250, 171, 7, 0.56);
+          text-stroke: 1px rgba(250, 171, 7, 0.56);
+          letter-spacing: 0;
+          margin: 0;
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          z-index: 0;
+          white-space: nowrap;
+        }
+
+        .season-title {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 60px;
+          font-weight: 900;
+          color: #FFF;
+          margin: 0;
+          letter-spacing: 0;
+          position: relative;
+          z-index: 1;
+          white-space: nowrap;
+        }
+
+        .season-badge {
+          position: relative;
+          display: flex;
+          width: 121px;
+          padding: 14px 10px 12px 10px;
+          align-items: center;
+
+          .badge-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+          }
+
+          .badge-fill {
+            position: relative;
+            z-index: 0;
+            background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+            border-radius: 8px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .badge-text {
+              font-size: 14px;
+              font-weight: 700;
+              color: #fff;
+              white-space: nowrap;
+            }
+          }
+        }
+
+        .collection-card {
+          display: inline-flex;
+          padding: 20px 38px;
+          align-items: flex-start;
+          gap: 30px;
+          background: #232323;
+          border: 1px solid rgba(80, 80, 90, 0.8);
+          border-radius: 12px;
+          margin-bottom: 24px;
+
+          .collection-icon {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            background: rgba(50, 55, 65, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(100, 100, 110, 0.4);
+
+            img {
+              width: 36px;
+              height: 36px;
+            }
+          }
+
+          .collection-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .collection-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .add-icon {
+              font-size: 18px;
+              color: #FAAB07;
+              font-weight: 700;
+            }
+
+            .collection-label {
+              font-size: 13px;
+              font-weight: 600;
+              color: #FAAB07;
+            }
+          }
+
+          .collection-text {
+            font-size: 14px;
+            color: #fff;
+            margin: 0;
+            line-height: 1.5;
+
+            strong {
+              color: #FF6B6B;
+              font-weight: 700;
+            }
+          }
+        }
+
+        .details-card {
+          display: flex;
+          width: 422px;
+          padding: 20px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+          background: rgba(40, 45, 55, 0.9);
+          border: 1px solid rgba(100, 100, 110, 0.6);
+          border-radius: 8px;
+
+          .details-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+
+            .toggle-icon {
+              font-size: 14px;
+              color: #fff;
+            }
+
+            .toggle-text {
+              flex: 1;
+              text-align: left;
+              font-size: 14px;
+              color: #fff;
+              font-weight: 600;
+            }
+          }
+
+          .details-content {
+            width: 100%;
+
+            .detail-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 7.5px 0;
+
+              &:first-child {
+                padding-top: 0;
+              }
+
+              &:last-child {
+                padding-bottom: 0;
+              }
+
+              .detail-label {
+                font-size: 14px;
+                color: #ccc;
+                font-weight: 500;
+              }
+
+              .detail-value {
+                font-size: 14px;
+                color: #FAAB07;
+                text-align: right;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+
+      .card-right {
+        position: absolute;
+        right: 68px;
+        bottom: 8px;
+        width: 488px;
+        height: 700px;
+        z-index: 10;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
+
+  // Section 3: SEASON CHALLENGE 배너
+  .cluster4-section3-banner {
+    width: 100%;
+    max-width: 1330px;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster 4/Bg img 02 .png');
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+
+    .banner-content {
+      padding: 60px 40px;
+
+      .banner-title {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 56px;
+        font-weight: 900;
+        color: #FFF;
+        margin: 0 0 20px 0;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      .banner-description {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 18px;
+        color: #FFF;
+        line-height: 1.8;
+        margin: 0 0 15px 0;
+      }
+
+      .banner-info {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 16px;
+        color: #FFF;
+        margin: 0;
+      }
+    }
+  }
+
+// Cluster 4 - Section 4 새 스타일 (9개 영역 기반)
+
+.cluster4-section4 {
+  width: 100%;
+  max-width: 1330px;
+  padding: 0 0 100px 0;
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr 360px;
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+
+    // Area 1: 이미지 스택 (왼쪽, 전체 높이)
+    .area-1-image-stack {
+      grid-row: 1 / 4;
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: flex-start;
+
+      .season-image-title {
+        font-family: 'Cafe24Ohsquare', sans-serif;
+        font-size: 32px;
+        color: #FFF;
+        margin: 0;
+        font-weight: 700;
+
+        .year-highlight {
+          color: #FAAB07;
+        }
+      }
+    }
+
+    // Area 2: 타이틀 + 날짜 + 상태 (우측 상단 왼쪽)
+    .area-2-title {
+      grid-row: 1;
+      grid-column: 2;
+      background: rgba(35, 35, 35, 0.6);
+      padding: 16px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(80, 80, 90, 0.4);
+
+      .season-title {
+        font-family: 'Cafe24Ohsquare', sans-serif;
+        font-size: 28px;
+        color: #FFF;
+        margin: 0 0 10px 0;
+
+        .year-orange {
+          color: #FFA500;
+        }
+      }
+
+      .season-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .date-range {
+          font-size: 13px;
+          color: #AAA;
+        }
+
+        .status-btn {
+          background: #FFA500;
+          border: none;
+          padding: 5px 14px;
+          border-radius: 14px;
+          font-size: 12px;
+          color: #000;
+          font-weight: 700;
+          cursor: pointer;
+        }
+      }
+    }
+
+    // Area 3: Qualified 배지 (우측 상단 오른쪽)
+    .area-3-qualified {
+      grid-row: 1;
+      grid-column: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      justify-content: center;
+
+      .qualified-text {
+        font-size: 14px;
+        color: #FFA500;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .qualified-tags {
+        display: flex;
+        gap: 6px;
+
+        .tag {
+          background: rgba(255, 165, 0, 0.15);
+          border: 1px solid #FFA500;
+          color: #FFA500;
+          padding: 4px 10px;
+          border-radius: 5px;
+          font-size: 11px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // Area 4: 통계 + 평점 (중앙 상단)
+    .area-4-stats {
+      grid-row: 2;
+      grid-column: 2;
+      background: rgba(35, 35, 35, 0.6);
+      padding: 16px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(80, 80, 90, 0.4);
+
+      .stats-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 12px;
+
+        .stat-item {
+          font-size: 13px;
+          color: #CCC;
+
+          strong {
+            color: #FFF;
+            font-weight: 700;
+          }
+        }
+      }
+
+      .rating-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .stars {
+          font-size: 16px;
+          color: #FFA500;
+        }
+
+        .rating-text {
+          font-size: 13px;
+          color: #AAA;
+        }
+
+        .review-btn {
+          background: #FFA500;
+          border: none;
+          padding: 6px 16px;
+          border-radius: 6px;
+          font-size: 12px;
+          color: #000;
+          font-weight: 700;
+          cursor: pointer;
+          margin-left: auto;
+        }
+      }
+
+      .review-comment {
+        font-size: 11px;
+        color: #888;
+        font-style: italic;
+        margin: 8px 0 0 0;
+      }
+    }
+
+    // Area 5: 원형 차트 3개 (중앙 하단 왼쪽)
+    .area-5-circles {
+      grid-row: 3;
+      grid-column: 2;
+      display: flex;
+      gap: 20px;
+      justify-content: space-around;
+      align-items: flex-start;
+      padding: 20px;
+      background: rgba(35, 35, 35, 0.3);
+      border-radius: 8px;
+
+      .circle-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        .circle {
+          position: relative;
+          width: 90px;
+          height: 90px;
+
+          svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+
+            .bg {
+              fill: none;
+              stroke: rgba(255, 255, 255, 0.1);
+              stroke-width: 8;
+            }
+
+            .fill {
+              fill: none;
+              stroke-width: 8;
+              stroke-linecap: round;
+              transition: stroke-dashoffset 1.2s ease;
+            }
+          }
+
+          &.pink .fill {
+            stroke: #FF1493;
+          }
+
+          &.yellow .fill {
+            stroke: #FFA500;
+          }
+
+          &.green .fill {
+            stroke: #4CAF50;
+          }
+
+          .percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFF;
+          }
+        }
+
+        .circle-label {
+          text-align: center;
+
+          .label-main {
+            font-size: 12px;
+            color: #CCC;
+            margin-bottom: 3px;
+          }
+
+          .label-sub {
+            font-size: 10px;
+            color: #888;
+          }
+        }
+      }
+    }
+
+    // Area 6: 진행률 바 4개 (중앙 하단 중앙)
+    .area-6-progress {
+      grid-row: 3;
+      grid-column: 2;
+      background: rgba(35, 35, 35, 0.6);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(80, 80, 90, 0.4);
+
+      .progress-title {
+        font-size: 16px;
+        color: #FFF;
+        font-weight: 700;
+        margin: 0 0 16px 0;
+      }
+
+      .progress-items {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        .progress-item {
+          .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+
+            .name {
+              font-size: 12px;
+              color: #CCC;
+            }
+
+            .value {
+              font-size: 11px;
+              color: #FFA500;
+              font-weight: 600;
+            }
+          }
+
+          .bar {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            height: 10px;
+            overflow: hidden;
+
+            .fill {
+              height: 100%;
+              border-radius: 8px;
+              transition: width 1.2s ease;
+
+              &.yellow {
+                background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+              }
+
+              &.green {
+                background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+              }
+
+              &.pink {
+                background: linear-gradient(90deg, #FF1493 0%, #FF69B4 100%);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Area 7: 시즌 상태 헤더 (우측 상단)
+    .area-7-header {
+      grid-row: 2;
+      grid-column: 3;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      background: rgba(35, 35, 35, 0.6);
+      border-radius: 8px;
+      border: 1px solid rgba(80, 80, 90, 0.4);
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #4CAF50;
+        flex-shrink: 0;
+      }
+
+      .status-text {
+        font-size: 14px;
+        color: #FFF;
+        font-weight: 600;
+        flex: 1;
+      }
+
+      .status-line {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(80, 80, 90, 0.6) 0%, transparent 100%);
+      }
+    }
+
+    // Area 8: 배지 카드 3개 (우측 중앙)
+    .area-8-badges {
+      grid-row: 2 / 3;
+      grid-column: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0;
+      margin-top: 60px;
+
+      .badge-card {
+        background: rgba(35, 35, 35, 0.6);
+        padding: 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(80, 80, 90, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .badge-icon {
+          width: 40px;
+          height: 40px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+        }
+
+        .badge-info {
+          flex: 1;
+
+          .badge-name {
+            font-size: 12px;
+            color: #FFF;
+            font-weight: 600;
+            margin-bottom: 4px;
+          }
+
+          .badge-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+
+            &.green {
+              background: rgba(76, 175, 80, 0.2);
+              border: 1px solid #4CAF50;
+              color: #4CAF50;
+            }
+
+            &.orange {
+              background: rgba(255, 165, 0, 0.2);
+              border: 1px solid #FFA500;
+              color: #FFA500;
+            }
+
+            &.yellow {
+              background: rgba(255, 235, 59, 0.2);
+              border: 1px solid #FFEB3B;
+              color: #FFEB3B;
+            }
+          }
+        }
+      }
+    }
+
+    // Area 9: 프로필 카드 3개 (우측 하단)
+    .area-9-profiles {
+      grid-row: 3;
+      grid-column: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0;
+
+      .profile-card {
+        background: rgba(35, 35, 35, 0.6);
+        padding: 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(80, 80, 90, 0.4);
+        display: flex;
+        gap: 12px;
+
+        .avatar {
+          flex-shrink: 0;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(255, 165, 0, 0.2);
+          border: 2px solid #FFA500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 22px;
+        }
+
+        .info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          .row1 {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+
+            .name {
+              font-size: 12px;
+              color: #FFF;
+              font-weight: 600;
+              flex: 1;
+            }
+
+            .deadline {
+              font-size: 10px;
+              color: #FFA500;
+              white-space: nowrap;
+
+              .badge {
+                &.green {
+                  color: #4CAF50;
+                  font-weight: 700;
+                }
+
+                &.gray {
+                  color: #888;
+                }
+              }
+            }
+          }
+
+          .row2 {
+            font-size: 10px;
+            color: #888;
+          }
+
+          .row3 {
+            display: flex;
+            gap: 6px;
+
+            .green-box,
+            .yellow-box {
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-size: 9px;
+              font-weight: 600;
+            }
+
+            .green-box {
+              background: rgba(76, 175, 80, 0.2);
+              border: 1px solid #4CAF50;
+              color: #4CAF50;
+            }
+
+            .yellow-box {
+              background: rgba(255, 165, 0, 0.2);
+              border: 1px solid #FFA500;
+              color: #FFA500;
+            }
+          }
+
+          .row4 {
+            font-size: 10px;
+            color: #888;
+            font-style: italic;
+          }
+
+          .row5 {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #888;
+
+            .rating {
+              color: #FFA500;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .season-card-wrapper {
+    position: relative;
+    background: #1a1a1a;
+    padding: 40px;
+    width: 100%;
+    max-width: 1330px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    // 상단 라인 (Area 2 + Area 3) - 전체 너비
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+
+      .area-2-title {
+        flex: 1;
+        background: rgba(35, 35, 35, 0.6);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(80, 80, 90, 0.4);
+
+        .season-title {
+          font-family: 'Cafe24Ohsquare', sans-serif;
+          font-size: 28px;
+          color: #FFF;
+          margin: 0 0 12px 0;
+
+          .year-orange {
+            color: #FFA500;
+          }
+        }
+
+        .date-status {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .date {
+            font-size: 13px;
+            color: #AAA;
+          }
+
+          .status-btn {
+            background: #FFA500;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 14px;
+            font-size: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .area-3-qualified {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-end;
+        padding: 20px;
+        background: rgba(35, 35, 35, 0.6);
+        border-radius: 8px;
+        border: 1px solid rgba(80, 80, 90, 0.4);
+
+        .qualified-label {
+          font-size: 14px;
+          color: #FFA500;
+          font-weight: 700;
+        }
+
+        .qualified-items {
+          display: flex;
+          gap: 8px;
+
+          .item {
+            background: rgba(255, 165, 0, 0.15);
+            border: 1px solid #FFA500;
+            color: #FFA500;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+
+    // 하단 영역: 이미지 + 정보 그리드
+    .content-row {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+      width: 100%;
+
+      // 왼쪽: 이미지 영역
+      .area-1-image-stack {
+        flex-shrink: 0;
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+
+        .season-image-title {
+          font-family: 'Cafe24Ohsquare', sans-serif;
+          font-size: 32px;
+          color: #FFF;
+          margin: 0;
+          font-weight: 700;
+
+          .year-highlight {
+            color: #FAAB07;
+          }
+        }
+      }
+
+      // 오른쪽: 정보 그리드
+      .season-info-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+
+        // 중앙 그리드 (3열)
+        .main-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 20px;
+          width: 100%;
+        }
+      }
+    }
+
+    // 골드 프레임 이미지 3개 겹침
+    .season-image-stack {
+      flex-shrink: 0;
+      width: 315.58px;
+      height: 465.967px;
+      position: relative;
+
+      .image-card {
+        position: absolute;
+        width: 315.58px;
+        height: 465.967px;
+
+        .card-frame {
+          width: 100%;
+          height: 100%;
+          border-radius: 12px;
+          overflow: hidden;
+          background: lightgray;
+
+          // 우측 상단 잘린 육각형 모양
+          clip-path: polygon(
+            0 12px,
+            12px 0,
+            calc(100% - 50px) 0,
+            100% 50px,
+            100% calc(100% - 12px),
+            calc(100% - 12px) 100%,
+            12px 100%,
+            0 calc(100% - 12px)
+          );
+
+          img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: 50% 50%;
+          }
+        }
+
+        // 맨 뒤 카드 (테두리 없음)
+        &.card-back {
+          top: 20px;
+          left: -15px;
+          z-index: 1;
+          opacity: 0.5;
+          transform: rotate(-5deg);
+        }
+
+        // 중간 카드 (테두리 없음)
+        &.card-middle {
+          top: 10px;
+          left: -8px;
+          z-index: 2;
+          opacity: 0.7;
+          transform: rotate(-2deg);
+        }
+
+        // 맨 앞 카드 (테두리 + 그림자)
+        &.card-front {
+          top: 0;
+          left: 0;
+          z-index: 3;
+          opacity: 1;
+
+          .card-frame {
+            border: 5px solid #FAAB07;
+            filter: drop-shadow(5px -5px 20px rgba(17, 17, 17, 0.80));
+          }
+        }
+      }
+    }
+
+    // 오른쪽: 전체 정보 영역
+    .season-right-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      // 최상단 바
+      .season-top-bar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 20px;
+        align-items: start;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #333;
+
+        .season-main-title {
+          font-family: 'Cafe24Ohsquare', sans-serif;
+          font-size: 28px;
+          color: #FFF;
+          margin: 0;
+
+          .year-orange {
+            color: #FFA500;
+          }
+        }
+
+        .season-date-status {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .date-range {
+            font-size: 13px;
+            color: #AAA;
+          }
+
+          .status-badge {
+            background: #FFA500;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+          }
+        }
+
+        .season-top-right {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          align-items: flex-end;
+
+          .qualified-text {
+            font-size: 14px;
+            color: #FFA500;
+            font-weight: 700;
+          }
+
+          .qualified-tags {
+            display: flex;
+            gap: 6px;
+
+            .tag {
+              background: rgba(255, 165, 0, 0.2);
+              border: 1px solid #FFA500;
+              color: #FFA500;
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-size: 11px;
+              font-weight: 600;
+            }
+          }
+
+          .season-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+
+            .nav-btn {
+              background: #333;
+              border: 1px solid #555;
+              color: #FFF;
+              padding: 4px 10px;
+              border-radius: 4px;
+              cursor: pointer;
+
+              &.active {
+                background: #FFA500;
+                border-color: #FFA500;
+                color: #000;
+              }
+            }
+
+            .nav-divider {
+              color: #666;
+            }
+
+            .more-dots {
+              color: #444;
+              letter-spacing: 2px;
+            }
+          }
+        }
+      }
+
+      // 통계 및 시즌 상태 바
+      .stats-status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #333;
+
+        .stats-items {
+          display: flex;
+          gap: 20px;
+
+          .stat {
+            font-size: 13px;
+            color: #CCC;
+
+            strong {
+              color: #FFF;
+              font-weight: 700;
+            }
+          }
+        }
+
+        .status-indicator {
+          font-size: 12px;
+          color: #888;
+
+          .status-line {
+            color: #444;
+          }
+        }
+      }
+
+      // 3열 그리드
+      .three-column-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr 350px;
+        gap: 20px;
+
+        // 왼쪽 열: 평점 + 원형 차트
+        .left-col {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+
+          .rating-section {
+            background: #222;
+            padding: 14px;
+            border-radius: 8px;
+
+            .stars-row {
+              font-size: 14px;
+              color: #FFA500;
+              margin-bottom: 8px;
+            }
+
+            .review-btn {
+              background: #FFA500;
+              border: none;
+              padding: 6px 12px;
+              border-radius: 6px;
+              font-size: 12px;
+              color: #000;
+              font-weight: 700;
+              cursor: pointer;
+              width: 100%;
+              margin-bottom: 8px;
+            }
+
+            .review-comment {
+              font-size: 11px;
+              color: #888;
+              font-style: italic;
+              margin: 0;
+            }
+          }
+
+          .three-circles {
+            display: flex;
+            gap: 10px;
+            justify-content: space-around;
+
+            .circle-item {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 8px;
+
+              .circle {
+                position: relative;
+                width: 80px;
+                height: 80px;
+
+                svg {
+                  width: 100%;
+                  height: 100%;
+                  transform: rotate(-90deg);
+
+                  .bg {
+                    fill: none;
+                    stroke: rgba(255, 255, 255, 0.1);
+                    stroke-width: 8;
+                  }
+
+                  .fill {
+                    fill: none;
+                    stroke-width: 8;
+                    stroke-linecap: round;
+                    transition: stroke-dashoffset 1s ease;
+                  }
+                }
+
+                &.pink .fill {
+                  stroke: #FF1493;
+                }
+
+                .percent {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: #FFF;
+                }
+              }
+
+              .circle-label {
+                text-align: center;
+
+                .label-main {
+                  font-size: 11px;
+                  color: #CCC;
+                  margin-bottom: 2px;
+                }
+
+                .label-sub {
+                  font-size: 10px;
+                  color: #888;
+                }
+              }
+            }
+          }
+        }
+
+        // 중앙 열: 실무 장면 진행률
+        .middle-col {
+          background: #222;
+          padding: 16px;
+          border-radius: 8px;
+
+          .col-title {
+            font-size: 16px;
+            color: #FFF;
+            font-weight: 700;
+            margin: 0 0 14px 0;
+          }
+
+          .progress-items {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+
+            .progress-item {
+              .progress-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 6px;
+
+                .name {
+                  font-size: 12px;
+                  color: #CCC;
+                }
+
+                .value {
+                  font-size: 11px;
+                  color: #FFA500;
+                  font-weight: 600;
+                }
+              }
+
+              .bar {
+                background: rgba(0, 0, 0, 0.4);
+                border-radius: 8px;
+                height: 8px;
+                overflow: hidden;
+
+                .fill {
+                  height: 100%;
+                  border-radius: 8px;
+                  transition: width 1s ease;
+
+                  &.yellow {
+                    background: linear-gradient(90deg, #FFA500 0%, #FF8C00 100%);
+                  }
+
+                  &.green {
+                    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 오른쪽 열: 시즌 성장
+        .right-col {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
+          .col-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #222;
+            border-radius: 8px;
+
+            .col-title {
+              font-size: 16px;
+              color: #FFF;
+              font-weight: 700;
+              margin: 0;
+            }
+
+            .filter-buttons {
+              display: flex;
+              gap: 6px;
+
+              .filter {
+                background: rgba(255, 165, 0, 0.1);
+                border: 1px solid rgba(255, 165, 0, 0.3);
+                color: #AAA;
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 10px;
+                cursor: pointer;
+
+                &.active {
+                  background: #FFA500;
+                  border-color: #FFA500;
+                  color: #000;
+                  font-weight: 700;
+                }
+              }
+            }
+          }
+
+          .profile-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .profile-card {
+              background: #222;
+              padding: 12px;
+              border-radius: 8px;
+              display: flex;
+              gap: 10px;
+
+              .avatar {
+                flex-shrink: 0;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: rgba(255, 165, 0, 0.2);
+                border: 2px solid #FFA500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+              }
+
+              .info {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .row1 {
+                  display: flex;
+                  justify-content: space-between;
+                  gap: 8px;
+
+                  .name {
+                    font-size: 11px;
+                    color: #FFF;
+                    font-weight: 600;
+                    flex: 1;
+                  }
+
+                  .deadline {
+                    font-size: 9px;
+                    color: #FFA500;
+                    white-space: nowrap;
+
+                    .badge {
+                      &.green {
+                        color: #4CAF50;
+                        font-weight: 700;
+                      }
+
+                      &.gray {
+                        color: #888;
+                      }
+                    }
+                  }
+                }
+
+                .row2 {
+                  font-size: 10px;
+                  color: #888;
+                }
+
+                .row3 {
+                  display: flex;
+                  gap: 6px;
+
+                  .green-box,
+                  .yellow-box {
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-size: 9px;
+                    font-weight: 600;
+                  }
+
+                  .green-box {
+                    background: rgba(76, 175, 80, 0.2);
+                    border: 1px solid #4CAF50;
+                    color: #4CAF50;
+                  }
+
+                  .yellow-box {
+                    background: rgba(255, 165, 0, 0.2);
+                    border: 1px solid #FFA500;
+                    color: #FFA500;
+                  }
+                }
+
+                .row4 {
+                  font-size: 10px;
+                  color: #888;
+                  font-style: italic;
+                }
+
+                .row5 {
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 10px;
+                  color: #888;
+
+                  .rating {
+                    color: #FFA500;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Section 3: 2025년도 여름 시즌 상세 페이지
+// Cluster 4 Section 3: 시즌 상세 페이지 (9개 영역)
+.cluster4-section3 {
+  width: 100%;
+  max-width: 1330px;
+  padding: 60px 0;
+
+  // SEASON CHALLENGE 배너
+  .section3-banner {
+    width: 100%;
+    padding: 60px 40px;
+    margin-bottom: 40px;
+    background-image: url('/images/0/cluster 4/Bg img 02 .png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-align: center;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 0;
+    }
+
+    .section3-title-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 20px;
+      z-index: 1;
+    }
+
+    .section3-banner-text-shadow {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 60px;
+      font-weight: 900;
+      color: #111;
+      -webkit-text-stroke: 1px #21E786;
+      text-stroke: 1px #21E786;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      z-index: 0;
+      white-space: nowrap;
+    }
+
+    .section3-banner-text {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 60px;
+      font-weight: 900;
+      color: #FFF;
+      text-align: center;
+      margin: 0;
+      letter-spacing: 0;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    .section3-banner-description {
+      font-family: 'HakgyoansimTuho', sans-serif !important;
+      font-size: 20px;
+      color: #FFF;
+      line-height: 1.8;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+
+      p {
+        margin: 8px 0;
+        border-left: none !important;
+        padding-left: 0 !important;
+        font-family: 'HakgyoansimTuho', sans-serif !important;
+      }
+    }
+
+    .section3-banner-notice {
+      font-family: 'HakgyoansimTuho', sans-serif !important;
+      font-size: 20px;
+      color: #FFF;
+      position: relative;
+      z-index: 1;
+
+      p {
+        margin: 0;
+        border-left: none !important;
+        padding-left: 0 !important;
+        font-family: 'HakgyoansimTuho', sans-serif !important;
+      }
+    }
+  }
+
+  // 시즌 상세 컨테이너
+  .season-detail-container {
+    background: #1a1a1a;
+    padding: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    // 상단 헤더 행 (영역 1 + 영역 2)
+    .top-header-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #333;
+
+      // 영역 1: 타이틀 + 날짜 + 상태
+      .area-1-title {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .season-main-title {
+          font-family: 'Cafe24Ohsquare', sans-serif;
+          font-size: 36px;
+          color: #FFF;
+          margin: 0;
+
+          .year-orange {
+            font-size: 36px;
+            color: #FFA500;
+          }
+
+          &::after {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #FFA500;
+            border-radius: 50%;
+            margin-left: 16px;
+            vertical-align: middle;
+          }
+        }
+
+        .date-status {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .date-range {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFF;
+
+            &::after {
+              content: '';
+              display: inline-block;
+              width: 4px;
+              height: 4px;
+              background: #FFA500;
+              border-radius: 50%;
+              margin-left: 12px;
+              vertical-align: middle;
+            }
+          }
+
+          .status-badge {
+            background: #FFA500;
+            border: none;
+            width: 87px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 17.5px;
+            font-size: 14px;
+            color: #FFF;
+            font-weight: 700;
+            cursor: pointer;
+            padding-top: 2px;
+          }
+        }
+      }
+
+      // 영역 2: Qualified
+      .area-2-qualified {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .qualified-text {
+          font-family: var(--lobster), cursive;
+          font-size: 24px;
+          color: #FFF;
+          font-weight: 400;
+        }
+
+        .qualified-items {
+          display: flex;
+          gap: 16px;
+
+          .item-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .item {
+              font-family: var(--rajdhani), sans-serif;
+              font-size: 12px;
+              font-weight: 600;
+              color: #FFF;
+              border-bottom: 1px solid rgba(250, 171, 7, 0.5);
+              padding: 0 8px 2px 8px;
+            }
+
+            .trophy {
+              font-size: 16px;
+            }
+          }
+        }
+      }
+    }
+
+    // 메인 컨텐츠 그리드 (3열)
+    .main-content-grid {
+      display: grid;
+      grid-template-columns: 315px 1fr 380px;
+      gap: 20px;
+
+      // 영역 3: 왼쪽 이미지 스택
+      .area-3-image {
+        .season-image-stack {
+          width: 315px;
+          height: 465px;
+          position: relative;
+
+          .image-card {
+            position: absolute;
+            width: 315px;
+            height: 465px;
+
+            .card-frame {
+              width: 100%;
+              height: 100%;
+              border-radius: 12px;
+              overflow: hidden;
+              background: lightgray;
+              clip-path: polygon(
+                0 12px,
+                12px 0,
+                calc(100% - 50px) 0,
+                100% 50px,
+                100% calc(100% - 12px),
+                calc(100% - 12px) 100%,
+                12px 100%,
+                0 calc(100% - 12px)
+              );
+
+              img {
+                width: 100%;
+                height: 100%;
+                display: block;
+                object-fit: cover;
+              }
+            }
+
+            &.card-back {
+              top: 18px;
+              left: -12px;
+              z-index: 1;
+              opacity: 0.5;
+              transform: rotate(-4deg);
+            }
+
+            &.card-middle {
+              top: 9px;
+              left: -6px;
+              z-index: 2;
+              opacity: 0.7;
+              transform: rotate(-2deg);
+            }
+
+            &.card-front {
+              top: 0;
+              left: 0;
+              z-index: 3;
+              opacity: 1;
+
+              .card-frame {
+                border: 5px solid #FAAB07;
+                filter: drop-shadow(5px -5px 20px rgba(17, 17, 17, 0.80));
+              }
+            }
+          }
+        }
+      }
+
+      // 중앙 열 (영역 4, 5, 6, 7)
+      .center-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        // 영역 4: 통계 바
+        .area-4-stats {
+          display: flex;
+          gap: 25px;
+          padding: 12px 16px;
+          background: #222;
+          border-radius: 8px;
+
+          .stat {
+            font-size: 14px;
+            color: #CCC;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+              content: '';
+              display: inline-block;
+              width: 2px;
+              height: 2px;
+              background: #FFA500;
+              border-radius: 50%;
+            }
+
+            .number {
+              font-family: var(--black-ops-one), cursive;
+              font-size: 22px;
+              color: #FFF;
+              font-weight: 400;
+            }
+
+            .unit {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 16px;
+              color: #CCC;
+              font-weight: 400;
+            }
+          }
+        }
+
+        // 영역 5: 평점 및 리뷰
+        .area-5-rating {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          width: 466px;
+          height: 80px;
+          padding: 16px;
+          background: #222;
+          border-radius: 8px;
+
+          .rating-avatar {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          .rating-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .top-row {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+
+              .stars-row {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                .star {
+                  width: 13px;
+                  height: 18px;
+                  flex-shrink: 0;
+                }
+
+                .rating-text {
+                  font-size: 14px;
+                  color: #FFA500;
+                  margin-left: 6px;
+                  line-height: 1;
+                }
+              }
+
+              .review-label {
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                color: #000;
+                font-weight: 600;
+                background: #FFA500;
+                padding: 3px 14px;
+                border-radius: 20px;
+              }
+            }
+
+            .review-comment {
+              font-size: 16px;
+              color: rgba(255, 255, 255, 0.7);
+              margin: 0;
+            }
+          }
+        }
+
+        // 영역 6: 원형 차트 3개
+        .area-6-circles {
+          display: flex;
+          gap: 16px;
+          justify-content: space-around;
+          padding: 20px;
+          background: #222;
+          border-radius: 8px;
+
+          .circle-item {
+            position: relative;
+            width: 123px;
+            height: 123px;
+
+            .circle {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              top: 0;
+              left: 0;
+
+              svg {
+                width: 100%;
+                height: 100%;
+                transform: rotate(-90deg);
+
+                .bg {
+                  fill: none;
+                  stroke: #FFDA8D;
+                  stroke-width: 7;
+                }
+
+                .fill {
+                  fill: none;
+                  stroke-width: 7;
+                  stroke-linecap: butt;
+                  transition: stroke-dashoffset 1s ease;
+                }
+              }
+
+              &.pink .fill {
+                stroke: #FF7676;
+              }
+
+              &.yellow .fill {
+                stroke: #FF7676;
+              }
+
+              &.green .fill {
+                stroke: #FF7676;
+              }
+
+              .icon {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 24px;
+                line-height: 1;
+              }
+
+              .percent {
+                position: absolute;
+                top: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 24px;
+                font-weight: 700;
+                color: #FFF;
+                line-height: 1;
+              }
+            }
+
+            .circle-label {
+              position: absolute;
+              top: 58px;
+              left: 50%;
+              transform: translateX(-50%);
+              text-align: center;
+              width: 100%;
+
+              .label-main {
+                font-size: 24px;
+                color: #FFF;
+                margin-bottom: 0;
+                line-height: 1;
+              }
+
+              .label-sub {
+                font-size: 16px;
+                color: #FFF;
+                margin-top: 0;
+                line-height: 1;
+
+                .highlight {
+                  font-size: 20px;
+                  font-weight: 700;
+                  color: #FFA500;
+                }
+              }
+            }
+          }
+        }
+
+        // 영역 7: 프로그레스 바 4개
+        .area-7-progress {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          padding: 16px;
+          background: #222;
+          border-radius: 8px;
+
+          .progress-item {
+            .progress-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+
+              .name {
+                font-size: 16px;
+                color: #FFF;
+              }
+
+              .value {
+                font-size: 14px;
+                color: #FFF;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                white-space: nowrap;
+
+                .stars-icon {
+                  width: 18px;
+                  height: 18px;
+                  flex-shrink: 0;
+                  object-fit: contain;
+                }
+
+                .highlight {
+                  font-size: 16px;
+                  color: #FFA500;
+                  font-weight: 700;
+                }
+              }
+            }
+
+            .bar {
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              background: #333532;
+              border-radius: 0;
+              width: 465.572px;
+              height: 12px;
+              overflow: hidden;
+
+              .fill {
+                height: 100%;
+                border-radius: 0;
+                transition: width 1s ease;
+
+                &.yellow {
+                  border: 1px solid rgba(255, 255, 255, 0.15);
+                  background: #FAAB07;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 우측 열 (영역 8, 9)
+      .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        // 영역 8: 시즌 상태
+        .area-8-season-status {
+          width: 342px;
+          background: #1a1a1a;
+          border-radius: 8px;
+          padding: 16px;
+
+          .section-title {
+            font-size: 16px;
+            color: #FFF;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+          }
+
+          .status-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 101px;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            .badge-item {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 6px 10px;
+              background: #222;
+              border-radius: 8px;
+              height: 38px;
+
+              .badge-icon {
+                flex-shrink: 0;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: rgba(255, 165, 0, 0.2);
+                border: 2px solid #FFA500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+              }
+
+              .badge-info {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                justify-content: center;
+
+                .badge-name {
+                  font-size: 10px;
+                  color: #FFF;
+                  font-weight: 600;
+                }
+
+                .badge-tag {
+                  font-size: 9px;
+                  color: #AAA;
+                }
+
+                .badge-status {
+                  font-size: 8px;
+                  padding: 2px 6px;
+                  border-radius: 3px;
+                  display: inline-block;
+                  width: fit-content;
+                  font-weight: 600;
+
+                  &.yellow {
+                    background: rgba(255, 165, 0, 0.2);
+                    border: 1px solid #FFA500;
+                    color: #FFA500;
+                  }
+
+                  &.orange {
+                    background: rgba(255, 140, 0, 0.2);
+                    border: 1px solid #FF8C00;
+                    color: #FF8C00;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 영역 9: 시즌 평판
+        .area-9-season-reputation {
+          width: 342px;
+          background: #1a1a1a;
+          border-radius: 8px;
+          padding: 16px;
+
+          .section-title {
+            font-size: 16px;
+            color: #FFF;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+          }
+
+          .profile-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            .profile-card {
+              width: 338px;
+              height: 150px;
+              background: #222;
+              padding: 12px;
+              border-radius: 8px;
+              display: flex;
+              gap: 12px;
+              flex-shrink: 0;
+
+              .avatar {
+                flex-shrink: 0;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: rgba(255, 165, 0, 0.2);
+                border: 2px solid #FFA500;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+              }
+
+              .info {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                font-size: 11px;
+
+                .row1 {
+                  display: flex;
+                  justify-content: space-between;
+                  gap: 8px;
+
+                  .name {
+                    font-size: 12px;
+                    color: #FFF;
+                    font-weight: 600;
+                  }
+
+                  .deadline {
+                    font-size: 10px;
+                    color: #FFA500;
+                    white-space: nowrap;
+
+                    .badge {
+                      &.green {
+                        color: #4CAF50;
+                        font-weight: 700;
+                      }
+
+                      &.gray {
+                        color: #888;
+                      }
+                    }
+                  }
+                }
+
+                .row2 {
+                  font-size: 10px;
+                  color: #888;
+                }
+
+                .row3 {
+                  display: flex;
+                  gap: 6px;
+                  flex-wrap: wrap;
+
+                  .green-box,
+                  .yellow-box {
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-size: 9px;
+                    font-weight: 600;
+                  }
+
+                  .green-box {
+                    background: rgba(76, 175, 80, 0.2);
+                    border: 1px solid #4CAF50;
+                    color: #4CAF50;
+                  }
+
+                  .yellow-box {
+                    background: rgba(255, 165, 0, 0.2);
+                    border: 1px solid #FFA500;
+                    color: #FFA500;
+                  }
+                }
+
+                .row4 {
+                  font-size: 10px;
+                  color: #888;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+
+                .row5 {
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 10px;
+                  color: #888;
+
+                  .rating {
+                    color: #FFA500;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+}

@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\n클러스터 4 페이지 구현 - SEASON GROWTH 카드 및 상세 정보 추가\n\n- Cluster4Content 컴포넌트 생성\n- CLUB CHALLENGE GROWTH 섹션 추가 (HakgyoansimTuho 폰트 적용)\n- SEASON GROWTH 카드 구현 (배경 이미지 레이어링, 캐릭터 배치)\n- Add new collection 카드 및 Details 카드 추가\n- 성장 진행 중 배지 디자인 (Vector.png 외곽선 + 내부 fill)\n- 반응형 스크롤 애니메이션 적용\n- _cluster4.scss 스타일시트 추가\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(git pull:*)",
+      "Bash(npm run dev:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(npm run build:*)",
+      "Bash(curl:*)",
+      "Bash(git commit:*)",
+      "Bash(node -e:*)",
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(/tmp/cluster4_new.scss)",
+      "Bash(/tmp/cluster4_content_new.tsx)",
+      "Bash(components/cluster-4/Cluster4Content.tsx)",
+      "Bash(pkill -f \"npm run dev\")",
+      "Bash(pkill:*)",
+      "Bash(awk:*)",
+      "Bash(npx sass:*)",
+      "Bash(/Users/hwangjihye/Desktop/Carrer-Resume-main/app/assets/scss/components/_cluster4.scss)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
