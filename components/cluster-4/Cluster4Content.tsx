@@ -338,31 +338,34 @@ const Cluster4Content = () => {
             <div className="right-column">
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title">시즌 상태</h4>
+                <h4 className="section-title">🛡️ 시즌 상태</h4>
                 <div className="status-badges">
                   <div className="badge-item">
-                    <div className="badge-icon">👨</div>
-                    <div className="badge-info">
-                      <span className="badge-name">엔터테인먼트 팀</span>
-                      <span className="badge-tag">내토너스 파트</span>
-                      <span className="badge-status yellow">운영진(챔피서티)</span>
+                    <div className="badge-icon">
+                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
                     </div>
+                    <div className="badge-info">
+                      <span className="badge-text">엔터테인먼트 팀 | 내돈내산 파트 |</span>
+                    </div>
+                    <span className="badge-status yellow">운영진(앰버서더)</span>
                   </div>
                   <div className="badge-item">
-                    <div className="badge-icon">👨</div>
-                    <div className="badge-info">
-                      <span className="badge-name">운영진(3기)</span>
-                      <span className="badge-tag">클럽 단장</span>
-                      <span className="badge-status yellow">협장(매스케어팀)</span>
+                    <div className="badge-icon">
+                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
                     </div>
+                    <div className="badge-info">
+                      <span className="badge-text">운영진(3기) | 클럽 단위 |</span>
+                    </div>
+                    <span className="badge-status yellow">팀장(헬스케어 팀)</span>
                   </div>
                   <div className="badge-item">
-                    <div className="badge-icon">👨</div>
-                    <div className="badge-info">
-                      <span className="badge-name">운영진(4기)</span>
-                      <span className="badge-tag">클럽 단장</span>
-                      <span className="badge-status orange">에피서티</span>
+                    <div className="badge-icon">
+                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
                     </div>
+                    <div className="badge-info">
+                      <span className="badge-text">운영진(4기) | 클럽 단위 |</span>
+                    </div>
+                    <span className="badge-status yellow">앰배서더</span>
                   </div>
                 </div>
               </div>

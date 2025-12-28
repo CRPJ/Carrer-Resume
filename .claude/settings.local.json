@@ -23,7 +23,13 @@
       "Bash(pkill:*)",
       "Bash(awk:*)",
       "Bash(npx sass:*)",
-      "Bash(/Users/hwangjihye/Desktop/Carrer-Resume-main/app/assets/scss/components/_cluster4.scss)"
+      "Bash(/Users/hwangjihye/Desktop/Carrer-Resume-main/app/assets/scss/components/_cluster4.scss)",
+      "Bash(/tmp/cluster4_before.scss)",
+      "Bash(/tmp/cluster4_final.scss)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(git reset:*)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []

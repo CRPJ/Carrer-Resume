@@ -2291,7 +2291,7 @@
           width: 342px;
           background: #1a1a1a;
           border-radius: 8px;
-          padding: 16px;
+          padding: 0;
 
           .section-title {
             font-size: 16px;
@@ -2311,62 +2311,67 @@
             .badge-item {
               display: flex;
               align-items: center;
-              gap: 8px;
-              padding: 6px 10px;
-              background: #222;
-              border-radius: 8px;
+              gap: 2px;
+              width: 342px;
               height: 38px;
+              padding: 0px 0px 0px 2px;
+              background: #000;
+              border: 1px solid #333;
+              border-radius: 6px;
+              box-sizing: border-box;
 
               .badge-icon {
                 flex-shrink: 0;
-                width: 28px;
-                height: 28px;
-                border-radius: 50%;
-                background: rgba(255, 165, 0, 0.2);
-                border: 2px solid #FFA500;
+                width: 24px;
+                height: 24px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 14px;
+
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: contain;
+                }
               }
 
               .badge-info {
                 flex: 1;
                 display: flex;
-                flex-direction: column;
-                gap: 2px;
-                justify-content: center;
+                align-items: center;
 
-                .badge-name {
-                  font-size: 10px;
+                .badge-text {
+                  font-family: 'Pretendard', sans-serif;
+                  font-size: 14px;
+                  font-weight: 700;
                   color: #FFF;
-                  font-weight: 600;
+                  white-space: nowrap;
+                }
+              }
+
+              .badge-status {
+                flex-shrink: 0;
+                width: 102px;
+                height: 21px;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 700;
+                padding: 0;
+                border-radius: 10.5px;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+
+                &.yellow {
+                  background: #FFA500;
+                  color: #000;
                 }
 
-                .badge-tag {
-                  font-size: 9px;
-                  color: #AAA;
-                }
-
-                .badge-status {
-                  font-size: 8px;
-                  padding: 2px 6px;
-                  border-radius: 3px;
-                  display: inline-block;
-                  width: fit-content;
-                  font-weight: 600;
-
-                  &.yellow {
-                    background: rgba(255, 165, 0, 0.2);
-                    border: 1px solid #FFA500;
-                    color: #FFA500;
-                  }
-
-                  &.orange {
-                    background: rgba(255, 140, 0, 0.2);
-                    border: 1px solid #FF8C00;
-                    color: #FF8C00;
-                  }
+                &.orange {
+                  background: #FF8C00;
+                  color: #000;
                 }
               }
             }
