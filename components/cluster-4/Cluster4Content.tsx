@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 const Cluster4Content = () => {
   // 스크롤 애니메이션을 위한 ref
   const seasonCardRef = useRef<HTMLDivElement>(null);
   const [seasonCardVisible, setSeasonCardVisible] = useState(false);
+  const [section3Page, setSection3Page] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,6 +36,12 @@ const Cluster4Content = () => {
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1">
+        {/* 우측 상단 탭 */}
+        <div className="top-tabs">
+          <Link href="/cluster-4-1" className="tab"></Link>
+          <div className="tab active"></div>
+        </div>
+
         {/* 타이틀 */}
         <div className="section1-title-wrapper">
           <div className="title-inner">
@@ -146,6 +154,19 @@ const Cluster4Content = () => {
           </div>
         </div>
 
+        {/* 페이지네이션 */}
+        <div className="section3-pagination">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <span
+              key={num}
+              className={`page-num ${section3Page === num - 1 ? 'active' : ''} ${num === 5 ? 'last' : ''}`}
+              onClick={() => setSection3Page(num - 1)}
+            >
+              {num}
+            </span>
+          ))}
+        </div>
+
         <div className="season-detail-container">
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
@@ -165,20 +186,20 @@ const Cluster4Content = () => {
               <span className="qualified-text">Qualified</span>
               <div className="qualified-items">
                 <div className="item-group">
-                  <span className="item">Port</span>
-                  <span className="trophy">🏆</span>
+                  <span className="item">Part</span>
+                  <img src="/images/0/cluster 4/icon/icon - part.png" alt="Part" className="qualified-icon" />
                 </div>
                 <div className="item-group">
                   <span className="item">Team</span>
-                  <span className="trophy">🏆</span>
+                  <img src="/images/0/cluster 4/icon/icon - team.png" alt="Team" className="qualified-icon" />
                 </div>
                 <div className="item-group">
-                  <span className="item">Divi</span>
-                  <span className="trophy">🏆</span>
+                  <span className="item">Club</span>
+                  <img src="/images/0/cluster 4/icon/icon - cluv.png" alt="Club" className="qualified-icon" />
                 </div>
                 <div className="item-group">
                   <span className="item">Supervise</span>
-                  <span className="trophy">🏆</span>
+                  <img src="/images/0/cluster 4/icon/icon - supervise.png" alt="Supervise" className="qualified-icon" />
                 </div>
               </div>
             </div>
@@ -191,17 +212,17 @@ const Cluster4Content = () => {
               <div className="season-image-stack">
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src="/images/0/cluster 4/summer-2025.png" alt="2025 Summer Season" />
+                    <img src="/images/0/cluster 4/주차 이미지/봄 5주차 (4월 1주차).png" alt="봄 5주차" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src="/images/0/cluster 4/summer-2025.png" alt="2025 Summer Season" />
+                    <img src="/images/0/cluster 4/주차 이미지/봄 3주차 (3월 3주차).png" alt="봄 3주차" />
                   </div>
                 </div>
                 <div className="image-card card-front">
                   <div className="card-frame">
-                    <img src="/images/0/cluster 4/summer-2025.png" alt="2025 Summer Season" />
+                    <img src="/images/0/cluster 4/주차 이미지/봄 1주차 (3월 1주차).png" alt="봄 1주차" />
                   </div>
                 </div>
               </div>
@@ -211,15 +232,15 @@ const Cluster4Content = () => {
             <div className="center-column">
               {/* 영역 4: 통계 바 */}
               <div className="area-4-stats">
-                <span className="stat">단감 ⭐ <strong className="number">25</strong><span className="unit">개</span></span>
-                <span className="stat">인절미 ⬇️ <strong className="number">30</strong><span className="unit">명</span></span>
-                <span className="stat">어흥 👍 <strong className="number">-2</strong><span className="unit">개</span></span>
+                <span className="stat">단감 <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">25</strong><span className="unit">개</span></span>
+                <span className="stat">인절미 <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="stat-icon" /> <strong className="number">30</strong><span className="unit">명</span></span>
+                <span className="stat">어흥 <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">-2</strong><span className="unit">개</span></span>
               </div>
 
               {/* 영역 5: 평점 및 리뷰 */}
               <div className="area-5-rating">
                 <div className="rating-avatar">
-                  <img src="/images/0/cluster 4/avatar1.png" alt="Profile" />
+                  <img src="/images/0/crew profile/이안2.webp" alt="Profile" />
                 </div>
                 <div className="rating-content">
                   <div className="top-row">
@@ -255,11 +276,11 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset="62.8" />
                     </svg>
-                    <div className="icon">📅</div>
+                    <img src="/images/0/cluster 4/icon/icon - 주차 활용도.png" alt="주차 활용도" className="circle-icon" />
                     <div className="percent">80%</div>
                   </div>
                   <div className="circle-label">
-                    <div className="label-main">주차 활동도</div>
+                    <div className="label-main">주차 활용도</div>
                     <div className="label-sub">총 10주 중 <span className="highlight">8</span>주</div>
                   </div>
                 </div>
@@ -269,7 +290,7 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset="25.12" />
                     </svg>
-                    <div className="icon">⏰</div>
+                    <img src="/images/0/cluster 4/icon/icon - 일정 신뢰도.png" alt="일정 신뢰도" className="circle-icon" />
                     <div className="percent">90%</div>
                   </div>
                   <div className="circle-label">
@@ -283,7 +304,7 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset="75.36" />
                     </svg>
-                    <div className="icon">📈</div>
+                    <img src="/images/0/cluster 4/icon/icon - 시즌 성장률.png" alt="시즌 성장률" className="circle-icon" />
                     <div className="percent">70%</div>
                   </div>
                   <div className="circle-label">
@@ -297,7 +318,7 @@ const Cluster4Content = () => {
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name">💼 실무 전반 성장률 (50%)</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 (50%)</span>
                     <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">20</span> 개</span>
                   </div>
                   <div className="bar">
@@ -306,7 +327,7 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name">💼 실무 역량 성장률 (60%)</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 (60%)</span>
                     <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">30</span> 개</span>
                   </div>
                   <div className="bar">
@@ -315,7 +336,7 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name">💼 실무 경쟁 성장률 (100%)</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 (100%)</span>
                     <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">40</span> 개</span>
                   </div>
                   <div className="bar">
@@ -324,7 +345,7 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name">💼 실무 기술 성장률 (10%)</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 (10%)</span>
                     <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">4</span> 개</span>
                   </div>
                   <div className="bar">
@@ -338,32 +359,32 @@ const Cluster4Content = () => {
             <div className="right-column">
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title">🛡️ 시즌 상태</h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster 4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
                 <div className="status-badges">
                   <div className="badge-item">
                     <div className="badge-icon">
-                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
+                      <img src="/images/0/crew profile/이안1.webp" alt="profile" />
                     </div>
                     <div className="badge-info">
-                      <span className="badge-text">엔터테인먼트 팀 | 내돈내산 파트 |</span>
+                      <span className="badge-text">엔터테인먼트 팀 <span className="separator">|</span> <span className="sub-text">내돈내산 파트</span> <span className="separator">|</span></span>
                     </div>
                     <span className="badge-status yellow">운영진(앰버서더)</span>
                   </div>
                   <div className="badge-item">
                     <div className="badge-icon">
-                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
+                      <img src="/images/0/crew profile/이안2.webp" alt="profile" />
                     </div>
                     <div className="badge-info">
-                      <span className="badge-text">운영진(3기) | 클럽 단위 |</span>
+                      <span className="badge-text">운영진(3기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span></span>
                     </div>
                     <span className="badge-status yellow">팀장(헬스케어 팀)</span>
                   </div>
                   <div className="badge-item">
                     <div className="badge-icon">
-                      <img src="/images/0/cluster 4/icon/profile.png" alt="profile" />
+                      <img src="/images/0/crew profile/이안3.jpg" alt="profile" />
                     </div>
                     <div className="badge-info">
-                      <span className="badge-text">운영진(4기) | 클럽 단위 |</span>
+                      <span className="badge-text">운영진(4기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span></span>
                     </div>
                     <span className="badge-status yellow">앰배서더</span>
                   </div>
@@ -372,63 +393,102 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <h4 className="section-title">시즌 평판</h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster 4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판</h4>
                 <div className="profile-cards">
                   <div className="profile-card">
-                    <div className="avatar">👨</div>
-                    <div className="info">
-                      <div className="row1">
-                        <span className="name">엔터테인먼트팀</span>
-                        <span className="deadline">내일까지 완료 <span className="badge green">🔥출근인증(매일)</span></span>
+                    <div className="corner top-left"></div>
+                    <div className="corner top-right"></div>
+                    <div className="corner bottom-left"></div>
+                    <div className="corner bottom-right"></div>
+                    <div className="card-top">
+                      <div className="avatar">
+                        <img src="/images/0/crew profile/이안1.webp" alt="profile" />
                       </div>
-                      <div className="row2">▼ 엔포피디(3기) | 내일까지 완료</div>
-                      <div className="row3">
-                        <span className="green-box">우리집스튜디오이슈(커뮤니티운영)</span>
-                        <span className="yellow-box">🏘️리모콘스튜디오</span>
+                      <div className="info">
+                        <div className="row1">김미현 <span className="separator">|</span> 여 <span className="separator">|</span> 24 <span className="separator">|</span> 서울대학교 <span className="separator">|</span> 미디어커뮤니케이션학과</div>
+                        <div className="row2">엔터테인먼트팀 <span className="separator">|</span> 내돈내산파트 <span className="separator">|</span> 엔비디아구글테슬라쿵</div>
                       </div>
-                      <div className="row4">☑ 임실대회 이 시즌입실대회 이 시즌입실대회 이 시즌입실대회 이... ≫</div>
-                      <div className="row5">
-                        <span>RM PM : 325</span>
-                        <span className="rating">Ratings : ★★★★☆ 4 / 10</span>
-                      </div>
+                    </div>
+                    <div className="tags">
+                      <span className="tag-green">#추천력추진력면</span>
+                      <span className="tag-green">#추진력추진력면</span>
+                    </div>
+                    <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
+                    <div className="stats">
+                      <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM : 235</span>
+                      <span className="rating">
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <span className="rating-score">6 / 10</span>
+                      </span>
                     </div>
                   </div>
                   <div className="profile-card">
-                    <div className="avatar">👨</div>
-                    <div className="info">
-                      <div className="row1">
-                        <span className="name">문경조(3기)</span>
-                        <span className="deadline">내일까지 완료 <span className="badge green">🔥출근인증(매일)</span></span>
+                    <div className="corner top-left"></div>
+                    <div className="corner top-right"></div>
+                    <div className="corner bottom-left"></div>
+                    <div className="corner bottom-right"></div>
+                    <div className="card-top">
+                      <div className="avatar">
+                        <img src="/images/0/crew profile/이안2.webp" alt="profile" />
                       </div>
-                      <div className="row2">▼ 리버티테인먼트(3기) | 내일까지 완료</div>
-                      <div className="row3">
-                        <span className="green-box">우리집스튜디오이슈(커뮤니티운영)</span>
-                        <span className="yellow-box">🏘️리모콘스튜디오</span>
+                      <div className="info">
+                        <div className="row1">문경조(3기) <span className="separator">|</span> 남 <span className="separator">|</span> 28 <span className="separator">|</span> 연세대학교 <span className="separator">|</span> 경영학...</div>
+                        <div className="row2">▼ 리버티테인먼트(3기) <span className="separator">|</span> 내일까지 완료</div>
                       </div>
-                      <div className="row4">☑ 임실대회 이 시즌입실대회 이 시즌입실대회 이 시즌입실대회 이... ≫</div>
-                      <div className="row5">
-                        <span>RM PM : 325</span>
-                        <span className="rating">Ratings : ★★★★☆ 4 / 10</span>
-                      </div>
+                    </div>
+                    <div className="tags">
+                      <span className="tag-green">#추천력추진력면</span>
+                      <span className="tag-yellow">#리모콘스튜디오</span>
+                    </div>
+                    <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
+                    <div className="stats">
+                      <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM : 235</span>
+                      <span className="rating">
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <span className="star-half">
+                          <img className="star-half-filled" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                          <img className="star-half-empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        </span>
+                        <img className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <span className="rating-score">7 / 10</span>
+                      </span>
                     </div>
                   </div>
                   <div className="profile-card">
-                    <div className="avatar">👨</div>
-                    <div className="info">
-                      <div className="row1">
-                        <span className="name">엔터테인먼트팀</span>
-                        <span className="deadline">1.5월까지 완료 <span className="badge gray">조장대훈(매일)</span></span>
+                    <div className="corner top-left"></div>
+                    <div className="corner top-right"></div>
+                    <div className="corner bottom-left"></div>
+                    <div className="corner bottom-right"></div>
+                    <div className="card-top">
+                      <div className="avatar">
+                        <img src="/images/0/crew profile/이안3.jpg" alt="profile" />
                       </div>
-                      <div className="row2">▼ 리버티테인먼트(3기) | 내일까지 완료</div>
-                      <div className="row3">
-                        <span className="green-box">우리집스튜디오이슈(커뮤니티운영)</span>
-                        <span className="yellow-box">🏘️리모콘스튜디오</span>
+                      <div className="info">
+                        <div className="row1">엔터테인먼트팀 <span className="separator">|</span> 여 <span className="separator">|</span> 26 <span className="separator">|</span> 고려대학교 <span className="separator">|</span> 디자인...</div>
+                        <div className="row2">▼ 리버티테인먼트(3기) <span className="separator">|</span> 내일까지 완료</div>
                       </div>
-                      <div className="row4">☑ 임실대회 이 시즌입실대회 이 시즌입실대회 이 시즌입실대회 이... ≫</div>
-                      <div className="row5">
-                        <span>RM PM : 325</span>
-                        <span className="rating">Ratings : ★★★★☆ 4 / 10</span>
-                      </div>
+                    </div>
+                    <div className="tags">
+                      <span className="tag-green">#추천력추진력면</span>
+                      <span className="tag-yellow">#리모콘스튜디오</span>
+                    </div>
+                    <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
+                    <div className="stats">
+                      <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM : 235</span>
+                      <span className="rating">
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <img className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                        <span className="rating-score">8 / 10</span>
+                      </span>
                     </div>
                   </div>
                 </div>
