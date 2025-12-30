@@ -1,45 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 
 const Cluster4Content = () => {
-  // 스크롤 애니메이션을 위한 ref
-  const seasonCardRef = useRef<HTMLDivElement>(null);
-  const [seasonCardVisible, setSeasonCardVisible] = useState(false);
   const [section3Page, setSection3Page] = useState(0);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setSeasonCardVisible(true);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (seasonCardRef.current) {
-      observer.observe(seasonCardRef.current);
-    }
-
-    return () => {
-      if (seasonCardRef.current) {
-        observer.unobserve(seasonCardRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1">
-        {/* 우측 상단 탭 */}
+        {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <Link href="/cluster-4-1" className="tab"></Link>
-          <div className="tab active"></div>
+          <Link href="/cluster-4" className="tab">
+            <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
+            <div className="tab-badge">
+              <span className="badge-text">Weekly Growth</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+            </div>
+          </Link>
+          <div className="tab active">
+            <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
+            <div className="tab-badge">
+              <span className="badge-text">Season Growth</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+            </div>
+          </div>
         </div>
 
         {/* 타이틀 */}
@@ -56,16 +42,16 @@ const Cluster4Content = () => {
           <p>잠깐의 열정과 객기는 누구나 가질 수 있지만, 역경과 부침, 짜증나는 고난과 요동치는 감정을 이겨내며 꾸준하게 성장할 수 있는 사람은 생각보다 적습니다.😊</p>
           <p className="small-text">1주, 1개월, 1분기, 1반기, 1년.. 세상에서 평가하는 나의 신뢰성은 어떠한가요?</p>
           <p className="quote-text">
-            There is no magic to achievement. It's really about hard work, choices and persistence.<br />
-            무언가를 성취하기 위해 부릴 수 있는 마법은 없다. 필요한 것은 오직 노력, 선택 그리고 꾸준함일 뿐이다.<br />
-            -Michelle Obama-
+            There is no magic to achievement. It's really about hard work, choices and persistence.
           </p>
+          <p className="quote-highlight">무언가를 성취하기 위해 부릴 수 있는 마법은 없다. 필요한 것은 오직 노력, 선택 그리고 꾸준함일 뿐이다.</p>
+          <p className="quote-author">-Michelle Obama-</p>
         </div>
       </section>
 
       {/* Section 2: SEASON GROWTH 카드 */}
-      <section className="cluster4-section2" ref={seasonCardRef}>
-        <div className={`season-growth-card ${seasonCardVisible ? 'visible' : ''}`}>
+      <section className="cluster4-section2">
+        <div className="season-growth-card visible">
           {/* 왼쪽 콘텐츠 */}
           <div className="card-left">
             {/* 타이틀과 배지를 한 줄로 */}
@@ -74,23 +60,20 @@ const Cluster4Content = () => {
                 <h3 className="season-title-shadow">SEASON GROWTH</h3>
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
-              <div className="season-badge">
-                <img src="/images/0/cluster 4/Vector.png" alt="Badge Border" className="badge-border" />
-                <div className="badge-fill">
-                  <span className="badge-text">성장 진행 중</span>
-                </div>
+              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster%204/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+                <span className="badge-text">성장 진행 중</span>
               </div>
             </div>
 
             {/* Add new collection 카드 */}
             <div className="collection-card">
               <div className="collection-icon">
-                <img src="/images/0/cluster 4/icon/profile.png" alt="Profile Icon" />
+                <img src="/images/0/cluster%204/아호%20캐릭터.png" alt="아호 캐릭터" />
               </div>
               <div className="collection-content">
                 <div className="collection-header">
-                  <span className="add-icon">⊕</span>
-                  <span className="collection-label">Add new collection</span>
+                  <img src="/images/0/cluster 4/icon/icon - plus.png" alt="plus" className="add-icon" />
+                  <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
                   현재 클럽은, <strong>2025년 여름 시즌</strong>을 준비 중인 전환 과정에 있습니다.
@@ -101,8 +84,9 @@ const Cluster4Content = () => {
             {/* Details 카드 */}
             <div className="details-card">
               <div className="details-header">
-                <span className="toggle-icon">📋</span>
+                <img src="/images/0/cluster 4/icon/icon - ppt.png" alt="details" className="toggle-icon" />
                 <span className="toggle-text">Details</span>
+                <span className="arrow-icon"></span>
               </div>
 
               <div className="details-content">
@@ -111,20 +95,20 @@ const Cluster4Content = () => {
                   <span className="detail-value">2024년, 가을 시즌, 14주차</span>
                 </div>
                 <div className="detail-row">
-                  <span className="detail-label">성장 기준 시즌</span>
-                  <span className="detail-value">5 개 시즌</span>
+                  <span className="detail-label">성장 가능 시즌</span>
+                  <span className="detail-value"><span className="number">5</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
-                  <span className="detail-label">성장 성숙 시즌</span>
-                  <span className="detail-value">4 개 시즌</span>
+                  <span className="detail-label">성장 성공 시즌</span>
+                  <span className="detail-value"><span className="number">4</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 휴식 시즌</span>
-                  <span className="detail-value">1 개 시즌</span>
+                  <span className="detail-value"><span className="number">1</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 종료 시즌</span>
-                  <span className="detail-value">2024년, 가을 시즌, 14주차 (성장 전환)</span>
+                  <span className="detail-value">2024년, 가을 시즌, 14주차 (성장 완료)</span>
                 </div>
               </div>
             </div>

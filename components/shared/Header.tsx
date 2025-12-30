@@ -37,6 +37,11 @@ const menu = [
         url: "/cluster-4",
       },
       {
+        id: "0.41",
+        title: "Cluster 4-1",
+        url: "/cluster-4-1",
+      },
+      {
         id: "0.5",
         title: "Cluster 5",
         url: "/cluster-5",

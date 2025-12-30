@@ -8,10 +8,22 @@ const Cluster41Content = () => {
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1">
-        {/* 우측 상단 탭 */}
+        {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <div className="tab active"></div>
-          <Link href="/cluster-4" className="tab"></Link>
+          <div className="tab active">
+            <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
+            <div className="tab-badge">
+              <span className="badge-text">Weekly Growth</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+            </div>
+          </div>
+          <Link href="/cluster-4-1" className="tab">
+            <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
+            <div className="tab-badge">
+              <span className="badge-text">Season Growth</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+            </div>
+          </Link>
         </div>
 
         {/* 타이틀 */}

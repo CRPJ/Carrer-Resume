@@ -29,7 +29,10 @@
       "Bash(git push:*)",
       "Bash(git config:*)",
       "Bash(git reset:*)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(copy \"C:\\\\Users\\\\ynlee\\\\OneDrive\\\\바탕 화면\\\\커리어레쥬메\\\\nftg\\\\nftg\\\\public\\\\images\\\\0\\\\cluster 4\\\\button.png\" \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\template1\\\\public\\\\images\\\\0\\\\cluster 4\\\\button.png\")",
+      "Bash(findstr:*)",
+      "Bash(copy \"C:\\\\Users\\\\ynlee\\\\OneDrive\\\\바탕 화면\\\\커리어레쥬메\\\\nftg\\\\nftg\\\\public\\\\images\\\\0\\\\cluster 4\\\\아호 캐릭터.png\" \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\template1\\\\public\\\\images\\\\0\\\\cluster 4\\\\아호 캐릭터.png\")"
     ],
     "deny": [],
     "ask": []
