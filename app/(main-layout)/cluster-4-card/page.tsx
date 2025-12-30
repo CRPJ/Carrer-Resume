@@ -3,12 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
-import Cluster4Content from "@/components/cluster-4/Cluster4Content";
+import Cluster4CardContent from "@/components/cluster-4-card/Cluster4CardContent";
 import Animations from "@/components/shared/Animations";
 
-const Cluster4Page = () => {
-  // 사이드바 크기는 CSS 변수로 동적 조절됨
-
+const Cluster41CardPage = () => {
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
     position: 'fixed',
     left: '110px',
@@ -26,7 +24,6 @@ const Cluster4Page = () => {
       const footerRect = footer.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
-      // 푸터가 화면에 보이기 시작하면 - 사이드바를 위로 이동
       if (footerRect.top < windowHeight) {
         const moveUp = windowHeight - footerRect.top;
         setSidebarStyle({
@@ -48,7 +45,7 @@ const Cluster4Page = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // 초기 실행
+    handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -63,12 +60,12 @@ const Cluster4Page = () => {
       {/* 메인 콘텐츠 */}
       <div className="container-fluid">
         <div className="row">
-          {/* 사이드바 공간 확보용 빈 영역 - CSS 변수로 동적 조절 */}
+          {/* 사이드바 공간 확보용 빈 영역 */}
           <div style={{ width: 'var(--sidebar-width, 520px)', flexShrink: 0 }}></div>
           <div className="home-two-content-col">
             <ClusterTabs />
             <div className="home-two-content">
-              <Cluster4Content />
+              <Cluster4CardContent />
             </div>
           </div>
         </div>
@@ -77,4 +74,4 @@ const Cluster4Page = () => {
   );
 };
 
-export default Cluster4Page;
+export default Cluster41CardPage;

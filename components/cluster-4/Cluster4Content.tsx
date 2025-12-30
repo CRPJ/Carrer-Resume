@@ -12,7 +12,7 @@ const Cluster4Content = () => {
       <section className="cluster4-section1">
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <Link href="/cluster-4" className="tab">
+          <Link href="/cluster-4-1" className="tab">
             <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>
