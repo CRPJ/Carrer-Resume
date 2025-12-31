@@ -22,6 +22,25 @@
   font-style: normal;
 }
 
+// 공통 태그 스타일
+.tag {
+  border-radius: 4px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  padding: 5px 8px 3px 8px;
+  line-height: 1;
+
+  &--pink { color: #FC6C85; background: rgba(252, 108, 133, 0.1); }
+  &--red { color: #FF4A4A; background: rgba(255, 74, 74, 0.1); }
+  &--yellow { color: #EBF748; background: rgba(235, 247, 72, 0.1); }
+  &--purple { color: #8F00FF; background: rgba(143, 0, 255, 0.1); }
+  &--green { color: #48F768; background: rgba(72, 247, 104, 0.1); }
+  &--cyan { color: #48F7EE; background: rgba(72, 247, 238, 0.1); }
+  &--mint { color: #00FFBE; background: rgba(0, 255, 190, 0.1); }
+  &--dark { color: #fff; background: #283C38; }
+}
 
 .cluster4-content {
   padding: 0;
@@ -2908,18 +2927,15 @@
                 gap: 6px;
                 margin-top: 8px;
 
-                .tag-green {
-                  width: 88px;
-                  height: 18px;
+                .tag {
                   background: rgba(0, 255, 190, 0.1);
                   color: #00FFBE;
                   border-radius: 4px;
                   font-size: 10px;
                   font-weight: 600;
                   white-space: nowrap;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
+                  padding: 6px 8px 2px 8px;
+                  line-height: 1;
                 }
 
                 .tag-yellow {
@@ -3517,6 +3533,7 @@
               font-family: 'Black Ops One', cursive;
               color: #fff;
               font-weight: 400;
+              font-size: 18px;
             }
           }
         }
@@ -4828,6 +4845,7 @@
                 font-family: 'Black Ops One', cursive;
                 color: #fff;
                 font-weight: 400;
+                font-size: 18px;
               }
             }
           }
@@ -5171,12 +5189,12 @@
             .card-profile {
               display: flex;
               align-items: center;
-              gap: 10px;
+              gap: 14px;
 
               .profile-image {
                 flex-shrink: 0;
-                width: 36px;
-                height: 36px;
+                width: 60px;
+                height: 60px;
                 border-radius: 50%;
                 overflow: hidden;
                 background: linear-gradient(135deg, #666, #444);
@@ -5197,43 +5215,39 @@
               .profile-info {
                 flex: 1;
                 min-width: 0;
+                .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+                .label { color: #999; font-size: 14px !important; }
+
+                .profile-name-row {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 2px;
+                  .date-view {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    .date { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+                    .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); }
+                  }
+                }
 
                 .profile-name {
-                  font-size: 13px;
-                  font-weight: 600;
-                  color: #fff;
-                  margin-bottom: 2px;
+                  font-size: 18px !important;
+                  color: rgba(255, 255, 255, 0.5);
+                  .text { font-size: 18px !important; }
                 }
 
                 .profile-details {
-                  font-size: 10px;
+                  font-size: 14px !important;
                   color: rgba(255, 255, 255, 0.5);
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
-
-                  .nickname {
-                    color: #FFA500;
-                  }
+                  line-height: 1.2;
+                  .text { font-size: 14px !important; }
+                  .nickname { color: #FFA500; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
                 }
-              }
-            }
-
-            .card-date-row {
-              display: flex;
-              align-items: center;
-              justify-content: flex-end;
-              gap: 8px;
-              margin-top: 8px;
-
-              .date {
-                font-size: 11px;
-                color: rgba(255, 255, 255, 0.5);
-              }
-
-              .view-icon {
-                font-size: 14px;
-                opacity: 0.6;
               }
             }
 
@@ -5253,28 +5267,28 @@
   // 주차 평판 카드 그리드 (2열)
   .reputation-cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 310px);
+    grid-template-columns: repeat(2, 320px);
     gap: 12px;
 
     .reputation-card {
-      width: 310px;
-      height: 228px;
+      width: 320px;
+      height: 250px;
       background: rgba(50, 50, 50, 0.8);
-      border-radius: 12px;
+      border-radius: 20px;
       padding: 14px;
       box-sizing: border-box;
       overflow: hidden;
 
       .card-profile {
         display: flex;
-        align-items: flex-start;
-        gap: 12px;
+        align-items: center;
+        gap: 14px;
         margin-bottom: 10px;
 
         .profile-image {
           flex-shrink: 0;
-          width: 48px;
-          height: 48px;
+          width: 60px;
+          height: 60px;
           border-radius: 50%;
           overflow: hidden;
           background: linear-gradient(135deg, #666, #444);
@@ -5287,29 +5301,64 @@
           flex: 1;
           min-width: 0;
 
-          .profile-name { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+          .label { color: #999; font-size: 14px !important; }
+          .profile-name {
+            font-size: 18px !important;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 2px;
+            .text { font-size: 18px !important; }
+          }
           .profile-details {
-            font-size: 11px; color: rgba(255, 255, 255, 0.5); line-height: 1.4;
-            .university { color: #4fc3f7; }
-            .nickname { color: #FFA500; }
+            font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2;
+            .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; }
+            .text { font-size: 14px !important; }
+            .nickname { color: #FFA500; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
           }
         }
       }
 
-      .card-rating {
-        display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-        .stars { display: flex; gap: 2px;
-          .star { font-size: 14px; &.filled { color: #FFD700; } &.empty { color: rgba(255, 255, 255, 0.2); } }
-        }
-        .rating-count { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+      .profile-divider {
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 10px 0;
       }
 
-      .card-description { font-size: 12px; color: rgba(255, 255, 255, 0.7); margin-bottom: 10px; .emoji { font-size: 14px; } }
+      .card-rating {
+        display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+        .stars { display: flex; align-items: center; gap: 4px;
+          .star { width: 13px; height: 18px; object-fit: contain; display: block;
+            &.half {
+              position: relative;
+              display: inline-block;
+              .star-half-filled {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 13px;
+                height: 18px;
+                object-fit: contain;
+                clip-path: inset(0 50% 0 0);
+              }
+              .star-half-empty {
+                width: 13px;
+                height: 18px;
+                object-fit: contain;
+              }
+            }
+          }
+        }
+        .rating-count { font-size: 12px; color: rgba(255, 255, 255, 0.5); line-height: 18px; position: relative; top: 2px; }
+      }
+
+      .card-description { font-size: 13px; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
 
       .card-footer {
-        display: flex; align-items: center; justify-content: space-between;
-        .fm-badge { font-size: 11px; color: rgba(255, 255, 255, 0.5); background: rgba(0, 0, 0, 0.3); padding: 4px 10px; border-radius: 12px; }
-        .recommend-btn { font-size: 11px; color: #4fc3f7; background: transparent; border: 1px solid rgba(79, 195, 247, 0.3); padding: 4px 12px; border-radius: 12px; cursor: pointer; &:hover { background: rgba(79, 195, 247, 0.1); } }
+        display: flex; align-items: center; gap: 8px;
+        .fm-badge { font-size: 15px; color: #fff; background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
+        .footer-divider { color: rgba(255, 255, 255, 0.3); }
+        .tag { font-size: 12px; }
       }
     }
   }
@@ -5328,23 +5377,20 @@
       &.empty { opacity: 0.5; }
 
       .card-profile {
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 14px;
         .profile-image {
-          flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #666, #444);
+          flex-shrink: 0; width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #666, #444);
           img { width: 100%; height: 100%; object-fit: cover; }
           .profile-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #555, #333); }
         }
         .profile-info {
           flex: 1; min-width: 0;
-          .profile-name { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px; }
-          .profile-details { font-size: 10px; color: rgba(255, 255, 255, 0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .nickname { color: #FFA500; } }
+          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+          .label { color: #999; font-size: 14px !important; }
+          .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 12px; color: rgba(255, 255, 255, 0.5); } .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); } } }
+          .profile-name { font-size: 18px !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 18px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; } }
+          .profile-details { font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; } .text { font-size: 14px !important; } .nickname { color: #FFA500; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; } }
         }
-      }
-
-      .card-date-row {
-        display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px;
-        .date { font-size: 11px; color: rgba(255, 255, 255, 0.5); }
-        .view-icon { font-size: 14px; opacity: 0.6; }
       }
     }
   }

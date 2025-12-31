@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 const Cluster4CardContent = () => {
+  // 태그 색상 배열
+  const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
+
   // 주차 평판 데이터
   const reputationData = [
     {
@@ -11,64 +14,72 @@ const Cluster4CardContent = () => {
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-1.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/여 3.jpg",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
-      rating: 3,
-      ratingCount: "6 / 10",
+      rating: 3.5,
+      ratingCount: "7 / 10",
       description: "20자까지 쓴 내용을 확인할 수 있습니다...",
       fm: 325,
+      tagColor: 'tag--mint',
+      tagText: '#추진력추진력추',
     },
     {
       id: 2,
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-2.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/남 5.jpg",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
-      rating: 4,
-      ratingCount: "6 / 10",
+      rating: 4.5,
+      ratingCount: "9 / 10",
       description: "20자까지 쓴 내용을 확인할 수 있습니다...",
       fm: 325,
+      tagColor: 'tag--purple',
+      tagText: '#리더십리더십리',
     },
     {
       id: 3,
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-3.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/여 7.webp",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
-      rating: 3,
-      ratingCount: "6 / 10",
+      rating: 2.5,
+      ratingCount: "5 / 10",
       description: "20자까지 쓴 내용을 확인할 수 있습니다...",
       fm: 325,
+      tagColor: 'tag--yellow',
+      tagText: '#창의력창의력창',
     },
     {
       id: 4,
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-1.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/남 2.jpg",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       rating: 5,
-      ratingCount: "6 / 10",
+      ratingCount: "10 / 10",
       description: "20자까지 쓴 내용을 확인할 수 있습니다...",
       fm: 325,
+      tagColor: 'tag--cyan',
+      tagText: '#협동심협동심협',
     },
   ];
 
@@ -79,10 +90,10 @@ const Cluster4CardContent = () => {
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-1.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/여 5.jpg",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
@@ -92,10 +103,10 @@ const Cluster4CardContent = () => {
       name: "김미현",
       gender: "여",
       age: 24,
-      profileImg: "/images/0/cluster 4/4-1/profile-2.png",
-      university: "서울대학교",
+      profileImg: "/images/0/crew profile/남 8.webp",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
@@ -106,9 +117,9 @@ const Cluster4CardContent = () => {
       gender: "여",
       age: 24,
       profileImg: "",
-      university: "서울대학교",
+      university: "서울대",
       major: "미디어커뮤니케이션",
-      team: "엔터테인먼트팀",
+      team: "엔터테인먼트",
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "0000 - 00 - 00 (월)",
@@ -146,13 +157,42 @@ const Cluster4CardContent = () => {
     { id: 5, code: "", badge: "", title: "Main Title", verified: true, date: "0000 - 00 - 00 (월)", likes: "0.99", hasWeb: false, isEmpty: true },
   ];
 
-  // 별점 렌더링 함수
+  // 별점 렌더링 함수 (반개 지원)
   const renderStars = (rating: number) => {
     const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
     for (let i = 0; i < 5; i++) {
-      stars.push(
-        <span key={i} className={`star ${i < rating ? 'filled' : 'empty'}`}>★</span>
-      );
+      if (i < fullStars) {
+        // 채워진 별
+        stars.push(
+          <img
+            key={i}
+            src="/images/0/cluster 4/icon/icon - star.png"
+            alt="star"
+            className="star filled"
+          />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        // 반개 별
+        stars.push(
+          <span key={i} className="star half">
+            <img src="/images/0/cluster 4/icon/icon - star.png" alt="star" className="star-half-filled" />
+            <img src="/images/0/cluster 4/icon/icon - empty star.png" alt="star" className="star-half-empty" />
+          </span>
+        );
+      } else {
+        // 빈 별
+        stars.push(
+          <img
+            key={i}
+            src="/images/0/cluster 4/icon/icon - empty star.png"
+            alt="star"
+            className="star empty"
+          />
+        );
+      }
     }
     return stars;
   };
@@ -283,20 +323,24 @@ const Cluster4CardContent = () => {
                       {user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name">{user.name} | {user.gender} | {user.age}</div>
+                      <div className="profile-name"><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></div>
                       <div className="profile-details">
-                        <span className="university">{user.university}</span> | <span className="major">{user.major}</span>학과 | <span className="team">{user.team}</span> | <span className="part">{user.part}</span>파트 | <span className="nickname">{user.nickname}</span>
+                        <div className="detail-line"><span className="text">{user.university}</span><span className="label">학교</span> | <span className="text">{user.major}</span><span className="label">학과</span></div>
+                        <div className="detail-line"><span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span></div>
+                        <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                       </div>
                     </div>
                   </div>
+                  <div className="profile-divider"></div>
                   <div className="card-rating">
                     <div className="stars">{renderStars(user.rating)}</div>
                     <span className="rating-count">{user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{user.description} <span className="emoji">😊</span></div>
+                  <div className="card-description">{user.description} <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="more-icon" /></div>
                   <div className="card-footer">
-                    <span className="fm-badge">FM : {user.fm}</span>
-                    <button className="recommend-btn">추천해주점봐♥</button>
+                    <span className="fm-badge"><img src="/images/0/cluster 4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {user.fm}</span>
+                    <span className="footer-divider">|</span>
+                    <span className={`tag ${user.tagColor}`}>{user.tagText}</span>
                   </div>
                 </div>
               ))}
@@ -318,15 +362,17 @@ const Cluster4CardContent = () => {
                       {user.profileImg && !user.isEmpty ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name">{user.name} | {user.gender} | {user.age}</div>
+                      <div className="profile-name-row">
+                        <div className="profile-name"><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></div>
+                        <div className="date-view">
+                          <span className="date">{user.date}</span>
+                          <img src="/images/0/cluster 4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
+                        </div>
+                      </div>
                       <div className="profile-details">
-                        <span className="university">{user.university}</span> | <span className="major">{user.major}</span>학과 | <span className="team">{user.team}</span> | <span className="part">{user.part}</span>파트 | <span className="nickname">{user.nickname}</span>
+                        <span className="text">{user.university}</span><span className="label">학교</span> | <span className="text">{user.major}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span>
                       </div>
                     </div>
-                  </div>
-                  <div className="card-date-row">
-                    <span className="date">{user.date}</span>
-                    <span className="view-icon">👁</span>
                   </div>
                 </div>
               ))}

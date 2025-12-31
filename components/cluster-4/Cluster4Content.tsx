@@ -394,8 +394,8 @@ const Cluster4Content = () => {
                       </div>
                     </div>
                     <div className="tags">
-                      <span className="tag-green">#추천력추진력면</span>
-                      <span className="tag-green">#추진력추진력면</span>
+                      <span className="tag">#추천력추진력면</span>
+                      <span className="tag">#추진력추진력면</span>
                     </div>
                     <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
                     <div className="stats">
@@ -425,7 +425,7 @@ const Cluster4Content = () => {
                       </div>
                     </div>
                     <div className="tags">
-                      <span className="tag-green">#추천력추진력면</span>
+                      <span className="tag">#추천력추진력면</span>
                       <span className="tag-yellow">#리모콘스튜디오</span>
                     </div>
                     <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
@@ -459,7 +459,7 @@ const Cluster4Content = () => {
                       </div>
                     </div>
                     <div className="tags">
-                      <span className="tag-green">#추천력추진력면</span>
+                      <span className="tag">#추천력추진력면</span>
                       <span className="tag-yellow">#리모콘스튜디오</span>
                     </div>
                     <div className="comment"><img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" /> 안녕하세요 이 시즌안녕하세요 이 시즌일아삼사오... <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" /></div>
