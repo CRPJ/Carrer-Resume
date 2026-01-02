@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
-import Cluster41Content from "@/components/cluster-4-1/Cluster41Content";
+import Cluster4Content from "@/components/cluster-4/Cluster4Content";
 import Animations from "@/components/shared/Animations";
 
 const Cluster41Page = () => {
@@ -68,7 +68,7 @@ const Cluster41Page = () => {
           <div className="home-two-content-col">
             <ClusterTabs />
             <div className="home-two-content">
-              <Cluster41Content />
+              <Cluster4Content />
             </div>
           </div>
         </div>

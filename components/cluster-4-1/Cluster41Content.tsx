@@ -285,7 +285,7 @@ const Cluster41Content = () => {
               <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </div>
-          <Link href="/cluster-4" className="tab">
+          <Link href="/cluster-4-1" className="tab">
             <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { WeekData } from "@/data/weeklyData";
+import { WeekData, weeklyData } from "@/data/weeklyData";
 
 interface Cluster4CardContentProps {
   weekData?: WeekData;
@@ -12,12 +12,14 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   // 기본값 설정
   const defaultImage = "/images/0/cluster 4/주차 이미지/여름 3주차 (7월 3주차).png";
   const defaultTitle = "2025 여름 시즌, 3주차";
-
-  const currentImage = weekData?.image || defaultImage;
-  const currentTitle = weekData?.shortTitle || defaultTitle;
+  const restImage = "/images/0/cluster%204/주차%20이미지/휴식(개인,공식).png";
 
   // 휴식 모드 체크 (휴식(개인), 휴식(공식)일 때 모든 카드 비활성화)
   const isRestMode = weekData?.growthStatus?.includes('휴식') || false;
+
+  // 휴식 모드일 때는 휴식 전용 이미지 사용
+  const currentImage = isRestMode ? restImage : (weekData?.image || defaultImage);
+  const currentTitle = weekData?.shortTitle || defaultTitle;
 
   // 성장 상태에 따른 뱃지 정보
   const getStatusBadgeInfo = (status: string | undefined) => {
@@ -56,6 +58,11 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   };
 
   const statusBadgeInfo = getStatusBadgeInfo(weekData?.growthStatus);
+
+  // 이전/다음 주차 계산
+  const currentIndex = weeklyData.findIndex(w => w.id === weekData?.id);
+  const prevWeekId = currentIndex < weeklyData.length - 1 ? weeklyData[currentIndex + 1]?.id : null;
+  const nextWeekId = currentIndex > 0 ? weeklyData[currentIndex - 1]?.id : null;
 
   // 태그 색상 배열
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
@@ -257,14 +264,14 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
-          <Link href="/cluster-4-1" className="tab active">
+          <Link href="/cluster-4" className="tab active">
             <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </Link>
-          <Link href="/cluster-4" className="tab">
+          <Link href="/cluster-4-1" className="tab">
             <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
@@ -273,15 +280,29 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
           </Link>
         </div>
         <div className="nav-buttons">
-          <button className="nav-btn-prev">
-            <span>이전 주</span>
-            <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
-          </button>
-          <button className="nav-btn-next">
-            <span>다음 주</span>
-            <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
-          </button>
-          <Link href="/cluster-4-1" className="nav-btn-filled">
+          {prevWeekId ? (
+            <Link href={`/cluster-4-card/${prevWeekId}`} className="nav-btn-prev">
+              <span>이전 주</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
+            </Link>
+          ) : (
+            <button className="nav-btn-prev disabled" disabled>
+              <span>이전 주</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
+            </button>
+          )}
+          {nextWeekId ? (
+            <Link href={`/cluster-4-card/${nextWeekId}`} className="nav-btn-next">
+              <span>다음 주</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
+            </Link>
+          ) : (
+            <button className="nav-btn-next disabled" disabled>
+              <span>다음 주</span>
+              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
+            </button>
+          )}
+          <Link href="/cluster-4" className="nav-btn-filled">
             <img src="/images/0/cluster%204/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
