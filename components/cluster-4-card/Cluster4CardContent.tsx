@@ -2,8 +2,61 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { WeekData } from "@/data/weeklyData";
 
-const Cluster4CardContent = () => {
+interface Cluster4CardContentProps {
+  weekData?: WeekData;
+}
+
+const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
+  // 기본값 설정
+  const defaultImage = "/images/0/cluster 4/주차 이미지/여름 3주차 (7월 3주차).png";
+  const defaultTitle = "2025 여름 시즌, 3주차";
+
+  const currentImage = weekData?.image || defaultImage;
+  const currentTitle = weekData?.shortTitle || defaultTitle;
+
+  // 휴식 모드 체크 (휴식(개인), 휴식(공식)일 때 모든 카드 비활성화)
+  const isRestMode = weekData?.growthStatus?.includes('휴식') || false;
+
+  // 성장 상태에 따른 뱃지 정보
+  const getStatusBadgeInfo = (status: string | undefined) => {
+    switch (status) {
+      case '성공':
+        return {
+          className: 'success',
+          text: '성장(성공)',
+          icon: '/images/0/cluster 4/icon/icon - 성장(성공).png'
+        };
+      case '실패':
+        return {
+          className: 'fail',
+          text: '성장(실패)',
+          icon: '/images/0/cluster 4/icon/icon - 성장(실패).png'
+        };
+      case '휴식(개인)':
+        return {
+          className: 'rest-personal',
+          text: '휴식(개인)',
+          icon: '/images/0/cluster 4/icon/icon - 휴식(개인).png'
+        };
+      case '휴식(공식)':
+        return {
+          className: 'rest-official',
+          text: '휴식(공식)',
+          icon: '/images/0/cluster 4/icon/icon - 휴식(공식).png'
+        };
+      default:
+        return {
+          className: 'success',
+          text: '성장(성공)',
+          icon: '/images/0/cluster 4/icon/icon - 성장(성공).png'
+        };
+    }
+  };
+
+  const statusBadgeInfo = getStatusBadgeInfo(weekData?.growthStatus);
+
   // 태그 색상 배열
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
 
@@ -131,12 +184,12 @@ const Cluster4CardContent = () => {
   // 실무 정보 카드 데이터
   const workInfoCards = [
     { id: 1, title: "Main Title", verified: true, category: "위즈덤", tagColor: "tag--red", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 위즈덤.png", isFruit: true },
-    { id: 2, title: "Main Title", verified: true, category: "에세이", tagColor: "tag--yellow", status: "waiting", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 에세이.png", isFruit: true },
-    { id: 3, title: "Main Title", verified: true, category: "인포데스크", tagColor: "tag--purple", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 인포데스크.png", isFruit: true },
-    { id: 4, title: "Main Title", verified: true, category: "캘린더", tagColor: "tag--dark", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 캘린더.png", isFruit: true },
+    { id: 2, title: "Main Title", verified: true, category: "에세이", tagColor: "tag--yellow", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 에세이.png", isFruit: true, isFailed: true },
+    { id: 3, title: "Main Title", verified: true, category: "인포데스크", tagColor: "tag--purple", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 인포데스크.png", isFruit: true, isFailed: true },
+    { id: 4, title: "Main Title", verified: true, category: "캘린더", tagColor: "tag--dark", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 캘린더.png", isFruit: true },
     { id: 5, title: "Main Title", verified: true, category: "포럼", tagColor: "tag--green", status: "waiting", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 포럼.png", isFruit: true },
     { id: 6, title: "Main Title", verified: true, category: "세션", tagColor: "tag--cyan", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 세션.png", isFruit: true },
-    { id: 7, title: "Main Title", verified: true, category: "기타a", tagColor: "tag--mint", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 기타a.png", isFruit: false },
+    { id: 7, title: "Main Title", verified: true, category: "기타a", tagColor: "tag--mint", status: "waiting", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 기타a.png", isFruit: false },
     { id: 8, title: "Main Title", verified: true, category: "", tagColor: "", status: "", icon: "", isEmpty: true },
     { id: 9, title: "Main Title", verified: true, category: "", tagColor: "", status: "", icon: "", isEmpty: true },
   ];
@@ -151,12 +204,12 @@ const Cluster4CardContent = () => {
 
   // 실무 경력 카드 데이터
   const workCareerCards = [
-    { id: 1, code: "AA22-11111", badge: "마케팅|마이릿|축시 출시", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/배민.png" },
-    { id: 2, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/sm.webp" },
-    { id: 3, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/Logo_tvN.svg.png" },
-    { id: 4, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/naver%20webtoon.png" },
-    { id: 5, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/CJ_logo.svg.png" },
-    { id: 6, code: "", badge: "", title: "Main Title", verified: true, date: "0000 - 00 - 00 (월)", likes: "0.99", hasWeb: false, isEmpty: true, icon: "" },
+    { id: 1, code: "AA22-11111", badge: "마케팅|마이릿|축시 출시", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/배민.png", supervisorImg: "/images/0/crew profile/남 2.jpg", supervisorName: "이준혁", supervisorDept: "서비스기획팀", supervisorCompany: "우아한형제들", supervisorPosition: "대리", statusBadge: "/images/0/cluster 4/icon/5 강화 성공.png", grade: "S" },
+    { id: 2, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/sm.webp", supervisorImg: "/images/0/crew profile/여 1.jpg", supervisorName: "김민지", supervisorDept: "마케팅팀", supervisorCompany: "네이버", supervisorPosition: "과장", statusBadge: "/images/0/cluster 4/icon/6 강화 대기.png", grade: "A" },
+    { id: 3, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/Logo_tvN.svg.png", supervisorImg: "/images/0/crew profile/남 4.jpg", supervisorName: "박성호", supervisorDept: "전략기획팀", supervisorCompany: "카카오", supervisorPosition: "차장", statusBadge: "/images/0/cluster 4/icon/8 해당 없음.png", isNotApplicable: true, grade: "B" },
+    { id: 4, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/naver%20webtoon.png", supervisorImg: "/images/0/crew profile/여 6.jpg", supervisorName: "최유진", supervisorDept: "UX팀", supervisorCompany: "토스", supervisorPosition: "팀장", statusBadge: "/images/0/cluster 4/icon/5 강화 성공.png", grade: "S" },
+    { id: 5, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/CJ_logo.svg.png", supervisorImg: "/images/0/crew profile/남 7.jpg", supervisorName: "정재원", supervisorDept: "개발팀", supervisorCompany: "쿠팡", supervisorPosition: "사원", statusBadge: "/images/0/cluster 4/icon/8 해당 없음.png", isNotApplicable: true, grade: "C" },
+    { id: 6, code: "", badge: "", title: "Main Title", verified: true, date: "0000 - 00 - 00 (월)", likes: "0.99", hasWeb: false, isEmpty: true, icon: "", supervisorImg: "", supervisorName: "", supervisorDept: "", supervisorCompany: "", supervisorPosition: "", statusBadge: "", grade: "" },
   ];
 
   // 별점 렌더링 함수 (반개 지원)
@@ -240,15 +293,12 @@ const Cluster4CardContent = () => {
         {/* 왼쪽: 큰 주차 이미지 */}
         <div className="section1-left">
           <div className="main-image-container">
-            <img src="/images/0/cluster 4/주차 이미지/여름 3주차 (7월 3주차).png" alt="주차 이미지" className="main-week-image" />
+            <img src={currentImage} alt="주차 이미지" className="main-week-image" />
             {/* 뱃지 두 개 */}
             <div className="image-badges">
-              <div className="badge-item">
+              <div className="badge-item heart-badge">
                 <span className="badge-count">99</span>
-                <span className="badge-icon">♥</span>
-              </div>
-              <div className="badge-item">
-                <img src="/images/0/cluster 4/icon/icon - trophy.png" alt="trophy" className="badge-trophy" />
+                <i className="ti ti-heart"></i>
               </div>
             </div>
           </div>
@@ -259,10 +309,10 @@ const Cluster4CardContent = () => {
           {/* 헤더 */}
           <div className="section1-header">
             <div className="header-title-row">
-              <h1 className="section1-title">2025 여름 시즌, 3주차</h1>
-              <div className="status-badge success">
-                <span>성장(성공)</span>
-                <img src="/images/0/cluster 4/icon/icon - 성장(성공).png" alt="성공" />
+              <h1 className="section1-title">{currentTitle}</h1>
+              <div className={`status-badge ${statusBadgeInfo.className}`}>
+                <span>{statusBadgeInfo.text}</span>
+                <img src={statusBadgeInfo.icon} alt={statusBadgeInfo.text} />
               </div>
             </div>
             <div className="header-info-row">
@@ -318,16 +368,18 @@ const Cluster4CardContent = () => {
               <span className="section-count"><span className="count-num">3</span>/3</span>
             </div>
             <div className="reputation-cards-grid">
-              {reputationData.map((user, index) => (
-                <div key={user.id} className={`reputation-card ${user.isEmpty ? 'empty' : ''}`}>
+              {reputationData.map((user, index) => {
+                const isEmpty = user.isEmpty || isRestMode;
+                return (
+                <div key={user.id} className={`reputation-card ${isEmpty ? 'empty' : ''}`}>
                   <div className="card-profile">
                     <div className="profile-image">
-                      {user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
+                      {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name"><span className="text">{user.isEmpty ? '-' : user.name}</span>{!user.isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                      <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
                       <div className="profile-details">
-                        {user.isEmpty ? (
+                        {isEmpty ? (
                           <>
                             <div className="detail-line"><span className="text">-</span></div>
                             <div className="detail-line"><span className="text">&nbsp;</span></div>
@@ -345,17 +397,18 @@ const Cluster4CardContent = () => {
                   </div>
                   <div className="profile-divider"></div>
                   <div className="card-rating">
-                    <div className="stars">{renderStars(user.rating)}</div>
-                    <span className="rating-count">{user.ratingCount}</span>
+                    <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
+                    <span className="rating-count">{isEmpty ? '- / 10' : user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{user.description} <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="more-icon" /></div>
+                  <div className="card-description">{isEmpty ? '-' : <>{user.description} <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
                   <div className="card-footer">
-                    <span className="fm-badge"><img src="/images/0/cluster 4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {user.fm}</span>
+                    <span className="fm-badge"><img src="/images/0/cluster 4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
                     <span className="footer-divider">|</span>
-                    <span className={`tag ${user.tagColor}`}>{user.tagText}</span>
+                    <span className={`tag ${isEmpty ? 'tag--dark' : user.tagColor}`}>{isEmpty ? '-' : user.tagText}</span>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -367,22 +420,24 @@ const Cluster4CardContent = () => {
               <span className="section-count"><span className="count-num">2</span>/3</span>
             </div>
             <div className="colleague-cards">
-              {colleagueData.map((user) => (
-                <div key={user.id} className={`colleague-card ${user.isEmpty ? 'empty' : ''}`}>
+              {colleagueData.map((user) => {
+                const isEmpty = user.isEmpty || isRestMode;
+                return (
+                <div key={user.id} className={`colleague-card ${isEmpty ? 'empty' : ''}`}>
                   <div className="card-profile">
                     <div className="profile-image">
-                      {user.profileImg && !user.isEmpty ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
+                      {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
                       <div className="profile-name-row">
-                        <div className="profile-name"><span className="text">{user.isEmpty ? '-' : user.name}</span>{!user.isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                        <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
                         <div className="date-view">
-                          <span className="date">{user.date}</span>
+                          <span className="date">{isEmpty ? '0000 - 00 - 00 (일)' : user.date}</span>
                           <img src="/images/0/cluster 4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
                         </div>
                       </div>
                       <div className="profile-details">
-                        {user.isEmpty ? (
+                        {isEmpty ? (
                           <span className="text">-</span>
                         ) : (
                           <><span className="text">{user.university}</span><span className="label">학교</span> | <span className="text">{user.major}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
@@ -391,7 +446,8 @@ const Cluster4CardContent = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -438,24 +494,32 @@ const Cluster4CardContent = () => {
             </div>
           </div>
           <div className="work-info-cards">
-            {workInfoCards.map((card) => (
-              <div key={card.id} className={`work-info-card ${card.isEmpty ? 'empty' : ''}`}>
+            {workInfoCards.map((card) => {
+              const isEmpty = card.isEmpty || isRestMode;
+              return (
+              <div key={card.id} className={`work-info-card ${isEmpty ? 'empty' : ''}`}>
                 <div className="card-content-area">
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">{card.title}</span>
                     <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                     <span className="verified-text">Verified</span>
-                    {card.category && <span className={`tag ${card.tagColor}`}>{card.category}</span>}
+                    {!isEmpty && card.category && <span className={`tag ${card.tagColor}`}>{card.category}</span>}
                   </div>
                   <div className="card-body-row">
-                    <div className={`card-icon-area ${card.isFruit ? 'fruit' : ''}`}>
-                      {card.icon ? <img src={card.icon} alt={card.category} /> : <div className="icon-placeholder"></div>}
+                    <div className={`card-icon-area ${!isEmpty && card.isFruit ? 'fruit' : ''} ${!isEmpty && card.isFailed ? 'failed' : ''}`}>
+                      {!isEmpty && card.icon ? <img src={card.icon} alt={card.category} /> : <div className="icon-placeholder"></div>}
+                      {!isEmpty && card.isFailed && (
+                        <div className="failed-overlay">
+                          <span className="failed-text">강화 실패</span>
+                          <span className="failed-emoji">😿</span>
+                        </div>
+                      )}
                     </div>
-                    <span className="card-desc">CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></span>
+                    <span className="card-desc">{isEmpty ? '-' : <>CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                   </div>
                 </div>
-                {card.status && (
+                {!isEmpty && card.status && (
                   <div className="status-badge">
                     {card.status === "success" && <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />}
                     {card.status === "waiting" && <img src="/images/0/cluster 4/icon/6 강화 대기.png" alt="강화 대기" />}
@@ -463,7 +527,8 @@ const Cluster4CardContent = () => {
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -480,9 +545,10 @@ const Cluster4CardContent = () => {
               <span className="rate-value"><span className="highlight">100</span>%</span>
             </div>
           </div>
-          <div className="work-ability-card">
+          <div className={`work-ability-card ${isRestMode ? 'empty' : ''}`}>
             <div className="card-icon-area">
-              <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="인하우스 & 에이전시" />
+              {!isRestMode && <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="인하우스 & 에이전시" />}
+              {isRestMode && <div className="icon-placeholder"></div>}
             </div>
             <div className="card-content-area">
               <div className="card-title-row">
@@ -490,19 +556,21 @@ const Cluster4CardContent = () => {
                 <span className="card-title">Main Title</span>
                 <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                 <span className="verified-text">Verified</span>
-                <span className="code-tag">AA22-11111</span>
-                <span className="info-tag">[실무 Info]인하우스 & 에이전시</span>
+                {!isRestMode && <span className="code-tag">AA22-11111</span>}
+                {!isRestMode && <span className="info-tag">[실무 Info]인하우스 & 에이전시</span>}
               </div>
-              <p className="main-desc">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</p>
+              <p className="main-desc">{isRestMode ? '-' : '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~'}</p>
               <div className="sub-title-row">
                 <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                 <span className="sub-label">Sub Title</span>
               </div>
-              <span className="sub-desc">실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></span>
+              <span className="sub-desc">{isRestMode ? '-' : <>실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
             </div>
+            {!isRestMode && (
             <div className="status-badge">
               <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />
             </div>
+            )}
           </div>
           <div className="character-image">
             <img src="/images/0/cluster 4/bg img 2.png" alt="character" />
@@ -526,47 +594,56 @@ const Cluster4CardContent = () => {
             </div>
           </div>
           <div className="work-exp-cards">
-            {workExpCards.map((card) => (
-              <div key={card.id} className={`work-exp-card ${card.isEmpty ? 'empty' : ''}`}>
-                <div className="card-icon-area">
-                  {card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
-                </div>
-                <div className="card-content-area">
-                  <div className="card-header-row">
-                    <span className="code-tag">{card.code || 'AA22-11111'}</span>
-                    <span className="badge-tag">{card.badge || '[커리어]마케터 Launch'}</span>
+            {workExpCards.map((card) => {
+              const isEmpty = card.isEmpty || isRestMode;
+              return (
+              <div key={card.id} className={`work-exp-card ${isEmpty ? 'empty' : ''}`}>
+                <div className="card-top-row">
+                  <div className="card-icon-area">
+                    {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
                   </div>
-                  <div className="card-rating-row">
-                    <div className="stars">
-                      {[1,2,3,4,5].map((star) => (
-                        <img
-                          key={star}
-                          src={star <= card.rating ? "/images/0/cluster 4/icon/icon - star.png" : "/images/0/cluster 4/icon/icon - empty star.png"}
-                          alt="star"
-                          className="star"
-                        />
-                      ))}
+                  <div className="card-header-area">
+                    <div className="card-header-row">
+                      <span className="code-tag">{isEmpty ? '-' : card.code}</span>
+                      <span className="badge-tag">{isEmpty ? '-' : card.badge}</span>
                     </div>
-                    <span className="rating-count">{card.ratingCount}</span>
+                    <div className="card-rating-row">
+                      <div className="stars">
+                        {[1,2,3,4,5].map((star) => (
+                          <img
+                            key={star}
+                            src={isEmpty || star > card.rating ? "/images/0/cluster 4/icon/icon - empty star.png" : "/images/0/cluster 4/icon/icon - star.png"}
+                            alt="star"
+                            className="star"
+                          />
+                        ))}
+                      </div>
+                      <span className="rating-count">{isEmpty ? '- / 10' : card.ratingCount}</span>
+                    </div>
                   </div>
+                </div>
+                <div className="card-bottom-area">
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
-                    <span className="card-title">{card.title}</span>
+                    <span className="card-title">Main Title</span>
                     <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                     <span className="verified-text">Verified</span>
                   </div>
-                  <p className="main-desc">[역량 파악 & 성장점 분석] "빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!"</p>
+                  <p className="main-desc">{isEmpty ? '-' : '[역량 파악 & 성장점 분석] "빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!"'}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93..<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></span>
+                  <span className="sub-desc">{isEmpty ? '-' : '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93..'}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                 </div>
-                <div className="status-badge">
-                  <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />
-                </div>
+                {!isEmpty && (
+                  <div className="status-badge">
+                    <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -584,58 +661,79 @@ const Cluster4CardContent = () => {
             </div>
           </div>
           <div className="work-career-cards">
-            {workCareerCards.map((card) => (
-              <div key={card.id} className={`work-career-card ${card.isEmpty ? 'empty' : ''}`}>
-                <div className="card-icon-area">
-                  {card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
+            {workCareerCards.map((card) => {
+              const isEmpty = card.isEmpty || isRestMode;
+              return (
+              <div key={card.id} className={`work-career-card ${isEmpty ? 'empty' : ''} ${!isEmpty && card.isNotApplicable ? 'not-applicable' : ''}`}>
+                {!isEmpty && card.isNotApplicable && <div className="card-overlay"></div>}
+                <div className="card-top-row">
+                  <div className="card-icon-area">
+                    {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
+                  </div>
+                  <div className="card-header-area">
+                    <div className="card-header-row">
+                      <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                      <span className="verified-text">Verified</span>
+                      <span className="code-tag">{isEmpty ? '-' : card.code}</span>
+                    </div>
+                    <div className="grade-row">
+                      <span className={`grade ${!isEmpty && card.grade === 'S' ? 'active' : ''}`}>S</span>
+                      <span className={`grade ${!isEmpty && card.grade === 'A' ? 'active' : ''}`}>A</span>
+                      <span className={`grade ${!isEmpty && card.grade === 'B' ? 'active' : ''}`}>B</span>
+                      <span className={`grade ${!isEmpty && card.grade === 'C' ? 'active' : ''}`}>C</span>
+                      <span className={`grade ${!isEmpty && card.grade === 'D' ? 'active' : ''}`}>D</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="card-content-area">
-                  <div className="card-header-row">
-                    <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
-                    <span className="verified-text">Verified</span>
-                    <span className="code-tag">{card.code || 'AA22-11111'}</span>
-                  </div>
-                  <div className="grade-row">
-                    <span className="grade active">S</span>
-                    <span className="grade">A</span>
-                    <span className="grade">B</span>
-                    <span className="grade">C</span>
-                    <span className="grade">D</span>
-                  </div>
-                  <p className="category-text">마케팅(바이럴) 혹시 몰라</p>
+                <div className="card-bottom-area">
+                  <p className="category-text">{isEmpty ? '-' : '마케팅(바이럴) 혹시 몰라'}</p>
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
-                    <span className="card-title">{card.title}</span>
+                    <span className="card-title">Main Title</span>
                   </div>
-                  <p className="main-desc-white">실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100</p>
+                  <p className="main-desc-white">{isEmpty ? '-' : '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100'}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></span>
+                  <span className="sub-desc">{isEmpty ? '-' : '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..'}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
                     <div className="supervisor-info">
-                      <span className="supervised-text">Supervised by:</span>
                       <div className="supervisor-profile">
-                        <div className="profile-avatar"></div>
-                        <span className="profile-name">김민지 | 서비스기획팀 | 우아한형제들 | 대리</span>
+                        <div className={`profile-avatar ${isEmpty ? 'empty' : ''}`}>
+                          {!isEmpty && card.supervisorImg && <img src={card.supervisorImg} alt="supervisor" />}
+                        </div>
+                        <div className="profile-text">
+                          <span className="supervised-text">Supervised by:</span>
+                          <span className="profile-name">{isEmpty ? '-' : <><strong>{card.supervisorName}</strong> | {card.supervisorDept} | {card.supervisorCompany} | {card.supervisorPosition}</>}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="profile-divider"></div>
                   </div>
                   <div className="card-footer-row">
                     <span className="current-bid">Current Bid</span>
-                    <span className="date-text">{card.date}</span>
-                    <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="check" className="check-icon" />
-                    <span className="likes">♦ {card.likes}</span>
+                    <div className="date-view">
+                      <span className="date">{isEmpty ? '0000-00-00 (일)' : card.date}</span>
+                      <span className="check-badge">
+                        <i className="ti ti-check"></i>
+                      </span>
+                    </div>
+                    <span className="likes"><img src="/images/0/cluster%204/icon/icon%20-%209.png" alt="likes" className="likes-icon" />{isEmpty ? '0,99' : card.likes}</span>
                   </div>
                 </div>
-                <div className="status-badge">
-                  <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />
-                </div>
+                {!isEmpty && card.statusBadge && (
+                  <div className="status-badge">
+                    <img src={card.statusBadge} alt="status" />
+                    {card.isNotApplicable && <span className="not-applicable-text">해당 없음</span>}
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
+          <div className="section-bottom-divider"></div>
         </div>
       </div>
     </div>
