@@ -5047,14 +5047,96 @@
   }
 
   // ============================================
+  // 플로팅 아이콘 스타일
+  // ============================================
+  .floating-icons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 5px;
+
+    .edit-icon {
+      width: 22px;
+      height: 22px;
+      background: #FAAB07;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+
+      &:hover {
+        transform: scale(1.1);
+        background: #FFC919;
+      }
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      img {
+        width: 12px;
+        height: 12px;
+        object-fit: contain;
+      }
+
+      // 툴팁 스타일
+      .tooltip {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: #222;
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        padding: 8px 12px;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 100%;
+          right: 8px;
+          border-width: 6px;
+          border-style: solid;
+          border-color: transparent transparent #222 transparent;
+        }
+      }
+
+      &:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
+  // ============================================
   // 섹션 1 레이아웃 (이미지 참고 디자인)
   // ============================================
   .section1-layout {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 24px;
     width: 100%;
     padding: 0;
+    padding-top: 40px;
+
+    .floating-icons {
+      top: 0;
+      right: 0;
+    }
 
     // 왼쪽: 큰 주차 이미지
     .section1-left {
@@ -5867,8 +5949,14 @@
   .section2-layout {
     width: 100%;
     padding: 30px 0;
+    padding-top: 50px;
     margin-top: 25px;
     position: relative;
+
+    .floating-icons {
+      top: 60px;
+      right: 0;
+    }
 
     &::before {
       content: '';
@@ -6025,7 +6113,13 @@
 
     // 실무 정보 섹션
     .work-info-section {
-      margin-bottom: 70px;
+      margin-bottom: 72px;
+      position: relative;
+
+      .floating-icons {
+        top: 0;
+        right: 0;
+      }
 
       .section-header-row {
         display: flex;
@@ -6254,7 +6348,12 @@
     // 실무 역량 섹션
     .work-ability-section {
       position: relative;
-      margin-bottom: 70px;
+      margin-bottom: 28px;
+
+      .floating-icons {
+        top: 0;
+        right: 0;
+      }
 
       .section-header-row {
         display: flex;
@@ -6511,6 +6610,13 @@
   .section3-layout {
     width: 100%;
     padding: 30px 0;
+    padding-top: 50px;
+    position: relative;
+
+    .floating-icons {
+      top: 60px;
+      right: 0;
+    }
 
     .section-header-row {
       display: flex;
@@ -6579,7 +6685,13 @@
     // 실무 경험/경력 섹션
     .work-exp-section,
     .work-career-section {
-      margin-bottom: 70px;
+      margin-bottom: 72px;
+      position: relative;
+
+      .floating-icons {
+        top: 0;
+        right: 0;
+      }
 
       .section-bottom-divider {
         width: 1023px;
@@ -7373,6 +7485,819 @@
                 color: #ff6b6b;
               }
             }
+          }
+        }
+      }
+    }
+  }
+
+  // ============================================
+  // 모달 스타일 (클러스터 3 디자인 적용)
+  // ============================================
+  .section-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    backdrop-filter: blur(5px);
+  }
+
+  .section-modal {
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    border: 1px solid #FFA500;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &.section-modal-wide {
+      width: 700px;
+    }
+
+    .section-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      position: relative;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      background: rgba(255, 165, 0, 0.05);
+
+      h3 {
+        margin: 0;
+        font-family: 'Cafe24Ohsquare', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #FFA500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        &::before {
+          content: '✦';
+          font-size: 14px;
+          color: #FFA500;
+        }
+      }
+
+      .modal-subtitle {
+        width: 100%;
+        margin: 8px 0 0 0;
+        color: #999;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        order: 3;
+      }
+
+      .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        background: none;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        color: #999;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: #fff;
+          color: #fff;
+        }
+      }
+    }
+
+    .section-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 24px;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 165, 0, 0.5);
+        border-radius: 3px;
+
+        &:hover {
+          background: #FFA500;
+        }
+      }
+
+      .modal-card-item {
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #FFA500;
+
+        &:last-child {
+          margin-bottom: 0;
+          padding-bottom: 0;
+          border-bottom: none;
+        }
+
+        // 실무 정보 모달 카드 스타일
+        &.modal-card-workinfo {
+          .modal-card-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+            .modal-card-left {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .modal-fruit-icon {
+                width: 64px;
+                height: 64px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.failed {
+                  opacity: 0.5;
+                  filter: grayscale(50%);
+                }
+
+                img {
+                  width: 64px;
+                  height: 64px;
+                  object-fit: contain;
+                }
+              }
+
+              .modal-card-info {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .modal-card-tag {
+                  color: #fff;
+                  font-size: 18px;
+                  font-weight: 700;
+                  font-family: 'Cafe24Ohsquare-v2.0', sans-serif;
+                  background: none;
+                  padding: 0;
+                }
+              }
+
+              .modal-date-badge {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 9999px;
+                padding: 3px 16px;
+                margin-left: 8px;
+
+                span {
+                  font-size: 12px;
+                  font-weight: 500;
+                  font-family: 'Pretendard', sans-serif;
+                  color: #fff;
+                  white-space: nowrap;
+                }
+              }
+
+              .modal-code-badge {
+                background: rgba(255, 165, 0, 0.2);
+                border-radius: 9999px;
+                padding: 2px 8px;
+                margin-left: 8px;
+
+                span {
+                  font-size: 12px;
+                  font-weight: 600;
+                  font-family: 'Pretendard', sans-serif;
+                  color: #FFA500;
+                  white-space: nowrap;
+                }
+              }
+
+              .modal-rating {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+                margin-left: 8px;
+
+                .modal-star {
+                  width: 16px;
+                  height: 16px;
+                  object-fit: contain;
+                }
+              }
+
+              .modal-grade {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                margin-left: 8px;
+
+                .grade {
+                  width: 24px;
+                  height: 24px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 4px;
+                  background: rgba(255, 255, 255, 0.1);
+                  font-size: 12px;
+                  font-weight: 700;
+                  font-family: 'Pretendard', sans-serif;
+                  color: rgba(255, 255, 255, 0.3);
+
+                  &.active {
+                    background: #FFA500;
+                    color: #000;
+                  }
+                }
+              }
+            }
+
+            .modal-header-right {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .modal-date-badge {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 9999px;
+                padding: 3px 16px;
+                margin-left: 8px;
+
+                span {
+                  font-size: 12px;
+                  font-weight: 500;
+                  font-family: 'Pretendard', sans-serif;
+                  color: #fff;
+                  white-space: nowrap;
+                }
+              }
+
+              .modal-status-badge {
+                display: flex;
+                flex-direction: row-reverse;
+                align-items: center;
+                gap: 0;
+
+                img {
+                  width: 56px;
+                  height: 56px;
+                  object-fit: contain;
+                }
+
+                .status-text {
+                  font-size: 16px;
+                  font-weight: 700;
+                  font-family: 'Pretendard', sans-serif;
+                  color: #fff;
+                }
+              }
+            }
+          }
+
+          .char-limit {
+            color: #888;
+            font-size: 11px;
+            font-weight: 400;
+          }
+
+          // 타이틀 섹션 스타일
+          .modal-title-section {
+            margin-bottom: 16px;
+
+            .main-title-row {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 6px;
+
+              .main-title {
+                color: #FFA500;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: 'Pretendard', sans-serif;
+              }
+
+              .modal-rating {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+                margin-top: 0;
+
+                .modal-star {
+                  width: 14px;
+                  height: 14px;
+                  object-fit: contain;
+                }
+
+                .rating-count {
+                  font-size: 14px;
+                  font-weight: 500;
+                  font-family: 'Pretendard', sans-serif;
+                  color: rgba(255, 255, 255, 0.7);
+                  margin-left: 6px;
+                }
+              }
+
+              .modal-grade {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                .grade {
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
+                  color: #9C9C9C;
+                  font-size: 18px;
+                  font-weight: 400;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: 'Black Ops One', sans-serif;
+                  text-shadow:
+                    1px 1px 2px rgba(0, 0, 0, 0.4),
+                    -1px -1px 1px rgba(255, 255, 255, 0.2);
+                  box-shadow:
+                    3px 3px 6px rgba(0, 0, 0, 0.3),
+                    -2px -2px 4px rgba(255, 255, 255, 0.1),
+                    inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+                    inset -1px -1px 2px rgba(0, 0, 0, 0.1);
+
+                  &.active {
+                    background: linear-gradient(145deg, #ffbc1a, #d99200);
+                    color: #fff;
+                    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35), 0 0 10px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 220, 100, 0.7), 0 0 30px rgba(255, 200, 50, 0.5);
+                    box-shadow:
+                      3px 3px 6px rgba(0, 0, 0, 0.3),
+                      -2px -2px 4px rgba(255, 200, 50, 0.2),
+                      inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+                      inset -1px -1px 2px rgba(200, 150, 0, 0.3);
+                  }
+                }
+              }
+            }
+
+            .main-title {
+              color: #FFA500;
+              font-size: 16px;
+              font-weight: 600;
+              font-family: 'Pretendard', sans-serif;
+              margin-bottom: 6px;
+            }
+
+            .content-title {
+              color: #fff;
+              font-size: 16px;
+              font-weight: 600;
+              font-family: 'Pretendard', sans-serif;
+              line-height: 1.5;
+            }
+
+            .modal-date-badge {
+              display: inline-block;
+              background: rgba(255, 255, 255, 0.2);
+              border-radius: 9999px;
+              padding: 3px 16px;
+              margin-top: 10px;
+
+              span {
+                font-size: 12px;
+                font-weight: 500;
+                font-family: 'Pretendard', sans-serif;
+                color: #fff;
+                white-space: nowrap;
+              }
+            }
+
+            .modal-rating {
+              display: flex;
+              align-items: center;
+              gap: 2px;
+              margin-top: 8px;
+
+              .rating-label {
+                font-size: 14px;
+                font-weight: 500;
+                font-family: 'Pretendard', sans-serif;
+                color: rgba(255, 255, 255, 0.7);
+                margin-right: 6px;
+              }
+
+              .modal-star {
+                width: 14px;
+                height: 14px;
+                object-fit: contain;
+              }
+
+              .rating-count {
+                font-size: 14px;
+                font-weight: 500;
+                font-family: 'Pretendard', sans-serif;
+                color: rgba(255, 255, 255, 0.7);
+                margin-left: 6px;
+              }
+            }
+          }
+
+          // 섹션 라벨 스타일 (Sub Title, Output Link 등)
+          .section-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+
+            .section-label {
+              color: #FFA500;
+              font-size: 14px;
+              font-weight: 600;
+              font-family: 'Pretendard', sans-serif;
+            }
+
+            .char-counter {
+              color: rgba(255, 255, 255, 0.4);
+              font-size: 12px;
+              font-family: 'Pretendard', sans-serif;
+
+              span {
+                color: rgba(255, 255, 255, 0.4);
+
+                &.active {
+                  color: #FFA500;
+                  font-weight: 600;
+                }
+              }
+            }
+          }
+
+          .section-label {
+            color: #FFA500;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Pretendard', sans-serif;
+            margin-bottom: 8px;
+
+            .char-limit {
+              color: #888;
+              font-size: 11px;
+              font-weight: 400;
+            }
+          }
+
+          // 읽기 전용 스타일
+          .modal-input-group.readonly {
+            margin-bottom: 8px;
+
+            label {
+              color: #FFA500;
+              font-size: 13px;
+              font-weight: 600;
+              margin-bottom: 4px;
+            }
+
+            .readonly-text {
+              color: #fff;
+              font-size: 14px;
+              font-family: 'Pretendard', sans-serif;
+              line-height: 1.6;
+            }
+
+            .readonly-date {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .date-badge {
+                padding: 6px 12px;
+                background: #fff;
+                border-radius: 6px;
+                color: #000;
+                font-size: 13px;
+                font-weight: 500;
+                font-family: 'Pretendard', sans-serif;
+              }
+
+              .date-separator {
+                color: #888;
+                font-size: 16px;
+              }
+            }
+          }
+
+          .date-range-inputs {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            input[type="date"] {
+              flex: 1;
+              padding: 10px 14px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              border-radius: 6px;
+              color: #fff;
+              font-size: 14px;
+              font-family: 'Pretendard', sans-serif;
+
+              &::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+                cursor: pointer;
+              }
+
+              &:focus {
+                outline: none;
+                border-color: #FFA500;
+              }
+            }
+
+            .date-separator {
+              color: #888;
+              font-size: 16px;
+            }
+          }
+
+          .output-links-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .output-link-item {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 10px 14px;
+              background: rgba(255, 255, 255, 0.03);
+              border: 1px solid rgba(255, 255, 255, 0.08);
+              border-radius: 8px;
+              transition: all 0.2s ease;
+
+              // 비활성화 상태 (링크 없음)
+              .link-button {
+                width: 24px;
+                height: 24px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                transition: all 0.2s ease;
+
+                .link-num {
+                  color: rgba(255, 255, 255, 0.4);
+                  font-size: 11px;
+                  font-weight: 600;
+                  font-family: 'Pretendard', sans-serif;
+                }
+              }
+
+              .link-desc {
+                flex: 1;
+                max-width: 180px;
+                padding: 6px 10px;
+                background: transparent;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 13px;
+                font-family: 'Pretendard', sans-serif;
+                transition: all 0.2s ease;
+
+                &:focus {
+                  outline: none;
+                  border-color: #FFA500;
+                  color: #fff;
+                }
+
+                &::placeholder {
+                  color: rgba(255, 255, 255, 0.25);
+                }
+              }
+
+              .link-url {
+                flex: 2;
+                padding: 6px 10px;
+                background: transparent;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                color: rgba(255, 255, 255, 0.5);
+                font-size: 12px;
+                font-family: 'Pretendard', sans-serif;
+                transition: all 0.2s ease;
+
+                &:focus {
+                  outline: none;
+                  border-color: #FFA500;
+                  color: #fff;
+                }
+
+                &::placeholder {
+                  color: rgba(255, 255, 255, 0.25);
+                }
+              }
+
+              // 활성화 상태 (링크 있음)
+              &.active {
+                background: rgba(255, 165, 0, 0.08);
+                border-color: rgba(255, 165, 0, 0.3);
+
+                .link-button {
+                  background: #FFA500;
+
+                  .link-num {
+                    color: #000;
+                  }
+                }
+
+                .link-desc {
+                  color: #fff;
+                  border-color: rgba(255, 165, 0, 0.3);
+                }
+
+                .link-url {
+                  color: #FFA500;
+                  border-color: rgba(255, 165, 0, 0.3);
+                }
+              }
+
+              &:hover {
+                border-color: rgba(255, 165, 0, 0.2);
+              }
+            }
+          }
+        }
+
+        .modal-card-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+          .modal-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: rgba(255, 165, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+
+            img {
+              width: 36px;
+              height: 36px;
+              object-fit: contain;
+            }
+          }
+
+          .modal-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .modal-card-number {
+              font-size: 14px;
+              font-weight: 600;
+              color: #fff;
+              font-family: 'Pretendard', sans-serif;
+            }
+
+            .modal-card-tag {
+              display: inline-block;
+              padding: 2px 8px;
+              font-size: 11px;
+              border-radius: 4px;
+              font-family: 'Pretendard', sans-serif;
+            }
+          }
+        }
+
+        .modal-card-content {
+          .modal-input-group {
+            margin-bottom: 12px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            label {
+              display: block;
+              font-size: 12px;
+              color: #FFA500;
+              margin-bottom: 6px;
+              font-family: 'Pretendard', sans-serif;
+              font-weight: 500;
+            }
+
+            input,
+            textarea,
+            select {
+              width: 100%;
+              padding: 10px 14px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.15);
+              border-radius: 6px;
+              color: #fff;
+              font-size: 14px;
+              font-family: 'Pretendard', sans-serif;
+              transition: all 0.3s ease;
+
+              &:focus {
+                outline: none;
+                border-color: #FFA500;
+                background: rgba(255, 165, 0, 0.05);
+              }
+
+              &::placeholder {
+                color: rgba(255, 255, 255, 0.3);
+              }
+            }
+
+            textarea {
+              resize: vertical;
+              min-height: 80px;
+            }
+
+            select {
+              cursor: pointer;
+              appearance: none;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFA500' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: right 12px center;
+              padding-right: 36px;
+
+              option {
+                background: #1a1f2e;
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .section-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.2);
+
+      button {
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        font-family: 'Pretendard', sans-serif;
+
+        &.cancel-btn {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #999;
+
+          &:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+          }
+        }
+
+        &.save-btn {
+          background: linear-gradient(135deg, #FFA500 0%, #FFA500 100%);
+          border: none;
+          color: #000;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
           }
         }
       }

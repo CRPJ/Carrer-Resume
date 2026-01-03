@@ -9,6 +9,15 @@ interface Cluster4CardContentProps {
 }
 
 const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
+  // 모달 상태 관리
+  const [workInfoModalOpen, setWorkInfoModalOpen] = useState(false);
+  const [workAbilityModalOpen, setWorkAbilityModalOpen] = useState(false);
+  const [workExpModalOpen, setWorkExpModalOpen] = useState(false);
+  const [workCareerModalOpen, setWorkCareerModalOpen] = useState(false);
+
+  // 서브 타이틀 글자수 관리
+  const [subTitleText, setSubTitleText] = useState("");
+
   // 기본값 설정
   const defaultImage = "/images/0/cluster 4/주차 이미지/여름 3주차 (7월 3주차).png";
   const defaultTitle = "2025 여름 시즌, 3주차";
@@ -311,6 +320,19 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
+        {/* 플로팅 아이콘 */}
+        <div className="floating-icons">
+          <div className="edit-icon" style={{ cursor: 'pointer' }}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         {/* 왼쪽: 큰 주차 이미지 */}
         <div className="section1-left">
           <div className="main-image-container">
@@ -503,6 +525,19 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 정보 */}
         <div className="work-info-section">
+          {/* 플로팅 아이콘 */}
+          <div className="floating-icons">
+            <div className="edit-icon" onClick={() => setWorkInfoModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
+          </div>
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
@@ -555,6 +590,19 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 역량 */}
         <div className="work-ability-section">
+          {/* 플로팅 아이콘 */}
+          <div className="floating-icons">
+            <div className="edit-icon" onClick={() => setWorkAbilityModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
+          </div>
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
@@ -603,6 +651,19 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       <div className="section3-layout">
         {/* 실무 경험 */}
         <div className="work-exp-section">
+          {/* 플로팅 아이콘 */}
+          <div className="floating-icons">
+            <div className="edit-icon" onClick={() => setWorkExpModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
+          </div>
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
@@ -670,6 +731,19 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 경력 */}
         <div className="work-career-section">
+          {/* 플로팅 아이콘 */}
+          <div className="floating-icons">
+            <div className="edit-icon" onClick={() => setWorkCareerModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
+          </div>
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
@@ -757,6 +831,428 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
           <div className="section-bottom-divider"></div>
         </div>
       </div>
+
+      {/* ========== 실무 정보 모달 ========== */}
+      {workInfoModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>실무 정보 편집</h3>
+            </div>
+            <div className="section-modal-body">
+              {workInfoCards.filter(card => !card.isEmpty).map((card, index) => (
+                <div key={card.id} className="modal-card-item modal-card-workinfo">
+                  {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
+                  <div className="modal-card-header-row">
+                    <div className="modal-card-left">
+                      <div className={`modal-fruit-icon ${card.isFruit ? 'fruit' : ''} ${card.isFailed ? 'failed' : ''}`}>
+                        {card.icon && <img src={card.icon} alt={card.category} />}
+                      </div>
+                      <div className="modal-card-info">
+                        <span className={`modal-card-tag ${card.tagColor}`}>{card.category}</span>
+                      </div>
+                    </div>
+                    <div className="modal-header-right">
+                      <div className="modal-status-badge">
+                        {card.status === "success" && (
+                          <>
+                            <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                            <span className="status-text success">강화성공</span>
+                          </>
+                        )}
+                        {card.status === "waiting" && (
+                          <>
+                            <img src="/images/0/cluster 4/icon/6 강화 대기.png" alt="강화대기" />
+                            <span className="status-text waiting">강화대기</span>
+                          </>
+                        )}
+                        {card.status === "fail" && (
+                          <>
+                            <img src="/images/0/cluster 4/icon/7 강화 실패.png" alt="강화실패" />
+                            <span className="status-text fail">강화실패</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="modal-card-content">
+                    {/* 타이틀 + 내용 (읽기 전용) */}
+                    <div className="modal-title-section">
+                      <div className="main-title">{card.title}</div>
+                      <div className="content-title">CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십</div>
+                      <div className="modal-date-badge">
+                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                      </div>
+                    </div>
+
+                    {/* Sub Title - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label-row">
+                        <div className="section-label">Sub Title</div>
+                        <div className="char-counter"><span className={subTitleText.length > 0 ? 'active' : ''}>{subTitleText.length}</span> / 150</div>
+                      </div>
+                      <textarea
+                        value={subTitleText}
+                        onChange={(e) => setSubTitleText(e.target.value)}
+                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                        rows={3}
+                        maxLength={150}
+                      ></textarea>
+                    </div>
+
+                    {/* Output Link - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label">Output Link</div>
+                      <div className="output-links-buttons">
+                        {(() => {
+                          const linkCounts = [1, 4, 2, 5, 3];
+                          const linkCount = linkCounts[index % linkCounts.length];
+                          const linkDescs = ["마케팅 포트폴리오", "프로젝트 결과물", "실무 사례", "참고 자료", "추가 링크"];
+                          return [1, 2, 3, 4, 5].map((num) => (
+                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                              <div className="link-button">
+                                <span className="link-num">{num}</span>
+                              </div>
+                              <input
+                                type="text"
+                                className="link-desc"
+                                placeholder="링크 설명을 입력하세요"
+                                maxLength={20}
+                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                              />
+                              <input
+                                type="url"
+                                className="link-url"
+                                placeholder="URL"
+                                defaultValue={num <= linkCount ? "https://example.com" : ""}
+                              />
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setWorkInfoModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={() => setWorkInfoModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 역량 모달 ========== */}
+      {workAbilityModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>실무 역량 편집</h3>
+            </div>
+            <div className="section-modal-body">
+              <div className="modal-card-item modal-card-workinfo">
+                {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
+                <div className="modal-card-header-row">
+                  <div className="modal-card-left">
+                    <div className="modal-fruit-icon fruit">
+                      <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="실무 역량" />
+                    </div>
+                    <div className="modal-card-info">
+                      <span className="modal-card-tag tag--cyan">[실무 Info]인하우스 & 에이전시</span>
+                    </div>
+                    <div className="modal-code-badge">
+                      <span>AA22-11111</span>
+                    </div>
+                  </div>
+                  <div className="modal-header-right">
+                    <div className="modal-status-badge">
+                      <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                      <span className="status-text success">강화성공</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-card-content">
+                  {/* 타이틀 + 내용 (읽기 전용) */}
+                  <div className="modal-title-section">
+                    <div className="main-title">Main Title</div>
+                    <div className="content-title">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
+                    <div className="modal-date-badge">
+                      <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                    </div>
+                  </div>
+
+                  {/* Sub Title - 수정 가능 */}
+                  <div className="modal-input-group">
+                    <div className="section-label-row">
+                      <div className="section-label">Sub Title</div>
+                      <div className="char-counter"><span>0</span> / 150</div>
+                    </div>
+                    <textarea
+                      placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                      rows={3}
+                      maxLength={150}
+                    ></textarea>
+                  </div>
+
+                  {/* Output Link - 수정 가능 */}
+                  <div className="modal-input-group">
+                    <div className="section-label">Output Link</div>
+                    <div className="output-links-buttons">
+                      {[1, 2, 3, 4, 5].map((num) => {
+                        const linkCount = 4;
+                        const linkDescs = ["역량 분석 리포트", "실무 테스트 결과", "성장 계획서", "스킬 인증서", ""];
+                        return (
+                          <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                            <div className="link-button">
+                              <span className="link-num">{num}</span>
+                            </div>
+                            <input
+                              type="text"
+                              className="link-desc"
+                              placeholder="링크 설명을 입력하세요"
+                              maxLength={20}
+                              defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                            />
+                            <input
+                              type="url"
+                              className="link-url"
+                              placeholder="URL"
+                              defaultValue={num <= linkCount ? "https://example.com" : ""}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setWorkAbilityModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={() => setWorkAbilityModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 경험 모달 ========== */}
+      {workExpModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>실무 경험 편집</h3>
+            </div>
+            <div className="section-modal-body">
+              {workExpCards.filter(card => !card.isEmpty).map((card, index) => (
+                <div key={card.id} className="modal-card-item modal-card-workinfo">
+                  {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
+                  <div className="modal-card-header-row">
+                    <div className="modal-card-left">
+                      <div className="modal-fruit-icon fruit">
+                        {card.icon && <img src={card.icon} alt={card.badge} />}
+                      </div>
+                      <div className="modal-card-info">
+                        <span className="modal-card-tag tag--purple">{card.badge}</span>
+                      </div>
+                      <div className="modal-code-badge">
+                        <span>{card.code}</span>
+                      </div>
+                    </div>
+                    <div className="modal-header-right">
+                      <div className="modal-status-badge">
+                        <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                        <span className="status-text success">강화성공</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="modal-card-content">
+                    {/* 타이틀 + 내용 (읽기 전용) */}
+                    <div className="modal-title-section">
+                      <div className="main-title-row">
+                        <div className="main-title">{card.title}</div>
+                        <div className="modal-rating">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <img
+                              key={star}
+                              src={star <= card.rating ? "/images/0/cluster 4/icon/icon - star.png" : "/images/0/cluster 4/icon/icon - empty star.png"}
+                              alt="star"
+                              className="modal-star"
+                            />
+                          ))}
+                          <span className="rating-count">{card.ratingCount}</span>
+                        </div>
+                      </div>
+                      <div className="content-title">[역량 파악 & 성장점 분석] 빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!</div>
+                      <div className="modal-date-badge">
+                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                      </div>
+                    </div>
+
+                    {/* Sub Title - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label-row">
+                        <div className="section-label">Sub Title</div>
+                        <div className="char-counter"><span>0</span> / 150</div>
+                      </div>
+                      <textarea
+                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                        rows={3}
+                        maxLength={150}
+                      ></textarea>
+                    </div>
+
+                    {/* Output Link - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label">Output Link</div>
+                      <div className="output-links-buttons">
+                        {(() => {
+                          const linkCounts = [3, 1, 5, 2, 4];
+                          const linkCount = linkCounts[index % linkCounts.length];
+                          const linkDescs = ["경험 증빙 자료", "프로젝트 문서", "성과 리포트", "팀 협업 자료", "기타 자료"];
+                          return [1, 2, 3, 4, 5].map((num) => (
+                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                              <div className="link-button">
+                                <span className="link-num">{num}</span>
+                              </div>
+                              <input
+                                type="text"
+                                className="link-desc"
+                                placeholder="링크 설명을 입력하세요"
+                                maxLength={20}
+                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                              />
+                              <input
+                                type="url"
+                                className="link-url"
+                                placeholder="URL"
+                                defaultValue={num <= linkCount ? "https://example.com" : ""}
+                              />
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setWorkExpModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={() => setWorkExpModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 경력 모달 ========== */}
+      {workCareerModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>실무 경력 편집</h3>
+            </div>
+            <div className="section-modal-body">
+              {workCareerCards.filter(card => !card.isEmpty).map((card, index) => (
+                <div key={card.id} className="modal-card-item modal-card-workinfo">
+                  {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
+                  <div className="modal-card-header-row">
+                    <div className="modal-card-left">
+                      <div className="modal-fruit-icon fruit">
+                        {card.icon && <img src={card.icon} alt={card.badge} />}
+                      </div>
+                      <div className="modal-card-info">
+                        <span className={`modal-card-tag ${card.grade === 'S' ? 'tag--yellow' : card.grade === 'A' ? 'tag--green' : card.grade === 'B' ? 'tag--cyan' : 'tag--purple'}`}>마케팅(바이럴) 혹시 몰라</span>
+                      </div>
+                      <div className="modal-code-badge">
+                        <span>{card.code}</span>
+                      </div>
+                    </div>
+                    <div className="modal-header-right">
+                      <div className="modal-status-badge">
+                        {card.statusBadge && <img src={card.statusBadge} alt="상태" />}
+                        <span className="status-text success">강화성공</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="modal-card-content">
+                    {/* 타이틀 + 내용 (읽기 전용) */}
+                    <div className="modal-title-section">
+                      <div className="main-title-row">
+                        <div className="main-title">{card.title}</div>
+                        <div className="modal-grade">
+                          <span className={`grade ${card.grade === 'S' ? 'active' : ''}`}>S</span>
+                          <span className={`grade ${card.grade === 'A' ? 'active' : ''}`}>A</span>
+                          <span className={`grade ${card.grade === 'B' ? 'active' : ''}`}>B</span>
+                          <span className={`grade ${card.grade === 'C' ? 'active' : ''}`}>C</span>
+                          <span className={`grade ${card.grade === 'D' ? 'active' : ''}`}>D</span>
+                        </div>
+                      </div>
+                      <div className="content-title">실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 80일이삼사오육칠팔구십</div>
+                      <div className="modal-date-badge">
+                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                      </div>
+                    </div>
+
+                    {/* Sub Title - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label-row">
+                        <div className="section-label">Sub Title</div>
+                        <div className="char-counter"><span>0</span> / 150</div>
+                      </div>
+                      <textarea
+                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                        rows={3}
+                        maxLength={150}
+                      ></textarea>
+                    </div>
+
+                    {/* Output Link - 수정 가능 */}
+                    <div className="modal-input-group">
+                      <div className="section-label">Output Link</div>
+                      <div className="output-links-buttons">
+                        {(() => {
+                          const linkCounts = [2, 5, 1, 3, 4];
+                          const linkCount = linkCounts[index % linkCounts.length];
+                          const linkDescs = ["이력서", "포트폴리오", "프로젝트 사례", "자격증 증빙", "추천서"];
+                          return [1, 2, 3, 4, 5].map((num) => (
+                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                              <div className="link-button">
+                                <span className="link-num">{num}</span>
+                              </div>
+                              <input
+                                type="text"
+                                className="link-desc"
+                                placeholder="링크 설명을 입력하세요"
+                                maxLength={20}
+                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                              />
+                              <input
+                                type="url"
+                                className="link-url"
+                                placeholder="URL"
+                                defaultValue={num <= linkCount ? "https://example.com" : ""}
+                              />
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={() => setWorkCareerModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
