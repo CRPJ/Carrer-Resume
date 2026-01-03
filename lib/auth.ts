@@ -1,9 +1,9 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 
-export const authConfig: AuthOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -82,5 +82,3 @@ export const authConfig: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
-
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
