@@ -15,6 +15,135 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   const [workExpModalOpen, setWorkExpModalOpen] = useState(false);
   const [workCareerModalOpen, setWorkCareerModalOpen] = useState(false);
 
+  // 상단 섹션 선택 모달 상태
+  const [selectionModalOpen, setSelectionModalOpen] = useState(false);
+  const [headerModalOpen, setHeaderModalOpen] = useState(false);
+  const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
+
+  // 연계 동료 선택 상태
+  const [selectedColleagues, setSelectedColleagues] = useState<{
+    id: number;
+    name: string;
+    gender: string;
+    age: number;
+    profileImg: string;
+    university: string;
+    major: string;
+    team: string;
+    part: string;
+    nickname: string;
+    message: string;
+  }[]>([
+    {
+      id: 7,
+      name: "윤서영",
+      gender: "여",
+      age: 24,
+      profileImg: "/images/0/crew profile/여 5.jpg",
+      university: "중앙대",
+      major: "영화학과",
+      team: "엔터테인먼트",
+      part: "로봇",
+      nickname: "영상편집마스터",
+      message: "",
+    },
+    {
+      id: 10,
+      name: "오승우",
+      gender: "남",
+      age: 25,
+      profileImg: "/images/0/crew profile/남 8.webp",
+      university: "건국대",
+      major: "미디어콘텐츠학과",
+      team: "미디어",
+      part: "AI",
+      nickname: "아이디어뱅크",
+      message: "",
+    },
+  ]);
+
+  // 크루 검색어 상태
+  const [crewSearchQuery, setCrewSearchQuery] = useState("");
+
+  // 타크루 모달 상태 (주차 평판 카드 편집)
+  const [selectedCrewForReputation, setSelectedCrewForReputation] = useState<number | null>(null);
+  const [reputationEditData, setReputationEditData] = useState<{
+    rating: number;
+    content: string;
+    keyword: string;
+  }>({ rating: 0, content: "", keyword: "" });
+  const [otherCrewSearchQuery, setOtherCrewSearchQuery] = useState("");
+
+  // 주차 평판 카드 상세보기 모달 상태
+  const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
+  const [selectedReputationCard, setSelectedReputationCard] = useState<any>(null);
+
+  // 연계 동료 카드 상세보기 모달 상태
+  const [colleagueViewModalOpen, setColleagueViewModalOpen] = useState(false);
+  const [selectedColleagueCard, setSelectedColleagueCard] = useState<any>(null);
+  const [selectedColleagueIndex, setSelectedColleagueIndex] = useState<number>(0);
+
+  // 실무 정보 카드 상세보기 모달 상태
+  const [workInfoViewModalOpen, setWorkInfoViewModalOpen] = useState(false);
+  const [selectedWorkInfoCard, setSelectedWorkInfoCard] = useState<any>(null);
+
+  // 실무 역량 카드 상세보기 모달 상태
+  const [workAbilityViewModalOpen, setWorkAbilityViewModalOpen] = useState(false);
+
+  // 실무 경험 카드 상세보기 모달 상태
+  const [workExpViewModalOpen, setWorkExpViewModalOpen] = useState(false);
+  const [selectedWorkExpCard, setSelectedWorkExpCard] = useState<any>(null);
+
+  // 실무 경력 카드 상세보기 모달 상태
+  const [workCareerViewModalOpen, setWorkCareerViewModalOpen] = useState(false);
+  const [selectedWorkCareerCard, setSelectedWorkCareerCard] = useState<any>(null);
+
+  // 동료 삭제 함수
+  const removeColleague = (id: number) => {
+    setSelectedColleagues(prev => prev.filter(c => c.id !== id));
+  };
+
+  // 동료 추가 함수 (순위 지정)
+  const addColleague = (user: typeof allCrewData[0], rank: number) => {
+    if (selectedColleagues.length >= 3) return;
+    if (selectedColleagues.find(c => c.id === user.id)) return;
+
+    const newColleague = { ...user, message: "" };
+    const newList = [...selectedColleagues];
+
+    // 해당 순위에 삽입 (0-indexed로 rank-1)
+    const insertIndex = Math.min(rank - 1, newList.length);
+    newList.splice(insertIndex, 0, newColleague);
+
+    setSelectedColleagues(newList);
+  };
+
+  // 메시지 업데이트 함수
+  const updateColleagueMessage = (id: number, message: string) => {
+    setSelectedColleagues(prev => prev.map(c =>
+      c.id === id ? { ...c, message } : c
+    ));
+  };
+
+  // 타크루 선택 함수 (주차 평판 편집용)
+  const selectCrewForReputation = (crewId: number) => {
+    const crew = reputationData.find(u => u.id === crewId);
+    if (crew && !crew.isEmpty) {
+      setSelectedCrewForReputation(crewId);
+      setReputationEditData({
+        rating: crew.rating,
+        content: crew.description,
+        keyword: crew.tagText.replace('#', ''),
+      });
+    }
+  };
+
+  // 타크루 편집 뒤로가기
+  const backToCrewList = () => {
+    setSelectedCrewForReputation(null);
+    setReputationEditData({ rating: 0, content: "", keyword: "" });
+  };
+
   // 서브 타이틀 글자수 관리
   const [subTitleText, setSubTitleText] = useState("");
 
@@ -91,7 +220,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       nickname: "엔비디아구글태슬라킹",
       rating: 3.5,
       ratingCount: "7 / 10",
-      description: "20자까지 쓴 내용을 확인할 수 있습니다...",
+      description: "팀 프로젝트에서 항상 적극적으로 참여하고 아이디어를 제시해주셔서 정말 감사했습니다. 덕분에 좋은 결과물을 만들 수 있었어요. 앞으로도 함께 일하고 싶은 동료입니다.",
       fm: 325,
       tagColor: 'tag--mint',
       tagText: '#추진력추진력추',
@@ -109,7 +238,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       nickname: "엔비디아구글태슬라킹",
       rating: 4.5,
       ratingCount: "9 / 10",
-      description: "20자까지 쓴 내용을 확인할 수 있습니다...",
+      description: "리더십이 뛰어나고 팀원들을 잘 이끌어주셨습니다. 어려운 상황에서도 침착하게 문제를 해결하는 모습이 인상적이었어요. 배울 점이 정말 많은 분이십니다.",
       fm: 325,
       tagColor: 'tag--purple',
       tagText: '#리더십리더십리',
@@ -127,7 +256,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       nickname: "엔비디아구글태슬라킹",
       rating: 2.5,
       ratingCount: "5 / 10",
-      description: "20자까지 쓴 내용을 확인할 수 있습니다...",
+      description: "창의적인 아이디어로 프로젝트에 새로운 방향을 제시해주셨습니다. 독특한 시각으로 문제를 바라보는 능력이 탁월해요. 함께 브레인스토밍하면 좋은 결과가 나옵니다.",
       fm: 325,
       tagColor: 'tag--yellow',
       tagText: '#창의력창의력창',
@@ -153,6 +282,164 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
     },
   ];
 
+  // 크루 검색용 더미 데이터
+  const allCrewData = [
+    {
+      id: 1,
+      name: "김미현",
+      gender: "여",
+      age: 24,
+      profileImg: "/images/0/crew profile/여 3.jpg",
+      university: "서울대",
+      major: "미디어커뮤니케이션",
+      team: "엔터테인먼트",
+      part: "내돈내산",
+      nickname: "엔비디아구글태슬라킹",
+    },
+    {
+      id: 2,
+      name: "이준혁",
+      gender: "남",
+      age: 26,
+      profileImg: "/images/0/crew profile/남 2.jpg",
+      university: "연세대",
+      major: "경영학과",
+      team: "미디어",
+      part: "브랜드",
+      nickname: "마케팅마스터",
+    },
+    {
+      id: 3,
+      name: "박소연",
+      gender: "여",
+      age: 23,
+      profileImg: "/images/0/crew profile/여 1.jpg",
+      university: "고려대",
+      major: "심리학과",
+      team: "콘텐츠",
+      part: "스타일",
+      nickname: "콘텐츠퀸",
+    },
+    {
+      id: 4,
+      name: "정민수",
+      gender: "남",
+      age: 27,
+      profileImg: "/images/0/crew profile/남 4.jpg",
+      university: "성균관대",
+      major: "컴퓨터공학",
+      team: "헬스케어",
+      part: "AI",
+      nickname: "코딩천재개발자",
+    },
+    {
+      id: 5,
+      name: "최유진",
+      gender: "여",
+      age: 25,
+      profileImg: "/images/0/crew profile/여 6.jpg",
+      university: "이화여대",
+      major: "디자인학부",
+      team: "스타일",
+      part: "브랜드",
+      nickname: "디자인요정",
+    },
+    {
+      id: 6,
+      name: "강동현",
+      gender: "남",
+      age: 28,
+      profileImg: "/images/0/crew profile/남 7.jpg",
+      university: "한양대",
+      major: "광고홍보학과",
+      team: "라이프",
+      part: "자동차",
+      nickname: "광고의신",
+    },
+    {
+      id: 7,
+      name: "윤서영",
+      gender: "여",
+      age: 24,
+      profileImg: "/images/0/crew profile/여 5.jpg",
+      university: "중앙대",
+      major: "영화학과",
+      team: "엔터테인먼트",
+      part: "로봇",
+      nickname: "영상편집마스터",
+    },
+    {
+      id: 8,
+      name: "임재현",
+      gender: "남",
+      age: 26,
+      profileImg: "/images/0/crew profile/남 5.jpg",
+      university: "서강대",
+      major: "경제학과",
+      team: "푸드",
+      part: "디저트",
+      nickname: "전략가임재현",
+    },
+    {
+      id: 9,
+      name: "한지민",
+      gender: "여",
+      age: 23,
+      profileImg: "/images/0/crew profile/여 7.webp",
+      university: "숙명여대",
+      major: "언론정보학부",
+      team: "콘텐츠",
+      part: "내돈내산",
+      nickname: "소통의달인",
+    },
+    {
+      id: 10,
+      name: "오승우",
+      gender: "남",
+      age: 25,
+      profileImg: "/images/0/crew profile/남 8.webp",
+      university: "건국대",
+      major: "미디어콘텐츠학과",
+      team: "미디어",
+      part: "AI",
+      nickname: "아이디어뱅크",
+    },
+    {
+      id: 11,
+      name: "김하늘",
+      gender: "여",
+      age: 22,
+      profileImg: "/images/0/crew profile/여 2.jpg",
+      university: "동국대",
+      major: "광고홍보학과",
+      team: "스타일",
+      part: "스타일",
+      nickname: "카피라이터하늘",
+    },
+    {
+      id: 12,
+      name: "신동욱",
+      gender: "남",
+      age: 27,
+      profileImg: "/images/0/crew profile/남 3.jpg",
+      university: "홍익대",
+      major: "시각디자인과",
+      team: "헬스케어",
+      part: "로봇",
+      nickname: "UX디자이너",
+    },
+  ];
+
+  // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
+  const filteredCrewData = allCrewData.filter(user => {
+    if (!crewSearchQuery) return true;
+    const query = crewSearchQuery.toLowerCase();
+    return (
+      user.name.toLowerCase().includes(query) ||
+      user.nickname.toLowerCase().includes(query)
+    );
+  }).filter(user => !selectedColleagues.find(c => c.id === user.id));
+
   // 연계 동료 데이터
   const colleagueData = [
     {
@@ -167,6 +454,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
+      message: "프로젝트에서 많은 도움을 주셔서 정말 감사합니다. 덕분에 성장할 수 있었어요!",
     },
     {
       id: 2,
@@ -180,6 +468,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
+      message: "항상 응원해주시고 조언해주셔서 감사합니다. 앞으로도 잘 부탁드려요!",
     },
     {
       id: 3,
@@ -193,6 +482,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       part: "-",
       nickname: "-",
       date: "0000 - 00 - 00 (일)",
+      message: "",
       isEmpty: true,
     },
   ];
@@ -322,7 +612,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       <div className="section1-layout">
         {/* 플로팅 아이콘 */}
         <div className="floating-icons">
-          <div className="edit-icon" style={{ cursor: 'pointer' }}>
+          <div className="edit-icon" onClick={() => setSelectionModalOpen(true)} style={{ cursor: 'pointer' }}>
             <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
           </div>
           <div className="edit-icon search-icon">
@@ -414,7 +704,17 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               {reputationData.map((user, index) => {
                 const isEmpty = user.isEmpty || isRestMode;
                 return (
-                <div key={user.id} className={`reputation-card ${isEmpty ? 'empty' : ''}`}>
+                <div
+                  key={user.id}
+                  className={`reputation-card ${isEmpty ? 'empty' : ''}`}
+                  onClick={() => {
+                    if (!isEmpty) {
+                      setSelectedReputationCard(user);
+                      setReputationViewModalOpen(true);
+                    }
+                  }}
+                  style={{ cursor: isEmpty ? 'default' : 'pointer' }}
+                >
                   <div className="card-profile">
                     <div className="profile-image">
                       {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
@@ -443,7 +743,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
                     <span className="rating-count">{isEmpty ? '- / 10' : user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{isEmpty ? '-' : <>{user.description} <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
+                  <div className="card-description">{isEmpty ? '-' : <>{user.description.slice(0, 20)}... <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
                   <div className="card-footer">
                     <span className="fm-badge"><img src="/images/0/cluster 4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
                     <span className="footer-divider">|</span>
@@ -463,10 +763,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="section-count"><span className="count-num">2</span>/3</span>
             </div>
             <div className="colleague-cards">
-              {colleagueData.map((user) => {
+              {colleagueData.map((user, index) => {
                 const isEmpty = user.isEmpty || isRestMode;
                 return (
-                <div key={user.id} className={`colleague-card ${isEmpty ? 'empty' : ''}`}>
+                <div
+                  key={user.id}
+                  className={`colleague-card ${isEmpty ? 'empty' : ''}`}
+                  onClick={() => {
+                    if (!isEmpty) {
+                      setSelectedColleagueCard(user);
+                      setSelectedColleagueIndex(index);
+                      setColleagueViewModalOpen(true);
+                    }
+                  }}
+                  style={{ cursor: isEmpty ? 'default' : 'pointer' }}
+                >
                   <div className="card-profile">
                     <div className="profile-image">
                       {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
@@ -553,7 +864,17 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             {workInfoCards.map((card) => {
               const isEmpty = card.isEmpty || isRestMode;
               return (
-              <div key={card.id} className={`work-info-card ${isEmpty ? 'empty' : ''}`}>
+              <div
+                key={card.id}
+                className={`work-info-card ${isEmpty ? 'empty' : ''}`}
+                onClick={() => {
+                  if (!isEmpty) {
+                    setSelectedWorkInfoCard(card);
+                    setWorkInfoViewModalOpen(true);
+                  }
+                }}
+                style={{ cursor: isEmpty ? 'default' : 'pointer' }}
+              >
                 <div className="card-content-area">
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
@@ -614,7 +935,15 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="rate-value"><span className="highlight">100</span>%</span>
             </div>
           </div>
-          <div className={`work-ability-card ${isRestMode ? 'empty' : ''}`}>
+          <div
+            className={`work-ability-card ${isRestMode ? 'empty' : ''}`}
+            onClick={() => {
+              if (!isRestMode) {
+                setWorkAbilityViewModalOpen(true);
+              }
+            }}
+            style={{ cursor: isRestMode ? 'default' : 'pointer' }}
+          >
             <div className="card-icon-area">
               {!isRestMode && <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="인하우스 & 에이전시" />}
               {isRestMode && <div className="icon-placeholder"></div>}
@@ -679,7 +1008,17 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             {workExpCards.map((card) => {
               const isEmpty = card.isEmpty || isRestMode;
               return (
-              <div key={card.id} className={`work-exp-card ${isEmpty ? 'empty' : ''}`}>
+              <div
+                key={card.id}
+                className={`work-exp-card ${isEmpty ? 'empty' : ''}`}
+                onClick={() => {
+                  if (!isEmpty) {
+                    setSelectedWorkExpCard(card);
+                    setWorkExpViewModalOpen(true);
+                  }
+                }}
+                style={{ cursor: isEmpty ? 'default' : 'pointer' }}
+              >
                 <div className="card-top-row">
                   <div className="card-icon-area">
                     {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
@@ -759,7 +1098,17 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             {workCareerCards.map((card) => {
               const isEmpty = card.isEmpty || isRestMode;
               return (
-              <div key={card.id} className={`work-career-card ${isEmpty ? 'empty' : ''} ${!isEmpty && card.isNotApplicable ? 'not-applicable' : ''}`}>
+              <div
+                key={card.id}
+                className={`work-career-card ${isEmpty ? 'empty' : ''} ${!isEmpty && card.isNotApplicable ? 'not-applicable' : ''}`}
+                onClick={() => {
+                  if (!isEmpty && !card.isNotApplicable) {
+                    setSelectedWorkCareerCard(card);
+                    setWorkCareerViewModalOpen(true);
+                  }
+                }}
+                style={{ cursor: (isEmpty || card.isNotApplicable) ? 'default' : 'pointer' }}
+              >
                 {!isEmpty && card.isNotApplicable && <div className="card-overlay"></div>}
                 <div className="card-top-row">
                   <div className="card-icon-area">
@@ -1249,6 +1598,747 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>취소</button>
               <button className="save-btn" onClick={() => setWorkCareerModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 상단 섹션 선택 모달 ========== */}
+      {selectionModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectionModalOpen(false); }}>
+          <div className="section-modal section-modal-selection">
+            <div className="section-modal-header">
+              <h3>편집 대상 선택</h3>
+            </div>
+            <div className="section-modal-body selection-body">
+              <p className="selection-desc">편집할 대상을 선택해주세요</p>
+              <div className="selection-buttons">
+                <button
+                  className="selection-btn self"
+                  onClick={() => {
+                    setSelectionModalOpen(false);
+                    setHeaderModalType('본인');
+                    setHeaderModalOpen(true);
+                  }}
+                >
+                  <div className="selection-icon">
+                    <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="본인" />
+                  </div>
+                  <span className="selection-label">본인</span>
+                  <span className="selection-sublabel">내 정보 편집하기</span>
+                </button>
+                <button
+                  className="selection-btn other"
+                  onClick={() => {
+                    setSelectionModalOpen(false);
+                    setHeaderModalType('타크루');
+                    setHeaderModalOpen(true);
+                  }}
+                >
+                  <div className="selection-icon">
+                    <img src="/images/0/cluster 4/icon/icon - 연계 동료.png" alt="타크루" />
+                  </div>
+                  <span className="selection-label">타크루</span>
+                  <span className="selection-sublabel">다른 크루 정보 보기</span>
+                </button>
+              </div>
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setSelectionModalOpen(false)}>닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
+      {headerModalOpen && headerModalType === '본인' && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>연계 동료 편집</h3>
+            </div>
+            <div className="section-modal-body">
+              <div className="modal-card-item modal-card-header-edit">
+                {/* 안내 문구 */}
+                <div className="header-edit-section colleague-guide">
+                  <div className="guide-text">
+                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span></p>
+                  </div>
+                </div>
+
+                {/* 연계 동료 선택 */}
+                <div className="header-edit-section">
+                  <div className="header-edit-title">연계 동료 선택 <span className="count-badge">{selectedColleagues.length} / 3</span></div>
+
+                  {/* 선택된 동료 목록 */}
+                  <div className="selected-colleagues">
+                    {selectedColleagues.map((colleague, index) => (
+                      <div key={colleague.id} className="selected-colleague-card">
+                        <div className="colleague-header">
+                          <div className="to-badge">
+                            <span className="to-text">To.</span>
+                            <span className="rank-number">{index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'}</span>
+                          </div>
+                          <button className="remove-btn" title="삭제" onClick={() => removeColleague(colleague.id)}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="colleague-profile-row">
+                          <div className="colleague-avatar">
+                            <img src={colleague.profileImg} alt={colleague.name} />
+                          </div>
+                          <div className="colleague-info">
+                            <div className="colleague-name">{colleague.name} | {colleague.gender} | {colleague.age}</div>
+                            <div className="colleague-details">{colleague.team} 팀 | {colleague.part} 파트 | {colleague.nickname}</div>
+                          </div>
+                        </div>
+                        <div className="colleague-message-section">
+                          <label>Thank you message <span className="char-limit">(최대 50자)</span></label>
+                          <div className="message-input-wrapper">
+                            <textarea
+                              placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
+                              maxLength={50}
+                              rows={1}
+                              value={colleague.message}
+                              onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}
+                            ></textarea>
+                            <span className="char-counter">{colleague.message.length} / 50</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* 추가 버튼 (3명 미만일 때만 표시) */}
+                    {selectedColleagues.length < 3 && (
+                      <div className="add-colleague-card">
+                        <div className="add-colleague-placeholder">
+                          <div className="add-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M12 5v14M5 12h14" />
+                            </svg>
+                          </div>
+                          <span>아래에서 크루를 검색하고 추가하세요</span>
+                          <span className="add-sublabel">{3 - selectedColleagues.length}명 추가 가능</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 크루 검색 섹션 */}
+                <div className="header-edit-section">
+                  <div className="header-edit-title with-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="title-icon">
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    크루 검색
+                  </div>
+                  <div className="header-edit-row">
+                    <div className="edit-field full-width">
+                      <div className="search-input-wrapper">
+                        <input
+                          type="text"
+                          placeholder="크루 이름 또는 닉네임으로 검색..."
+                          value={crewSearchQuery}
+                          onChange={(e) => setCrewSearchQuery(e.target.value)}
+                        />
+                        <button className="search-btn">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="M21 21l-4.35-4.35" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 검색 결과 목록 */}
+                  <div className="crew-search-results">
+                    {filteredCrewData.length === 0 ? (
+                      <div className="no-results">
+                        {selectedColleagues.length >= 3 ? '최대 3명까지만 선택 가능합니다.' : '검색 결과가 없습니다.'}
+                      </div>
+                    ) : (
+                      filteredCrewData.map((user) => (
+                        <div key={user.id} className="crew-search-item">
+                          <div className="crew-profile">
+                            <div className="crew-avatar">
+                              <img src={user.profileImg} alt={user.name} />
+                            </div>
+                            <div className="crew-info">
+                              <div className="crew-name">{user.name} | {user.gender} | {user.age}</div>
+                              <div className="crew-details">{user.team} 팀 | {user.part} 파트 | {user.nickname}</div>
+                            </div>
+                          </div>
+                          <div className="rank-select-buttons">
+                            <button
+                              className={`rank-btn ${selectedColleagues.length >= 1 ? 'disabled' : ''}`}
+                              title="1순위로 선택"
+                              onClick={() => addColleague(user, 1)}
+                              disabled={selectedColleagues.length >= 3}
+                            >1st</button>
+                            <button
+                              className={`rank-btn ${selectedColleagues.length >= 2 ? 'disabled' : ''}`}
+                              title="2순위로 선택"
+                              onClick={() => addColleague(user, 2)}
+                              disabled={selectedColleagues.length >= 3}
+                            >2nd</button>
+                            <button
+                              className={`rank-btn ${selectedColleagues.length >= 3 ? 'disabled' : ''}`}
+                              title="3순위로 선택"
+                              onClick={() => addColleague(user, 3)}
+                              disabled={selectedColleagues.length >= 3}
+                            >3rd</button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setHeaderModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={() => setHeaderModalOpen(false)}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 상단 섹션 타크루 모달 (타크루가 나에 대해 평판을 남김) ========== */}
+      {headerModalOpen && headerModalType === '타크루' && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
+          <div className="section-modal section-modal-wide">
+            <div className="section-modal-header">
+              <h3>주차 평판</h3>
+              <span className="modal-subtitle">해당 크루에게 평판을 남겨주세요</span>
+            </div>
+            <div className="section-modal-body">
+              <div className="modal-card-item modal-card-header-edit reputation-form-modal">
+                {/* 평판 작성 폼 */}
+                <div className="reputation-form">
+                  {/* 평점 */}
+                  <div className="form-field">
+                    <label>평점</label>
+                    <div className="rating-row">
+                      <div className="star-rating-sm">
+                        {[1, 2, 3, 4, 5].map((starIndex) => {
+                          const fullValue = starIndex * 2;
+                          const halfValue = starIndex * 2 - 1;
+                          const currentRating = reputationEditData.rating;
+                          const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                          const isFull = currentRating >= fullValue;
+
+                          return (
+                            <div key={starIndex} className="star-wrapper">
+                              {/* 배경 별 (빈 별) */}
+                              <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                              {/* 반개 채움 */}
+                              {isHalf && (
+                                <svg className="star-half-fill" viewBox="0 0 24 24">
+                                  <defs>
+                                    <clipPath id={`halfClip${starIndex}`}>
+                                      <rect x="0" y="0" width="12" height="24" />
+                                    </clipPath>
+                                  </defs>
+                                  <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                    fill="#FFA500"
+                                    clipPath={`url(#halfClip${starIndex})`}
+                                  />
+                                </svg>
+                              )}
+                              {/* 전체 채움 */}
+                              {isFull && (
+                                <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                              )}
+                              {/* 클릭 영역 */}
+                              <button
+                                className="star-click-area star-click-left"
+                                type="button"
+                                onClick={() => setReputationEditData(prev => ({ ...prev, rating: halfValue }))}
+                              />
+                              <button
+                                className="star-click-area star-click-right"
+                                type="button"
+                                onClick={() => setReputationEditData(prev => ({ ...prev, rating: fullValue }))}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <span className="rating-value">{reputationEditData.rating} / 10</span>
+                    </div>
+                  </div>
+
+                  {/* 내용 */}
+                  <div className="form-field">
+                    <label>내용 <span className="char-limit">(최대 100자)</span></label>
+                    <div className="textarea-wrapper">
+                      <textarea
+                        placeholder="해당 크루에 대한 평가 내용을 작성해주세요..."
+                        maxLength={100}
+                        rows={3}
+                        value={reputationEditData.content}
+                        onChange={(e) => setReputationEditData(prev => ({ ...prev, content: e.target.value }))}
+                      ></textarea>
+                      <span className="char-counter">{reputationEditData.content.length} / 100</span>
+                    </div>
+                  </div>
+
+                  {/* 키워드 */}
+                  <div className="form-field">
+                    <label>키워드 <span className="char-limit">(최대 7자)</span></label>
+                    <div className="keyword-row">
+                      <span className="hashtag">#</span>
+                      <input
+                        type="text"
+                        placeholder="키워드를 입력하세요"
+                        value={reputationEditData.keyword}
+                        onChange={(e) => setReputationEditData(prev => ({ ...prev, keyword: e.target.value }))}
+                        maxLength={7}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="section-modal-footer">
+              <button className="cancel-btn" onClick={() => setHeaderModalOpen(false)}>취소</button>
+              <button
+                className="save-btn"
+                onClick={() => setHeaderModalOpen(false)}
+                disabled={reputationEditData.rating === 0 || reputationEditData.content.trim() === '' || reputationEditData.keyword.trim() === ''}
+              >저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 주차 평판 카드 상세보기 모달 ========== */}
+      {reputationViewModalOpen && selectedReputationCard && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setReputationViewModalOpen(false); }}>
+          <div className="section-modal reputation-view-modal">
+            <div className="section-modal-header">
+              <h3>주차 평판</h3>
+              <button className="modal-close-btn" onClick={() => setReputationViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* 프로필 */}
+              <div className="reputation-view-profile">
+                <div className="profile-image">
+                  <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} />
+                </div>
+                <div className="profile-info">
+                  <div className="profile-name">
+                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{selectedReputationCard.age}</span>
+                  </div>
+                  <div className="profile-details">
+                    <div className="detail-line">
+                      <span className="text">{selectedReputationCard.university}</span><span className="label">학교</span> | <span className="text">{selectedReputationCard.major}</span><span className="label">학과</span>
+                    </div>
+                    <div className="detail-line">
+                      <span className="text">{selectedReputationCard.team}</span><span className="label">팀</span> | <span className="text">{selectedReputationCard.part}</span><span className="label">파트</span>
+                    </div>
+                    <div className="detail-line">
+                      <span className="nickname">{selectedReputationCard.nickname}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 평점 */}
+              <div className="reputation-view-rating">
+                <div className="rating-label">평점</div>
+                <div className="rating-content">
+                  <div className="stars">{renderStars(selectedReputationCard.rating)}</div>
+                  <span className="rating-count">{selectedReputationCard.ratingCount}</span>
+                </div>
+              </div>
+
+              {/* 내용 */}
+              <div className="reputation-view-content">
+                <div className="content-label">내용</div>
+                <div className="content-text">{selectedReputationCard.description}</div>
+              </div>
+
+              {/* FM & 키워드 */}
+              <div className="reputation-view-footer">
+                <div className="footer-item">
+                  <span className="footer-label">FM</span>
+                  <span className="footer-value">{selectedReputationCard.fm}</span>
+                </div>
+                <span className="footer-divider">|</span>
+                <div className="footer-item">
+                  <span className="footer-label">키워드</span>
+                  <span className={`tag ${selectedReputationCard.tagColor}`}>{selectedReputationCard.tagText}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 연계 동료 카드 상세보기 모달 ========== */}
+      {colleagueViewModalOpen && selectedColleagueCard && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setColleagueViewModalOpen(false); }}>
+          <div className="section-modal colleague-view-modal">
+            <div className="section-modal-header">
+              <h3>연계 동료</h3>
+              <button className="modal-close-btn" onClick={() => setColleagueViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* To. 뱃지 + 날짜 */}
+              <div className="colleague-header-row">
+                <div className="colleague-to-badge">
+                  <span className="to-text">To.</span>
+                  <span className="rank-number">{selectedColleagueIndex + 1}{selectedColleagueIndex === 0 ? 'st' : selectedColleagueIndex === 1 ? 'nd' : 'rd'}</span>
+                </div>
+                <div className="colleague-view-date">
+                  <span className="date-value">{selectedColleagueCard.date}</span>
+                </div>
+              </div>
+
+              {/* 프로필 */}
+              <div className="colleague-view-profile">
+                <div className="profile-image">
+                  <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} />
+                </div>
+                <div className="profile-info">
+                  <div className="profile-name">
+                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{selectedColleagueCard.age}</span>
+                  </div>
+                  <div className="profile-details">
+                    <div className="detail-line">
+                      <span className="text">{selectedColleagueCard.university}</span><span className="label">학교</span> | <span className="text">{selectedColleagueCard.major}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thank you message */}
+              <div className="colleague-view-message">
+                <div className="message-label">Thank you message</div>
+                <div className="message-content">{selectedColleagueCard.message}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 정보 카드 상세보기 모달 ========== */}
+      {workInfoViewModalOpen && selectedWorkInfoCard && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoViewModalOpen(false); }}>
+          <div className="section-modal work-view-modal">
+            <div className="section-modal-header">
+              <h3>실무 정보</h3>
+              <button className="modal-close-btn" onClick={() => setWorkInfoViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
+              <div className="work-view-header-row">
+                <div className="work-view-left">
+                  <div className={`work-icon-box ${selectedWorkInfoCard.isFruit ? 'fruit' : ''}`}>
+                    {selectedWorkInfoCard.icon && <img src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category} />}
+                  </div>
+                  <span className="category-title">{selectedWorkInfoCard.category}</span>
+                </div>
+                <div className="work-view-right">
+                  {selectedWorkInfoCard.status === "success" && (
+                    <div className="status-badge success">
+                      <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                      <span>강화성공</span>
+                    </div>
+                  )}
+                  {selectedWorkInfoCard.status === "waiting" && (
+                    <div className="status-badge waiting">
+                      <img src="/images/0/cluster 4/icon/6 강화 대기.png" alt="강화대기" />
+                      <span>강화대기</span>
+                    </div>
+                  )}
+                  {selectedWorkInfoCard.status === "fail" && (
+                    <div className="status-badge fail">
+                      <img src="/images/0/cluster 4/icon/7 강화 실패.png" alt="강화실패" />
+                      <span>강화실패</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Main Title + Content */}
+              <div className="work-view-title-section">
+                <div className="main-title">{selectedWorkInfoCard.title}</div>
+                <div className="content-text">CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십</div>
+                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+              </div>
+
+              {/* Sub Title */}
+              <div className="work-view-section">
+                <div className="section-label">Sub Title</div>
+                <div className="section-content">메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀로 표현합니다. 실무에서 경험한 내용과 인사이트를 바탕으로 작성된 서브타이틀입니다. 사용자가 직접 입력한 내용이 여기에 표시되며 최대 150자까지 작성할 수 있습니다.</div>
+              </div>
+
+              {/* Output Link */}
+              <div className="work-view-section">
+                <div className="section-label">Output Link</div>
+                <div className="output-links-view">
+                  {(() => {
+                    const linkCounts = [1, 4, 2, 5, 3];
+                    const linkCount = linkCounts[selectedWorkInfoCard.id % linkCounts.length];
+                    const linkDescs = ["마케팅 포트폴리오 실무 프로젝트 사례", "프로젝트 결과물", "실무 사례", "참고 자료", "추가 링크"];
+                    return [1, 2, 3, 4, 5].map((num) => {
+                      const isActive = num <= linkCount;
+                      return (
+                        <a
+                          key={num}
+                          href={isActive ? "https://example.com" : undefined}
+                          target={isActive ? "_blank" : undefined}
+                          rel={isActive ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
+                          onClick={(e) => !isActive && e.preventDefault()}
+                        >
+                          <span className="link-num">{num}</span>
+                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                        </a>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 역량 카드 상세보기 모달 ========== */}
+      {workAbilityViewModalOpen && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityViewModalOpen(false); }}>
+          <div className="section-modal work-view-modal">
+            <div className="section-modal-header">
+              <h3>실무 역량</h3>
+              <button className="modal-close-btn" onClick={() => setWorkAbilityViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+              <div className="work-view-header-row">
+                <div className="work-view-left">
+                  <div className="work-icon-box fruit">
+                    <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="실무 역량" />
+                  </div>
+                  <span className="category-title">[실무 Info]인하우스 & 에이전시</span>
+                  <span className="code-badge">AA22-11111</span>
+                </div>
+                <div className="work-view-right">
+                  <div className="status-badge success">
+                    <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                    <span>강화성공</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Title + Content */}
+              <div className="work-view-title-section">
+                <div className="main-title">Main Title</div>
+                <div className="content-text">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
+                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+              </div>
+
+              {/* Sub Title */}
+              <div className="work-view-section">
+                <div className="section-label">Sub Title</div>
+                <div className="section-content">인하우스와 에이전시의 차이점을 실무 관점에서 분석한 내용입니다. 각각의 장단점과 커리어 성장 가능성을 비교하여 본인에게 맞는 방향을 찾는 것이 중요합니다. 마케터로서 어떤 환경이 더 적합한지 고민해보세요.</div>
+              </div>
+
+              {/* Output Link */}
+              <div className="work-view-section">
+                <div className="section-label">Output Link</div>
+                <div className="output-links-view">
+                  {[1, 2, 3, 4, 5].map((num) => {
+                    const linkCount = 4;
+                    const linkDescs = ["역량 분석 리포트 상세 내용 테스트", "실무 테스트 결과", "성장 계획서", "스킬 인증서", ""];
+                    const isActive = num <= linkCount;
+                    return (
+                      <a
+                        key={num}
+                        href={isActive ? "https://example.com" : undefined}
+                        target={isActive ? "_blank" : undefined}
+                        rel={isActive ? "noopener noreferrer" : undefined}
+                        className={`output-link-item ${!isActive ? 'disabled' : ''}`}
+                        onClick={(e) => !isActive && e.preventDefault()}
+                      >
+                        <span className="link-num">{num}</span>
+                        <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 경험 카드 상세보기 모달 ========== */}
+      {workExpViewModalOpen && selectedWorkExpCard && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpViewModalOpen(false); }}>
+          <div className="section-modal work-view-modal">
+            <div className="section-modal-header">
+              <h3>실무 경험</h3>
+              <button className="modal-close-btn" onClick={() => setWorkExpViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+              <div className="work-view-header-row">
+                <div className="work-view-left">
+                  <div className="work-icon-box fruit">
+                    {selectedWorkExpCard.icon && <img src={selectedWorkExpCard.icon} alt={selectedWorkExpCard.badge} />}
+                  </div>
+                  <span className="category-title">{selectedWorkExpCard.badge}</span>
+                  <span className="code-badge">{selectedWorkExpCard.code}</span>
+                </div>
+                <div className="work-view-right">
+                  <div className="status-badge success">
+                    <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
+                    <span>강화성공</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Title + 별점 + Content */}
+              <div className="work-view-title-section">
+                <div className="main-title-row">
+                  <div className="main-title">{selectedWorkExpCard.title}</div>
+                  <div className="rating-row">
+                    <div className="stars">{renderStars(selectedWorkExpCard.rating)}</div>
+                    <span className="rating-count">{selectedWorkExpCard.ratingCount}</span>
+                  </div>
+                </div>
+                <div className="content-text">[역량 파악 & 성장점 분석] 빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!</div>
+                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+              </div>
+
+              {/* Sub Title */}
+              <div className="work-view-section">
+                <div className="section-label">Sub Title</div>
+                <div className="section-content">마케터로서의 커리어를 시작하고 성장하는 과정에서 겪은 경험들을 정리한 내용입니다. 실무에서 배운 것들과 앞으로의 성장 방향에 대한 생각을 담았습니다. 지속적인 학습과 도전이 중요합니다.</div>
+              </div>
+
+              {/* Output Link */}
+              <div className="work-view-section">
+                <div className="section-label">Output Link</div>
+                <div className="output-links-view">
+                  {(() => {
+                    const linkCounts = [3, 1, 5, 2, 4];
+                    const linkCount = linkCounts[selectedWorkExpCard.id % linkCounts.length];
+                    const linkDescs = ["경험 증빙 자료 및 프로젝트 상세 문서", "프로젝트 문서", "성과 리포트", "팀 협업 자료", "기타 자료"];
+                    return [1, 2, 3, 4, 5].map((num) => {
+                      const isActive = num <= linkCount;
+                      return (
+                        <a
+                          key={num}
+                          href={isActive ? "https://example.com" : undefined}
+                          target={isActive ? "_blank" : undefined}
+                          rel={isActive ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
+                          onClick={(e) => !isActive && e.preventDefault()}
+                        >
+                          <span className="link-num">{num}</span>
+                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                        </a>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 실무 경력 카드 상세보기 모달 ========== */}
+      {workCareerViewModalOpen && selectedWorkCareerCard && (
+        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerViewModalOpen(false); }}>
+          <div className="section-modal work-view-modal">
+            <div className="section-modal-header">
+              <h3>실무 경력</h3>
+              <button className="modal-close-btn" onClick={() => setWorkCareerViewModalOpen(false)}>×</button>
+            </div>
+            <div className="section-modal-body">
+              {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+              <div className="work-view-header-row">
+                <div className="work-view-left">
+                  <div className="work-icon-box fruit">
+                    {selectedWorkCareerCard.icon && <img src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge} />}
+                  </div>
+                  <span className="category-title">마케팅(바이럴) 혹시 몰라</span>
+                  <span className="code-badge">{selectedWorkCareerCard.code}</span>
+                </div>
+                <div className="work-view-right">
+                  {selectedWorkCareerCard.statusBadge && (
+                    <div className="status-badge success">
+                      <img src={selectedWorkCareerCard.statusBadge} alt="상태" />
+                      <span>강화성공</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Main Title + 등급 + Content */}
+              <div className="work-view-title-section">
+                <div className="main-title-row">
+                  <div className="main-title">{selectedWorkCareerCard.title}</div>
+                  <div className="grade-row">
+                    <span className={`grade ${selectedWorkCareerCard.grade === 'S' ? 'active' : ''}`}>S</span>
+                    <span className={`grade ${selectedWorkCareerCard.grade === 'A' ? 'active' : ''}`}>A</span>
+                    <span className={`grade ${selectedWorkCareerCard.grade === 'B' ? 'active' : ''}`}>B</span>
+                    <span className={`grade ${selectedWorkCareerCard.grade === 'C' ? 'active' : ''}`}>C</span>
+                    <span className={`grade ${selectedWorkCareerCard.grade === 'D' ? 'active' : ''}`}>D</span>
+                  </div>
+                </div>
+                <div className="content-text">바이럴 마케팅 분야에서 3년간의 실무 경력을 쌓으며 다양한 캠페인을 성공적으로 운영했습니다. SNS 채널 운영과 콘텐츠 기획, 인플루언서 협업 등 폭넓은 경험을 보유하고 있습니다.</div>
+                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+              </div>
+
+              {/* Sub Title */}
+              <div className="work-view-section">
+                <div className="section-label">Sub Title</div>
+                <div className="section-content">바이럴 마케팅 실무 경력에 대한 상세 내용입니다. 다양한 프로젝트를 진행하며 쌓은 노하우와 성과를 정리했습니다. 클라이언트와의 협업 경험과 캠페인 운영 역량을 바탕으로 지속 성장 중입니다.</div>
+              </div>
+
+              {/* Output Link */}
+              <div className="work-view-section">
+                <div className="section-label">Output Link</div>
+                <div className="output-links-view">
+                  {(() => {
+                    const linkCounts = [2, 5, 1, 3, 4];
+                    const linkCount = linkCounts[selectedWorkCareerCard.id % linkCounts.length];
+                    const linkDescs = ["이력서 및 경력 증명서 포트폴리오", "포트폴리오", "프로젝트 사례", "자격증 증빙", "추천서"];
+                    return [1, 2, 3, 4, 5].map((num) => {
+                      const isActive = num <= linkCount;
+                      return (
+                        <a
+                          key={num}
+                          href={isActive ? "https://example.com" : undefined}
+                          target={isActive ? "_blank" : undefined}
+                          rel={isActive ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
+                          onClick={(e) => !isActive && e.preventDefault()}
+                        >
+                          <span className="link-num">{num}</span>
+                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                        </a>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
             </div>
           </div>
         </div>
