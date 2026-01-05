@@ -2,23 +2,27 @@
  --------- (6.0) responsive styles start ---------
  ==== */
 
-// Home 페이지에서 body/html 스크롤 방지 및 전체 높이 설정
+// Home 페이지에서 body/html 설정 - 푸터 표시를 위해 스크롤 허용
 body:has(.nftg-content-home),
 html:has(.nftg-content-home) {
-  overflow: hidden !important;
-  height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100vh !important;
 }
 
 
 // Home two layout - 사이드바와 메인콘텐츠 고정 레이아웃
 .nftg-content-home {
-  height: var(--container-height, calc(100vh - 124px)) !important;
+  height: auto !important;
+  min-height: calc(100vh - 124px) !important;
   overflow: visible !important;
 
   > .container-fluid {
     max-width: 100% !important;
     padding: 0 !important;
-    height: var(--container-height, 100%) !important;
+    height: auto !important;
+    min-height: 100% !important;
     overflow: visible !important;
 
     > .row {
@@ -27,7 +31,8 @@ html:has(.nftg-content-home) {
       flex-direction: row !important;
       margin: 0 !important;
       width: 100% !important;
-      height: var(--container-height, 100%) !important;
+      height: auto !important;
+      min-height: 100% !important;
 
       // 사이드바 - 항상 화면 세로에 딱 맞게
       .home-two-sidebar-col {
@@ -35,8 +40,8 @@ html:has(.nftg-content-home) {
         max-width: var(--sidebar-width, 520px) !important;
         width: var(--sidebar-width, 520px) !important;
         min-width: var(--sidebar-width, 520px) !important;
-        height: var(--container-height, 100%) !important;
-        max-height: var(--container-height, 100%) !important;
+        height: auto !important;
+        min-height: 100% !important;
         position: relative !important;
         z-index: 10 !important;
         padding: 0 !important;
@@ -63,9 +68,10 @@ html:has(.nftg-content-home) {
       .home-two-content-col {
         flex: 1 !important;
         min-width: 0 !important;
-        height: 100% !important;
+        height: auto !important;
+        min-height: 100% !important;
         overflow-x: hidden !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
         padding: 0 !important;
         padding-right: 20px !important;
         margin: 0 !important;

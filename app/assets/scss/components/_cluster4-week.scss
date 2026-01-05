@@ -2602,7 +2602,7 @@
     // 실무 경험/경력 섹션
     .work-exp-section,
     .work-career-section {
-      margin-bottom: 72px;
+      margin-bottom: 20px;
       position: relative;
 
       .floating-icons {
@@ -2885,6 +2885,7 @@
 
             .status-badge {
               z-index: 2;
+              right: -10px;
             }
           }
 

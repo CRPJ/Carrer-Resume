@@ -45,7 +45,7 @@ const Footer = () => {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <div className="footer__inner pt-120 pb-120">
+            <div className="footer__inner" style={{ paddingTop: '20px' }}>
               <div className="row vertical-column-gap-lg">
                 <div className="col-12 col-lg-4">
                   <div className="footer__widget fade-top">
@@ -60,7 +60,7 @@ const Footer = () => {
                               <Link href="/about-us">About Us</Link>
                             </li>
                             <li>
-                              <Link href="/shop">NFT Marketplace</Link>
+                              <Link href="/shop">Talent Marketplace</Link>
                             </li>
                             <li>
                               <Link href="/blog">Blog</Link>
@@ -82,11 +82,11 @@ const Footer = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="footer__widget-newsletter mt-60">
+                    <div className="footer__widget-newsletter mt-30">
                       <div className="footer__newsletter-header">
                         <h5 className="fw-6 mt-8">Subscribe To Newsletter</h5>
                       </div>
-                      <div className="footer__newsletter-wrapper mt-24">
+                      <div className="footer__newsletter-wrapper mt-12">
                         <form action="#" method="post" autoComplete="off">
                           <div className="newsletter-form">
                             <div className="newsletter-form-group">
@@ -107,7 +107,7 @@ const Footer = () => {
                 <div className="col-12 col-lg-4">
                   <div className="footer__widget footer__widget--alt mt-8 fade-top">
                     <div className="footer__widget-text">
-                      <p className="text-center">Dive into a world of endless gaming possibilities. Join the adventure, conquer challenges.</p>
+                      <p className="text-center">Dive into the competent workforce infrastructure. Challenge the world our ancestors have devoted for us.</p>
                     </div>
                     <div className="footer__widget-logo  text-center mt-35">
                       <Link href="/" aria-label="home page" title="logo" className="not-cursor">
@@ -115,7 +115,7 @@ const Footer = () => {
                       </Link>
                     </div>
                     <div className=" footer__widget-text footer__widget-text--alt mt-35">
-                      <p className="text-center">Level up your gaming experience with us!</p>
+                      <p className="text-center">Inspire your ambition, not frustration.</p>
                     </div>
                   </div>
                 </div>
@@ -130,7 +130,7 @@ const Footer = () => {
                           <div>
                             <p>
                               <a href="https://goo.gl/maps/16KHwiUcctAojuLj8" target="_blank">
-                                Valentine, Street Road 27, New York. USA - 752252
+                                29274 Cliffside Dr, Malibu, CA 90265
                               </a>
                             </p>
                           </div>
@@ -141,17 +141,17 @@ const Footer = () => {
                               <a href="tel:629-555-0129">(629) 555-0129</a>
                             </li>
                             <li>
-                              <a href="mailto:binhan628@gmail.com">example@gmail.com</a>
+                              <a href="mailto:example@gmail.com">example@gmail.com</a>
                             </li>
                           </ul>
                         </div>
                       </div>
                     </div>
-                    <div className="footer__widget-social mt-60">
+                    <div className="footer__widget-social mt-30">
                       <div className="footer__social-header">
                         <h5 className="fw-6 mt-8">Follow Us :</h5>
                       </div>
-                      <div className="footer__social-wrapper mt-24">
+                      <div className="footer__social-wrapper mt-12">
                         <Social />
                       </div>
                     </div>
@@ -172,8 +172,7 @@ const Footer = () => {
                   <div className="footer__copyright-content text-center text-lg-start">
                     <p>
                       Copyright &copy;
-                      <span id="copyrightYear"></span>
-                      <Link href="/">Nftg</Link>. <span className="divider"></span> Designed By <a href="https://themeforest.net/user/pixelaxis">Pixelaxis</a>
+                      <Link href="/">NFTG</Link>. <span className="divider"></span> Designed By <a href="https://themeforest.net/user/pixelaxis">PIXELAXIS</a>
                     </p>
                   </div>
                 </div>
