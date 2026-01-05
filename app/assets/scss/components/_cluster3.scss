@@ -160,7 +160,7 @@
       top: 0;
       left: 0;
       width: 1330px;
-      height: 500px;
+      height: 736px;
       z-index: 0;
       overflow: hidden;
 
@@ -175,7 +175,7 @@
       .char-left {
         position: absolute;
         left: 150px;
-        top: calc(50% - 70px);
+        top: calc(50% + 130px);
         transform: translateY(-50%);
         width: 100px;
         height: 100px;
@@ -192,7 +192,7 @@
       .char-right {
         position: absolute;
         right: 170px;
-        top: calc(50% - 50px);
+        top: calc(50% + 115px);
         transform: translateY(-50%);
         width: 100px;
         height: 100px;
@@ -253,13 +253,73 @@
       white-space: nowrap;
     }
 
+    // 설명 텍스트
+    .section1-description {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 40px 0;
+      line-height: 22px;
+      position: relative;
+      z-index: 1;
+      text-align: left;
+
+      p {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        margin-bottom: 0;
+        color: #FFF;
+
+        &:nth-child(2) {
+          margin-bottom: 22px;
+        }
+      }
+
+      .small-text {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        color: #FFF;
+        margin-top: 0;
+      }
+
+      .quote-text {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+        margin-top: 24px;
+        margin-bottom: 0;
+        font-style: italic;
+      }
+
+      .quote-highlight {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 24px;
+        line-height: 1.4;
+        background: linear-gradient(90deg, #FED402, #FFF1AA);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        font-style: italic;
+      }
+
+      .quote-author {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+        margin: 0;
+        font-style: italic;
+      }
+    }
+
     // 프로그레스 영역
     .progress-area {
       position: relative;
       z-index: 1;
       display: flex;
       justify-content: center;
-      margin: 90px 0 -80px;
+      margin: -20px 0 -80px;
 
       .progress-semi-circle {
         position: relative;
@@ -318,6 +378,7 @@
       justify-content: center;
       gap: 20px;
       padding: 0 20px;
+      margin-top: -60px;
 
       .stat-card {
         background: transparent;
@@ -375,7 +436,7 @@
         }
 
         &:nth-child(1),
-        &:nth-child(2) {
+        &:nth-child(3) {
           height: 298px;
         }
 
@@ -417,7 +478,7 @@
 
           .card-title {
             font-family: 'Cafe24Ohsquare', sans-serif;
-            font-size: 25px;
+            font-size: 22px;
             font-weight: 600;
             color: #fff;
             margin: 0;
@@ -502,6 +563,11 @@
                 color: #fff;
                 font-size: 14px;
                 margin-left: 3px;
+              }
+
+              .highlight-orange {
+                color: #FAAB07;
+                font-weight: 700;
               }
 
               &.be-cluving {

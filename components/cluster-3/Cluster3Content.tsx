@@ -280,6 +280,19 @@ const Cluster3Content = () => {
           </div>
         </div>
 
+        {/* 설명 텍스트 */}
+        <div className="section1-description">
+          <p>이 페이지는 우리 시대의 성장하는 청춘! 크루들의 지금까지 누적된, 현재 성장 & 강화 결과를 리포트합니다.</p>
+          <p>클럽의 마지막 성장 주차까지 종료한 크루의 경우, 그대로 클럽 마지막 최종 결과표가 되기도 할 거에요. 😊</p>
+          <p className="small-text">내가 가고 있는 이 길이 어디쯤 와있는지, 내가 초심을 잃지 않고 목표를 향해, 성장을 향해 잘 나아가고 있는지를, 확인하세요!</p>
+          <p className="small-text">당신의 시간과 성장은 얼마나 자랑스러우신가요?</p>
+          <p className="quote-text">
+            I believe that every right implies a responsibility; every opportunity, an obligation; every possession, a duty.
+          </p>
+          <p className="quote-highlight">"모든 권리에는 책임이 따르고, 모든 기회에는 의무가 따르며, 모든 소유물에는 의무가 따른다고 믿는다."</p>
+          <p className="quote-author">-존 D. 록펠러 (John D. Rockefeller)-</p>
+        </div>
+
         {/* 프로그레스 반원 */}
         <div className="progress-area">
           <div className="progress-semi-circle">
@@ -327,7 +340,7 @@ const Cluster3Content = () => {
               <div className="card-icon pink">
                 <img src="/images/0/cluster 3/icon/0pink.png" alt="Pink" />
               </div>
-              <h3 className="card-title">성장 진행 상태</h3>
+              <h3 className="card-title">성장 진행 상태(Process)</h3>
             </div>
             <div className="card-body">
               <div className="info-row">
@@ -339,82 +352,82 @@ const Cluster3Content = () => {
                 <span className="info-value">2025년 02월 22일 (월)</span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 종료일</span>
+                <span className="info-label"><span className="dot">·</span> 성장 종료일</span>
                 <span className="info-value be-cluving">Be Cluving</span>
               </div>
             </div>
             <div className="card-footer">
-              <span className="watch-pricing">WATCH PRICING <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
             </div>
           </div>
 
-          {/* 카드 2: 성장 점수 기록 */}
-          <div className="stat-card">
-            <div className="card-header">
-              <div className="card-icon green">
-                <img src="/images/0/cluster 3/icon/0green.png" alt="Green" />
-              </div>
-              <h3 className="card-title">성장 점수 기록</h3>
-            </div>
-            <div className="card-body">
-              <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 단감 <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" /></span>
-                <span className="info-value number">99,999</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 인절미 <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" /></span>
-                <span className="info-value number">99,999</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 어흥 <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" /></span>
-                <span className="info-value number negative">-99,999</span>
-              </div>
-            </div>
-            <div className="card-footer">
-              <span className="watch-pricing">WATCH PRICING <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
-            </div>
-          </div>
-
-          {/* 카드 3: 성장 기간 집계 */}
+          {/* 카드 2: 성장 기간 집계(Period) */}
           <div className="stat-card wide">
             <div className="card-header">
               <div className="card-icon purple">
                 <img src="/images/0/cluster 3/icon/0purple.png" alt="Purple" />
               </div>
-              <h3 className="card-title">성장 기간 집계</h3>
+              <h3 className="card-title">성장 기간 집계(Period)</h3>
             </div>
             <div className="card-body">
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 인정 주차</span>
-                <span className="info-value week">1<span className="unit">주</span></span>
+                <span className="info-label"><span className="dot">·</span> 성장(성공) 주차</span>
+                <span className="info-value week">999<span className="highlight-orange">(1)</span><span className="unit">주</span></span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 미인정 주차</span>
-                <span className="info-value week">1<span className="unit">주</span></span>
+                <span className="info-label"><span className="dot">·</span> 성장(실패) 주차</span>
+                <span className="info-value week">999<span className="unit">주</span></span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 휴식 주차</span>
-                <span className="info-value week">1<span className="unit">주</span></span>
+                <span className="info-label"><span className="dot">·</span> 휴식(개인) 주차</span>
+                <span className="info-value week">999<span className="highlight-orange">(999)</span><span className="unit">주</span></span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 공식 휴식 주차</span>
-                <span className="info-value week">1<span className="unit">주</span></span>
+                <span className="info-label"><span className="dot">·</span> 휴식(공식) 주차</span>
+                <span className="info-value week">999<span className="unit">주</span></span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 가능 주차</span>
-                <span className="info-value week">1<span className="unit">주</span></span>
+                <span className="info-label"><span className="dot">·</span> 성장 가능 주차</span>
+                <span className="info-value week">999<span className="unit">주</span></span>
               </div>
               <div className="info-row separator">
-                <span className="info-label"><span className="dot">·</span> 활동 휴식 시즌</span>
-                <span className="info-value season">1<span className="unit">시즌</span></span>
+                <span className="info-label"><span className="dot">·</span> 성장 휴식 시즌</span>
+                <span className="info-value season">999<span className="unit">시즌</span></span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 활동 인정 시즌</span>
-                <span className="info-value season">1<span className="unit">시즌</span></span>
+                <span className="info-label"><span className="dot">·</span> 성장(성공) 시즌</span>
+                <span className="info-value season">999<span className="unit">시즌</span></span>
               </div>
             </div>
             <div className="card-footer">
-              <span className="watch-pricing">WATCH PRICING <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+            </div>
+          </div>
+
+          {/* 카드 3: 성장 점수 기록(Point) */}
+          <div className="stat-card">
+            <div className="card-header">
+              <div className="card-icon green">
+                <img src="/images/0/cluster 3/icon/0green.png" alt="Green" />
+              </div>
+              <h3 className="card-title">성장 점수 기록(Point)</h3>
+            </div>
+            <div className="card-body">
+              <div className="info-row">
+                <span className="info-label"><span className="dot">·</span> 단감(총합) <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" /></span>
+                <span className="info-value number">99,999<span className="unit">개</span></span>
+              </div>
+              <div className="info-row">
+                <span className="info-label"><span className="dot">·</span> 인절미(총합) <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" /></span>
+                <span className="info-value number">99,999<span className="unit">개</span></span>
+              </div>
+              <div className="info-row">
+                <span className="info-label"><span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" /></span>
+                <span className="info-value number negative">-99,999<span className="unit">개</span></span>
+              </div>
+            </div>
+            <div className="card-footer">
+              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
             </div>
           </div>
         </div>
@@ -637,7 +650,7 @@ const Cluster3Content = () => {
         <div className="section4-header">
           <h2 className="section4-title">World Of Top Works</h2>
           <p className="section4-desc">
-            본 아카이빙 Output은 클럽에서 쌓은 '실무 경험' 중 최고 결과물에 해당하는 것들 중 &lt;일부분&gt;만을 다루고 있습니다.<br />
+            *본 아카이빙 Output은 클럽에서 쌓은 '실무 경험' 중 최고 결과물에 해당하는 것들 중 &lt;일부분&gt;만을 다루고 있습니다.<br />
             전체적인 실무 경험, 실무 경력, 역량, 정보 등은 다른 탭에서 확인해주세요.
           </p>
         </div>
