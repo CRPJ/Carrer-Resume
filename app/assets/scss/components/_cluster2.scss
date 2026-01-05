@@ -51,6 +51,7 @@
     z-index: 0;
     width: 100%;
     max-width: 1325px;
+    height: 667px;
 
     &::before {
       content: '';
@@ -69,6 +70,66 @@
       position: relative;
       width: 100%;
       text-align: center;
+    }
+
+    // 설명 텍스트
+    .section1-description {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 40px 0;
+      line-height: 22px;
+      position: relative;
+      z-index: 1;
+      text-align: left;
+
+      p {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        margin-bottom: 0;
+        color: #FFF;
+
+        &:nth-child(2) {
+          margin-bottom: 22px;
+        }
+      }
+
+      .small-text {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        color: #FFF;
+        margin-top: 0;
+      }
+
+      .quote-text {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+        margin-top: 24px;
+        margin-bottom: 0;
+        font-style: italic;
+      }
+
+      .quote-highlight {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 24px;
+        line-height: 1.4;
+        background: linear-gradient(90deg, #FED402, #FFF1AA);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        font-style: italic;
+      }
+
+      .quote-author {
+        font-family: 'HakgyoansimTuho', sans-serif;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+        margin: 0;
+        font-style: italic;
+      }
     }
   }
 
@@ -282,7 +343,7 @@
       height: 573px;
       flex-shrink: 0;
       position: absolute;
-      left: 550px;
+      left: 565px;
       top: -48px;
       z-index: 10;
 
@@ -659,9 +720,23 @@
             letter-spacing: 1px;
           }
 
+          .score-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+          }
+
           .score-stars {
             font-size: 16px;
             color: #DFF314;
+            position: relative;
+            top: 2px;
+          }
+
+          .score-count {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 12px;
+            color: #888;
           }
         }
       }
@@ -1822,6 +1897,67 @@
         }
       }
 
+    }
+  }
+
+  // CLUB REVIEW 배너
+  .cluster2-review-banner {
+    position: relative;
+    width: 100%;
+    max-width: 1336px;
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      background: url('/images/0/cluster 2/review-banner-bg.png') center center/cover no-repeat;
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    .review-banner-inner {
+      position: relative;
+      text-align: center;
+    }
+
+    .review-banner-title-shadow {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 60px;
+      font-weight: 900;
+      color: #111;
+      -webkit-text-stroke: 1px #21E786;
+      text-stroke: 1px #21E786;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: absolute;
+      top: 3px;
+      left: calc(50% - 3px);
+      transform: translateX(-50%);
+      z-index: 0;
+      white-space: nowrap;
+    }
+
+    .review-banner-title {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 60px;
+      font-weight: 900;
+      color: #FFF;
+      text-align: center;
+      letter-spacing: 0;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
     }
   }
 
@@ -4680,6 +4816,83 @@
 
           &.grade-row {
             grid-template-columns: 1fr 20px 1fr;
+          }
+
+          // 100% 성적 드롭다운
+          .edu-custom-dropdown.grade-percent {
+            .dropdown-options {
+              max-height: 200px;
+              overflow-y: auto;
+            }
+          }
+
+          // 성적 드롭다운 row (정수.소수)
+          .grade-dropdown-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+
+            .grade-dot {
+              color: #fff;
+              font-size: 16px;
+              font-weight: 700;
+              margin: 0 8px;
+              position: relative;
+              top: 4px;
+            }
+
+            .edu-custom-dropdown {
+              &.grade-int,
+              &.grade-decimal {
+                position: relative;
+                width: auto;
+                flex: 1;
+
+                .dropdown-selected {
+                  width: 100%;
+                  min-width: 100px;
+                  height: 44px;
+                  padding: 10px 12px;
+                }
+
+                .dropdown-options {
+                  position: absolute;
+                  top: 100%;
+                  left: 0;
+                  width: 100%;
+                  min-width: 100px;
+                  max-height: 180px;
+                  overflow-y: auto;
+                  background: #1a1a1a;
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-top: none;
+                  z-index: 1000;
+
+                  .dropdown-option {
+                    padding: 8px 10px;
+                    font-size: 14px;
+                    color: #fff;
+                    cursor: pointer;
+                    transition: background 0.2s;
+
+                    &:hover {
+                      background: #252525;
+                    }
+
+                    &.selected {
+                      background: #333;
+                      color: #FFA500;
+                    }
+
+                    &.disabled {
+                      opacity: 0.3;
+                      cursor: not-allowed;
+                      pointer-events: none;
+                    }
+                  }
+                }
+              }
+            }
           }
 
           // 기타 최대치 입력

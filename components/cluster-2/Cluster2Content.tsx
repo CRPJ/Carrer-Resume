@@ -585,6 +585,16 @@ const Cluster2Content = () => {
           <h1 className="cluster2-title-shadow">PROFILE</h1>
           <h1 className="cluster2-title">PROFILE</h1>
         </div>
+        {/* 설명 텍스트 */}
+        <div className="section1-description">
+          <p>이 페이지는 사회로 나아가는 우리의 모습이 등장합니다.</p>
+          <p>우리가 어떻게 바라봤던, 나의 모습, 나의 능력, 나의 경험.. 우리는 그때 그 목표에 얼마나 가까이 살고 있나요?</p>
+          <p className="small-text">우수하고, 뛰어나고, 멋진 건 아무 짝에도 소용 없습니다. 남들의 시선도 무시하세요! 😊</p>
+          <p className="small-text">중요한건, 내가 나답게 세상에 보여질 수 있는지, 그리고 그 모습을 얼마나 후회없이 그려나가고 있는지 입니다.</p>
+          <p className="quote-text">"Know thyself"</p>
+          <p className="quote-highlight">"너 자신을 알라"</p>
+          <p className="quote-author">- 소크라테스 (Socrates) -</p>
+        </div>
       </div>
 
       {/* 상단 섹션: 연결된 프레임 */}
@@ -803,13 +813,16 @@ const Cluster2Content = () => {
                 </div>
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
-                  <span className="score-stars animated-stars">
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                  </span>
+                  <div className="score-row">
+                    <span className="score-stars animated-stars">
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                    </span>
+                    <span className="score-count">6/10</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -838,13 +851,16 @@ const Cluster2Content = () => {
                 </div>
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
-                  <span className="score-stars animated-stars">
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                    <span className="star">✦</span>
-                  </span>
+                  <div className="score-row">
+                    <span className="score-stars animated-stars">
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                      <span className="star">✦</span>
+                    </span>
+                    <span className="score-count">6/10</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -897,7 +913,7 @@ const Cluster2Content = () => {
                 <li><span className="dot">·</span><span className="label">계열</span><span className="value">{edu.category}</span></li>
                 <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period.includes('~ing') ? (<>{edu.period.replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : edu.period}</span></li>
                 <li><span className="dot">·</span><span className="label">상태</span><span className="value">{edu.status}</span></li>
-                <li><span className="dot">·</span><span className="label">학점</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && ` / ${edu.gradeMax}`}</span></li>
+                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && ` / ${edu.gradeMax}`}</span></li>
               </ul>
               <div
                 className="edu-footer"
@@ -939,6 +955,14 @@ const Cluster2Content = () => {
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* CLUB REVIEW 배너 */}
+      <div className="cluster2-review-banner">
+        <div className="review-banner-inner">
+          <h2 className="review-banner-title-shadow">CLUB REVIEW</h2>
+          <h2 className="review-banner-title">CLUB REVIEW</h2>
         </div>
       </div>
 
@@ -2155,7 +2179,7 @@ const Cluster2Content = () => {
                     {/* 행 6: 성적 (달성치 / 최대치) */}
                     <div className="edu-edit-row grade-row">
                       <div className="edu-edit-field">
-                        <label>학점</label>
+                        <label>성적<span className="required">*</span></label>
                         {/* 최대치에 따라 달성치 입력 방식 변경 */}
                         {edu.gradeMax === '-' ? (
                           // '-' 선택 시: 비활성화된 입력창에 '-' 표시
@@ -2166,46 +2190,111 @@ const Cluster2Content = () => {
                             className="disabled-input"
                           />
                         ) : edu.gradeMax === '4.5' || edu.gradeMax === '4.3' ? (
-                          // 4.5 또는 4.3: 소숫점 2자리까지 직접 입력
-                          <input
-                            type="text"
-                            value={edu.gradeValue}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              // 숫자와 소숫점만 허용, 소숫점 2자리까지
-                              if (/^\d*\.?\d{0,2}$/.test(value)) {
-                                const numValue = parseFloat(value);
-                                const maxValue = parseFloat(edu.gradeMax);
-                                // 최대값 이하만 허용
-                                if (value === '' || value === '.' || (numValue >= 0 && numValue <= maxValue)) {
-                                  const newData = [...editingEduData];
-                                  newData[index].gradeValue = value;
-                                  setEditingEduData(newData);
-                                }
-                              }
-                            }}
-                            placeholder={`0.00 ~ ${edu.gradeMax}`}
-                          />
+                          // 4.5 또는 4.3: 정수+소수 드롭다운
+                          <div className="grade-dropdown-row">
+                            {/* 정수 부분 (0-4) */}
+                            <div className={`edu-custom-dropdown grade-int ${eduDropdowns[`${index}_gradeInt`] ? 'open' : ''}`}>
+                              <div
+                                className="dropdown-selected"
+                                onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_gradeInt`]: !prev[`${index}_gradeInt`] }))}
+                              >
+                                <span>{edu.gradeValue ? edu.gradeValue.split('.')[0] : '0'}</span>
+                                <i className="ti ti-chevron-down"></i>
+                              </div>
+                              {eduDropdowns[`${index}_gradeInt`] && (
+                                <div className="dropdown-options">
+                                  {[4, 3, 2, 1, 0].map((num) => (
+                                    <div
+                                      key={num}
+                                      className={`dropdown-option ${edu.gradeValue?.split('.')[0] === String(num) ? 'selected' : ''}`}
+                                      onClick={() => {
+                                        const newData = [...editingEduData];
+                                        const currentDecimal = edu.gradeValue?.split('.')[1] || '00';
+                                        const newValue = `${num}.${currentDecimal}`;
+                                        const maxValue = parseFloat(edu.gradeMax);
+                                        // 최대값 체크
+                                        if (parseFloat(newValue) <= maxValue) {
+                                          newData[index].gradeValue = newValue;
+                                        } else {
+                                          // 최대값 초과 시 최대값으로 설정
+                                          newData[index].gradeValue = edu.gradeMax === '4.5' ? '4.50' : '4.30';
+                                        }
+                                        setEditingEduData(newData);
+                                        setEduDropdowns(prev => ({ ...prev, [`${index}_gradeInt`]: false }));
+                                      }}
+                                    >
+                                      {num}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <span className="grade-dot">.</span>
+                            {/* 소수 부분 (00-99) */}
+                            <div className={`edu-custom-dropdown grade-decimal ${eduDropdowns[`${index}_gradeDecimal`] ? 'open' : ''}`}>
+                              <div
+                                className="dropdown-selected"
+                                onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_gradeDecimal`]: !prev[`${index}_gradeDecimal`] }))}
+                              >
+                                <span>{edu.gradeValue?.split('.')[1] || '00'}</span>
+                                <i className="ti ti-chevron-down"></i>
+                              </div>
+                              {eduDropdowns[`${index}_gradeDecimal`] && (
+                                <div className="dropdown-options">
+                                  {Array.from({ length: 100 }, (_, i) => i.toString().padStart(2, '0')).map((num) => {
+                                    const intPart = edu.gradeValue?.split('.')[0] || '0';
+                                    const testValue = parseFloat(`${intPart}.${num}`);
+                                    const maxValue = parseFloat(edu.gradeMax);
+                                    const isDisabled = testValue > maxValue;
+                                    return (
+                                      <div
+                                        key={num}
+                                        className={`dropdown-option ${edu.gradeValue?.split('.')[1] === num ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                                        onClick={() => {
+                                          if (isDisabled) return;
+                                          const newData = [...editingEduData];
+                                          newData[index].gradeValue = `${intPart}.${num}`;
+                                          setEditingEduData(newData);
+                                          setEduDropdowns(prev => ({ ...prev, [`${index}_gradeDecimal`]: false }));
+                                        }}
+                                      >
+                                        {num}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         ) : edu.gradeMax === '100%' ? (
-                          // 100%: 1~100 직접 입력
-                          <input
-                            type="text"
-                            value={edu.gradeValue}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              // 숫자만 허용
-                              if (/^\d*$/.test(value)) {
-                                const numValue = parseInt(value);
-                                // 1~100 범위만 허용
-                                if (value === '' || (numValue >= 1 && numValue <= 100)) {
-                                  const newData = [...editingEduData];
-                                  newData[index].gradeValue = value;
-                                  setEditingEduData(newData);
-                                }
-                              }
-                            }}
-                            placeholder="1 ~ 100"
-                          />
+                          // 100%: 100~0 드롭다운
+                          <div className={`edu-custom-dropdown grade-percent ${eduDropdowns[`${index}_gradePercent`] ? 'open' : ''}`}>
+                            <div
+                              className="dropdown-selected"
+                              onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_gradePercent`]: !prev[`${index}_gradePercent`] }))}
+                            >
+                              <span>{edu.gradeValue || '선택'}</span>
+                              <i className="ti ti-chevron-down"></i>
+                            </div>
+                            {eduDropdowns[`${index}_gradePercent`] && (
+                              <div className="dropdown-options">
+                                {Array.from({ length: 101 }, (_, i) => 100 - i).map((num) => (
+                                  <div
+                                    key={num}
+                                    className={`dropdown-option ${edu.gradeValue === String(num) ? 'selected' : ''}`}
+                                    onClick={() => {
+                                      const newData = [...editingEduData];
+                                      newData[index].gradeValue = String(num);
+                                      setEditingEduData(newData);
+                                      setEduDropdowns(prev => ({ ...prev, [`${index}_gradePercent`]: false }));
+                                    }}
+                                  >
+                                    {num}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         ) : edu.gradeMax === '9등급' ? (
                           // 9등급: 1~9 드롭다운
                           <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_gradeValue`] ? 'open' : ''}`}>
@@ -2213,7 +2302,7 @@ const Cluster2Content = () => {
                               className="dropdown-selected"
                               onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_gradeValue`]: !prev[`${index}_gradeValue`] }))}
                             >
-                              <span>{edu.gradeValue === '-' ? '-' : (edu.gradeValue ? `${edu.gradeValue}등급` : '학점 선택')}</span>
+                              <span>{edu.gradeValue === '-' ? '-' : (edu.gradeValue ? `${edu.gradeValue}등급` : '성적 선택')}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
                             {eduDropdowns[`${index}_gradeValue`] && (
@@ -2247,7 +2336,7 @@ const Cluster2Content = () => {
                                 setEditingEduData(newData);
                               }
                             }}
-                            placeholder="학점 입력 (최대 5자)"
+                            placeholder="성적 입력 (최대 5자)"
                             maxLength={5}
                           />
                         )}
@@ -2349,13 +2438,14 @@ const Cluster2Content = () => {
               <button
                 className="save-btn"
                 onClick={() => {
-                  // 필수 입력 검증: 학교, 전공1, 입학년도, 상태
+                  // 필수 입력 검증: 학교, 전공1, 입학년도, 상태, 성적
                   const invalidCards = editingEduData.map((edu, index) => {
                     const missing: string[] = [];
                     if (!edu.school) missing.push('학교');
                     if (!edu.major1) missing.push('전공 1');
                     if (!edu.startYear) missing.push('입학년도');
                     if (!edu.status) missing.push('상태');
+                    if (!edu.gradeValue) missing.push('성적');
                     return { index: index + 1, missing };
                   }).filter(item => item.missing.length > 0);
 
