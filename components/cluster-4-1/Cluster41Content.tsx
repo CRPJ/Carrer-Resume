@@ -581,6 +581,14 @@ const Cluster41Content = () => {
                 <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus : `성장 (${week.growthStatus})`}</span>
                 <img src={`/images/0/cluster%204/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
               </div>
+
+              {/* 더보기 버튼 */}
+              <div className="weekly-card-more-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="8" r="7" stroke="#fff" strokeWidth="2" fill="none" />
+                  <path d="M7 5.5L10 8L7 10.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+              </div>
             </Link>
           ))}
         </div>

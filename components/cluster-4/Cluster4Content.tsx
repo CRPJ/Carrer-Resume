@@ -279,6 +279,9 @@ const Cluster4Content = () => {
                 <div className="item-group inactive">
                   <span className="item">Team</span>
                   <img src="/images/0/cluster 4/icon/icon - team.png" alt="Team" className="qualified-icon" />
+                  <div className="tooltip unqualified">
+                    <span className="unqualified-text">UnQualified</span>
+                  </div>
                 </div>
                 <div className="item-group">
                   <span className="item">Club</span>

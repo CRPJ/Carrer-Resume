@@ -1888,7 +1888,7 @@
   width: 100%;
   max-width: 1330px;
   padding: 30px 0 10px 0;
-  margin-top: -10px;
+  margin-top: 20px;
 
   // SEASON CHALLENGE 배너
   .section3-banner {
@@ -2363,8 +2363,12 @@
             }
 
             &.inactive {
-              opacity: 0.4;
+              opacity: 1;
               cursor: default;
+
+              .item, .qualified-icon {
+                opacity: 0.4;
+              }
             }
 
             &:last-child .tooltip {
@@ -2418,6 +2422,23 @@
                 width: 180px;
                 height: auto;
                 filter: invert(1);
+              }
+
+              // UnQualified 툴팁 스타일
+              &.unqualified {
+                background: #333;
+                min-width: 120px;
+                min-height: 40px;
+                padding: 10px 15px;
+                border: 1px solid #666;
+
+                .unqualified-text {
+                  font-family: 'Pretendard', sans-serif;
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: #767676;
+                  letter-spacing: 0.5px;
+                }
               }
             }
 
@@ -4084,6 +4105,25 @@
         height: 42px;
         object-fit: contain;
         margin-top: -3px;
+      }
+    }
+
+    // 더보기 버튼
+    .weekly-card-more-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
       }
     }
   }

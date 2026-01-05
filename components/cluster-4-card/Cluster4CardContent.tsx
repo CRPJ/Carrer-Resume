@@ -454,7 +454,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
-      message: "프로젝트에서 많은 도움을 주셔서 정말 감사합니다. 덕분에 성장할 수 있었어요!",
+      message: "프로젝트에서 많은 도움을 주셔서 정말 감사합니다. 덕분에 성장할 수 있었어요! 앞으로도 함께 좋은 결과물 만들어가요. 항상 응원하겠습니다. 파이팅!일이삼사오육칠팔구십",
     },
     {
       id: 2,
@@ -468,7 +468,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       part: "내돈내산",
       nickname: "엔비디아구글태슬라킹",
       date: "2025 - 12 - 22 (월)",
-      message: "항상 응원해주시고 조언해주셔서 감사합니다. 앞으로도 잘 부탁드려요!",
+      message: "항상 응원해주시고 조언해주셔서 감사합니다. 앞으로도 잘 부탁드려요! 함께 성장하며 멋진 프로젝트 완성해봐요. 최고의 파트너입니다!일이삼사오육칠팔구십 최고의 파트너입니다!!!!!!!",
     },
     {
       id: 3,
@@ -513,7 +513,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
     { id: 1, code: "AA22-11111", badge: "마케팅|마이릿|축시 출시", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/배민.png", supervisorImg: "/images/0/crew profile/남 2.jpg", supervisorName: "이준혁", supervisorDept: "서비스기획팀", supervisorCompany: "우아한형제들", supervisorPosition: "대리", statusBadge: "/images/0/cluster 4/icon/5 강화 성공.png", grade: "S" },
     { id: 2, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/sm.webp", supervisorImg: "/images/0/crew profile/여 1.jpg", supervisorName: "김민지", supervisorDept: "마케팅팀", supervisorCompany: "네이버", supervisorPosition: "과장", statusBadge: "/images/0/cluster 4/icon/6 강화 대기.png", grade: "A" },
     { id: 3, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/Logo_tvN.svg.png", supervisorImg: "/images/0/crew profile/남 4.jpg", supervisorName: "박성호", supervisorDept: "전략기획팀", supervisorCompany: "카카오", supervisorPosition: "차장", statusBadge: "/images/0/cluster 4/icon/8 해당 없음.png", isNotApplicable: true, grade: "B" },
-    { id: 4, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/naver%20webtoon.png", supervisorImg: "/images/0/crew profile/여 6.jpg", supervisorName: "최유진", supervisorDept: "UX팀", supervisorCompany: "토스", supervisorPosition: "팀장", statusBadge: "/images/0/cluster 4/icon/5 강화 성공.png", grade: "S" },
+    { id: 4, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/naver%20webtoon.png", supervisorImg: "/images/0/cluster 4/4-1-card/조지 워싱턴.png", supervisorName: "조지 워싱턴", supervisorDept: "", supervisorCompany: "", supervisorPosition: "", statusBadge: "/images/0/cluster 4/icon/5 강화 성공.png", grade: "S" },
     { id: 5, code: "AA22-11111", badge: "마케팅|마이릿|축시 진행", title: "Main Title", verified: true, date: "2025 - 12 - 22 (월)", likes: "0.99", hasWeb: true, icon: "/images/0/CJ_logo.svg.png", supervisorImg: "/images/0/crew profile/남 7.jpg", supervisorName: "정재원", supervisorDept: "개발팀", supervisorCompany: "쿠팡", supervisorPosition: "사원", statusBadge: "/images/0/cluster 4/icon/8 해당 없음.png", isNotApplicable: true, grade: "C" },
     { id: 6, code: "", badge: "", title: "Main Title", verified: true, date: "0000 - 00 - 00 (월)", likes: "0.99", hasWeb: false, isEmpty: true, icon: "", supervisorImg: "", supervisorName: "", supervisorDept: "", supervisorCompany: "", supervisorPosition: "", statusBadge: "", grade: "" },
   ];
@@ -856,7 +856,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="section-count">총 7개 중 <span className="highlight">4</span>개</span>
             </div>
             <div className="section-title-right">
-              <span className="rate-label">강화율</span>
+              <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">65</span>%</span>
             </div>
           </div>
@@ -931,7 +931,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="section-count">총 1개 중 <span className="highlight">1</span>개</span>
             </div>
             <div className="section-title-right">
-              <span className="rate-label">강화율</span>
+              <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">100</span>%</span>
             </div>
           </div>
@@ -1000,7 +1000,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="section-count">총 4개 중 <span className="highlight">3</span>개</span>
             </div>
             <div className="section-title-right">
-              <span className="rate-label">강화율</span>
+              <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">75</span>%</span>
             </div>
           </div>
@@ -1090,7 +1090,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <span className="section-count">총 5개 중 <span className="highlight">3</span>개</span>
             </div>
             <div className="section-title-right">
-              <span className="rate-label">강화율</span>
+              <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">75</span>%</span>
             </div>
           </div>
@@ -1150,7 +1150,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                         </div>
                         <div className="profile-text">
                           <span className="supervised-text">Supervised by:</span>
-                          <span className="profile-name">{isEmpty ? '-' : <><strong>{card.supervisorName}</strong> | {card.supervisorDept} | {card.supervisorCompany} | {card.supervisorPosition}</>}</span>
+                          <span className="profile-name">{isEmpty ? '-' : <><strong>{card.supervisorName}</strong>{card.supervisorDept && <> | {card.supervisorDept}</>}{card.supervisorCompany && <> | {card.supervisorCompany}</>}{card.supervisorPosition && <> | {card.supervisorPosition}</>}</>}</span>
                         </div>
                       </div>
                     </div>
