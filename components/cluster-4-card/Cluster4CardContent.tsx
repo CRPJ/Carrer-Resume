@@ -8,6 +8,21 @@ interface Cluster4CardContentProps {
   weekData?: WeekData;
 }
 
+interface SelectedColleague {
+  id: number;
+  name: string;
+  gender: string;
+  age: number;
+  profileImg: string;
+  university: string;
+  major: string;
+  team: string;
+  part: string;
+  nickname: string;
+  rank: number;
+  message: string;
+}
+
 const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   // 모달 상태 관리
   const [workInfoModalOpen, setWorkInfoModalOpen] = useState(false);
@@ -20,20 +35,8 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   const [headerModalOpen, setHeaderModalOpen] = useState(false);
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
 
-  // 연계 동료 선택 상태
-  const [selectedColleagues, setSelectedColleagues] = useState<{
-    id: number;
-    name: string;
-    gender: string;
-    age: number;
-    profileImg: string;
-    university: string;
-    major: string;
-    team: string;
-    part: string;
-    nickname: string;
-    message: string;
-  }[]>([
+  // 연계 동료 선택 상태 (1st, 2nd, 3rd 각각 별도 저장)
+  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([
     {
       id: 7,
       name: "윤서영",
@@ -45,6 +48,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       team: "엔터테인먼트",
       part: "로봇",
       nickname: "영상편집마스터",
+      rank: 1,
       message: "",
     },
     {
@@ -58,6 +62,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       team: "미디어",
       part: "AI",
       nickname: "아이디어뱅크",
+      rank: 2,
       message: "",
     },
   ]);
@@ -107,13 +112,14 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   const addColleague = (user: typeof allCrewData[0], rank: number) => {
     if (selectedColleagues.length >= 3) return;
     if (selectedColleagues.find(c => c.id === user.id)) return;
+    // 해당 순위가 이미 사용중인지 확인
+    if (selectedColleagues.find(c => c.rank === rank)) return;
 
-    const newColleague = { ...user, message: "" };
-    const newList = [...selectedColleagues];
+    const newColleague = { ...user, message: "", rank };
+    const newList = [...selectedColleagues, newColleague];
 
-    // 해당 순위에 삽입 (0-indexed로 rank-1)
-    const insertIndex = Math.min(rank - 1, newList.length);
-    newList.splice(insertIndex, 0, newColleague);
+    // rank 순서대로 정렬
+    newList.sort((a, b) => a.rank - b.rank);
 
     setSelectedColleagues(newList);
   };
@@ -1677,7 +1683,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                         <div className="colleague-header">
                           <div className="to-badge">
                             <span className="to-text">To.</span>
-                            <span className="rank-number">{index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : 'rd'}</span>
+                            <span className="rank-number">{colleague.rank}{colleague.rank === 1 ? 'st' : colleague.rank === 2 ? 'nd' : 'rd'}</span>
                           </div>
                           <button className="remove-btn" title="삭제" onClick={() => removeColleague(colleague.id)}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1775,22 +1781,22 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                           </div>
                           <div className="rank-select-buttons">
                             <button
-                              className={`rank-btn ${selectedColleagues.length >= 1 ? 'disabled' : ''}`}
+                              className={`rank-btn ${selectedColleagues.find(c => c.rank === 1) ? 'disabled' : ''}`}
                               title="1순위로 선택"
                               onClick={() => addColleague(user, 1)}
-                              disabled={selectedColleagues.length >= 3}
+                              disabled={!!selectedColleagues.find(c => c.rank === 1) || selectedColleagues.length >= 3}
                             >1st</button>
                             <button
-                              className={`rank-btn ${selectedColleagues.length >= 2 ? 'disabled' : ''}`}
+                              className={`rank-btn ${selectedColleagues.find(c => c.rank === 2) ? 'disabled' : ''}`}
                               title="2순위로 선택"
                               onClick={() => addColleague(user, 2)}
-                              disabled={selectedColleagues.length >= 3}
+                              disabled={!!selectedColleagues.find(c => c.rank === 2) || selectedColleagues.length >= 3}
                             >2nd</button>
                             <button
-                              className={`rank-btn ${selectedColleagues.length >= 3 ? 'disabled' : ''}`}
+                              className={`rank-btn ${selectedColleagues.find(c => c.rank === 3) ? 'disabled' : ''}`}
                               title="3순위로 선택"
                               onClick={() => addColleague(user, 3)}
-                              disabled={selectedColleagues.length >= 3}
+                              disabled={!!selectedColleagues.find(c => c.rank === 3) || selectedColleagues.length >= 3}
                             >3rd</button>
                           </div>
                         </div>
