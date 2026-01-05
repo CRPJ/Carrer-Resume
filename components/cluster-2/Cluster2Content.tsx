@@ -347,17 +347,17 @@ const Cluster2Content = () => {
     },
     {
       id: 2,
-      icon: '/images/0/cluster 2/icon/02커리어 방향.png',
-      title: '커리어 방향',
+      icon: '/images/0/cluster 2/icon/03사회 경험.png',
+      title: '사회 경험',
       subtitle: '저는 이런 것들을 경험하였습니다 😊',
-      content: '저의 커리어 목표는 "사람과 기술을 연결하는 다리"가 되는 것입니다. 빠르게 변화하는 디지털 환경 속에서 기술만으로는 진정한 가치를 만들어낼 수 없다고 생각합니다. 기술을 이해하면서도 사람의 니즈를 파악하고, 이 둘을 효과적으로 연결할 수 있는 전문가가 되고자 합니다.\n\n단기적으로는 디지털 마케팅과 콘텐츠 기획 분야에서 실무 역량을 쌓고 싶습니다. 데이터 분석을 기반으로 한 마케팅 전략 수립, 타겟 고객에게 공감을 주는 콘텐츠 제작, 그리고 브랜드 아이덴티티 구축까지 전반적인 마케팅 사이클을 경험하며 전문성을 키워나가겠습니다.\n\n중장기적으로는 브랜드 매니저 또는 마케팅 디렉터로 성장하여 브랜드의 방향성을 제시하고, 팀을 이끌어 나가는 역할을 맡고 싶습니다. 단순히 매출을 올리는 마케팅이 아닌, 고객과 진정성 있는 관계를 형성하고 사회적 가치를 창출하는 마케팅을 실현하고자 합니다.\n\n궁극적으로는 제가 쌓은 경험과 지식을 후배들과 나누며, 업계 전체의 발전에 기여하는 사람이 되고 싶습니다. 멘토링과 강연, 그리고 실무 교육을 통해 다음 세대의 마케터들이 성장할 수 있도록 돕겠습니다.'
+      content: '대학 시절 시작한 첫 인턴십은 스타트업 마케팅 팀이었습니다. 작은 규모의 회사였기에 기획부터 실행, 분석까지 마케팅의 전 과정을 경험할 수 있었습니다. 한정된 예산으로 최대의 효과를 내기 위해 고민하며 창의적인 문제 해결 능력을 키웠고, 빠른 의사결정과 실행력의 중요성을 배웠습니다.\n\n이후 중견 기업의 브랜드 마케팅 부서에서 근무하며 체계적인 브랜드 관리와 대규모 캠페인 운영을 경험했습니다. 다양한 이해관계자들과 협업하는 과정에서 커뮤니케이션 능력을 한층 발전시킬 수 있었고, 데이터 기반의 의사결정이 얼마나 중요한지 깨달았습니다.\n\n또한 대학생 마케팅 연합 동아리에서 2년간 활동하며 다양한 기업들의 마케팅 프로젝트를 수행했습니다. 서로 다른 전공과 배경을 가진 팀원들과 협업하며 다양한 관점에서 문제를 바라보는 법을 배웠습니다.\n\n봉사활동으로는 지역 소상공인들의 온라인 마케팅을 무료로 지원하는 프로젝트에 참여했습니다. 디지털 전환에 어려움을 겪는 분들께 실질적인 도움을 드리며, 마케팅이 단순한 판매 촉진을 넘어 사회적 가치를 창출할 수 있다는 것을 경험했습니다.'
     },
     {
       id: 3,
-      icon: '/images/0/cluster 2/icon/03사회 경험.png',
-      title: '사회 경험',
+      icon: '/images/0/cluster 2/icon/02커리어 방향.png',
+      title: '커리어 방향',
       subtitle: '저는 이 방향으로 나아가고자 합니다 😊',
-      content: '대학 시절 시작한 첫 인턴십은 스타트업 마케팅 팀이었습니다. 작은 규모의 회사였기에 기획부터 실행, 분석까지 마케팅의 전 과정을 경험할 수 있었습니다. 한정된 예산으로 최대의 효과를 내기 위해 고민하며 창의적인 문제 해결 능력을 키웠고, 빠른 의사결정과 실행력의 중요성을 배웠습니다.\n\n이후 중견 기업의 브랜드 마케팅 부서에서 근무하며 체계적인 브랜드 관리와 대규모 캠페인 운영을 경험했습니다. 다양한 이해관계자들과 협업하는 과정에서 커뮤니케이션 능력을 한층 발전시킬 수 있었고, 데이터 기반의 의사결정이 얼마나 중요한지 깨달았습니다.\n\n또한 대학생 마케팅 연합 동아리에서 2년간 활동하며 다양한 기업들의 마케팅 프로젝트를 수행했습니다. 서로 다른 전공과 배경을 가진 팀원들과 협업하며 다양한 관점에서 문제를 바라보는 법을 배웠습니다.\n\n봉사활동으로는 지역 소상공인들의 온라인 마케팅을 무료로 지원하는 프로젝트에 참여했습니다. 디지털 전환에 어려움을 겪는 분들께 실질적인 도움을 드리며, 마케팅이 단순한 판매 촉진을 넘어 사회적 가치를 창출할 수 있다는 것을 경험했습니다.'
+      content: '저의 커리어 목표는 "사람과 기술을 연결하는 다리"가 되는 것입니다. 빠르게 변화하는 디지털 환경 속에서 기술만으로는 진정한 가치를 만들어낼 수 없다고 생각합니다. 기술을 이해하면서도 사람의 니즈를 파악하고, 이 둘을 효과적으로 연결할 수 있는 전문가가 되고자 합니다.\n\n단기적으로는 디지털 마케팅과 콘텐츠 기획 분야에서 실무 역량을 쌓고 싶습니다. 데이터 분석을 기반으로 한 마케팅 전략 수립, 타겟 고객에게 공감을 주는 콘텐츠 제작, 그리고 브랜드 아이덴티티 구축까지 전반적인 마케팅 사이클을 경험하며 전문성을 키워나가겠습니다.\n\n중장기적으로는 브랜드 매니저 또는 마케팅 디렉터로 성장하여 브랜드의 방향성을 제시하고, 팀을 이끌어 나가는 역할을 맡고 싶습니다. 단순히 매출을 올리는 마케팅이 아닌, 고객과 진정성 있는 관계를 형성하고 사회적 가치를 창출하는 마케팅을 실현하고자 합니다.\n\n궁극적으로는 제가 쌓은 경험과 지식을 후배들과 나누며, 업계 전체의 발전에 기여하는 사람이 되고 싶습니다. 멘토링과 강연, 그리고 실무 교육을 통해 다음 세대의 마케터들이 성장할 수 있도록 돕겠습니다.'
     },
     {
       id: 4,
@@ -599,10 +599,19 @@ const Cluster2Content = () => {
 
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame" style={{ position: 'relative' }}>
-        {/* Edit Button */}
-        <button className="section-edit-btn" onClick={() => setSection1ModalOpen(true)}>
-          <i className="ti ti-pencil"></i>
-        </button>
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon" onClick={() => setSection1ModalOpen(true)}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         {/* 왼쪽 카드 */}
         <div className="frame-left">
           <h2 className="adventure-title">Adventure With Us</h2>
@@ -692,10 +701,19 @@ const Cluster2Content = () => {
 
       {/* 섹션 2-1: 비디오 섹션 */}
       <div className="cluster2-videos" style={{ position: 'relative' }}>
-        {/* Edit Button */}
-        <button className="section-edit-btn" onClick={() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }}>
-          <i className="ti ti-pencil"></i>
-        </button>
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon" onClick={() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
 
         <div className="videos-header">
           <h2 className="videos-title">Let Me Speak My Own Vision</h2>
@@ -782,10 +800,19 @@ const Cluster2Content = () => {
 
       {/* 인용문 섹션 */}
       <div className="cluster2-quotes" style={{ position: 'relative' }}>
-        {/* Edit Button */}
-        <button className="section-edit-btn" onClick={() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }}>
-          <i className="ti ti-pencil"></i>
-        </button>
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon" onClick={() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         <div className="quotes-bg-image">
           <img src="/images/0/cluster 2/bg00.png" alt="" />
         </div>
@@ -873,10 +900,19 @@ const Cluster2Content = () => {
         className="cluster2-education"
         style={{ position: 'relative' }}
       >
-        {/* Edit Button */}
-        <button className="section-edit-btn" onClick={() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }}>
-          <i className="ti ti-pencil"></i>
-        </button>
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon" onClick={() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         <div className="edu-bg-image">
           <img src="/images/0/cluster 2/bg04.png" alt="" />
         </div>
@@ -959,7 +995,20 @@ const Cluster2Content = () => {
       </div>
 
       {/* CLUB REVIEW 배너 */}
-      <div className="cluster2-review-banner">
+      <div className="cluster2-review-banner" style={{ position: 'relative' }}>
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon" onClick={() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }}>
+            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          </div>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         <div className="review-banner-inner">
           <h2 className="review-banner-title-shadow">CLUB REVIEW</h2>
           <h2 className="review-banner-title">CLUB REVIEW</h2>
@@ -968,16 +1017,6 @@ const Cluster2Content = () => {
 
       {/* 섹션 4 - Cluving Review */}
       <div className="cluster2-section4" style={{ position: 'relative' }}>
-        {/* Edit Button */}
-        <button
-          className="section-edit-btn"
-          onClick={() => {
-            setEditingReviewLinks([...reviewLinks]);
-            setSection4ModalOpen(true);
-          }}
-        >
-          <i className="ti ti-pencil"></i>
-        </button>
         {/* 왼쪽 - 명언 카드 3개 */}
         <div className="section4-left">
           <div
@@ -1107,6 +1146,16 @@ const Cluster2Content = () => {
         ref={introRef}
         onMouseMove={handleIntroMouseMove}
       >
+        {/* Floating Icons */}
+        <div className="floating-icons">
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         {/* 물결 파동 효과 */}
         {ripples.map(ripple => (
           <div
