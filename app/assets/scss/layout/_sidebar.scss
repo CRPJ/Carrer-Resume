@@ -29,8 +29,14 @@
     justify-content: center;
 
     img {
-      max-width: 40px;
+      width: 77px;
+      height: 77px;
+      max-width: none;
     }
+  }
+
+  .sidebar__widget:nth-of-type(1) {
+    padding: 12.5px 0px;
   }
 
   .sidebar__widget {

@@ -1,5 +1,5 @@
 "use client";
-import logo from "@/public/images/logo.png";
+import logo from "@/public/images/0/header-logo.png";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -282,7 +282,7 @@ const Header = () => {
               <nav className="navbar p-0">
                 <div className="navbar__logo d-xxl-none">
                   <Link href="/" aria-label="home page" title="logo" className="not-cursor">
-                    <Image src={logo} alt="Image" />
+                    <Image src={logo} alt="Image" width={77} height={77} />
                   </Link>
                 </div>
                 <div className="navbar__menu d-none d-xl-block">
@@ -350,10 +350,10 @@ const Header = () => {
                       <i className="ti ti-search"></i>
                     </button>
                     <Link href="/profile" className="btn--primary">
-                      Claim Coins
+                      Log - In
                     </Link>
-                    <button onClick={() => setCartIsOpen(true)} className={`icon-drop cart-ic open-cart ${cartIsOpen && "cart-ic-active"}`} aria-label="view cart" title="view cart items">
-                      <i className="ti ti-garden-cart"></i>
+                    <button onClick={() => setCartIsOpen(true)} className={`icon-drop cart-ic open-cart ${cartIsOpen && "cart-ic-active"}`} aria-label="view notifications" title="view notifications">
+                      <i className="ti ti-bell"></i>
                       <span>3</span>
                     </button>
                     <Link href="/profile" className="wallet-ic d-none d-xl-none" title="view wallet">
@@ -390,7 +390,7 @@ const Header = () => {
             <div className="mobile-menu__header nav-fade">
               <div className="logo">
                 <Link href="/" aria-label="home page" title="logo">
-                  <Image src={logo} alt="Image" />
+                  <Image src={logo} alt="Image" width={77} height={77} />
                 </Link>
               </div>
               <button onClick={() => setMobileMenu(false)} aria-label="close mobile menu" className="close-mobile-menu">
@@ -446,7 +446,7 @@ const Header = () => {
             </div>
             <div className="mobile-menu__options nav-fade">
               <Link href="/profile" className="btn--primary">
-                Claim Coins
+                Log - In
               </Link>
             </div>
             <ul className="mobile-menu__social social nav-fade">
