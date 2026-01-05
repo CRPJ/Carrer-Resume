@@ -1628,9 +1628,9 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                   }}
                 >
                   <div className="selection-icon">
-                    <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="본인" />
+                    <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="연계 동료 작성하기" />
                   </div>
-                  <span className="selection-label">본인</span>
+                  <span className="selection-label">연계 동료<br />작성하기</span>
                   <span className="selection-sublabel">내 정보 편집하기</span>
                 </button>
                 <button
@@ -1642,9 +1642,9 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                   }}
                 >
                   <div className="selection-icon">
-                    <img src="/images/0/cluster 4/icon/icon - 연계 동료.png" alt="타크루" />
+                    <img src="/images/0/cluster 4/icon/icon - 연계 동료.png" alt="주차평판 남기기" />
                   </div>
-                  <span className="selection-label">타크루</span>
+                  <span className="selection-label">주차평판<br />남기기</span>
                   <span className="selection-sublabel">다른 크루 정보 보기</span>
                 </button>
               </div>
