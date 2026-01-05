@@ -117,7 +117,8 @@
 @import "./components/cluster1";
 @import "./components/cluster2";
 @import "./components/cluster3";
-@import "./components/cluster4";
+@import "./components/cluster4-season"; // 시즌 카드용
+@import "./components/cluster4-week";   // 주차 카드용
 
 // layout styles
 @import "./layout/header";

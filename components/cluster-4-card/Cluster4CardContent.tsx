@@ -500,12 +500,12 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
     { id: 9, title: "Main Title", verified: true, category: "", tagColor: "", status: "", icon: "", isEmpty: true },
   ];
 
-  // 실무 경험 카드 데이터
+  // 실무 경험 카드 데이터 (rating * 2 = 점수, 반개당 1점)
   const workExpCards = [
-    { id: 1, code: "AA22-11111", badge: "[커리어]마케터 Launch", title: "Main Title", verified: true, rating: 4, ratingCount: "6 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[커리어]마케터%20Launch.png" },
-    { id: 2, code: "AA22-11111", badge: "[생산성]상호 피드백", title: "Main Title", verified: true, rating: 4, ratingCount: "6 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[생산성]상호%20피드백.png" },
-    { id: 3, code: "AA22-11111", badge: "[콘텐츠]마케팅 실무", title: "Main Title", verified: true, rating: 3, ratingCount: "6 / 10", hasWeb: false, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[콘텐츠]마케팅%20실무.png" },
-    { id: 4, code: "AA22-11111", badge: "", title: "Main Title", verified: true, rating: 0, ratingCount: "- / 10", hasWeb: false, isEmpty: true, icon: "" },
+    { id: 1, code: "EX01 - SFA01", badge: "[커리어]마케터 Launch", title: "Main Title", verified: true, rating: 4, ratingCount: "8 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[커리어]마케터%20Launch.png" },
+    { id: 2, code: "EX02 - RUA99", badge: "[생산성]상호 피드백", title: "Main Title", verified: true, rating: 3.5, ratingCount: "7 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[생산성]상호%20피드백.png" },
+    { id: 3, code: "EX03 - RUA99", badge: "[콘텐츠]마케팅 실무", title: "Main Title", verified: true, rating: 3, ratingCount: "6 / 10", hasWeb: false, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[콘텐츠]마케팅%20실무.png" },
+    { id: 4, code: "", badge: "", title: "Main Title", verified: true, rating: 0, ratingCount: "- / 10", hasWeb: false, isEmpty: true, icon: "" },
   ];
 
   // 실무 경력 카드 데이터
@@ -954,7 +954,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                 <span className="card-title">Main Title</span>
                 <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                 <span className="verified-text">Verified</span>
-                {!isRestMode && <span className="code-tag">AA22-11111</span>}
+                {!isRestMode && <span className="code-tag">CP10 - UN010</span>}
                 {!isRestMode && <span className="info-tag">[실무 Info]인하우스 & 에이전시</span>}
               </div>
               <p className="main-desc">{isRestMode ? '-' : '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~'}</p>
@@ -1312,7 +1312,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                       <span className="modal-card-tag tag--cyan">[실무 Info]인하우스 & 에이전시</span>
                     </div>
                     <div className="modal-code-badge">
-                      <span>AA22-11111</span>
+                      <span>CP10 - UN010</span>
                     </div>
                   </div>
                   <div className="modal-header-right">
@@ -2133,7 +2133,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster%204/icon/실무%20역량/실무%20역량%20-%20[실무%20Info]인하우스%20%26%20에이전시.png" alt="실무 역량" />
                   </div>
                   <span className="category-title">[실무 Info]인하우스 & 에이전시</span>
-                  <span className="code-badge">AA22-11111</span>
+                  <span className="code-badge">CP10 - UN010</span>
                 </div>
                 <div className="work-view-right">
                   <div className="status-badge success">

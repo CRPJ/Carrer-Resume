@@ -273,7 +273,7 @@ const Cluster41Content = () => {
         </div>
       )}
 
-    <div className="cluster4-content">
+    <div className="cluster4-content cluster4-content--week">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1">
         {/* 좌측 상단 탭 (세로 정렬) */}
