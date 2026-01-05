@@ -943,7 +943,7 @@
   // 플로팅 아이콘 스타일
   // ============================================
   .floating-icons {
-    display: none;
+    display: flex;
     position: absolute;
     top: 20px;
     right: 20px;
