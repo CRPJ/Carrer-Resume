@@ -943,12 +943,12 @@ const Cluster2Content = () => {
                 <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">{edu.school}</span></h3>
               </div>
               <ul className="edu-details">
+                <li><span className="dot">·</span><span className="label">상태</span><span className="value">{edu.status}</span></li>
+                <li><span className="dot">·</span><span className="label">계열</span><span className="value">{edu.category}</span></li>
                 <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">{edu.major1}</span></li>
                 <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{edu.major2}</span></li>
                 <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{edu.major3}</span></li>
-                <li><span className="dot">·</span><span className="label">계열</span><span className="value">{edu.category}</span></li>
                 <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period.includes('~ing') ? (<>{edu.period.replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : edu.period}</span></li>
-                <li><span className="dot">·</span><span className="label">상태</span><span className="value">{edu.status}</span></li>
                 <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && ` / ${edu.gradeMax}`}</span></li>
               </ul>
               <div
@@ -1980,7 +1980,75 @@ const Cluster2Content = () => {
                       </div>
                     </div>
 
-                    {/* 행 2: 전공 1 / 전공 2 / 전공 3 */}
+                    {/* 행 2: 상태 */}
+                    <div className="edu-edit-row">
+                      <div className="edu-edit-field full-width">
+                        <label>상태<span className="required">*</span></label>
+                        <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_status`] ? 'open' : ''}`}>
+                          <div
+                            className="dropdown-selected"
+                            onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_status`]: !prev[`${index}_status`] }))}
+                          >
+                            <span>{edu.status || '선택'}</span>
+                            <i className="ti ti-chevron-down"></i>
+                          </div>
+                          {eduDropdowns[`${index}_status`] && (
+                            <div className="dropdown-options">
+                              {['-', '재학', '졸업', '졸예', '휴학', '중퇴'].map((opt) => (
+                                <div
+                                  key={opt}
+                                  className={`dropdown-option ${edu.status === opt ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    const newData = [...editingEduData];
+                                    newData[index].status = opt;
+                                    setEditingEduData(newData);
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_status`]: false }));
+                                  }}
+                                >
+                                  {opt}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 행 3: 계열 */}
+                    <div className="edu-edit-row">
+                      <div className="edu-edit-field full-width">
+                        <label>계열</label>
+                        <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_category`] ? 'open' : ''}`}>
+                          <div
+                            className="dropdown-selected"
+                            onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_category`]: !prev[`${index}_category`] }))}
+                          >
+                            <span>{edu.category || '선택'}</span>
+                            <i className="ti ti-chevron-down"></i>
+                          </div>
+                          {eduDropdowns[`${index}_category`] && (
+                            <div className="dropdown-options">
+                              {['-', '상경', '인문', '자연', '공학', '예체능', '사회', '기타'].map((opt) => (
+                                <div
+                                  key={opt}
+                                  className={`dropdown-option ${edu.category === opt ? 'selected' : ''}`}
+                                  onClick={() => {
+                                    const newData = [...editingEduData];
+                                    newData[index].category = opt;
+                                    setEditingEduData(newData);
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_category`]: false }));
+                                  }}
+                                >
+                                  {opt}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 행 4: 전공 1 / 전공 2 / 전공 3 */}
                     <div className="edu-edit-row three-cols">
                       <div className="edu-edit-field">
                         <label>전공 1<span className="required">*</span></label>
@@ -2024,41 +2092,7 @@ const Cluster2Content = () => {
                       <p className="major-hint">* 전공이 없을 시 "-"로 입력해주세요.</p>
                     </div>
 
-                    {/* 행 3: 계열 */}
-                    <div className="edu-edit-row">
-                      <div className="edu-edit-field full-width">
-                        <label>계열</label>
-                        <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_category`] ? 'open' : ''}`}>
-                          <div
-                            className="dropdown-selected"
-                            onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_category`]: !prev[`${index}_category`] }))}
-                          >
-                            <span>{edu.category || '선택'}</span>
-                            <i className="ti ti-chevron-down"></i>
-                          </div>
-                          {eduDropdowns[`${index}_category`] && (
-                            <div className="dropdown-options">
-                              {['-', '상경', '인문', '자연', '공학', '예체능', '사회', '기타'].map((opt) => (
-                                <div
-                                  key={opt}
-                                  className={`dropdown-option ${edu.category === opt ? 'selected' : ''}`}
-                                  onClick={() => {
-                                    const newData = [...editingEduData];
-                                    newData[index].category = opt;
-                                    setEditingEduData(newData);
-                                    setEduDropdowns(prev => ({ ...prev, [`${index}_category`]: false }));
-                                  }}
-                                >
-                                  {opt}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 행 4: 입학 / 졸업 */}
+                    {/* 행 5: 입학 / 졸업 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field">
                         <label>입학년도<span className="required">*</span></label>
@@ -2188,40 +2222,6 @@ const Cluster2Content = () => {
                             </div>
                           </div>
                         )}
-                      </div>
-                    </div>
-
-                    {/* 행 5: 상태 */}
-                    <div className="edu-edit-row">
-                      <div className="edu-edit-field full-width">
-                        <label>상태<span className="required">*</span></label>
-                        <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_status`] ? 'open' : ''}`}>
-                          <div
-                            className="dropdown-selected"
-                            onClick={() => setEduDropdowns(prev => ({ ...prev, [`${index}_status`]: !prev[`${index}_status`] }))}
-                          >
-                            <span>{edu.status || '선택'}</span>
-                            <i className="ti ti-chevron-down"></i>
-                          </div>
-                          {eduDropdowns[`${index}_status`] && (
-                            <div className="dropdown-options">
-                              {['-', '재학', '졸업', '졸예', '휴학', '중퇴'].map((opt) => (
-                                <div
-                                  key={opt}
-                                  className={`dropdown-option ${edu.status === opt ? 'selected' : ''}`}
-                                  onClick={() => {
-                                    const newData = [...editingEduData];
-                                    newData[index].status = opt;
-                                    setEditingEduData(newData);
-                                    setEduDropdowns(prev => ({ ...prev, [`${index}_status`]: false }));
-                                  }}
-                                >
-                                  {opt}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     </div>
 

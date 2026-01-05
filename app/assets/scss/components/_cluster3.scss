@@ -67,11 +67,11 @@
 
   // 플로팅 아이콘 공통 스타일
   .floating-icons {
+    display: none;
     position: absolute;
     top: 20px;
     right: 20px;
     z-index: 100;
-    display: flex;
     gap: 5px;
 
     .edit-icon {
