@@ -652,7 +652,7 @@ const Cluster4Content = () => {
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ display: 'flex', gap: '4px' }}>
+                  <div style={{ display: 'flex', gap: '4px', position: 'relative', top: '-3px' }}>
                     {[1, 2, 3, 4, 5].map((starIndex) => {
                       const fullValue = starIndex * 2;
                       const halfValue = starIndex * 2 - 1;
@@ -660,7 +660,7 @@ const Cluster4Content = () => {
                       const isHalf = currentRating >= halfValue && currentRating < fullValue;
                       const isFull = currentRating >= fullValue;
                       return (
-                        <div key={starIndex} style={{ width: '24px', height: '24px', position: 'relative', cursor: 'pointer' }}>
+                        <div key={starIndex} style={{ width: '16px', height: '16px', position: 'relative', cursor: 'pointer' }}>
                           <svg viewBox="0 0 24 24" fill={isFull ? '#FFA500' : 'none'} stroke="#FFA500" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>

@@ -425,6 +425,7 @@
       left: 565px;
       top: -48px;
       z-index: 10;
+      overflow: hidden;
 
       img {
         width: 100%;
@@ -432,6 +433,39 @@
         object-fit: cover;
         display: block;
         filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+      }
+
+      // 빛이 지나가는 효과
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.08),
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.08),
+          transparent
+        );
+        transform: skewX(-25deg);
+        animation: shine-effect 10s infinite;
+        pointer-events: none;
+      }
+
+      @keyframes shine-effect {
+        0% {
+          left: -100%;
+        }
+        10% {
+          left: 150%;
+        }
+        100% {
+          left: 150%;
+        }
       }
 
       // 빈 상태 스타일
@@ -3487,6 +3521,9 @@
       align-items: center;
       justify-content: center;
       background: rgba(29, 37, 56, 0.7);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
 
       .waiting-content {
         display: flex;
@@ -3500,6 +3537,7 @@
           width: 84px;
           height: 84px;
           filter: drop-shadow(0 0 15px rgba(128, 97, 255, 0.6));
+          transition: all 0.3s ease;
         }
 
         .waiting-text {
@@ -3512,6 +3550,27 @@
           background-clip: text;
           letter-spacing: 0;
         }
+      }
+
+      // 딸랑딸랑 호버 효과
+      &:hover {
+        .waiting-icon {
+          animation: jingle 0.5s ease-in-out;
+          filter: drop-shadow(0 0 20px rgba(128, 97, 255, 0.9));
+        }
+        .waiting-text {
+          filter: drop-shadow(0 0 10px rgba(128, 97, 255, 1)) drop-shadow(0 0 20px rgba(128, 97, 255, 0.6));
+        }
+      }
+
+      @keyframes jingle {
+        0%, 100% { transform: rotate(0deg); }
+        15% { transform: rotate(-15deg); }
+        30% { transform: rotate(12deg); }
+        45% { transform: rotate(-10deg); }
+        60% { transform: rotate(8deg); }
+        75% { transform: rotate(-5deg); }
+        90% { transform: rotate(3deg); }
       }
     }
   }
