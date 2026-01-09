@@ -2,8 +2,10 @@
 import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { useSession } from "next-auth/react";
 
 const Sidebar = () => {
+  const { data: session } = useSession();
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
@@ -14,6 +16,31 @@ const Sidebar = () => {
   const [skill3, setSkill3] = useState(0);
   const [skill4, setSkill4] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // 실제 유저 프로필 데이터
+  const [userProfile, setUserProfile] = useState<{
+    name: string;
+    nameEng: string;
+    gender: string;
+    birthDate: string;
+    city: string;
+    district: string;
+    phone: string;
+    email: string;
+    school: string;
+    major: string;
+    quote: string;
+    photo: string;
+  } | null>(null);
+
+  // Hydration 에러 방지를 위한 마운트 상태
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // 아이콘 링크 state
   const [iconLink1, setIconLink1] = useState('https://www.google.com/');
@@ -209,7 +236,7 @@ const Sidebar = () => {
       school: '성균관대학교',
       major: '미디어커뮤니케이션학과',
       major2: '경영학과',
-      major3: '데이터사이언스학과',
+      major3: '데이터사이언스학과2',
       enrollPeriod: '2025. 03',
       graduationStatus: 'ing',
       gpa: '3.0',
@@ -265,8 +292,64 @@ const Sidebar = () => {
     }
   };
 
-  // 현재 선택된 프로필 가져오기
-  const currentProfile = profileData[debugPanelType];
+  // 현재 선택된 프로필 가져오기 (기본값)
+  const defaultProfile = profileData[debugPanelType];
+
+  // 실제 표시할 프로필 (마운트 후 유저 프로필이 있으면 사용, 없으면 기본값)
+  const currentProfile = (isMounted && userProfile) ? {
+    ...defaultProfile,
+    name: userProfile.name,
+    nameEng: userProfile.nameEng,
+    gender: userProfile.gender,
+    birthDate: userProfile.birthDate,
+    city: userProfile.city,
+    district: userProfile.district,
+    phone: userProfile.phone,
+    email: userProfile.email,
+    school: userProfile.school,
+    major: userProfile.major,
+    quote: userProfile.quote,
+    photo: userProfile.photo || defaultProfile.photo,
+  } : defaultProfile;
+
+  // 페이지 로드 시 프로필 데이터 가져오기
+  const fetchUserProfile = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch('/api/profile');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const profile = result.data;
+        const addressParts = (profile.address || '').split(' ');
+
+        setUserProfile({
+          name: profile.display_name || '',
+          nameEng: profile.eng_name || '',
+          gender: profile.gender || '',
+          birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, '.') : '',
+          city: addressParts[0] || '',
+          district: addressParts.slice(1).join(' ') || '',
+          phone: profile.phone ? profile.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3').replace(/010-/, '010-').replace(/(\d{4})-(\d{4})$/, '$1-****') : '',
+          email: profile.email || '',
+          school: profile.university || '',
+          major: profile.major_first || '',
+          quote: profile.bio || '',
+          photo: profile.profile_photo_url || '',
+        });
+      }
+    } catch (error) {
+      console.error('프로필 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 프로필 로드
+  useEffect(() => {
+    if (session) {
+      fetchUserProfile();
+    }
+  }, [session]);
 
   // Error state for validation
   const [errors, setErrors] = useState({
@@ -350,7 +433,101 @@ const Sidebar = () => {
     return missingFields;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 승인 상태 확인 함수
+  const checkApprovalStatus = async () => {
+    if (!session) return false;
+
+    try {
+      setIsCheckingStatus(true);
+      const response = await fetch('/api/auth/check-status');
+      const result = await response.json();
+
+      if (result.success && result.status === 'approved') {
+        setIsApproved(true);
+        return true;
+      } else {
+        setIsApproved(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('승인 상태 확인 오류:', error);
+      setIsApproved(false);
+      return false;
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
+
+  // 프로필 데이터 로드 함수
+  const loadProfile = async () => {
+    try {
+      const response = await fetch('/api/profile');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const profile = result.data;
+
+        // user_profiles → formData 변환
+        const displayNameParts = (profile.display_name || '').split(' ');
+        const lastName = displayNameParts[0] || '';
+        const firstName = displayNameParts.slice(1).join(' ') || '';
+
+        const engNameParts = (profile.eng_name || '').split(' ');
+        const lastNameEng = engNameParts[0] || '';
+        const firstNameEng = engNameParts.slice(1).join(' ') || '';
+
+        const addressParts = (profile.address || '').split(' ');
+        const addressCity = addressParts[0] || '';
+        const addressDistrict = addressParts.slice(1).join(' ') || '';
+
+        const emailParts = (profile.email || '').split('@');
+        const emailId = emailParts[0] || '';
+        const emailDomain = emailParts[1] || '';
+
+        const phoneParts = (profile.phone || '').replace(/^010-?/, '').split('-');
+
+        setFormData(prev => ({
+          ...prev,
+          lastName,
+          firstName,
+          lastNameEng,
+          firstNameEng,
+          gender: profile.gender === '남' ? 'male' : profile.gender === '여' ? 'female' : '',
+          birthDate: profile.birth_date || '',
+          addressCity,
+          addressDistrict,
+          phone: phoneParts.length >= 2 ? `${phoneParts[0]}-${phoneParts[1]}` : profile.phone?.replace(/^010-?/, '') || '',
+          emailId,
+          emailDomain,
+          slogan: profile.bio || '',
+          phoneComment: profile.contact_available || '',
+        }));
+      }
+    } catch (error) {
+      console.error('프로필 로드 오류:', error);
+    }
+  };
+
+  // 프로필 수정 버튼 클릭 핸들러
+  const handleEditButtonClick = async () => {
+    if (!session) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const approved = await checkApprovalStatus();
+
+    if (!approved) {
+      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      return;
+    }
+
+    // 승인된 경우 프로필 로드 후 모달 열기
+    await loadProfile();
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const missingFields = validateForm();
@@ -360,8 +537,49 @@ const Sidebar = () => {
       return;
     }
 
-    console.log('Form submitted:', formData);
-    setIsEditModalOpen(false);
+    try {
+      setIsSaving(true);
+
+      // formData → user_profiles 필드 변환
+      const profileData = {
+        display_name: `${formData.lastName} ${formData.firstName}`.trim(),
+        eng_name: `${formData.lastNameEng} ${formData.firstNameEng}`.trim(),
+        gender: formData.gender === 'male' ? '남' : formData.gender === 'female' ? '여' : null,
+        birth_date: formData.birthDate || null,
+        address: `${formData.addressCity} ${formData.addressDistrict}`.trim(),
+        phone: formData.phone ? `010-${formData.phone}` : null,
+        email: formData.emailId && formData.emailDomain
+          ? `${formData.emailId}@${formData.emailDomain === '직접입력' ? formData.customEmailDomain : formData.emailDomain}`
+          : null,
+        bio: formData.slogan || null,
+        portfolio_files: iconLink3 || null,
+        contact_available: formData.phoneComment || null,
+      };
+
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('프로필이 성공적으로 저장되었습니다.');
+        setIsEditModalOpen(false);
+        // 프로필 데이터 새로고침
+        fetchUserProfile();
+      } else {
+        alert(result.error || '프로필 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('프로필 저장 오류:', error);
+      alert('프로필 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   useEffect(() => {
@@ -514,6 +732,20 @@ const Sidebar = () => {
     };
   }, [isDragging]);
 
+  // Hydration 에러 방지: 마운트 전에는 빈 placeholder 반환
+  if (!isMounted) {
+    return (
+      <div className="home-two-sidebar-col">
+        <div style={{
+          width: '474px',
+          height: '810px',
+          backgroundColor: '#1a1a2e',
+          borderRadius: '12px'
+        }} />
+      </div>
+    );
+  }
+
   return (
     <div className="home-two-sidebar-col">
       <style dangerouslySetInnerHTML={{__html: `
@@ -598,7 +830,7 @@ const Sidebar = () => {
             {/* Edit Button - 프로필 이미지 우측 하단 */}
             <button
               className="resume-edit-btn"
-              onClick={() => setIsEditModalOpen(true)}
+              onClick={handleEditButtonClick}
               style={{
                 position: 'absolute',
                 bottom: '8px',
@@ -725,7 +957,22 @@ const Sidebar = () => {
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.phone}
                       <span
-                        onClick={() => setIsPhoneCommentModalOpen(true)}
+                        onClick={async () => {
+                          // 모달 열기 전에 기존 값 로드
+                          try {
+                            const response = await fetch('/api/profile');
+                            const result = await response.json();
+                            if (result.success && result.data) {
+                              setFormData(prev => ({
+                                ...prev,
+                                phoneComment: result.data.contact_available || ''
+                              }));
+                            }
+                          } catch (error) {
+                            console.error('연락처 코멘트 로드 오류:', error);
+                          }
+                          setIsPhoneCommentModalOpen(true);
+                        }}
                         style={{
                           color: currentProfile.accentColor,
                           fontSize: '14px',
@@ -2656,7 +2903,24 @@ const Sidebar = () => {
             `}} />
             <button
               className="chamfer-box phone-modal-btn"
-              onClick={() => setIsPhoneCommentModalOpen(false)}
+              onClick={async () => {
+                try {
+                  const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact_available: formData.phoneComment || null }),
+                  });
+                  const result = await response.json();
+                  if (result.success) {
+                    setIsPhoneCommentModalOpen(false);
+                  } else {
+                    alert('저장 실패: ' + (result.error || '알 수 없는 오류'));
+                  }
+                } catch (error) {
+                  console.error('연락처 코멘트 저장 오류:', error);
+                  alert('저장 중 오류가 발생했습니다.');
+                }
+              }}
               style={{
                 width: '70%',
                 marginTop: '20px',
