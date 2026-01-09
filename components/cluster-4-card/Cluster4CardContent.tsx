@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { WeekData, weeklyData } from "@/data/weeklyData";
 
 interface Cluster4CardContentProps {
@@ -24,6 +26,11 @@ interface SelectedColleague {
 }
 
 const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
+  // 세션 및 본인 프로필 여부 확인
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get('userId');
+  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
   // 모달 상태 관리
   const [workInfoModalOpen, setWorkInfoModalOpen] = useState(false);
   const [workAbilityModalOpen, setWorkAbilityModalOpen] = useState(false);
@@ -616,19 +623,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => setSelectionModalOpen(true)} style={{ cursor: 'pointer' }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => setSelectionModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         {/* 왼쪽: 큰 주차 이미지 */}
         <div className="section1-left">
           <div className="main-image-container">
@@ -842,19 +851,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 정보 */}
         <div className="work-info-section">
-          {/* 플로팅 아이콘 */}
-          <div className="floating-icons">
-            <div className="edit-icon" onClick={() => setWorkInfoModalOpen(true)} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+          {session && isOwner && (
+            <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="edit-icon" onClick={() => setWorkInfoModalOpen(true)} style={{ cursor: 'pointer' }}>
+                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              </div>
+              <div className="edit-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <div className="tooltip">등록된 도움말이 없습니다</div>
+              </div>
             </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
+          )}
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
@@ -917,19 +928,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 역량 */}
         <div className="work-ability-section">
-          {/* 플로팅 아이콘 */}
-          <div className="floating-icons">
-            <div className="edit-icon" onClick={() => setWorkAbilityModalOpen(true)} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+          {session && isOwner && (
+            <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="edit-icon" onClick={() => setWorkAbilityModalOpen(true)} style={{ cursor: 'pointer' }}>
+                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              </div>
+              <div className="edit-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <div className="tooltip">등록된 도움말이 없습니다</div>
+              </div>
             </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
+          )}
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
@@ -986,19 +999,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
       <div className="section3-layout">
         {/* 실무 경험 */}
         <div className="work-exp-section">
-          {/* 플로팅 아이콘 */}
-          <div className="floating-icons">
-            <div className="edit-icon" onClick={() => setWorkExpModalOpen(true)} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
+          {session && isOwner && (
+            <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="edit-icon" onClick={() => setWorkExpModalOpen(true)} style={{ cursor: 'pointer' }}>
+                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              </div>
+              <div className="edit-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <div className="tooltip">등록된 도움말이 없습니다</div>
+              </div>
             </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
+          )}
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
@@ -1076,19 +1091,21 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
         {/* 실무 경력 */}
         <div className="work-career-section">
-          {/* 플로팅 아이콘 */}
-          <div className="floating-icons">
-            <div className="edit-icon" onClick={() => setWorkCareerModalOpen(true)} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
+          {session && isOwner && (
+            <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="edit-icon" onClick={() => setWorkCareerModalOpen(true)} style={{ cursor: 'pointer' }}>
+                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              </div>
+              <div className="edit-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <div className="tooltip">등록된 도움말이 없습니다</div>
+              </div>
             </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
+          )}
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />

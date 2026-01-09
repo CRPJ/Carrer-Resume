@@ -338,6 +338,17 @@ const Sidebar = () => {
           quote: profile.bio || '',
           photo: profile.profile_photo_url || '',
         });
+
+        // DB status → crewStatus 매핑
+        const statusMap: Record<string, 'Running' | 'Complete' | 'On Rest' | 'Recharging' | 'Next Challenge'> = {
+          'active': 'Running',
+          'graduated': 'Complete',
+          'suspended': 'On Rest',
+          'pending': 'Recharging',
+        };
+        if (profile.status && statusMap[profile.status]) {
+          setCrewStatus(statusMap[profile.status]);
+        }
       }
     } catch (error) {
       console.error('프로필 로드 오류:', error);
@@ -1480,7 +1491,7 @@ const Sidebar = () => {
               </span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {hasData && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
               </div>
             </div>
             <div className="notice-box green">
@@ -1488,7 +1499,7 @@ const Sidebar = () => {
               <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {hasData && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
               </div>
             </div>
           </div>

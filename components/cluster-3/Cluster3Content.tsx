@@ -1,8 +1,15 @@
 ﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 const Cluster3Content = () => {
+  // 세션 및 본인 프로필 여부 확인
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get('userId');
+  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
   // 현재 활성화된 슬라이드 인덱스
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -249,16 +256,18 @@ const Cluster3Content = () => {
     <div className="cluster3-content">
       {/* Section 1: CLUB FINAL INDEX - 새 디자인 */}
       <section className="cluster3-section1">
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-        </div>
+        )}
         {/* 배경 이미지 영역 */}
         <div className="section1-bg">
           <img src="/images/0/cluster 3/bg1.png" alt="Background" />
@@ -435,16 +444,18 @@ const Cluster3Content = () => {
 
       {/* Section 2: 졸업 자격 조건 - 배경 이미지 영역 */}
       <section className="cluster3-section2" ref={section2Ref}>
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-        </div>
+        )}
         <div className="section2-bg">
           <img src="/images/0/cluster 3/bg2.png" alt="Background" />
         </div>
@@ -511,22 +522,24 @@ const Cluster3Content = () => {
 
       {/* Section 3: 포트폴리오 마케팅 Channel */}
       <section className="cluster3-section3">
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => {
-            setEditingSection3Links(channelCards.slice(0, 16).map(card => card.link || ""));
-            setSection3ModalOpen(true);
-          }} style={{ cursor: 'pointer' }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => {
+              setEditingSection3Links(channelCards.slice(0, 16).map(card => card.link || ""));
+              setSection3ModalOpen(true);
+            }} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         {/* 배경 이미지 */}
         <div className="section3-bg">
           <img src="/images/0/cluster 3/bg3.png" alt="Background" />
@@ -611,22 +624,24 @@ const Cluster3Content = () => {
 
       {/* Section 4: 포트폴리오 아카이빙 Output */}
       <section className="cluster3-section4">
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => {
-            setEditingSection4Links(topWorksSlides.map(slide => slide.link || ""));
-            setSection4ModalOpen(true);
-          }} style={{ cursor: 'pointer' }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => {
+              setEditingSection4Links(topWorksSlides.map(slide => slide.link || ""));
+              setSection4ModalOpen(true);
+            }} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         {/* 배경 이미지 */}
         <div className="section4-bg">
           <img src="/images/0/cluster 3/bg4.png" alt="Background" />
@@ -738,22 +753,24 @@ const Cluster3Content = () => {
 
         {/* Section 5: The Detail 10 - 섹션4 배경 안에 포함 */}
         <div className="cluster3-section5">
-        {/* 플로팅 아이콘 */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => {
-            setEditingSection5Links(detailThumbnails.map(thumb => thumb.link || ""));
-            setSection5ModalOpen(true);
-          }} style={{ cursor: 'pointer' }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => {
+              setEditingSection5Links(detailThumbnails.map(thumb => thumb.link || ""));
+              setSection5ModalOpen(true);
+            }} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         <div className="section5-header">
           <div className="header-left">
             <h2 className="subtitle">

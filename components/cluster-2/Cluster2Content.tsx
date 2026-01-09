@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 // 학력 데이터 타입
 interface EduData {
@@ -124,6 +126,14 @@ const sloganOptions = [
 ];
 
 const Cluster2Content = () => {
+  // 세션 및 본인 프로필 여부 확인
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get('userId');
+
+  // 본인 프로필인지 확인: URL에 userId가 없거나, 로그인한 사용자 ID와 같으면 본인
+  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+
   const [currentPage, setCurrentPage] = useState(0);
   const [isWiggling, setIsWiggling] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -131,14 +141,149 @@ const Cluster2Content = () => {
 
   // 섹션 1 모달 (프로필 사진 수정)
   const [section1ModalOpen, setSection1ModalOpen] = useState(false);
-  const [mainPhoto, setMainPhoto] = useState<string | null>("/images/0/cluster 2/이안0.png");
-  const [subPhotos, setSubPhotos] = useState<(string | null)[]>([
-    "/images/0/cluster 2/이안1.webp",
-    "/images/0/cluster 2/이안2.webp",
-    "/images/0/cluster 2/이안3.jpg",
-    "/images/0/cluster 2/이안4.jpg"
-  ]);
+  const [mainPhoto, setMainPhoto] = useState<string | null>(null);
+  const [subPhotos, setSubPhotos] = useState<(string | null)[]>([null, null, null, null]);
   const [starredPhoto, setStarredPhoto] = useState<number | null>(null);
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const [photoSaving, setPhotoSaving] = useState(false);
+
+  // 이미지 압축 함수 (2MB 이하로)
+  const compressImage = async (file: File, maxSizeMB: number = 2): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        let { width, height } = img;
+        const maxDimension = 1200; // 최대 1200px
+
+        // 크기 조정
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = (height / width) * maxDimension;
+            width = maxDimension;
+          } else {
+            width = (width / height) * maxDimension;
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // 품질 조정하면서 압축
+        let quality = 0.9;
+        const tryCompress = () => {
+          canvas.toBlob(
+            (blob) => {
+              if (blob && blob.size <= maxSizeMB * 1024 * 1024) {
+                resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+              } else if (quality > 0.1) {
+                quality -= 0.1;
+                tryCompress();
+              } else {
+                resolve(new File([blob!], file.name, { type: 'image/jpeg' }));
+              }
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        tryCompress();
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // 사진 업로드 함수
+  const uploadPhoto = async (file: File, photoType: string): Promise<string | null> => {
+    try {
+      // 2MB 초과시 압축
+      let processedFile = file;
+      if (file.size > 2 * 1024 * 1024) {
+        processedFile = await compressImage(file);
+      }
+
+      const formData = new FormData();
+      formData.append('file', processedFile);
+      formData.append('type', photoType);
+
+      const response = await fetch('/api/photos/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        return result.url;
+      } else {
+        alert(result.error || '사진 업로드에 실패했습니다.');
+        return null;
+      }
+    } catch (error) {
+      console.error('사진 업로드 오류:', error);
+      alert('사진 업로드 중 오류가 발생했습니다.');
+      return null;
+    }
+  };
+
+  // DB에서 사진 로드
+  const fetchPhotos = async () => {
+    if (!session) return;
+
+    setPhotoLoading(true);
+    try {
+      const response = await fetch('/api/photos');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setMainPhoto(result.data.mainPhoto || null);
+        setSubPhotos(result.data.subPhotos || [null, null, null, null]);
+      }
+    } catch (error) {
+      console.error('사진 로드 오류:', error);
+    } finally {
+      setPhotoLoading(false);
+    }
+  };
+
+  // 세션 변경 시 사진 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchPhotos();
+    }
+  }, [session, isOwner]);
+
+  // 사진 저장 함수
+  const handleSavePhotos = async () => {
+    setPhotoSaving(true);
+    try {
+      const response = await fetch('/api/photos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mainPhoto,
+          subPhotos,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert('사진이 저장되었습니다.');
+        setSection1ModalOpen(false);
+      } else {
+        alert(result.error || '사진 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('사진 저장 오류:', error);
+      alert('사진 저장 중 오류가 발생했습니다.');
+    } finally {
+      setPhotoSaving(false);
+    }
+  };
 
   // 파일 input refs
   const mainPhotoInputRef = useRef<HTMLInputElement>(null);
@@ -146,41 +291,38 @@ const Cluster2Content = () => {
   const [currentSubIndex, setCurrentSubIndex] = useState<number>(0);
 
   // 메인 사진 변경 핸들러
-  const handleMainPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMainPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setMainPhoto(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      setPhotoLoading(true);
+      const url = await uploadPhoto(file, 'main');
+      if (url) {
+        setMainPhoto(url);
+      }
+      setPhotoLoading(false);
     }
-    // input 초기화 (같은 파일 다시 선택 가능하게)
     e.target.value = '';
   };
 
   // 서브 사진 업로드 핸들러 - 순서대로 채움
-  const handleSubPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSubPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const newPhoto = event.target?.result as string;
+      setPhotoLoading(true);
+      // 업로드할 슬롯 결정
+      const targetIndex = subPhotos.findIndex(photo => !photo);
+      const uploadIndex = targetIndex !== -1 ? targetIndex : currentSubIndex;
+      const photoType = `sub${uploadIndex + 1}`;
+
+      const url = await uploadPhoto(file, photoType);
+      if (url) {
         setSubPhotos(prev => {
-          // 비어있는 첫 번째 슬롯 찾기
-          const emptyIndex = prev.findIndex(photo => !photo);
-          if (emptyIndex !== -1) {
-            const newPhotos = [...prev];
-            newPhotos[emptyIndex] = newPhoto;
-            return newPhotos;
-          }
-          // 모든 슬롯이 차있으면 현재 선택한 인덱스에 업로드
           const newPhotos = [...prev];
-          newPhotos[currentSubIndex] = newPhoto;
+          newPhotos[uploadIndex] = url;
           return newPhotos;
         });
-      };
-      reader.readAsDataURL(file);
+      }
+      setPhotoLoading(false);
     }
     e.target.value = '';
   };
@@ -252,12 +394,82 @@ const Cluster2Content = () => {
   // 섹션 2 모달 (슬로건 편집)
   const [section2ModalOpen, setSection2ModalOpen] = useState(false);
   const [sloganData, setSloganData] = useState({
-    slogan1: { option: "Dreamer", content: "지금의 한 걸음이 작아 보여도 결국 미래를 바꾸는 결정적 힘이 된다 흔들려도 멈추지 않으면 결국 도착한다 그게 성장의 즐거다" },
-    slogan2: { option: "Dreamer", content: "작은 용기가 쌓여 결국 더 큰 변화를 만들고 흔들리는 순간에도 멈추지 않으면 마침내 스스로의 길을 찾아간다 라는 믿음이다." }
+    slogan1: { option: "", content: "" },
+    slogan2: { option: "", content: "" }
   });
   const [editingSloganData, setEditingSloganData] = useState(sloganData);
   const [dropdown1Open, setDropdown1Open] = useState(false);
   const [dropdown2Open, setDropdown2Open] = useState(false);
+  const [sloganSaving, setSloganSaving] = useState(false);
+  const [sloganAuthorName, setSloganAuthorName] = useState("");
+
+  // DB에서 슬로건 로드
+  const fetchSlogans = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch('/api/slogans');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const newSloganData = {
+          slogan1: {
+            option: result.data.slogan1?.option || "",
+            content: result.data.slogan1?.content || ""
+          },
+          slogan2: {
+            option: result.data.slogan2?.option || "",
+            content: result.data.slogan2?.content || ""
+          }
+        };
+        setSloganData(newSloganData);
+        setEditingSloganData(newSloganData);
+
+        // 영어 이름 설정
+        if (result.data.engName) {
+          setSloganAuthorName(result.data.engName);
+        }
+      }
+    } catch (error) {
+      console.error('슬로건 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 슬로건 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchSlogans();
+    }
+  }, [session, isOwner]);
+
+  // 슬로건 저장
+  const handleSaveSlogans = async () => {
+    setSloganSaving(true);
+    try {
+      const response = await fetch('/api/slogans', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slogan1: editingSloganData.slogan1,
+          slogan2: editingSloganData.slogan2,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSloganData(editingSloganData);
+        alert('슬로건이 저장되었습니다.');
+        setSection2ModalOpen(false);
+      } else {
+        alert(result.error || '슬로건 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('슬로건 저장 오류:', error);
+      alert('슬로건 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSloganSaving(false);
+    }
+  };
 
   // 섹션 2-1 모달 (비디오 편집)
   const [section21ModalOpen, setSection21ModalOpen] = useState(false);
@@ -296,7 +508,7 @@ const Cluster2Content = () => {
       viewers: "9.9k Viewers",
       thumbnail: "/images/0/cluster 2/영상 01.jpeg",
       isBookmarked: true,
-      videoUrl: "https://youtu.be/_NAJCvSYWnA?si=XBJMKwjLFoEL_joQ"
+      videoUrl: ""
     },
     {
       id: 2,
@@ -318,6 +530,80 @@ const Cluster2Content = () => {
     }
   ]);
   const [editingVideoData, setEditingVideoData] = useState(videoData);
+  const [videoSaving, setVideoSaving] = useState(false);
+
+  // DB에서 영상 URL 로드
+  const fetchVideos = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch('/api/videos');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const authorName = result.data.engName || 'Unknown';
+        setVideoData(prev => {
+          const newData = [...prev];
+          // 모든 영상에 영어 이름 설정
+          newData.forEach(video => {
+            video.author = authorName;
+          });
+          if (result.data.videoUrl1) {
+            newData[0].videoUrl = result.data.videoUrl1;
+            newData[0].thumbnail = getYouTubeThumbnail(result.data.videoUrl1);
+          }
+          if (result.data.videoUrl2) {
+            newData[1].videoUrl = result.data.videoUrl2;
+            newData[1].thumbnail = getYouTubeThumbnail(result.data.videoUrl2);
+          }
+          if (result.data.videoUrl3) {
+            newData[2].videoUrl = result.data.videoUrl3;
+            newData[2].thumbnail = getYouTubeThumbnail(result.data.videoUrl3);
+          }
+          return newData;
+        });
+      }
+    } catch (error) {
+      console.error('영상 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 영상 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchVideos();
+    }
+  }, [session, isOwner]);
+
+  // 영상 URL 저장
+  const handleSaveVideos = async () => {
+    setVideoSaving(true);
+    try {
+      const response = await fetch('/api/videos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoUrl1: editingVideoData[0]?.videoUrl || null,
+          videoUrl2: editingVideoData[1]?.videoUrl || null,
+          videoUrl3: editingVideoData[2]?.videoUrl || null,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setVideoData([...editingVideoData]);
+        alert('영상이 저장되었습니다.');
+        setSection21ModalOpen(false);
+      } else {
+        alert(result.error || '영상 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('영상 저장 오류:', error);
+      alert('영상 저장 중 오류가 발생했습니다.');
+    } finally {
+      setVideoSaving(false);
+    }
+  };
 
   // 섹션 3 모달 (학력 편집)
   const [section3ModalOpen, setSection3ModalOpen] = useState(false);
@@ -379,29 +665,78 @@ const Cluster2Content = () => {
   const [isEditingIntro, setIsEditingIntro] = useState(false);
   const [editingIntroData, setEditingIntroData] = useState({ content: '' });
   const [reviewLinks, setReviewLinks] = useState<string[]>([
-    'https://www.youtube.com/watch?v=TeQTJb9LkwI', // Total
-    'https://www.youtube.com/watch?v=8Ddgy5tCKtg', // 3 weeks
-    'https://www.youtube.com/watch?v=8r3iXanFcNk', // 6 weeks
-    'https://www.youtube.com/watch?v=Kk9e-zkOk88', // 9 weeks
-    'https://www.youtube.com/watch?v=Pqzeqt7j2uQ', // 12 weeks
-    'https://www.youtube.com/watch?v=5rWYzT4VlLU', // 15 weeks
-    'https://www.youtube.com/watch?v=hD6eSvkWXfE', // 18 weeks
-    'https://www.youtube.com/watch?v=XD__iZhK4MM', // 21 weeks
-    'https://www.youtube.com/watch?v=27PzfMoopvg', // 24 weeks
-    ''  // 27 weeks - 링크 없음
+    '', // Total Complete (cluving_review_link)
+    '', // 3 weeks
+    '', // 6 weeks
+    '', // 9 weeks
+    '', // 12 weeks
+    '', // 15 weeks
+    '', // 18 weeks
+    '', // 21 weeks
+    '', // 24 weeks
+    ''  // 27 weeks
   ]);
   const [editingReviewLinks, setEditingReviewLinks] = useState<string[]>([
-    'https://www.youtube.com/watch?v=TeQTJb9LkwI',
-    'https://www.youtube.com/watch?v=8Ddgy5tCKtg',
-    'https://www.youtube.com/watch?v=8r3iXanFcNk',
-    'https://www.youtube.com/watch?v=Kk9e-zkOk88',
-    'https://www.youtube.com/watch?v=Pqzeqt7j2uQ',
-    'https://www.youtube.com/watch?v=5rWYzT4VlLU',
-    'https://www.youtube.com/watch?v=hD6eSvkWXfE',
-    'https://www.youtube.com/watch?v=XD__iZhK4MM',
-    'https://www.youtube.com/watch?v=27PzfMoopvg',
-    ''  // 27 weeks - 링크 없음
+    '', '', '', '', '', '', '', '', '', ''
   ]);
+  const [reviewLinkSaving, setReviewLinkSaving] = useState(false);
+
+  // DB에서 리뷰 링크 로드
+  const fetchReviewLink = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch('/api/review-link');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        if (result.data.cluvingReviewLink) {
+          setReviewLinks(prev => {
+            const newLinks = [...prev];
+            newLinks[0] = result.data.cluvingReviewLink;
+            return newLinks;
+          });
+        }
+      }
+    } catch (error) {
+      console.error('리뷰 링크 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 리뷰 링크 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchReviewLink();
+    }
+  }, [session, isOwner]);
+
+  // 리뷰 링크 저장
+  const handleSaveReviewLinks = async () => {
+    setReviewLinkSaving(true);
+    try {
+      const response = await fetch('/api/review-link', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cluvingReviewLink: editingReviewLinks[0] || null,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setReviewLinks([...editingReviewLinks]);
+        alert('리뷰 링크가 저장되었습니다.');
+        setSection4ModalOpen(false);
+      } else {
+        alert(result.error || '리뷰 링크 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('리뷰 링크 저장 오류:', error);
+      alert('리뷰 링크 저장 중 오류가 발생했습니다.');
+    } finally {
+      setReviewLinkSaving(false);
+    }
+  };
   // 각 학력 카드별 드롭다운 상태 (eduIndex_fieldName 형태로 관리)
   const [eduDropdowns, setEduDropdowns] = useState<{ [key: string]: boolean }>({});
   // 학교 검색어 상태
@@ -599,19 +934,21 @@ const Cluster2Content = () => {
 
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame" style={{ position: 'relative' }}>
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => setSection1ModalOpen(true)}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => setSection1ModalOpen(true)}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         {/* 왼쪽 카드 */}
         <div className="frame-left">
           <h2 className="adventure-title">Adventure With Us</h2>
@@ -701,19 +1038,21 @@ const Cluster2Content = () => {
 
       {/* 섹션 2-1: 비디오 섹션 */}
       <div className="cluster2-videos" style={{ position: 'relative' }}>
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
 
         <div className="videos-header">
           <h2 className="videos-title">Let Me Speak My Own Vision</h2>
@@ -800,19 +1139,21 @@ const Cluster2Content = () => {
 
       {/* 인용문 섹션 */}
       <div className="cluster2-quotes" style={{ position: 'relative' }}>
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         <div className="quotes-bg-image">
           <img src="/images/0/cluster 2/bg00.png" alt="" />
         </div>
@@ -834,7 +1175,7 @@ const Cluster2Content = () => {
                 <div className="quote-author">
                   <img src={subPhotos[0] || "/images/0/cluster 2/이안1.webp"} alt="" />
                   <div className="author-info">
-                    <span className="author-name">Hwang Yeongueong</span>
+                    <span className="author-name">{sloganAuthorName || 'Unknown'}</span>
                     <span className="author-role">{sloganData.slogan1.option}</span>
                   </div>
                 </div>
@@ -848,7 +1189,7 @@ const Cluster2Content = () => {
                       <span className="star">✦</span>
                       <span className="star">✦</span>
                     </span>
-                    <span className="score-count">6/10</span>
+                    <span className="score-count">n/10</span>
                   </div>
                 </div>
               </div>
@@ -872,7 +1213,7 @@ const Cluster2Content = () => {
                 <div className="quote-author">
                   <img src={subPhotos[2] || "/images/0/cluster 2/이안3.jpg"} alt="" />
                   <div className="author-info">
-                    <span className="author-name">Hwang Yeongueong</span>
+                    <span className="author-name">{sloganAuthorName || 'Unknown'}</span>
                     <span className="author-role">{sloganData.slogan2.option}</span>
                   </div>
                 </div>
@@ -886,7 +1227,7 @@ const Cluster2Content = () => {
                       <span className="star">✦</span>
                       <span className="star">✦</span>
                     </span>
-                    <span className="score-count">6/10</span>
+                    <span className="score-count">n/10</span>
                   </div>
                 </div>
               </div>
@@ -900,19 +1241,21 @@ const Cluster2Content = () => {
         className="cluster2-education"
         style={{ position: 'relative' }}
       >
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         <div className="edu-bg-image">
           <img src="/images/0/cluster 2/bg04.png" alt="" />
         </div>
@@ -996,19 +1339,21 @@ const Cluster2Content = () => {
 
       {/* CLUB REVIEW 배너 */}
       <div className="cluster2-review-banner" style={{ position: 'relative' }}>
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon" onClick={() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }}>
-            <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
+        )}
         <div className="review-banner-inner">
           <h2 className="review-banner-title-shadow">CLUB REVIEW</h2>
           <h2 className="review-banner-title">CLUB REVIEW</h2>
@@ -1146,16 +1491,18 @@ const Cluster2Content = () => {
         ref={introRef}
         onMouseMove={handleIntroMouseMove}
       >
-        {/* Floating Icons */}
-        <div className="floating-icons">
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
+        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {session && isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
-        </div>
+        )}
         {/* 물결 파동 효과 */}
         {ripples.map(ripple => (
           <div
@@ -1283,7 +1630,25 @@ const Cluster2Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section1-modal-body">
+            <div className="section1-modal-body" style={{ position: 'relative' }}>
+              {/* 로딩 오버레이 */}
+              {photoLoading && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                  borderRadius: '8px',
+                }}>
+                  <span style={{ color: '#fff', fontSize: '14px' }}>업로드 중...</span>
+                </div>
+              )}
               {/* 숨겨진 파일 input들 */}
               <input
                 type="file"
@@ -1381,8 +1746,10 @@ const Cluster2Content = () => {
               </div>
             </div>
             <div className="section1-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection1ModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setSection1ModalOpen(false)}>저장</button>
+              <button className="cancel-btn" onClick={() => setSection1ModalOpen(false)} disabled={photoSaving}>취소</button>
+              <button className="save-btn" onClick={handleSavePhotos} disabled={photoSaving || photoLoading}>
+                {photoSaving ? '저장 중...' : '저장'}
+              </button>
             </div>
           </div>
         </div>
@@ -1499,15 +1866,13 @@ const Cluster2Content = () => {
               </div>
             </div>
             <div className="section2-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection2ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection2ModalOpen(false)} disabled={sloganSaving}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setSloganData(editingSloganData);
-                  setSection2ModalOpen(false);
-                }}
+                onClick={handleSaveSlogans}
+                disabled={sloganSaving}
               >
-                저장
+                {sloganSaving ? '저장 중...' : '저장'}
               </button>
             </div>
           </div>
@@ -1580,15 +1945,13 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section21-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection21ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection21ModalOpen(false)} disabled={videoSaving}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setVideoData([...editingVideoData]);
-                  setSection21ModalOpen(false);
-                }}
+                onClick={handleSaveVideos}
+                disabled={videoSaving}
               >
-                저장
+                {videoSaving ? '저장 중...' : '저장'}
               </button>
             </div>
           </div>
@@ -1737,7 +2100,7 @@ const Cluster2Content = () => {
                   </div>
                   <input
                     type="url"
-                    placeholder="링크를 입력하세요 (https://...)"
+                    placeholder="(입력해도 저장되지 않습니다. 곧 도입될 예정입니다.)"
                     value={editingReviewLinks[index + 1]}
                     onChange={(e) => {
                       const newLinks = [...editingReviewLinks];
@@ -1749,14 +2112,14 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section4-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)} disabled={reviewLinkSaving}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setReviewLinks([...editingReviewLinks]);
-                  setSection4ModalOpen(false);
-                }}
-              >저장</button>
+                onClick={handleSaveReviewLinks}
+                disabled={reviewLinkSaving}
+              >
+                {reviewLinkSaving ? '저장 중...' : '저장'}
+              </button>
             </div>
           </div>
         </div>

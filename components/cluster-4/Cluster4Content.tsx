@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 // 시즌 데이터 배열
 const seasonData = [
@@ -78,6 +80,12 @@ const seasonData = [
 ];
 
 const Cluster4Content = () => {
+  // 세션 및 본인 프로필 여부 확인
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const urlUserId = searchParams.get('userId');
+  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isTextFading, setIsTextFading] = useState(false);
@@ -234,18 +242,20 @@ const Cluster4Content = () => {
       <section className="cluster4-section3">
         {/* SEASON CHALLENGE 배너 */}
         <div className="section3-banner">
-          {/* Floating Icons */}
-          <div className="floating-icons">
-            <div className="edit-icon" onClick={() => setSeasonReputationModalOpen(true)}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+          {/* Floating Icons - 로그인한 본인만 표시 */}
+          {session && isOwner && (
+            <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="edit-icon" onClick={() => setSeasonReputationModalOpen(true)}>
+                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              </div>
+              <div className="edit-icon search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+              </div>
             </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-            </div>
-          </div>
+          )}
           <div className="section3-title-wrapper">
             <h2 className="section3-banner-text-shadow">SEASON CHALLENGE</h2>
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>

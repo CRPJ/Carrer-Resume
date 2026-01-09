@@ -19,6 +19,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "img1.kakaocdn.net",
       },
+      {
+        protocol: "https",
+        hostname: "otaoevvpavpkohdkmtre.supabase.co",
+      },
     ],
   },
   trailingSlash: true,

@@ -253,6 +253,10 @@
     height: 570px;
     position: relative;
 
+    &:hover .floating-icons {
+      display: flex;
+    }
+
     .floating-icons {
       top: -50px;
     }
@@ -671,6 +675,10 @@
     height: 850px;
     overflow: hidden;
 
+    &:hover .floating-icons {
+      display: flex;
+    }
+
     .section-edit-btn {
       top: 20px;
       right: 20px;
@@ -864,6 +872,10 @@
     margin: 50px 0;
     padding: 25px 0;
     background: transparent;
+
+    &:hover .floating-icons {
+      display: flex;
+    }
 
     .floating-icons {
       top: -10px;
@@ -1484,6 +1496,10 @@
     height: 685px;
     overflow: hidden;
 
+    &:hover .floating-icons {
+      display: flex;
+    }
+
     .section-edit-btn {
       top: 20px;
       right: 20px;
@@ -2028,6 +2044,10 @@
     justify-content: center;
     margin: 40px 0;
 
+    &:hover .floating-icons {
+      display: flex;
+    }
+
     &::before {
       content: '';
       position: absolute;
@@ -2427,6 +2447,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+
+    &:hover .floating-icons {
+      display: flex;
+    }
 
     // 물결 파동 효과
     .ripple-effect {
