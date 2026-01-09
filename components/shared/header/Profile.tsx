@@ -3,29 +3,40 @@ import avatar from "@/public/images/avatar/avatar.png";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import OutsideClickHandler from "react-outside-click-handler";
 
 const Profile = () => {
+  const { data: session, status } = useSession();
   const [profileOpen, setProfileOpen] = useState(false);
+  const isLoading = status === "loading";
+
+  const userName = session?.user?.name || "Guest";
+  const userImage = session?.user?.image || avatar;
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <OutsideClickHandler onOutsideClick={() => setProfileOpen(false)}>
       <div className="profile-dropdown nftg-modal-wrapper">
         <button onClick={() => setProfileOpen(!profileOpen)} type="button" aria-label="view profile" title="view profile" className={`open-profile nftg-open-modal ${profileOpen && "nftg-open-modal-active"}`}>
           <span className="hexagon-wrapper">
-            <Image src={avatar} alt="View Profile" />
+            <Image src={userImage} alt="View Profile" width={40} height={40} />
             <svg viewBox="-3 -3 106 106" xmlns="http://www.w3.org/2000/svg" fill="none" className="hexagon-border">
               <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
             </svg>
           </span>
-          <span className="text-xl fw-6">David Malan</span>
+          <span className="text-xl fw-6">{userName}</span>
           <span className="profile-dropdown-btn rotate">
             <i className="ti ti-chevron-down"></i>
           </span>
         </button>
         <div className={`profile-dropdown__modal nftg-modal-body ${profileOpen && "nftg-modal-body-active"}`}>
           <div className="profile-dropdown__widget">
-            <p className="fw-5">David Malan</p>
-            <p className="text-md tertiary-text mt-4">Software Engineer</p>
+            <p className="fw-5">{userName}</p>
+            <p className="text-md tertiary-text mt-4">{session?.user?.email || ""}</p>
           </div>
           <hr />
           <div className="profile-dropdown__widget">
@@ -62,9 +73,9 @@ const Profile = () => {
           </div>
           <hr />
           <div className="profile-dropdown__widget">
-            <Link href="/">
+            <button onClick={() => signOut({ callbackUrl: "/" })} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", color: "inherit", fontSize: "inherit" }}>
               <i className="ti ti-logout"></i>Log Out
-            </Link>
+            </button>
           </div>
         </div>
       </div>

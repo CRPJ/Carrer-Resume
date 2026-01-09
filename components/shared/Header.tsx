@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Cart from "./Cart";
 import ColorPalate from "./ColorPalate";
 import Message from "./header/Message";
@@ -238,6 +239,8 @@ const menu = [
 ];
 
 const Header = () => {
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
   const [search, setSearch] = useState(false);
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const [colorPalete, setColorPalete] = useState(false);
@@ -349,9 +352,15 @@ const Header = () => {
                     <button onClick={() => setSearch(true)} aria-label="open search popup" title="open search popup" className="open-search">
                       <i className="ti ti-search"></i>
                     </button>
-                    <Link href="/profile" className="btn--primary">
-                      Log - In
-                    </Link>
+                    {!isLoading && (session ? (
+                      <button onClick={() => signOut({ callbackUrl: "/" })} className="btn--primary">
+                        Log Out
+                      </button>
+                    ) : (
+                      <button onClick={() => signIn("kakao", { callbackUrl: "/cluster-4" })} className="btn--primary">
+                        Log - In
+                      </button>
+                    ))}
                     <button onClick={() => setCartIsOpen(true)} className={`icon-drop cart-ic open-cart ${cartIsOpen && "cart-ic-active"}`} aria-label="view notifications" title="view notifications">
                       <i className="ti ti-bell"></i>
                       <span>3</span>
@@ -445,9 +454,15 @@ const Header = () => {
               </ul>
             </div>
             <div className="mobile-menu__options nav-fade">
-              <Link href="/profile" className="btn--primary">
-                Log - In
-              </Link>
+              {!isLoading && (session ? (
+                <button onClick={() => signOut({ callbackUrl: "/" })} className="btn--primary">
+                  Log Out
+                </button>
+              ) : (
+                <button onClick={() => signIn("kakao", { callbackUrl: "/cluster-4" })} className="btn--primary">
+                  Log - In
+                </button>
+              ))}
             </div>
             <ul className="mobile-menu__social social nav-fade">
               <li>
