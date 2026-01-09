@@ -1,8 +1,13 @@
 "use client";
 
+// #ToDo 커리어넷 API 키 발급 후 전국 학교 목록 연동
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import schoolDataJson from "@/data/korea-schools.json";
+
+const schoolData: { [key: string]: string[] } = schoolDataJson;
 
 // 학력 데이터 타입
 interface EduData {
@@ -24,85 +29,25 @@ interface EduData {
   isFinal?: boolean;
 }
 
-// 학교 데이터 (샘플)
-const schoolData: { [key: string]: string[] } = {
-  '대학원': ['서울대학교 대학원', '연세대학교 대학원', '고려대학교 대학원', 'KAIST 대학원', '포항공대 대학원', '성균관대학교 대학원', '한양대학교 대학원', '중앙대학교 대학원', '경희대학교 대학원', '이화여자대학교 대학원'],
-  '대학교': ['서울대학교', '연세대학교', '고려대학교', 'KAIST', '포항공대', '성균관대학교', '한양대학교', '중앙대학교', '경희대학교', '이화여자대학교', '서강대학교', '건국대학교', '동국대학교', '홍익대학교', '국민대학교', '숭실대학교', '세종대학교', '단국대학교', '아주대학교', '인하대학교'],
-  '고등학교': ['서울과학고등학교', '한성과학고등학교', '세종과학고등학교', '경기과학고등학교', '대전과학고등학교', '광주과학고등학교', '대구과학고등학교', '부산과학고등학교', '민사고', '상산고', '외대부고', '하나고', '용인외고', '대원외고', '대일외고'],
-  '중학교': ['서울중학교', '경기중학교', '강남중학교', '서초중학교', '용산중학교', '마포중학교', '성북중학교', '종로중학교'],
-  '초등학교': ['서울초등학교', '경기초등학교', '강남초등학교', '서초초등학교', '용산초등학교', '마포초등학교', '성북초등학교', '종로초등학교']
-};
-
-// 학력 데이터
+// 학력 데이터 (기본값 - DB에서 로드되면 덮어씀)
 const initialEducationData: EduData[] = [
   {
-    eduLevel: "대학원",
-    school: "고려대학교 대학원",
-    status: "재학",
-    category: "사회",
-    major1: "콘텐츠전략학",
-    major2: "디지털마케팅학",
+    eduLevel: "-",
+    school: "-",
+    status: "-",
+    category: "-",
+    major1: "-",
+    major2: "-",
     major3: "-",
-    period: "2025.03 - ~ing",
-    startYear: "2025",
-    startMonth: "03",
+    period: "-",
+    startYear: "",
+    startMonth: "",
     endYear: "",
     endMonth: "",
-    gradeMax: "4.5",
-    gradeValue: "3.8",
-    description: "석사 과정에서 더 깊이 있는 연구와 전문성을 쌓고 있습니다. 학부에서 배운 이론을 실무에 적용하는 연구를 진행하고 있습니다.",
+    gradeMax: "-",
+    gradeValue: "-",
+    description: "-",
     isFinal: true
-  },
-  {
-    eduLevel: "대학교",
-    school: "연세대학교",
-    status: "졸업",
-    category: "예체능",
-    major1: "미디어커뮤니케이션학과",
-    major2: "-",
-    major3: "-",
-    period: "2021. 03 - 2025. 02",
-    startYear: "2021",
-    startMonth: "03",
-    endYear: "2025",
-    endMonth: "02",
-    gradeMax: "4.3",
-    gradeValue: "4.12",
-    description: "대학 4년간 전공과 프로젝트를 통해 미디어와 커뮤니케이션에 대한 이해를 쌓았습니다. 학회, 공모전, 인턴십을 통해 이론과 실무를 연결했습니다."
-  },
-  {
-    eduLevel: "고등학교",
-    school: "서울과학고등학교",
-    status: "졸업",
-    category: "기타",
-    major1: "-",
-    major2: "-",
-    major3: "-",
-    period: "2018. 03 - 2021. 02",
-    startYear: "2018",
-    startMonth: "03",
-    endYear: "2021",
-    endMonth: "02",
-    gradeMax: "9등급",
-    gradeValue: "2",
-    description: "진로를 탐색하고 꿈을 구체화했던 시기입니다. 다양한 동아리 활동과 봉사활동을 통해 협동심과 리더십을 기르고, 열정적인 선생님들 덕분에 학업에 대한 흥미를 잃지 않을 수 있었습니다."
-  },
-  {
-    eduLevel: "중학교",
-    school: "용산중학교",
-    status: "졸업",
-    category: "기타",
-    major1: "-",
-    major2: "-",
-    major3: "-",
-    period: "2015. 03 - 2018. 02",
-    startYear: "2015",
-    startMonth: "03",
-    endYear: "2018",
-    endMonth: "02",
-    gradeMax: "100%",
-    gradeValue: "15",
-    description: "호기심 가득했던 시절, 다양한 과목을 접하며 세상을 배웠습니다. 친구들과 우정을 쌓고, 학교 행사에서 즐거운 추억을 만들며 꿈을 키웠습니다."
   }
 ];
 
@@ -610,6 +555,58 @@ const Cluster2Content = () => {
   const [educationData, setEducationData] = useState<EduData[]>(initialEducationData);
   const [editingEduData, setEditingEduData] = useState<EduData[]>(initialEducationData);
   const [hasEduChanges, setHasEduChanges] = useState(false); // 학력 변경사항 추적
+  const [eduSaving, setEduSaving] = useState(false);
+
+  // 학력 데이터 로드
+  const fetchEducations = async () => {
+    try {
+      const response = await fetch('/api/educations');
+      const result = await response.json();
+      if (result.success && result.data && result.data.length > 0) {
+        setEducationData(result.data);
+        setEditingEduData(result.data);
+      }
+    } catch (error) {
+      console.error('학력 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 학력 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchEducations();
+    }
+  }, [session, isOwner]);
+
+  // 학력 저장 함수
+  const handleSaveEducations = async (processedData: EduData[]) => {
+    setEduSaving(true);
+    try {
+      const response = await fetch('/api/educations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          educations: processedData,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setEducationData(processedData);
+        setEditingEduData(processedData);
+        setHasEduChanges(false);
+        setSection3ModalOpen(false);
+        alert('학력이 저장되었습니다.');
+      } else {
+        alert(result.error || '학력 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('학력 저장 오류:', error);
+      alert('학력 저장 중 오류가 발생했습니다.');
+    } finally {
+      setEduSaving(false);
+    }
+  };
 
   // 삭제 확인 모달
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
@@ -623,47 +620,49 @@ const Cluster2Content = () => {
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
 
   // 섹션 5 - 자기소개서 카드 데이터
+  const defaultIntroContent = '카드를 클릭하여 자기소개서를 작성해주세요';
   const [introCards, setIntroCards] = useState([
     {
       id: 1,
       icon: '/images/0/cluster 2/icon/01성장 과정.png',
       title: '성장 과정',
       subtitle: '저는 이렇게 성장하였습니다 😊',
-      content: '어린 시절부터 저는 "왜?"라는 질문을 멈추지 않는 아이였습니다. 부모님께서는 항상 제 질문에 진지하게 답해주셨고, 스스로 답을 찾아보도록 격려해주셨습니다. 이러한 환경 속에서 저는 자연스럽게 탐구하는 습관과 문제 해결 능력을 키워나갈 수 있었습니다. 특히 아버지께서는 "답을 아는 것보다 질문을 던지는 것이 더 중요하다"고 말씀하셨는데, 이 가르침은 지금까지도 저의 삶의 방향을 이끌어주고 있습니다.\n\n중학교 시절, 학교 신문부 활동을 하면서 글쓰기와 소통의 즐거움을 알게 되었습니다. 단순히 정보를 전달하는 것이 아니라, 어떻게 하면 독자의 마음을 움직일 수 있을지 고민하며 콘텐츠를 만들었습니다. 첫 기사가 교내 신문에 실렸을 때의 뿌듯함은 아직도 생생합니다. 이 경험은 훗날 마케팅과 브랜딩에 관심을 갖게 된 계기가 되었습니다.\n\n고등학교에서는 학생회 활동을 통해 리더십을 배웠습니다. 다양한 의견을 조율하고, 팀원들의 강점을 살려 프로젝트를 완성해가는 과정에서 협업의 가치를 깨달았습니다. 학교 축제를 기획할 때 예산 부족과 일정 지연 등 여러 어려움이 있었지만, 팀원들과 함께 해결책을 찾아가며 성공적으로 마무리했습니다. 실패도 있었지만, 그 실패들이 오히려 더 단단한 저를 만들어주었습니다.\n\n대학에 진학한 후에는 전공 공부와 함께 다양한 동아리와 대외활동에 참여했습니다. 특히 창업 동아리에서의 경험은 제 시야를 크게 넓혀주었고, 실제 비즈니스 현장에서 필요한 역량이 무엇인지 체감할 수 있었습니다. 직접 사업 계획서를 작성하고 투자자 앞에서 발표하는 경험을 통해 아이디어를 현실로 만드는 과정의 어려움과 보람을 동시에 느꼈습니다. 이 모든 경험들이 쌓여 지금의 저를 만들었고, 앞으로도 끊임없이 성장하는 사람이 되고자 합니다.'
+      content: defaultIntroContent
     },
     {
       id: 2,
       icon: '/images/0/cluster 2/icon/03사회 경험.png',
       title: '사회 경험',
       subtitle: '저는 이런 것들을 경험하였습니다 😊',
-      content: '대학 시절 시작한 첫 인턴십은 스타트업 마케팅 팀이었습니다. 작은 규모의 회사였기에 기획부터 실행, 분석까지 마케팅의 전 과정을 경험할 수 있었습니다. 한정된 예산으로 최대의 효과를 내기 위해 고민하며 창의적인 문제 해결 능력을 키웠고, 빠른 의사결정과 실행력의 중요성을 배웠습니다.\n\n이후 중견 기업의 브랜드 마케팅 부서에서 근무하며 체계적인 브랜드 관리와 대규모 캠페인 운영을 경험했습니다. 다양한 이해관계자들과 협업하는 과정에서 커뮤니케이션 능력을 한층 발전시킬 수 있었고, 데이터 기반의 의사결정이 얼마나 중요한지 깨달았습니다.\n\n또한 대학생 마케팅 연합 동아리에서 2년간 활동하며 다양한 기업들의 마케팅 프로젝트를 수행했습니다. 서로 다른 전공과 배경을 가진 팀원들과 협업하며 다양한 관점에서 문제를 바라보는 법을 배웠습니다.\n\n봉사활동으로는 지역 소상공인들의 온라인 마케팅을 무료로 지원하는 프로젝트에 참여했습니다. 디지털 전환에 어려움을 겪는 분들께 실질적인 도움을 드리며, 마케팅이 단순한 판매 촉진을 넘어 사회적 가치를 창출할 수 있다는 것을 경험했습니다.'
+      content: defaultIntroContent
     },
     {
       id: 3,
       icon: '/images/0/cluster 2/icon/02커리어 방향.png',
       title: '커리어 방향',
       subtitle: '저는 이 방향으로 나아가고자 합니다 😊',
-      content: '저의 커리어 목표는 "사람과 기술을 연결하는 다리"가 되는 것입니다. 빠르게 변화하는 디지털 환경 속에서 기술만으로는 진정한 가치를 만들어낼 수 없다고 생각합니다. 기술을 이해하면서도 사람의 니즈를 파악하고, 이 둘을 효과적으로 연결할 수 있는 전문가가 되고자 합니다.\n\n단기적으로는 디지털 마케팅과 콘텐츠 기획 분야에서 실무 역량을 쌓고 싶습니다. 데이터 분석을 기반으로 한 마케팅 전략 수립, 타겟 고객에게 공감을 주는 콘텐츠 제작, 그리고 브랜드 아이덴티티 구축까지 전반적인 마케팅 사이클을 경험하며 전문성을 키워나가겠습니다.\n\n중장기적으로는 브랜드 매니저 또는 마케팅 디렉터로 성장하여 브랜드의 방향성을 제시하고, 팀을 이끌어 나가는 역할을 맡고 싶습니다. 단순히 매출을 올리는 마케팅이 아닌, 고객과 진정성 있는 관계를 형성하고 사회적 가치를 창출하는 마케팅을 실현하고자 합니다.\n\n궁극적으로는 제가 쌓은 경험과 지식을 후배들과 나누며, 업계 전체의 발전에 기여하는 사람이 되고 싶습니다. 멘토링과 강연, 그리고 실무 교육을 통해 다음 세대의 마케터들이 성장할 수 있도록 돕겠습니다.'
+      content: defaultIntroContent
     },
     {
       id: 4,
       icon: '/images/0/cluster 2/icon/04실무 스타일.png',
       title: '실무 스타일',
       subtitle: '저는 이렇게 일합니다 😊',
-      content: '저의 업무 스타일은 "철저한 준비, 유연한 실행"으로 요약할 수 있습니다. 프로젝트를 시작하기 전에는 충분한 리서치와 기획을 통해 방향성을 명확히 합니다. 하지만 실행 단계에서는 상황에 따라 유연하게 대응하며, 더 나은 결과를 위해 계획을 수정하는 것을 두려워하지 않습니다.\n\n협업에 있어서는 투명한 소통을 가장 중요하게 생각합니다. 진행 상황을 주기적으로 공유하고, 문제가 발생했을 때는 즉시 팀원들과 논의하여 해결책을 찾습니다. "혼자 고민하지 않고, 함께 해결한다"는 원칙을 지키려 노력합니다.\n\n시간 관리에 있어서는 우선순위를 명확히 하고, 데드라인을 철저히 지킵니다. 급한 일과 중요한 일을 구분하여 리소스를 효율적으로 배분하며, 예상치 못한 상황에 대비해 항상 버퍼 시간을 확보해둡니다.\n\n피드백에 대해서는 열린 자세를 유지합니다. 건설적인 비판은 성장의 기회로 받아들이며, 같은 실수를 반복하지 않기 위해 회고하는 습관을 들이고 있습니다. 또한 동료들에게도 구체적이고 실행 가능한 피드백을 제공하려 노력합니다.'
+      content: defaultIntroContent
     },
     {
       id: 5,
       icon: '/images/0/cluster 2/icon/05퍼스널 스토리.png',
       title: '퍼스널 스토리',
       subtitle: '저는 이런 사람입니다 😊',
-      content: '저를 한 단어로 표현하자면 "연결자"입니다. 사람과 사람, 아이디어와 실행, 문제와 해결책을 연결하는 것에서 가장 큰 보람을 느낍니다. 이러한 성향은 어릴 때부터 자연스럽게 형성되었는데, 친구들 사이에서 중재자 역할을 하거나 그룹 프로젝트에서 조율자 역할을 맡는 일이 많았습니다.\n\n취미로는 여행과 사진 촬영을 즐깁니다. 새로운 장소를 방문하고 그곳의 문화를 경험하는 것은 시야를 넓히고 창의성을 자극합니다. 카메라 렌즈를 통해 세상을 바라보며 디테일에 주목하는 습관은 업무에서도 큰 도움이 됩니다.\n\n독서도 빼놓을 수 없는 취미입니다. 마케팅, 심리학, 경영 서적뿐 아니라 소설과 에세이도 즐겨 읽습니다. 다양한 분야의 책을 통해 폭넓은 인사이트를 얻고, 이를 업무에 적용하려 노력합니다.\n\n저의 강점은 긍정적인 에너지와 회복탄력성입니다. 어려운 상황에서도 해결책을 찾으려 노력하고, 실패를 경험해도 빠르게 털어내고 다시 일어섭니다. 이러한 태도가 주변 사람들에게도 좋은 영향을 미친다는 피드백을 종종 받습니다. 앞으로도 이런 에너지로 조직에 활력을 불어넣는 사람이 되고 싶습니다.'
+      content: defaultIntroContent
     }
   ]);
   const [introModalOpen, setIntroModalOpen] = useState(false);
   const [selectedIntroCard, setSelectedIntroCard] = useState<number | null>(null);
   const [isEditingIntro, setIsEditingIntro] = useState(false);
   const [editingIntroData, setEditingIntroData] = useState({ content: '' });
+  const [introSaving, setIntroSaving] = useState(false);
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     '', // Total Complete (cluving_review_link)
     '', // 3 weeks
@@ -709,6 +708,88 @@ const Cluster2Content = () => {
       fetchReviewLink();
     }
   }, [session, isOwner]);
+
+  // DB에서 자기소개서 로드
+  const fetchIntroductions = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch('/api/introductions');
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const fieldMapping: { [key: string]: string } = {
+          growthStory: '성장 과정',
+          socialExperience: '사회 경험',
+          careerDirection: '커리어 방향',
+          workStyle: '실무 스타일',
+          personalStory: '퍼스널 스토리',
+        };
+
+        const dbFieldOrder = ['growthStory', 'socialExperience', 'careerDirection', 'workStyle', 'personalStory'];
+
+        setIntroCards(prev => {
+          const newCards = [...prev];
+          dbFieldOrder.forEach((dbField, index) => {
+            const dbValue = result.data[dbField];
+            if (dbValue) {
+              newCards[index] = {
+                ...newCards[index],
+                content: dbValue
+              };
+            }
+          });
+          return newCards;
+        });
+      }
+    } catch (error) {
+      console.error('자기소개서 로드 오류:', error);
+    }
+  };
+
+  // 세션 변경 시 자기소개서 로드
+  useEffect(() => {
+    if (session && isOwner) {
+      fetchIntroductions();
+    }
+  }, [session, isOwner]);
+
+  // 자기소개서 저장
+  const handleSaveIntroduction = async (cardIndex: number, content: string) => {
+    const fieldMapping = ['growth_story', 'social_experience', 'career_direction', 'work_style', 'personal_story'];
+    const field = fieldMapping[cardIndex];
+
+    setIntroSaving(true);
+    try {
+      const response = await fetch('/api/introductions', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          field,
+          content,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const newCards = [...introCards];
+        newCards[cardIndex] = {
+          ...newCards[cardIndex],
+          content: content
+        };
+        setIntroCards(newCards);
+        setIsEditingIntro(false);
+        alert('자기소개서가 저장되었습니다.');
+      } else {
+        alert(result.error || '자기소개서 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('자기소개서 저장 오류:', error);
+      alert('자기소개서 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIntroSaving(false);
+    }
+  };
 
   // 리뷰 링크 저장
   const handleSaveReviewLinks = async () => {
@@ -1304,7 +1385,7 @@ const Cluster2Content = () => {
               >
                 <div className="edu-description">
                   <img className="edu-scroll-icon" src="/images/0/cluster 2/icon/Scroll.png" alt="" />
-                  <p className="desc-text">{edu.description.substring(0, 80)}...</p>
+                  <p className="desc-text">{edu.description.length > 35 ? edu.description.substring(0, 35) + '...' : edu.description}</p>
                   <span className="arrow">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1993,17 +2074,14 @@ const Cluster2Content = () => {
                     </button>
                     <button
                       className="save-edit-btn"
+                      disabled={introSaving}
                       onClick={() => {
-                        const newCards = [...introCards];
-                        newCards[selectedIntroCard] = {
-                          ...newCards[selectedIntroCard],
-                          content: editingIntroData.content
-                        };
-                        setIntroCards(newCards);
-                        setIsEditingIntro(false);
+                        if (selectedIntroCard !== null) {
+                          handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
+                        }
                       }}
                     >
-                      저장
+                      {introSaving ? '저장 중...' : '저장'}
                     </button>
                   </>
                 ) : (
@@ -2849,14 +2927,16 @@ const Cluster2Content = () => {
             <div className="section3-modal-footer">
               <button
                 className="save-btn"
+                disabled={eduSaving}
                 onClick={() => {
-                  // 필수 입력 검증: 학교, 전공1, 입학년도, 상태, 성적
+                  // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학년도, 성적
                   const invalidCards = editingEduData.map((edu, index) => {
                     const missing: string[] = [];
-                    if (!edu.school) missing.push('학교');
-                    if (!edu.major1) missing.push('전공 1');
+                    if (!edu.school || edu.school === '-') missing.push('학교');
+                    if (!edu.status || edu.status === '-') missing.push('상태');
+                    if (!edu.category || edu.category === '-') missing.push('계열');
+                    if (!edu.major1 || edu.major1 === '-') missing.push('전공 1');
                     if (!edu.startYear) missing.push('입학년도');
-                    if (!edu.status) missing.push('상태');
                     if (!edu.gradeValue) missing.push('성적');
                     return { index: index + 1, missing };
                   }).filter(item => item.missing.length > 0);
@@ -2876,13 +2956,10 @@ const Cluster2Content = () => {
                     major2: edu.major2.trim() === '' ? '-' : edu.major2,
                     major3: edu.major3.trim() === '' ? '-' : edu.major3,
                   }));
-                  setEducationData(processedData);
-                  setEditingEduData(processedData);
-                  setHasEduChanges(false); // 변경사항 초기화
-                  setSection3ModalOpen(false);
+                  handleSaveEducations(processedData);
                 }}
               >
-                저장
+                {eduSaving ? '저장 중...' : '저장'}
               </button>
             </div>
           </div>
