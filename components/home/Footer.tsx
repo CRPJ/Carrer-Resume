@@ -1,10 +1,9 @@
 "use client";
-import controller from "@/public/images/controller.png";
-import logoLg from "@/public/images/logo-lg.png";
+import footerImg from "@/public/images/0/footer-img.png";
+import footerLogo from "@/public/images/0/footer-logo.png";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Social from "../shared/Social";
@@ -45,7 +44,7 @@ const Footer = () => {
       <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <div className="footer__inner pt-120 pb-120">
+            <div className="footer__inner">
               <div className="row vertical-column-gap-lg">
                 <div className="col-12 col-lg-4">
                   <div className="footer__widget fade-top">
@@ -57,36 +56,36 @@ const Footer = () => {
                         <div className="col-12 col-xl-6">
                           <ul>
                             <li>
-                              <Link href="/about-us">About Us</Link>
+                              <span>About Us</span>
                             </li>
                             <li>
-                              <Link href="/shop">NFT Marketplace</Link>
+                              <span>Talent Marketplace</span>
                             </li>
                             <li>
-                              <Link href="/blog">Blog</Link>
+                              <span>Blog</span>
                             </li>
                           </ul>
                         </div>
                         <div className="col-12 col-xl-6">
                           <ul>
                             <li>
-                              <Link href="/tournaments">Tournaments</Link>
+                              <span>Tournaments</span>
                             </li>
                             <li>
-                              <Link href="/games">Games</Link>
+                              <span>Games</span>
                             </li>
                             <li>
-                              <Link href="/leaderboard">Leaderboard</Link>
+                              <span>Leaderboard</span>
                             </li>
                           </ul>
                         </div>
                       </div>
                     </div>
-                    <div className="footer__widget-newsletter mt-60">
+                    <div className="footer__widget-newsletter mt-30">
                       <div className="footer__newsletter-header">
                         <h5 className="fw-6 mt-8">Subscribe To Newsletter</h5>
                       </div>
-                      <div className="footer__newsletter-wrapper mt-24">
+                      <div className="footer__newsletter-wrapper">
                         <form action="#" method="post" autoComplete="off">
                           <div className="newsletter-form">
                             <div className="newsletter-form-group">
@@ -107,15 +106,15 @@ const Footer = () => {
                 <div className="col-12 col-lg-4">
                   <div className="footer__widget footer__widget--alt mt-8 fade-top">
                     <div className="footer__widget-text">
-                      <p className="text-center">Dive into a world of endless gaming possibilities. Join the adventure, conquer challenges.</p>
+                      <p className="text-center">Dive into the competent workforce infrastructure. Challenge the world our ancestors have devoted for us.</p>
                     </div>
                     <div className="footer__widget-logo  text-center mt-35">
-                      <Link href="/" aria-label="home page" title="logo" className="not-cursor">
-                        <Image src={logoLg} alt="Logo" />
-                      </Link>
+                      <span className="not-cursor">
+                        <Image src={footerLogo} alt="Logo" />
+                      </span>
                     </div>
                     <div className=" footer__widget-text footer__widget-text--alt mt-35">
-                      <p className="text-center">Level up your gaming experience with us!</p>
+                      <p className="text-center">Inspire your ambition, not frustration.</p>
                     </div>
                   </div>
                 </div>
@@ -129,40 +128,38 @@ const Footer = () => {
                         <div className="col-12 col-xl-6">
                           <div>
                             <p>
-                              <a href="https://goo.gl/maps/16KHwiUcctAojuLj8" target="_blank">
-                                Valentine, Street Road 27, New York. USA - 752252
-                              </a>
+                              <span>29274 Cliffside Dr, Malibu, CA 90265</span>
                             </p>
                           </div>
                         </div>
                         <div className="col-12 col-xl-6">
                           <ul>
                             <li>
-                              <a href="tel:629-555-0129">(629) 555-0129</a>
+                              <span>(629) 555-0129</span>
                             </li>
                             <li>
-                              <a href="mailto:binhan628@gmail.com">example@gmail.com</a>
+                              <span>example@gmail.com</span>
                             </li>
                           </ul>
                         </div>
                       </div>
                     </div>
-                    <div className="footer__widget-social mt-60">
+                    <div className="footer__widget-social mt-30">
                       <div className="footer__social-header">
                         <h5 className="fw-6 mt-8">Follow Us :</h5>
                       </div>
-                      <div className="footer__social-wrapper mt-24">
+                      <div className="footer__social-wrapper">
                         <Social />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="footer-thumb fade-left">
-                <Image src={controller} alt="Controller" />
-              </div>
             </div>
           </div>
+        </div>
+        <div className="footer-thumb fade-left">
+          <Image src={footerImg} alt="Footer Image" width={230} height={184} />
         </div>
         <div className="row">
           <div className="col-12">
@@ -172,8 +169,7 @@ const Footer = () => {
                   <div className="footer__copyright-content text-center text-lg-start">
                     <p>
                       Copyright &copy;
-                      <span id="copyrightYear"></span>
-                      <Link href="/">Nftg</Link>. <span className="divider"></span> Designed By <a href="https://themeforest.net/user/pixelaxis">Pixelaxis</a>
+                      <span>NFTG</span>. <span className="divider"></span> Designed By <span>PIXELAXIS</span>
                     </p>
                   </div>
                 </div>
@@ -181,10 +177,10 @@ const Footer = () => {
                   <div className="footer__copyright-links">
                     <ul className="justify-content-center justify-content-lg-end">
                       <li>
-                        <Link href="/contact-us">Privacy Policy</Link>
+                        <span>Privacy Policy</span>
                       </li>
                       <li>
-                        <Link href="/contact-us">Terms & Conditions</Link>
+                        <span>Terms & Conditions</span>
                       </li>
                     </ul>
                   </div>

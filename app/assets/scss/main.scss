@@ -73,6 +73,9 @@
     ==================================
 ============== */
 
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+
 // bootstrap five css
 @import "bootstrap/scss/bootstrap.scss";
 
@@ -111,6 +114,11 @@
 @import "./components/forms";
 @import "./components/preloader";
 @import "./components/resume-card";
+@import "./components/cluster1";
+@import "./components/cluster2";
+@import "./components/cluster3";
+@import "./components/cluster4-season"; // 시즌 카드용
+@import "./components/cluster4-week";   // 주차 카드용
 
 // layout styles
 @import "./layout/header";

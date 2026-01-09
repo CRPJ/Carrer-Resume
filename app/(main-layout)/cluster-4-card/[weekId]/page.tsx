@@ -1,0 +1,83 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
+import ClusterTabs from "@/components/home-career/ClusterTabs";
+import Sidebar from "@/components/home-career/Sidebar";
+import Cluster4CardContent from "@/components/cluster-4-card/Cluster4CardContent";
+import Animations from "@/components/shared/Animations";
+import { getWeekDataById } from "@/data/weeklyData";
+
+const Cluster4CardDynamicPage = () => {
+  const params = useParams();
+  const weekId = parseInt(params.weekId as string);
+  const weekData = getWeekDataById(weekId);
+
+  const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
+    position: 'fixed',
+    left: '110px',
+    top: '124px',
+    overflow: 'visible',
+    zIndex: 100,
+  });
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const footer = document.querySelector('footer');
+      if (!footer) return;
+
+      const footerRect = footer.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      if (footerRect.top < windowHeight) {
+        const moveUp = windowHeight - footerRect.top;
+        setSidebarStyle({
+          position: 'fixed',
+          left: '110px',
+          top: `${124 - moveUp}px`,
+          overflow: 'visible',
+          zIndex: 100,
+        });
+      } else {
+        setSidebarStyle({
+          position: 'fixed',
+          left: '110px',
+          top: '124px',
+          overflow: 'visible',
+          zIndex: 100,
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <main ref={mainRef} className="nftg-content nftg-content-home">
+      <Animations />
+      {/* 고정 사이드바 */}
+      <div style={sidebarStyle}>
+        <Sidebar />
+      </div>
+      {/* 메인 콘텐츠 */}
+      <div className="container-fluid">
+        <div className="row">
+          {/* 사이드바 공간 확보용 빈 영역 */}
+          <div style={{ width: 'var(--sidebar-width, 520px)', flexShrink: 0 }}></div>
+          <div className="home-two-content-col">
+            <ClusterTabs />
+            <div className="home-two-content">
+              <Cluster4CardContent weekData={weekData} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default Cluster4CardDynamicPage;

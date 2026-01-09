@@ -20,6 +20,9 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 body {
@@ -28,24 +31,18 @@ body {
   font-weight: 400;
   color: var(--template-color);
   background-color: var(--template-bg);
-  overflow-x: clip;
-  min-width: 100vw;
+  overflow-x: hidden;
+  width: 100%;
   min-height: 100vh;
+  max-width: 100vw;
 
+  // 스크롤바 숨기기
   &::-webkit-scrollbar {
-    width: 5px;
+    display: none;
+    width: 0;
   }
-
-  &::-webkit-scrollbar-track {
-    background-color: #cae6f7;
-    border-radius: 5px;
-  }
-
-  &::-webkit-scrollbar-button,
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--primary-color);
-    border-radius: 5px;
-  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .body-active {
@@ -59,7 +56,7 @@ body {
 }
 
 .nftg-app {
-  overflow-x: clip;
+  overflow-x: visible;
 }
 
 button {

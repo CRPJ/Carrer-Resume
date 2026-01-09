@@ -1,5 +1,5 @@
 "use client";
-import logo from "@/public/images/logo.png";
+import logo from "@/public/images/0/header-logo.png";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,6 +13,67 @@ import MouseCursor from "./MouseCursor";
 
 const menu = [
   {
+    id: "0",
+    title: "Career",
+    submenus: [
+      {
+        id: "0.1",
+        title: "Cluster 1",
+        url: "/career",
+      },
+      {
+        id: "0.2",
+        title: "Cluster 2",
+        url: "/cluster-2",
+      },
+      {
+        id: "0.3",
+        title: "Cluster 3",
+        url: "/cluster-3",
+      },
+      {
+        id: "0.4",
+        title: "Cluster 4",
+        url: "/cluster-4",
+      },
+      {
+        id: "0.41",
+        title: "Cluster 4-1",
+        url: "/cluster-4-1",
+      },
+      {
+        id: "0.5",
+        title: "Cluster 5",
+        url: "/cluster-5",
+      },
+      {
+        id: "0.6",
+        title: "Cluster 6",
+        url: "/cluster-6",
+      },
+      {
+        id: "0.7",
+        title: "Cluster 7",
+        url: "/cluster-7",
+      },
+      {
+        id: "0.8",
+        title: "Cluster 8",
+        url: "/cluster-8",
+      },
+      {
+        id: "0.9",
+        title: "Cluster 9",
+        url: "/cluster-9",
+      },
+      {
+        id: "0.10",
+        title: "Cluster 10",
+        url: "/cluster-10",
+      },
+    ],
+  },
+  {
     id: "1",
     title: "Home",
     submenus: [
@@ -23,7 +84,7 @@ const menu = [
       },
       {
         id: "1.2",
-        title: "Home Two",
+        title: "Home 2",
         url: "/index-two",
       },
     ],
@@ -197,8 +258,17 @@ const Header = () => {
     }
   }, [search, cartIsOpen]);
   const pathName = usePathname();
+
+  // 현재 경로와 메뉴 URL 비교 함수
+  const isActiveUrl = (url: string) => {
+    if (!url) return false;
+    const normalizedPath = pathName?.replace(/\/$/, '') || '';
+    const normalizedUrl = url.replace(/\/$/, '');
+    return normalizedPath === normalizedUrl;
+  };
+
   useEffect(() => {
-    const parent = menu.find((item) => item.submenus?.some((submenu) => submenu.url === pathName));
+    const parent = menu.find((item) => item.submenus?.some((submenu) => submenu.url && isActiveUrl(submenu.url)));
     if (parent) {
       setActiveParent(parent.id);
     }
@@ -212,7 +282,7 @@ const Header = () => {
               <nav className="navbar p-0">
                 <div className="navbar__logo d-xxl-none">
                   <Link href="/" aria-label="home page" title="logo" className="not-cursor">
-                    <Image src={logo} alt="Image" />
+                    <Image src={logo} alt="Image" width={77} height={77} />
                   </Link>
                 </div>
                 <div className="navbar__menu d-none d-xl-block">
@@ -220,7 +290,7 @@ const Header = () => {
                     {menu.map(({ id, title, url, submenus }) => (
                       <Fragment key={id}>
                         {url ? (
-                          <li className={`navbar__item nav-fade ${pathName === url ? "active" : ""}`}>
+                          <li className={`navbar__item nav-fade ${isActiveUrl(url) ? "active" : ""}`}>
                             <Link href={url}>{title}</Link>
                           </li>
                         ) : (
@@ -232,7 +302,7 @@ const Header = () => {
                               {submenus?.map(({ id, title, submenus, url }) => (
                                 <Fragment key={id}>
                                   {url ? (
-                                    <li className={` ${pathName === url ? "active" : ""}`}>
+                                    <li className={`${isActiveUrl(url) ? "active" : ""}`}>
                                       <Link href={url}>{title}</Link>
                                     </li>
                                   ) : (
@@ -242,7 +312,7 @@ const Header = () => {
                                       </button>
                                       <ul className="navbar__sub-menu navbar__sub-menu__nested">
                                         {submenus?.map(({ id, title, url }) => (
-                                          <li key={id} className={` ${pathName === url ? "active" : ""}`}>
+                                          <li key={id} className={`${isActiveUrl(url) ? "active" : ""}`}>
                                             <Link href={url}>{title}</Link>
                                           </li>
                                         ))}
@@ -280,10 +350,10 @@ const Header = () => {
                       <i className="ti ti-search"></i>
                     </button>
                     <Link href="/profile" className="btn--primary">
-                      Claim Coins
+                      Log - In
                     </Link>
-                    <button onClick={() => setCartIsOpen(true)} className={`icon-drop cart-ic open-cart ${cartIsOpen && "cart-ic-active"}`} aria-label="view cart" title="view cart items">
-                      <i className="ti ti-garden-cart"></i>
+                    <button onClick={() => setCartIsOpen(true)} className={`icon-drop cart-ic open-cart ${cartIsOpen && "cart-ic-active"}`} aria-label="view notifications" title="view notifications">
+                      <i className="ti ti-bell"></i>
                       <span>3</span>
                     </button>
                     <Link href="/profile" className="wallet-ic d-none d-xl-none" title="view wallet">
@@ -320,7 +390,7 @@ const Header = () => {
             <div className="mobile-menu__header nav-fade">
               <div className="logo">
                 <Link href="/" aria-label="home page" title="logo">
-                  <Image src={logo} alt="Image" />
+                  <Image src={logo} alt="Image" width={77} height={77} />
                 </Link>
               </div>
               <button onClick={() => setMobileMenu(false)} aria-label="close mobile menu" className="close-mobile-menu">
@@ -332,7 +402,7 @@ const Header = () => {
                 {menu.map(({ id, url, title, submenus }) => (
                   <Fragment key={id}>
                     {url ? (
-                      <li className={`navbar__item nav-fade ${pathName === url ? "active" : ""}`}>
+                      <li className={`navbar__item nav-fade ${isActiveUrl(url) ? "active" : ""}`}>
                         <Link href={url}>{title}</Link>
                       </li>
                     ) : (
@@ -345,7 +415,7 @@ const Header = () => {
                             {submenus?.map(({ id, title, submenus, url }) => (
                               <Fragment key={id}>
                                 {url ? (
-                                  <li className={` ${pathName === url ? "active" : ""}`}>
+                                  <li className={`${isActiveUrl(url) ? "active" : ""}`}>
                                     <Link href={url}>{title}</Link>
                                   </li>
                                 ) : (
@@ -376,7 +446,7 @@ const Header = () => {
             </div>
             <div className="mobile-menu__options nav-fade">
               <Link href="/profile" className="btn--primary">
-                Claim Coins
+                Log - In
               </Link>
             </div>
             <ul className="mobile-menu__social social nav-fade">

@@ -8,7 +8,7 @@
   top: 0px;
   left: 0px;
   right: 0px;
-  z-index: 10;
+  z-index: 999;
   background-color: var(--template-bg);
   border-bottom: 1px solid #39424c;
 
@@ -165,10 +165,14 @@
       }
     }
 
-    .active > a {
-      color: var(--quaternary-color);
+    li.active > a {
+      color: #fff !important;
+      background: linear-gradient(to right, #21E786, #4AE89D) !important;
+      border-left: none !important;
+      font-weight: 600 !important;
       &::before {
         width: 10px;
+        background-color: #fff !important;
       }
     }
 

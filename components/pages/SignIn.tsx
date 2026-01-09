@@ -14,12 +14,54 @@ import walletConnectIcon from "@/public/images/authentication/wallet-connect.png
 import walletIcon from "@/public/images/authentication/wallet.png";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
+  const router = useRouter();
   const [walletModal, setWalletModal] = useState(false);
   const [isEmailTab, setIsEmailTab] = useState(true);
   const [showPass, setShowPass] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEmailLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      } else if (result?.ok) {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("로그인 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    setIsLoading(true);
+    try {
+      await signIn(provider, { callbackUrl: "/" });
+    } catch (err) {
+      setError("소셜 로그인 중 오류가 발생했습니다.");
+      setIsLoading(false);
+    }
+  };
   return (
     <main className="nftg-content-two">
       <section className="authentication pt-120 pb-120 fade-wrapper">
@@ -32,17 +74,34 @@ const SignIn = () => {
                   <p className="text-xl text-alter mt-12">Welcome Back, We Missed You.</p>
                 </div>
                 <div className="authentication__inner">
+                  {error && (
+                    <div className="alert alert-danger mb-3" role="alert">
+                      {error}
+                    </div>
+                  )}
                   {isEmailTab ? (
                     <div className="oauth-tab">
                       <div className="oauth-btns">
-                        <button aria-label="continue with google" title="continue with google" className="btn--tertiary">
+                        <button
+                          onClick={() => handleSocialLogin("google")}
+                          disabled={isLoading}
+                          aria-label="continue with google"
+                          title="continue with google"
+                          className="btn--tertiary"
+                        >
                           <Image src={googleIcon} alt="Google" width={24} height={24} />
                           Google
                           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
                             <path d="M0 0  L100 0  L100 70 L89 100 L0 100 Z" vectorEffect="non-scaling-stroke" />
                           </svg>
                         </button>
-                        <button aria-label="continue with discord" title="continue with discord" className="btn--tertiary">
+                        <button
+                          onClick={() => handleSocialLogin("discord")}
+                          disabled={isLoading}
+                          aria-label="continue with discord"
+                          title="continue with discord"
+                          className="btn--tertiary"
+                        >
                           <Image src={discordIcon} alt="Discord" width={24} height={24} />
                           Discord
                           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
@@ -150,11 +209,20 @@ const SignIn = () => {
                     </div>
                   ) : (
                     <div className="custom-tab">
-                      <form action="#" method="post">
+                      <form onSubmit={handleEmailLogin}>
                         <div className="input-single">
                           <label htmlFor="userEmail">Your Email</label>
                           <div className="ic-group">
-                            <input type="email" name="user-email" id="userEmail" placeholder="Enter Email" required />
+                            <input
+                              type="email"
+                              name="user-email"
+                              id="userEmail"
+                              placeholder="Enter Email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                              disabled={isLoading}
+                            />
                             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
                               <path d="M0 0  L100 0  L100 75 L92 100 L0 100 Z" vectorEffect="non-scaling-stroke" />
                             </svg>
@@ -166,7 +234,16 @@ const SignIn = () => {
                           <div className="ic-group pass">
                             <i className="ti ti-key"></i>
                             <i className={`ti ti-eye-off show-pass ${showPass ? "show-pass-active" : ""}`} onClick={() => setShowPass(!showPass)}></i>
-                            <input type={`${showPass ? "text" : "password"}`} name="user-Password" id="userPassword" placeholder="Enter Password" required />
+                            <input
+                              type={`${showPass ? "text" : "password"}`}
+                              name="user-Password"
+                              id="userPassword"
+                              placeholder="Enter Password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                              disabled={isLoading}
+                            />
                             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
                               <path d="M0 0  L100 0  L100 75 L92 100 L0 100 Z" vectorEffect="non-scaling-stroke" />
                             </svg>
@@ -176,8 +253,8 @@ const SignIn = () => {
                           </p>
                         </div>
                         <div className="btn-wrapper mt-40">
-                          <button className="btn--secondary" aria-label="login" title="login">
-                            Login{" "}
+                          <button type="submit" className="btn--secondary" aria-label="login" title="login" disabled={isLoading}>
+                            {isLoading ? "로그인 중..." : "Login"}
                           </button>
                         </div>
                       </form>

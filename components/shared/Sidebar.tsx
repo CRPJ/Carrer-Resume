@@ -1,5 +1,5 @@
 "use client";
-import logo from "@/public/images/logo.png";
+import logo from "@/public/images/0/header-logo.png";
 import one from "@/public/images/sidebar/one.png";
 import three from "@/public/images/sidebar/three.png";
 import two from "@/public/images/sidebar/two.png";
@@ -32,7 +32,7 @@ const Sidebar = () => {
             <div className="sidebar__wrapper">
               <div className="sidebar__widget">
                 <Link href="/" className="sidebar__logo not-cursor" aria-label="home page" title="logo">
-                  <Image src={logo} alt="Logo" />
+                  <Image src={logo} alt="Logo" width={77} height={77} />
                 </Link>
               </div>
               <div className="sidebar__widget sidebar--links">

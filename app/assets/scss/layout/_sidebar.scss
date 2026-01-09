@@ -10,7 +10,7 @@
   height: 100vh;
   overflow-y: auto;
   overflow-x: clip;
-  z-index: 99;
+  z-index: 100000;
   background-color: var(--black);
   transition-duration: 300ms;
   border-right: 1px solid #39424c;
@@ -29,8 +29,14 @@
     justify-content: center;
 
     img {
-      max-width: 40px;
+      width: 77px;
+      height: 77px;
+      max-width: none;
     }
+  }
+
+  .sidebar__widget:nth-of-type(1) {
+    padding: 12.5px 0px;
   }
 
   .sidebar__widget {

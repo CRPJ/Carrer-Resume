@@ -1,5 +1,4 @@
 // Font imports
-@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
@@ -27,6 +26,14 @@
 }
 
 @font-face {
+  font-family: 'Tenada';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/Tenada.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Eutman';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKCHAN.woff2') format('woff2');
   font-weight: normal;
@@ -37,6 +44,14 @@
 @font-face {
   font-family: 'GanaChocolate';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jeongmeokbawi';
+  src: url('https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/SangSangRockOTF.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -54,18 +69,22 @@
 }
 
 // Resume Card - Exact Design Match
+// 474px x 810px 고정 (transform: scale로 크기 조절)
 .resume-card {
   width: 474px !important;
   min-width: 474px !important;
   max-width: 474px !important;
   height: 810px !important;
-  border: 1px solid #313F11;
-  border-radius: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 810px !important;
+  max-height: 810px !important;
+  border: 1px solid #999 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
+  position: relative;
+  box-sizing: border-box !important;
 
   * {
     box-sizing: border-box;
@@ -89,10 +108,10 @@
       margin: -20px 0 0 -15px;
       padding: 0;
       position: relative;
-      -webkit-mask-image: url('/images/0/shape.png');
+      -webkit-mask-image: url('/images/0/cluster 1/shape.png');
       -webkit-mask-size: cover;
       -webkit-mask-position: center;
-      mask-image: url('/images/0/shape.png');
+      mask-image: url('/images/0/cluster 1/shape.png');
       mask-size: cover;
       mask-position: center;
 
@@ -114,6 +133,8 @@
       align-items: flex-start;
       gap: 5px;
       margin: 0;
+      margin-top: 5px;
+      position: relative;
 
       .resume-icons {
         display: flex;
@@ -134,8 +155,10 @@
         font-style: normal;
         font-weight: 400;
         line-height: 34px;
-        margin-bottom: 16px;
+        margin-top: -8px;
+        margin-bottom: 6px;
         margin-left: -5px;
+        padding-right: 35px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -157,13 +180,13 @@
       .resume-details {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 6px;
 
         .detail-row {
           display: flex;
           gap: 10px;
           font-size: 14px;
-          line-height: 1;
+          line-height: 1.4;
           color: #FFFFFF;
           align-items: center;
 
@@ -192,9 +215,9 @@
 
   // Introduction
   .resume-intro {
-    width: 474px;
-    height: 104px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/17.png');
+    width: 472px;
+    height: 114px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/cluster 1/bg image/17.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -251,26 +274,29 @@
     .stat-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      width: 100%;
+      justify-content: space-between;
+      width: 138px;
 
       .stat-label {
-        font-size: 14px;
+        font-size: 15px;
         color: #999;
         white-space: nowrap;
+
+        .stat-dot {
+          color: #FFEC8F;
+        }
       }
 
       .stat-value {
-        font-family: 'Black Ops One', cursive;
+        font-family: var(--black-ops-one), cursive;
         font-size: 22px;
         font-weight: 400;
         color: #FFEC8F;
         white-space: nowrap;
 
         .stat-unit {
-          font-family: 'Black Ops One', cursive;
-          font-size: 14px;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 12px;
           font-weight: 400;
           color: #FFEC8F;
         }
@@ -278,7 +304,7 @@
     }
 
     .progress-bar {
-      width: 124.2px;
+      width: 138px;
       height: 3px;
       background: #555555;
       border: none;
@@ -308,7 +334,7 @@
     .badge-group {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 10px;
       justify-content: center;
 
       .badge-icon {
@@ -322,25 +348,28 @@
         background-position: center;
 
         &.icon-graphic10 {
-          background-image: url('/images/0/Graphic10.png');
+          background-image: url('/images/0/cluster 1/Ok01.png');
+          width: 19px;
+          height: 19px;
+          filter: sepia(100%) saturate(300%) hue-rotate(-10deg) brightness(1.1);
         }
 
         &.icon-shield {
-          background-image: url('/images/0/Shield.png');
+          background-image: url('/images/0/cluster 1/OK02.png');
         }
 
         &.icon-graphic13 {
-          background-image: url('/images/0/Graphic13.png');
+          background-image: url('/images/0/cluster 1/Ok03.png');
         }
       }
 
       .badge-num {
-        font-family: 'Black Ops One', cursive;
-        font-size: 18px;
+        font-family: var(--black-ops-one), cursive;
+        font-size: 17px;
         font-weight: 400;
         color: #FFEC8F;
-        min-width: 80px;
-        text-align: center;
+        min-width: 55px;
+        text-align: right;
 
         &.red {
           color: #FFEC8F;
@@ -359,6 +388,20 @@
     justify-content: center;
     position: relative;
     font-size: 14px;
+    margin-top: 6px;
+
+    // Complete일 때 오버레이 제거 + 금장 glow 효과
+    &.no-overlay {
+      .medal-image-wrapper {
+        &::before {
+          display: none;
+        }
+
+        img {
+          box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 165, 0, 0.7), 0 0 90px rgba(255, 200, 0, 0.5);
+        }
+      }
+    }
 
     .medal-image-wrapper {
       position: relative;
@@ -396,12 +439,12 @@
 
     .medal-text {
       position: absolute;
-      bottom: 5px;
-      right: 20px;
+      bottom: 17px;
+      right: 7px;
       z-index: 2;
-      width: 70px;
-      height: 25px;
-      padding: 0;
+      width: 80px;
+      height: 28px;
+      padding: 0 8px;
       font-family: 'Cafe24Anemone', sans-serif;
       font-size: 14px;
       color: #FFEC8F;
@@ -410,17 +453,39 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: rotate(-8deg);
-      background-image: url('/images/0/ribon box.png');
+      transform: rotate(-13deg);
+      background-image: url('/images/0/cluster 1/ribon box.png');
       background-size: 100% 100%;
       background-repeat: no-repeat;
       background-position: center;
+      transition: width 0.3s ease;
+
+      // 짧은-중간 길이 (Complete)
+      &.short-medium {
+        width: 90px;
+        right: 2px;
+        font-size: 13px;
+      }
+
+      // 중간 길이 (Recharging)
+      &.medium {
+        width: 105px;
+        right: -5px;
+        font-size: 13px;
+      }
+
+      // 긴 길이 (Next Challenge)
+      &.long {
+        width: 125px;
+        right: -8px;
+        font-size: 12px;
+      }
     }
   }
 
   // Activities
   .resume-activities {
-    width: 474px;
+    width: 472px;
     height: 95px;
     max-height: 95px;
     overflow-y: scroll;
@@ -431,7 +496,7 @@
 
     // Custom scrollbar
     &::-webkit-scrollbar {
-      width: 4px;
+      width: 2px;
       display: block;
     }
 
@@ -441,18 +506,49 @@
 
     &::-webkit-scrollbar-thumb {
       background: #FFEC8F;
-      border-radius: 4px;
+      border-radius: 2px;
+
+      .resume-card.px-theme & {
+        background: #B2FF8F !important;
+      }
+
+      .resume-card.ec-theme & {
+        background: #FF98A6 !important;
+      }
     }
 
     &::-webkit-scrollbar-thumb:hover {
       background: #FFD700;
+
+      .resume-card.px-theme & {
+        background: #90EE90 !important;
+      }
+
+      .resume-card.ec-theme & {
+        background: #FF6B8A !important;
+      }
     }
 
-    // Remove scrollbar arrows
+    // Remove scrollbar arrows - all button types
     &::-webkit-scrollbar-button {
-      display: none;
-      height: 0;
-      width: 0;
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    &::-webkit-scrollbar-button:single-button {
+      display: none !important;
+    }
+    &::-webkit-scrollbar-button:start:decrement {
+      display: none !important;
+    }
+    &::-webkit-scrollbar-button:end:increment {
+      display: none !important;
+    }
+    &::-webkit-scrollbar-button:vertical:start:increment {
+      display: none !important;
+    }
+    &::-webkit-scrollbar-button:vertical:end:decrement {
+      display: none !important;
     }
 
     // Firefox
@@ -465,7 +561,7 @@
       gap: 4px;
       padding: 0;
       border-bottom: 0;
-      width: 471px;
+      width: 470px;
       height: 36px;
       background-color: #1C242F;
       margin-bottom: 0;
@@ -571,7 +667,7 @@
   // Bottom section wrapper with background
   .resume-bottom-section {
     position: relative;
-    width: 474px;
+    width: 472px;
 
     &::before {
       content: '';
@@ -580,9 +676,9 @@
       left: 0;
       right: 0;
       bottom: -18px;
-      background-image: url('/images/0/OK 섹션89.png');
+      background-image: url('/images/0/cluster 1/bg image/OK 섹션89.png');
       background-size: cover;
-      background-position: center -30px;
+      background-position: center -80px;
       background-repeat: no-repeat;
       z-index: 1;
     }
@@ -608,7 +704,9 @@
     padding-top: 30px;
     padding-bottom: 0;
     margin-bottom: 0;
-    width: 474px;
+    width: 420px;
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
     z-index: 3;
 
@@ -628,65 +726,61 @@
       height: 50px;
       overflow: visible;
 
-      &:nth-child(1) {
-        background-image: url('/images/0/Sheriff Badge1 2.png');
-        background-size: 34px 34px;
-        background-repeat: no-repeat;
-        background-position: calc(50% - 25px) calc(50% - 10px);
+      .skill-num-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        position: relative;
+        z-index: 2;
       }
 
-      &:nth-child(2) {
-        background-image: url('/images/0/Sheriff Badge1.png');
-        background-size: 34px 34px;
-        background-repeat: no-repeat;
-        background-position: calc(50% - 25px) calc(50% - 10px);
-      }
-
-      &:nth-child(3) {
-        background-image: url('/images/0/Sheriff Badge1 3.png');
-        background-size: 34px 34px;
-        background-repeat: no-repeat;
-        background-position: calc(50% - 25px) calc(50% - 10px);
-      }
-
-      &:nth-child(4) {
-        background-image: url('/images/0/Sheriff Badge1 4.png');
-        background-size: 34px 34px;
-        background-repeat: no-repeat;
-        background-position: calc(50% - 25px) calc(50% - 10px);
+      .skill-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        object-fit: contain;
+        margin-right: -6px;
+        position: relative;
+        top: -3px;
       }
 
       .skill-num {
-        font-family: 'Black Ops One', cursive;
+        font-family: var(--black-ops-one), cursive;
         font-size: 30px;
         font-weight: 400;
         color: #FFEC8F;
         line-height: 1;
         margin-bottom: 0;
-        margin-top: 5px;
         position: relative;
-        z-index: 10;
+        z-index: 2;
       }
 
       .skill-label {
-        font-size: 15px;
+        font-size: 13px;
         color: #FFF;
         line-height: 1.2;
         position: relative;
-        z-index: 10;
+        z-index: 2;
+      }
+
+      & > div {
+        position: relative;
+        z-index: 2;
       }
     }
   }
 
   // Notices
   .resume-notices {
-    padding: 25px 20px 20px 0;
-    margin-top: 0;
+    padding: 25px 20px 12px 0;
+    margin-top: -8px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     position: relative;
     z-index: 3;
+    gap: 0;
 
     .notice-box {
       display: flex;
@@ -764,6 +858,574 @@
         background: transparent;
         border: none;
         color: #21E786;
+      }
+    }
+  }
+}
+
+// EC Theme - Pink Color Scheme
+.resume-card.ec-theme {
+  // Resume intro border
+  .resume-intro {
+    border-left: 2px solid #FF4B70 !important;
+  }
+
+  // Badges - 영역 5 아이콘
+  .resume-badges {
+    .badge-group {
+      .badge-icon {
+        &.icon-graphic10 {
+          background-image: url('/images/0/cluster 1/Graphic10.png') !important;
+        }
+        &.icon-shield {
+          background-image: url('/images/0/cluster 1/pX02.png') !important;
+        }
+        &.icon-graphic13 {
+          background-image: url('/images/0/cluster 1/Graphic13.png') !important;
+        }
+      }
+    }
+  }
+
+  // Stats - 영역 4
+  .resume-stats {
+    .stat-item {
+      .stat-row {
+        .stat-value {
+          color: #FF98A6 !important;
+
+          .stat-unit {
+            color: #FF98A6 !important;
+          }
+        }
+      }
+
+      .progress-bar {
+        .progress-fill {
+          background: #FF98A6 !important;
+        }
+      }
+    }
+  }
+
+  // Badges - 영역 5
+  .resume-badges {
+    .badge-group {
+      .badge-num {
+        color: #FF98A6 !important;
+
+        &.red {
+          color: #FF98A6 !important;
+        }
+      }
+    }
+  }
+
+  // Medal text - 진행중 텍스트
+  .resume-medal {
+    .medal-text {
+      color: #FF98A6 !important;
+    }
+  }
+
+  // Activity badge colors
+  .resume-activities {
+    scrollbar-color: #FF98A6 #2a2a2a !important;
+
+    .activity-row {
+      .activity-content {
+        .activity-line {
+          .activity-season {
+            color: #fff !important;
+          }
+
+          .activity-period {
+            color: #fff !important;
+          }
+
+          .activity-role {
+            color: #fff !important;
+          }
+
+          .activity-badge {
+            &.active {
+              color: #FF98A6 !important;
+            }
+
+            &.complete {
+              color: #FF98A6 !important;
+            }
+          }
+
+          .activity-check {
+            &.pending {
+              color: #999 !important;
+            }
+
+            &.approved {
+              color: #fff !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Skill numbers
+  .resume-skills {
+    .skill-card {
+      .skill-num {
+        color: #FF98A6 !important;
+      }
+    }
+  }
+
+  // Notice box yellow - Section 7
+  .resume-notices {
+    .notice-box {
+      &.yellow {
+        color: #FF98A6 !important;
+
+        .notice-text {
+          &.notice-text-top {
+            font-family: 'Tenada', sans-serif !important;
+            font-size: 15px !important;
+            position: relative;
+            top: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  // Bottom section background - Section 8, 9
+  .resume-bottom-section {
+    &::before {
+      background-image: url('/images/0/cluster 1/bg image/EC02 (2).png') !important;
+      background-position: center -80px !important;
+    }
+  }
+}
+
+// PX Theme - Green color scheme
+.resume-card.px-theme {
+  // Section 3 - intro border
+  .resume-intro {
+    border-left: 2px solid #36DA60 !important;
+  }
+
+  // Section 4 - stats
+  .resume-stats {
+    .stat-item {
+      .stat-row {
+        .stat-value {
+          color: #B2FF8F !important;
+
+          .stat-unit {
+            color: #B2FF8F !important;
+          }
+        }
+      }
+    }
+
+    .progress-bar {
+      .progress-fill {
+        background: #B2FF8F !important;
+      }
+    }
+  }
+
+  // Section 5 - badges
+  .resume-badges {
+    .badge-group {
+      .badge-icon {
+        &.icon-graphic10 {
+          background-image: url('/images/0/cluster 1/PX01.png') !important;
+        }
+        &.icon-shield {
+          background-image: url('/images/0/cluster 1/pX02.png') !important;
+        }
+        &.icon-graphic13 {
+          background-image: url('/images/0/cluster 1/PX03.png') !important;
+        }
+      }
+
+      .badge-num {
+        color: #B2FF8F !important;
+
+        &.red {
+          color: #B2FF8F !important;
+        }
+      }
+    }
+  }
+
+  // Section 7 - activities
+  .resume-activities {
+    .activity-row {
+      .activity-season,
+      .activity-period,
+      .activity-role {
+        color: #fff !important;
+      }
+
+      .activity-badge {
+        &.active,
+        &.complete {
+          color: #B2FF8F !important;
+        }
+      }
+
+      .activity-check {
+        &.pending {
+          color: #999 !important;
+        }
+        &.approved {
+          color: #fff !important;
+        }
+      }
+    }
+  }
+
+  // Section 8 - skills
+  .resume-skills {
+    .skill-card {
+      .skill-num {
+        color: #B2FF8F !important;
+      }
+    }
+  }
+
+  // Section 6 - medal
+  .resume-medal {
+    .medal-text {
+      color: #B2FF8F !important;
+    }
+  }
+
+  // Section 9 - notices (yellow box)
+  .resume-notices {
+    .notice-box {
+      &.yellow {
+        color: #B2FF8F !important;
+
+        .notice-text.notice-text-top {
+          font-family: 'Jeongmeokbawi', sans-serif !important;
+          font-size: 16px !important;
+          position: relative;
+          top: 1px;
+        }
+      }
+    }
+  }
+
+  // Section 7 - activities scroll
+  .resume-activities {
+    scrollbar-color: #B2FF8F #2a2a2a !important;
+
+    &::-webkit-scrollbar-thumb {
+      background: #B2FF8F !important;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #90EE90 !important;
+    }
+  }
+
+  // Bottom section background - Section 8, 9
+  .resume-bottom-section {
+    &::before {
+      background-image: url('/images/0/cluster 1/bg image/PX05.jpg') !important;
+      background-position: center -80px !important;
+    }
+  }
+}
+
+// OK theme scrollbar (default)
+.resume-card .resume-activities::-webkit-scrollbar {
+  width: 2px !important;
+}
+.resume-card .resume-activities::-webkit-scrollbar-button {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+// PX theme scrollbar - must be outside nested rules
+.resume-card.px-theme .resume-activities::-webkit-scrollbar {
+  width: 2px !important;
+}
+.resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb {
+  background: #B2FF8F !important;
+  border-radius: 2px !important;
+}
+.resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb:hover {
+  background: #90EE90 !important;
+}
+.resume-card.px-theme .resume-activities::-webkit-scrollbar-button {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+// EC theme scrollbar
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar {
+  width: 2px !important;
+}
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb {
+  background: #FF98A6 !important;
+  border-radius: 2px !important;
+}
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb:hover {
+  background: #FF6B8A !important;
+}
+.resume-card.ec-theme .resume-activities::-webkit-scrollbar-button {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+// Cluster Tabs Navigation
+.cluster-tabs {
+  width: 100%;
+  padding: 0;
+  margin-top: -8px;
+  margin-bottom: 3px;
+  position: relative;
+  z-index: 50;
+  background: transparent;
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  overflow: visible;
+
+  .cluster-tabs-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    margin-left: 0;
+    overflow-x: visible;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 8px;
+    // 5개씩 한 줄에 배치 (250px * 5 + gap 6px * 4 = 1274px)
+    max-width: 1274px;
+  }
+
+  // 두 줄 모드에서 그라데이션과 화살표 숨김
+  .cluster-tabs-gradient,
+  .cluster-tabs-arrow {
+    display: none;
+  }
+
+  .cluster-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 48px;
+    width: 250px;
+    min-width: 250px;
+    padding: 0 20px;
+    border-radius: 0;
+    font-family: var(--black-ops-one), 'Black Ops One', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #FED402;
+    background: rgba(28, 31, 24, 0.6);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    .tab-text {
+      line-height: 1.4;
+      background: linear-gradient(to right, #FED402, #FFF1AA);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding-bottom: 2px;
+    }
+
+
+    &:hover {
+      background: rgba(254, 212, 2, 0.2);
+    }
+
+    &.active {
+      color: #000 !important;
+      background: linear-gradient(to right, #FED402, #FFF1AA) !important;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      gap: 8px;
+
+      .tab-deco {
+        height: 36px;
+        width: auto;
+        flex-shrink: 0;
+        position: absolute;
+
+        &.left {
+          left: 10px;
+        }
+
+        &.right {
+          transform: scaleY(-1);
+          right: 10px;
+        }
+      }
+
+      // 긴 탭 이름용 (클러스터 9, 10)
+      &.wide-deco {
+        .tab-deco {
+          &.left {
+            left: 3px;
+          }
+
+          &.right {
+            right: 3px;
+          }
+        }
+      }
+
+      .tab-text {
+        background: none !important;
+        -webkit-text-fill-color: #000 !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+      }
+
+      .tab-settings {
+        display: flex !important;
+        color: #000 !important;
+        border-color: #000 !important;
+      }
+    }
+
+
+    .tab-settings {
+      display: flex;
+      align-items: center;
+      margin-left: 12px;
+      padding-left: 12px;
+      font-size: 14px;
+      color: #000;
+      border-left: 1px dashed #000;
+      height: 20px;
+    }
+
+    &.placeholder {
+      cursor: default;
+      pointer-events: none;
+      opacity: 1;
+      background: rgba(28, 31, 24, 0.6);
+    }
+  }
+
+  .cluster-tabs-gradient {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 56px;
+    background: linear-gradient(to right, transparent, #0a0a0a 70%);
+    pointer-events: none;
+    z-index: 11;
+
+    &.at-start {
+      right: auto;
+      left: 0;
+      background: linear-gradient(to left, transparent, #0a0a0a 70%);
+    }
+  }
+
+  .cluster-tabs-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD000 0%, #FAAB07 100%);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 12;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
+    animation: pulse-glow 2s ease-in-out infinite;
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
+      }
+      50% {
+        box-shadow: 0 2px 16px rgba(250, 171, 7, 0.6);
+      }
+    }
+
+    i {
+      color: #000;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: arrow-hint 1.5s ease-in-out infinite;
+    }
+
+    @keyframes arrow-hint {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(3px);
+      }
+    }
+
+    &:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
+      animation: none;
+
+      i {
+        animation: none;
+        transform: translateX(3px);
+      }
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    &.at-start {
+      right: auto;
+      left: 10px;
+
+      i {
+        animation-name: arrow-hint-left;
+      }
+
+      @keyframes arrow-hint-left {
+        0%, 100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(-3px);
+        }
+      }
+
+      &:hover i {
+        transform: translateX(-3px);
       }
     }
   }
