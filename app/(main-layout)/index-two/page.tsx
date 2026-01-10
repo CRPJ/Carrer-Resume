@@ -6,7 +6,7 @@ import Countdown from "@/components/home-two/Countdown";
 import Feature from "@/components/home-two/Feature";
 import LastStream from "@/components/home-two/LastStream";
 import Platform from "@/components/home-two/Platform";
-import Sidebar from "@/components/home-two/Sidebar";
+import Sidebar from "@/components/home-career/Sidebar";
 import Streamer from "@/components/home-two/Streamer";
 import TrendingNFT from "@/components/home-two/TrendingNFT";
 import Cta from "@/components/home/Cta";
