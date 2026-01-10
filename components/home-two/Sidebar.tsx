@@ -400,10 +400,10 @@ const Sidebar = () => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label">· 일정 신뢰도</span>
-                <span className="stat-value">{hasReliabilityData ? stat1 : "-"}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{hasReliabilityData ? reliabilityRate : "-"}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${hasReliabilityData ? stat1 : 0}%` }}></div>
+                <div className="progress-fill" style={{ width: `${hasReliabilityData ? reliabilityRate : 0}%` }}></div>
               </div>
             </div>
             <div className="stat-item">
