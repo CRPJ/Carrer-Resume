@@ -45,6 +45,8 @@ const Cluster3Content = () => {
     ];
 
     if (koreanStatuses.includes(growthStatus)) {
+      // '활동 중'은 '성장 중'으로 표시
+      if (growthStatus === '활동 중') return '성장 중';
       return growthStatus;
     }
 
@@ -52,7 +54,7 @@ const Cluster3Content = () => {
     if (status === 'graduated') return '성장 완료(졸업)';
     if (status === 'suspended') return '성장 중단';
     if (status === 'pending') return '클럽 온보딩 중';
-    if (growthStatus === 'active') return '활동 중';
+    if (growthStatus === 'active') return '성장 중';
     if (growthStatus === 'resting') return '휴식(주차) 중';
     if (growthStatus === 'official_rest') return '휴식(공식) 중';
     if (growthStatus === 'season_rest') return '시즌 휴식 중';
