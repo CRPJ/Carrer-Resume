@@ -17,6 +17,8 @@ const Sidebar = () => {
   const [skill4, setSkill4] = useState(0);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
+  const [completionRate, setCompletionRate] = useState<number | null>(null);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
 
   // 실무 데이터 상태 (activities 테이블에서 가져올 실제 값)
   const [practicalData, setPracticalData] = useState({
@@ -123,6 +125,15 @@ const Sidebar = () => {
         } else {
           setHasReliabilityData(false);
           setReliabilityRate(0);
+        }
+
+        // completionRate 설정
+        if (result.completionRate !== undefined) {
+          setHasCompletionData(true);
+          setCompletionRate(result.completionRate);
+        } else {
+          setHasCompletionData(false);
+          setCompletionRate(0);
         }
 
         // 실무 데이터 설정
@@ -409,10 +420,10 @@ const Sidebar = () => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label">· 활동 완료율</span>
-                <span className="stat-value">{stat2}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{hasCompletionData ? completionRate : "-"}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${stat2}%` }}></div>
+                <div className="progress-fill" style={{ width: `${hasCompletionData ? completionRate : 0}%` }}></div>
               </div>
             </div>
           </div>

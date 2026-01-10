@@ -73,6 +73,20 @@ export async function GET() {
       .eq("user_id", profile.id)
       .maybeSingle();
 
+    // 활동 완료율 가져오기 (weekly_activities 테이블 기반)
+    const { data: weeklyActivities } = await supabaseAdmin
+      .from("weekly_activities")
+      .select("status")
+      .eq("user_id", profile.id);
+
+    let completionRate = 0;
+    if (weeklyActivities && weeklyActivities.length > 0) {
+      const completedCount = weeklyActivities.filter(
+        (activity) => activity.status === "approved" || activity.status === "completed"
+      ).length;
+      completionRate = Math.round((completedCount / weeklyActivities.length) * 100);
+    }
+
     // user_cumulative_points 가져오기 (별, 번개, 방패)
     const { data: cumulativePoints } = await supabaseAdmin
       .from("user_cumulative_points")
@@ -126,6 +140,7 @@ export async function GET() {
       data: profile,
       practicalCounts,
       reliabilityRate: reliabilityData?.reliability_rate || 0,
+      completionRate,
       badges: {
         stars: cumulativePoints?.total_stars || 0,
         lightnings: cumulativePoints?.total_lightnings || 0,
