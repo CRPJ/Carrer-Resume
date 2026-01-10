@@ -16,6 +16,8 @@ const Cluster3Content = () => {
   // 일정 신뢰도 프로그레스 애니메이션 (섹션 1)
   const [progressOffset, setProgressOffset] = useState(393); // 시작: 0%
   const [progressPercent, setProgressPercent] = useState(0); // 퍼센트 숫자
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
+  const [hasReliabilityData, setHasReliabilityData] = useState(false);
 
   // 섹션 2 프로그레스 바 애니메이션
   const [section2Progress, setSection2Progress] = useState(0);
@@ -67,14 +69,47 @@ const Cluster3Content = () => {
   const [editingSection4Links, setEditingSection4Links] = useState<string[]>([]);
   const [editingSection5Links, setEditingSection5Links] = useState<string[]>([]);
 
+  // API에서 일정 신뢰도 데이터 가져오기
   useEffect(() => {
-    // 페이지 로드 후 애니메이션 시작 (50% = 196.5)
-    const timer = setTimeout(() => {
-      setProgressOffset(196.5);
+    const fetchReliabilityRate = async () => {
+      if (!session?.user?.email) {
+        setHasReliabilityData(false);
+        return;
+      }
 
-      // 숫자 카운트업 애니메이션 (1.5초 동안 0 → 50)
+      try {
+        const response = await fetch('/api/profile');
+        const result = await response.json();
+
+        if (response.ok && result.reliabilityRate !== undefined) {
+          setReliabilityRate(result.reliabilityRate);
+          setHasReliabilityData(true);
+        } else {
+          setHasReliabilityData(false);
+        }
+      } catch (error) {
+        console.error("신뢰도 데이터 로드 오류:", error);
+        setHasReliabilityData(false);
+      }
+    };
+
+    fetchReliabilityRate();
+  }, [session?.user?.email]);
+
+  // 일정 신뢰도 프로그레스 애니메이션
+  useEffect(() => {
+    // reliabilityRate가 로드되지 않았으면 대기
+    if (reliabilityRate === null) return;
+
+    const targetPercent = reliabilityRate;
+    // 393 = 전체 반원 길이, 0% = 393, 100% = 0
+    const targetOffset = 393 - (393 * targetPercent / 100);
+
+    const timer = setTimeout(() => {
+      setProgressOffset(targetOffset);
+
+      // 숫자 카운트업 애니메이션
       const duration = 1500;
-      const targetPercent = 50;
       const startTime = Date.now();
 
       const countUp = () => {
@@ -95,7 +130,7 @@ const Cluster3Content = () => {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [reliabilityRate]);
 
   // 섹션 2 스크롤 감지
   useEffect(() => {
@@ -336,7 +371,7 @@ const Cluster3Content = () => {
             </svg>
             <div className="progress-text">
               <span className="progress-percent">{progressPercent}%</span>
-              <span className="progress-label">일정 신뢰도</span>
+                <span className="progress-label">일정 신뢰도</span>
             </div>
           </div>
         </div>
