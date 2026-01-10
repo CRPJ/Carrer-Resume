@@ -1,8 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Sidebar = () => {
+  const { data: session } = useSession();
+
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
@@ -12,8 +15,155 @@ const Sidebar = () => {
   const [skill2, setSkill2] = useState(0);
   const [skill3, setSkill3] = useState(0);
   const [skill4, setSkill4] = useState(0);
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
+
+  // 실무 데이터 상태 (activities 테이블에서 가져올 실제 값)
+  const [practicalData, setPracticalData] = useState({
+    competency: 0,  // 실무역량
+    experience: 0,  // 실무경험
+    info: 0,        // 실무정보
+    career: 0       // 실무경력
+  });
+
+  // 배지 데이터 상태 (user_cumulative_points 테이블)
+  const [badgeData, setBadgeData] = useState({
+    stars: 0,       // 별
+    lightnings: 0,  // 번개
+    shields: 0      // 방패
+  });
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
+
+  // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
+  interface SeasonHistory {
+    id: string;
+    role_in_season: string;
+    approved_weeks: number;
+    total_weeks: number;
+    progress_status: string;
+    review_status: string;
+    seasons: {
+      id: string;
+      year: number;
+      name: string;
+      start_date: string;
+    };
+  }
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
+
+  // 시즌 이름 한글 변환
+  const seasonNameKorean: { [key: string]: string } = {
+    'spring': '봄',
+    'summer': '여름',
+    'fall': '가을',
+    'winter': '겨울'
+  };
+
+  // 역할 한글 변환
+  const roleKorean: { [key: string]: string } = {
+    'crew_regular': '일반(정규)',
+    'crew_advanced': '심화(파트장)',
+    'admin': '운영진(앰베서더)'
+  };
+
+  // 진행 상태 변환
+  const getProgressStatus = (status: string) => {
+    switch (status) {
+      case 'completed': return { text: '정상 완료', className: 'complete' };
+      case 'in_progress': return { text: '진행중', className: 'active' };
+      case 'full_rest': return { text: '휴식', className: 'rest' };
+      default: return { text: status, className: '' };
+    }
+  };
+
+  // 검수 상태 변환
+  const getReviewStatus = (status: string) => {
+    switch (status) {
+      case 'approved': return { text: '승인 완료', className: 'approved' };
+      case 'reviewing': return { text: '검수중', className: 'pending' };
+      default: return { text: status, className: '' };
+    }
+  };
+
+  // 아바타 이미지 순환 (01.png, 02.png, 03.png)
+  const getAvatarImage = (index: number) => {
+    const num = (index % 3) + 1;
+    return `/images/0/cluster 1/0${num}.png`;
+  };
+
+  // API를 통해 프로필과 실무 데이터 가져오기
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!session?.user?.email) {
+        console.log("세션에 이메일 없음");
+        setHasReliabilityData(false);
+        setReliabilityRate(0);
+        return;
+      }
+
+      try {
+        console.log("=== API 호출 시작 ===");
+        const response = await fetch('/api/profile');
+        const result = await response.json();
+
+        console.log("API 응답:", result);
+
+        if (!response.ok) {
+          console.log("API 에러:", result.error);
+          setHasReliabilityData(false);
+          setReliabilityRate(0);
+          return;
+        }
+
+        // reliability_rate 설정
+        if (result.reliabilityRate !== undefined) {
+          setHasReliabilityData(true);
+          setReliabilityRate(result.reliabilityRate);
+        } else {
+          setHasReliabilityData(false);
+          setReliabilityRate(0);
+        }
+
+        // 실무 데이터 설정
+        if (result.practicalCounts) {
+          console.log("실무 데이터:", result.practicalCounts);
+          setPracticalData(result.practicalCounts);
+        }
+
+        // 배지 데이터 설정 (별, 번개, 방패)
+        if (result.badges) {
+          console.log("배지 데이터:", result.badges);
+          setBadgeData(result.badges);
+          setHasBadgeData(true);
+        } else {
+          setHasBadgeData(false);
+        }
+
+        // 시즌 히스토리 데이터 설정
+        if (result.seasonHistories && result.seasonHistories.length > 0) {
+          console.log("시즌 히스토리 데이터:", result.seasonHistories);
+          setSeasonHistories(result.seasonHistories);
+          setHasSeasonData(true);
+        } else {
+          setHasSeasonData(false);
+        }
+      } catch (error) {
+        console.error("데이터 로드 오류:", error);
+        setHasReliabilityData(false);
+        setReliabilityRate(0);
+        setHasBadgeData(false);
+        setHasSeasonData(false);
+      }
+    };
+
+    fetchData();
+  }, [session?.user?.email]);
 
   useEffect(() => {
+    // reliabilityRate가 아직 로드되지 않았으면 애니메이션 시작하지 않음
+    if (reliabilityRate === null) return;
+
     const animateNumber = (setter: (val: number) => void, target: number, duration: number = 2000) => {
       const steps = 60;
       const increment = target / steps;
@@ -36,21 +186,21 @@ const Sidebar = () => {
     };
 
     const timers = [
-      animateNumber(setStat1, 100, 1500),
+      animateNumber(setStat1, reliabilityRate, 1500),
       animateNumber(setStat2, 80, 1500),
-      animateNumber(setBadge1, 99999, 1500),
-      animateNumber(setBadge2, 99999, 1500),
-      animateNumber(setBadge3, -9999, 1500),
-      animateNumber(setSkill1, 21, 1500),
-      animateNumber(setSkill2, 21, 1500),
-      animateNumber(setSkill3, 21, 1500),
-      animateNumber(setSkill4, 21, 1500),
+      animateNumber(setBadge1, badgeData.stars, 1500),       // 별
+      animateNumber(setBadge2, badgeData.lightnings, 1500),  // 번개
+      animateNumber(setBadge3, badgeData.shields, 1500),     // 방패
+      animateNumber(setSkill1, practicalData.competency, 1500),  // 실무역량
+      animateNumber(setSkill2, practicalData.experience, 1500),  // 실무경험
+      animateNumber(setSkill3, practicalData.info, 1500),        // 실무정보
+      animateNumber(setSkill4, practicalData.career, 1500),      // 실무경력
     ];
 
     return () => {
       timers.forEach(timer => clearInterval(timer));
     };
-  }, []);
+  }, [reliabilityRate, practicalData, badgeData]);
 
   return (
     <div className="col-xxl-3 order-xxl-first">
@@ -250,10 +400,10 @@ const Sidebar = () => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label">· 일정 신뢰도</span>
-                <span className="stat-value">{stat1}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{hasReliabilityData ? stat1 : "-"}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: `${stat1}%` }}></div>
+                <div className="progress-fill" style={{ width: `${hasReliabilityData ? stat1 : 0}%` }}></div>
               </div>
             </div>
             <div className="stat-item">
@@ -271,15 +421,15 @@ const Sidebar = () => {
           <div className="resume-badges">
             <div className="badge-group">
               <span className="badge-icon icon-graphic10"></span>
-              <span className="badge-num">{badge1}</span>
+              <span className="badge-num">{hasBadgeData ? badge1.toLocaleString() : "-"}</span>
             </div>
             <div className="badge-group">
               <span className="badge-icon icon-shield"></span>
-              <span className="badge-num">{badge2}</span>
+              <span className="badge-num">{hasBadgeData ? badge2.toLocaleString() : "-"}</span>
             </div>
             <div className="badge-group">
               <span className="badge-icon icon-graphic13"></span>
-              <span className="badge-num red">{badge3}</span>
+              <span className="badge-num red">{hasBadgeData ? badge3.toLocaleString() : "-"}</span>
             </div>
           </div>
 
@@ -310,50 +460,38 @@ const Sidebar = () => {
           display: 'block',
           position: 'relative'
         } as React.CSSProperties}>
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/cluster 1/01.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">운영진(앰베서더)</span>
-                <span className="activity-badge active">진행중</span>
-                <span className="activity-check pending">검수중</span>
-              </div>
-            </div>
-          </div>
+          {hasSeasonData && seasonHistories.length > 0 ? (
+            seasonHistories.map((history, index) => {
+              const progressStatus = getProgressStatus(history.progress_status);
+              const reviewStatus = getReviewStatus(history.review_status);
+              const yearShort = String(history.seasons.year).slice(-2);
+              const seasonKorean = seasonNameKorean[history.seasons.name] || history.seasons.name;
+              const roleText = roleKorean[history.role_in_season] || history.role_in_season;
 
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/cluster 1/02.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
-                <span className="activity-role">심화(파트장)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
+              return (
+                <div className="activity-row" key={history.id}>
+                  <div className="activity-avatar">
+                    <Image src={getAvatarImage(index)} alt="" width={36} height={36} />
+                  </div>
+                  <div className="activity-content">
+                    <div className="activity-line">
+                      <span className="activity-season">{yearShort}, {seasonKorean}<span style={{ color: '#999' }}>시즌</span></span>
+                      <span className="activity-period">{history.approved_weeks}주 <span style={{ color: '#999' }}>/ {history.total_weeks}주</span></span>
+                      <span className="activity-role">{roleText}</span>
+                      <span className={`activity-badge ${progressStatus.className}`}>{progressStatus.text}</span>
+                      <span className={`activity-check ${reviewStatus.className}`}>{reviewStatus.text}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="activity-row">
+              <div className="activity-content" style={{ textAlign: 'center', width: '100%', color: '#999', padding: '20px 0' }}>
+                시즌 히스토리가 없습니다.
               </div>
             </div>
-          </div>
-
-          <div className="activity-row">
-            <div className="activity-avatar">
-              <Image src="/images/0/cluster 1/03.png" alt="" width={36} height={36} />
-            </div>
-            <div className="activity-content">
-              <div className="activity-line">
-                <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                <span className="activity-period">12주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                <span className="activity-role">일반(정규)</span>
-                <span className="activity-badge complete">정상 완료</span>
-                <span className="activity-check approved">승인 완료</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Skill Cards and Footer Notices - with background */}

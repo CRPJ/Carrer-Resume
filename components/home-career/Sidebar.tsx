@@ -3,17 +3,93 @@ import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
+import { supabase } from "@/lib/supabase";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 
 const Sidebar = () => {
   const { data: session } = useSession();
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
+  const [completionRate, setCompletionRate] = useState<number | null>(null);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(0); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(0); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(0); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(0); // 실무 경력 누적
+  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
   const [badge2, setBadge2] = useState(0);
   const [badge3, setBadge3] = useState(0);
+  // 배지 데이터 상태 (user_cumulative_points 테이블)
+  const [badgeData, setBadgeData] = useState({
+    stars: 0,       // 별
+    lightnings: 0,  // 번개
+    shields: 0      // 방패
+  });
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
+
+  // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
+  interface SeasonHistory {
+    id: string;
+    role_in_season: string;
+    approved_weeks: number;
+    total_weeks: number;
+    progress_status: string;
+    review_status: string;
+    seasons: {
+      id: string;
+      year: number;
+      name: string;
+      start_date: string;
+    };
+  }
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
+
+  // 시즌 이름 한글 변환
+  const seasonNameKorean: { [key: string]: string } = {
+    'spring': '봄',
+    'summer': '여름',
+    'fall': '가을',
+    'winter': '겨울'
+  };
+
+  // 역할 한글 변환
+  const roleKorean: { [key: string]: string } = {
+    'crew_regular': '일반(정규)',
+    'crew_advanced': '심화(파트장)',
+    'admin': '운영진(앰베서더)'
+  };
+
+  // 진행 상태 변환
+  const getProgressStatus = (status: string) => {
+    switch (status) {
+      case 'completed': return { text: '정상 완료', className: 'complete' };
+      case 'in_progress': return { text: '진행중', className: 'active' };
+      case 'full_rest': return { text: '휴식', className: 'rest' };
+      default: return { text: status, className: '' };
+    }
+  };
+
+  // 검수 상태 변환
+  const getReviewStatus = (status: string) => {
+    switch (status) {
+      case 'approved': return { text: '승인 완료', className: 'approved' };
+      case 'reviewing': return { text: '검수중', className: 'pending' };
+      default: return { text: status, className: '' };
+    }
+  };
+
+  // 아바타 이미지 순환 (01.png, 02.png, 03.png)
+  const getAvatarImage = (index: number) => {
+    const num = (index % 3) + 1;
+    return `/images/0/cluster 1/bg image/0${num}.png`;
+  };
+
   const [skill1, setSkill1] = useState(0);
   const [skill2, setSkill2] = useState(0);
   const [skill3, setSkill3] = useState(0);
@@ -629,6 +705,150 @@ const Sidebar = () => {
     }
   };
 
+  // 일정 신뢰도(reliability_rate) 가져오기
+  useEffect(() => {
+    const fetchReliabilityRate = async () => {
+      const userId = session?.user?.id;
+      if (!userId) {
+        setHasReliabilityData(false);
+        setReliabilityRate(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("user_reliability_rates")
+          .select("reliability_rate")
+          .eq("user_id", userId)
+          .single();
+
+        if (error || !data) {
+          setHasReliabilityData(false);
+          setReliabilityRate(null);
+        } else {
+          setHasReliabilityData(true);
+          setReliabilityRate(data.reliability_rate);
+        }
+      } catch (err) {
+        console.error("일정 신뢰도 조회 오류:", err);
+        setHasReliabilityData(false);
+        setReliabilityRate(null);
+      }
+    };
+
+    fetchReliabilityRate();
+  }, [session?.user?.id]);
+
+  // 활동 완료율 가져오기 (weekly_activities 테이블 기반)
+  useEffect(() => {
+    const fetchCompletionRate = async () => {
+      const userId = session?.user?.id;
+      if (!userId) {
+        setHasCompletionData(false);
+        setCompletionRate(null);
+        return;
+      }
+
+      try {
+        // weekly_activities에서 해당 유저의 모든 활동 조회
+        const { data, error } = await supabase
+          .from("weekly_activities")
+          .select("status")
+          .eq("user_id", userId);
+
+        if (error || !data || data.length === 0) {
+          setHasCompletionData(false);
+          setCompletionRate(null);
+        } else {
+          // 완료된 활동 수 계산 (status가 'approved' 또는 'completed'인 경우)
+          const completedCount = data.filter(
+            (activity) => activity.status === "approved" || activity.status === "completed"
+          ).length;
+          const totalCount = data.length;
+          const rate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+          setHasCompletionData(true);
+          setCompletionRate(rate);
+        }
+      } catch (err) {
+        console.error("활동 완료율 조회 오류:", err);
+        setHasCompletionData(false);
+        setCompletionRate(null);
+      }
+    };
+
+    fetchCompletionRate();
+  }, [session?.user?.id]);
+
+  // 스킬 카드 데이터 가져오기 (API 통해 activities 데이터 조회)
+  useEffect(() => {
+    const fetchActivityCounts = async () => {
+      if (!session?.user?.email) {
+        console.log("세션에 이메일 없음");
+        setHasActivityData(false);
+        return;
+      }
+
+      try {
+        console.log("=== 스킬카드 API 호출 시작 ===");
+        const response = await fetch('/api/profile');
+        const result = await response.json();
+
+        console.log("API 응답:", result);
+
+        if (!response.ok) {
+          console.log("API 에러:", result.error);
+          setHasActivityData(false);
+          return;
+        }
+
+        // 실무 데이터 설정
+        if (result.practicalCounts) {
+          console.log("실무 데이터:", result.practicalCounts);
+          const { competency, experience, info, career } = result.practicalCounts;
+          setPracticalCompetency(competency);
+          setPracticalExperience(experience);
+          setPracticalInfo(info);
+          setPracticalCareer(career);
+          setHasActivityData(competency > 0 || experience > 0 || info > 0 || career > 0);
+        } else {
+          setHasActivityData(false);
+        }
+
+        // reliability_rate도 함께 설정 (API에서 반환됨)
+        if (result.reliabilityRate !== undefined) {
+          setHasReliabilityData(true);
+          setReliabilityRate(result.reliabilityRate);
+        }
+
+        // 배지 데이터 설정 (별, 번개, 방패)
+        if (result.badges) {
+          console.log("배지 데이터:", result.badges);
+          setBadgeData(result.badges);
+          setHasBadgeData(true);
+        } else {
+          setHasBadgeData(false);
+        }
+
+        // 시즌 히스토리 데이터 설정
+        if (result.seasonHistories && result.seasonHistories.length > 0) {
+          console.log("시즌 히스토리 데이터:", result.seasonHistories);
+          setSeasonHistories(result.seasonHistories);
+          setHasSeasonData(true);
+        } else {
+          setHasSeasonData(false);
+        }
+      } catch (err) {
+        console.error("활동 데이터 조회 오류:", err);
+        setHasActivityData(false);
+        setHasBadgeData(false);
+        setHasSeasonData(false);
+      }
+    };
+
+    fetchActivityCounts();
+  }, [session?.user?.email]);
+
   useEffect(() => {
     // 0에서 올라가는 애니메이션
     const animateNumber = (setter: (val: number) => void, target: number, duration: number = 1000) => {
@@ -688,9 +908,10 @@ const Sidebar = () => {
     const timers = [
       animateNumber(setStat1, currentStats.stat1, 1000),
       animateNumber(setStat2, currentStats.stat2, 1000),
-      animateNumber(setBadge1, currentStats.badge1, 1000),
-      animateNumber(setBadge2, currentStats.badge2, 1000),
-      animateNumber(setBadge3, currentStats.badge3, 1000),
+      // 배지 데이터는 실제 API 데이터 사용 (hasBadgeData가 true인 경우)
+      animateNumber(setBadge1, hasBadgeData ? badgeData.stars : currentStats.badge1, 1000),       // 별
+      animateNumber(setBadge2, hasBadgeData ? badgeData.lightnings : currentStats.badge2, 1000),  // 번개
+      animateNumber(setBadge3, hasBadgeData ? -badgeData.shields : currentStats.badge3, 1000),    // 방패 (음수로 표시)
       animateNumber(setSkill1, currentStats.skill1, 1000),
       animateNumber(setSkill2, currentStats.skill2, 1000),
       animateNumber(setSkill3, currentStats.skill3, 1000),
@@ -700,7 +921,7 @@ const Sidebar = () => {
     return () => {
       timers.forEach(timer => clearInterval(timer));
     };
-  }, [debugPanelType]);
+  }, [debugPanelType, hasBadgeData, badgeData]);
 
   // 커스텀 스크롤바 업데이트
   const updateScrollbar = useCallback(() => {
@@ -1142,19 +1363,19 @@ const Sidebar = () => {
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label"><span className="stat-dot">·</span> 일정 신뢰도</span>
-                <span className="stat-value">{hasData ? stat1 : '-'}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{hasReliabilityData ? reliabilityRate : '-'}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: hasData ? `${stat1}%` : '0%' }}></div>
+                <div className="progress-fill" style={{ width: hasReliabilityData ? `${reliabilityRate}%` : '0%' }}></div>
               </div>
             </div>
             <div className="stat-item">
               <div className="stat-row">
                 <span className="stat-label"><span className="stat-dot">·</span> 활동 완료율</span>
-                <span className="stat-value">{hasData ? stat2 : '-'}<span className="stat-unit">%</span></span>
+                <span className="stat-value">{hasCompletionData ? completionRate : '-'}<span className="stat-unit">%</span></span>
               </div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width: hasData ? `${stat2}%` : '0%' }}></div>
+                <div className="progress-fill" style={{ width: hasCompletionData ? `${completionRate}%` : '0%' }}></div>
               </div>
             </div>
           </div>
@@ -1208,202 +1429,39 @@ const Sidebar = () => {
               msOverflowStyle: 'none'
             } as React.CSSProperties}
           >
-            {/* OK: 3개 */}
-            {debugPanelType === 'OK' && (
-              <>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">운영진(앰베서더)</span>
-                      <span className="activity-badge active">진행중</span>
-                      <span className="activity-check pending">검수중</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 가을<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
-                      <span className="activity-role">심화(파트장)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">12주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+            {/* 시즌 히스토리 동적 렌더링 */}
+            {hasSeasonData && seasonHistories.length > 0 ? (
+              seasonHistories.map((history, index) => {
+                const progressStatus = getProgressStatus(history.progress_status);
+                const reviewStatus = getReviewStatus(history.review_status);
+                const yearShort = String(history.seasons.year).slice(-2);
+                const seasonKorean = seasonNameKorean[history.seasons.name] || history.seasons.name;
+                const roleText = roleKorean[history.role_in_season] || history.role_in_season;
+                const avatarImage = getAvatarImage(index);
 
-            {/* EC: 1개 */}
-            {debugPanelType === 'EC' && (
-              <div className="activity-row">
-                <div className="activity-avatar">
-                  <Image src="/images/0/cluster 1/bg image/EC02 (2).png" alt="" width={36} height={36} />
-                </div>
-                <div className="activity-content">
-                  <div className="activity-line">
-                    <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                    <span className="activity-period">5주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                    <span className="activity-role">일반(정규)</span>
-                    <span className="activity-badge active">진행중</span>
-                    <span className="activity-check pending">검수중</span>
+                return (
+                  <div className="activity-row" key={history.id}>
+                    <div className="activity-avatar">
+                      <Image src={avatarImage} alt="" width={36} height={36} />
+                    </div>
+                    <div className="activity-content">
+                      <div className="activity-line">
+                        <span className="activity-season">{yearShort}, {seasonKorean}<span style={{ color: '#999' }}>시즌</span></span>
+                        <span className="activity-period">{history.approved_weeks}주 <span style={{ color: '#999' }}>/ {history.total_weeks}주</span></span>
+                        <span className="activity-role">{roleText}</span>
+                        <span className={`activity-badge ${progressStatus.className}`}>{progressStatus.text}</span>
+                        <span className={`activity-check ${reviewStatus.className}`}>{reviewStatus.text}</span>
+                      </div>
+                    </div>
                   </div>
+                );
+              })
+            ) : (
+              <div className="activity-row">
+                <div className="activity-content" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                  시즌 활동 기록이 없습니다.
                 </div>
               </div>
-            )}
-
-            {/* PX: 9개 */}
-            {debugPanelType === 'PX' && (
-              <>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">3주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">운영진(앰베서더)</span>
-                      <span className="activity-badge active">진행중</span>
-                      <span className="activity-check pending">검수중</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 가을<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">8주 <span style={{ color: '#999' }}>/ 8주</span></span>
-                      <span className="activity-role">심화(파트장)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">25, 봄<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">심화(파트장)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">24, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">24, 가을<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/01.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">24, 여름<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/02.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">24, 봄<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="activity-row">
-                  <div className="activity-avatar">
-                    <Image src="/images/0/cluster 1/bg image/03.png" alt="" width={36} height={36} />
-                  </div>
-                  <div className="activity-content">
-                    <div className="activity-line">
-                      <span className="activity-season">23, 겨울<span style={{ color: '#999' }}>시즌</span></span>
-                      <span className="activity-period">16주 <span style={{ color: '#999' }}>/ 16주</span></span>
-                      <span className="activity-role">일반(정규)</span>
-                      <span className="activity-badge complete">정상 완료</span>
-                      <span className="activity-check approved">승인 완료</span>
-                    </div>
-                  </div>
-                </div>
-              </>
             )}
           </div>
 
@@ -1480,7 +1538,7 @@ const Sidebar = () => {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasData ? skill1 : '-'}</span>
+                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasActivityData ? practicalCompetency : '-'}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>unit</span>
                 </div>
                 <div className="skill-label">실무 역량 성장</div>
@@ -1490,7 +1548,7 @@ const Sidebar = () => {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/cluster 1/Sheriff Badge1.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasData ? skill2 : '-'}</span>
+                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasActivityData ? practicalExperience : '-'}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>건</span>
                 </div>
                 <div className="skill-label">실무 경험 축적</div>
@@ -1500,7 +1558,7 @@ const Sidebar = () => {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasData ? skill3 : '-'}</span>
+                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasActivityData ? practicalInfo : '-'}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>회</span>
                 </div>
                 <div className="skill-label">실무 정보 습득</div>
@@ -1510,7 +1568,7 @@ const Sidebar = () => {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
                 <div className="skill-num-wrapper">
                   <Image src="/images/0/cluster 1/Sheriff Badge1 4.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasData ? skill4 : '-'}</span>
+                  <span className="skill-num" style={{ color: '#FFEB99' }}>{hasActivityData ? practicalCareer : '-'}</span>
                   <span style={{ fontSize: '12px', fontFamily: 'Pretendard, sans-serif', color: '#FFF', alignSelf: 'flex-end', marginBottom: '4px', marginLeft: '2px' }}>proj</span>
                 </div>
                 <div className="skill-label">실무 경력 누적</div>

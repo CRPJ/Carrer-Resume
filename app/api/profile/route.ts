@@ -18,13 +18,17 @@ export async function GET() {
       );
     }
 
-    const email = session.user.email;
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: "서버 설정 오류" },
+        { status: 500 }
+      );
+    }
 
-    // user_profiles에서 프로필 조회
     const { data: profile, error } = await supabaseAdmin
       .from("user_profiles")
       .select("*")
-      .eq("email", email)
+      .eq("email", session.user.email)
       .maybeSingle();
 
     if (error) {
@@ -42,9 +46,92 @@ export async function GET() {
       );
     }
 
+    // activities 데이터 가져오기 (실무 카드용)
+    const { data: activitiesData } = await supabaseAdmin
+      .from("activities")
+      .select("activity_type_id")
+      .eq("user_id", profile.id)
+      .eq("status", "approved");
+
+    // activity_type_id 별로 카운트
+    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
+    const competencyTypes = ['optional_unit', 'practical_lecture'];
+    const experienceTypes = ['required_unit'];
+    const careerTypes = ['practical_project'];
+
+    const practicalCounts = activitiesData ? {
+      competency: activitiesData.filter(a => competencyTypes.includes(a.activity_type_id)).length,
+      experience: activitiesData.filter(a => experienceTypes.includes(a.activity_type_id)).length,
+      info: activitiesData.filter(a => infoTypes.includes(a.activity_type_id)).length,
+      career: activitiesData.filter(a => careerTypes.includes(a.activity_type_id)).length
+    } : { competency: 0, experience: 0, info: 0, career: 0 };
+
+    // reliability_rate 가져오기
+    const { data: reliabilityData } = await supabaseAdmin
+      .from("user_reliability_rates")
+      .select("reliability_rate")
+      .eq("user_id", profile.id)
+      .maybeSingle();
+
+    // user_cumulative_points 가져오기 (별, 번개, 방패)
+    const { data: cumulativePoints } = await supabaseAdmin
+      .from("user_cumulative_points")
+      .select("total_stars, total_lightnings, total_shields")
+      .eq("user_id", profile.id)
+      .maybeSingle();
+
+    // user_season_histories + seasons 가져오기 (진행 시즌)
+    const { data: seasonHistories } = await supabaseAdmin
+      .from("user_season_histories")
+      .select(`
+        id,
+        role_in_season,
+        approved_weeks,
+        total_weeks,
+        progress_status,
+        review_status,
+        seasons (
+          id,
+          year,
+          name,
+          start_date
+        )
+      `)
+      .eq("user_id", profile.id);
+
+    // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
+    const seasonOrderMap: { [key: string]: number } = {
+      'spring': 1,
+      'summer': 2,
+      'fall': 3,
+      'winter': 4
+    };
+
+    // seasons 데이터가 있는 항목만 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sortedSeasonHistories = seasonHistories
+      ? seasonHistories
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((item: any) => item.seasons !== null)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .sort((a: any, b: any) => {
+            const yearDiff = b.seasons.year - a.seasons.year;
+            if (yearDiff !== 0) return yearDiff;
+            return (seasonOrderMap[b.seasons.name] || 0) - (seasonOrderMap[a.seasons.name] || 0);
+          })
+      : [];
+
     return NextResponse.json({
       success: true,
       data: profile,
+      practicalCounts,
+      reliabilityRate: reliabilityData?.reliability_rate || 0,
+      badges: {
+        stars: cumulativePoints?.total_stars || 0,
+        lightnings: cumulativePoints?.total_lightnings || 0,
+        shields: cumulativePoints?.total_shields || 0,
+      },
+      seasonHistories: sortedSeasonHistories,
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);
