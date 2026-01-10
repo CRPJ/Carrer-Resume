@@ -19,6 +19,37 @@ const Cluster3Content = () => {
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
   const [hasReliabilityData, setHasReliabilityData] = useState(false);
 
+  // 성장 진행 상태 데이터
+  interface GrowthInfo {
+    status: string;
+    growthStatus: string;
+    startDate: string | null;
+    endDate: string | null;
+  }
+  const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>(null);
+
+  // 성장 상태 한글 변환
+  const getGrowthStatusText = (status: string, growthStatus: string): string => {
+    if (status === 'graduated') return '클럽 졸업';
+    if (status === 'suspended') return '활동 중단';
+    if (status === 'pending') return '클럽 온보딩 중';
+    if (growthStatus === 'active') return '클럽 성장 중';
+    if (growthStatus === 'resting') return '클럽 휴식 중';
+    return '클럽 온보딩 중';
+  };
+
+  // 날짜 포맷 변환 (2025-02-22 → 2025년 02월 22일 (토))
+  const formatDateKorean = (dateStr: string | null): string => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+    const weekDay = weekDays[date.getDay()];
+    return `${year}년 ${month}월 ${day}일 (${weekDay})`;
+  };
+
   // 섹션 2 프로그레스 바 애니메이션
   const [section2Progress, setSection2Progress] = useState(0);
   const [section2Percent, setSection2Percent] = useState(0); // 퍼센트 숫자
@@ -86,6 +117,11 @@ const Cluster3Content = () => {
           setHasReliabilityData(true);
         } else {
           setHasReliabilityData(false);
+        }
+
+        // 성장 진행 상태 데이터 설정
+        if (result.growthInfo) {
+          setGrowthInfo(result.growthInfo);
         }
       } catch (error) {
         console.error("신뢰도 데이터 로드 오류:", error);
@@ -389,15 +425,21 @@ const Cluster3Content = () => {
             <div className="card-body">
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 상태</span>
-                <span className="info-value highlight">클럽 온보딩 중</span>
+                <span className="info-value highlight">
+                  {growthInfo ? getGrowthStatusText(growthInfo.status, growthInfo.growthStatus) : '-'}
+                </span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 시작일</span>
-                <span className="info-value">2025년 02월 22일 (월)</span>
+                <span className="info-value">
+                  {growthInfo?.startDate ? formatDateKorean(growthInfo.startDate) : '-'}
+                </span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 종료일</span>
-                <span className="info-value be-cluving">Be Cluving</span>
+                <span className={`info-value ${growthInfo?.endDate ? '' : 'be-cluving'}`}>
+                  {growthInfo?.endDate ? formatDateKorean(growthInfo.endDate) : 'Be Cluving'}
+                </span>
               </div>
             </div>
             <div className="card-footer">

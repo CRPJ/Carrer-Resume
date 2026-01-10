@@ -46,6 +46,54 @@ export async function GET() {
       );
     }
 
+    // 성장 시작일 가져오기 (joined_week_id로 weeks 조회)
+    let growthStartDate = null;
+    if (profile.joined_week_id) {
+      const { data: joinedWeek } = await supabaseAdmin
+        .from("weeks")
+        .select("start_date")
+        .eq("id", profile.joined_week_id)
+        .maybeSingle();
+
+      if (joinedWeek) {
+        growthStartDate = joinedWeek.start_date;
+      }
+    }
+
+    // 성장 종료일 가져오기 (suspended → weeks.end_date, graduated → seasons.end_date)
+    let growthEndDate = null;
+    if (profile.status === 'suspended' && profile.suspended_week_id) {
+      const { data: suspendedWeek } = await supabaseAdmin
+        .from("weeks")
+        .select("end_date")
+        .eq("id", profile.suspended_week_id)
+        .maybeSingle();
+
+      if (suspendedWeek) {
+        growthEndDate = suspendedWeek.end_date;
+      }
+    } else if (profile.status === 'graduated') {
+      // 가장 최근 완료된 시즌의 end_date 가져오기
+      const { data: lastSeasonHistory } = await supabaseAdmin
+        .from("user_season_histories")
+        .select(`
+          seasons (
+            end_date
+          )
+        `)
+        .eq("user_id", profile.id)
+        .eq("progress_status", "completed")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (lastSeasonHistory && (lastSeasonHistory as any).seasons) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        growthEndDate = (lastSeasonHistory as any).seasons.end_date;
+      }
+    }
+
     // activities 데이터 가져오기 (실무 카드용)
     const { data: activitiesData } = await supabaseAdmin
       .from("activities")
@@ -147,6 +195,12 @@ export async function GET() {
         shields: cumulativePoints?.total_shields || 0,
       },
       seasonHistories: sortedSeasonHistories,
+      growthInfo: {
+        status: profile.status,
+        growthStatus: profile.growth_status,
+        startDate: growthStartDate,
+        endDate: growthEndDate,
+      },
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);
