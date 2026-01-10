@@ -28,13 +28,38 @@ const Cluster3Content = () => {
   }
   const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>(null);
 
-  // 성장 상태 한글 변환
+  // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
-    if (status === 'graduated') return '클럽 졸업';
+    // 이미 한글로 저장된 경우 그대로 반환
+    const koreanStatuses = [
+      '클럽 온보딩 중',
+      '활동 중',
+      '주차 휴식 중',
+      '공식 휴식 중',
+      '시즌 휴식 중',
+      '활동 유보',
+      '활동 중단',
+      '졸업 절차중',
+      '졸업 완료',
+      '강화 진행중'
+    ];
+
+    if (koreanStatuses.includes(growthStatus)) {
+      return growthStatus;
+    }
+
+    // 영문 status/growthStatus 값 변환
+    if (status === 'graduated') return '졸업 완료';
     if (status === 'suspended') return '활동 중단';
     if (status === 'pending') return '클럽 온보딩 중';
-    if (growthStatus === 'active') return '클럽 성장 중';
-    if (growthStatus === 'resting') return '클럽 휴식 중';
+    if (growthStatus === 'active') return '활동 중';
+    if (growthStatus === 'resting') return '주차 휴식 중';
+    if (growthStatus === 'official_rest') return '공식 휴식 중';
+    if (growthStatus === 'season_rest') return '시즌 휴식 중';
+    if (growthStatus === 'deferred') return '활동 유보';
+    if (growthStatus === 'graduating') return '졸업 절차중';
+    if (growthStatus === 'reinforcing') return '강화 진행중';
+
     return '클럽 온보딩 중';
   };
 
