@@ -46,60 +46,79 @@ export async function GET() {
       );
     }
 
-    // 성장 시작일 가져오기 (joined_week_id로 weeks 조회)
-    let growthStartDate = null;
-    if (profile.joined_week_id) {
-      const { data: joinedWeek } = await supabaseAdmin
-        .from("weeks")
-        .select("start_date")
-        .eq("id", profile.joined_week_id)
-        .maybeSingle();
+    // 모든 쿼리를 병렬로 실행 (성능 최적화)
+    const [
+      joinedWeekResult,
+      growthEndDateResult,
+      activitiesResult,
+      reliabilityResult,
+      weeklyActivitiesResult,
+      cumulativePointsResult,
+      seasonHistoriesResult
+    ] = await Promise.all([
+      // 성장 시작일 (joined_week_id로 weeks 조회)
+      profile.joined_week_id
+        ? supabaseAdmin.from("weeks").select("start_date").eq("id", profile.joined_week_id).maybeSingle()
+        : Promise.resolve({ data: null }),
 
-      if (joinedWeek) {
-        growthStartDate = joinedWeek.start_date;
-      }
-    }
+      // 성장 종료일
+      profile.status === 'suspended' && profile.suspended_week_id
+        ? supabaseAdmin.from("weeks").select("end_date").eq("id", profile.suspended_week_id).maybeSingle()
+        : profile.status === 'graduated'
+          ? supabaseAdmin.from("user_season_histories")
+              .select(`seasons (end_date)`)
+              .eq("user_id", profile.id)
+              .eq("progress_status", "completed")
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
 
-    // 성장 종료일 가져오기 (suspended → weeks.end_date, graduated → seasons.end_date)
+      // activities 데이터 (실무 카드용)
+      supabaseAdmin.from("activities").select("activity_type_id").eq("user_id", profile.id).eq("status", "approved"),
+
+      // reliability_rate
+      supabaseAdmin.from("user_reliability_rates").select("reliability_rate").eq("user_id", profile.id).maybeSingle(),
+
+      // weekly_activities (활동 완료율)
+      supabaseAdmin.from("weekly_activities").select("status").eq("user_id", profile.id),
+
+      // cumulative_points (별, 번개, 방패)
+      supabaseAdmin.from("user_cumulative_points").select("total_stars, total_lightnings, total_shields").eq("user_id", profile.id).maybeSingle(),
+
+      // season_histories
+      supabaseAdmin.from("user_season_histories").select(`
+        id,
+        role_in_season,
+        approved_weeks,
+        total_weeks,
+        progress_status,
+        review_status,
+        seasons (
+          id,
+          year,
+          name,
+          start_date
+        )
+      `).eq("user_id", profile.id)
+    ]);
+
+    // 결과 처리
+    const growthStartDate = joinedWeekResult.data?.start_date || null;
+
     let growthEndDate = null;
-    if (profile.status === 'suspended' && profile.suspended_week_id) {
-      const { data: suspendedWeek } = await supabaseAdmin
-        .from("weeks")
-        .select("end_date")
-        .eq("id", profile.suspended_week_id)
-        .maybeSingle();
-
-      if (suspendedWeek) {
-        growthEndDate = suspendedWeek.end_date;
-      }
+    if (profile.status === 'suspended') {
+      growthEndDate = growthEndDateResult.data?.end_date || null;
     } else if (profile.status === 'graduated') {
-      // 가장 최근 완료된 시즌의 end_date 가져오기
-      const { data: lastSeasonHistory } = await supabaseAdmin
-        .from("user_season_histories")
-        .select(`
-          seasons (
-            end_date
-          )
-        `)
-        .eq("user_id", profile.id)
-        .eq("progress_status", "completed")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (lastSeasonHistory && (lastSeasonHistory as any).seasons) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        growthEndDate = (lastSeasonHistory as any).seasons.end_date;
-      }
+      growthEndDate = (growthEndDateResult.data as any)?.seasons?.end_date || null;
     }
 
-    // activities 데이터 가져오기 (실무 카드용)
-    const { data: activitiesData } = await supabaseAdmin
-      .from("activities")
-      .select("activity_type_id")
-      .eq("user_id", profile.id)
-      .eq("status", "approved");
+    const activitiesData = activitiesResult.data;
+    const reliabilityData = reliabilityResult.data;
+    const weeklyActivities = weeklyActivitiesResult.data;
+    const cumulativePoints = cumulativePointsResult.data;
+    const seasonHistories = seasonHistoriesResult.data;
 
     // activity_type_id 별로 카운트
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
@@ -114,19 +133,6 @@ export async function GET() {
       career: activitiesData.filter(a => careerTypes.includes(a.activity_type_id)).length
     } : { competency: 0, experience: 0, info: 0, career: 0 };
 
-    // reliability_rate 가져오기
-    const { data: reliabilityData } = await supabaseAdmin
-      .from("user_reliability_rates")
-      .select("reliability_rate")
-      .eq("user_id", profile.id)
-      .maybeSingle();
-
-    // 활동 완료율 가져오기 (weekly_activities 테이블 기반)
-    const { data: weeklyActivities } = await supabaseAdmin
-      .from("weekly_activities")
-      .select("status")
-      .eq("user_id", profile.id);
-
     let completionRate = 0;
     if (weeklyActivities && weeklyActivities.length > 0) {
       const completedCount = weeklyActivities.filter(
@@ -134,32 +140,6 @@ export async function GET() {
       ).length;
       completionRate = Math.round((completedCount / weeklyActivities.length) * 100);
     }
-
-    // user_cumulative_points 가져오기 (별, 번개, 방패)
-    const { data: cumulativePoints } = await supabaseAdmin
-      .from("user_cumulative_points")
-      .select("total_stars, total_lightnings, total_shields")
-      .eq("user_id", profile.id)
-      .maybeSingle();
-
-    // user_season_histories + seasons 가져오기 (진행 시즌)
-    const { data: seasonHistories } = await supabaseAdmin
-      .from("user_season_histories")
-      .select(`
-        id,
-        role_in_season,
-        approved_weeks,
-        total_weeks,
-        progress_status,
-        review_status,
-        seasons (
-          id,
-          year,
-          name,
-          start_date
-        )
-      `)
-      .eq("user_id", profile.id);
 
     // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
     const seasonOrderMap: { [key: string]: number } = {

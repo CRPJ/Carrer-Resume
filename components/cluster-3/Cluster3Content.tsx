@@ -28,6 +28,9 @@ const Cluster3Content = () => {
   }
   const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>(null);
 
+  // 영어 이름
+  const [engName, setEngName] = useState<string>('');
+
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
     // 이미 한글로 저장된 경우 그대로 반환
@@ -127,6 +130,234 @@ const Cluster3Content = () => {
   const [editingSection4Links, setEditingSection4Links] = useState<string[]>([]);
   const [editingSection5Links, setEditingSection5Links] = useState<string[]>([]);
 
+  // 포트폴리오 아카이빙 데이터 (DB 저장용)
+  const [portfolioArchives, setPortfolioArchives] = useState<string[]>(Array(10).fill(""));
+  const [isSavingArchives, setIsSavingArchives] = useState(false);
+
+  // 포트폴리오 Output 데이터 (DB 저장용)
+  const [portfolioOutputs, setPortfolioOutputs] = useState<string[]>(Array(5).fill(""));
+  const [portfolioOutputChannels, setPortfolioOutputChannels] = useState<string[]>(Array(5).fill(""));
+  const [editingOutputChannels, setEditingOutputChannels] = useState<string[]>(Array(5).fill(""));
+  const [isSavingOutputs, setIsSavingOutputs] = useState(false);
+
+  // Detail 10 데이터 (DB 저장용 - portfolio_output_6~15)
+  const [portfolioDetails, setPortfolioDetails] = useState<string[]>(Array(10).fill(""));
+  const [portfolioDetailChannels, setPortfolioDetailChannels] = useState<string[]>(Array(10).fill(""));
+  const [editingDetailChannels, setEditingDetailChannels] = useState<string[]>(Array(10).fill(""));
+  const [isSavingDetails, setIsSavingDetails] = useState(false);
+
+  // 채널 옵션 목록
+  const channelOptions = [
+    { value: '', label: '채널 선택', icon: '' },
+    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/icon/Instagram.png' },
+    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/icon/Youtube.png' },
+    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/icon/Naver Blog.png' },
+    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/icon/Tstory.png' },
+    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/icon/X.png' },
+    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/icon/Threads.png' },
+    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/icon/TikTok.png' },
+    { value: 'behance', label: '비핸스', icon: '/images/0/cluster 3/icon/Behance.png' },
+    { value: 'etc', label: '기타', icon: '/images/0/cluster 3/icon/etc 2.png' },
+  ];
+
+  // 포트폴리오 아카이빙 데이터 가져오기
+  useEffect(() => {
+    const fetchPortfolioArchives = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const response = await fetch('/api/portfolio-archives');
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+          setPortfolioArchives(result.data);
+          // channelCards의 처음 10개 링크도 업데이트
+          const updatedCards = channelCards.map((card, index) => {
+            if (index < 10 && result.data[index]) {
+              return { ...card, link: result.data[index] };
+            }
+            return card;
+          });
+          setChannelCards(updatedCards);
+        }
+      } catch (error) {
+        console.error("포트폴리오 아카이빙 데이터 로드 오류:", error);
+      }
+    };
+
+    fetchPortfolioArchives();
+  }, [session?.user?.email]);
+
+  // 포트폴리오 아카이빙 저장 함수
+  const savePortfolioArchives = async (links: string[]) => {
+    setIsSavingArchives(true);
+    try {
+      const response = await fetch('/api/portfolio-archives', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ portfolioArchives: links }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setPortfolioArchives(links);
+        // channelCards의 처음 10개 링크도 업데이트
+        const updatedCards = channelCards.map((card, index) => {
+          if (index < 10) {
+            return { ...card, link: links[index] || "" };
+          }
+          return card;
+        });
+        setChannelCards(updatedCards);
+        return true;
+      } else {
+        console.error("저장 실패:", result.error);
+        alert(result.error || "저장에 실패했습니다.");
+        return false;
+      }
+    } catch (error) {
+      console.error("포트폴리오 아카이빙 저장 오류:", error);
+      alert("저장 중 오류가 발생했습니다.");
+      return false;
+    } finally {
+      setIsSavingArchives(false);
+    }
+  };
+
+  // 포트폴리오 Output 데이터 가져오기
+  useEffect(() => {
+    const fetchPortfolioOutputs = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const response = await fetch('/api/portfolio-outputs');
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+          setPortfolioOutputs(result.data);
+          // 채널 정보도 업데이트
+          if (result.channels) {
+            setPortfolioOutputChannels(result.channels);
+          }
+          // topWorksSlides 링크도 업데이트
+          const updatedSlides = topWorksSlides.map((slide, index) => {
+            if (result.data[index]) {
+              return { ...slide, link: result.data[index] };
+            }
+            return slide;
+          });
+          setTopWorksSlides(updatedSlides);
+        }
+      } catch (error) {
+        console.error("포트폴리오 Output 데이터 로드 오류:", error);
+      }
+    };
+
+    fetchPortfolioOutputs();
+  }, [session?.user?.email]);
+
+  // 포트폴리오 Output 저장 함수
+  const savePortfolioOutputs = async (links: string[], channels: string[]) => {
+    setIsSavingOutputs(true);
+    try {
+      const response = await fetch('/api/portfolio-outputs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ portfolioOutputs: links, portfolioOutputChannels: channels }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setPortfolioOutputs(links);
+        setPortfolioOutputChannels(channels);
+        // topWorksSlides 링크도 업데이트
+        const updatedSlides = topWorksSlides.map((slide, index) => ({
+          ...slide,
+          link: links[index] || ""
+        }));
+        setTopWorksSlides(updatedSlides);
+        return true;
+      } else {
+        console.error("저장 실패:", result.error);
+        alert(result.error || "저장에 실패했습니다.");
+        return false;
+      }
+    } catch (error) {
+      console.error("포트폴리오 Output 저장 오류:", error);
+      alert("저장 중 오류가 발생했습니다.");
+      return false;
+    } finally {
+      setIsSavingOutputs(false);
+    }
+  };
+
+  // Detail 10 데이터 가져오기
+  useEffect(() => {
+    const fetchPortfolioDetails = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const response = await fetch('/api/portfolio-details');
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+          setPortfolioDetails(result.data);
+          // 채널 정보도 업데이트
+          if (result.channels) {
+            setPortfolioDetailChannels(result.channels);
+          }
+          // detailThumbnails 링크도 업데이트
+          const updatedThumbnails = detailThumbnails.map((thumb, index) => {
+            if (result.data[index]) {
+              return { ...thumb, link: result.data[index] };
+            }
+            return thumb;
+          });
+          setDetailThumbnails(updatedThumbnails);
+        }
+      } catch (error) {
+        console.error("Detail 10 데이터 로드 오류:", error);
+      }
+    };
+
+    fetchPortfolioDetails();
+  }, [session?.user?.email]);
+
+  // Detail 10 저장 함수
+  const savePortfolioDetails = async (links: string[], channels: string[]) => {
+    setIsSavingDetails(true);
+    try {
+      const response = await fetch('/api/portfolio-details', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ portfolioDetails: links, portfolioDetailChannels: channels }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setPortfolioDetails(links);
+        setPortfolioDetailChannels(channels);
+        // detailThumbnails 링크도 업데이트
+        const updatedThumbnails = detailThumbnails.map((thumb, index) => ({
+          ...thumb,
+          link: links[index] || ""
+        }));
+        setDetailThumbnails(updatedThumbnails);
+        return true;
+      } else {
+        console.error("저장 실패:", result.error);
+        alert(result.error || "저장에 실패했습니다.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Detail 10 저장 오류:", error);
+      alert("저장 중 오류가 발생했습니다.");
+      return false;
+    } finally {
+      setIsSavingDetails(false);
+    }
+  };
+
   // API에서 일정 신뢰도 데이터 가져오기
   useEffect(() => {
     const fetchReliabilityRate = async () => {
@@ -149,6 +380,11 @@ const Cluster3Content = () => {
         // 성장 진행 상태 데이터 설정
         if (result.growthInfo) {
           setGrowthInfo(result.growthInfo);
+        }
+
+        // 영어 이름 설정
+        if (result.data?.eng_name) {
+          setEngName(result.data.eng_name);
         }
       } catch (error) {
         console.error("신뢰도 데이터 로드 오류:", error);
@@ -271,23 +507,45 @@ const Cluster3Content = () => {
     return () => observer.disconnect();
   }, [animationComplete]);
 
-  // 포트폴리오 채널 카드 데이터 (16개 - 2페이지)
+  // 포트폴리오 채널 카드 데이터 (16개 표시, 10개만 DB 연동)
+  // SNS 아이콘 순서: 인스타, 유튜브, 블로그, 티스토리, X, 쓰레드, 틱톡, 비핸스, 기타1, 기타2, (11-16번은 반복)
+  const snsIconOrder = [
+    '/images/0/cluster 3/icon/Instagram.png',
+    '/images/0/cluster 3/icon/Youtube.png',
+    '/images/0/cluster 3/icon/Naver Blog.png',
+    '/images/0/cluster 3/icon/Tstory.png',
+    '/images/0/cluster 3/icon/X.png',
+    '/images/0/cluster 3/icon/Threads.png',
+    '/images/0/cluster 3/icon/TikTok.png',
+    '/images/0/cluster 3/icon/Behance.png',
+    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 2.png',
+    // 11-16번 카드용 (페이지 2)
+    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 3.png',
+    '/images/0/cluster 3/icon/etc 1.png',
+    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 3.png',
+  ];
+
   const [channelCards, setChannelCards] = useState([
-    { id: 1, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.instagram.com/encre.club/" },
-    { id: 2, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.youtube.com/watch?v=kjI_5WYM7FE" },
-    { id: 3, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://m.blog.naver.com/en_cre20/222485485232" },
-    { id: 4, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://phalanx-club.tistory.com/" },
-    { id: 5, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://x.com/?lang=ko" },
-    { id: 6, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.threads.com/?hl=ko" },
-    { id: 7, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.tiktok.com/ko-KR/" },
-    { id: 8, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.behance.net/" },
-    { id: 9, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.facebook.com/?locale=ko_KR" },
-    { id: 10, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://www.linkedin.com/company/meta" },
-    { id: 11, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "https://kr.pinterest.com/" },
-    { id: 12, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 13, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 14, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 15, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 1, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 2, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 3, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 4, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 5, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 6, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 7, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 8, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 9, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    { id: 10, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    // 11-16번은 샘플 데이터 (DB 저장 안 함)
+    { id: 11, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    // { id: 12, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    // { id: 13, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    // { id: 14, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
+    // { id: 15, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
     { id: 16, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
   ]);
 
@@ -320,6 +578,15 @@ const Cluster3Content = () => {
     '/images/0/cluster 3/icon/etc 2.png',
     '/images/0/cluster 3/icon/etc 3.png'
   ];
+
+  // URL에 프로토콜 추가 함수
+  const ensureProtocol = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
 
   // URL에 따른 아이콘 매칭 함수
   const getIconByUrl = (url: string, id?: number) => {
@@ -630,7 +897,8 @@ const Cluster3Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => {
-              setEditingSection3Links(channelCards.slice(0, 16).map(card => card.link || ""));
+              // 포트폴리오 아카이빙은 10개만 DB 저장
+              setEditingSection3Links([...portfolioArchives]);
               setSection3ModalOpen(true);
             }} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
@@ -668,10 +936,11 @@ const Cluster3Content = () => {
         <div className="channel-cards">
           {channelCards.slice(section3Page * 8, section3Page * 8 + 8).map((card, index) => {
             const actualIndex = section3Page * 8 + index;
-            // URL에 따른 아이콘 매칭
-            const snsImage = getIconByUrl(card.link, card.id);
+            // 순서대로 아이콘 표시 (인스타, 유튜브, 블로그, 티스토리, X, 쓰레드, 틱톡, 비핸스, 기타1, 기타2)
+            const snsImage = snsIconOrder[card.id - 1] || snsIconOrder[snsIconOrder.length - 1];
+            const isEtcIcon = snsImage.includes('etc');
             return (
-              <div key={card.id} className="channel-card" onClick={() => card.link && window.open(card.link, '_blank')}>
+              <div key={card.id} className="channel-card" onClick={() => card.link && window.open(ensureProtocol(card.link), '_blank')}>
                 <div className="card-image">
                   <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.tag}</div>
@@ -686,14 +955,10 @@ const Cluster3Content = () => {
                   <div className="card-info">
                     <div className="info-row">
                       <div className="info-author">
-                        {snsImage ? (
-                          <img src={snsImage} alt="SNS" className={`sns-icon${snsImage.includes('etc') ? ' sns-icon-etc' : ''}`} />
-                        ) : (
-                          <div className="sns-icon sns-gradient"></div>
-                        )}
+                        <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? ' sns-icon-etc' : ''}`} />
                         <div className="author-text">
                           <span className="info-label">Created by:</span>
-                          <span className="author-name">Hwnag Yeongyeong</span>
+                          <span className="author-name">{engName || 'Unknown'}</span>
                         </div>
                       </div>
                     </div>
@@ -733,6 +998,7 @@ const Cluster3Content = () => {
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => {
               setEditingSection4Links(topWorksSlides.map(slide => slide.link || ""));
+              setEditingOutputChannels([...portfolioOutputChannels]);
               setSection4ModalOpen(true);
             }} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
@@ -791,12 +1057,10 @@ const Cluster3Content = () => {
 
         <div className="top-works-slider">
           {topWorksSlides.map((slide, index) => {
-            const snsIcons = [
-              '/images/0/cluster 3/icon/Instagram.png',
-              '/images/0/cluster 3/icon/Youtube.png',
-              '/images/0/cluster 3/icon/Threads.png',
-            ];
-            const randomIcon = snsIcons[slide.id % snsIcons.length];
+            // 선택된 채널에 따른 아이콘 표시
+            const selectedChannel = portfolioOutputChannels[index];
+            const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
+            const channelIcon = channelOption?.icon || '';
 
             // 현재 활성 슬라이드 기준으로 원형 회전 위치 계산
             const totalSlides = topWorksSlides.length;
@@ -811,21 +1075,21 @@ const Cluster3Content = () => {
                 key={slide.id}
                 className={`slider-item position-${position}`}
                 data-position={position}
-                onClick={() => slide.link && window.open(slide.link, '_blank')}
+                onClick={() => slide.link && window.open(ensureProtocol(slide.link), '_blank')}
                 style={{ cursor: 'pointer' }}
               >
                 <img src={`/images/0/cluster 3/image/2-${slide.id}.png`} alt={`Work ${slide.id}`} />
                 <div className="card-overlay">
                   <div className="card-top">
                     <div className="info-author">
-                      {!slide.link ? (
+                      {!slide.link || !channelIcon ? (
                         <div className="sns-icon sns-gradient"></div>
                       ) : (
-                        <img src={randomIcon} alt="SNS" className="sns-icon" />
+                        <img src={channelIcon} alt="SNS" className="sns-icon" />
                       )}
                       <div className="author-text">
                         <span className="info-label">Posted by :</span>
-                        <span className="author-name">Hwang Yeongyeong</span>
+                        <span className="author-name">{engName || 'Unknown'}</span>
                       </div>
                     </div>
                   </div>
@@ -861,7 +1125,8 @@ const Cluster3Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => {
-              setEditingSection5Links(detailThumbnails.map(thumb => thumb.link || ""));
+              setEditingSection5Links([...portfolioDetails]);
+              setEditingDetailChannels([...portfolioDetailChannels]);
               setSection5ModalOpen(true);
             }} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
@@ -892,10 +1157,14 @@ const Cluster3Content = () => {
         </div>
 
         <div className="detail-grid">
-          {detailThumbnails.map((thumb) => {
-            const iconUrl = getIconByUrl(thumb.link, thumb.id);
+          {detailThumbnails.map((thumb, index) => {
+            // 선택된 채널에 따른 아이콘 표시
+            const selectedChannel = portfolioDetailChannels[index];
+            const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
+            const channelIcon = channelOption?.icon || '';
+
             return (
-              <div key={thumb.id} className="detail-item" onClick={() => thumb.link && window.open(thumb.link, '_blank')} style={{ cursor: thumb.link ? 'pointer' : 'default' }}>
+              <div key={thumb.id} className="detail-item" onClick={() => thumb.link && window.open(ensureProtocol(thumb.link), '_blank')} style={{ cursor: thumb.link ? 'pointer' : 'default' }}>
                 <img src={`/images/0/cluster 3/image/3-${thumb.id}.png`} alt={`Detail ${thumb.id}`} />
                 <div className="item-overlay">
                   <div className="like-badge">
@@ -905,14 +1174,14 @@ const Cluster3Content = () => {
                     <span>99 Like</span>
                   </div>
                   <div className="item-bottom">
-                    {iconUrl ? (
-                      <img src={iconUrl} alt="SNS" className="sns-icon" />
-                    ) : (
+                    {!thumb.link || !channelIcon ? (
                       <div className="sns-icon sns-gradient"></div>
+                    ) : (
+                      <img src={channelIcon} alt="SNS" className="sns-icon" />
                     )}
                     <div className="item-info">
                       <span className="item-tags">#Detail, #Micro</span>
-                      <span className="item-author">@Hwang Yeongyeong</span>
+                      <span className="item-author">@{engName || 'Unknown'}</span>
                     </div>
                   </div>
                 </div>
@@ -935,41 +1204,39 @@ const Cluster3Content = () => {
               </button>
             </div>
             <div className="section-modal-body">
-              {editingSection3Links.map((link, index) => (
-                <div key={index} className="link-edit-item">
-                  <div className="link-item-header">
-                    <span className="link-label">Channel {index + 1}</span>
+              {editingSection3Links.map((link, index) => {
+                const snsNames = ['인스타그램', '유튜브', '블로그', '티스토리', 'X(트위터)', '쓰레드', '틱톡', '비핸스', '기타1', '기타2'];
+                return (
+                  <div key={index} className="link-edit-item">
+                    <div className="link-item-header">
+                      <span className="link-label">Channel {index + 1} - {snsNames[index]}</span>
+                    </div>
+                    <input
+                      type="url"
+                      placeholder={`${snsNames[index]} 링크를 입력하세요 (https://...)`}
+                      value={link}
+                      onChange={(e) => {
+                        const newLinks = [...editingSection3Links];
+                        newLinks[index] = e.target.value;
+                        setEditingSection3Links(newLinks);
+                      }}
+                    />
                   </div>
-                  <input
-                    type="url"
-                    placeholder="링크를 입력하세요 (https://...)"
-                    value={link}
-                    onChange={(e) => {
-                      const newLinks = [...editingSection3Links];
-                      newLinks[index] = e.target.value;
-                      setEditingSection3Links(newLinks);
-                    }}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setSection3ModalOpen(false)}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setSection3Links([...editingSection3Links]);
-                  // 카드 데이터 업데이트
-                  const updatedCards = channelCards.map((card, index) => {
-                    if (index < 16) {
-                      return { ...card, link: editingSection3Links[index] };
-                    }
-                    return card;
-                  });
-                  setChannelCards(updatedCards);
-                  setSection3ModalOpen(false);
+                disabled={isSavingArchives}
+                onClick={async () => {
+                  const success = await savePortfolioArchives(editingSection3Links);
+                  if (success) {
+                    setSection3ModalOpen(false);
+                  }
                 }}
-              >저장</button>
+              >{isSavingArchives ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -992,6 +1259,21 @@ const Cluster3Content = () => {
                   <div className="link-item-header">
                     <span className="link-label">Work {index + 1}</span>
                   </div>
+                  <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
+                  <select
+                    className="channel-select"
+                    style={{ display: 'block', marginBottom: '8px' }}
+                    value={editingOutputChannels[index] || ''}
+                    onChange={(e) => {
+                      const newChannels = [...editingOutputChannels];
+                      newChannels[index] = e.target.value;
+                      setEditingOutputChannels(newChannels);
+                    }}
+                  >
+                    {channelOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
                   <input
                     type="url"
                     placeholder="링크를 입력하세요 (https://...)"
@@ -1009,17 +1291,21 @@ const Cluster3Content = () => {
               <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setSection4Links([...editingSection4Links]);
-                  // 슬라이드 데이터 업데이트
-                  const updatedSlides = topWorksSlides.map((slide, index) => ({
-                    ...slide,
-                    link: editingSection4Links[index]
-                  }));
-                  setTopWorksSlides(updatedSlides);
-                  setSection4ModalOpen(false);
+                disabled={isSavingOutputs}
+                onClick={async () => {
+                  const success = await savePortfolioOutputs(editingSection4Links, editingOutputChannels);
+                  if (success) {
+                    setSection4Links([...editingSection4Links]);
+                    // 슬라이드 데이터 업데이트
+                    const updatedSlides = topWorksSlides.map((slide, index) => ({
+                      ...slide,
+                      link: editingSection4Links[index]
+                    }));
+                    setTopWorksSlides(updatedSlides);
+                    setSection4ModalOpen(false);
+                  }
                 }}
-              >저장</button>
+              >{isSavingOutputs ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -1042,6 +1328,21 @@ const Cluster3Content = () => {
                   <div className="link-item-header">
                     <span className="link-label">Detail {index + 1}</span>
                   </div>
+                  <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
+                  <select
+                    className="channel-select"
+                    style={{ display: 'block', marginBottom: '8px' }}
+                    value={editingDetailChannels[index] || ''}
+                    onChange={(e) => {
+                      const newChannels = [...editingDetailChannels];
+                      newChannels[index] = e.target.value;
+                      setEditingDetailChannels(newChannels);
+                    }}
+                  >
+                    {channelOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
                   <input
                     type="url"
                     placeholder="링크를 입력하세요 (https://...)"
@@ -1059,17 +1360,15 @@ const Cluster3Content = () => {
               <button className="cancel-btn" onClick={() => setSection5ModalOpen(false)}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setSection5Links([...editingSection5Links]);
-                  // 썸네일 데이터 업데이트
-                  const updatedThumbnails = detailThumbnails.map((thumb, index) => ({
-                    ...thumb,
-                    link: editingSection5Links[index]
-                  }));
-                  setDetailThumbnails(updatedThumbnails);
-                  setSection5ModalOpen(false);
+                disabled={isSavingDetails}
+                onClick={async () => {
+                  const success = await savePortfolioDetails(editingSection5Links, editingDetailChannels);
+                  if (success) {
+                    setSection5Links([...editingSection5Links]);
+                    setSection5ModalOpen(false);
+                  }
                 }}
-              >저장</button>
+              >{isSavingDetails ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
