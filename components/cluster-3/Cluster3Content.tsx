@@ -47,6 +47,18 @@ const Cluster3Content = () => {
   }
   const [gradeStats, setGradeStats] = useState<GradeStats | null>(null);
 
+  // 성장 기간 집계 데이터 (user_growth_stats)
+  interface GrowthPeriodStats {
+    approvedWeeks: number;      // 성장(성공) 주차
+    unapprovedWeeks: number;    // 성장(실패) 주차
+    restWeeks: number;          // 휴식(개인) 주차
+    clubBreakWeeks: number;     // 휴식(공식) 주차
+    availableWeeks: number;     // 성장 가능 주차
+    restSeasons: number;        // 성장 휴식 시즌
+    approvedSeasons: number;    // 성장(성공) 시즌
+  }
+  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>(null);
+
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
     // 이미 한글로 저장된 경우 그대로 반환
@@ -415,6 +427,13 @@ const Cluster3Content = () => {
         // 품계 데이터 설정
         if (result.gradeStats) {
           setGradeStats(result.gradeStats);
+          // 상위 퍼센트 즉시 설정 (애니메이션은 섹션 스크롤 시 실행)
+          setTopPercent(result.gradeStats.avgPercentile || 0);
+        }
+
+        // 성장 기간 집계 데이터 설정
+        if (result.growthPeriodStats) {
+          setGrowthPeriodStats(result.growthPeriodStats);
         }
       } catch (error) {
         console.error("신뢰도 데이터 로드 오류:", error);
@@ -782,31 +801,31 @@ const Cluster3Content = () => {
             <div className="card-body">
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장(성공) 주차</span>
-                <span className="info-value week">999<span className="highlight-orange">(1)</span><span className="unit">주</span></span>
+                <span className="info-value week">{growthPeriodStats?.approvedWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.approvedSeasons ?? 0})</span><span className="unit">주</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장(실패) 주차</span>
-                <span className="info-value week">999<span className="unit">주</span></span>
+                <span className="info-value week">{growthPeriodStats?.unapprovedWeeks ?? 0}<span className="unit">주</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 휴식(개인) 주차</span>
-                <span className="info-value week">999<span className="highlight-orange">(999)</span><span className="unit">주</span></span>
+                <span className="info-value week">{growthPeriodStats?.restWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.restSeasons ?? 0})</span><span className="unit">주</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 휴식(공식) 주차</span>
-                <span className="info-value week">999<span className="unit">주</span></span>
+                <span className="info-value week">{growthPeriodStats?.clubBreakWeeks ?? 0}<span className="unit">주</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 가능 주차</span>
-                <span className="info-value week">999<span className="unit">주</span></span>
+                <span className="info-value week">{growthPeriodStats?.availableWeeks ?? 0}<span className="unit">주</span></span>
               </div>
               <div className="info-row separator">
                 <span className="info-label"><span className="dot">·</span> 성장 휴식 시즌</span>
-                <span className="info-value season">999<span className="unit">시즌</span></span>
+                <span className="info-value season">{growthPeriodStats?.restSeasons ?? 0}<span className="unit">시즌</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장(성공) 시즌</span>
-                <span className="info-value season">999<span className="unit">시즌</span></span>
+                <span className="info-value season">{growthPeriodStats?.approvedSeasons ?? 0}<span className="unit">시즌</span></span>
               </div>
             </div>
             <div className="card-footer">

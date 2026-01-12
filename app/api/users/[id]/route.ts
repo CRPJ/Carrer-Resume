@@ -39,14 +39,14 @@ export async function GET(
 
     console.log('Profile data found:', profileData.id, profileData.display_name)
 
-    // user_reliability_rates 조회 (데이터가 없어도 에러 처리 안함)
-    const { data: reliabilityData } = await supabase
-      .from('user_reliability_rates')
+    // user_growth_stats 조회 (reliability_rate 포함, 데이터가 없어도 에러 처리 안함)
+    const { data: growthStatsData } = await supabase
+      .from('user_growth_stats')
       .select('reliability_rate')
       .eq('user_id', userId)
       .maybeSingle()
 
-    console.log('Reliability data:', reliabilityData)
+    console.log('Growth stats data:', growthStatsData)
 
     // user_cumulative_points 조회 (데이터가 없어도 에러 처리 안함)
     const { data: pointsData } = await supabase
@@ -69,7 +69,7 @@ export async function GET(
     // 모든 데이터를 합치기 (데이터가 없으면 null)
     const responseData = {
       ...profileData,
-      reliability_rate: reliabilityData?.reliability_rate ?? null,
+      reliability_rate: growthStatsData?.reliability_rate ? parseFloat(growthStatsData.reliability_rate) : null,
       total_stars: pointsData?.total_stars ?? null,
       total_shields: pointsData?.total_shields ?? null,
       total_lightnings: pointsData?.total_lightnings ?? null,

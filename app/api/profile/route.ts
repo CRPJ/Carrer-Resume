@@ -51,11 +51,11 @@ export async function GET() {
       joinedWeekResult,
       growthEndDateResult,
       activitiesResult,
-      reliabilityResult,
       weeklyActivitiesResult,
       cumulativePointsResult,
       seasonHistoriesResult,
-      gradeStatsResult
+      gradeStatsResult,
+      growthStatsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회)
       profile.joined_week_id
@@ -77,9 +77,6 @@ export async function GET() {
 
       // activities 데이터 (실무 카드용)
       supabaseAdmin.from("activities").select("activity_type_id").eq("user_id", profile.id).eq("status", "approved"),
-
-      // reliability_rate
-      supabaseAdmin.from("user_reliability_rates").select("reliability_rate").eq("user_id", profile.id).maybeSingle(),
 
       // weekly_activities (활동 완료율)
       supabaseAdmin.from("weekly_activities").select("status").eq("user_id", profile.id),
@@ -104,7 +101,10 @@ export async function GET() {
       `).eq("user_id", profile.id),
 
       // grade_stats (품계 정보)
-      supabaseAdmin.from("user_grade_stats").select("avg_percentile, grade, grade_label").eq("user_id", profile.id).maybeSingle()
+      supabaseAdmin.from("user_grade_stats").select("avg_percentile, grade, grade_label").eq("user_id", profile.id).maybeSingle(),
+
+      // growth_stats (성장 기간 집계 + reliability_rate)
+      supabaseAdmin.from("user_growth_stats").select("approved_weeks, unapproved_weeks, rest_weeks, club_break_weeks, available_weeks, rest_seasons, approved_seasons, reliability_rate").eq("user_id", profile.id).maybeSingle()
     ]);
 
     // 결과 처리
@@ -119,11 +119,11 @@ export async function GET() {
     }
 
     const activitiesData = activitiesResult.data;
-    const reliabilityData = reliabilityResult.data;
     const weeklyActivities = weeklyActivitiesResult.data;
     const cumulativePoints = cumulativePointsResult.data;
     const seasonHistories = seasonHistoriesResult.data;
     const gradeStats = gradeStatsResult.data;
+    const growthStats = growthStatsResult.data;
 
     // activity_type_id 별로 카운트
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
@@ -172,7 +172,7 @@ export async function GET() {
       success: true,
       data: profile,
       practicalCounts,
-      reliabilityRate: reliabilityData?.reliability_rate || 0,
+      reliabilityRate: growthStats?.reliability_rate ? parseFloat(growthStats.reliability_rate) : 0,
       completionRate,
       badges: {
         stars: cumulativePoints?.total_stars || 0,
@@ -190,6 +190,15 @@ export async function GET() {
         avgPercentile: parseFloat(gradeStats.avg_percentile) || 0,
         grade: gradeStats.grade || 10,
         gradeLabel: gradeStats.grade_label || '정 9품',
+      } : null,
+      growthPeriodStats: growthStats ? {
+        approvedWeeks: growthStats.approved_weeks || 0,
+        unapprovedWeeks: growthStats.unapproved_weeks || 0,
+        restWeeks: growthStats.rest_weeks || 0,
+        clubBreakWeeks: growthStats.club_break_weeks || 0,
+        availableWeeks: growthStats.available_weeks || 0,
+        restSeasons: growthStats.rest_seasons || 0,
+        approvedSeasons: growthStats.approved_seasons || 0,
       } : null,
     });
   } catch (error) {

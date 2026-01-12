@@ -705,7 +705,7 @@ const Sidebar = () => {
     }
   };
 
-  // 일정 신뢰도(reliability_rate) 가져오기
+  // 일정 신뢰도(reliability_rate) 가져오기 - user_growth_stats에서 조회
   useEffect(() => {
     const fetchReliabilityRate = async () => {
       const userId = session?.user?.id;
@@ -717,7 +717,7 @@ const Sidebar = () => {
 
       try {
         const { data, error } = await supabase
-          .from("user_reliability_rates")
+          .from("user_growth_stats")
           .select("reliability_rate")
           .eq("user_id", userId)
           .single();
@@ -727,7 +727,7 @@ const Sidebar = () => {
           setReliabilityRate(null);
         } else {
           setHasReliabilityData(true);
-          setReliabilityRate(data.reliability_rate);
+          setReliabilityRate(parseFloat(data.reliability_rate) || 0);
         }
       } catch (err) {
         console.error("일정 신뢰도 조회 오류:", err);
