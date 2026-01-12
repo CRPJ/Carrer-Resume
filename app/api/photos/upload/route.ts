@@ -20,6 +20,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    }
+
     // user_profiles에서 사용자 ID 조회
     const { data: profile } = await supabaseAdmin
       .from("user_profiles")

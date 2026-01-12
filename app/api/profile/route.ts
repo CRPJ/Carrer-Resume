@@ -112,7 +112,8 @@ export async function GET() {
 
     let growthEndDate = null;
     if (profile.status === 'suspended') {
-      growthEndDate = growthEndDateResult.data?.end_date || null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      growthEndDate = (growthEndDateResult.data as any)?.end_date || null;
     } else if (profile.status === 'graduated') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       growthEndDate = (growthEndDateResult.data as any)?.seasons?.end_date || null;
@@ -224,6 +225,10 @@ export async function PUT(request: Request) {
 
     const email = session.user.email;
     const body = await request.json();
+
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    }
 
     // user_profiles에서 기존 프로필 확인
     const { data: existingProfile } = await supabaseAdmin

@@ -18,6 +18,10 @@ export async function GET() {
       );
     }
 
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    }
+
     // user_profiles에서 사용자 ID 조회
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profiles")
@@ -80,6 +84,10 @@ export async function PUT(request: Request) {
         { error: "잘못된 필드입니다." },
         { status: 400 }
       );
+    }
+
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
     // user_profiles에서 사용자 ID 조회

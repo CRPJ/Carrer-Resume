@@ -19,6 +19,13 @@ export async function GET() {
 
     const email = session.user.email;
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: "서버 설정 오류" },
+        { status: 500 }
+      );
+    }
+
     // 1. user_profiles에서 승인된 사용자 확인
     const { data: profile } = await supabaseAdmin
       .from("user_profiles")

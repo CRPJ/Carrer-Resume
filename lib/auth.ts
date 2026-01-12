@@ -78,6 +78,11 @@ export const authOptions: AuthOptions = {
             return true; // 이메일 없어도 로그인은 허용
           }
 
+          if (!supabaseAdmin) {
+            console.error("카카오 로그인: supabaseAdmin 없음");
+            return true; // 서버 설정 오류여도 로그인은 허용
+          }
+
           // 1. user_profiles에서 기존 사용자 확인 (이미 승인된 사용자)
           const { data: existingProfile } = await supabaseAdmin
             .from("user_profiles")
@@ -133,7 +138,7 @@ export const authOptions: AuthOptions = {
       }
 
       // 카카오 로그인 시 user_profiles ID 확인
-      if (account?.provider === "kakao" && user?.email) {
+      if (account?.provider === "kakao" && user?.email && supabaseAdmin) {
         try {
           const { data: profile } = await supabaseAdmin
             .from("user_profiles")
