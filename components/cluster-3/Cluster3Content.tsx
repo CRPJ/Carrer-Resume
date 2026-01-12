@@ -31,6 +31,22 @@ const Cluster3Content = () => {
   // 영어 이름
   const [engName, setEngName] = useState<string>('');
 
+  // 성장 점수 기록 데이터 (단감, 인절미, 어흥)
+  interface PointsData {
+    dangam: number;    // 단감 (star)
+    injeolmi: number;  // 인절미 (shield - lightning)
+    eoheung: number;   // 어흥 (lightning)
+  }
+  const [pointsData, setPointsData] = useState<PointsData>({ dangam: 0, injeolmi: 0, eoheung: 0 });
+
+  // 품계 데이터 (user_grade_stats)
+  interface GradeStats {
+    avgPercentile: number;  // 상위 퍼센트
+    grade: number;          // 품계 숫자 (1=정승, 2=정1품, ... 10=정9품)
+    gradeLabel: string;     // 품계 라벨 (정 7품 등)
+  }
+  const [gradeStats, setGradeStats] = useState<GradeStats | null>(null);
+
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
     // 이미 한글로 저장된 경우 그대로 반환
@@ -53,16 +69,16 @@ const Cluster3Content = () => {
       return growthStatus;
     }
 
-    // 영문 status/growthStatus 값 변환
-    if (status === 'graduated') return '성장 완료(졸업)';
-    if (status === 'suspended') return '성장 중단';
-    if (status === 'pending') return '클럽 온보딩 중';
+    // 영문 growthStatus 값 변환 (10개)
+    if (growthStatus === 'pending') return '클럽 온보딩 중';
     if (growthStatus === 'active') return '성장 중';
     if (growthStatus === 'resting') return '휴식(주차) 중';
     if (growthStatus === 'official_rest') return '휴식(공식) 중';
     if (growthStatus === 'season_rest') return '시즌 휴식 중';
     if (growthStatus === 'deferred') return '성장 유보';
+    if (growthStatus === 'suspended') return '성장 중단';
     if (growthStatus === 'graduating') return '졸업 절차중';
+    if (growthStatus === 'graduated') return '성장 완료(졸업)';
     if (growthStatus === 'reinforcing') return '추가 성장 중';
 
     return '클럽 온보딩 중';
@@ -386,6 +402,20 @@ const Cluster3Content = () => {
         if (result.data?.eng_name) {
           setEngName(result.data.eng_name);
         }
+
+        // 성장 점수 기록 데이터 설정 (badges에서 가져옴)
+        if (result.badges) {
+          setPointsData({
+            dangam: result.badges.stars || 0,       // 단감 = star (별)
+            injeolmi: result.badges.shields || 0,   // 인절미 = total_shields (이미 계산된 값: shields_net - lightnings)
+            eoheung: result.badges.lightnings || 0, // 어흥 = lightning (번개)
+          });
+        }
+
+        // 품계 데이터 설정
+        if (result.gradeStats) {
+          setGradeStats(result.gradeStats);
+        }
       } catch (error) {
         console.error("신뢰도 데이터 로드 오류:", error);
         setHasReliabilityData(false);
@@ -461,9 +491,9 @@ const Cluster3Content = () => {
 
               requestAnimationFrame(countUp);
 
-              // 상위 퍼센트 카운트업 애니메이션 (0.8초 동안 0 → 30)
+              // 상위 퍼센트 카운트업 애니메이션 (gradeStats.avgPercentile 값으로)
               const topDuration = 800;
-              const topTarget = 30;
+              const topTarget = gradeStats?.avgPercentile || 0;
               const topStartTime = Date.now();
 
               const countUpTop = () => {
@@ -505,7 +535,7 @@ const Cluster3Content = () => {
     }
 
     return () => observer.disconnect();
-  }, [animationComplete]);
+  }, [animationComplete, gradeStats]);
 
   // 포트폴리오 채널 카드 데이터 (16개 표시, 10개만 DB 연동)
   // SNS 아이콘 순서: 인스타, 유튜브, 블로그, 티스토리, X, 쓰레드, 틱톡, 비핸스, 기타1, 기타2, (11-16번은 반복)
@@ -795,15 +825,15 @@ const Cluster3Content = () => {
             <div className="card-body">
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 단감(총합) <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" /></span>
-                <span className="info-value number">99,999<span className="unit">개</span></span>
+                <span className="info-value number">{pointsData.dangam.toLocaleString()}<span className="unit">개</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 인절미(총합) <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" /></span>
-                <span className="info-value number">99,999<span className="unit">개</span></span>
+                <span className="info-value number">{pointsData.injeolmi.toLocaleString()}<span className="unit">개</span></span>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" /></span>
-                <span className="info-value number negative">-99,999<span className="unit">개</span></span>
+                <span className={`info-value number ${pointsData.eoheung > 0 ? 'negative' : ''}`}>{pointsData.eoheung > 0 ? `-${pointsData.eoheung.toLocaleString()}` : pointsData.eoheung.toLocaleString()}<span className="unit">개</span></span>
               </div>
             </div>
             <div className="card-footer">
@@ -851,7 +881,7 @@ const Cluster3Content = () => {
             return (
               <div
                 key={rank}
-                className={`rank-card ${rank === 3 ? 'active' : 'inactive'}`}
+                className={`rank-card ${rank === (gradeStats?.grade || 10) ? 'active' : 'inactive'}`}
                 style={{
                   transform: !animationComplete && highlightedRank !== -1 && highlightedRank >= rank
                     ? `scale(${1 + 0.08 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}) translateY(${-5 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}px)`

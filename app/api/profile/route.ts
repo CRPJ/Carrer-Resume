@@ -54,7 +54,8 @@ export async function GET() {
       reliabilityResult,
       weeklyActivitiesResult,
       cumulativePointsResult,
-      seasonHistoriesResult
+      seasonHistoriesResult,
+      gradeStatsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회)
       profile.joined_week_id
@@ -100,7 +101,10 @@ export async function GET() {
           name,
           start_date
         )
-      `).eq("user_id", profile.id)
+      `).eq("user_id", profile.id),
+
+      // grade_stats (품계 정보)
+      supabaseAdmin.from("user_grade_stats").select("avg_percentile, grade, grade_label").eq("user_id", profile.id).maybeSingle()
     ]);
 
     // 결과 처리
@@ -119,6 +123,7 @@ export async function GET() {
     const weeklyActivities = weeklyActivitiesResult.data;
     const cumulativePoints = cumulativePointsResult.data;
     const seasonHistories = seasonHistoriesResult.data;
+    const gradeStats = gradeStatsResult.data;
 
     // activity_type_id 별로 카운트
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
@@ -181,6 +186,11 @@ export async function GET() {
         startDate: growthStartDate,
         endDate: growthEndDate,
       },
+      gradeStats: gradeStats ? {
+        avgPercentile: parseFloat(gradeStats.avg_percentile) || 0,
+        grade: gradeStats.grade || 10,
+        gradeLabel: gradeStats.grade_label || '정 9품',
+      } : null,
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);
