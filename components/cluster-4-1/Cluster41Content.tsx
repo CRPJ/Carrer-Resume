@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { weeklyData as sharedWeeklyData } from "@/data/weeklyData";
+import { supabase } from "@/lib/supabase";
 
 const Cluster41Content = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,6 +15,103 @@ const Cluster41Content = () => {
   const [resultBtnPos, setResultBtnPos] = useState({ top: 0, left: 0 });
   const seasonBtnRef = useRef<HTMLDivElement>(null);
   const resultBtnRef = useRef<HTMLDivElement>(null);
+
+  // 현재 시즌 정보 상태
+  const [currentSeasonInfo, setCurrentSeasonInfo] = useState<{
+    year: number;
+    name: string;
+    currentWeek: number;
+    isClubBreak: boolean;
+    holidayName: string | null;
+  } | null>(null);
+
+  // 성장 기간 집계 데이터 상태
+  interface GrowthPeriodStats {
+    approvedWeeks: number;      // 성장(성공) 주차
+    unapprovedWeeks: number;    // 성장(실패) 주차
+    restWeeks: number;          // 휴식 주차
+    clubBreakWeeks: number;     // 휴식(공식) 주차
+    availableWeeks: number;     // 성장 가능 주차
+    availableSeasons: number;   // 성장 가능 시즌 (크루 등록 이후 클럽 정상 운영 시즌 수)
+    restSeasons: number;        // 성장 휴식 시즌
+  }
+  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>(null);
+
+  // 성장 시작/종료 주차 정보 상태
+  interface WeekInfo {
+    year: number | null;
+    seasonName: string | null;
+    weekNumber: number | null;
+  }
+  const [startWeekInfo, setStartWeekInfo] = useState<WeekInfo | null>(null);
+  const [endWeekInfo, setEndWeekInfo] = useState<WeekInfo | null>(null);
+  const [growthStatus, setGrowthStatus] = useState<string>('');
+
+  // 현재 시즌 정보 가져오기
+  useEffect(() => {
+    const fetchCurrentSeason = async () => {
+      const today = new Date().toISOString().split('T')[0];
+
+      // 현재 주차 정보 가져오기 (is_club_break, holiday_name 포함)
+      const { data: currentWeekData } = await supabase
+        .from('weeks')
+        .select('id, week_number, is_club_break, holiday_name, seasons (id, name, year)')
+        .lte('start_date', today)
+        .gte('end_date', today)
+        .maybeSingle();
+
+      if (currentWeekData) {
+        // 시즌 이름 변환 (spring -> 봄, summer -> 여름, fall -> 가을, winter -> 겨울)
+        const seasonNameMap: { [key: string]: string } = {
+          'spring': '봄',
+          'summer': '여름',
+          'fall': '가을',
+          'winter': '겨울'
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const seasonData = currentWeekData.seasons as any;
+        const displayName = seasonNameMap[seasonData?.name] || seasonData?.name || '';
+
+        setCurrentSeasonInfo({
+          year: seasonData?.year || 0,
+          name: displayName,
+          currentWeek: currentWeekData.week_number,
+          isClubBreak: currentWeekData.is_club_break || false,
+          holidayName: currentWeekData.holiday_name || null
+        });
+      }
+    };
+
+    fetchCurrentSeason();
+  }, []);
+
+  // 프로필 API에서 성장 기간 집계 데이터 가져오기
+  useEffect(() => {
+    const fetchGrowthStats = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        const result = await response.json();
+
+        if (response.ok) {
+          // 성장 기간 집계 데이터 설정
+          if (result.growthPeriodStats) {
+            setGrowthPeriodStats(result.growthPeriodStats);
+          }
+
+          // 성장 시작/종료 주차 정보 설정
+          if (result.growthInfo) {
+            setStartWeekInfo(result.growthInfo.startWeekInfo);
+            setEndWeekInfo(result.growthInfo.endWeekInfo);
+            setGrowthStatus(result.growthInfo.growthStatus || '');
+          }
+        }
+      } catch (error) {
+        console.error("성장 데이터 로드 오류:", error);
+      }
+    };
+
+    fetchGrowthStats();
+  }, []);
 
   // 버튼 위치 업데이트
   const updateSeasonPos = () => {
@@ -342,7 +440,7 @@ const Cluster41Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  현재 클럽은, <strong>2025년 여름 시즌, 6주차</strong>를 진행 중인 과정에 있습니다.
+                  현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.
                 </p>
               </div>
             </div>
@@ -358,27 +456,43 @@ const Cluster41Content = () => {
               <div className="details-content">
                 <div className="detail-row">
                   <span className="detail-label">성장 시작 주차</span>
-                  <span className="detail-value">2024년, 가을 시즌, 14주차</span>
+                  <span className="detail-value">
+                    {startWeekInfo && startWeekInfo.year
+                      ? `${startWeekInfo.year}년, ${startWeekInfo.seasonName} 시즌, ${startWeekInfo.weekNumber}주차`
+                      : '-'}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 주차</span>
-                  <span className="detail-value"><span className="number">15</span><span className="orange-highlight">(1)</span> <span className="white-text">개 주차</span></span>
+                  <span className="detail-value">
+                    <span className="number">{growthPeriodStats?.availableWeeks ?? '-'}</span><span className="orange-highlight">({growthPeriodStats?.availableSeasons ?? 0})</span> <span className="white-text">개 주차</span>
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 성공 주차</span>
-                  <span className="detail-value"><span className="number">12</span><span className="orange-highlight">(1)</span> <span className="white-text">개 주차</span></span>
+                  <span className="detail-value">
+                    <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span> <span className="white-text">개 주차</span>
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 실패 주차</span>
-                  <span className="detail-value"><span className="number">3</span><span className="orange-highlight">(0)</span> <span className="white-text">개 주차</span></span>
+                  <span className="detail-value">
+                    <span className="number">{growthPeriodStats?.unapprovedWeeks ?? '-'}</span> <span className="white-text">개 주차</span>
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 휴식 주차</span>
-                  <span className="detail-value"><span className="number">6</span> <span className="white-text">개 주차</span></span>
+                  <span className="detail-value">
+                    <span className="number">{growthPeriodStats ? (growthPeriodStats.restWeeks + growthPeriodStats.clubBreakWeeks) : '-'}</span>{growthPeriodStats?.restSeasons ? <span className="orange-highlight">({growthPeriodStats.restSeasons})</span> : null} <span className="white-text">개 주차</span>
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 종료 주차</span>
-                  <span className="detail-value">2024년, 가을 시즌, 14주차 (성장 완료)</span>
+                  <span className="detail-value">
+                    {endWeekInfo && endWeekInfo.year
+                      ? `${endWeekInfo.year}년, ${endWeekInfo.seasonName} 시즌${endWeekInfo.weekNumber ? `, ${endWeekInfo.weekNumber}주차` : ''} (${growthStatus === 'graduated' ? '성장 완료' : '성장 중단'})`
+                      : growthStatus === 'active' || growthStatus === '활동 중' ? '성장 진행 중' : '-'}
+                  </span>
                 </div>
               </div>
             </div>

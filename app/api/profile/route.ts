@@ -46,6 +46,8 @@ export async function GET() {
       );
     }
 
+    const today = new Date().toISOString().split('T')[0];
+
     // 모든 쿼리를 병렬로 실행 (성능 최적화)
     const [
       joinedWeekResult,
@@ -55,19 +57,23 @@ export async function GET() {
       cumulativePointsResult,
       seasonHistoriesResult,
       gradeStatsResult,
-      growthStatsResult
+      growthStatsResult,
+      allWeeksResult,
+      allRestsResult,
+      allSeasonsResult,
+      userActivitiesResult
     ] = await Promise.all([
-      // 성장 시작일 (joined_week_id로 weeks 조회)
+      // 성장 시작일 (joined_week_id로 weeks 조회) - 시즌 정보 포함
       profile.joined_week_id
-        ? supabaseAdmin.from("weeks").select("start_date").eq("id", profile.joined_week_id).maybeSingle()
+        ? supabaseAdmin.from("weeks").select("start_date, week_number, seasons (year, name)").eq("id", profile.joined_week_id).maybeSingle()
         : Promise.resolve({ data: null }),
 
-      // 성장 종료일
+      // 성장 종료일 - 시즌 정보 포함
       profile.status === 'suspended' && profile.suspended_week_id
-        ? supabaseAdmin.from("weeks").select("end_date").eq("id", profile.suspended_week_id).maybeSingle()
+        ? supabaseAdmin.from("weeks").select("end_date, week_number, seasons (year, name)").eq("id", profile.suspended_week_id).maybeSingle()
         : profile.status === 'graduated'
           ? supabaseAdmin.from("user_season_histories")
-              .select(`seasons (end_date)`)
+              .select(`seasons (year, name, end_date)`)
               .eq("user_id", profile.id)
               .eq("progress_status", "completed")
               .order("created_at", { ascending: false })
@@ -76,7 +82,7 @@ export async function GET() {
           : Promise.resolve({ data: null }),
 
       // activities 데이터 (실무 카드용)
-      supabaseAdmin.from("activities").select("activity_type_id").eq("user_id", profile.id).eq("status", "approved"),
+      supabaseAdmin.from("activities").select("activity_type_id, week_id").eq("user_id", profile.id).eq("status", "approved"),
 
       // weekly_activities (활동 완료율)
       supabaseAdmin.from("weekly_activities").select("status").eq("user_id", profile.id),
@@ -104,19 +110,59 @@ export async function GET() {
       supabaseAdmin.from("user_grade_stats").select("avg_percentile, grade, grade_label").eq("user_id", profile.id).maybeSingle(),
 
       // growth_stats (성장 기간 집계 + reliability_rate)
-      supabaseAdmin.from("user_growth_stats").select("approved_weeks, unapproved_weeks, rest_weeks, club_break_weeks, available_weeks, rest_seasons, approved_seasons, reliability_rate").eq("user_id", profile.id).maybeSingle()
+      supabaseAdmin.from("user_growth_stats").select("approved_weeks, unapproved_weeks, rest_weeks, club_break_weeks, available_weeks, available_weeks_club, available_seasons, rest_seasons, approved_seasons, reliability_rate").eq("user_id", profile.id).maybeSingle(),
+
+      // 모든 주차 (실시간 계산용)
+      supabaseAdmin.from("weeks").select("id, start_date, end_date, is_club_break, season_id, week_number").lte("start_date", today).order("start_date", { ascending: true }),
+
+      // 해당 유저의 승인된 휴식 요청
+      supabaseAdmin.from("rest_requests").select("week_id").eq("user_id", profile.id).eq("status", "approved"),
+
+      // 모든 시즌 (성장 가능 시즌 계산용)
+      supabaseAdmin.from("seasons").select("id, name, year, start_date, end_date").order("start_date", { ascending: true }),
+
+      // 해당 유저의 승인된 활동 (주차별)
+      supabaseAdmin.from("activities").select("week_id").eq("user_id", profile.id).eq("status", "approved")
     ]);
+
+    // 시즌 이름 변환 맵 (영문 → 한글)
+    const seasonNameKoreanMap: { [key: string]: string } = {
+      'spring': '봄',
+      'summer': '여름',
+      'fall': '가을',
+      'winter': '겨울'
+    };
 
     // 결과 처리
     const growthStartDate = joinedWeekResult.data?.start_date || null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const joinedWeekData = joinedWeekResult.data as any;
+    const growthStartWeekInfo = joinedWeekData ? {
+      year: joinedWeekData.seasons?.year || null,
+      seasonName: seasonNameKoreanMap[joinedWeekData.seasons?.name] || joinedWeekData.seasons?.name || null,
+      weekNumber: joinedWeekData.week_number || null
+    } : null;
 
     let growthEndDate = null;
+    let growthEndWeekInfo = null;
     if (profile.status === 'suspended') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      growthEndDate = (growthEndDateResult.data as any)?.end_date || null;
+      const endWeekData = growthEndDateResult.data as any;
+      growthEndDate = endWeekData?.end_date || null;
+      growthEndWeekInfo = endWeekData ? {
+        year: endWeekData.seasons?.year || null,
+        seasonName: seasonNameKoreanMap[endWeekData.seasons?.name] || endWeekData.seasons?.name || null,
+        weekNumber: endWeekData.week_number || null
+      } : null;
     } else if (profile.status === 'graduated') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      growthEndDate = (growthEndDateResult.data as any)?.seasons?.end_date || null;
+      const graduatedData = growthEndDateResult.data as any;
+      growthEndDate = graduatedData?.seasons?.end_date || null;
+      growthEndWeekInfo = graduatedData?.seasons ? {
+        year: graduatedData.seasons.year || null,
+        seasonName: seasonNameKoreanMap[graduatedData.seasons.name] || graduatedData.seasons.name || null,
+        weekNumber: null // 졸업의 경우 주차 정보 없음
+      } : null;
     }
 
     const activitiesData = activitiesResult.data;
@@ -125,6 +171,135 @@ export async function GET() {
     const seasonHistories = seasonHistoriesResult.data;
     const gradeStats = gradeStatsResult.data;
     const growthStats = growthStatsResult.data;
+    const allWeeks = allWeeksResult.data || [];
+    const allRests = allRestsResult.data || [];
+    const allSeasons = allSeasonsResult.data || [];
+    const userActivities = userActivitiesResult.data || [];
+
+    // 실시간 성장 기간 통계 계산 (user_growth_stats 테이블에 데이터가 없을 때)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userRestWeekIds = new Set(allRests.map((r: any) => r.week_id));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const activityByWeek = new Map(userActivities.map((a: any) => [a.week_id, a]));
+
+    // 가입 주차 시작일 찾기
+    const joinedWeekStartDate = growthStartDate;
+
+    // 가입 이후 지나간 주차 필터링
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const passedWeeksForUser = allWeeks.filter((w: any) => {
+      if (!joinedWeekStartDate) return false;
+      return w.start_date >= joinedWeekStartDate;
+    });
+
+    // 주차별 통계 계산
+    let approvedWeeksCount = 0;      // a: 활동 인정 주차
+    let unapprovedWeeksCount = 0;    // b: 활동 미인정 주차
+    let restWeeksCount = 0;          // c: 활동 휴식 주차
+    let clubBreakWeeksCount = 0;     // d: 공식 휴식 주차
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passedWeeksForUser.forEach((week: any) => {
+      const hasActivity = activityByWeek.has(week.id);
+      const hasRest = userRestWeekIds.has(week.id);
+      const isClubBreak = week.is_club_break;
+
+      // 특수 케이스: 공식 휴식 주차인데 활동 인정 받은 경우 → a에만 +1
+      if (isClubBreak && hasActivity) {
+        approvedWeeksCount++;
+        return;
+      }
+
+      // 공식 휴식 주차 (d)
+      if (isClubBreak) {
+        clubBreakWeeksCount++;
+        return;
+      }
+
+      // 개인 휴식 주차 (c)
+      if (hasRest) {
+        restWeeksCount++;
+        return;
+      }
+
+      // 활동 인정 (a)
+      if (hasActivity) {
+        approvedWeeksCount++;
+        return;
+      }
+
+      // 활동 미인정 (b)
+      unapprovedWeeksCount++;
+    });
+
+    // e: 활동 가능 주차 = a + b + c
+    const availableWeeksCount = approvedWeeksCount + unapprovedWeeksCount + restWeeksCount;
+
+    // break 시즌 ID 목록 (전환 시즌)
+    const breakSeasonIds = new Set(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      allSeasons.filter((s: any) => s.name?.toLowerCase().includes('break')).map((s: any) => s.id)
+    );
+
+    // 성장 가능 시즌 수 계산 (가입 이후 클럽 정상 운영 시즌, break 시즌 제외)
+    let availableSeasonsCount = 0;
+    if (joinedWeekStartDate) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      availableSeasonsCount = allSeasons.filter((season: any) => {
+        // break 시즌 제외
+        if (breakSeasonIds.has(season.id)) return false;
+
+        // 가입 이후 시작된 시즌 또는 가입일이 해당 시즌 내인 경우
+        const seasonStartsAfterJoin = season.start_date >= joinedWeekStartDate;
+        const joinedDuringSeason = season.start_date <= joinedWeekStartDate && season.end_date >= joinedWeekStartDate;
+
+        if (!seasonStartsAfterJoin && !joinedDuringSeason) return false;
+
+        // 현재까지 시작된 시즌만
+        return season.start_date <= today;
+      }).length;
+    }
+
+    // 성장 가능 주차 수 계산 (클럽 정상 운영 주차, break 시즌/공식 휴식 제외)
+    let availableWeeksClubCount = 0;
+    if (joinedWeekStartDate) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      availableWeeksClubCount = allWeeks.filter((week: any) => {
+        // 가입 이전 주차 제외
+        if (week.start_date < joinedWeekStartDate) return false;
+
+        // 클럽 공식 휴식 주차 체크 (활동 인정 받은 경우 예외)
+        if (week.is_club_break) {
+          const hasApprovedActivity = activityByWeek.has(week.id);
+          if (!hasApprovedActivity) return false;
+        }
+
+        // 전환 시즌(break) 주차 제외
+        if (week.season_id && breakSeasonIds.has(week.season_id)) return false;
+
+        // 현재까지 시작된 주차만
+        return week.start_date <= today;
+      }).length;
+    }
+
+    // 일정 신뢰도 실시간 계산: (a + c) / (a + b + c) * 100
+    let calculatedReliabilityRate = 0;
+    if (availableWeeksCount > 0) {
+      calculatedReliabilityRate = Math.ceil(((approvedWeeksCount + restWeeksCount) / availableWeeksCount) * 100);
+    }
+
+    // DB 데이터가 있으면 사용, 없으면 실시간 계산 값 사용
+    const finalGrowthPeriodStats = {
+      approvedWeeks: growthStats?.approved_weeks ?? approvedWeeksCount,
+      unapprovedWeeks: growthStats?.unapproved_weeks ?? unapprovedWeeksCount,
+      restWeeks: growthStats?.rest_weeks ?? restWeeksCount,
+      clubBreakWeeks: growthStats?.club_break_weeks ?? clubBreakWeeksCount,
+      availableWeeks: growthStats?.available_weeks ?? availableWeeksCount,
+      availableSeasons: growthStats?.available_seasons ?? availableSeasonsCount,
+      restSeasons: growthStats?.rest_seasons ?? 0,
+      approvedSeasons: growthStats?.approved_seasons ?? 0,
+      reliabilityRate: growthStats?.reliability_rate ? parseFloat(growthStats.reliability_rate) : calculatedReliabilityRate,
+    };
 
     // activity_type_id 별로 카운트
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
@@ -173,7 +348,7 @@ export async function GET() {
       success: true,
       data: profile,
       practicalCounts,
-      reliabilityRate: growthStats?.reliability_rate ? parseFloat(growthStats.reliability_rate) : 0,
+      reliabilityRate: finalGrowthPeriodStats.reliabilityRate,
       completionRate,
       badges: {
         stars: cumulativePoints?.total_stars || 0,
@@ -186,21 +361,24 @@ export async function GET() {
         growthStatus: profile.growth_status,
         startDate: growthStartDate,
         endDate: growthEndDate,
+        startWeekInfo: growthStartWeekInfo,
+        endWeekInfo: growthEndWeekInfo,
       },
       gradeStats: gradeStats ? {
         avgPercentile: parseFloat(gradeStats.avg_percentile) || 0,
         grade: gradeStats.grade || 10,
         gradeLabel: gradeStats.grade_label || '정 9품',
       } : null,
-      growthPeriodStats: growthStats ? {
-        approvedWeeks: growthStats.approved_weeks || 0,
-        unapprovedWeeks: growthStats.unapproved_weeks || 0,
-        restWeeks: growthStats.rest_weeks || 0,
-        clubBreakWeeks: growthStats.club_break_weeks || 0,
-        availableWeeks: growthStats.available_weeks || 0,
-        restSeasons: growthStats.rest_seasons || 0,
-        approvedSeasons: growthStats.approved_seasons || 0,
-      } : null,
+      growthPeriodStats: {
+        approvedWeeks: finalGrowthPeriodStats.approvedWeeks,
+        unapprovedWeeks: finalGrowthPeriodStats.unapprovedWeeks,
+        restWeeks: finalGrowthPeriodStats.restWeeks,
+        clubBreakWeeks: finalGrowthPeriodStats.clubBreakWeeks,
+        availableWeeks: growthStats?.available_weeks_club ?? availableWeeksClubCount, // DB 우선, 없으면 실시간 계산
+        availableSeasons: growthStats?.available_seasons ?? availableSeasonsCount, // DB 우선, 없으면 실시간 계산
+        restSeasons: finalGrowthPeriodStats.restSeasons,
+        approvedSeasons: finalGrowthPeriodStats.approvedSeasons,
+      },
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);

@@ -338,7 +338,7 @@ const Sidebar = () => {
             <h1 className="resume-name">
               <span className="back-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
-              </span>정이안 <span className="name-eng">Jung Ian</span>
+              </span>이름 <span className="name-eng">English Name</span>
             </h1>
 
             <div className="resume-details">

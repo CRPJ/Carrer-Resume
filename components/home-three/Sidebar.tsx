@@ -177,13 +177,13 @@ const Sidebar = () => {
             <h1 className="resume-name">
               <span className="back-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
-              </span>정이안 <span className="name-eng">Jung Ian</span>
+              </span>이름 <span className="name-eng">English Name</span>
             </h1>
 
             <div className="resume-details">
               <div className="detail-row">
                 <Image src="/images/0/cluster 1/small icon/User_01.png" alt="" width={16} height={16} />
-                <span><span style={{ color: '#FFEC8F' }}>·</span> 여 <Image src="/images/0/cluster 1/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: '#FFEC8F' }}>·</span> 2002.02.02</span>
+                <span><span style={{ color: '#FFEC8F' }}>·</span> 남/여 <Image src="/images/0/cluster 1/small icon/Gift.png" alt="" width={13} height={13} style={{ display: 'inline-block', verticalAlign: 'text-bottom', margin: '0 2px' }} /> <span style={{ color: '#FFEC8F' }}>·</span> 2002.02.02</span>
               </div>
               <div className="detail-row">
                 <Image src="/images/0/cluster 1/small icon/House_01.png" alt="" width={16} height={16} />
@@ -208,7 +208,7 @@ const Sidebar = () => {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   maxWidth: '180px'
-                }}><span style={{ color: '#FFEC8F' }}>·</span> wkwkwkwkwkwkk@naver.com</span>
+                }}><span style={{ color: '#FFEC8F' }}>·</span> writeyoureamil@gmail.com</span>
               </div>
               <div className="detail-row">
                 <Image src="/images/0/cluster 1/small icon/Building_03.png" alt="" width={16} height={16} />
