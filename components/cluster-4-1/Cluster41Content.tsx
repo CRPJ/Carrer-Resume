@@ -23,6 +23,9 @@ const Cluster41Content = () => {
     currentWeek: number;
     isClubBreak: boolean;
     holidayName: string | null;
+    isBreakSeason: boolean;
+    fromSeason: string | null;
+    toSeason: string | null;
   } | null>(null);
 
   // 성장 기간 집계 데이터 상태
@@ -70,14 +73,33 @@ const Cluster41Content = () => {
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const seasonData = currentWeekData.seasons as any;
-        const displayName = seasonNameMap[seasonData?.name] || seasonData?.name || '';
+        const rawSeasonName = seasonData?.name || '';
+
+        // break 시즌인지 확인 (예: spring_summer_break, fall_winter_break)
+        const isBreakSeason = rawSeasonName.toLowerCase().includes('break');
+        let fromSeason: string | null = null;
+        let toSeason: string | null = null;
+        let displayName = seasonNameMap[rawSeasonName] || rawSeasonName;
+
+        if (isBreakSeason) {
+          // break 시즌 이름 파싱 (spring_summer_break -> 봄, 여름)
+          const parts = rawSeasonName.replace('_break', '').split('_');
+          if (parts.length >= 2) {
+            fromSeason = seasonNameMap[parts[0]] || parts[0];
+            toSeason = seasonNameMap[parts[1]] || parts[1];
+          }
+          displayName = '시즌 전환';
+        }
 
         setCurrentSeasonInfo({
           year: seasonData?.year || 0,
           name: displayName,
           currentWeek: currentWeekData.week_number,
           isClubBreak: currentWeekData.is_club_break || false,
-          holidayName: currentWeekData.holiday_name || null
+          holidayName: currentWeekData.holiday_name || null,
+          isBreakSeason,
+          fromSeason,
+          toSeason
         });
       }
     };
@@ -440,7 +462,11 @@ const Cluster41Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.
+                  {currentSeasonInfo?.isBreakSeason ? (
+                    <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
+                  ) : (
+                    <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                  )}
                 </p>
               </div>
             </div>
