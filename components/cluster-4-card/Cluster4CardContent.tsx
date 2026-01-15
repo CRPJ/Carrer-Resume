@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { WeekData, weeklyData } from "@/data/weeklyData";
+import { supabase } from "@/lib/supabase";
 
 interface Cluster4CardContentProps {
-  weekData?: WeekData;
+  weekId: string;
+}
+
+// DB에서 가져온 주차 데이터 타입
+interface DBWeekData {
+  id: string;
+  weekNumber: number;
+  seasonYear: number;
+  seasonName: string;
+  startDate: string;
+  endDate: string;
+  isClubBreak: boolean;
+  holidayName: string | null;
+  growthStatus: string;
 }
 
 interface SelectedColleague {
@@ -25,12 +38,393 @@ interface SelectedColleague {
   message: string;
 }
 
-const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
+const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+
+  // DB에서 가져온 주차 데이터 상태
+  const [weekData, setWeekData] = useState<DBWeekData | null>(null);
+  const [isLoadingWeek, setIsLoadingWeek] = useState(true);
+
+  // 팀/파트/역할/포인트 데이터 상태
+  const [teamName, setTeamName] = useState<string | null>(null);
+  const [partName, setPartName] = useState<string | null>(null);
+  const [roleLabel, setRoleLabel] = useState<string | null>(null);
+  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
+  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
+  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
+
+  // 이전/다음 주차 ID
+  const [prevWeekId, setPrevWeekId] = useState<string | null>(null);
+  const [nextWeekId, setNextWeekId] = useState<string | null>(null);
+
+  // 현재 유저 ID (저장 시 사용)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // 주간 활동 데이터 (실무정보 모달용)
+  interface WeeklyActivity {
+    id: string;
+    activity_type_id: string;
+    title: string | null;
+    is_active: boolean;
+  }
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
+
+  // 유저 활동 데이터 (강화 성공 집계용)
+  interface UserActivity {
+    id: string;
+    weekly_activity_id: string;
+    status: string;
+    activity_type_id?: string;
+  }
+  const [userActivities, setUserActivities] = useState<UserActivity[]>([]);
+
+  // 파트별 강화 집계 (P: 열린 총 활동 수, R: 강화 성공 수)
+  interface PracticalStats {
+    total: number;  // P
+    success: number; // R
+  }
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 0, success: 0 });
+
+  // 강화 상태 판단용 (해당 주차 데이터)
+  interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
+  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([]);
+  const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
+
+  // 2차 정보 (서브타이틀, 아웃풋링크) - 해당 주차 데이터
+  interface OutputLink { desc: string; url: string; }
+  interface ActivityDetail {
+    week_id: string;
+    activity_type_id: string;
+    sub_title: string | null;
+    output_links: OutputLink[] | null;
+  }
+  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
+
+  // 모달 편집 상태 (activity_type_id별로 관리)
+  const [editingDetails, setEditingDetails] = useState<{
+    [activityType: string]: {
+      subTitle: string;
+      outputLinks: OutputLink[];
+    };
+  }>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  // activity_type_id별 파트 분류
+  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+  const competencyTypes = ['optional_unit', 'practical_lecture'];
+  const experienceTypes = ['required_unit'];
+  const careerTypes = ['practical_project'];
+
+  // 역할 라벨 매핑
+  const roleLabels: { [key: string]: string } = {
+    'crew_regular': '일반',
+    'part_leader': '심화(파트장)',
+    'crew_agent': '심화(에이전트)',
+    'crew_ambassador': '운영진(앰배서더)',
+    'crew_team_leader': '운영진(팀장)',
+  };
+
+  // 시즌 이름 변환 맵
+  const seasonNameMap: { [key: string]: string } = {
+    'spring': '봄',
+    'summer': '여름',
+    'fall': '가을',
+    'winter': '겨울'
+  };
+
+  // 날짜 포맷 함수 (2026-01-05 → 2026 - 01 - 05 (월))
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dayOfWeek = days[date.getDay()];
+    return `${year} - ${month} - ${day} (${dayOfWeek})`;
+  };
+
+  // DB에서 주차 데이터 및 관련 정보 가져오기
+  useEffect(() => {
+    const fetchWeekData = async () => {
+      if (!weekId) return;
+
+      console.log('[DEBUG] fetchWeekData started for weekId:', weekId);
+
+      // 상태 리셋
+      setPrevWeekId(null);
+      setNextWeekId(null);
+
+      try {
+        setIsLoadingWeek(true);
+
+        // 1. 현재 주차 정보 가져오기
+        const { data: currentWeek, error: weekError } = await supabase
+          .from('weeks')
+          .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
+          .eq('id', weekId)
+          .single();
+
+        if (weekError) throw weekError;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const seasonData = currentWeek.seasons as any;
+        const rawSeasonName = seasonData?.name || '';
+        const seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
+
+        // 2. 현재 유저 정보 가져오기
+        const response = await fetch('/api/profile');
+        const profileResult = await response.json();
+
+        if (!response.ok || !profileResult.data?.id) {
+          console.error('Failed to fetch profile');
+          return;
+        }
+
+        const userId = profileResult.data.id;
+        setCurrentUserId(userId);  // 저장 시 사용하기 위해 state에 저장
+        const apiActivityWeekIds = profileResult.activityWeekIds || [];
+        const apiRestWeekIds = profileResult.restWeekIds || [];
+        const apiApprovedActivities = profileResult.approvedActivities || [];
+        const apiActivityRecords = profileResult.activityRecords || [];
+        const apiActivityDetails = profileResult.activityDetails || [];
+
+        // 성장 상태 결정
+        let growthStatus = '실패';
+        if (currentWeek.is_club_break) {
+          growthStatus = '휴식(공식)';
+        } else if (apiRestWeekIds.includes(currentWeek.id)) {
+          growthStatus = '휴식(개인)';
+        } else if (apiActivityWeekIds.includes(currentWeek.id)) {
+          growthStatus = '성공';
+        }
+
+        setWeekData({
+          id: currentWeek.id,
+          weekNumber: currentWeek.week_number,
+          seasonYear: seasonData?.year || 0,
+          seasonName,
+          startDate: currentWeek.start_date,
+          endDate: currentWeek.end_date,
+          isClubBreak: currentWeek.is_club_break || false,
+          holidayName: currentWeek.holiday_name,
+          growthStatus
+        });
+
+        // 3. 팀/파트 정보 가져오기
+        const { data: userTeamPart } = await supabase
+          .from('user_team_parts')
+          .select('team_id, part_id')
+          .eq('user_id', userId)
+          .lte('joined_at', currentWeek.start_date)
+          .or(`left_at.is.null,left_at.gte.${currentWeek.start_date}`)
+          .order('joined_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (userTeamPart) {
+          // 팀 이름 가져오기
+          if (userTeamPart.team_id) {
+            const { data: team } = await supabase
+              .from('teams')
+              .select('name')
+              .eq('id', userTeamPart.team_id)
+              .single();
+            setTeamName(team?.name || null);
+          }
+          // 파트 이름 가져오기
+          if (userTeamPart.part_id) {
+            const { data: part } = await supabase
+              .from('parts')
+              .select('name')
+              .eq('id', userTeamPart.part_id)
+              .single();
+            setPartName(part?.name || null);
+          }
+        }
+
+        // 4. 역할 정보 가져오기
+        const { data: userRole } = await supabase
+          .from('user_role_history')
+          .select('role')
+          .eq('user_id', userId)
+          .lte('started_at', currentWeek.start_date)
+          .or(`ended_at.is.null,ended_at.gte.${currentWeek.start_date}`)
+          .order('started_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (userRole) {
+          setRoleLabel(roleLabels[userRole.role] || userRole.role);
+        }
+
+        // 5. 포인트 정보 가져오기 (해당 주차)
+        const { data: points } = await supabase
+          .from('points')
+          .select('point_type, points')
+          .eq('user_id', userId)
+          .eq('week_id', weekId);
+
+        if (points) {
+          const star = points.filter(p => p.point_type === 'star').reduce((sum, p) => sum + p.points, 0);
+          const lightning = points.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
+          const shield = points.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+          setWeekPoints({ star, lightning, shield });
+        }
+
+        // 6. 누적 인절미 계산 (해당 주차 종료일까지)
+        const { data: allWeeksUntilCurrent } = await supabase
+          .from('weeks')
+          .select('id')
+          .lte('end_date', currentWeek.end_date);
+
+        if (allWeeksUntilCurrent) {
+          const weekIds = allWeeksUntilCurrent.map(w => w.id);
+          const { data: allPoints } = await supabase
+            .from('points')
+            .select('point_type, points')
+            .eq('user_id', userId)
+            .in('week_id', weekIds);
+
+          if (allPoints) {
+            const totalShield = allPoints.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+            const totalLightning = allPoints.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
+            setCumulativeInjeolmi(totalShield - totalLightning);
+          }
+        }
+
+        // 7. 누적 성공 주차 수 계산
+        if (allWeeksUntilCurrent) {
+          const weekIds = allWeeksUntilCurrent.map(w => w.id);
+          const approvedCount = weekIds.filter(wId => apiActivityWeekIds.includes(wId)).length;
+          setCumulativeApprovedWeeks(approvedCount);
+        }
+
+        // 8. 이전/다음 주차 ID 가져오기
+        const today = new Date().toISOString().split('T')[0];
+        const userStartDate = profileResult.growthInfo?.startDate || '1900-01-01';
+
+        // 사용자의 모든 주차 가져오기 (시즌 정보 포함)
+        const { data: allUserWeeks, error: weeksError } = await supabase
+          .from('weeks')
+          .select('id, start_date, season_id, seasons(name)')
+          .order('start_date', { ascending: false });
+
+        console.log('[DEBUG] allUserWeeks query result:', allUserWeeks?.length, 'error:', weeksError);
+
+        if (allUserWeeks && allUserWeeks.length > 0) {
+          // 클라이언트에서 날짜 필터링 + break 시즌 제외
+          const filteredWeeks = allUserWeeks.filter(w => {
+            const seasonName = (w.seasons as any)?.name || '';
+            const isBreakSeason = seasonName.toLowerCase().includes('break');
+            return w.start_date >= userStartDate && w.start_date <= today && !isBreakSeason;
+          });
+
+          console.log('[DEBUG] filteredWeeks:', filteredWeeks.length, 'userStartDate:', userStartDate, 'today:', today);
+
+          const currentIndex = filteredWeeks.findIndex(w => w.id === weekId);
+          console.log('[DEBUG] currentIndex:', currentIndex, 'weekId:', weekId);
+
+          if (currentIndex !== -1) {
+            // 내림차순 정렬이므로: index-1 = 더 최근(다음), index+1 = 더 과거(이전)
+            if (currentIndex > 0) {
+              setNextWeekId(filteredWeeks[currentIndex - 1].id);
+              console.log('[DEBUG] setNextWeekId:', filteredWeeks[currentIndex - 1].id);
+            }
+            if (currentIndex < filteredWeeks.length - 1) {
+              setPrevWeekId(filteredWeeks[currentIndex + 1].id);
+              console.log('[DEBUG] setPrevWeekId:', filteredWeeks[currentIndex + 1].id);
+            }
+          }
+        }
+
+        // 9. 주간 활동 데이터 가져오기 (실무정보 모달용)
+        const { data: activitiesData, error: activitiesError } = await supabase
+          .from('weekly_activities')
+          .select('id, activity_type_id, title, is_active')
+          .eq('week_id', weekId);
+
+        if (activitiesError) {
+          console.error('주간 활동 데이터 로드 오류:', activitiesError);
+        } else if (activitiesData) {
+          setWeeklyActivities(activitiesData);
+          console.log('[DEBUG] weeklyActivities loaded:', activitiesData.length);
+
+          // 11. 파트별 강화 집계 계산
+          // activity_type_id별 파트 분류
+          const infoTypesList = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+          const competencyTypesList = ['optional_unit', 'practical_lecture'];
+          const experienceTypesList = ['required_unit'];
+          const careerTypesList = ['practical_project'];
+
+          // P (열린 총 활동 수): is_active=true인 weekly_activities
+          const activeActivities = activitiesData.filter(a => a.is_active);
+          console.log('[DEBUG] activeActivities:', activeActivities.length, activeActivities.map(a => a.activity_type_id));
+
+          // 10. 유저 활동 데이터 (profile API에서 가져온 데이터 활용 - RLS 우회)
+          // 해당 주차의 approved activity_type_id 목록 추출
+          const weekApprovedActivities = apiApprovedActivities.filter(
+            (a: { week_id: string; activity_type_id: string }) => a.week_id === weekId
+          );
+          console.log('[DEBUG] weekApprovedActivities:', weekApprovedActivities.length, weekApprovedActivities);
+
+          const approvedActivityTypes = new Set<string>(
+            weekApprovedActivities.map((a: { activity_type_id: string }) => a.activity_type_id)
+          );
+          console.log('[DEBUG] approvedActivityTypes:', Array.from(approvedActivityTypes));
+
+          // 11. 강화 상태 판단용 데이터 설정
+          // 해당 주차의 activity_records 필터링
+          const filteredActivityRecords = apiActivityRecords.filter(
+            (ar: { week_id: string }) => ar.week_id === weekId
+          );
+          console.log('[DEBUG] weekActivityRecords:', filteredActivityRecords.length, filteredActivityRecords);
+          setWeekActivityRecords(filteredActivityRecords);
+          setWeekApprovedTypes(approvedActivityTypes);
+
+          // 12. 2차 정보 (서브타이틀, 아웃풋링크) 필터링
+          const filteredActivityDetails = apiActivityDetails.filter(
+            (ad: { week_id: string }) => ad.week_id === weekId
+          );
+          console.log('[DEBUG] weekActivityDetails:', filteredActivityDetails.length, filteredActivityDetails);
+          setWeekActivityDetails(filteredActivityDetails);
+
+          // 각 파트별 집계 (유저 활동 데이터 유무와 관계없이 total은 계산)
+          const calcStats = (types: string[]) => {
+            const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
+            const success = activeActivities.filter(a =>
+              types.includes(a.activity_type_id) && approvedActivityTypes.has(a.activity_type_id)
+            ).length;
+            return { total, success };
+          };
+
+          setInfoStats(calcStats(infoTypesList));
+          setCompetencyStats(calcStats(competencyTypesList));
+          setExperienceStats(calcStats(experienceTypesList));
+          setCareerStats(calcStats(careerTypesList));
+
+          console.log('[DEBUG] Stats calculated - info:', calcStats(infoTypesList),
+            'competency:', calcStats(competencyTypesList),
+            'experience:', calcStats(experienceTypesList),
+            'career:', calcStats(careerTypesList));
+        }
+
+      } catch (error) {
+        console.error('주차 데이터 로드 오류:', error);
+      } finally {
+        setIsLoadingWeek(false);
+      }
+    };
+
+    fetchWeekData();
+  }, [weekId]);
+
   // 모달 상태 관리
   const [workInfoModalOpen, setWorkInfoModalOpen] = useState(false);
   const [workAbilityModalOpen, setWorkAbilityModalOpen] = useState(false);
@@ -161,16 +555,58 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   const [subTitleText, setSubTitleText] = useState("");
 
   // 기본값 설정
-  const defaultImage = "/images/0/cluster 4/주차 이미지/여름 3주차 (7월 3주차).png";
-  const defaultTitle = "2025 여름 시즌, 3주차";
   const restImage = "/images/0/cluster%204/주차%20이미지/휴식(개인,공식).png";
 
   // 휴식 모드 체크 (휴식(개인), 휴식(공식)일 때 모든 카드 비활성화)
   const isRestMode = weekData?.growthStatus?.includes('휴식') || false;
 
-  // 휴식 모드일 때는 휴식 전용 이미지 사용
-  const currentImage = isRestMode ? restImage : (weekData?.image || defaultImage);
-  const currentTitle = weekData?.shortTitle || defaultTitle;
+  // 시즌명과 주차번호로 월/주차 계산하여 이미지 경로 생성
+  const getWeekImagePath = (data: DBWeekData) => {
+    // 시즌별 시작 월 매핑
+    const seasonStartMonth: { [key: string]: number } = {
+      '겨울': 1,  // 1월
+      '봄': 3,    // 3월
+      '여름': 7,  // 7월
+      '가을': 9   // 9월
+    };
+
+    const startMonth = seasonStartMonth[data.seasonName] || 1;
+    const monthOffset = Math.floor((data.weekNumber - 1) / 4);
+    const month = startMonth + monthOffset;
+    const weekOfMonth = ((data.weekNumber - 1) % 4) + 1;
+
+    // 공휴일이 있는 경우 파일명에 추가
+    const holidaySuffix = data.holidayName ? ` ${data.holidayName}` : '';
+
+    // 파일명 형식: "겨울 1주차 (1월 1주차).png" 또는 "겨울 6주차 (2월 2주차 설,구정).png"
+    return `/images/0/cluster 4/주차 이미지/${data.seasonName} ${data.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+  };
+
+  // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
+  const currentImage = isRestMode
+    ? restImage
+    : weekData
+      ? getWeekImagePath(weekData)
+      : "/images/0/cluster 4/주차 이미지/겨울 1주차 (1월 1주차).png";
+  const currentTitle = weekData
+    ? `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
+    : "로딩 중...";
+
+  // 날짜 포맷팅 함수 (2025 - 01 - 06 (월) 형식)
+  const formatDateWithDay = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayName = dayNames[date.getDay()];
+    return `${year} - ${month} - ${day} (${dayName})`;
+  };
+
+  // 주차 기간 문자열 생성
+  const weekDateRange = weekData
+    ? `${formatDateWithDay(weekData.startDate)} ~ ${formatDateWithDay(weekData.endDate)}`
+    : '날짜 로딩 중...';
 
   // 성장 상태에 따른 뱃지 정보
   const getStatusBadgeInfo = (status: string | undefined) => {
@@ -209,11 +645,6 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
   };
 
   const statusBadgeInfo = getStatusBadgeInfo(weekData?.growthStatus);
-
-  // 이전/다음 주차 계산
-  const currentIndex = weeklyData.findIndex(w => w.id === weekData?.id);
-  const prevWeekId = currentIndex < weeklyData.length - 1 ? weeklyData[currentIndex + 1]?.id : null;
-  const nextWeekId = currentIndex > 0 ? weeklyData[currentIndex - 1]?.id : null;
 
   // 태그 색상 배열
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
@@ -500,17 +931,168 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
     },
   ];
 
-  // 실무 정보 카드 데이터
+  // 실무 정보 activity_type_id → UI 매핑
+  const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
+    'wisdom': { category: '위즈덤', tagColor: 'tag--red', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 위즈덤.png', isFruit: true },
+    'essay': { category: '에세이', tagColor: 'tag--yellow', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 에세이.png', isFruit: true },
+    'infodesk': { category: '인포데스크', tagColor: 'tag--purple', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 인포데스크.png', isFruit: true },
+    'calendar': { category: '캘린더', tagColor: 'tag--dark', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
+    'forum': { category: '포럼', tagColor: 'tag--green', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 포럼.png', isFruit: true },
+    'session': { category: '세션', tagColor: 'tag--cyan', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 세션.png', isFruit: true },
+    'etc_a': { category: '기타a', tagColor: 'tag--mint', icon: '/images/0/cluster 4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: false },
+  };
+
+  // 실무 정보에 해당하는 activity types
+  const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'etc_a'];
+
+  // 강화 상태 판단 함수
+  // - 해당 없음: weekly_activities.is_active = false
+  // - 강화(성공): activity_records.is_completed = true + approvedActivities에 있음
+  // - 강화(대기): activity_records.is_completed = true + approvedActivities에 없음
+  // - 강화(실패): activity_records.is_completed = false 또는 레코드 없음
+  type EnhancementStatus = 'success' | 'waiting' | 'failed' | 'not_applicable';
+  const getEnhancementStatus = (activityType: string, isActive: boolean): EnhancementStatus => {
+    // 1. 해당 없음: 활동이 개설되지 않음
+    if (!isActive) return 'not_applicable';
+
+    // 2. activity_records에서 해당 activity_type의 이행 여부 확인
+    const record = weekActivityRecords.find(ar => ar.activity_type_id === activityType);
+
+    if (!record || !record.is_completed) {
+      // 레코드 없거나 is_completed = false → 강화(실패)
+      return 'failed';
+    }
+
+    // 3. is_completed = true인 경우, 2차 정보(activities) 확인
+    if (weekApprovedTypes.has(activityType)) {
+      // approvedActivities에 있음 → 강화(성공)
+      return 'success';
+    } else {
+      // approvedActivities에 없음 → 강화(대기)
+      return 'waiting';
+    }
+  };
+
+  // 강화 상태별 아이콘
+  const enhancementStatusIcons: { [key in EnhancementStatus]: string } = {
+    'success': '/images/0/cluster 4/icon/5 강화 성공.png',
+    'waiting': '/images/0/cluster 4/icon/6 강화 대기.png',
+    'failed': '/images/0/cluster 4/icon/7 강화 실패.png',
+    'not_applicable': '/images/0/cluster 4/icon/8 해당 없음.png',
+  };
+
+  // 특정 activity_type의 2차 정보 가져오기
+  const getActivityDetail = (activityType: string) => {
+    return weekActivityDetails.find(ad => ad.activity_type_id === activityType);
+  };
+
+  // 빈 output links 배열 생성 헬퍼
+  const createEmptyOutputLinks = (): OutputLink[] => {
+    return [0, 1, 2, 3, 4].map(() => ({ desc: '', url: '' }));
+  };
+
+  // 편집 모달 열 때 초기화
+  const initializeEditingDetails = () => {
+    const newEditingDetails: { [key: string]: { subTitle: string; outputLinks: OutputLink[] } } = {};
+
+    workInfoActivityTypes.forEach(activityType => {
+      const detail = getActivityDetail(activityType);
+      // 기존 링크가 있으면 5개로 패딩, 없으면 빈 5개 생성
+      const existingLinks = detail?.output_links || [];
+      const paddedLinks: OutputLink[] = [];
+      for (let i = 0; i < 5; i++) {
+        paddedLinks.push(existingLinks[i] ? { ...existingLinks[i] } : { desc: '', url: '' });
+      }
+      newEditingDetails[activityType] = {
+        subTitle: detail?.sub_title || '',
+        outputLinks: paddedLinks,
+      };
+    });
+
+    setEditingDetails(newEditingDetails);
+  };
+
+  // 2차 정보 저장
+  const saveActivityDetail = async (activityType: string) => {
+    if (!currentUserId || !weekId) return;
+
+    setIsSaving(true);
+    try {
+      const detail = editingDetails[activityType];
+      if (!detail) return;
+
+      // 빈 링크 필터링
+      const validLinks = detail.outputLinks.filter(link => link.url.trim() !== '');
+
+      const response = await fetch('/api/activity-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUserId,
+          week_id: weekId,
+          activity_type_id: activityType,
+          sub_title: detail.subTitle || null,
+          output_links: validLinks.length > 0 ? validLinks : null,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Failed to save activity detail:', error);
+        alert('저장에 실패했습니다.');
+        return;
+      }
+
+      console.log('[DEBUG] Activity detail saved for:', activityType);
+    } catch (error) {
+      console.error('Error saving activity detail:', error);
+      alert('저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 모든 실무 정보 카드 저장
+  const saveAllActivityDetails = async () => {
+    setIsSaving(true);
+    try {
+      for (const activityType of workInfoActivityTypes) {
+        await saveActivityDetail(activityType);
+      }
+      alert('저장되었습니다.');
+      setWorkInfoModalOpen(false);
+    } catch (error) {
+      console.error('Error saving all activity details:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 실무 정보 카드 데이터 (DB 데이터 기반 + 빈 카드 2개)
   const workInfoCards = [
-    { id: 1, title: "Main Title", verified: true, category: "위즈덤", tagColor: "tag--red", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 위즈덤.png", isFruit: true },
-    { id: 2, title: "Main Title", verified: true, category: "에세이", tagColor: "tag--yellow", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 에세이.png", isFruit: true, isFailed: true },
-    { id: 3, title: "Main Title", verified: true, category: "인포데스크", tagColor: "tag--purple", status: "fail", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 인포데스크.png", isFruit: true, isFailed: true },
-    { id: 4, title: "Main Title", verified: true, category: "캘린더", tagColor: "tag--dark", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 캘린더.png", isFruit: true },
-    { id: 5, title: "Main Title", verified: true, category: "포럼", tagColor: "tag--green", status: "waiting", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 포럼.png", isFruit: true },
-    { id: 6, title: "Main Title", verified: true, category: "세션", tagColor: "tag--cyan", status: "success", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 세션.png", isFruit: true },
-    { id: 7, title: "Main Title", verified: true, category: "기타a", tagColor: "tag--mint", status: "waiting", icon: "/images/0/cluster 4/icon/실무 정보/실무 정보 - 기타a.png", isFruit: false },
-    { id: 8, title: "Main Title", verified: true, category: "", tagColor: "", status: "", icon: "", isEmpty: true },
-    { id: 9, title: "Main Title", verified: true, category: "", tagColor: "", status: "", icon: "", isEmpty: true },
+    ...workInfoActivityTypes.map((activityType, index) => {
+      const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+      const config = activityTypeConfig[activityType];
+      const isActive = activity?.is_active ?? false;
+      const enhancementStatus = getEnhancementStatus(activityType, isActive);
+      return {
+        id: index + 1,
+        activityType,
+        title: activity?.title || '제목 없음',
+        verified: true,
+        category: config?.category || activityType,
+        tagColor: config?.tagColor || '',
+        status: enhancementStatus,
+        statusIcon: enhancementStatusIcons[enhancementStatus],
+        icon: config?.icon || '',
+        isFruit: config?.isFruit || false,
+        isFailed: enhancementStatus === 'failed',
+        isEmpty: false,
+      };
+    }),
+    // 빈 카드 2개
+    { id: 8, activityType: '', title: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true },
+    { id: 9, activityType: '', title: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true },
   ];
 
   // 실무 경험 카드 데이터 (rating * 2 = 점수, 반개당 1점)
@@ -591,6 +1173,10 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             </div>
           </Link>
         </div>
+        {/* 디버그 정보 (개발 중 임시) */}
+        <div style={{ fontSize: '10px', color: '#666', marginBottom: '5px' }}>
+          [DEBUG] weekId: {weekId} | prevWeekId: {prevWeekId || 'null'} | nextWeekId: {nextWeekId || 'null'}
+        </div>
         <div className="nav-buttons">
           {prevWeekId ? (
             <Link href={`/cluster-4-card/${prevWeekId}`} className="nav-btn-prev">
@@ -666,42 +1252,42 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="header-info-row">
               <div className="info-badge date">
                 <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" />
-                <span>2025 - 03 - 23 (월) ~ 2025 - 03 - 30 (일)</span>
+                <span>{weekData ? `${formatDate(weekData.startDate)} ~ ${formatDate(weekData.endDate)}` : '로딩 중...'}</span>
               </div>
               <div className="info-badge role">
                 <img src="/images/0/cluster 4/icon/Interface/Star-3.png" alt="role" />
-                <span>운영진(앰배서더)</span>
+                <span>{roleLabel || '-'}</span>
               </div>
               <div className="info-badge week">
                 <img src="/images/0/cluster 4/icon/icon - 7.png" alt="week" />
-                <span><span className="highlight">25</span> / 30 주차</span>
+                <span><span className="highlight">{cumulativeApprovedWeeks}</span> / 30 주차</span>
               </div>
             </div>
             <div className="header-info-row2">
               <div className="info-group left">
-                <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">미디어</span></span>
+                <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{teamName || '-'}</span></span>
                 <span className="info-divider">|</span>
-                <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">웹툰드라마</span></span>
+                <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{partName || '-'}</span></span>
               </div>
               <div className="info-group right">
                 <span className="info-item with-icon">
                   단감
                   <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="item-icon" />
-                  <strong className="number-value">25</strong>
+                  <strong className="number-value">{weekPoints.star}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">30</strong>
+                  <strong className="number-value">{cumulativeInjeolmi}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   어흥
                   <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                  <strong className="number-value">-2</strong>
+                  <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
                   개
                 </span>
               </div>
@@ -829,14 +1415,14 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
           <div className="growth-left">
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
-              <span className="growth-count"><img src="/images/0/cluster 4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 13 개 중 <span className="highlight">7</span>개</span>
+              <span className="growth-count"><img src="/images/0/cluster 4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
             <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: '65%' }}></div>
+              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : 0}%` }}></div>
             </div>
           </div>
           <div className="growth-center">
-            <span className="progress-percent"><span className="number">65</span><span className="percent">%</span></span>
+            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : 0}</span><span className="percent">%</span></span>
           </div>
           <div className="growth-right">
             <span className="growth-label">라인별 강화 결과</span>
@@ -854,7 +1440,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => setWorkInfoModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <div className="edit-icon" onClick={() => { initializeEditingDetails(); setWorkInfoModalOpen(true); }} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -870,11 +1456,11 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 정보</span>
-              <span className="section-count">총 7개 중 <span className="highlight">4</span>개</span>
+              <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">65</span>%</span>
+              <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.round((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-info-cards">
@@ -895,7 +1481,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                 <div className="card-content-area">
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
-                    <span className="card-title">{card.title}</span>
+                    <span className="card-title">Main Title</span>
                     <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                     <span className="verified-text">Verified</span>
                     {!isEmpty && card.category && <span className={`tag ${card.tagColor}`}>{card.category}</span>}
@@ -913,11 +1499,9 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <span className="card-desc">{isEmpty ? '-' : <>CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                   </div>
                 </div>
-                {!isEmpty && card.status && (
+                {!isEmpty && card.status && card.statusIcon && (
                   <div className="status-badge">
-                    {card.status === "success" && <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />}
-                    {card.status === "waiting" && <img src="/images/0/cluster 4/icon/6 강화 대기.png" alt="강화 대기" />}
-                    {card.status === "fail" && <img src="/images/0/cluster 4/icon/7 강화 실패.png" alt="강화 실패" />}
+                    <img src={card.statusIcon} alt={card.status} />
                   </div>
                 )}
               </div>
@@ -947,11 +1531,11 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 역량</span>
-              <span className="section-count">총 1개 중 <span className="highlight">1</span>개</span>
+              <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">100</span>%</span>
+              <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.round((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div
@@ -1018,11 +1602,11 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 경험</span>
-              <span className="section-count">총 4개 중 <span className="highlight">3</span>개</span>
+              <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">75</span>%</span>
+              <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.round((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-exp-cards">
@@ -1110,11 +1694,11 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 경력</span>
-              <span className="section-count">총 5개 중 <span className="highlight">3</span>개</span>
+              <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">75</span>%</span>
+              <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.round((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-career-cards">
@@ -1238,10 +1822,16 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                             <span className="status-text waiting">강화대기</span>
                           </>
                         )}
-                        {card.status === "fail" && (
+                        {card.status === "failed" && (
                           <>
                             <img src="/images/0/cluster 4/icon/7 강화 실패.png" alt="강화실패" />
                             <span className="status-text fail">강화실패</span>
+                          </>
+                        )}
+                        {card.status === "not_applicable" && (
+                          <>
+                            <img src="/images/0/cluster 4/icon/8 해당 없음.png" alt="해당없음" />
+                            <span className="status-text not-applicable">해당없음</span>
                           </>
                         )}
                       </div>
@@ -1251,10 +1841,10 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                   <div className="modal-card-content">
                     {/* 타이틀 + 내용 (읽기 전용) */}
                     <div className="modal-title-section">
-                      <div className="main-title">{card.title}</div>
-                      <div className="content-title">CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십</div>
+                      <div className="main-title">Main Title</div>
+                      <div className="content-title">{card.title}</div>
                       <div className="modal-date-badge">
-                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                        <span>{weekDateRange}</span>
                       </div>
                     </div>
 
@@ -1262,11 +1852,17 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <div className="modal-input-group">
                       <div className="section-label-row">
                         <div className="section-label">Sub Title</div>
-                        <div className="char-counter"><span className={subTitleText.length > 0 ? 'active' : ''}>{subTitleText.length}</span> / 150</div>
+                        <div className="char-counter"><span className={(editingDetails[card.activityType]?.subTitle || '').length > 0 ? 'active' : ''}>{(editingDetails[card.activityType]?.subTitle || '').length}</span> / 150</div>
                       </div>
                       <textarea
-                        value={subTitleText}
-                        onChange={(e) => setSubTitleText(e.target.value)}
+                        value={editingDetails[card.activityType]?.subTitle || ''}
+                        onChange={(e) => setEditingDetails(prev => ({
+                          ...prev,
+                          [card.activityType]: {
+                            ...prev[card.activityType],
+                            subTitle: e.target.value,
+                          }
+                        }))}
                         placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
                         rows={3}
                         maxLength={150}
@@ -1277,31 +1873,52 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <div className="modal-input-group">
                       <div className="section-label">Output Link</div>
                       <div className="output-links-buttons">
-                        {(() => {
-                          const linkCounts = [1, 4, 2, 5, 3];
-                          const linkCount = linkCounts[index % linkCounts.length];
-                          const linkDescs = ["마케팅 포트폴리오", "프로젝트 결과물", "실무 사례", "참고 자료", "추가 링크"];
-                          return [1, 2, 3, 4, 5].map((num) => (
-                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                        {[0, 1, 2, 3, 4].map((idx) => {
+                          const link = editingDetails[card.activityType]?.outputLinks?.[idx] || { desc: '', url: '' };
+                          const hasContent = link.url.trim() !== '';
+                          return (
+                            <div key={idx} className={`output-link-item ${hasContent ? 'active' : ''}`}>
                               <div className="link-button">
-                                <span className="link-num">{num}</span>
+                                <span className="link-num">{idx + 1}</span>
                               </div>
                               <input
                                 type="text"
                                 className="link-desc"
-                                placeholder="링크 설명을 입력하세요"
+                                placeholder="링크 설명 (20자)"
                                 maxLength={20}
-                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                                value={link.desc}
+                                onChange={(e) => setEditingDetails(prev => {
+                                  const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
+                                  currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                  return {
+                                    ...prev,
+                                    [card.activityType]: {
+                                      ...prev[card.activityType],
+                                      outputLinks: currentLinks,
+                                    }
+                                  };
+                                })}
                               />
                               <input
                                 type="url"
                                 className="link-url"
                                 placeholder="URL"
-                                defaultValue={num <= linkCount ? "https://example.com" : ""}
+                                value={link.url}
+                                onChange={(e) => setEditingDetails(prev => {
+                                  const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
+                                  currentLinks[idx] = { ...currentLinks[idx], url: e.target.value };
+                                  return {
+                                    ...prev,
+                                    [card.activityType]: {
+                                      ...prev[card.activityType],
+                                      outputLinks: currentLinks,
+                                    }
+                                  };
+                                })}
                               />
                             </div>
-                          ));
-                        })()}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -1310,7 +1927,9 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
             </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkInfoModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setWorkInfoModalOpen(false)}>저장</button>
+              <button className="save-btn" onClick={saveAllActivityDetails} disabled={isSaving}>
+                {isSaving ? '저장 중...' : '저장'}
+              </button>
             </div>
           </div>
         </div>
@@ -1352,7 +1971,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <div className="main-title">Main Title</div>
                     <div className="content-title">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
                     <div className="modal-date-badge">
-                      <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                      <span>{weekDateRange}</span>
                     </div>
                   </div>
 
@@ -1460,7 +2079,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                       </div>
                       <div className="content-title">[역량 파악 & 성장점 분석] 빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!</div>
                       <div className="modal-date-badge">
-                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                        <span>{weekDateRange}</span>
                       </div>
                     </div>
 
@@ -1566,7 +2185,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                       </div>
                       <div className="content-title">실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 80일이삼사오육칠팔구십</div>
                       <div className="modal-date-badge">
-                        <span>2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</span>
+                        <span>{weekDateRange}</span>
                       </div>
                     </div>
 
@@ -2086,10 +2705,16 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                       <span>강화대기</span>
                     </div>
                   )}
-                  {selectedWorkInfoCard.status === "fail" && (
+                  {selectedWorkInfoCard.status === "failed" && (
                     <div className="status-badge fail">
                       <img src="/images/0/cluster 4/icon/7 강화 실패.png" alt="강화실패" />
                       <span>강화실패</span>
+                    </div>
+                  )}
+                  {selectedWorkInfoCard.status === "not_applicable" && (
+                    <div className="status-badge not-applicable">
+                      <img src="/images/0/cluster 4/icon/8 해당 없음.png" alt="해당없음" />
+                      <span>해당없음</span>
                     </div>
                   )}
                 </div>
@@ -2097,9 +2722,9 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
 
               {/* Main Title + Content */}
               <div className="work-view-title-section">
-                <div className="main-title">{selectedWorkInfoCard.title}</div>
-                <div className="content-text">CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십</div>
-                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+                <div className="main-title">Main Title</div>
+                <div className="content-text">{selectedWorkInfoCard.title}</div>
+                <div className="date-badge">{weekDateRange}</div>
               </div>
 
               {/* Sub Title */}
@@ -2170,7 +2795,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               <div className="work-view-title-section">
                 <div className="main-title">Main Title</div>
                 <div className="content-text">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
-                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+                <div className="date-badge">{weekDateRange}</div>
               </div>
 
               {/* Sub Title */}
@@ -2237,14 +2862,14 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               {/* Main Title + 별점 + Content */}
               <div className="work-view-title-section">
                 <div className="main-title-row">
-                  <div className="main-title">{selectedWorkExpCard.title}</div>
+                  <div className="main-title">Main Title</div>
                   <div className="rating-row">
                     <div className="stars">{renderStars(selectedWorkExpCard.rating)}</div>
                     <span className="rating-count">{selectedWorkExpCard.ratingCount}</span>
                   </div>
                 </div>
-                <div className="content-text">[역량 파악 & 성장점 분석] 빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!</div>
-                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+                <div className="content-text">{selectedWorkExpCard.title}</div>
+                <div className="date-badge">{weekDateRange}</div>
               </div>
 
               {/* Sub Title */}
@@ -2316,7 +2941,7 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
               {/* Main Title + 등급 + Content */}
               <div className="work-view-title-section">
                 <div className="main-title-row">
-                  <div className="main-title">{selectedWorkCareerCard.title}</div>
+                  <div className="main-title">Main Title</div>
                   <div className="grade-row">
                     <span className={`grade ${selectedWorkCareerCard.grade === 'S' ? 'active' : ''}`}>S</span>
                     <span className={`grade ${selectedWorkCareerCard.grade === 'A' ? 'active' : ''}`}>A</span>
@@ -2325,8 +2950,8 @@ const Cluster4CardContent = ({ weekData }: Cluster4CardContentProps) => {
                     <span className={`grade ${selectedWorkCareerCard.grade === 'D' ? 'active' : ''}`}>D</span>
                   </div>
                 </div>
-                <div className="content-text">바이럴 마케팅 분야에서 3년간의 실무 경력을 쌓으며 다양한 캠페인을 성공적으로 운영했습니다. SNS 채널 운영과 콘텐츠 기획, 인플루언서 협업 등 폭넓은 경험을 보유하고 있습니다.</div>
-                <div className="date-badge">2025 - 12 - 22 (월) ~ 2025 - 12 - 28 (일)</div>
+                <div className="content-text">{selectedWorkCareerCard.title}</div>
+                <div className="date-badge">{weekDateRange}</div>
               </div>
 
               {/* Sub Title */}

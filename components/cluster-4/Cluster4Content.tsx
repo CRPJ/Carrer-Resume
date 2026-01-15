@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 // 시즌 데이터 배열
 const seasonData = [
@@ -103,6 +104,161 @@ const Cluster4Content = () => {
   // 현재 선택된 시즌 데이터
   const currentSeason = seasonData[section3Page];
 
+  // 현재 시즌 정보 상태 (DB에서 가져옴)
+  const [currentSeasonInfo, setCurrentSeasonInfo] = useState<{
+    year: number;
+    name: string;
+    currentWeek: number;
+    isClubBreak: boolean;
+    holidayName: string | null;
+    isBreakSeason: boolean;
+    fromSeason: string | null;
+    toSeason: string | null;
+  } | null>(null);
+
+  // 사용자의 상태 (status, growth_status)
+  const [userStatus, setUserStatus] = useState<string | null>(null);
+  const [growthStatus, setGrowthStatus] = useState<string | null>(null);
+
+  // 성장 종료 정보
+  const [growthEndInfo, setGrowthEndInfo] = useState<{
+    year: number | null;
+    seasonName: string | null;
+    weekNumber: number | null;
+  } | null>(null);
+
+  // 현재 시즌 정보 가져오기
+  useEffect(() => {
+    const fetchCurrentSeason = async () => {
+      const today = new Date().toISOString().split('T')[0];
+
+      // 현재 주차 정보 가져오기 (is_club_break, holiday_name 포함)
+      const { data: currentWeekData } = await supabase
+        .from('weeks')
+        .select('id, week_number, is_club_break, holiday_name, seasons (id, name, year)')
+        .lte('start_date', today)
+        .gte('end_date', today)
+        .maybeSingle();
+
+      if (currentWeekData) {
+        // 시즌 이름 변환 (spring -> 봄, summer -> 여름, fall -> 가을, winter -> 겨울)
+        const seasonNameMap: { [key: string]: string } = {
+          'spring': '봄',
+          'summer': '여름',
+          'fall': '가을',
+          'winter': '겨울'
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const seasonData = currentWeekData.seasons as any;
+        const rawSeasonName = seasonData?.name || '';
+
+        // break 시즌인지 확인 (예: spring_summer_break, fall_winter_break)
+        const isBreakSeason = rawSeasonName.toLowerCase().includes('break');
+        let fromSeason: string | null = null;
+        let toSeason: string | null = null;
+        let displayName = seasonNameMap[rawSeasonName] || rawSeasonName;
+
+        if (isBreakSeason) {
+          // break 시즌 이름 파싱 (spring_summer_break -> 봄, 여름)
+          const parts = rawSeasonName.replace('_break', '').split('_');
+          if (parts.length >= 2) {
+            fromSeason = seasonNameMap[parts[0]] || parts[0];
+            toSeason = seasonNameMap[parts[1]] || parts[1];
+          }
+          displayName = '시즌 전환';
+        }
+
+        setCurrentSeasonInfo({
+          year: seasonData?.year || 0,
+          name: displayName,
+          currentWeek: currentWeekData.week_number,
+          isClubBreak: currentWeekData.is_club_break || false,
+          holidayName: currentWeekData.holiday_name || null,
+          isBreakSeason,
+          fromSeason,
+          toSeason
+        });
+      }
+    };
+
+    fetchCurrentSeason();
+  }, []);
+
+  // 사용자 프로필에서 status, growth_status, growthEndInfo 가져오기
+  useEffect(() => {
+    const fetchUserStatus = async () => {
+      try {
+        // urlUserId가 있으면 해당 사용자, 없으면 본인 프로필 조회
+        if (urlUserId) {
+          const res = await fetch(`/api/users/${urlUserId}`);
+          if (res.ok) {
+            const json = await res.json();
+            setUserStatus(json.data?.status || null);
+            setGrowthStatus(json.data?.growth_status || null);
+            // growthEndInfo는 /api/users/[id]에서 제공하지 않으므로 null
+            setGrowthEndInfo(null);
+          }
+        } else if (session?.user?.id) {
+          const res = await fetch('/api/profile');
+          if (res.ok) {
+            const json = await res.json();
+            setUserStatus(json.growthInfo?.status || null);
+            setGrowthStatus(json.growthInfo?.growthStatus || null);
+            // 성장 종료 정보 설정
+            if (json.growthInfo?.endWeekInfo) {
+              setGrowthEndInfo({
+                year: json.growthInfo.endWeekInfo.year,
+                seasonName: json.growthInfo.endWeekInfo.seasonName,
+                weekNumber: json.growthInfo.endWeekInfo.weekNumber
+              });
+            } else {
+              setGrowthEndInfo(null);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user status:', error);
+      }
+    };
+
+    fetchUserStatus();
+  }, [urlUserId, session?.user?.id]);
+
+  // 성장 상태를 badge 텍스트로 변환 (status와 growth_status 두 개 사용)
+  const getGrowthBadgeText = (status: string | null, growthStatus: string | null): string => {
+    // 1. 성장 완료 체크 (최우선)
+    if (
+      status === 'graduated' ||
+      growthStatus === '졸업 완료' ||
+      growthStatus === '졸업 절차중'
+    ) {
+      return '성장 완료';
+    }
+
+    // 2. 성장 중단 체크
+    if (
+      status === 'suspended' ||
+      growthStatus === '활동 중단' ||
+      growthStatus === '활동 유보'
+    ) {
+      return '성장 중단';
+    }
+
+    // 3. 성장 휴식 체크
+    if (
+      status === 'weekly_rest' ||
+      status === 'seasonal_rest' ||
+      growthStatus === '주차 휴식 중' ||
+      growthStatus === '시즌 휴식 중' ||
+      growthStatus === '공식 휴식 중'
+    ) {
+      return '성장 휴식';
+    }
+
+    // 4. 기본값
+    return '성장 진행 중';
+  };
+
   // 페이지 전환 핸들러
   const handlePageChange = (newPage: number) => {
     if (newPage === section3Page || isFlipping) return;
@@ -178,7 +334,7 @@ const Cluster4Content = () => {
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
               <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster%204/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
-                <span className="badge-text">성장 진행 중</span>
+                <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>
 
@@ -193,7 +349,11 @@ const Cluster4Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  현재 클럽은, <strong>2025년 여름 시즌</strong>을 준비 중인 전환 과정에 있습니다.
+                  {currentSeasonInfo?.isBreakSeason ? (
+                    <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
+                  ) : (
+                    <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                  )}
                 </p>
               </div>
             </div>
@@ -225,7 +385,16 @@ const Cluster4Content = () => {
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 종료 시즌</span>
-                  <span className="detail-value">2024년, 가을 시즌, 14주차 (성장 완료)</span>
+                  <span className="detail-value">
+                    {growthEndInfo ? (
+                      <>
+                        {growthEndInfo.year}년, {growthEndInfo.seasonName} 시즌
+                        {growthEndInfo.weekNumber ? `, ${growthEndInfo.weekNumber}주차` : ''} ({getGrowthBadgeText(userStatus, growthStatus)})
+                      </>
+                    ) : (
+                      <>- ({getGrowthBadgeText(userStatus, growthStatus)})</>
+                    )}
+                  </span>
                 </div>
               </div>
             </div>

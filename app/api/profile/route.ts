@@ -61,7 +61,10 @@ export async function GET() {
       allWeeksResult,
       allRestsResult,
       allSeasonsResult,
-      userActivitiesResult
+      userActivitiesResult,
+      userRoleHistoryResult,
+      activityRecordsResult,
+      userActivityDetailsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회) - 시즌 정보 포함
       profile.joined_week_id
@@ -122,7 +125,16 @@ export async function GET() {
       supabaseAdmin.from("seasons").select("id, name, year, start_date, end_date").order("start_date", { ascending: true }),
 
       // 해당 유저의 승인된 활동 (주차별)
-      supabaseAdmin.from("activities").select("week_id").eq("user_id", profile.id).eq("status", "approved")
+      supabaseAdmin.from("activities").select("week_id").eq("user_id", profile.id).eq("status", "approved"),
+
+      // 해당 유저의 역할 이력
+      supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
+
+      // 해당 유저의 활동 이행 기록 (강화 상태 판단용)
+      supabaseAdmin.from("activity_records").select("week_id, activity_type_id, is_completed").eq("user_id", profile.id),
+
+      // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크)
+      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id)
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -379,6 +391,17 @@ export async function GET() {
         restSeasons: finalGrowthPeriodStats.restSeasons,
         approvedSeasons: finalGrowthPeriodStats.approvedSeasons,
       },
+      // 활동/휴식 주차 ID 목록 (클라이언트에서 사용)
+      activityWeekIds: activitiesData?.map((a: { week_id: string }) => a.week_id) || [],
+      restWeekIds: allRests?.map((r: { week_id: string }) => r.week_id) || [],
+      // 역할 이력 (클라이언트에서 사용)
+      userRoleHistory: userRoleHistoryResult.data || [],
+      // 승인된 활동 전체 (주차별 강화 집계용)
+      approvedActivities: activitiesData || [],
+      // 활동 이행 기록 (강화 상태 판단용: is_completed)
+      activityRecords: activityRecordsResult.data || [],
+      // 2차 정보 (서브타이틀, 아웃풋링크)
+      activityDetails: userActivityDetailsResult.data || [],
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);

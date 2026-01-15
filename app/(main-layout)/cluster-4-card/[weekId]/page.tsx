@@ -6,12 +6,10 @@ import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
 import Cluster4CardContent from "@/components/cluster-4-card/Cluster4CardContent";
 import Animations from "@/components/shared/Animations";
-import { getWeekDataById } from "@/data/weeklyData";
 
 const Cluster4CardDynamicPage = () => {
   const params = useParams();
-  const weekId = parseInt(params.weekId as string);
-  const weekData = getWeekDataById(weekId);
+  const weekId = params.weekId as string;
 
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
     position: 'fixed',
@@ -71,7 +69,7 @@ const Cluster4CardDynamicPage = () => {
           <div className="home-two-content-col">
             <ClusterTabs />
             <div className="home-two-content">
-              <Cluster4CardContent weekData={weekData} />
+              <Cluster4CardContent weekId={weekId} />
             </div>
           </div>
         </div>
