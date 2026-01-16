@@ -52,7 +52,6 @@ export async function GET() {
     const [
       joinedWeekResult,
       growthEndDateResult,
-      activitiesResult,
       weeklyActivitiesResult,
       cumulativePointsResult,
       seasonHistoriesResult,
@@ -83,9 +82,6 @@ export async function GET() {
               .limit(1)
               .maybeSingle()
           : Promise.resolve({ data: null }),
-
-      // activities 데이터 (실무 카드용)
-      supabaseAdmin.from("activities").select("activity_type_id, week_id").eq("user_id", profile.id).eq("status", "approved"),
 
       // weekly_activities (활동 완료율)
       supabaseAdmin.from("weekly_activities").select("status").eq("user_id", profile.id),
@@ -177,7 +173,9 @@ export async function GET() {
       } : null;
     }
 
-    const activitiesData = activitiesResult.data;
+    // activity_records에서 is_completed=true인 것만 필터링 (기존 activities 테이블 대체)
+    const activityRecordsData = activityRecordsResult.data || [];
+    const activitiesData = activityRecordsData.filter((ar: { is_completed: boolean }) => ar.is_completed);
     const weeklyActivities = weeklyActivitiesResult.data;
     const cumulativePoints = cumulativePointsResult.data;
     const seasonHistories = seasonHistoriesResult.data;
@@ -396,10 +394,10 @@ export async function GET() {
       restWeekIds: allRests?.map((r: { week_id: string }) => r.week_id) || [],
       // 역할 이력 (클라이언트에서 사용)
       userRoleHistory: userRoleHistoryResult.data || [],
-      // 승인된 활동 전체 (주차별 강화 집계용)
+      // 승인된 활동 전체 (주차별 강화 집계용) - activity_records에서 is_completed=true인 것
       approvedActivities: activitiesData || [],
-      // 활동 이행 기록 (강화 상태 판단용: is_completed)
-      activityRecords: activityRecordsResult.data || [],
+      // 활동 이행 기록 전체 (강화 상태 판단용: is_completed 포함)
+      activityRecords: activityRecordsData,
       // 2차 정보 (서브타이틀, 아웃풋링크)
       activityDetails: userActivityDetailsResult.data || [],
     });

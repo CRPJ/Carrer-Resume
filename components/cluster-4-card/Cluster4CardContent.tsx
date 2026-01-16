@@ -70,6 +70,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     activity_type_id: string;
     title: string | null;
     is_active: boolean;
+    opened_at: string | null;  // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
+    output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
 
@@ -344,10 +346,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
         }
 
-        // 9. 주간 활동 데이터 가져오기 (실무정보 모달용)
+        // 9. 주간 활동 데이터 가져오기 (실무정보 모달용) - output_links, opened_at 포함 (운영진 입력)
         const { data: activitiesData, error: activitiesError } = await supabase
           .from('weekly_activities')
-          .select('id, activity_type_id, title, is_active')
+          .select('id, activity_type_id, title, is_active, opened_at, output_links')
           .eq('week_id', weekId);
 
         if (activitiesError) {
@@ -395,12 +397,38 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           console.log('[DEBUG] weekActivityDetails:', filteredActivityDetails.length, filteredActivityDetails);
           setWeekActivityDetails(filteredActivityDetails);
 
-          // 각 파트별 집계 (유저 활동 데이터 유무와 관계없이 total은 계산)
+          // 각 파트별 집계 (2차 정보 기입 OR 48시간 경과 시 success로 카운트)
           const calcStats = (types: string[]) => {
             const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
-            const success = activeActivities.filter(a =>
-              types.includes(a.activity_type_id) && approvedActivityTypes.has(a.activity_type_id)
-            ).length;
+            const now = Date.now();
+            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+            const success = activeActivities.filter(a => {
+              if (!types.includes(a.activity_type_id)) return false;
+              if (!approvedActivityTypes.has(a.activity_type_id)) return false; // is_completed = true 필요
+
+              // 2차 정보 확인
+              const detail = filteredActivityDetails.find(
+                (d: { activity_type_id: string }) => d.activity_type_id === a.activity_type_id
+              );
+              const hasSecondaryInfo = detail && (
+                (detail.sub_title && detail.sub_title.trim() !== '') ||
+                (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+              );
+
+              // 2차 정보가 있으면 바로 success
+              if (hasSecondaryInfo) return true;
+
+              // 48시간 경과 확인
+              if (a.opened_at) {
+                const openedTime = new Date(a.opened_at).getTime();
+                const elapsed = now - openedTime;
+                if (elapsed >= deadline) return true;
+              }
+
+              return false;
+            }).length;
+
             return { total, success };
           };
 
@@ -944,31 +972,84 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 실무 정보에 해당하는 activity types
   const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'etc_a'];
+  // 실무 역량 activity types - DB: practical_competency 클러스터의 실제 activity_type_id들
+  const workAbilityActivityTypes = ['optional_unit', 'practical_lecture'];
+  // 실무 경험 activity types - DB: practical_experience 클러스터
+  const workExpActivityTypes = ['career_marketer_launch', 'productivity_feedback', 'contents_marketing_practical', 'performance_marketing_practical'];
+  // 실무 경력 activity types - DB: practical_career 클러스터
+  const workCareerActivityTypes = ['practical_project'];
+  // 전체 activity types (2차 정보 저장용)
+  const allActivityTypes = [...workInfoActivityTypes, ...workAbilityActivityTypes, ...workExpActivityTypes, ...workCareerActivityTypes];
 
-  // 강화 상태 판단 함수
-  // - 해당 없음: weekly_activities.is_active = false
-  // - 강화(성공): activity_records.is_completed = true + approvedActivities에 있음
-  // - 강화(대기): activity_records.is_completed = true + approvedActivities에 없음
-  // - 강화(실패): activity_records.is_completed = false 또는 레코드 없음
+  // 실무 역량: 첫 번째 존재하는 활동 찾기 헬퍼
+  const findFirstAbilityActivity = () => {
+    for (const actType of workAbilityActivityTypes) {
+      const activity = weeklyActivities.find(a => a.activity_type_id === actType);
+      if (activity) return activity;
+    }
+    return null;
+  };
+
+  // 실무 역량: 첫 번째 존재하는 활동 타입 ID 가져오기
+  const getFirstAbilityActivityType = (): string => {
+    const activity = findFirstAbilityActivity();
+    return activity?.activity_type_id || workAbilityActivityTypes[0];
+  };
+
+  // 강화 상태 판단 함수 (2차 정보 기입 OR 48시간 기준)
+  // - 해당 없음: weekly_activities.is_active = false (활동 미개설)
+  // - 강화 실패: 활동 개설됨 + 카페 댓글 집계에서 이행하지 않음 (is_completed = false)
+  // - 강화 대기: 활동 개설됨 + 이행함 (is_completed = true) + 48시간 미경과 + 2차 정보 미기입
+  // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = 'success' | 'waiting' | 'failed' | 'not_applicable';
-  const getEnhancementStatus = (activityType: string, isActive: boolean): EnhancementStatus => {
+  const getEnhancementStatus = (activityType: string): EnhancementStatus => {
+    // 해당 활동 정보 가져오기
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+
     // 1. 해당 없음: 활동이 개설되지 않음
-    if (!isActive) return 'not_applicable';
+    if (!activity?.is_active) return 'not_applicable';
 
     // 2. activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find(ar => ar.activity_type_id === activityType);
 
     if (!record || !record.is_completed) {
-      // 레코드 없거나 is_completed = false → 강화(실패)
+      // 레코드 없거나 is_completed = false → 강화 실패
       return 'failed';
     }
 
-    // 3. is_completed = true인 경우, 2차 정보(activities) 확인
-    if (weekApprovedTypes.has(activityType)) {
-      // approvedActivities에 있음 → 강화(성공)
+    // 3. is_completed = true인 경우, 2차 정보 기입 여부 확인
+    const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
+    const hasSecondaryInfo = detail && (
+      (detail.sub_title && detail.sub_title.trim() !== '') ||
+      (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+    );
+
+    // 2차 정보가 기입되어 있으면 바로 강화 성공
+    if (hasSecondaryInfo) {
+      return 'success';
+    }
+
+    // 4. 2차 정보 미기입 시, 48시간 경과 여부 확인
+    const openedAt = activity.opened_at;
+    if (!openedAt) {
+      // 개설 시각이 없으면 대기 상태로 처리
+      console.log(`[getEnhancementStatus] ${activityType}: no opened_at -> waiting`);
+      return 'waiting';
+    }
+
+    const openedTime = new Date(openedAt).getTime();
+    const now = Date.now();
+    const elapsed = now - openedTime;
+    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+    const hoursElapsed = Math.floor(elapsed / (60 * 60 * 1000));
+
+    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, deadline=48h, result=${elapsed >= deadline ? 'success' : 'waiting'}`);
+
+    if (elapsed >= deadline) {
+      // 48시간 경과 → 강화 성공 (2차 정보 없이도 자동 성공)
       return 'success';
     } else {
-      // approvedActivities에 없음 → 강화(대기)
+      // 48시간 미경과 + 2차 정보 미기입 → 강화 대기
       return 'waiting';
     }
   };
@@ -986,23 +1067,133 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return weekActivityDetails.find(ad => ad.activity_type_id === activityType);
   };
 
+  // 48시간 이내인지 확인
+  const isWithin48Hours = (openedAt: string | null): boolean => {
+    if (!openedAt) return false;
+    const openedTime = new Date(openedAt).getTime();
+    const now = Date.now();
+    const elapsed = now - openedTime;
+    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+    return elapsed < deadline;
+  };
+
+  // 활동이 개설되었고 48시간 이내인지 확인 (운영진이 개설해야만 + 48시간 이내에만 사용자가 2차 정보 입력 가능)
+  const isActivityActive = (activityType: string): boolean => {
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    if (!activity?.is_active) return false;
+    // 48시간 이내인지 확인
+    return isWithin48Hours(activity.opened_at);
+  };
+
+  // 활동이 개설되었지만 48시간이 지났는지 확인 (마감 표시용)
+  const isActivityExpired = (activityType: string): boolean => {
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    if (!activity?.is_active) return false;
+    // 개설은 되었지만 48시간이 지남
+    return !isWithin48Hours(activity.opened_at);
+  };
+
+  // 실무 역량: 아무 activity type이나 개설되었는지 확인
+  const isAnyAbilityActivityActive = (): boolean => {
+    return workAbilityActivityTypes.some(actType => isActivityActive(actType));
+  };
+
+  // 실무 역량: 모든 activity type이 만료되었는지 확인
+  const isAnyAbilityActivityExpired = (): boolean => {
+    return workAbilityActivityTypes.some(actType => isActivityExpired(actType));
+  };
+
+  // 실무 역량: 첫 번째 활성화된 activity type ID 가져오기 (모달/저장용)
+  const getActiveAbilityActivityType = (): string => {
+    const activeType = workAbilityActivityTypes.find(actType => isActivityActive(actType));
+    if (activeType) return activeType;
+    // 활성화된 것이 없으면 개설된 것(만료 포함) 찾기
+    const openedType = workAbilityActivityTypes.find(actType => {
+      const activity = weeklyActivities.find(a => a.activity_type_id === actType);
+      return activity?.is_active;
+    });
+    return openedType || workAbilityActivityTypes[0];
+  };
+
+  // 남은 시간 계산 (표시용)
+  const getRemainingTime = (activityType: string): { hours: number; minutes: number } | null => {
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    if (!activity?.is_active || !activity.opened_at) return null;
+
+    const openedTime = new Date(activity.opened_at).getTime();
+    const now = Date.now();
+    const elapsed = now - openedTime;
+    const deadline = 48 * 60 * 60 * 1000;
+    const remaining = deadline - elapsed;
+
+    if (remaining <= 0) return null;
+
+    const hours = Math.floor(remaining / (60 * 60 * 1000));
+    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+    return { hours, minutes };
+  };
+
+  // 특정 activity types 중 하나라도 개설되었는지 확인
+  const isAnyActivityActive = (activityTypes: string[]): boolean => {
+    return activityTypes.some(type => isActivityActive(type));
+  };
+
   // 빈 output links 배열 생성 헬퍼
   const createEmptyOutputLinks = (): OutputLink[] => {
     return [0, 1, 2, 3, 4].map(() => ({ desc: '', url: '' }));
+  };
+
+  // URL에 프로토콜이 없으면 https:// 추가
+  const ensureProtocol = (url: string): string => {
+    if (!url) return url;
+    const trimmedUrl = url.trim();
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl;
+    }
+    return `https://${trimmedUrl}`;
+  };
+
+  // 운영진이 입력한 output links 개수 가져오기
+  const getAdminOutputLinksCount = (activityType: string): number => {
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    return activity?.output_links?.filter(l => l.url?.trim())?.length || 0;
+  };
+
+  // 운영진이 입력한 output links 가져오기
+  const getAdminOutputLinks = (activityType: string): OutputLink[] => {
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    return activity?.output_links || [];
   };
 
   // 편집 모달 열 때 초기화
   const initializeEditingDetails = () => {
     const newEditingDetails: { [key: string]: { subTitle: string; outputLinks: OutputLink[] } } = {};
 
-    workInfoActivityTypes.forEach(activityType => {
+    // 모든 activity types에 대해 초기화 (실무 정보 + 실무 역량 + 실무 경험 + 실무 경력)
+    allActivityTypes.forEach(activityType => {
       const detail = getActivityDetail(activityType);
-      // 기존 링크가 있으면 5개로 패딩, 없으면 빈 5개 생성
-      const existingLinks = detail?.output_links || [];
+      const adminLinks = getAdminOutputLinks(activityType);
+      const userLinks = detail?.output_links || [];
+
+      // 5개 슬롯 생성: 운영진 링크 → 사용자 링크 → 빈 슬롯
       const paddedLinks: OutputLink[] = [];
+      const adminCount = adminLinks.filter(l => l.url?.trim()).length;
+
       for (let i = 0; i < 5; i++) {
-        paddedLinks.push(existingLinks[i] ? { ...existingLinks[i] } : { desc: '', url: '' });
+        if (i < adminCount && adminLinks[i]?.url?.trim()) {
+          // 운영진 링크 (수정 불가)
+          paddedLinks.push({ ...adminLinks[i] });
+        } else {
+          // 사용자 링크 (수정 가능)
+          const userLinkIndex = i - adminCount;
+          if (userLinks[userLinkIndex]?.url?.trim()) {
+            paddedLinks.push({ ...userLinks[userLinkIndex] });
+          } else {
+            paddedLinks.push({ desc: '', url: '' });
+          }
+        }
       }
+
       newEditingDetails[activityType] = {
         subTitle: detail?.sub_title || '',
         outputLinks: paddedLinks,
@@ -1012,7 +1203,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setEditingDetails(newEditingDetails);
   };
 
-  // 2차 정보 저장
+  // 2차 정보 저장 (운영진 링크 제외, 사용자 링크만 저장)
   const saveActivityDetail = async (activityType: string) => {
     if (!currentUserId || !weekId) return;
 
@@ -1021,8 +1212,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const detail = editingDetails[activityType];
       if (!detail) return;
 
-      // 빈 링크 필터링
-      const validLinks = detail.outputLinks.filter(link => link.url.trim() !== '');
+      // 운영진 링크 개수 확인
+      const adminCount = getAdminOutputLinksCount(activityType);
+
+      // 운영진 링크 이후의 사용자 링크만 필터링 (빈 링크 제외)
+      const userLinks = detail.outputLinks.slice(adminCount).filter(link => link.url.trim() !== '');
 
       const response = await fetch('/api/activity-details', {
         method: 'POST',
@@ -1032,7 +1226,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           week_id: weekId,
           activity_type_id: activityType,
           sub_title: detail.subTitle || null,
-          output_links: validLinks.length > 0 ? validLinks : null,
+          output_links: userLinks.length > 0 ? userLinks : null,
         }),
       });
 
@@ -1052,6 +1246,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
+  // 저장 후 weekActivityDetails 상태 즉시 업데이트 (공통 함수)
+  const updateWeekActivityDetailsAfterSave = (activityTypes: string[]) => {
+    setWeekActivityDetails(prev => {
+      const updatedDetails = [...prev];
+      activityTypes.forEach(activityType => {
+        const detail = editingDetails[activityType];
+        const validLinks = detail?.outputLinks.filter(link => link.url.trim() !== '') || [];
+        const newDetail = {
+          week_id: weekId,
+          activity_type_id: activityType,
+          sub_title: detail?.subTitle || null,
+          output_links: validLinks.length > 0 ? validLinks : null,
+        };
+        const existingIndex = updatedDetails.findIndex(d => d.activity_type_id === activityType);
+        if (existingIndex >= 0) {
+          updatedDetails[existingIndex] = newDetail;
+        } else {
+          updatedDetails.push(newDetail);
+        }
+      });
+      return updatedDetails;
+    });
+  };
+
   // 모든 실무 정보 카드 저장
   const saveAllActivityDetails = async () => {
     setIsSaving(true);
@@ -1059,6 +1277,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       for (const activityType of workInfoActivityTypes) {
         await saveActivityDetail(activityType);
       }
+
+      // 저장 후 weekActivityDetails 상태 즉시 업데이트
+      updateWeekActivityDetailsAfterSave(workInfoActivityTypes);
+
       alert('저장되었습니다.');
       setWorkInfoModalOpen(false);
     } catch (error) {
@@ -1072,13 +1294,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const workInfoCards = [
     ...workInfoActivityTypes.map((activityType, index) => {
       const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+      const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
       const config = activityTypeConfig[activityType];
-      const isActive = activity?.is_active ?? false;
-      const enhancementStatus = getEnhancementStatus(activityType, isActive);
+      const enhancementStatus = getEnhancementStatus(activityType);
+      // DEBUG: 실무 정보 카드 데이터 확인
+      console.log(`[workInfoCards] ${activityType}: title="${activity?.title}", status=${enhancementStatus}`);
+
+      // Output Links 병합 (운영진 링크 + 사용자 링크)
+      const adminLinks = activity?.output_links || [];
+      const userLinks = detail?.output_links || [];
+      const adminCount = adminLinks.filter((l: { url?: string }) => l.url?.trim()).length;
+      const mergedOutputLinks: { desc: string; url: string }[] = [];
+      for (let i = 0; i < 5; i++) {
+        if (i < adminCount && adminLinks[i]?.url?.trim()) {
+          // 운영진 링크
+          mergedOutputLinks.push(adminLinks[i]);
+        } else {
+          // 사용자 링크 (운영진 링크 개수만큼 오프셋)
+          const userLinkIndex = i - adminCount;
+          if (userLinks[userLinkIndex]?.url?.trim()) {
+            mergedOutputLinks.push(userLinks[userLinkIndex]);
+          } else {
+            mergedOutputLinks.push({ desc: '', url: '' });
+          }
+        }
+      }
+
       return {
         id: index + 1,
         activityType,
-        title: activity?.title || '제목 없음',
+        title: activity?.title || '-',  // 운영진이 입력한 Main Title (없으면 '-')
+        subTitle: detail?.sub_title || '',
         verified: true,
         category: config?.category || activityType,
         tagColor: config?.tagColor || '',
@@ -1088,11 +1334,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         isFruit: config?.isFruit || false,
         isFailed: enhancementStatus === 'failed',
         isEmpty: false,
+        outputLinks: mergedOutputLinks,
       };
     }),
     // 빈 카드 2개
-    { id: 8, activityType: '', title: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true },
-    { id: 9, activityType: '', title: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true },
+    { id: 8, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
+    { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
   // 실무 경험 카드 데이터 (rating * 2 = 점수, 반개당 1점)
@@ -1440,7 +1687,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => { initializeEditingDetails(); setWorkInfoModalOpen(true); }} style={{ cursor: 'pointer' }}>
+              <div className="edit-icon" onClick={() => {
+                initializeEditingDetails();
+                setWorkInfoModalOpen(true);
+              }} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -1488,7 +1738,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="card-body-row">
                     <div className={`card-icon-area ${!isEmpty && card.isFruit ? 'fruit' : ''} ${!isEmpty && card.isFailed ? 'failed' : ''}`}>
-                      {!isEmpty && card.icon ? <img src={card.icon} alt={card.category} /> : <div className="icon-placeholder"></div>}
+                      {!isEmpty && card.icon ? (
+                        <img
+                          src={card.icon}
+                          alt={card.category}
+                          style={{ opacity: (card.status === 'failed' || card.status === 'not_applicable') ? 0.3 : 1 }}
+                        />
+                      ) : (
+                        <div className="icon-placeholder"></div>
+                      )}
                       {!isEmpty && card.isFailed && (
                         <div className="failed-overlay">
                           <span className="failed-text">강화 실패</span>
@@ -1496,7 +1754,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       )}
                     </div>
-                    <span className="card-desc">{isEmpty ? '-' : <>CU의 무덤이 몽골에 이어 하와이까지 업습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피를 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                    <span className="card-desc">{isEmpty ? '-' : <>{card.title || '-'}<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                   </div>
                 </div>
                 {!isEmpty && card.status && card.statusIcon && (
@@ -1515,7 +1773,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => setWorkAbilityModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <div className="edit-icon" onClick={() => {
+                initializeEditingDetails();
+                setWorkAbilityModalOpen(true);
+              }} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -1560,12 +1821,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {!isRestMode && <span className="code-tag">CP10 - UN010</span>}
                 {!isRestMode && <span className="info-tag">[실무 Info]인하우스 & 에이전시</span>}
               </div>
-              <p className="main-desc">{isRestMode ? '-' : '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~'}</p>
+              <p className="main-desc">{isRestMode ? '-' : (findFirstAbilityActivity()?.title || '-')}</p>
               <div className="sub-title-row">
                 <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                 <span className="sub-label">Sub Title</span>
               </div>
-              <span className="sub-desc">{isRestMode ? '-' : <>실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+              <span className="sub-desc">{isRestMode ? '-' : <>{weekActivityDetails.find(d => workAbilityActivityTypes.includes(d.activity_type_id))?.sub_title || '-'}<img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
             </div>
             {!isRestMode && (
             <div className="status-badge">
@@ -1586,7 +1847,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => setWorkExpModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <div className="edit-icon" onClick={() => {
+                if (!isAnyActivityActive(workExpActivityTypes)) {
+                  alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
+                  return;
+                }
+                initializeEditingDetails();
+                setWorkExpModalOpen(true);
+              }} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -1610,8 +1878,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-exp-cards">
-            {workExpCards.map((card) => {
+            {workExpCards.map((card, cardIndex) => {
               const isEmpty = card.isEmpty || isRestMode;
+              const expActivityType = workExpActivityTypes[cardIndex];
               return (
               <div
                 key={card.id}
@@ -1655,12 +1924,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                     <span className="verified-text">Verified</span>
                   </div>
-                  <p className="main-desc">{isEmpty ? '-' : '[역량 파악 & 성장점 분석] "빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!"'}</p>
+                  <p className="main-desc">{isEmpty ? '-' : (weeklyActivities.find(a => a.activity_type_id === expActivityType)?.title || '-')}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93..'}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === expActivityType)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                 </div>
                 {!isEmpty && (
                   <div className="status-badge">
@@ -1678,7 +1947,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => setWorkCareerModalOpen(true)} style={{ cursor: 'pointer' }}>
+              <div className="edit-icon" onClick={() => {
+                if (!isAnyActivityActive(workCareerActivityTypes)) {
+                  alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
+                  return;
+                }
+                initializeEditingDetails();
+                setWorkCareerModalOpen(true);
+              }} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -1702,8 +1978,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-career-cards">
-            {workCareerCards.map((card) => {
+            {workCareerCards.map((card, cardIndex) => {
               const isEmpty = card.isEmpty || isRestMode;
+              const careerActivityType = workCareerActivityTypes[cardIndex];
               return (
               <div
                 key={card.id}
@@ -1742,12 +2019,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                   </div>
-                  <p className="main-desc-white">{isEmpty ? '-' : '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100'}</p>
+                  <p className="main-desc-white">{isEmpty ? '-' : (weeklyActivities.find(a => a.activity_type_id === careerActivityType)?.title || '-')}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..'}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === careerActivityType)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
                     <div className="supervisor-info">
@@ -1848,7 +2125,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     </div>
 
-                    {/* Sub Title - 수정 가능 */}
+                    {/* 미개설/강화실패/마감 안내 */}
+                    {!isActivityActive(card.activityType) && (
+                      <div style={{
+                        padding: '16px',
+                        backgroundColor: (getEnhancementStatus(card.activityType) === 'failed' || isActivityExpired(card.activityType)) ? '#fee2e2' : '#fff3cd',
+                        border: (getEnhancementStatus(card.activityType) === 'failed' || isActivityExpired(card.activityType)) ? '1px solid #ef4444' : '1px solid #ffc107',
+                        borderRadius: '8px',
+                        marginBottom: '16px'
+                      }}>
+                        <p style={{ margin: 0, color: (getEnhancementStatus(card.activityType) === 'failed' || isActivityExpired(card.activityType)) ? '#dc2626' : '#856404', fontSize: '14px' }}>
+                          {getEnhancementStatus(card.activityType) === 'failed'
+                            ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
+                            : isActivityExpired(card.activityType)
+                              ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                              : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Sub Title - 개설된 경우만 수정 가능 */}
                     <div className="modal-input-group">
                       <div className="section-label-row">
                         <div className="section-label">Sub Title</div>
@@ -1863,31 +2159,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             subTitle: e.target.value,
                           }
                         }))}
-                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                        placeholder={isActivityActive(card.activityType) ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
                         rows={3}
                         maxLength={150}
+                        disabled={!isActivityActive(card.activityType)}
+                        style={!isActivityActive(card.activityType) ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                       ></textarea>
                     </div>
 
-                    {/* Output Link - 수정 가능 */}
+                    {/* Output Link - 운영진 입력은 읽기 전용, 미개설 시 전체 비활성화 */}
                     <div className="modal-input-group">
                       <div className="section-label">Output Link</div>
                       <div className="output-links-buttons">
                         {[0, 1, 2, 3, 4].map((idx) => {
                           const link = editingDetails[card.activityType]?.outputLinks?.[idx] || { desc: '', url: '' };
                           const hasContent = link.url.trim() !== '';
+                          const adminCount = getAdminOutputLinksCount(card.activityType);
+                          const isAdminLink = idx < adminCount;
+                          const isDisabled = !isActivityActive(card.activityType) || isAdminLink;
                           return (
-                            <div key={idx} className={`output-link-item ${hasContent ? 'active' : ''}`}>
+                            <div key={idx} className={`output-link-item ${hasContent ? 'active' : ''} ${isAdminLink ? 'admin-link' : ''}`}>
                               <div className="link-button">
                                 <span className="link-num">{idx + 1}</span>
+                                {isAdminLink && <span className="admin-badge" title="운영진 입력">A</span>}
                               </div>
                               <input
                                 type="text"
                                 className="link-desc"
-                                placeholder="링크 설명 (20자)"
+                                placeholder={isDisabled ? '' : '링크 설명 (20자)'}
                                 maxLength={20}
                                 value={link.desc}
-                                onChange={(e) => setEditingDetails(prev => {
+                                disabled={isDisabled}
+                                style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                onChange={(e) => !isDisabled && setEditingDetails(prev => {
                                   const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
                                   currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
                                   return {
@@ -1902,9 +2206,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <input
                                 type="url"
                                 className="link-url"
-                                placeholder="URL"
+                                placeholder={isDisabled ? '' : 'URL'}
                                 value={link.url}
-                                onChange={(e) => setEditingDetails(prev => {
+                                disabled={isDisabled}
+                                style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                onChange={(e) => !isDisabled && setEditingDetails(prev => {
                                   const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
                                   currentLinks[idx] = { ...currentLinks[idx], url: e.target.value };
                                   return {
@@ -1920,6 +2226,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           );
                         })}
                       </div>
+                      {getAdminOutputLinksCount(card.activityType) > 0 && (
+                        <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                          * 'A' 표시된 링크는 운영진이 입력한 것으로 수정할 수 없습니다.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1969,61 +2280,112 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 타이틀 + 내용 (읽기 전용) */}
                   <div className="modal-title-section">
                     <div className="main-title">Main Title</div>
-                    <div className="content-title">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
+                    <div className="content-title">{findFirstAbilityActivity()?.title || '-'}</div>
                     <div className="modal-date-badge">
                       <span>{weekDateRange}</span>
                     </div>
                   </div>
 
+                  {/* 미개설/강화실패/마감 안내 */}
+                  {!isAnyAbilityActivityActive() && (
+                    <div style={{
+                      padding: '16px',
+                      backgroundColor: (getEnhancementStatus(getActiveAbilityActivityType()) === 'failed' || isAnyAbilityActivityExpired()) ? '#fee2e2' : '#fff3cd',
+                      border: (getEnhancementStatus(getActiveAbilityActivityType()) === 'failed' || isAnyAbilityActivityExpired()) ? '1px solid #ef4444' : '1px solid #ffc107',
+                      borderRadius: '8px',
+                      marginBottom: '16px'
+                    }}>
+                      <p style={{ margin: 0, color: (getEnhancementStatus(getActiveAbilityActivityType()) === 'failed' || isAnyAbilityActivityExpired()) ? '#dc2626' : '#856404', fontSize: '14px' }}>
+                        {getEnhancementStatus(getActiveAbilityActivityType()) === 'failed'
+                          ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
+                          : isAnyAbilityActivityExpired()
+                            ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                            : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Sub Title - 수정 가능 */}
                   <div className="modal-input-group">
                     <div className="section-label-row">
                       <div className="section-label">Sub Title</div>
-                      <div className="char-counter"><span>0</span> / 150</div>
+                      <div className="char-counter"><span>{editingDetails[getActiveAbilityActivityType()]?.subTitle?.length || 0}</span> / 150</div>
                     </div>
                     <textarea
-                      placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
+                      placeholder={isAnyAbilityActivityActive() ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
                       rows={3}
                       maxLength={150}
+                      value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ''}
+                      onChange={(e) => {
+                        const actType = getActiveAbilityActivityType();
+                        setEditingDetails(prev => ({
+                          ...prev,
+                          [actType]: { ...prev[actType], subTitle: e.target.value }
+                        }));
+                      }}
+                      disabled={!isAnyAbilityActivityActive()}
+                      style={!isAnyAbilityActivityActive() ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                     ></textarea>
                   </div>
 
-                  {/* Output Link - 수정 가능 */}
+                  {/* Output Link - 운영진 입력은 읽기 전용, 미개설 시 전체 비활성화 */}
                   <div className="modal-input-group">
                     <div className="section-label">Output Link</div>
                     <div className="output-links-buttons">
-                      {[1, 2, 3, 4, 5].map((num) => {
-                        const linkCount = 4;
-                        const linkDescs = ["역량 분석 리포트", "실무 테스트 결과", "성장 계획서", "스킬 인증서", ""];
+                      {(editingDetails[getActiveAbilityActivityType()]?.outputLinks || []).map((link, linkIndex) => {
+                        const actType = getActiveAbilityActivityType();
+                        const adminCount = getAdminOutputLinksCount(actType);
+                        const isAdminLink = linkIndex < adminCount;
+                        const isDisabled = !isAnyAbilityActivityActive() || isAdminLink;
                         return (
-                          <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
+                          <div key={linkIndex} className={`output-link-item ${link.url.trim() ? 'active' : ''} ${isAdminLink ? 'admin-link' : ''}`}>
                             <div className="link-button">
-                              <span className="link-num">{num}</span>
+                              <span className="link-num">{linkIndex + 1}</span>
+                              {isAdminLink && <span className="admin-badge" title="운영진 입력">A</span>}
                             </div>
                             <input
                               type="text"
                               className="link-desc"
-                              placeholder="링크 설명을 입력하세요"
+                              placeholder={isDisabled ? '' : '링크 설명을 입력하세요'}
                               maxLength={20}
-                              defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
+                              value={link.desc}
+                              disabled={isDisabled}
+                              style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                              onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                const newLinks = [...prev[actType].outputLinks];
+                                newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
+                              })}
                             />
                             <input
                               type="url"
                               className="link-url"
-                              placeholder="URL"
-                              defaultValue={num <= linkCount ? "https://example.com" : ""}
+                              placeholder={isDisabled ? '' : 'URL'}
+                              value={link.url}
+                              disabled={isDisabled}
+                              style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                              onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                const newLinks = [...prev[actType].outputLinks];
+                                newLinks[linkIndex] = { ...newLinks[linkIndex], url: e.target.value };
+                                return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
+                              })}
                             />
                           </div>
                         );
                       })}
                     </div>
+                    {getAdminOutputLinksCount(getActiveAbilityActivityType()) > 0 && (
+                      <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                        * 'A' 표시된 링크는 운영진이 입력한 것으로 수정할 수 없습니다.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkAbilityModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setWorkAbilityModalOpen(false)}>저장</button>
+              <button className="save-btn" onClick={async () => { const actType = getActiveAbilityActivityType(); await saveActivityDetail(actType); updateWeekActivityDetailsAfterSave([actType]); alert('저장되었습니다.'); setWorkAbilityModalOpen(false); }} disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -2077,63 +2439,133 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className="rating-count">{card.ratingCount}</span>
                         </div>
                       </div>
-                      <div className="content-title">[역량 파악 & 성장점 분석] 빼날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 빼저리게 느껴보자구!</div>
+                      <div className="content-title">{weeklyActivities.find(a => a.activity_type_id === workExpActivityTypes[index])?.title || '-'}</div>
                       <div className="modal-date-badge">
                         <span>{weekDateRange}</span>
                       </div>
                     </div>
 
                     {/* Sub Title - 수정 가능 */}
-                    <div className="modal-input-group">
-                      <div className="section-label-row">
-                        <div className="section-label">Sub Title</div>
-                        <div className="char-counter"><span>0</span> / 150</div>
-                      </div>
-                      <textarea
-                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
-                        rows={3}
-                        maxLength={150}
-                      ></textarea>
-                    </div>
-
-                    {/* Output Link - 수정 가능 */}
-                    <div className="modal-input-group">
-                      <div className="section-label">Output Link</div>
-                      <div className="output-links-buttons">
-                        {(() => {
-                          const linkCounts = [3, 1, 5, 2, 4];
-                          const linkCount = linkCounts[index % linkCounts.length];
-                          const linkDescs = ["경험 증빙 자료", "프로젝트 문서", "성과 리포트", "팀 협업 자료", "기타 자료"];
-                          return [1, 2, 3, 4, 5].map((num) => (
-                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
-                              <div className="link-button">
-                                <span className="link-num">{num}</span>
-                              </div>
-                              <input
-                                type="text"
-                                className="link-desc"
-                                placeholder="링크 설명을 입력하세요"
-                                maxLength={20}
-                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
-                              />
-                              <input
-                                type="url"
-                                className="link-url"
-                                placeholder="URL"
-                                defaultValue={num <= linkCount ? "https://example.com" : ""}
-                              />
+                    {(() => {
+                      const activityType = workExpActivityTypes[index];
+                      const isActive = isActivityActive(activityType);
+                      const isExpired = isActivityExpired(activityType);
+                      const isFailed = getEnhancementStatus(activityType) === 'failed';
+                      return (
+                        <>
+                          {/* 미개설/강화실패/마감 안내 */}
+                          {!isActive && (
+                            <div style={{
+                              padding: '16px',
+                              backgroundColor: (isFailed || isExpired) ? '#fee2e2' : '#fff3cd',
+                              border: (isFailed || isExpired) ? '1px solid #ef4444' : '1px solid #ffc107',
+                              borderRadius: '8px',
+                              marginBottom: '16px'
+                            }}>
+                              <p style={{ margin: 0, color: (isFailed || isExpired) ? '#dc2626' : '#856404', fontSize: '14px' }}>
+                                {isFailed
+                                  ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
+                                  : isExpired
+                                    ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                                    : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
+                              </p>
                             </div>
-                          ));
-                        })()}
-                      </div>
-                    </div>
+                          )}
+
+                          <div className="modal-input-group">
+                            <div className="section-label-row">
+                              <div className="section-label">Sub Title</div>
+                              <div className="char-counter"><span>{editingDetails[activityType]?.subTitle?.length || 0}</span> / 150</div>
+                            </div>
+                            <textarea
+                              placeholder={isActive ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
+                              rows={3}
+                              maxLength={150}
+                              value={editingDetails[activityType]?.subTitle || ''}
+                              onChange={(e) => setEditingDetails(prev => ({
+                                ...prev,
+                                [activityType]: { ...prev[activityType], subTitle: e.target.value }
+                              }))}
+                              disabled={!isActive}
+                              style={!isActive ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                            ></textarea>
+                          </div>
+
+                          {/* Output Link - 운영진 입력은 읽기 전용, 미개설 시 전체 비활성화 */}
+                          <div className="modal-input-group">
+                            <div className="section-label">Output Link</div>
+                            <div className="output-links-buttons">
+                              {editingDetails[activityType]?.outputLinks.map((link, linkIndex) => {
+                                const adminCount = getAdminOutputLinksCount(activityType);
+                                const isAdminLink = linkIndex < adminCount;
+                                const isDisabled = !isActive || isAdminLink;
+                                return (
+                                  <div key={linkIndex} className={`output-link-item ${link.url.trim() ? 'active' : ''} ${isAdminLink ? 'admin-link' : ''}`}>
+                                    <div className="link-button">
+                                      <span className="link-num">{linkIndex + 1}</span>
+                                      {isAdminLink && <span className="admin-badge" title="운영진 입력">A</span>}
+                                    </div>
+                                    <input
+                                      type="text"
+                                      className="link-desc"
+                                      placeholder={isDisabled ? '' : '링크 설명을 입력하세요'}
+                                      maxLength={20}
+                                      value={link.desc}
+                                      disabled={isDisabled}
+                                      style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                      onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                        const newLinks = [...prev[activityType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                        return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                      })}
+                                    />
+                                    <input
+                                      type="url"
+                                      className="link-url"
+                                      placeholder={isDisabled ? '' : 'URL'}
+                                      value={link.url}
+                                      disabled={isDisabled}
+                                      style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                      onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                        const newLinks = [...prev[activityType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], url: e.target.value };
+                                        return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                      })}
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            {getAdminOutputLinksCount(activityType) > 0 && (
+                              <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                                * 'A' 표시된 링크는 운영진이 입력한 것으로 수정할 수 없습니다.
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}
             </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkExpModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setWorkExpModalOpen(false)}>저장</button>
+              <button className="save-btn" onClick={async () => {
+                setIsSaving(true);
+                try {
+                  for (const activityType of workExpActivityTypes) {
+                    await saveActivityDetail(activityType);
+                  }
+                  updateWeekActivityDetailsAfterSave(workExpActivityTypes);
+                  alert('저장되었습니다.');
+                  setWorkExpModalOpen(false);
+                } catch (error) {
+                  console.error('Error saving work exp details:', error);
+                } finally {
+                  setIsSaving(false);
+                }
+              }} disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -2183,63 +2615,133 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className={`grade ${card.grade === 'D' ? 'active' : ''}`}>D</span>
                         </div>
                       </div>
-                      <div className="content-title">실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 뭘까 80일이삼사오육칠팔구십</div>
+                      <div className="content-title">{weeklyActivities.find(a => a.activity_type_id === workCareerActivityTypes[index])?.title || '-'}</div>
                       <div className="modal-date-badge">
                         <span>{weekDateRange}</span>
                       </div>
                     </div>
 
                     {/* Sub Title - 수정 가능 */}
-                    <div className="modal-input-group">
-                      <div className="section-label-row">
-                        <div className="section-label">Sub Title</div>
-                        <div className="char-counter"><span>0</span> / 150</div>
-                      </div>
-                      <textarea
-                        placeholder="메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)"
-                        rows={3}
-                        maxLength={150}
-                      ></textarea>
-                    </div>
-
-                    {/* Output Link - 수정 가능 */}
-                    <div className="modal-input-group">
-                      <div className="section-label">Output Link</div>
-                      <div className="output-links-buttons">
-                        {(() => {
-                          const linkCounts = [2, 5, 1, 3, 4];
-                          const linkCount = linkCounts[index % linkCounts.length];
-                          const linkDescs = ["이력서", "포트폴리오", "프로젝트 사례", "자격증 증빙", "추천서"];
-                          return [1, 2, 3, 4, 5].map((num) => (
-                            <div key={num} className={`output-link-item ${num <= linkCount ? 'active' : ''}`}>
-                              <div className="link-button">
-                                <span className="link-num">{num}</span>
-                              </div>
-                              <input
-                                type="text"
-                                className="link-desc"
-                                placeholder="링크 설명을 입력하세요"
-                                maxLength={20}
-                                defaultValue={num <= linkCount ? linkDescs[num - 1] : ""}
-                              />
-                              <input
-                                type="url"
-                                className="link-url"
-                                placeholder="URL"
-                                defaultValue={num <= linkCount ? "https://example.com" : ""}
-                              />
+                    {(() => {
+                      const activityType = workCareerActivityTypes[index];
+                      const isActive = isActivityActive(activityType);
+                      const isExpired = isActivityExpired(activityType);
+                      const isFailed = getEnhancementStatus(activityType) === 'failed';
+                      return (
+                        <>
+                          {/* 미개설/강화실패/마감 안내 */}
+                          {!isActive && (
+                            <div style={{
+                              padding: '16px',
+                              backgroundColor: (isFailed || isExpired) ? '#fee2e2' : '#fff3cd',
+                              border: (isFailed || isExpired) ? '1px solid #ef4444' : '1px solid #ffc107',
+                              borderRadius: '8px',
+                              marginBottom: '16px'
+                            }}>
+                              <p style={{ margin: 0, color: (isFailed || isExpired) ? '#dc2626' : '#856404', fontSize: '14px' }}>
+                                {isFailed
+                                  ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
+                                  : isExpired
+                                    ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                                    : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
+                              </p>
                             </div>
-                          ));
-                        })()}
-                      </div>
-                    </div>
+                          )}
+
+                          <div className="modal-input-group">
+                            <div className="section-label-row">
+                              <div className="section-label">Sub Title</div>
+                              <div className="char-counter"><span>{editingDetails[activityType]?.subTitle?.length || 0}</span> / 150</div>
+                            </div>
+                            <textarea
+                              placeholder={isActive ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
+                              rows={3}
+                              maxLength={150}
+                              value={editingDetails[activityType]?.subTitle || ''}
+                              onChange={(e) => setEditingDetails(prev => ({
+                                ...prev,
+                                [activityType]: { ...prev[activityType], subTitle: e.target.value }
+                              }))}
+                              disabled={!isActive}
+                              style={!isActive ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                            ></textarea>
+                          </div>
+
+                          {/* Output Link - 운영진 입력은 읽기 전용, 미개설 시 전체 비활성화 */}
+                          <div className="modal-input-group">
+                            <div className="section-label">Output Link</div>
+                            <div className="output-links-buttons">
+                              {editingDetails[activityType]?.outputLinks.map((link, linkIndex) => {
+                                const adminCount = getAdminOutputLinksCount(activityType);
+                                const isAdminLink = linkIndex < adminCount;
+                                const isDisabled = !isActive || isAdminLink;
+                                return (
+                                  <div key={linkIndex} className={`output-link-item ${link.url.trim() ? 'active' : ''} ${isAdminLink ? 'admin-link' : ''}`}>
+                                    <div className="link-button">
+                                      <span className="link-num">{linkIndex + 1}</span>
+                                      {isAdminLink && <span className="admin-badge" title="운영진 입력">A</span>}
+                                    </div>
+                                    <input
+                                      type="text"
+                                      className="link-desc"
+                                      placeholder={isDisabled ? '' : '링크 설명을 입력하세요'}
+                                      maxLength={20}
+                                      value={link.desc}
+                                      disabled={isDisabled}
+                                      style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                      onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                        const newLinks = [...prev[activityType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                        return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                      })}
+                                    />
+                                    <input
+                                      type="url"
+                                      className="link-url"
+                                      placeholder={isDisabled ? '' : 'URL'}
+                                      value={link.url}
+                                      disabled={isDisabled}
+                                      style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                      onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                        const newLinks = [...prev[activityType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], url: e.target.value };
+                                        return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                      })}
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            {getAdminOutputLinksCount(activityType) > 0 && (
+                              <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                                * 'A' 표시된 링크는 운영진이 입력한 것으로 수정할 수 없습니다.
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}
             </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setWorkCareerModalOpen(false)}>저장</button>
+              <button className="save-btn" onClick={async () => {
+                setIsSaving(true);
+                try {
+                  for (const activityType of workCareerActivityTypes) {
+                    await saveActivityDetail(activityType);
+                  }
+                  updateWeekActivityDetailsAfterSave(workCareerActivityTypes);
+                  alert('저장되었습니다.');
+                  setWorkCareerModalOpen(false);
+                } catch (error) {
+                  console.error('Error saving work career details:', error);
+                } finally {
+                  setIsSaving(false);
+                }
+              }} disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -2730,34 +3232,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* Sub Title */}
               <div className="work-view-section">
                 <div className="section-label">Sub Title</div>
-                <div className="section-content">메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀로 표현합니다. 실무에서 경험한 내용과 인사이트를 바탕으로 작성된 서브타이틀입니다. 사용자가 직접 입력한 내용이 여기에 표시되며 최대 150자까지 작성할 수 있습니다.</div>
+                <div className="section-content">{selectedWorkInfoCard.subTitle || '-'}</div>
               </div>
 
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
                 <div className="output-links-view">
-                  {(() => {
-                    const linkCounts = [1, 4, 2, 5, 3];
-                    const linkCount = linkCounts[selectedWorkInfoCard.id % linkCounts.length];
-                    const linkDescs = ["마케팅 포트폴리오 실무 프로젝트 사례", "프로젝트 결과물", "실무 사례", "참고 자료", "추가 링크"];
-                    return [1, 2, 3, 4, 5].map((num) => {
-                      const isActive = num <= linkCount;
-                      return (
-                        <a
-                          key={num}
-                          href={isActive ? "https://example.com" : undefined}
-                          target={isActive ? "_blank" : undefined}
-                          rel={isActive ? "noopener noreferrer" : undefined}
-                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
-                          onClick={(e) => !isActive && e.preventDefault()}
-                        >
-                          <span className="link-num">{num}</span>
-                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
-                        </a>
-                      );
-                    });
-                  })()}
+                  {[0, 1, 2, 3, 4].map((idx) => {
+                    const link = selectedWorkInfoCard.outputLinks?.[idx];
+                    const hasLink = link?.url && link.url.trim() !== '';
+                    return (
+                      <a
+                        key={idx}
+                        href={hasLink ? ensureProtocol(link.url) : undefined}
+                        target={hasLink ? "_blank" : undefined}
+                        rel={hasLink ? "noopener noreferrer" : undefined}
+                        className={`output-link-item ${!hasLink ? 'disabled' : ''}`}
+                        onClick={(e) => !hasLink && e.preventDefault()}
+                      >
+                        <span className="link-num">{idx + 1}</span>
+                        <span className="link-desc">{hasLink ? (link.desc || '링크') : '-'}</span>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -2794,38 +3292,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* Main Title + Content */}
               <div className="work-view-title-section">
                 <div className="main-title">Main Title</div>
-                <div className="content-text">[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시의 개념, 그리고 내부 속성을 알아보자구~</div>
+                <div className="content-text">{findFirstAbilityActivity()?.title || '-'}</div>
                 <div className="date-badge">{weekDateRange}</div>
               </div>
 
               {/* Sub Title */}
               <div className="work-view-section">
                 <div className="section-label">Sub Title</div>
-                <div className="section-content">인하우스와 에이전시의 차이점을 실무 관점에서 분석한 내용입니다. 각각의 장단점과 커리어 성장 가능성을 비교하여 본인에게 맞는 방향을 찾는 것이 중요합니다. 마케터로서 어떤 환경이 더 적합한지 고민해보세요.</div>
+                <div className="section-content">{weekActivityDetails.find(d => workAbilityActivityTypes.includes(d.activity_type_id))?.sub_title || '-'}</div>
               </div>
 
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
                 <div className="output-links-view">
-                  {[1, 2, 3, 4, 5].map((num) => {
-                    const linkCount = 4;
-                    const linkDescs = ["역량 분석 리포트 상세 내용 테스트", "실무 테스트 결과", "성장 계획서", "스킬 인증서", ""];
-                    const isActive = num <= linkCount;
-                    return (
-                      <a
-                        key={num}
-                        href={isActive ? "https://example.com" : undefined}
-                        target={isActive ? "_blank" : undefined}
-                        rel={isActive ? "noopener noreferrer" : undefined}
-                        className={`output-link-item ${!isActive ? 'disabled' : ''}`}
-                        onClick={(e) => !isActive && e.preventDefault()}
-                      >
-                        <span className="link-num">{num}</span>
-                        <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
-                      </a>
-                    );
-                  })}
+                  {(() => {
+                    const activityType = getActiveAbilityActivityType();
+                    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+                    const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
+                    const adminLinks = activity?.output_links || [];
+                    const userLinks = detail?.output_links || [];
+                    return [0, 1, 2, 3, 4].map((idx) => {
+                      const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
+                      const hasLink = link?.url && link.url.trim() !== '';
+                      return (
+                        <a
+                          key={idx}
+                          href={hasLink ? ensureProtocol(link.url) : undefined}
+                          target={hasLink ? "_blank" : undefined}
+                          rel={hasLink ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!hasLink ? 'disabled' : ''}`}
+                          onClick={(e) => !hasLink && e.preventDefault()}
+                        >
+                          <span className="link-num">{idx + 1}</span>
+                          <span className="link-desc">{hasLink ? (link.desc || '링크') : '-'}</span>
+                        </a>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
@@ -2875,7 +3379,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* Sub Title */}
               <div className="work-view-section">
                 <div className="section-label">Sub Title</div>
-                <div className="section-content">마케터로서의 커리어를 시작하고 성장하는 과정에서 겪은 경험들을 정리한 내용입니다. 실무에서 배운 것들과 앞으로의 성장 방향에 대한 생각을 담았습니다. 지속적인 학습과 도전이 중요합니다.</div>
+                <div className="section-content">{(() => {
+                  const activityType = workExpActivityTypes[selectedWorkExpCard.id - 1];
+                  return weekActivityDetails.find(d => d.activity_type_id === activityType)?.sub_title || '-';
+                })()}</div>
               </div>
 
               {/* Output Link */}
@@ -2883,22 +3390,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Output Link</div>
                 <div className="output-links-view">
                   {(() => {
-                    const linkCounts = [3, 1, 5, 2, 4];
-                    const linkCount = linkCounts[selectedWorkExpCard.id % linkCounts.length];
-                    const linkDescs = ["경험 증빙 자료 및 프로젝트 상세 문서", "프로젝트 문서", "성과 리포트", "팀 협업 자료", "기타 자료"];
-                    return [1, 2, 3, 4, 5].map((num) => {
-                      const isActive = num <= linkCount;
+                    const activityType = workExpActivityTypes[selectedWorkExpCard.id - 1];
+                    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+                    const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
+                    const adminLinks = activity?.output_links || [];
+                    const userLinks = detail?.output_links || [];
+                    return [0, 1, 2, 3, 4].map((idx) => {
+                      const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
+                      const hasLink = link?.url && link.url.trim() !== '';
                       return (
                         <a
-                          key={num}
-                          href={isActive ? "https://example.com" : undefined}
-                          target={isActive ? "_blank" : undefined}
-                          rel={isActive ? "noopener noreferrer" : undefined}
-                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
-                          onClick={(e) => !isActive && e.preventDefault()}
+                          key={idx}
+                          href={hasLink ? ensureProtocol(link.url) : undefined}
+                          target={hasLink ? "_blank" : undefined}
+                          rel={hasLink ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!hasLink ? 'disabled' : ''}`}
+                          onClick={(e) => !hasLink && e.preventDefault()}
                         >
-                          <span className="link-num">{num}</span>
-                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                          <span className="link-num">{idx + 1}</span>
+                          <span className="link-desc">{hasLink ? (link.desc || '링크') : '-'}</span>
                         </a>
                       );
                     });
@@ -2957,7 +3467,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* Sub Title */}
               <div className="work-view-section">
                 <div className="section-label">Sub Title</div>
-                <div className="section-content">바이럴 마케팅 실무 경력에 대한 상세 내용입니다. 다양한 프로젝트를 진행하며 쌓은 노하우와 성과를 정리했습니다. 클라이언트와의 협업 경험과 캠페인 운영 역량을 바탕으로 지속 성장 중입니다.</div>
+                <div className="section-content">{(() => {
+                  const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                  return weekActivityDetails.find(d => d.activity_type_id === activityType)?.sub_title || '-';
+                })()}</div>
               </div>
 
               {/* Output Link */}
@@ -2965,22 +3478,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Output Link</div>
                 <div className="output-links-view">
                   {(() => {
-                    const linkCounts = [2, 5, 1, 3, 4];
-                    const linkCount = linkCounts[selectedWorkCareerCard.id % linkCounts.length];
-                    const linkDescs = ["이력서 및 경력 증명서 포트폴리오", "포트폴리오", "프로젝트 사례", "자격증 증빙", "추천서"];
-                    return [1, 2, 3, 4, 5].map((num) => {
-                      const isActive = num <= linkCount;
+                    const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+                    const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
+                    const adminLinks = activity?.output_links || [];
+                    const userLinks = detail?.output_links || [];
+                    return [0, 1, 2, 3, 4].map((idx) => {
+                      const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
+                      const hasLink = link?.url && link.url.trim() !== '';
                       return (
                         <a
-                          key={num}
-                          href={isActive ? "https://example.com" : undefined}
-                          target={isActive ? "_blank" : undefined}
-                          rel={isActive ? "noopener noreferrer" : undefined}
-                          className={`output-link-item ${!isActive ? 'disabled' : ''}`}
-                          onClick={(e) => !isActive && e.preventDefault()}
+                          key={idx}
+                          href={hasLink ? ensureProtocol(link.url) : undefined}
+                          target={hasLink ? "_blank" : undefined}
+                          rel={hasLink ? "noopener noreferrer" : undefined}
+                          className={`output-link-item ${!hasLink ? 'disabled' : ''}`}
+                          onClick={(e) => !hasLink && e.preventDefault()}
                         >
-                          <span className="link-num">{num}</span>
-                          <span className="link-desc">{isActive ? linkDescs[num - 1] : '-'}</span>
+                          <span className="link-num">{idx + 1}</span>
+                          <span className="link-desc">{hasLink ? (link.desc || '링크') : '-'}</span>
                         </a>
                       );
                     });
