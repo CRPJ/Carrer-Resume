@@ -2,9 +2,16 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const Cluster41Content = () => {
+  // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
+  const searchParams = useSearchParams();
+  const targetUserId = searchParams.get('userId');
+
+  // 디버그: 컴포넌트 렌더링 시 targetUserId 확인
+  console.log('[Cluster41 RENDER] targetUserId from URL:', targetUserId);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
   const [resultDropdownOpen, setResultDropdownOpen] = useState(false);
@@ -164,13 +171,13 @@ const Cluster41Content = () => {
   }
   const [userPoints, setUserPoints] = useState<PointData[]>([]);
 
-  // 활동 데이터 상태 (주차별 실무 강화율 계산용)
+  // 활동 데이터 상태 (주차별 실무 강화율 계산용) - activity_records 테이블 사용
   interface ActivityData {
     id: string;
     user_id: string;
     week_id: string;
     activity_type_id: string;
-    status: string;
+    is_completed: boolean;
   }
   const [userActivities, setUserActivities] = useState<ActivityData[]>([]);
 
@@ -332,10 +339,19 @@ const Cluster41Content = () => {
 
   // 프로필 API에서 성장 기간 집계 데이터 가져오기
   useEffect(() => {
+    const abortController = new AbortController();
+    const currentTargetUserId = targetUserId; // 현재 요청 시점의 targetUserId 저장
+
     const fetchGrowthStats = async () => {
       try {
-        const response = await fetch('/api/profile');
+        const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
+        console.log('[Cluster41] fetchGrowthStats - targetUserId:', currentTargetUserId, ', API URL:', apiUrl);
+        const response = await fetch(apiUrl, { signal: abortController.signal });
         const result = await response.json();
+        console.log('[Cluster41] fetchGrowthStats - Response user ID:', result.data?.id);
+
+        // 요청 중 targetUserId가 바뀌지 않았는지 확인
+        if (abortController.signal.aborted) return;
 
         if (response.ok) {
           // 성장 기간 집계 데이터 설정
@@ -352,12 +368,17 @@ const Cluster41Content = () => {
           }
         }
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error("성장 데이터 로드 오류:", error);
       }
     };
 
     fetchGrowthStats();
-  }, []);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [targetUserId]);
 
   // 성장 상태를 badge 텍스트로 변환 (status와 growth_status 두 개 사용)
   const getGrowthBadgeText = (status: string | null, growthStatus: string | null): string => {
@@ -399,6 +420,9 @@ const Cluster41Content = () => {
 
   // DB에서 주차 데이터 가져오기
   useEffect(() => {
+    const abortController = new AbortController();
+    const currentTargetUserId = targetUserId; // 현재 요청 시점의 targetUserId 저장
+
     const fetchWeeklyData = async () => {
       try {
         setIsLoadingWeeks(true);
@@ -419,10 +443,13 @@ const Cluster41Content = () => {
         let apiRestWeekIds: string[] = [];
 
         try {
-          const response = await fetch('/api/profile');
+          const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
+          console.log('[Cluster41] fetchWeeklyData - targetUserId:', currentTargetUserId, ', API URL:', apiUrl);
+          const response = await fetch(apiUrl, { signal: abortController.signal });
           const result = await response.json();
 
           console.log('[DEBUG] Profile API result:', result);
+          console.log('[Cluster41] fetchWeeklyData - Response user ID:', result.data?.id);
 
           if (response.ok && result.data?.id) {
             userId = result.data.id;
@@ -449,7 +476,11 @@ const Cluster41Content = () => {
             setUserRoleHistory(result.userRoleHistory);
             console.log('[DEBUG] API User role history:', result.userRoleHistory);
           }
+
+          // 요청 중 targetUserId가 바뀌었으면 중단
+          if (abortController.signal.aborted) return;
         } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') return;
           console.error('[DEBUG] Failed to fetch profile:', err);
         }
 
@@ -489,7 +520,7 @@ const Cluster41Content = () => {
             supabase.from('user_team_parts').select('id, user_id, team_id, part_id, joined_at, left_at, is_current, season_id').eq('user_id', userId),
             supabase.from('user_role_history').select('id, user_id, role, started_at, ended_at').eq('user_id', userId),
             supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
-            supabase.from('activities').select('id, user_id, week_id, activity_type_id, status').eq('user_id', userId).eq('status', 'approved')
+            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true)
           ]);
 
           if (teamsResult.data) setTeams(teamsResult.data);
@@ -543,16 +574,26 @@ const Cluster41Content = () => {
           };
         }).filter(Boolean) as DBWeekData[];
 
+        // 요청 중 targetUserId가 바뀌지 않았는지 확인
+        if (abortController.signal.aborted) return;
+
         setDbWeeklyData(formattedData);
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error("주차 데이터 로드 오류:", error);
       } finally {
-        setIsLoadingWeeks(false);
+        if (!abortController.signal.aborted) {
+          setIsLoadingWeeks(false);
+        }
       }
     };
 
     fetchWeeklyData();
-  }, []);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [targetUserId]);
 
   // 버튼 위치 업데이트
   const updateSeasonPos = () => {

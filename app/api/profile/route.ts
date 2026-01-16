@@ -1,22 +1,19 @@
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 프로필 조회
-export async function GET() {
+// GET: 프로필 조회 (userId 쿼리 파라미터로 다른 유저 조회 가능)
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get('userId');
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
-    }
+    console.log('[Profile API] Request URL:', request.url);
+    console.log('[Profile API] Target userId:', targetUserId);
 
     if (!supabaseAdmin) {
       return NextResponse.json(
@@ -25,26 +22,68 @@ export async function GET() {
       );
     }
 
-    const { data: profile, error } = await supabaseAdmin
-      .from("user_profiles")
-      .select("*")
-      .eq("email", session.user.email)
-      .maybeSingle();
+    let profile;
 
-    if (error) {
-      console.error("프로필 조회 오류:", error);
-      return NextResponse.json(
-        { error: "프로필을 가져오는데 실패했습니다." },
-        { status: 500 }
-      );
+    if (targetUserId) {
+      // 특정 유저 조회 (공개 접근 가능)
+      const { data, error } = await supabaseAdmin
+        .from("user_profiles")
+        .select("*")
+        .eq("id", targetUserId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("프로필 조회 오류:", error);
+        return NextResponse.json(
+          { error: "프로필을 가져오는데 실패했습니다." },
+          { status: 500 }
+        );
+      }
+
+      if (!data) {
+        return NextResponse.json(
+          { error: "사용자를 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+
+      profile = data;
+    } else {
+      // 현재 로그인 유저 조회 (로그인 필요)
+      const session = await getServerSession(authOptions);
+
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from("user_profiles")
+        .select("*")
+        .eq("email", session.user.email)
+        .maybeSingle();
+
+      if (error) {
+        console.error("프로필 조회 오류:", error);
+        return NextResponse.json(
+          { error: "프로필을 가져오는데 실패했습니다." },
+          { status: 500 }
+        );
+      }
+
+      if (!data) {
+        return NextResponse.json(
+          { error: "승인된 프로필이 없습니다. 어드민 승인을 기다려주세요." },
+          { status: 404 }
+        );
+      }
+
+      profile = data;
     }
 
-    if (!profile) {
-      return NextResponse.json(
-        { error: "승인된 프로필이 없습니다. 어드민 승인을 기다려주세요." },
-        { status: 404 }
-      );
-    }
+    console.log('[Profile API] Returning profile for:', profile.id, profile.display_name);
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -83,8 +122,9 @@ export async function GET() {
               .maybeSingle()
           : Promise.resolve({ data: null }),
 
-      // weekly_activities (활동 완료율)
-      supabaseAdmin.from("weekly_activities").select("status").eq("user_id", profile.id),
+      // weekly_activities - 이 테이블은 user_id 컬럼이 없어서 사용 불가
+      // completionRate는 activity_records 기반으로 계산
+      Promise.resolve({ data: null }),
 
       // cumulative_points (별, 번개, 방패)
       supabaseAdmin.from("user_cumulative_points").select("total_stars, total_lightnings, total_shields").eq("user_id", profile.id).maybeSingle(),
@@ -120,8 +160,8 @@ export async function GET() {
       // 모든 시즌 (성장 가능 시즌 계산용)
       supabaseAdmin.from("seasons").select("id, name, year, start_date, end_date").order("start_date", { ascending: true }),
 
-      // 해당 유저의 승인된 활동 (주차별)
-      supabaseAdmin.from("activities").select("week_id").eq("user_id", profile.id).eq("status", "approved"),
+      // 해당 유저의 승인된 활동 (주차별) - activity_records 사용
+      supabaseAdmin.from("activity_records").select("week_id").eq("user_id", profile.id).eq("is_completed", true),
 
       // 해당 유저의 역할 이력
       supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),

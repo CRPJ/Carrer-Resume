@@ -72,6 +72,11 @@ const menu = [
         title: "Cluster 10",
         url: "/cluster-10",
       },
+      {
+        id: "0.11",
+        title: "Weekly Ranking",
+        url: "/weekly-ranking",
+      },
     ],
   },
   {

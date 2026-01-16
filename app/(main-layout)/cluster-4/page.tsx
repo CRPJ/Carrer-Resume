@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
 import Cluster41Content from "@/components/cluster-4-1/Cluster41Content";
@@ -68,7 +68,9 @@ const Cluster4Page = () => {
           <div className="home-two-content-col">
             <ClusterTabs />
             <div className="home-two-content">
-              <Cluster41Content />
+              <Suspense fallback={<div>Loading...</div>}>
+                <Cluster41Content />
+              </Suspense>
             </div>
           </div>
         </div>
