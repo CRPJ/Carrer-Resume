@@ -56,6 +56,8 @@ const Cluster41Content = () => {
   const [endWeekInfo, setEndWeekInfo] = useState<WeekInfo | null>(null);
   const [userStatus, setUserStatus] = useState<string | null>(null);
   const [growthStatus, setGrowthStatus] = useState<string | null>(null);
+  // user_profiles.role 기본값 (역할 이력이 없을 때 사용)
+  const [userDefaultRole, setUserDefaultRole] = useState<string | null>(null);
 
   // 현재 시즌 정보 가져오기
   useEffect(() => {
@@ -221,10 +223,12 @@ const Cluster41Content = () => {
   };
 
   // 특정 날짜에 해당하는 역할 정보 찾기
+  // 1순위: user_role_history 테이블에서 해당 날짜에 맞는 역할
+  // 2순위: user_profiles.role 기본값
   const getRoleForDate = (date: string) => {
     const dateObj = new Date(date);
 
-    // 해당 날짜에 활성화된 역할 찾기
+    // 1순위: 해당 날짜에 활성화된 역할 이력 찾기
     const activeRole = userRoleHistory.find(urh => {
       const startDate = new Date(urh.started_at);
       const endDate = urh.ended_at ? new Date(urh.ended_at) : null;
@@ -233,12 +237,22 @@ const Cluster41Content = () => {
       return startDate <= dateObj && (!endDate || endDate >= dateObj);
     });
 
-    if (!activeRole) return null;
+    if (activeRole) {
+      return {
+        role: activeRole.role,
+        roleLabel: roleLabels[activeRole.role] || activeRole.role
+      };
+    }
 
-    return {
-      role: activeRole.role,
-      roleLabel: roleLabels[activeRole.role] || activeRole.role
-    };
+    // 2순위: user_profiles.role 기본값 사용
+    if (userDefaultRole) {
+      return {
+        role: userDefaultRole,
+        roleLabel: roleLabels[userDefaultRole] || userDefaultRole
+      };
+    }
+
+    return null;
   };
 
   // 특정 주차의 포인트 정보 계산
@@ -365,6 +379,11 @@ const Cluster41Content = () => {
             setEndWeekInfo(result.growthInfo.endWeekInfo);
             setUserStatus(result.growthInfo.status || null);
             setGrowthStatus(result.growthInfo.growthStatus || null);
+          }
+
+          // user_profiles.role 기본값 저장
+          if (result.data?.role) {
+            setUserDefaultRole(result.data.role);
           }
         }
       } catch (error) {

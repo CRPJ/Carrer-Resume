@@ -119,6 +119,8 @@ const Cluster4Content = () => {
   // 사용자의 상태 (status, growth_status)
   const [userStatus, setUserStatus] = useState<string | null>(null);
   const [growthStatus, setGrowthStatus] = useState<string | null>(null);
+  // user_profiles.role 기본값 (역할 이력이 없을 때 사용)
+  const [userDefaultRole, setUserDefaultRole] = useState<string | null>(null);
 
   // 성장 종료 정보
   const [growthEndInfo, setGrowthEndInfo] = useState<{
@@ -184,7 +186,7 @@ const Cluster4Content = () => {
     fetchCurrentSeason();
   }, []);
 
-  // 사용자 프로필에서 status, growth_status, growthEndInfo 가져오기
+  // 사용자 프로필에서 status, growth_status, growthEndInfo, role 가져오기
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
@@ -195,6 +197,10 @@ const Cluster4Content = () => {
             const json = await res.json();
             setUserStatus(json.data?.status || null);
             setGrowthStatus(json.data?.growth_status || null);
+            // user_profiles.role 기본값 저장
+            if (json.data?.role) {
+              setUserDefaultRole(json.data.role);
+            }
             // growthEndInfo는 /api/users/[id]에서 제공하지 않으므로 null
             setGrowthEndInfo(null);
           }
@@ -204,6 +210,10 @@ const Cluster4Content = () => {
             const json = await res.json();
             setUserStatus(json.growthInfo?.status || null);
             setGrowthStatus(json.growthInfo?.growthStatus || null);
+            // user_profiles.role 기본값 저장
+            if (json.data?.role) {
+              setUserDefaultRole(json.data.role);
+            }
             // 성장 종료 정보 설정
             if (json.growthInfo?.endWeekInfo) {
               setGrowthEndInfo({

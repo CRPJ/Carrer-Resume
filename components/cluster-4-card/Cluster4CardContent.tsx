@@ -52,6 +52,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 팀/파트/역할/포인트 데이터 상태
   const [teamName, setTeamName] = useState<string | null>(null);
   const [partName, setPartName] = useState<string | null>(null);
+  const [generation, setGeneration] = useState<number | null>(null);
+  const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
   const [roleLabel, setRoleLabel] = useState<string | null>(null);
   const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
   const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
@@ -128,9 +130,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const roleLabels: { [key: string]: string } = {
     'crew_regular': '일반',
     'part_leader': '심화(파트장)',
+    'crew_partleader': '심화(파트장)',
     'crew_agent': '심화(에이전트)',
-    'crew_ambassador': '운영진(앰배서더)',
-    'crew_team_leader': '운영진(팀장)',
+    'operations_ambassador': '운영진(앰배서더)',
+    'operations_teamleader': '운영진(팀장)',
+    'operations_clubleader': '운영진(클럽장)',
   };
 
   // 시즌 이름 변환 맵
@@ -222,7 +226,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         // 3. 팀/파트 정보 가져오기
         const { data: userTeamPart } = await supabase
           .from('user_team_parts')
-          .select('team_id, part_id')
+          .select('team_id, part_id, generation, managed_team_id')
           .eq('user_id', userId)
           .lte('joined_at', currentWeek.start_date)
           .or(`left_at.is.null,left_at.gte.${currentWeek.start_date}`)
@@ -231,6 +235,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           .maybeSingle();
 
         if (userTeamPart) {
+          // 기수 설정
+          setGeneration(userTeamPart.generation || null);
+
           // 팀 이름 가져오기
           if (userTeamPart.team_id) {
             const { data: team } = await supabase
@@ -249,9 +256,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               .single();
             setPartName(part?.name || null);
           }
+          // 담당 팀 이름 가져오기 (팀장인 경우)
+          if (userTeamPart.managed_team_id) {
+            const { data: managedTeam } = await supabase
+              .from('teams')
+              .select('name')
+              .eq('id', userTeamPart.managed_team_id)
+              .single();
+            setManagedTeamName(managedTeam?.name || null);
+          }
         }
 
         // 4. 역할 정보 가져오기
+        // 1순위: user_role_history 테이블에서 해당 날짜에 맞는 역할
+        // 2순위: user_profiles.role 기본값
         const { data: userRole } = await supabase
           .from('user_role_history')
           .select('role')
@@ -264,6 +282,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
         if (userRole) {
           setRoleLabel(roleLabels[userRole.role] || userRole.role);
+        } else if (profileResult.data?.role) {
+          // 역할 이력이 없으면 user_profiles.role 기본값 사용
+          setRoleLabel(roleLabels[profileResult.data.role] || profileResult.data.role);
         }
 
         // 5. 포인트 정보 가져오기 (해당 주차)
@@ -1512,9 +1533,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="header-info-row2">
               <div className="info-group left">
-                <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{teamName || '-'}</span></span>
+                <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{
+                  teamName === '운영진' && generation
+                    ? `운영진(${generation}기)`
+                    : (teamName || '-')
+                }</span></span>
                 <span className="info-divider">|</span>
-                <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{partName || '-'}</span></span>
+                <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
+                  teamName === '운영진' && partName === '팀장' && managedTeamName
+                    ? `팀장(${managedTeamName})`
+                    : (partName || '-')
+                }</span></span>
               </div>
               <div className="info-group right">
                 <span className="info-item with-icon">
