@@ -182,6 +182,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return '/images/0/cluster 4/icon/실무 역량/실무 역량 - default.png';
   };
 
+  // 실무 경험 아이콘 매핑 (activity_type_id → 이미지 파일명)
+  const experienceIconMap: { [key: string]: string } = {
+    'career_marketer_launch': '실무 경험 - [커리어]마케터 Launch.png',
+    'productivity_feedback': '실무 경험 - [생산성]상호 피드백.png',
+    'contents_marketing_practical': '실무 경험 - [콘텐츠]마케팅 실무.png',
+    'performance_marketing_practical': '실무 경험 - [퍼포먼스]마케팅 실무.png',
+  };
+
+  // 실무 경험 아이콘 경로 가져오기 헬퍼 함수
+  const getExperienceIconPath = (activityTypeId: string): string => {
+    const fileName = experienceIconMap[activityTypeId];
+    if (fileName) {
+      return `/images/0/cluster 4/icon/실무 경험/${fileName}`;
+    }
+    return '/images/0/cluster 4/icon/실무 경험/실무 경험 - default.png';
+  };
+
   // 시즌 이름 변환 맵
   const seasonNameMap: { [key: string]: string } = {
     'spring': '봄',
@@ -1496,13 +1513,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
-  // 실무 경험 카드 데이터 (rating * 2 = 점수, 반개당 1점)
-  const workExpCards = [
-    { id: 1, code: "EX01 - SFA01", badge: "[커리어]마케터 Launch", title: "Main Title", verified: true, rating: 4, ratingCount: "8 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[커리어]마케터%20Launch.png" },
-    { id: 2, code: "EX02 - RUA99", badge: "[생산성]상호 피드백", title: "Main Title", verified: true, rating: 3.5, ratingCount: "7 / 10", hasWeb: true, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[생산성]상호%20피드백.png" },
-    { id: 3, code: "EX03 - RUA99", badge: "[콘텐츠]마케팅 실무", title: "Main Title", verified: true, rating: 3, ratingCount: "6 / 10", hasWeb: false, icon: "/images/0/cluster%204/icon/실무%20경험/실무%20경험%20-%20[콘텐츠]마케팅%20실무.png" },
-    { id: 4, code: "", badge: "", title: "Main Title", verified: true, rating: 0, ratingCount: "- / 10", hasWeb: false, isEmpty: true, icon: "" },
-  ];
+  // 실무 경험 카드 데이터 (동적 생성)
+  const workExpCards = workExpActivityTypes.map((activityTypeId, index) => {
+    const activityType = activityTypes.find(at => at.id === activityTypeId);
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
+    const detail = weekActivityDetails[activityTypeId];
+    const enhStatus = getEnhancementStatus(activityTypeId);
+    const hasActivity = !!activity;
+
+    // 별점 계산 (activity_details.rating 필드 사용, 없으면 0)
+    const rating = detail?.rating || 0;
+    const ratingScore = rating * 2; // 별 1개 = 2점
+
+    return {
+      id: index + 1,
+      activityTypeId,
+      code: activityType?.line_code || '-',
+      badge: activityType?.name || '-',
+      title: activity?.title || '-',
+      verified: enhStatus === 'success',
+      rating: rating,
+      ratingCount: hasActivity ? `${ratingScore} / 10` : '- / 10',
+      hasWeb: (detail?.output_links?.length || 0) > 0,
+      icon: getExperienceIconPath(activityTypeId),
+      isEmpty: !hasActivity,
+      enhancementStatus: enhStatus,
+    };
+  });
 
   // 실무 경력 카드 데이터
   const workCareerCards = [
@@ -2118,19 +2155,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="card-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
-                    <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
-                    <span className="verified-text">Verified</span>
+                    {!isEmpty && card.verified && (
+                      <>
+                        <img src="/images/0/cluster 4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                        <span className="verified-text">Verified</span>
+                      </>
+                    )}
                   </div>
-                  <p className="main-desc">{isEmpty ? '-' : (weeklyActivities.find(a => a.activity_type_id === expActivityType)?.title || '-')}</p>
+                  <p className="main-desc">{isEmpty ? '-' : card.title}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster 4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === expActivityType)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails[card.activityTypeId]?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster 4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                 </div>
                 {!isEmpty && (
-                  <div className="status-badge">
-                    <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화 성공" />
+                  <div className={`status-badge ${card.enhancementStatus}`}>
+                    {(() => {
+                      const statusImages: Record<string, string> = {
+                        'success': '/images/0/cluster 4/icon/5 강화 성공.png',
+                        'waiting': '/images/0/cluster 4/icon/6 강화 대기.png',
+                        'failed': '/images/0/cluster 4/icon/7 강화 실패.png',
+                        'not_applicable': '/images/0/cluster 4/icon/8 해당 없음.png'
+                      };
+                      return <img src={statusImages[card.enhancementStatus] || statusImages['not_applicable']} alt="강화 상태" />;
+                    })()}
                   </div>
                 )}
               </div>
@@ -2659,10 +2708,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     </div>
                     <div className="modal-header-right">
-                      <div className="modal-status-badge">
-                        <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
-                        <span className="status-text success">강화성공</span>
-                      </div>
+                      {(() => {
+                        const enhStatus = card.enhancementStatus;
+                        const statusLabels: Record<string, string> = {
+                          'success': '강화성공',
+                          'waiting': '강화대기',
+                          'failed': '강화실패',
+                          'not_applicable': '해당없음'
+                        };
+                        const statusImages: Record<string, string> = {
+                          'success': '/images/0/cluster 4/icon/5 강화 성공.png',
+                          'waiting': '/images/0/cluster 4/icon/6 강화 대기.png',
+                          'failed': '/images/0/cluster 4/icon/7 강화 실패.png',
+                          'not_applicable': '/images/0/cluster 4/icon/8 해당 없음.png'
+                        };
+                        return (
+                          <div className={`modal-status-badge ${enhStatus}`}>
+                            <img src={statusImages[enhStatus]} alt={statusLabels[enhStatus]} />
+                            <span className={`status-text ${enhStatus}`}>{statusLabels[enhStatus]}</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -2670,7 +2736,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {/* 타이틀 + 내용 (읽기 전용) */}
                     <div className="modal-title-section">
                       <div className="main-title-row">
-                        <div className="main-title">{card.title}</div>
+                        <div className="main-title">Main Title</div>
                         <div className="modal-rating">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <img
@@ -2683,7 +2749,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className="rating-count">{card.ratingCount}</span>
                         </div>
                       </div>
-                      <div className="content-title">{weeklyActivities.find(a => a.activity_type_id === workExpActivityTypes[index])?.title || '-'}</div>
+                      <div className="content-title">{card.title}</div>
                       <div className="modal-date-badge">
                         <span>{weekDateRange}</span>
                       </div>
@@ -2691,7 +2757,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                     {/* Sub Title - 수정 가능 */}
                     {(() => {
-                      const activityType = workExpActivityTypes[index];
+                      const activityType = card.activityTypeId;
                       const isActive = isActivityActive(activityType);
                       const isExpired = isActivityExpired(activityType);
                       const isFailed = getEnhancementStatus(activityType) === 'failed';
@@ -3621,10 +3687,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <span className="code-badge">{selectedWorkExpCard.code}</span>
                 </div>
                 <div className="work-view-right">
-                  <div className="status-badge success">
-                    <img src="/images/0/cluster 4/icon/5 강화 성공.png" alt="강화성공" />
-                    <span>강화성공</span>
-                  </div>
+                  {(() => {
+                    const enhStatus = selectedWorkExpCard.enhancementStatus;
+                    const statusLabels: Record<string, string> = {
+                      'success': '강화성공',
+                      'waiting': '강화대기',
+                      'failed': '강화실패',
+                      'not_applicable': '해당없음'
+                    };
+                    const statusImages: Record<string, string> = {
+                      'success': '/images/0/cluster 4/icon/5 강화 성공.png',
+                      'waiting': '/images/0/cluster 4/icon/6 강화 대기.png',
+                      'failed': '/images/0/cluster 4/icon/7 강화 실패.png',
+                      'not_applicable': '/images/0/cluster 4/icon/8 해당 없음.png'
+                    };
+                    return (
+                      <div className={`status-badge ${enhStatus}`}>
+                        <img src={statusImages[enhStatus]} alt={statusLabels[enhStatus]} />
+                        <span>{statusLabels[enhStatus]}</span>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -3644,10 +3727,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* Sub Title */}
               <div className="work-view-section">
                 <div className="section-label">Sub Title</div>
-                <div className="section-content">{(() => {
-                  const activityType = workExpActivityTypes[selectedWorkExpCard.id - 1];
-                  return weekActivityDetails.find(d => d.activity_type_id === activityType)?.sub_title || '-';
-                })()}</div>
+                <div className="section-content">{weekActivityDetails[selectedWorkExpCard.activityTypeId]?.sub_title || '-'}</div>
               </div>
 
               {/* Output Link */}
@@ -3655,9 +3735,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Output Link</div>
                 <div className="output-links-view">
                   {(() => {
-                    const activityType = workExpActivityTypes[selectedWorkExpCard.id - 1];
+                    const activityType = selectedWorkExpCard.activityTypeId;
                     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-                    const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
+                    const detail = weekActivityDetails[activityType];
                     const adminLinks = activity?.output_links || [];
                     const userLinks = detail?.output_links || [];
                     return [0, 1, 2, 3, 4].map((idx) => {
