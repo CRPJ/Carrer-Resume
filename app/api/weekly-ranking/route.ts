@@ -12,6 +12,21 @@ const seasonNameKorean: { [key: string]: string } = {
   'winter': '겨울'
 }
 
+// 관계형 필드를 안전하게 추출하는 헬퍼 함수
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSeason(seasons: any): { id: string; year: number; name: string } | null {
+  if (!seasons) return null
+  if (Array.isArray(seasons)) return seasons[0] || null
+  return seasons
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getRelated(data: any): { name: string } | null {
+  if (!data) return null
+  if (Array.isArray(data)) return data[0] || null
+  return data
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createAdminClient()
@@ -54,8 +69,10 @@ export async function GET(request: NextRequest) {
     // break 시즌 필터링 및 유효한 시즌만
     const validWeeks = (weeksData || []).filter(week => {
       if (!week.seasons) return false
-      const seasonName = (week.seasons as { name: string }).name
-      if (seasonName.includes('break')) return false
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seasonData = week.seasons as any
+      const seasonName = Array.isArray(seasonData) ? seasonData[0]?.name : seasonData?.name
+      if (!seasonName || seasonName.includes('break')) return false
       return true
     })
 
@@ -115,7 +132,7 @@ export async function GET(request: NextRequest) {
       .map(([userId]) => userId)
 
     if (userIdsWithStars.length === 0) {
-      const selectedSeason = selectedWeek.seasons as { id: string; year: number; name: string }
+      const selectedSeason = getSeason(selectedWeek.seasons)
       return NextResponse.json({
         success: true,
         data: {
@@ -125,21 +142,21 @@ export async function GET(request: NextRequest) {
             week_number: selectedWeek.week_number,
             start_date: selectedWeek.start_date,
             end_date: selectedWeek.end_date,
-            season: {
+            season: selectedSeason ? {
               id: selectedSeason.id,
               year: selectedSeason.year,
               name: selectedSeason.name,
               name_korean: seasonNameKorean[selectedSeason.name] || selectedSeason.name
-            }
+            } : null
           },
           availableWeeks: validWeeks.map(week => {
-            const season = week.seasons as { id: string; year: number; name: string }
+            const season = getSeason(week.seasons)
             return {
               id: week.id,
               week_number: week.week_number,
-              season_year: season.year,
-              season_name: season.name,
-              label: `${season.year} ${seasonNameKorean[season.name] || season.name} ${week.week_number}주차`
+              season_year: season?.year || 0,
+              season_name: season?.name || '',
+              label: `${season?.year || ''} ${seasonNameKorean[season?.name || ''] || season?.name || ''} ${week.week_number}주차`
             }
           })
         }
@@ -175,8 +192,8 @@ export async function GET(request: NextRequest) {
     const teamPartsMap: { [userId: string]: { team_name: string; part_name: string } } = {}
     for (const tp of (teamPartsData || [])) {
       teamPartsMap[tp.user_id] = {
-        team_name: (tp.teams as { name: string })?.name || '-',
-        part_name: (tp.parts as { name: string })?.name || '-'
+        team_name: getRelated(tp.teams)?.name || '-',
+        part_name: getRelated(tp.parts)?.name || '-'
       }
     }
 
@@ -217,18 +234,18 @@ export async function GET(request: NextRequest) {
 
     // 9. 사용 가능한 주차 목록 구성
     const availableWeeks = validWeeks.map(week => {
-      const season = week.seasons as { id: string; year: number; name: string }
+      const season = getSeason(week.seasons)
       return {
         id: week.id,
         week_number: week.week_number,
-        season_year: season.year,
-        season_name: season.name,
-        label: `${season.year} ${seasonNameKorean[season.name] || season.name} ${week.week_number}주차`
+        season_year: season?.year || 0,
+        season_name: season?.name || '',
+        label: `${season?.year || ''} ${seasonNameKorean[season?.name || ''] || season?.name || ''} ${week.week_number}주차`
       }
     })
 
     // 10. 응답 구성
-    const selectedSeason = selectedWeek.seasons as { id: string; year: number; name: string }
+    const selectedSeason = getSeason(selectedWeek.seasons)
     return NextResponse.json({
       success: true,
       data: {
@@ -238,12 +255,12 @@ export async function GET(request: NextRequest) {
           week_number: selectedWeek.week_number,
           start_date: selectedWeek.start_date,
           end_date: selectedWeek.end_date,
-          season: {
+          season: selectedSeason ? {
             id: selectedSeason.id,
             year: selectedSeason.year,
             name: selectedSeason.name,
             name_korean: seasonNameKorean[selectedSeason.name] || selectedSeason.name
-          }
+          } : null
         },
         availableWeeks
       }

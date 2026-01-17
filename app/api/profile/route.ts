@@ -364,12 +364,15 @@ export async function GET(request: NextRequest) {
       career: activitiesData.filter(a => careerTypes.includes(a.activity_type_id)).length
     } : { competency: 0, experience: 0, info: 0, career: 0 };
 
+    // completionRate는 activity_records 기반으로 계산 (weekly_activities에는 user_id가 없음)
     let completionRate = 0;
-    if (weeklyActivities && weeklyActivities.length > 0) {
-      const completedCount = weeklyActivities.filter(
-        (activity) => activity.status === "approved" || activity.status === "completed"
-      ).length;
-      completionRate = Math.round((completedCount / weeklyActivities.length) * 100);
+    if (activitiesData && activitiesData.length > 0) {
+      // activitiesData는 이미 is_completed=true인 것만 필터링됨
+      // 전체 기록 대비 완료 비율 계산
+      const totalRecords = activityRecordsData.length;
+      if (totalRecords > 0) {
+        completionRate = Math.round((activitiesData.length / totalRecords) * 100);
+      }
     }
 
     // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)

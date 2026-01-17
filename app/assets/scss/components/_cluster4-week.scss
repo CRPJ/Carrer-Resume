@@ -2355,6 +2355,7 @@
           justify-content: center;
           align-self: flex-start;
           margin-top: 2px;
+          position: relative;
 
           img {
             width: 60px;
@@ -2367,6 +2368,37 @@
             height: 60px;
             background: #CCC;
             border-radius: 0;
+          }
+
+          &.failed {
+            > img {
+              opacity: 0.3;
+            }
+
+            .failed-overlay {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+              z-index: 2;
+
+              .failed-text {
+                font-size: 12px;
+                font-weight: 700;
+                color: #FF0D0D;
+                font-family: 'Pretendard', sans-serif;
+                white-space: nowrap;
+              }
+
+              .failed-emoji {
+                font-size: 12px;
+                line-height: 1;
+              }
+            }
           }
         }
 
