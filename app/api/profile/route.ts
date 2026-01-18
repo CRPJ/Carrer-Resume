@@ -143,7 +143,8 @@ export async function GET(request: NextRequest) {
           id,
           year,
           name,
-          start_date
+          start_date,
+          end_date
         )
       `).eq("user_id", profile.id),
 
@@ -397,6 +398,7 @@ export async function GET(request: NextRequest) {
     };
 
     // seasons 데이터가 있는 항목만 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)
+    console.log('[Profile API] Raw seasonHistories:', JSON.stringify(seasonHistories, null, 2));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sortedSeasonHistories = seasonHistories
       ? seasonHistories

@@ -6643,3 +6643,164 @@
     }
   }
 }
+
+// Section 2.5: 시즌별 카드 리스트
+.cluster4-season-list {
+  padding: 30px 0;
+  margin-bottom: 20px;
+
+  .season-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    .season-list-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+
+      .title-icon {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .season-count {
+      font-family: 'Pretendard', sans-serif;
+      font-size: 14px;
+      color: #888;
+    }
+  }
+
+  .season-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .season-card-item {
+    width: calc(50% - 10px);
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: rgba(255, 165, 0, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .season-card-image {
+      width: 200px;
+      height: 150px;
+      position: relative;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .image-badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+
+        .badge-tag {
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          background: rgba(255, 165, 0, 0.9);
+          color: #fff;
+
+          &.in-progress {
+            background: rgba(72, 247, 104, 0.9);
+          }
+
+          &.completed {
+            background: rgba(100, 149, 237, 0.9);
+          }
+
+          &.resting {
+            background: rgba(255, 165, 0, 0.9);
+          }
+        }
+      }
+    }
+
+    .season-card-content {
+      flex: 1;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+
+      .season-card-header {
+        .season-card-title {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 18px;
+          font-weight: 700;
+          color: #fff;
+          margin: 0;
+        }
+      }
+
+      .season-card-date {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        color: #aaa;
+
+        .date-icon {
+          width: 14px;
+          height: 14px;
+          opacity: 0.7;
+        }
+      }
+
+      .season-card-stats {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .stat-label {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 12px;
+            color: #888;
+          }
+
+          .stat-value {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFA500;
+          }
+        }
+
+        .stat-divider {
+          color: #444;
+        }
+      }
+    }
+  }
+}

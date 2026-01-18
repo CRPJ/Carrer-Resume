@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import koreaRegionsData from "@/data/korea-regions.json";
 
@@ -10,6 +11,9 @@ const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 
 const Sidebar = () => {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const targetUserId = searchParams.get('userId');
+  const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
   const [completionRate, setCompletionRate] = useState<number | null>(null);
@@ -384,14 +388,20 @@ const Sidebar = () => {
 
   // 페이지 로드 시 프로필 데이터 가져오기
   const fetchUserProfile = async () => {
-    if (!session) return;
+    // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
+    if (!targetUserId && !session) return;
 
     try {
-      const response = await fetch('/api/profile');
+      const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
+      const response = await fetch(apiUrl);
       const result = await response.json();
 
       if (result.success && result.data) {
         const profile = result.data;
+
+        // 본인 여부 확인
+        const currentUserId = session?.user?.id;
+        setIsOwner(!targetUserId || targetUserId === currentUserId);
         const addressParts = (profile.address || '').split(' ');
 
         setUserProfile({
@@ -439,7 +449,8 @@ const Sidebar = () => {
   // 학력 데이터 가져오기 (최종학력)
   const fetchEducations = async () => {
     try {
-      const response = await fetch('/api/educations');
+      const apiUrl = targetUserId ? `/api/educations?userId=${targetUserId}` : '/api/educations';
+      const response = await fetch(apiUrl);
       const result = await response.json();
 
       if (result.success && result.data && result.data.length > 0) {
@@ -467,12 +478,12 @@ const Sidebar = () => {
     }
   };
 
-  // 세션 변경 시 프로필 로드
+  // 세션 또는 targetUserId 변경 시 프로필 로드
   useEffect(() => {
-    if (session) {
+    if (session || targetUserId) {
       fetchUserProfile();
     }
-  }, [session]);
+  }, [session, targetUserId]);
 
   // Error state for validation
   const [errors, setErrors] = useState({
@@ -708,7 +719,7 @@ const Sidebar = () => {
   // 일정 신뢰도(reliability_rate) 가져오기 - user_growth_stats에서 조회
   useEffect(() => {
     const fetchReliabilityRate = async () => {
-      const userId = session?.user?.id;
+      const userId = targetUserId || session?.user?.id;
       if (!userId) {
         setHasReliabilityData(false);
         setReliabilityRate(null);
@@ -737,12 +748,12 @@ const Sidebar = () => {
     };
 
     fetchReliabilityRate();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, targetUserId]);
 
-  // 활동 완료율 가져오기 (weekly_activities 테이블 기반)
+  // 활동 완료율 가져오기 (activity_records 테이블 기반)
   useEffect(() => {
     const fetchCompletionRate = async () => {
-      const userId = session?.user?.id;
+      const userId = targetUserId || session?.user?.id;
       if (!userId) {
         setHasCompletionData(false);
         setCompletionRate(null);
@@ -750,19 +761,19 @@ const Sidebar = () => {
       }
 
       try {
-        // weekly_activities에서 해당 유저의 모든 활동 조회
+        // activity_records에서 해당 유저의 모든 활동 조회
         const { data, error } = await supabase
-          .from("weekly_activities")
-          .select("status")
+          .from("activity_records")
+          .select("is_completed")
           .eq("user_id", userId);
 
         if (error || !data || data.length === 0) {
           setHasCompletionData(false);
           setCompletionRate(null);
         } else {
-          // 완료된 활동 수 계산 (status가 'approved' 또는 'completed'인 경우)
+          // 완료된 활동 수 계산 (is_completed가 true인 경우)
           const completedCount = data.filter(
-            (activity) => activity.status === "approved" || activity.status === "completed"
+            (activity) => activity.is_completed === true
           ).length;
           const totalCount = data.length;
           const rate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -778,12 +789,13 @@ const Sidebar = () => {
     };
 
     fetchCompletionRate();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, targetUserId]);
 
   // 스킬 카드 데이터 가져오기 (API 통해 activities 데이터 조회)
   useEffect(() => {
     const fetchActivityCounts = async () => {
-      if (!session?.user?.email) {
+      // targetUserId가 있거나 로그인한 사용자가 있어야 함
+      if (!targetUserId && !session?.user?.email) {
         console.log("세션에 이메일 없음");
         setHasActivityData(false);
         return;
@@ -791,7 +803,8 @@ const Sidebar = () => {
 
       try {
         console.log("=== 스킬카드 API 호출 시작 ===");
-        const response = await fetch('/api/profile');
+        const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
+        const response = await fetch(apiUrl);
         const result = await response.json();
 
         console.log("API 응답:", result);
@@ -847,7 +860,7 @@ const Sidebar = () => {
     };
 
     fetchActivityCounts();
-  }, [session?.user?.email]);
+  }, [session?.user?.email, targetUserId]);
 
   useEffect(() => {
     // 0에서 올라가는 애니메이션
@@ -1108,7 +1121,7 @@ const Sidebar = () => {
                 borderRadius: '50%',
                 backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
                 border: 'none',
-                display: debugProfileType === '본인' ? 'flex' : 'none',
+                display: isOwner && debugProfileType === '본인' ? 'flex' : 'none',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
@@ -1224,30 +1237,32 @@ const Sidebar = () => {
                     <Image src={debugPanelType === 'EC' ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : debugPanelType === 'PX' ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"} alt="" width={16} height={16} className="detail-icon" />
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.phone}
-                      <span
-                        onClick={async () => {
-                          // 모달 열기 전에 기존 값 로드
-                          try {
-                            const response = await fetch('/api/profile');
-                            const result = await response.json();
-                            if (result.success && result.data) {
-                              setFormData(prev => ({
-                                ...prev,
-                                phoneComment: result.data.contact_available || ''
-                              }));
+                      {isOwner && (
+                        <span
+                          onClick={async () => {
+                            // 모달 열기 전에 기존 값 로드
+                            try {
+                              const response = await fetch('/api/profile');
+                              const result = await response.json();
+                              if (result.success && result.data) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  phoneComment: result.data.contact_available || ''
+                                }));
+                              }
+                            } catch (error) {
+                              console.error('연락처 코멘트 로드 오류:', error);
                             }
-                          } catch (error) {
-                            console.error('연락처 코멘트 로드 오류:', error);
-                          }
-                          setIsPhoneCommentModalOpen(true);
-                        }}
-                        style={{
-                          color: currentProfile.accentColor,
-                          fontSize: '14px',
-                          fontWeight: '400',
-                          lineHeight: '1',
-                          cursor: 'pointer'
-                        }}>+</span>
+                            setIsPhoneCommentModalOpen(true);
+                          }}
+                          style={{
+                            color: currentProfile.accentColor,
+                            fontSize: '14px',
+                            fontWeight: '400',
+                            lineHeight: '1',
+                            cursor: 'pointer'
+                          }}>+</span>
+                      )}
                     </span>
                   </div>
                   <div className="detail-row">

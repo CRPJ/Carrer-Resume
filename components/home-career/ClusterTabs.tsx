@@ -30,7 +30,8 @@ const ClusterTabs = () => {
     if (tabPath === "/cluster-4") {
       return pathname === "/cluster-4" || pathname === "/cluster-4/" ||
              pathname === "/cluster-4-1" || pathname === "/cluster-4-1/" ||
-             pathname === "/cluster-4-card" || pathname === "/cluster-4-card/";
+             pathname === "/cluster-4-card" || pathname === "/cluster-4-card/" ||
+             pathname.startsWith("/cluster-4-card/");
     }
     return pathname === tabPath || pathname === tabPath + "/";
   };

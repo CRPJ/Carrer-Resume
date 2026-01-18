@@ -59,6 +59,22 @@ const Cluster41Content = () => {
   // user_profiles.role 기본값 (역할 이력이 없을 때 사용)
   const [userDefaultRole, setUserDefaultRole] = useState<string | null>(null);
 
+  // 시즌 카드 데이터
+  interface SeasonCardData {
+    id: string;
+    seasonId: string;
+    year: number;
+    seasonName: string;
+    startDate: string;
+    endDate: string;
+    progressStatus: string;  // in_progress, completed, resting
+    approvedWeeks: number;
+    totalWeeks: number;
+    roleInSeason: string;
+  }
+  const [seasonCards, setSeasonCards] = useState<SeasonCardData[]>([]);
+  const [isLoadingSeasons, setIsLoadingSeasons] = useState(true);
+
   // 현재 시즌 정보 가져오기
   useEffect(() => {
     const fetchCurrentSeason = async () => {
@@ -353,19 +369,22 @@ const Cluster41Content = () => {
 
   // 프로필 API에서 성장 기간 집계 데이터 가져오기
   useEffect(() => {
-    const abortController = new AbortController();
-    const currentTargetUserId = targetUserId; // 현재 요청 시점의 targetUserId 저장
+    let isMounted = true; // 컴포넌트 마운트 상태 추적
 
     const fetchGrowthStats = async () => {
       try {
-        const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
-        console.log('[Cluster41] fetchGrowthStats - targetUserId:', currentTargetUserId, ', API URL:', apiUrl);
-        const response = await fetch(apiUrl, { signal: abortController.signal });
+        const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
+        console.log('[Cluster41] fetchGrowthStats - targetUserId:', targetUserId, ', API URL:', apiUrl);
+        const response = await fetch(apiUrl);
         const result = await response.json();
         console.log('[Cluster41] fetchGrowthStats - Response user ID:', result.data?.id);
+        console.log('[Cluster41] fetchGrowthStats - isMounted:', isMounted);
 
-        // 요청 중 targetUserId가 바뀌지 않았는지 확인
-        if (abortController.signal.aborted) return;
+        // 컴포넌트가 언마운트됐으면 state 업데이트 스킵
+        if (!isMounted) {
+          console.log('[Cluster41] Component unmounted, skipping state update');
+          return;
+        }
 
         if (response.ok) {
           // 성장 기간 집계 데이터 설정
@@ -385,17 +404,66 @@ const Cluster41Content = () => {
           if (result.data?.role) {
             setUserDefaultRole(result.data.role);
           }
+
+          // 시즌 카드 데이터 설정
+          console.log('[Cluster41] seasonHistories from API:', result.seasonHistories);
+          console.log('[Cluster41] seasonHistories length:', result.seasonHistories?.length);
+          if (result.seasonHistories && result.seasonHistories.length > 0) {
+            const seasonNameMap: { [key: string]: string } = {
+              'spring': '봄',
+              'summer': '여름',
+              'fall': '가을',
+              'winter': '겨울'
+            };
+
+            const cards: SeasonCardData[] = result.seasonHistories.map((sh: {
+              id: string;
+              role_in_season: string;
+              approved_weeks: number;
+              total_weeks: number;
+              progress_status: string;
+              seasons: {
+                id: string;
+                year: number;
+                name: string;
+                start_date: string;
+                end_date?: string;
+              };
+            }) => ({
+              id: sh.id,
+              seasonId: sh.seasons?.id || '',
+              year: sh.seasons?.year || 0,
+              seasonName: seasonNameMap[sh.seasons?.name] || sh.seasons?.name || '',
+              startDate: sh.seasons?.start_date || '',
+              endDate: sh.seasons?.end_date || '',
+              progressStatus: sh.progress_status,
+              approvedWeeks: sh.approved_weeks || 0,
+              totalWeeks: sh.total_weeks || 0,
+              roleInSeason: sh.role_in_season || '',
+            }));
+            console.log('[Cluster41] Parsed season cards:', cards);
+            console.log('[Cluster41] Setting seasonCards state with', cards.length, 'items');
+            setSeasonCards(cards);
+          } else {
+            console.log('[Cluster41] No seasonHistories data or empty array');
+            setSeasonCards([]);
+          }
+        } else {
+          console.log('[Cluster41] Response not ok:', response.status);
         }
+        setIsLoadingSeasons(false);
       } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') return;
         console.error("성장 데이터 로드 오류:", error);
+        if (isMounted) {
+          setIsLoadingSeasons(false);
+        }
       }
     };
 
     fetchGrowthStats();
 
     return () => {
-      abortController.abort();
+      isMounted = false;
     };
   }, [targetUserId]);
 
@@ -1090,6 +1158,100 @@ const Cluster41Content = () => {
           </div>
         </div>
       </section>
+
+      {/*/!* Section 2.5: 시즌별 카드 리스트 *!/*/}
+      {/*<section className="cluster4-season-list">*/}
+      {/*  <div className="season-list-header">*/}
+      {/*    <h3 className="season-list-title">*/}
+      {/*      <img src="/images/0/cluster 4/icon/icon - book.png" alt="book" className="title-icon" />*/}
+      {/*      SEASON HISTORY*/}
+      {/*    </h3>*/}
+      {/*    <span className="season-count">총 {seasonCards.length}개 시즌</span>*/}
+      {/*  </div>*/}
+      {/*  <div className="season-cards">*/}
+      {/*    {isLoadingSeasons ? (*/}
+      {/*      <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>시즌 데이터 로딩 중...</div>*/}
+      {/*    ) : seasonCards.length === 0 ? (*/}
+      {/*      <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>표시할 시즌이 없습니다.</div>*/}
+      {/*    ) : seasonCards.map((season) => {*/}
+      {/*      // 시즌 상태 텍스트*/}
+      {/*      const getSeasonStatusText = (status: string) => {*/}
+      {/*        switch (status) {*/}
+      {/*          case 'in_progress': return '시즌 진행 중';*/}
+      {/*          case 'completed': return '시즌 완료';*/}
+      {/*          case 'resting': return '시즌 휴식';*/}
+      {/*          default: return status;*/}
+      {/*        }*/}
+      {/*      };*/}
+      {/*      // 시즌 상태 클래스*/}
+      {/*      const getSeasonStatusClass = (status: string) => {*/}
+      {/*        switch (status) {*/}
+      {/*          case 'in_progress': return 'in-progress';*/}
+      {/*          case 'completed': return 'completed';*/}
+      {/*          case 'resting': return 'resting';*/}
+      {/*          default: return '';*/}
+      {/*        }*/}
+      {/*      };*/}
+      {/*      // 날짜 포맷 (2025-06-01 → 2025 - 06 - 01 (일))*/}
+      {/*      const formatSeasonDate = (dateStr: string) => {*/}
+      {/*        if (!dateStr) return '-';*/}
+      {/*        const date = new Date(dateStr);*/}
+      {/*        const days = ['일', '월', '화', '수', '목', '금', '토'];*/}
+      {/*        const year = date.getFullYear();*/}
+      {/*        const month = String(date.getMonth() + 1).padStart(2, '0');*/}
+      {/*        const day = String(date.getDate()).padStart(2, '0');*/}
+      {/*        const dayOfWeek = days[date.getDay()];*/}
+      {/*        return `${year} - ${month} - ${day} (${dayOfWeek})`;*/}
+      {/*      };*/}
+      {/*      // 시즌 이미지 경로*/}
+      {/*      const getSeasonImagePath = (seasonName: string) => {*/}
+      {/*        const seasonImageMap: { [key: string]: string } = {*/}
+      {/*          '봄': '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',*/}
+      {/*          '여름': '/images/0/cluster 4/시즌 이미지/여름_후보_3.png',*/}
+      {/*          '가을': '/images/0/cluster 4/시즌 이미지/가을_후보_1.png',*/}
+      {/*          '겨울': '/images/0/cluster 4/시즌 이미지/겨울_후보_1.png',*/}
+      {/*        };*/}
+      {/*        return seasonImageMap[seasonName] || '/images/0/cluster 4/시즌 이미지/봄_후보_1.png';*/}
+      {/*      };*/}
+
+      {/*      return (*/}
+      {/*        <div key={season.id} className="season-card-item">*/}
+      {/*          /!* 시즌 이미지 *!/*/}
+      {/*          <div className="season-card-image">*/}
+      {/*            <img src={getSeasonImagePath(season.seasonName)} alt={`${season.year}년 ${season.seasonName} 시즌`} />*/}
+      {/*            <div className="image-badges">*/}
+      {/*              <div className={`badge-tag ${getSeasonStatusClass(season.progressStatus)}`}>*/}
+      {/*                {getSeasonStatusText(season.progressStatus)}*/}
+      {/*              </div>*/}
+      {/*            </div>*/}
+      {/*          </div>*/}
+
+      {/*          /!* 시즌 정보 *!/*/}
+      {/*          <div className="season-card-content">*/}
+      {/*            <div className="season-card-header">*/}
+      {/*              <h4 className="season-card-title">{season.year}년도_{season.seasonName} 시즌</h4>*/}
+      {/*            </div>*/}
+      {/*            <div className="season-card-date">*/}
+      {/*              <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />*/}
+      {/*              {formatSeasonDate(season.startDate)} ~ {formatSeasonDate(season.endDate)}*/}
+      {/*            </div>*/}
+      {/*            <div className="season-card-stats">*/}
+      {/*              <span className="stat-item">*/}
+      {/*                <span className="stat-label">성공 주차</span>*/}
+      {/*                <span className="stat-value">{season.approvedWeeks} / {season.totalWeeks}</span>*/}
+      {/*              </span>*/}
+      {/*              <span className="stat-divider">|</span>*/}
+      {/*              <span className="stat-item">*/}
+      {/*                <span className="stat-label">역할</span>*/}
+      {/*                <span className="stat-value">{season.roleInSeason || '-'}</span>*/}
+      {/*              </span>*/}
+      {/*            </div>*/}
+      {/*          </div>*/}
+      {/*        </div>*/}
+      {/*      );*/}
+      {/*    })}*/}
+      {/*  </div>*/}
+      {/*</section>*/}
 
       {/* Section 3: 주차별 리스트 */}
       <section className="cluster4-weekly-list">
