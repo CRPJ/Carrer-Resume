@@ -104,6 +104,19 @@ const Cluster4Content = () => {
   // 현재 선택된 시즌 데이터
   const currentSeason = seasonData[section3Page];
 
+  // 활동 통계 (주차 성장률)
+  const [activityStats, setActivityStats] = useState<{
+    info: { total: number; success: number };
+    competency: { total: number; success: number };
+    experience: { total: number; success: number };
+    career: { total: number; success: number };
+  }>({
+    info: { total: 0, success: 0 },
+    competency: { total: 0, success: 0 },
+    experience: { total: 0, success: 0 },
+    career: { total: 0, success: 0 },
+  });
+
   // 현재 시즌 정보 상태 (DB에서 가져옴)
   const [currentSeasonInfo, setCurrentSeasonInfo] = useState<{
     year: number;
@@ -185,6 +198,127 @@ const Cluster4Content = () => {
 
     fetchCurrentSeason();
   }, []);
+
+  // 활동 통계 가져오기 (현재 주차 기준)
+  useEffect(() => {
+    const fetchActivityStats = async () => {
+      if (!session?.user?.id && !urlUserId) return;
+
+      const today = new Date().toISOString().split('T')[0];
+
+      // 1. 현재 주차 정보 가져오기
+      const { data: currentWeekData } = await supabase
+        .from('weeks')
+        .select('id')
+        .lte('start_date', today)
+        .gte('end_date', today)
+        .maybeSingle();
+
+      if (!currentWeekData) return;
+
+      const weekId = currentWeekData.id;
+
+      // 2. activity_types 정보 가져오기 (cluster_id 분류용)
+      const { data: activityTypesData } = await supabase
+        .from('activity_types')
+        .select('id, cluster_id')
+        .eq('is_active', true);
+
+      if (!activityTypesData) return;
+
+      // 클러스터별 activity_type_id 분류
+      const infoTypeIds: string[] = [];
+      const competencyTypeIds: string[] = [];
+      const experienceTypeIds: string[] = [];
+      const careerTypeIds: string[] = [];
+
+      activityTypesData.forEach((at) => {
+        if (at.cluster_id === 'practical_info') {
+          infoTypeIds.push(at.id);
+        } else if (at.cluster_id === 'practical_competency') {
+          competencyTypeIds.push(at.id);
+        } else if (at.cluster_id === 'practical_experience') {
+          experienceTypeIds.push(at.id);
+        } else if (at.cluster_id === 'practical_career') {
+          careerTypeIds.push(at.id);
+        }
+      });
+
+      // 3. weekly_activities 가져오기 (열린 활동)
+      const { data: activitiesData } = await supabase
+        .from('weekly_activities')
+        .select('activity_type_id, is_active, opened_at')
+        .eq('week_id', weekId);
+
+      if (!activitiesData) return;
+
+      const activeActivities = activitiesData.filter(a => a.is_active);
+
+      // 4. 프로필 API에서 activity_records, activity_details 가져오기
+      const targetUserId = urlUserId || session?.user?.id;
+      const res = await fetch(urlUserId ? `/api/users/${urlUserId}` : '/api/profile');
+      if (!res.ok) return;
+
+      const profileResult = await res.json();
+      const apiActivityRecords = profileResult.activityRecords || [];
+      const apiActivityDetails = profileResult.activityDetails || [];
+
+      // 해당 주차의 approved activity_type_id 목록
+      const weekApprovedActivities = apiActivityRecords.filter(
+        (ar: { week_id: string; is_completed: boolean }) => ar.week_id === weekId && ar.is_completed
+      );
+      const approvedActivityTypes = new Set<string>(
+        weekApprovedActivities.map((a: { activity_type_id: string }) => a.activity_type_id)
+      );
+
+      // 해당 주차의 activity_details
+      const filteredActivityDetails = apiActivityDetails.filter(
+        (ad: { week_id: string }) => ad.week_id === weekId
+      );
+
+      // 5. 각 클러스터별 통계 계산
+      const calcStats = (typeIds: string[]) => {
+        const total = activeActivities.filter(a => typeIds.includes(a.activity_type_id)).length;
+        const now = Date.now();
+        const deadline = 48 * 60 * 60 * 1000; // 48시간
+
+        const success = activeActivities.filter(a => {
+          if (!typeIds.includes(a.activity_type_id)) return false;
+          if (!approvedActivityTypes.has(a.activity_type_id)) return false;
+
+          // 2차 정보 확인
+          const detail = filteredActivityDetails.find(
+            (d: { activity_type_id: string }) => d.activity_type_id === a.activity_type_id
+          );
+          const hasSecondaryInfo = detail && (
+            (detail.sub_title && detail.sub_title.trim() !== '') ||
+            (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+          );
+
+          if (hasSecondaryInfo) return true;
+
+          // 48시간 경과 확인
+          if (a.opened_at) {
+            const openedTime = new Date(a.opened_at).getTime();
+            if (now - openedTime >= deadline) return true;
+          }
+
+          return false;
+        }).length;
+
+        return { total, success };
+      };
+
+      setActivityStats({
+        info: calcStats(infoTypeIds),
+        competency: calcStats(competencyTypeIds),
+        experience: calcStats(experienceTypeIds),
+        career: calcStats(careerTypeIds),
+      });
+    };
+
+    fetchActivityStats();
+  }, [session?.user?.id, urlUserId]);
 
   // 사용자 프로필에서 status, growth_status, growthEndInfo, role 가져오기
   useEffect(() => {
@@ -617,38 +751,38 @@ const Cluster4Content = () => {
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress.info}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">{Math.round(currentSeason.progress.info * 0.4)}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.info.total} 개 중 <span className="highlight">{activityStats.info.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress.info}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.info.total > 0 ? (activityStats.info.success / activityStats.info.total) * 100 : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress.ability}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">{Math.round(currentSeason.progress.ability * 0.4)}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.competency.total} 개 중 <span className="highlight">{activityStats.competency.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress.ability}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.competency.total > 0 ? (activityStats.competency.success / activityStats.competency.total) * 100 : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress.experience}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">{Math.round(currentSeason.progress.experience * 0.4)}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.experience.total} 개 중 <span className="highlight">{activityStats.experience.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress.experience}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.experience.total > 0 ? (activityStats.experience.success / activityStats.experience.total) * 100 : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress.career}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 40 개 중 <span className="highlight">{Math.round(currentSeason.progress.career * 0.4)}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.career.total} 개 중 <span className="highlight">{activityStats.career.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress.career}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.career.total > 0 ? (activityStats.career.success / activityStats.career.total) * 100 : 0}%` }}></div>
                   </div>
                 </div>
               </div>

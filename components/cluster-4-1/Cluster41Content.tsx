@@ -530,7 +530,24 @@ const Cluster41Content = () => {
         console.log('[DEBUG] User activities weeks:', activityWeekIds);
         console.log('[DEBUG] User rest weeks:', restWeekIds);
 
+        // user_weekly_growth 데이터 가져오기 (성장 상태 결정용)
+        let userWeeklyGrowthMap = new Map<string, { is_success: boolean; is_resting: boolean; is_club_break: boolean }>();
         if (userId) {
+          const { data: weeklyGrowthData } = await supabase
+            .from('user_weekly_growth')
+            .select('week_id, is_success, is_resting, is_club_break')
+            .eq('user_id', userId);
+
+          if (weeklyGrowthData) {
+            weeklyGrowthData.forEach((wg) => {
+              userWeeklyGrowthMap.set(wg.week_id, {
+                is_success: wg.is_success,
+                is_resting: wg.is_resting,
+                is_club_break: wg.is_club_break
+              });
+            });
+          }
+          console.log('[DEBUG] User weekly growth data:', userWeeklyGrowthMap.size, 'records');
 
           // 4. 팀/파트/역할/포인트/활동 데이터 가져오기
           const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult] = await Promise.all([
@@ -570,14 +587,30 @@ const Cluster41Content = () => {
 
           const seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
 
-          // 성장 상태 결정
+          // 성장 상태 결정 (user_weekly_growth 테이블 우선 사용)
           let status = '실패';
-          if (week.is_club_break) {
-            status = '휴식(공식)';
-          } else if (restWeekIds.has(week.id)) {
-            status = '휴식(개인)';
-          } else if (activityWeekIds.has(week.id)) {
-            status = '성공';
+          const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
+
+          if (weeklyGrowth) {
+            // user_weekly_growth 테이블에 데이터가 있으면 해당 데이터 사용
+            if (weeklyGrowth.is_club_break) {
+              status = '휴식(공식)';
+            } else if (weeklyGrowth.is_resting) {
+              status = '휴식(개인)';
+            } else if (weeklyGrowth.is_success) {
+              status = '성공';
+            } else {
+              status = '실패';
+            }
+          } else {
+            // user_weekly_growth 테이블에 데이터가 없으면 기존 로직으로 폴백
+            if (week.is_club_break) {
+              status = '휴식(공식)';
+            } else if (restWeekIds.has(week.id)) {
+              status = '휴식(개인)';
+            } else if (activityWeekIds.has(week.id)) {
+              status = '성공';
+            }
           }
 
           return {

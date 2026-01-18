@@ -111,6 +111,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
 
+  // 활동별 평점 (activity_type_id → points)
+  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
+
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
     id: string;
@@ -292,16 +295,42 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiApprovedActivities = profileResult.approvedActivities || [];
         const apiActivityRecords = profileResult.activityRecords || [];
         const apiActivityDetails = profileResult.activityDetails || [];
+        const apiActivityPoints = profileResult.activityPoints || [];
 
-        // 성장 상태 결정
+        // 성장 상태 결정 (user_weekly_growth 테이블에서 조회)
         let growthStatus = '실패';
-        if (currentWeek.is_club_break) {
-          growthStatus = '휴식(공식)';
-        } else if (apiRestWeekIds.includes(currentWeek.id)) {
-          growthStatus = '휴식(개인)';
-        } else if (apiActivityWeekIds.includes(currentWeek.id)) {
-          growthStatus = '성공';
+        const { data: weeklyGrowth, error: weeklyGrowthError } = await supabase
+          .from('user_weekly_growth')
+          .select('is_success, is_resting, is_club_break, failure_reason')
+          .eq('user_id', userId)
+          .eq('week_id', weekId)
+          .maybeSingle();
+
+        console.log('[DEBUG] weeklyGrowth query:', { userId, weekId, weeklyGrowth, error: weeklyGrowthError });
+
+        if (weeklyGrowth) {
+          // user_weekly_growth 테이블에 데이터가 있으면 해당 데이터 사용
+          if (weeklyGrowth.is_club_break) {
+            growthStatus = '휴식(공식)';
+          } else if (weeklyGrowth.is_resting) {
+            growthStatus = '휴식(개인)';
+          } else if (weeklyGrowth.is_success) {
+            growthStatus = '성공';
+          } else {
+            growthStatus = '실패';
+          }
+        } else {
+          // user_weekly_growth 테이블에 데이터가 없으면 기존 로직으로 폴백
+          if (currentWeek.is_club_break) {
+            growthStatus = '휴식(공식)';
+          } else if (apiRestWeekIds.includes(currentWeek.id)) {
+            growthStatus = '휴식(개인)';
+          } else if (apiActivityWeekIds.includes(currentWeek.id)) {
+            growthStatus = '성공';
+          }
         }
+
+        console.log('[DEBUG] final growthStatus:', growthStatus, 'weeklyGrowth exists:', !!weeklyGrowth);
 
         setWeekData({
           id: currentWeek.id,
@@ -509,6 +538,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           );
           console.log('[DEBUG] weekActivityDetails:', filteredActivityDetails.length, filteredActivityDetails);
           setWeekActivityDetails(filteredActivityDetails);
+
+          // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
+          const ratingsMap = new Map<string, number>();
+          filteredActivityRecords.forEach((ar: { id: string; activity_type_id: string }) => {
+            const pointData = apiActivityPoints.find((p: { activity_id: string }) => p.activity_id === ar.id);
+            if (pointData) {
+              ratingsMap.set(ar.activity_type_id, pointData.points);
+            }
+          });
+          console.log('[DEBUG] activityRatings:', ratingsMap);
+          setActivityRatings(ratingsMap);
 
           // 각 파트별 집계 (2차 정보 기입 OR 48시간 경과 시 success로 카운트)
           const calcStats = (types: string[]) => {
@@ -1515,15 +1555,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 실무 경험 카드 데이터 (동적 생성)
   const workExpCards = workExpActivityTypes.map((activityTypeId, index) => {
-    const activityType = activityTypes.find(at => at.id === activityTypeId);
+    const activityType = activityTypesMap.get(activityTypeId);
     const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
     const detail = weekActivityDetails[activityTypeId];
     const enhStatus = getEnhancementStatus(activityTypeId);
     const hasActivity = !!activity;
 
-    // 별점 계산 (activity_details.rating 필드 사용, 없으면 0)
-    const rating = detail?.rating || 0;
-    const ratingScore = rating * 2; // 별 1개 = 2점
+    // 별점 계산 (points 테이블에서 가져온 평점 사용, 0~10 정수)
+    const ratingScore = activityRatings.get(activityTypeId) || 0;
+    const rating = ratingScore / 2; // 별 표시용 (0~5)
 
     return {
       id: index + 1,

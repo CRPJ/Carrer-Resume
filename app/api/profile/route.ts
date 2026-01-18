@@ -102,7 +102,9 @@ export async function GET(request: NextRequest) {
       userActivitiesResult,
       userRoleHistoryResult,
       activityRecordsResult,
-      userActivityDetailsResult
+      userActivityDetailsResult,
+      activityTypesResult,
+      activityPointsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회) - 시즌 정보 포함
       profile.joined_week_id
@@ -166,11 +168,17 @@ export async function GET(request: NextRequest) {
       // 해당 유저의 역할 이력
       supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
 
-      // 해당 유저의 활동 이행 기록 (강화 상태 판단용)
-      supabaseAdmin.from("activity_records").select("week_id, activity_type_id, is_completed").eq("user_id", profile.id),
+      // 해당 유저의 활동 이행 기록 (강화 상태 판단용) - id 추가 (points 매핑용)
+      supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
 
       // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크)
-      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id)
+      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
+
+      // activity_types (cluster_id 기반 분류용)
+      supabaseAdmin.from("activity_types").select("id, cluster_id"),
+
+      // 해당 유저의 활동별 포인트 (평점용) - star 타입만
+      supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null)
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -351,17 +359,22 @@ export async function GET(request: NextRequest) {
       reliabilityRate: growthStats?.reliability_rate ? parseFloat(growthStats.reliability_rate) : calculatedReliabilityRate,
     };
 
-    // activity_type_id 별로 카운트
-    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
-    const competencyTypes = ['optional_unit', 'practical_lecture'];
-    const experienceTypes = ['required_unit'];
-    const careerTypes = ['practical_project'];
+    // activity_type_id → cluster_id 매핑 생성
+    const activityTypes = activityTypesResult.data || [];
+    const typeToClusterMap = new Map<string, string>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    activityTypes.forEach((at: any) => {
+      if (at.id && at.cluster_id) {
+        typeToClusterMap.set(at.id, at.cluster_id);
+      }
+    });
 
+    // cluster_id 기반으로 카운트
     const practicalCounts = activitiesData ? {
-      competency: activitiesData.filter(a => competencyTypes.includes(a.activity_type_id)).length,
-      experience: activitiesData.filter(a => experienceTypes.includes(a.activity_type_id)).length,
-      info: activitiesData.filter(a => infoTypes.includes(a.activity_type_id)).length,
-      career: activitiesData.filter(a => careerTypes.includes(a.activity_type_id)).length
+      competency: activitiesData.filter(a => typeToClusterMap.get(a.activity_type_id) === 'practical_competency').length,
+      experience: activitiesData.filter(a => typeToClusterMap.get(a.activity_type_id) === 'practical_experience').length,
+      info: activitiesData.filter(a => typeToClusterMap.get(a.activity_type_id) === 'practical_info').length,
+      career: activitiesData.filter(a => typeToClusterMap.get(a.activity_type_id) === 'practical_career').length
     } : { competency: 0, experience: 0, info: 0, career: 0 };
 
     // completionRate는 activity_records 기반으로 계산 (weekly_activities에는 user_id가 없음)
@@ -443,6 +456,8 @@ export async function GET(request: NextRequest) {
       activityRecords: activityRecordsData,
       // 2차 정보 (서브타이틀, 아웃풋링크)
       activityDetails: userActivityDetailsResult.data || [],
+      // 활동별 포인트 (평점용) - activity_id → points 매핑
+      activityPoints: activityPointsResult.data || [],
     });
   } catch (error) {
     console.error("프로필 API 오류:", error);
