@@ -323,11 +323,11 @@ export async function GET(request: NextRequest) {
 
       // 해당 주차까지의 모든 주차 중 활동이 있는 주차 수 계산
       let cumulativeApprovedWeeks = 0;
-      for (const [wId, wEndDate] of weekEndDateMap.entries()) {
+      weekEndDateMap.forEach((wEndDate, wId) => {
         if (wEndDate <= selectedWeekEndDate && userActivityWeekIds.has(wId)) {
           cumulativeApprovedWeeks++;
         }
-      }
+      });
 
       // 온보딩 주차 추가 (온보딩 주차가 activity_records에 없더라도 성공으로 카운트)
       const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
