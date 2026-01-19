@@ -309,7 +309,7 @@ const Sidebar = () => {
       graduationStatus: 'ing',
       gpa: '0.0',
       gpaMax: '0.0',
-      photo: '/images/0/cluster 1/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp',
+      photo: '/images/0/crew profile/이안0.png',
       quote: '로그인 후에 상단 연필 아이콘을 클릭하여 프로필을 완성해보세요 !',
       lightColor: '#FFEC8F',
       accentColor: '#FFC300'
@@ -382,7 +382,7 @@ const Sidebar = () => {
     graduationStatus: userProfile.graduationStatus,
     gpa: userProfile.gpa,
     gpaMax: userProfile.gpaMax,
-    quote: userProfile.quote,
+    quote: userProfile.quote || defaultProfile.quote,
     photo: userProfile.photo || defaultProfile.photo,
   } : defaultProfile;
 
@@ -439,6 +439,15 @@ const Sidebar = () => {
         };
         if (profile.status && statusMap[profile.status]) {
           setCrewStatus(statusMap[profile.status]);
+        }
+
+        // completionRate (활동 완료율) - API 응답에서 가져오기
+        if (result.completionRate !== undefined && result.completionRate !== null) {
+          setHasCompletionData(true);
+          setCompletionRate(result.completionRate);
+        } else {
+          setHasCompletionData(false);
+          setCompletionRate(null);
         }
       }
     } catch (error) {
@@ -731,7 +740,7 @@ const Sidebar = () => {
           .from("user_growth_stats")
           .select("reliability_rate")
           .eq("user_id", userId)
-          .single();
+          .maybeSingle();
 
         if (error || !data) {
           setHasReliabilityData(false);
@@ -750,34 +759,124 @@ const Sidebar = () => {
     fetchReliabilityRate();
   }, [session?.user?.id, targetUserId]);
 
-  // 활동 완료율 가져오기 (activity_records 테이블 기반)
+  // 활동 완료율: fetchUserProfile에서 /api/profile 응답으로 처리하므로 별도 쿼리 불필요
+  // (RLS 정책으로 인해 클라이언트 직접 쿼리 시 실패)
+  /*
   useEffect(() => {
     const fetchCompletionRate = async () => {
       const userId = targetUserId || session?.user?.id;
+      console.log('[Sidebar] fetchCompletionRate 시작, userId:', userId);
       if (!userId) {
+        console.log('[Sidebar] userId 없음, return');
         setHasCompletionData(false);
         setCompletionRate(null);
         return;
       }
 
       try {
-        // activity_records에서 해당 유저의 모든 활동 조회
-        const { data, error } = await supabase
-          .from("activity_records")
-          .select("is_completed")
-          .eq("user_id", userId);
+        // 1. 유저의 가입 주차 정보 가져오기
+        const { data: profileData, error: profileError } = await supabase
+          .from("user_profiles")
+          .select("joined_week_id")
+          .eq("id", userId)
+          .maybeSingle();
 
-        if (error || !data || data.length === 0) {
+        console.log('[Sidebar] profileData:', profileData, 'profileError:', profileError);
+
+        if (profileError || !profileData?.joined_week_id) {
+          console.log('[Sidebar] joined_week_id 없음, return');
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        // 2. 가입 주차의 시작일 가져오기
+        const { data: joinedWeekData, error: weekError } = await supabase
+          .from("weeks")
+          .select("start_date")
+          .eq("id", profileData.joined_week_id)
+          .maybeSingle();
+
+        if (weekError || !joinedWeekData?.start_date) {
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        const joinedWeekStartDate = joinedWeekData.start_date;
+
+        // 3. 가입 주차 이후의 모든 주차 ID 가져오기 (break 시즌 제외)
+        const { data: weeksData, error: weeksError } = await supabase
+          .from("weeks")
+          .select("id, season_id, seasons(name)")
+          .gte("start_date", joinedWeekStartDate);
+
+        console.log('[Sidebar] weeksData:', weeksData?.length, 'weeksError:', weeksError);
+
+        if (weeksError || !weeksData) {
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        // break 시즌 주차 제외
+        const validWeekIds = weeksData
+          .filter((w: { seasons: { name: string } | null }) => {
+            // seasons가 null이면 포함 (break 시즌이 아님)
+            if (!w.seasons) return true;
+            return !w.seasons.name?.toLowerCase().includes('break');
+          })
+          .map((w: { id: string }) => w.id);
+
+        console.log('[Sidebar] validWeekIds:', validWeekIds.length);
+
+        if (validWeekIds.length === 0) {
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        // 4. P: 가입 주차 이후 열린 모든 활동 수 (weekly_activities에서 is_active=true)
+        const { data: weeklyActivitiesData, error: waError } = await supabase
+          .from("weekly_activities")
+          .select("week_id, activity_type_id")
+          .in("week_id", validWeekIds)
+          .eq("is_active", true);
+
+        if (waError) {
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        const totalP = weeklyActivitiesData?.length || 0;
+        console.log('[Sidebar] totalP (열린 활동 수):', totalP);
+
+        // 5. R: 완료한 활동 수 (activity_records에서 is_completed=true)
+        const { data: activityRecordsData, error: arError } = await supabase
+          .from("activity_records")
+          .select("week_id, activity_type_id")
+          .eq("user_id", userId)
+          .eq("is_completed", true);
+
+        if (arError) {
+          console.error('[Sidebar] activity_records 오류:', arError);
+          setHasCompletionData(false);
+          setCompletionRate(null);
+          return;
+        }
+
+        const totalR = activityRecordsData?.length || 0;
+        console.log('[Sidebar] totalR (완료한 활동 수):', totalR);
+
+        // 6. 활동 이행율 계산: (R / P) × 100
+        if (totalP === 0) {
+          console.log('[Sidebar] totalP가 0이라 completionRate를 null로 설정');
           setHasCompletionData(false);
           setCompletionRate(null);
         } else {
-          // 완료된 활동 수 계산 (is_completed가 true인 경우)
-          const completedCount = data.filter(
-            (activity) => activity.is_completed === true
-          ).length;
-          const totalCount = data.length;
-          const rate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
+          const rate = Math.round((totalR / totalP) * 100);
+          console.log('[Sidebar] completionRate 계산 결과:', rate, '%');
           setHasCompletionData(true);
           setCompletionRate(rate);
         }
@@ -790,6 +889,7 @@ const Sidebar = () => {
 
     fetchCompletionRate();
   }, [session?.user?.id, targetUserId]);
+  */
 
   // 스킬 카드 데이터 가져오기 (API 통해 activities 데이터 조회)
   useEffect(() => {
@@ -828,11 +928,8 @@ const Sidebar = () => {
           setHasActivityData(false);
         }
 
-        // reliability_rate도 함께 설정 (API에서 반환됨)
-        if (result.reliabilityRate !== undefined) {
-          setHasReliabilityData(true);
-          setReliabilityRate(result.reliabilityRate);
-        }
+        // reliability_rate는 user_growth_stats에서 직접 조회한 값을 사용 (719줄 useEffect)
+        // API 실시간 계산값으로 덮어쓰지 않음
 
         // 배지 데이터 설정 (별, 번개, 방패)
         if (result.badges) {

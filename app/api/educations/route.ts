@@ -83,9 +83,11 @@ const gradeMaxFromDb: { [key: string]: string } = {
 };
 
 // GET: 학력 조회
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get('userId');
 
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -101,25 +103,33 @@ export async function GET() {
       );
     }
 
-    // user_profiles에서 사용자 ID 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
+    let userId: string;
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
-      );
+    if (targetUserId) {
+      // targetUserId가 있으면 해당 유저의 학력 조회
+      userId = targetUserId;
+    } else {
+      // user_profiles에서 사용자 ID 조회
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("email", session.user.email)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      userId = profile.id;
     }
 
     // user_educations에서 학력 조회 (sort_order 기준 정렬)
     const { data: educations, error: eduError } = await supabaseAdmin
       .from("user_educations")
       .select("*")
-      .eq("user_id", profile.id)
+      .eq("user_id", userId)
       .order("sort_order", { ascending: true });
 
     if (eduError) {

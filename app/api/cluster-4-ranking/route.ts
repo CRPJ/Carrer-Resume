@@ -20,10 +20,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 1. 모든 시즌과 주차 가져오기 (break 시즌 제외)
+    // 1. 모든 시즌과 주차 가져오기 (break 시즌 제외, 완료된 주차만)
+    // 현재 진행 중인 주차는 제외 (end_date < today)
+    const today = new Date().toISOString().split('T')[0];
     const { data: allWeeks, error: weeksError } = await supabaseAdmin
       .from('weeks')
       .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
+      .lt('end_date', today)
       .order('start_date', { ascending: false });
 
     if (weeksError) {
@@ -89,7 +92,7 @@ export async function GET(request: NextRequest) {
     // (joined_week의 start_date <= 해당 주차의 start_date)
     const { data: allProfiles } = await supabaseAdmin
       .from('user_profiles')
-      .select('id, display_name, profile_photo_url, status, role, joined_week_id')
+      .select('id, display_name, profile_photo_url, status, role, joined_week_id, onboarding_week_id')
       .not('joined_week_id', 'is', null)
       .in('status', ['active', 'seasonal_rest', 'weekly_rest', 'graduated']);
 
@@ -99,6 +102,14 @@ export async function GET(request: NextRequest) {
       const joinedWeekStartDate = weekStartDateMap.get(profile.joined_week_id);
       if (!joinedWeekStartDate) return false;
       return joinedWeekStartDate <= selectedWeekStartDate;
+    });
+
+    // 온보딩 주차 ID 매핑 (userId -> onboarding_week_id)
+    const userOnboardingWeekMap = new Map<string, string>();
+    eligibleProfiles.forEach(p => {
+      if (p.onboarding_week_id) {
+        userOnboardingWeekMap.set(p.id, p.onboarding_week_id);
+      }
     });
 
     const userIds = new Set<string>();
@@ -155,11 +166,18 @@ export async function GET(request: NextRequest) {
       .select('user_id, role, started_at, ended_at')
       .in('user_id', Array.from(userIds));
 
-    // 7. 활동 기록 가져오기 (강화율 계산용)
+    // 7. 활동 기록 가져오기 (강화율 계산용 - 해당 주차)
     const { data: activityRecords } = await supabaseAdmin
       .from('activity_records')
       .select('user_id, activity_type_id, is_completed')
       .eq('week_id', weekId)
+      .eq('is_completed', true);
+
+    // 7-1. 모든 활동 기록 가져오기 (누적 주차 계산용 - 활동이 있는 주차 = 성공)
+    const { data: allActivityRecords } = await supabaseAdmin
+      .from('activity_records')
+      .select('user_id, week_id')
+      .in('user_id', Array.from(userIds))
       .eq('is_completed', true);
 
     // 8. 활동 타입 정보 가져오기 (cluster_id 포함)
@@ -292,13 +310,34 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      // 해당 주차까지의 누적 성공 주차 수 계산
+      // 해당 주차까지의 누적 성공 주차 수 계산 (활동 기록 기반 + 온보딩 주차)
+      // cluster-4-card와 동일한 방식: activity_records에서 활동이 있는 주차 = 성공
       const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
-      const cumulativeApprovedWeeks = (allGrowthData || []).filter(g => {
-        if (g.user_id !== userId || !g.is_success) return false;
-        const gWeekEndDate = weekEndDateMap.get(g.week_id);
-        return gWeekEndDate && gWeekEndDate <= selectedWeekEndDate;
-      }).length;
+
+      // 해당 사용자의 활동이 있는 주차 ID 목록
+      const userActivityWeekIds = new Set(
+        (allActivityRecords || [])
+          .filter(ar => ar.user_id === userId)
+          .map(ar => ar.week_id)
+      );
+
+      // 해당 주차까지의 모든 주차 중 활동이 있는 주차 수 계산
+      let cumulativeApprovedWeeks = 0;
+      for (const [wId, wEndDate] of weekEndDateMap.entries()) {
+        if (wEndDate <= selectedWeekEndDate && userActivityWeekIds.has(wId)) {
+          cumulativeApprovedWeeks++;
+        }
+      }
+
+      // 온보딩 주차 추가 (온보딩 주차가 activity_records에 없더라도 성공으로 카운트)
+      const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
+      if (userOnboardingWeekId) {
+        const onboardingEndDate = weekEndDateMap.get(userOnboardingWeekId);
+        // 온보딩 주차가 선택된 주차 이전이고, 아직 카운트되지 않았으면 추가
+        if (onboardingEndDate && onboardingEndDate <= selectedWeekEndDate && !userActivityWeekIds.has(userOnboardingWeekId)) {
+          cumulativeApprovedWeeks++;
+        }
+      }
 
       rankings.push({
         userId,

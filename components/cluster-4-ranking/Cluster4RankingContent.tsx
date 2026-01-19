@@ -68,18 +68,8 @@ const Cluster4RankingContent = () => {
         if (result.success && result.weeks) {
           setWeeks(result.weeks);
 
-          // 현재 진행 중인 주차 찾기 (오늘 날짜가 start_date와 end_date 사이에 있는 주차)
-          const today = new Date().toISOString().split('T')[0];
-          const currentWeek = result.weeks.find((w: WeekOption) =>
-            w.startDate <= today && w.endDate >= today
-          );
-
-          if (currentWeek) {
-            // 현재 진행 중인 주차가 있으면 선택
-            setSelectedWeekId(currentWeek.id);
-            setSelectedSeason(`${currentWeek.seasonYear}년, ${currentWeek.seasonName} 시즌`);
-          } else if (result.weeks.length > 0) {
-            // 없으면 가장 최근 주차 선택
+          // 가장 최근 완료된 주차를 기본 선택 (현재 진행 중인 주차는 API에서 제외됨)
+          if (result.weeks.length > 0) {
             setSelectedWeekId(result.weeks[0].id);
             setSelectedSeason(`${result.weeks[0].seasonYear}년, ${result.weeks[0].seasonName} 시즌`);
           }

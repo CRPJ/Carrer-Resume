@@ -260,7 +260,7 @@ const Sidebar = () => {
         <div className="resume-header" style={{ position: 'relative' }}>
           <div className="resume-photo">
             <Image
-              src="/images/0/cluster 1/iZKpm7I6mM-X1RCe8whJEe_K4L1q7r24whHrO5pK6vLZ1ivZs-sMvk3r35n6xbZ5P3Y8updzx8RXuoYL_5-GCQ.webp"
+              src="/images/0/crew profile/이안0.png"
               alt="Profile"
               width={240}
               height={273}

@@ -199,11 +199,19 @@ const Cluster41Content = () => {
   }
   const [userActivities, setUserActivities] = useState<ActivityData[]>([]);
 
-  // 활동 타입별 분류 (실무 카테고리)
-  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom'];
-  const competencyTypes = ['optional_unit', 'practical_lecture'];
-  const experienceTypes = ['required_unit'];
-  const careerTypes = ['practical_project'];
+  // 활동 타입별 분류 (실무 카테고리) - DB에서 동적으로 가져옴
+  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
+  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
+  const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
+
+  // 주차별 열린 활동 데이터 (weekly_activities 테이블)
+  interface WeeklyActivityData {
+    week_id: string;
+    activity_type_id: string;
+    is_active: boolean;
+  }
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivityData[]>([]);
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
@@ -323,33 +331,45 @@ const Cluster41Content = () => {
   // 주차별 실무 강화율 계산 함수들
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
-    const weekActivities = userActivities.filter(a => a.week_id === weekId);
-    const infoCount = weekActivities.filter(a => infoTypes.includes(a.activity_type_id)).length;
-    const total = 6; // 실무 정보 전체 개수
+    // 해당 주차에 열린 활동 중 info 타입 개수 (total)
+    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
+    const total = weekOpenActivities.filter(wa => infoTypes.includes(wa.activity_type_id)).length;
+    // 유저가 완료한 info 타입 활동 개수 (count)
+    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
+    const infoCount = userWeekActivities.filter(a => infoTypes.includes(a.activity_type_id)).length;
     return { count: infoCount, total, rate: total > 0 ? Math.round((infoCount / total) * 100) : 0 };
   };
 
   // 주차별 실무 역량 강화율 (competency)
   const getWeeklyCompetencyRate = (weekId: string) => {
-    const weekActivities = userActivities.filter(a => a.week_id === weekId);
-    const competencyCount = weekActivities.filter(a => competencyTypes.includes(a.activity_type_id)).length;
-    const total = 1; // 실무 역량 전체 개수
+    // 해당 주차에 열린 활동 중 competency 타입 개수 (total)
+    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
+    const total = weekOpenActivities.filter(wa => competencyTypeIds.includes(wa.activity_type_id)).length;
+    // 유저가 완료한 competency 타입 활동 개수 (count)
+    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
+    const competencyCount = userWeekActivities.filter(a => competencyTypeIds.includes(a.activity_type_id)).length;
     return { count: competencyCount, total, rate: total > 0 ? Math.round((competencyCount / total) * 100) : 0 };
   };
 
   // 주차별 실무 경험 강화율 (experience)
   const getWeeklyExperienceRate = (weekId: string) => {
-    const weekActivities = userActivities.filter(a => a.week_id === weekId);
-    const experienceCount = weekActivities.filter(a => experienceTypes.includes(a.activity_type_id)).length;
-    const total = 4; // 실무 경험 전체 개수
+    // 해당 주차에 열린 활동 중 experience 타입 개수 (total)
+    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
+    const total = weekOpenActivities.filter(wa => experienceTypeIds.includes(wa.activity_type_id)).length;
+    // 유저가 완료한 experience 타입 활동 개수 (count)
+    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
+    const experienceCount = userWeekActivities.filter(a => experienceTypeIds.includes(a.activity_type_id)).length;
     return { count: experienceCount, total, rate: total > 0 ? Math.round((experienceCount / total) * 100) : 0 };
   };
 
   // 주차별 실무 경력 강화율 (career)
   const getWeeklyCareerRate = (weekId: string) => {
-    const weekActivities = userActivities.filter(a => a.week_id === weekId);
-    const careerCount = weekActivities.filter(a => careerTypes.includes(a.activity_type_id)).length;
-    const total = 5; // 실무 경력 전체 개수
+    // 해당 주차에 열린 활동 중 career 타입 개수 (total)
+    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
+    const total = weekOpenActivities.filter(wa => careerTypeIds.includes(wa.activity_type_id)).length;
+    // 유저가 완료한 career 타입 활동 개수 (count)
+    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
+    const careerCount = userWeekActivities.filter(a => careerTypeIds.includes(a.activity_type_id)).length;
     return { count: careerCount, total, rate: total > 0 ? Math.round((careerCount / total) * 100) : 0 };
   };
 
@@ -528,6 +548,7 @@ const Cluster41Content = () => {
         let userId: string | null = null;
         let apiActivityWeekIds: string[] = [];
         let apiRestWeekIds: string[] = [];
+        let apiOnboardingWeekId: string | null = null;
 
         try {
           const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
@@ -563,6 +584,11 @@ const Cluster41Content = () => {
             setUserRoleHistory(result.userRoleHistory);
             console.log('[DEBUG] API User role history:', result.userRoleHistory);
           }
+          // API에서 온보딩 주차 ID 가져오기
+          if (response.ok && result.onboardingWeekId) {
+            apiOnboardingWeekId = result.onboardingWeekId;
+            console.log('[DEBUG] API Onboarding week ID:', apiOnboardingWeekId);
+          }
 
           // 요청 중 targetUserId가 바뀌었으면 중단
           if (abortController.signal.aborted) return;
@@ -571,11 +597,12 @@ const Cluster41Content = () => {
           console.error('[DEBUG] Failed to fetch profile:', err);
         }
 
-        // 1. 모든 주차 가져오기 (현재까지, 가입 주차 이후만)
+        // 1. 모든 주차 가져오기 (완료된 주차만, 가입 주차 이후만)
+        // 현재 진행 중인 주차는 제외 (end_date < today)
         let weeksQuery = supabase
           .from('weeks')
           .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
-          .lte('start_date', today)
+          .lt('end_date', today)
           .order('start_date', { ascending: false });
 
         // 가입 주차 이후만 필터링
@@ -617,14 +644,16 @@ const Cluster41Content = () => {
           }
           console.log('[DEBUG] User weekly growth data:', userWeeklyGrowthMap.size, 'records');
 
-          // 4. 팀/파트/역할/포인트/활동 데이터 가져오기
-          const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult] = await Promise.all([
+          // 4. 팀/파트/역할/포인트/활동/활동타입/주차별활동 데이터 가져오기
+          const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult, activityTypesResult, weeklyActivitiesResult] = await Promise.all([
             supabase.from('teams').select('id, name'),
             supabase.from('parts').select('id, name, team_id'),
             supabase.from('user_team_parts').select('id, user_id, team_id, part_id, joined_at, left_at, is_current, season_id').eq('user_id', userId),
             supabase.from('user_role_history').select('id, user_id, role, started_at, ended_at').eq('user_id', userId),
             supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
-            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true)
+            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
+            supabase.from('activity_types').select('id, cluster_id').eq('is_active', true),
+            supabase.from('weekly_activities').select('week_id, activity_type_id, is_active')
           ]);
 
           if (teamsResult.data) setTeams(teamsResult.data);
@@ -633,6 +662,27 @@ const Cluster41Content = () => {
           if (userRoleHistoryResult.data) setUserRoleHistory(userRoleHistoryResult.data);
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
+          if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
+
+          // activity_types에서 클러스터별 ID 분류
+          if (activityTypesResult.data) {
+            const competencyIds: string[] = [];
+            const experienceIds: string[] = [];
+            const careerIds: string[] = [];
+            activityTypesResult.data.forEach((at: { id: string; cluster_id: string }) => {
+              if (at.cluster_id === 'practical_competency') {
+                competencyIds.push(at.id);
+              } else if (at.cluster_id === 'practical_experience') {
+                experienceIds.push(at.id);
+              } else if (at.cluster_id === 'practical_career') {
+                careerIds.push(at.id);
+              }
+            });
+            setCompetencyTypeIds(competencyIds);
+            setExperienceTypeIds(experienceIds);
+            setCareerTypeIds(careerIds);
+            console.log('[DEBUG] Activity types - competency:', competencyIds, 'experience:', experienceIds, 'career:', careerIds);
+          }
 
           console.log('[DEBUG] Teams:', teamsResult.data);
           console.log('[DEBUG] Parts:', partsResult.data);
@@ -640,6 +690,7 @@ const Cluster41Content = () => {
           console.log('[DEBUG] User role history:', userRoleHistoryResult.data);
           console.log('[DEBUG] User points:', userPointsResult.data);
           console.log('[DEBUG] User activities:', userActivitiesResult.data);
+          console.log('[DEBUG] Weekly activities:', weeklyActivitiesResult.data?.length, 'records');
         }
 
         // 5. 데이터 변환
@@ -655,29 +706,35 @@ const Cluster41Content = () => {
 
           const seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
 
-          // 성장 상태 결정 (user_weekly_growth 테이블 우선 사용)
+          // 성장 상태 결정 (온보딩 주차 → user_weekly_growth → 기존 로직)
           let status = '실패';
-          const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
 
-          if (weeklyGrowth) {
-            // user_weekly_growth 테이블에 데이터가 있으면 해당 데이터 사용
-            if (weeklyGrowth.is_club_break) {
-              status = '휴식(공식)';
-            } else if (weeklyGrowth.is_resting) {
-              status = '휴식(개인)';
-            } else if (weeklyGrowth.is_success) {
-              status = '성공';
-            } else {
-              status = '실패';
-            }
+          // 온보딩 주차는 무조건 성공 처리
+          if (apiOnboardingWeekId && week.id === apiOnboardingWeekId) {
+            status = '성공';
           } else {
-            // user_weekly_growth 테이블에 데이터가 없으면 기존 로직으로 폴백
-            if (week.is_club_break) {
-              status = '휴식(공식)';
-            } else if (restWeekIds.has(week.id)) {
-              status = '휴식(개인)';
-            } else if (activityWeekIds.has(week.id)) {
-              status = '성공';
+            const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
+
+            if (weeklyGrowth) {
+              // user_weekly_growth 테이블에 데이터가 있으면 해당 데이터 사용
+              if (weeklyGrowth.is_club_break) {
+                status = '휴식(공식)';
+              } else if (weeklyGrowth.is_resting) {
+                status = '휴식(개인)';
+              } else if (weeklyGrowth.is_success) {
+                status = '성공';
+              } else {
+                status = '실패';
+              }
+            } else {
+              // user_weekly_growth 테이블에 데이터가 없으면 기존 로직으로 폴백
+              if (week.is_club_break) {
+                status = '휴식(공식)';
+              } else if (restWeekIds.has(week.id)) {
+                status = '휴식(개인)';
+              } else if (activityWeekIds.has(week.id)) {
+                status = '성공';
+              }
             }
           }
 
@@ -1137,7 +1194,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 휴식 주차</span>
                   <span className="detail-value">
-                    <span className="number">{growthPeriodStats ? (growthPeriodStats.restWeeks + growthPeriodStats.clubBreakWeeks) : '-'}</span>{growthPeriodStats?.restSeasons ? <span className="orange-highlight">({growthPeriodStats.restSeasons})</span> : null} <span className="white-text">개 주차</span>
+                    <span className="number">{growthPeriodStats?.restWeeks ?? '-'}</span>{growthPeriodStats?.restSeasons ? <span className="orange-highlight">({growthPeriodStats.restSeasons})</span> : null} <span className="white-text">개 주차</span>
                   </span>
                 </div>
                 <div className="detail-row">
@@ -1335,7 +1392,7 @@ const Cluster41Content = () => {
           ) : paginatedDbData.length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>표시할 주차가 없습니다.</div>
           ) : paginatedDbData.map((week) => (
-            <Link href={`/cluster-4-card/${week.id}`} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link href={`/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               {/* 왼쪽 이미지 */}
               <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
                 <img src={getWeekImagePath(week)} alt={`${week.seasonYear} ${week.seasonName} 시즌, ${week.weekNumber}주차`} />

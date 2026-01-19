@@ -342,6 +342,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiActivityDetails = profileResult.activityDetails || [];
         const apiActivityPoints = profileResult.activityPoints || [];
 
+        console.log('[DEBUG] Profile API Response for userId:', userId);
+        console.log('[DEBUG] apiApprovedActivities:', apiApprovedActivities.length, apiApprovedActivities);
+        console.log('[DEBUG] apiActivityRecords:', apiActivityRecords.length);
+        console.log('[DEBUG] apiActivityDetails:', apiActivityDetails.length);
+        console.log('[DEBUG] urlUserId:', urlUserId, '| fetched userId:', userId);
+
         // 성장 상태 결정 (user_weekly_growth 테이블에서 조회)
         let growthStatus = '실패';
         const { data: weeklyGrowth, error: weeklyGrowthError } = await supabase
@@ -595,36 +601,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           console.log('[DEBUG] activityRatings:', ratingsMap);
           setActivityRatings(ratingsMap);
 
-          // 각 파트별 집계 (2차 정보 기입 OR 48시간 경과 시 success로 카운트)
+          // 각 파트별 집계 (is_completed=true인 활동 수 - weekly-ranking과 동일한 방식)
           const calcStats = (types: string[]) => {
             const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
-            const now = Date.now();
-            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-
             const success = activeActivities.filter(a => {
               if (!types.includes(a.activity_type_id)) return false;
-              if (!approvedActivityTypes.has(a.activity_type_id)) return false; // is_completed = true 필요
-
-              // 2차 정보 확인
-              const detail = filteredActivityDetails.find(
-                (d: { activity_type_id: string }) => d.activity_type_id === a.activity_type_id
-              );
-              const hasSecondaryInfo = detail && (
-                (detail.sub_title && detail.sub_title.trim() !== '') ||
-                (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
-              );
-
-              // 2차 정보가 있으면 바로 success
-              if (hasSecondaryInfo) return true;
-
-              // 48시간 경과 확인
-              if (a.opened_at) {
-                const openedTime = new Date(a.opened_at).getTime();
-                const elapsed = now - openedTime;
-                if (elapsed >= deadline) return true;
-              }
-
-              return false;
+              return approvedActivityTypes.has(a.activity_type_id); // is_completed = true
             }).length;
 
             return { total, success };
@@ -1493,33 +1475,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 통계 재계산 함수 (저장 후 즉시 업데이트용)
+  // 통계 재계산 함수 (저장 후 즉시 업데이트용 - is_completed=true 기준)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const recalculateStats = (updatedDetails: ActivityDetail[]) => {
     const activeActivities = weeklyActivities.filter(a => a.is_active);
-    const now = Date.now();
-    const deadline = 48 * 60 * 60 * 1000; // 48시간
 
     const calcStats = (types: string[]) => {
       const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
       const success = activeActivities.filter(a => {
         if (!types.includes(a.activity_type_id)) return false;
-        if (!weekApprovedTypes.has(a.activity_type_id)) return false;
-
-        const detail = updatedDetails.find(d => d.activity_type_id === a.activity_type_id);
-        const hasSecondaryInfo = detail && (
-          (detail.sub_title && detail.sub_title.trim() !== '') ||
-          (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
-        );
-
-        if (hasSecondaryInfo) return true;
-
-        if (a.opened_at) {
-          const openedTime = new Date(a.opened_at).getTime();
-          const elapsed = now - openedTime;
-          if (elapsed >= deadline) return true;
-        }
-
-        return false;
+        return weekApprovedTypes.has(a.activity_type_id); // is_completed = true
       }).length;
 
       return { total, success };
@@ -1807,7 +1772,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
         <div className="nav-buttons">
           {prevWeekId ? (
-            <Link href={`/cluster-4-card/${prevWeekId}`} className="nav-btn-prev">
+            <Link href={`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-prev">
               <span>이전 주</span>
               <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
             </Link>
@@ -1818,7 +1783,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </button>
           )}
           {nextWeekId ? (
-            <Link href={`/cluster-4-card/${nextWeekId}`} className="nav-btn-next">
+            <Link href={`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-next">
               <span>다음 주</span>
               <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </Link>
@@ -3271,7 +3236,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                         <div className="colleague-profile-row">
                           <div className="colleague-avatar">
-                            <img src={colleague.profileImg} alt={colleague.name} />
+                            {colleague.profileImg ? <img src={colleague.profileImg} alt={colleague.name} /> : <div className="profile-placeholder"></div>}
                           </div>
                           <div className="colleague-info">
                             <div className="colleague-name">{colleague.name} | {colleague.gender} | {colleague.age}</div>
@@ -3350,7 +3315,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <div key={user.id} className="crew-search-item">
                           <div className="crew-profile">
                             <div className="crew-avatar">
-                              <img src={user.profileImg} alt={user.name} />
+                              {user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                             </div>
                             <div className="crew-info">
                               <div className="crew-name">{user.name} | {user.gender} | {user.age}</div>
@@ -3518,7 +3483,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* 프로필 */}
               <div className="reputation-view-profile">
                 <div className="profile-image">
-                  <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} />
+                  {selectedReputationCard.profileImg ? <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} /> : <div className="profile-placeholder"></div>}
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
@@ -3593,7 +3558,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* 프로필 */}
               <div className="colleague-view-profile">
                 <div className="profile-image">
-                  <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} />
+                  {selectedColleagueCard.profileImg ? <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} /> : <div className="profile-placeholder"></div>}
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
