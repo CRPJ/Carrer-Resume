@@ -1,6 +1,8 @@
 import { createAdminClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = "force-dynamic"
+
 // GET: 사용자의 경력 기록 조회 (프로젝트 정보 포함)
 export async function GET(request: NextRequest) {
   try {
