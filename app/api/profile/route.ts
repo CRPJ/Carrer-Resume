@@ -498,6 +498,7 @@ export async function GET(request: NextRequest) {
         // 각 시즌에 대해 user_season_histories INSERT
         const today = new Date().toISOString().split('T')[0];
         const insertPromises = Array.from(seasonMap.values()).map(async ({ seasonId, seasonData, successWeekIds }) => {
+          if (!supabaseAdmin) return; // null 체크
           const approvedWeeks = successWeekIds.size; // 성공한 주차 수
           // 이미 존재하는지 확인
           const { data: existing } = await supabaseAdmin
