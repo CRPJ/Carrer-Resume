@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         keyword_2,
         created_at
       `)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
 
     if (targetUserId) {
       query = query.eq("target_user_id", targetUserId);

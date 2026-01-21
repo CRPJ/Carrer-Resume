@@ -65,6 +65,16 @@ const Cluster4Content = () => {
   const [seasonReputationSuccess, setSeasonReputationSuccess] = useState(false);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>("");
 
+  // 평판 키워드 목록
+  interface ReputationKeyword {
+    id: string | number;
+    cluster_number: number;
+    cluster_name: string;
+    cluster_color: string;
+    keyword: string;
+  }
+  const [reputationKeywords, setReputationKeywords] = useState<ReputationKeyword[]>([]);
+
   // 시즌 평판 데이터 (DB에서 가져옴)
   interface SeasonReputationData {
     id: string;
@@ -550,6 +560,26 @@ const Cluster4Content = () => {
       console.error('Error fetching season reputations:', error);
     }
   };
+
+  // 평판 키워드 목록 가져오기
+  const fetchReputationKeywords = async () => {
+    try {
+      const res = await fetch('/api/reputation-keywords');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setReputationKeywords(json.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching reputation keywords:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 키워드 목록 가져오기
+  useEffect(() => {
+    fetchReputationKeywords();
+  }, []);
 
   // 시즌 평판 데이터 가져오기 (시즌 변경 시마다)
   useEffect(() => {
@@ -1747,30 +1777,98 @@ const Cluster4Content = () => {
               {/* 키워드 */}
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
-                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 2개, 각 7자)</span>
+                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
                 </label>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px', padding: '12px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500' }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드 1"
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {/* 키워드 1 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#1</span>
+                    <select
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword1: e.target.value }))}
-                      maxLength={7}
-                      style={{ flex: 1, background: 'none', border: 'none', color: '#fff', fontSize: '14px', outline: 'none' }}
-                    />
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '48px',
+                        padding: '12px 14px',
+                        background: '#1a1f2e',
+                        border: '2px solid #FFA500',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="">키워드를 선택해주세요</option>
+                      {reputationKeywords.length === 0 ? (
+                        <option value="" disabled>키워드 로딩 중...</option>
+                      ) : (
+                        [1, 2, 3, 4, 5].map(clusterNum => {
+                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
+                          if (clusterKeywords.length === 0) return null;
+                          const clusterInfo = clusterKeywords[0];
+                          return (
+                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
+                              {clusterKeywords.map(k => (
+                                <option
+                                  key={k.id}
+                                  value={k.keyword}
+                                  disabled={k.keyword === seasonReputationEditData.keyword2}
+                                >
+                                  {k.keyword}
+                                </option>
+                              ))}
+                            </optgroup>
+                          );
+                        })
+                      )}
+                    </select>
                   </div>
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px', padding: '12px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500' }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드 2"
+                  {/* 키워드 2 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#2</span>
+                    <select
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword2: e.target.value }))}
-                      maxLength={7}
-                      style={{ flex: 1, background: 'none', border: 'none', color: '#fff', fontSize: '14px', outline: 'none' }}
-                    />
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '48px',
+                        padding: '12px 14px',
+                        background: '#1a1f2e',
+                        border: '2px solid #FFA500',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="">키워드를 선택해주세요</option>
+                      {reputationKeywords.length === 0 ? (
+                        <option value="" disabled>키워드 로딩 중...</option>
+                      ) : (
+                        [1, 2, 3, 4, 5].map(clusterNum => {
+                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
+                          if (clusterKeywords.length === 0) return null;
+                          const clusterInfo = clusterKeywords[0];
+                          return (
+                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
+                              {clusterKeywords.map(k => (
+                                <option
+                                  key={k.id}
+                                  value={k.keyword}
+                                  disabled={k.keyword === seasonReputationEditData.keyword1}
+                                >
+                                  {k.keyword}
+                                </option>
+                              ))}
+                            </optgroup>
+                          );
+                        })
+                      )}
+                    </select>
                   </div>
                 </div>
               </div>
