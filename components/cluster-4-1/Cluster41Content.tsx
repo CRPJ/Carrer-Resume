@@ -1309,7 +1309,7 @@ const Cluster41Content = () => {
                   <span className="detail-value">
                     {endWeekInfo && endWeekInfo.year
                       ? `${endWeekInfo.year}년, ${endWeekInfo.seasonName} 시즌${endWeekInfo.weekNumber ? `, ${endWeekInfo.weekNumber}주차` : ''} (${getGrowthBadgeText(userStatus, growthStatus)})`
-                      : `- (${getGrowthBadgeText(userStatus, growthStatus)})`}
+                      : `~ing (${getGrowthBadgeText(userStatus, growthStatus)})`}
                   </span>
                 </div>
               </div>

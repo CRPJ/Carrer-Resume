@@ -101,9 +101,6 @@ const Cluster4Content = () => {
     keyword2: string;
   }>({ rating: 0, content: "", keyword1: "", keyword2: "" });
 
-  // 현재 선택된 시즌 데이터
-  const currentSeason = seasonData[section3Page];
-
   // 활동 통계 (주차 성장률)
   const [activityStats, setActivityStats] = useState<{
     info: { total: number; success: number };
@@ -141,6 +138,61 @@ const Cluster4Content = () => {
     seasonName: string | null;
     weekNumber: number | null;
   } | null>(null);
+
+  // 성장 시작 정보
+  const [growthStartInfo, setGrowthStartInfo] = useState<{
+    year: number | null;
+    seasonName: string | null;
+    weekNumber: number | null;
+  } | null>(null);
+
+  // 성장 기간 통계 (시즌 기반)
+  const [growthPeriodStats, setGrowthPeriodStats] = useState<{
+    availableSeasons: number;
+    approvedSeasons: number;
+    restSeasons: number;
+  } | null>(null);
+
+  // 시즌 히스토리 (API에서 가져온 동적 데이터)
+  interface SeasonHistoryData {
+    id: string;
+    year: string;
+    season: string;
+    dateRange: string;
+    status: string;
+    statusClass: string;
+    image: string;
+    approvedWeeks: number;
+    totalWeeks: number;
+    roleInSeason: string;
+    // 하드코딩 데이터와 호환을 위한 기본값 필드
+    stats: { dangam: number; injeolmi: number; eoheung: number };
+    rating: number;
+    review: string;
+    circles: {
+      weekUsage: number;
+      scheduleReliability: number;
+      seasonGrowth: number;
+      // 실제 값 표시용 추가 데이터
+      approvedWeeks?: number;
+      totalOperatingWeeks?: number;
+      reliableWeeks?: number;
+      completedActivities?: number;
+      totalActivities?: number;
+    };
+    progress: {
+      info: { total: number; completed: number; rate: number };
+      competency: { total: number; completed: number; rate: number };
+      experience: { total: number; completed: number; rate: number };
+      career: { total: number; completed: number; rate: number };
+    };
+  }
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistoryData[]>([]);
+
+  // 현재 선택된 시즌 데이터 (동적 데이터 우선, 없으면 하드코딩 폴백)
+  const currentSeason = seasonHistories.length > 0
+    ? seasonHistories[section3Page] || seasonHistories[0]
+    : seasonData[section3Page];
 
   // 현재 시즌 정보 가져오기
   useEffect(() => {
@@ -320,26 +372,13 @@ const Cluster4Content = () => {
     fetchActivityStats();
   }, [session?.user?.id, urlUserId]);
 
-  // 사용자 프로필에서 status, growth_status, growthEndInfo, role 가져오기
+  // 사용자 프로필에서 status, growth_status, growthEndInfo, growthStartInfo, growthPeriodStats, role 가져오기
   useEffect(() => {
     const fetchUserStatus = async () => {
       try {
         // urlUserId가 있으면 해당 사용자, 없으면 본인 프로필 조회
         if (urlUserId) {
-          const res = await fetch(`/api/users/${urlUserId}`);
-          if (res.ok) {
-            const json = await res.json();
-            setUserStatus(json.data?.status || null);
-            setGrowthStatus(json.data?.growth_status || null);
-            // user_profiles.role 기본값 저장
-            if (json.data?.role) {
-              setUserDefaultRole(json.data.role);
-            }
-            // growthEndInfo는 /api/users/[id]에서 제공하지 않으므로 null
-            setGrowthEndInfo(null);
-          }
-        } else if (session?.user?.id) {
-          const res = await fetch('/api/profile');
+          const res = await fetch(`/api/profile?userId=${urlUserId}`);
           if (res.ok) {
             const json = await res.json();
             setUserStatus(json.growthInfo?.status || null);
@@ -347,6 +386,16 @@ const Cluster4Content = () => {
             // user_profiles.role 기본값 저장
             if (json.data?.role) {
               setUserDefaultRole(json.data.role);
+            }
+            // 성장 시작 정보 설정
+            if (json.growthInfo?.startWeekInfo) {
+              setGrowthStartInfo({
+                year: json.growthInfo.startWeekInfo.year,
+                seasonName: json.growthInfo.startWeekInfo.seasonName,
+                weekNumber: json.growthInfo.startWeekInfo.weekNumber
+              });
+            } else {
+              setGrowthStartInfo(null);
             }
             // 성장 종료 정보 설정
             if (json.growthInfo?.endWeekInfo) {
@@ -358,6 +407,63 @@ const Cluster4Content = () => {
             } else {
               setGrowthEndInfo(null);
             }
+            // 성장 기간 통계 설정
+            if (json.growthPeriodStats) {
+              setGrowthPeriodStats({
+                availableSeasons: json.growthPeriodStats.availableSeasons ?? 0,
+                approvedSeasons: json.growthPeriodStats.approvedSeasons ?? 0,
+                restSeasons: json.growthPeriodStats.restSeasons ?? 0
+              });
+            }
+            // 시즌 히스토리 설정
+            if (json.seasonHistories && json.seasonHistories.length > 0) {
+              const formattedSeasons = formatSeasonHistories(json.seasonHistories);
+              setSeasonHistories(formattedSeasons);
+            }
+          }
+        } else if (session?.user?.id) {
+          const res = await fetch('/api/profile');
+          if (res.ok) {
+            const json = await res.json();
+            setUserStatus(json.growthInfo?.status || null);
+            setGrowthStatus(json.growthInfo?.growthStatus || null);
+            // user_profiles.role 기본값 저장
+            if (json.data?.role) {
+              setUserDefaultRole(json.data.role);
+            }
+            // 성장 시작 정보 설정
+            if (json.growthInfo?.startWeekInfo) {
+              setGrowthStartInfo({
+                year: json.growthInfo.startWeekInfo.year,
+                seasonName: json.growthInfo.startWeekInfo.seasonName,
+                weekNumber: json.growthInfo.startWeekInfo.weekNumber
+              });
+            } else {
+              setGrowthStartInfo(null);
+            }
+            // 성장 종료 정보 설정
+            if (json.growthInfo?.endWeekInfo) {
+              setGrowthEndInfo({
+                year: json.growthInfo.endWeekInfo.year,
+                seasonName: json.growthInfo.endWeekInfo.seasonName,
+                weekNumber: json.growthInfo.endWeekInfo.weekNumber
+              });
+            } else {
+              setGrowthEndInfo(null);
+            }
+            // 성장 기간 통계 설정
+            if (json.growthPeriodStats) {
+              setGrowthPeriodStats({
+                availableSeasons: json.growthPeriodStats.availableSeasons ?? 0,
+                approvedSeasons: json.growthPeriodStats.approvedSeasons ?? 0,
+                restSeasons: json.growthPeriodStats.restSeasons ?? 0
+              });
+            }
+            // 시즌 히스토리 설정
+            if (json.seasonHistories && json.seasonHistories.length > 0) {
+              const formattedSeasons = formatSeasonHistories(json.seasonHistories);
+              setSeasonHistories(formattedSeasons);
+            }
           }
         }
       } catch (error) {
@@ -367,6 +473,191 @@ const Cluster4Content = () => {
 
     fetchUserStatus();
   }, [urlUserId, session?.user?.id]);
+
+  // 시즌 히스토리 포맷팅 함수
+  const formatSeasonHistories = (histories: Array<{
+    id: string;
+    role_in_season: string;
+    approved_weeks: number;
+    total_weeks: number;
+    progress_status: string;
+    seasons: {
+      id: string;
+      year: number;
+      name: string;
+      start_date: string;
+      end_date: string;
+    };
+    seasonPoints?: {
+      stars: number;
+      shields: number;
+      lightnings: number;
+    };
+    seasonStats?: {
+      weekUsageRate: number;
+      approvedWeeks: number;
+      totalOperatingWeeks: number;
+      reliabilityRate: number;
+      reliableWeeks: number;
+      growthRate: number;
+      completedActivities: number;
+      totalActivities: number;
+      clusterStats?: {
+        info: { total: number; completed: number };
+        competency: { total: number; completed: number };
+        experience: { total: number; completed: number };
+        career: { total: number; completed: number };
+      };
+    };
+  }>): SeasonHistoryData[] => {
+    const seasonNameMap: { [key: string]: string } = {
+      'spring': '봄',
+      'summer': '여름',
+      'fall': '가을',
+      'winter': '겨울'
+    };
+
+    const seasonImageMap: { [key: string]: string } = {
+      '봄': '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
+      '여름': '/images/0/cluster 4/시즌 이미지/여름_후보_3.png',
+      '가을': '/images/0/cluster 4/시즌 이미지/가을_후보_1.png',
+      '겨울': '/images/0/cluster 4/시즌 이미지/겨울_후보_1.png'
+    };
+
+    const getStatusInfo = (progressStatus: string): { status: string; statusClass: string } => {
+      switch (progressStatus) {
+        case 'in_progress':
+          return { status: '시즌 진행 중', statusClass: 'in-progress' };
+        case 'completed':
+          return { status: '시즌 성공', statusClass: 'completed' };
+        case 'full_rest':
+        case 'resting':
+          return { status: '시즌 휴식', statusClass: 'resting' };
+        case 'suspended':
+          return { status: '시즌 중단', statusClass: 'suspended' };
+        default:
+          return { status: '시즌 진행 중', statusClass: 'in-progress' };
+      }
+    };
+
+    const formatDate = (dateStr: string): string => {
+      const date = new Date(dateStr);
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dayOfWeek = days[date.getDay()];
+      return `${year} / ${month} / ${day} (${dayOfWeek})`;
+    };
+
+    return histories.map((sh: {
+      id: string;
+      role_in_season: string;
+      approved_weeks: number;
+      total_weeks: number;
+      progress_status: string;
+      seasons: {
+        id: string;
+        year: number;
+        name: string;
+        start_date: string;
+        end_date: string;
+      };
+      seasonPoints?: {
+        stars: number;
+        shields: number;
+        lightnings: number;
+      };
+    }) => {
+      const seasonName = seasonNameMap[sh.seasons?.name] || sh.seasons?.name || '';
+      const statusInfo = getStatusInfo(sh.progress_status);
+      const startDate = formatDate(sh.seasons?.start_date || '');
+      const endDate = formatDate(sh.seasons?.end_date || '');
+
+      // 시즌별 포인트 (API에서 가져온 데이터)
+      const seasonPoints = sh.seasonPoints || { stars: 0, shields: 0, lightnings: 0 };
+      // 시즌별 통계 (API에서 가져온 데이터)
+      const seasonStats = sh.seasonStats || {
+        weekUsageRate: 0,
+        approvedWeeks: 0,
+        totalOperatingWeeks: 0,
+        reliabilityRate: 0,
+        reliableWeeks: 0,
+        growthRate: 0,
+        completedActivities: 0,
+        totalActivities: 0,
+        clusterStats: {
+          info: { total: 0, completed: 0 },
+          competency: { total: 0, completed: 0 },
+          experience: { total: 0, completed: 0 },
+          career: { total: 0, completed: 0 }
+        }
+      };
+
+      // 클러스터별 강화율 계산
+      const clusterStats = seasonStats.clusterStats || {
+        info: { total: 0, completed: 0 },
+        competency: { total: 0, completed: 0 },
+        experience: { total: 0, completed: 0 },
+        career: { total: 0, completed: 0 }
+      };
+
+      return {
+        id: sh.id,
+        year: String(sh.seasons?.year || ''),
+        season: seasonName,
+        dateRange: `${startDate} - ${endDate}`,
+        status: statusInfo.status,
+        statusClass: statusInfo.statusClass,
+        image: seasonImageMap[seasonName] || '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
+        approvedWeeks: sh.approved_weeks || 0,
+        totalWeeks: sh.total_weeks || 0,
+        roleInSeason: sh.role_in_season || '',
+        // 시즌별 포인트 (단감=별, 인절미=방패, 어흥=번개)
+        stats: {
+          dangam: seasonPoints.stars,
+          injeolmi: seasonPoints.shields,
+          eoheung: seasonPoints.lightnings
+        },
+        rating: 0,
+        review: '',
+        // 시즌별 통계 (주차 활용도, 일정 신뢰도, 시즌 성장률)
+        circles: {
+          weekUsage: seasonStats.weekUsageRate,
+          scheduleReliability: seasonStats.reliabilityRate,
+          seasonGrowth: seasonStats.growthRate,
+          // 추가 데이터 (실제 값 표시용)
+          approvedWeeks: seasonStats.approvedWeeks,
+          totalOperatingWeeks: seasonStats.totalOperatingWeeks,
+          reliableWeeks: seasonStats.reliableWeeks,
+          completedActivities: seasonStats.completedActivities,
+          totalActivities: seasonStats.totalActivities
+        },
+        progress: {
+          info: {
+            total: clusterStats.info.total,
+            completed: clusterStats.info.completed,
+            rate: clusterStats.info.total > 0 ? Math.round((clusterStats.info.completed / clusterStats.info.total) * 100) : 0
+          },
+          competency: {
+            total: clusterStats.competency.total,
+            completed: clusterStats.competency.completed,
+            rate: clusterStats.competency.total > 0 ? Math.round((clusterStats.competency.completed / clusterStats.competency.total) * 100) : 0
+          },
+          experience: {
+            total: clusterStats.experience.total,
+            completed: clusterStats.experience.completed,
+            rate: clusterStats.experience.total > 0 ? Math.round((clusterStats.experience.completed / clusterStats.experience.total) * 100) : 0
+          },
+          career: {
+            total: clusterStats.career.total,
+            completed: clusterStats.career.completed,
+            rate: clusterStats.career.total > 0 ? Math.round((clusterStats.career.completed / clusterStats.career.total) * 100) : 0
+          }
+        }
+      };
+    });
+  };
 
   // 성장 상태를 badge 텍스트로 변환 (status와 growth_status 두 개 사용)
   const getGrowthBadgeText = (status: string | null, growthStatus: string | null): string => {
@@ -513,19 +804,23 @@ const Cluster4Content = () => {
               <div className="details-content">
                 <div className="detail-row">
                   <span className="detail-label">성장 시작 시즌</span>
-                  <span className="detail-value">2024년, 가을 시즌, 14주차</span>
+                  <span className="detail-value">
+                    {growthStartInfo && growthStartInfo.year
+                      ? `${growthStartInfo.year}년, ${growthStartInfo.seasonName} 시즌, ${growthStartInfo.weekNumber}주차`
+                      : '-'}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 시즌</span>
-                  <span className="detail-value"><span className="number">5</span> <span className="white-text">개 시즌</span></span>
+                  <span className="detail-value"><span className="number">{growthPeriodStats?.availableSeasons ?? '-'}</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 성공 시즌</span>
-                  <span className="detail-value"><span className="number">4</span> <span className="white-text">개 시즌</span></span>
+                  <span className="detail-value"><span className="number">{growthPeriodStats?.approvedSeasons ?? '-'}</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 휴식 시즌</span>
-                  <span className="detail-value"><span className="number">1</span> <span className="white-text">개 시즌</span></span>
+                  <span className="detail-value"><span className="number">{growthPeriodStats?.restSeasons ?? '-'}</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 종료 시즌</span>
@@ -536,7 +831,7 @@ const Cluster4Content = () => {
                         {growthEndInfo.weekNumber ? `, ${growthEndInfo.weekNumber}주차` : ''} ({getGrowthBadgeText(userStatus, growthStatus)})
                       </>
                     ) : (
-                      <>- ({getGrowthBadgeText(userStatus, growthStatus)})</>
+                      <>~ing ({getGrowthBadgeText(userStatus, growthStatus)})</>
                     )}
                   </span>
                 </div>
@@ -584,13 +879,13 @@ const Cluster4Content = () => {
 
         {/* 페이지네이션 */}
         <div className="section3-pagination">
-          {[1, 2, 3, 4, 5].map((num) => (
+          {(seasonHistories.length > 0 ? seasonHistories : seasonData).map((_, index) => (
             <span
-              key={num}
-              className={`page-num ${section3Page === num - 1 ? 'active' : ''} ${num === 5 ? 'last' : ''}`}
-              onClick={() => handlePageChange(num - 1)}
+              key={index}
+              className={`page-num ${section3Page === index ? 'active' : ''} ${index === (seasonHistories.length > 0 ? seasonHistories.length : seasonData.length) - 1 ? 'last' : ''}`}
+              onClick={() => handlePageChange(index)}
             >
-              {num}
+              {index + 1}
             </span>
           ))}
         </div>
@@ -652,12 +947,12 @@ const Cluster4Content = () => {
               <div className={`season-image-stack ${isFlipping ? 'flipping' : ''}`}>
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src={seasonData[(section3Page + 2) % seasonData.length]?.image || currentSeason.image} alt="시즌" />
+                    <img src={(seasonHistories.length > 0 ? seasonHistories : seasonData)[(section3Page + 2) % (seasonHistories.length > 0 ? seasonHistories.length : seasonData.length)]?.image || currentSeason.image} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src={seasonData[(section3Page + 1) % seasonData.length]?.image || currentSeason.image} alt="시즌" />
+                    <img src={(seasonHistories.length > 0 ? seasonHistories : seasonData)[(section3Page + 1) % (seasonHistories.length > 0 ? seasonHistories.length : seasonData.length)]?.image || currentSeason.image} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-front">
@@ -674,7 +969,7 @@ const Cluster4Content = () => {
               <div className="area-4-stats">
                 <span className="stat">단감 <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">{currentSeason.stats.dangam}</strong><span className="unit">개</span></span>
                 <span className="stat">인절미 <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="stat-icon" /> <strong className="number">{currentSeason.stats.injeolmi}</strong><span className="unit">명</span></span>
-                <span className="stat">어흥 <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">{currentSeason.stats.eoheung}</strong><span className="unit">개</span></span>
+                <span className="stat">어흥 <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">-{currentSeason.stats.eoheung}</strong><span className="unit">개</span></span>
               </div>
 
               {/* 영역 5: 평점 및 리뷰 */}
@@ -714,7 +1009,7 @@ const Cluster4Content = () => {
                   </div>
                   <div className="circle-label">
                     <div className="label-main">주차 활용도</div>
-                    <div className="label-sub">총 10주 중 <span className="highlight">{Math.round(currentSeason.circles.weekUsage / 10)}</span>주</div>
+                    <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.approvedWeeks ?? 0}</span>주</div>
                   </div>
                 </div>
                 <div className="circle-item">
@@ -728,7 +1023,7 @@ const Cluster4Content = () => {
                   </div>
                   <div className="circle-label">
                     <div className="label-main">일정 신뢰도</div>
-                    <div className="label-sub">총 10주 중 <span className="highlight">{Math.round(currentSeason.circles.scheduleReliability / 10)}</span>주</div>
+                    <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.reliableWeeks ?? 0}</span>주</div>
                   </div>
                 </div>
                 <div className="circle-item">
@@ -742,47 +1037,47 @@ const Cluster4Content = () => {
                   </div>
                   <div className="circle-label">
                     <div className="label-main">시즌 성장률</div>
-                    <div className="label-sub">총 20개 중 <span className="highlight">{Math.round(currentSeason.circles.seasonGrowth / 5)}</span>주</div>
+                    <div className="label-sub">총 {currentSeason.circles.totalActivities ?? 0}개 중 <span className="highlight">{currentSeason.circles.completedActivities ?? 0}</span>개</div>
                   </div>
                 </div>
               </div>
 
-              {/* 영역 7: 실무 성장률 프로그레스 바 */}
+              {/* 영역 7: 실무 성장률 프로그레스 바 (시즌별 데이터) */}
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.info.total} 개 중 <span className="highlight">{activityStats.info.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress?.info?.rate ?? 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.info?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.info?.completed ?? 0}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.info.total > 0 ? (activityStats.info.success / activityStats.info.total) * 100 : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.info?.rate ?? 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.competency.total} 개 중 <span className="highlight">{activityStats.competency.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress?.competency?.rate ?? 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.competency?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.competency?.completed ?? 0}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.competency.total > 0 ? (activityStats.competency.success / activityStats.competency.total) * 100 : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.competency?.rate ?? 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.experience.total} 개 중 <span className="highlight">{activityStats.experience.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress?.experience?.rate ?? 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.experience?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.experience?.completed ?? 0}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.experience.total > 0 ? (activityStats.experience.success / activityStats.experience.total) * 100 : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.experience?.rate ?? 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.career.total} 개 중 <span className="highlight">{activityStats.career.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress?.career?.rate ?? 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.career?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.career?.completed ?? 0}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.career.total > 0 ? (activityStats.career.success / activityStats.career.total) * 100 : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.career?.rate ?? 0}%` }}></div>
                   </div>
                 </div>
               </div>

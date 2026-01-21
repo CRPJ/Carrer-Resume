@@ -104,7 +104,8 @@ export async function GET(request: NextRequest) {
       activityRecordsResult,
       userActivityDetailsResult,
       activityTypesResult,
-      activityPointsResult
+      activityPointsResult,
+      seasonPointsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회) - 시즌 정보 포함
       profile.joined_week_id
@@ -178,7 +179,10 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from("activity_types").select("id, cluster_id"),
 
       // 해당 유저의 활동별 포인트 (평점용) - star 타입만
-      supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null)
+      supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+
+      // 해당 유저의 시즌별 포인트 (week_id를 통해 season 조인)
+      supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id)
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -596,15 +600,260 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onboardingWeek = allWeeks.find((w: any) => w.id === profile.onboarding_week_id);
     const onboardingSeasonId = onboardingWeek?.season_id;
+
+    // 시즌별 포인트 집계
+    const seasonPointsData = seasonPointsResult.data || [];
+    const seasonPointsMap = new Map<string, { stars: number; lightnings: number; shields: number }>();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    seasonPointsData.forEach((p: any) => {
+      const seasonId = p.weeks?.season_id;
+      if (!seasonId) return;
+
+      if (!seasonPointsMap.has(seasonId)) {
+        seasonPointsMap.set(seasonId, { stars: 0, lightnings: 0, shields: 0 });
+      }
+
+      const current = seasonPointsMap.get(seasonId)!;
+      if (p.point_type === 'star') {
+        current.stars += p.points || 0;
+      } else if (p.point_type === 'lightning') {
+        current.lightnings += p.points || 0;
+      } else if (p.point_type === 'shield') {
+        current.shields += p.points || 0;
+      }
+    });
+
+    // 시즌별 주차/활동 통계 계산을 위한 데이터 준비
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userRestWeekIdsForSeason = new Set(allRests.map((r: any) => r.week_id));
+    const activityRecordsForSeason = activityRecordsResult.data || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const completedActivityRecords = activityRecordsForSeason.filter((ar: any) => ar.is_completed);
+
+    // activity_type_id → cluster_id 매핑
+    const activityTypesData = activityTypesResult.data || [];
+    const typeToClusterMapForSeason = new Map<string, string>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    activityTypesData.forEach((at: any) => {
+      if (at.id && at.cluster_id) {
+        typeToClusterMapForSeason.set(at.id, at.cluster_id);
+      }
+    });
+
+    // 시즌별 통계 계산
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const finalSeasonHistoriesWithOnboarding = sortedSeasonHistories.map((item: any) => {
+      const seasonId = item.seasons?.id;
+      const seasonPoints = seasonPointsMap.get(seasonId) || { stars: 0, lightnings: 0, shields: 0 };
+      // 인절미(방패)는 순수 방패 - 번개로 계산
+      const netShields = seasonPoints.shields - seasonPoints.lightnings;
+
+      // 현재 진행 중인 주차 찾기 (start_date <= today <= end_date)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const currentWeek = allWeeks.find((w: any) => w.start_date <= today && w.end_date >= today);
+      const currentWeekId = currentWeek?.id;
+
+      // 해당 시즌의 주차들 필터링 (유저 가입일 이후, 현재 진행 중인 주차 제외)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seasonWeeks = allWeeks.filter((w: any) => {
+        if (w.season_id !== seasonId) return false;
+        // 유저 가입일 이후 주차만 포함
+        if (growthStartDate && w.start_date < growthStartDate) return false;
+        // 현재 진행 중인 주차 제외
+        if (currentWeekId && w.id === currentWeekId) return false;
+        // 미래 주차 제외 (start_date가 오늘 이후면 아직 시작 안함)
+        if (w.start_date > today) return false;
+        return true;
+      });
+      // 운영 주차 (공식 휴식 제외)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const operatingWeeks = seasonWeeks.filter((w: any) => !w.is_club_break);
+      const totalOperatingWeeks = operatingWeeks.length;
+
+      // 해당 시즌의 주차 ID 목록
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seasonWeekIds = new Set(seasonWeeks.map((w: any) => w.id));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const operatingWeekIds = new Set(operatingWeeks.map((w: any) => w.id));
+
+      // 인정받은 주차 수 (approved_weeks 사용)
+      const approvedWeeksCount = item.approved_weeks || 0;
+
+      // 개인 휴식 주차 수 (해당 시즌 내)
+      let restWeeksInSeason = 0;
+      operatingWeekIds.forEach((weekId: string) => {
+        if (userRestWeekIdsForSeason.has(weekId)) {
+          restWeeksInSeason++;
+        }
+      });
+
+      // 주차 활용도: 인정받은 주차 / 운영 주차
+      const weekUsageRate = totalOperatingWeeks > 0
+        ? Math.round((approvedWeeksCount / totalOperatingWeeks) * 100)
+        : 0;
+
+      // 일정 신뢰도: (인정받은 주차 + 휴식 주차) / 운영 주차
+      const reliableWeeks = approvedWeeksCount + restWeeksInSeason;
+      const reliabilityRate = totalOperatingWeeks > 0
+        ? Math.round((reliableWeeks / totalOperatingWeeks) * 100)
+        : 0;
+
+      // 시즌 성장률: 완료한 활동 / 열린 활동
+      // 해당 시즌에 열린 활동 수 (온보딩 주차 제외)
+      const weeklyActivitiesData = weeklyActivitiesResult.data || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seasonOpenedActivities = weeklyActivitiesData.filter((wa: any) => {
+        if (!seasonWeekIds.has(wa.week_id)) return false;
+        // 온보딩 주차의 활동 제외
+        if (wa.week_id === profile.onboarding_week_id) return false;
+        return true;
+      });
+
+      // 실무 역량용 운영 주차 수 계산 (공식 휴식 + 개인 휴식 + 온보딩 주차 제외)
+      // operatingWeeks는 공식 휴식만 제외된 상태이므로, 개인 휴식과 온보딩 주차도 추가로 제외
+      // 온보딩 주차가 해당 시즌의 운영 주차에 포함되어 있는지 확인
+      const isOnboardingInThisSeason = profile.onboarding_week_id && operatingWeekIds.has(profile.onboarding_week_id);
+      const competencyOperatingWeeks = totalOperatingWeeks - restWeeksInSeason - (isOnboardingInThisSeason ? 1 : 0);
+
+      // 실무 경험용 "진행 주차" 기반 분모 계산
+      // 진행 주차별 가능한 실무 경험 개수:
+      // - 진행 1주차: 0개 (온보딩)
+      // - 진행 2주차: 2개 (커리어 Launch 1회 + 콘텐츠)
+      // - 진행 3주차: 2개 (생산성 + 콘텐츠)
+      // - 진행 4주차~: 3개 (생산성 + 콘텐츠 + 퍼포먼스)
+      const calculateExperienceTotal = () => {
+        // 해당 시즌의 운영 주차 중 유저가 참여 가능한 주차 (개인 휴식 제외)
+        const participatingWeeks = totalOperatingWeeks - restWeeksInSeason;
+        if (participatingWeeks <= 0) return 0;
+
+        // 온보딩 시즌인지 확인 (온보딩 주차가 이 시즌에 있는지)
+        const isOnboardingSeason = isOnboardingInThisSeason;
+
+        // 온보딩 시즌이 아니면 이미 진행 4주차 이상이므로 매주 3개
+        if (!isOnboardingSeason) {
+          return participatingWeeks * 3;
+        }
+
+        // 온보딩 시즌인 경우 진행 주차별로 계산
+        let total = 0;
+        for (let progressWeek = 1; progressWeek <= participatingWeeks; progressWeek++) {
+          if (progressWeek === 1) {
+            // 진행 1주차 (온보딩): 0개
+            total += 0;
+          } else if (progressWeek === 2) {
+            // 진행 2주차: 2개 (커리어 Launch 1회 + 콘텐츠)
+            total += 2;
+          } else if (progressWeek === 3) {
+            // 진행 3주차: 2개 (생산성 + 콘텐츠)
+            total += 2;
+          } else {
+            // 진행 4주차~: 3개 (생산성 + 콘텐츠 + 퍼포먼스)
+            total += 3;
+          }
+        }
+        return total;
+      };
+      const experienceOpenedByProgressWeek = calculateExperienceTotal();
+
+      // 클러스터별로 열린 활동 분류
+      let infoOpenedCount = 0;
+      let competencyOpenedCount = Math.max(0, competencyOperatingWeeks);  // 실무 역량: 한 주에 1개만 가능, 음수 방지
+      let experienceOpenedCount = experienceOpenedByProgressWeek;  // 실무 경험: 진행 주차 기반 계산
+      let careerOpenedCount = 0;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      seasonOpenedActivities.forEach((wa: any) => {
+        const clusterId = typeToClusterMapForSeason.get(wa.activity_type_id);
+        if (clusterId === 'practical_info') infoOpenedCount++;
+        // competency는 운영 주차 수로 이미 설정됨
+        // experience는 진행 주차 기반으로 이미 설정됨
+        else if (clusterId === 'practical_career') careerOpenedCount++;
+      });
+
+      // 전체 열린 활동 수 (실무 역량은 운영 주차 수로 계산)
+      const totalOpenedActivities = infoOpenedCount + competencyOpenedCount + experienceOpenedCount + careerOpenedCount;
+
+      // 해당 시즌에 완료한 활동 수 (온보딩 주차 제외)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seasonCompletedActivities = completedActivityRecords.filter((ar: any) => {
+        if (!seasonWeekIds.has(ar.week_id)) return false;
+        // 온보딩 주차의 활동 제외
+        if (ar.week_id === profile.onboarding_week_id) return false;
+        return true;
+      });
+      const totalCompletedActivities = seasonCompletedActivities.length;
+
+      const growthRate = totalOpenedActivities > 0
+        ? Math.round((totalCompletedActivities / totalOpenedActivities) * 100)
+        : 0;
+
+      // 클러스터별 활동 통계 (실무 강화율)
+      const clusterStats = {
+        info: { total: infoOpenedCount, completed: 0 },
+        competency: { total: competencyOpenedCount, completed: 0 },  // 실무 역량: 운영 주차 수 (한 주에 1개만 가능)
+        experience: { total: experienceOpenedCount, completed: 0 },
+        career: { total: careerOpenedCount, completed: 0 }
+      };
+
+      // 해당 시즌에 완료한 활동을 클러스터별로 분류
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      seasonCompletedActivities.forEach((ar: any) => {
+        const clusterId = typeToClusterMapForSeason.get(ar.activity_type_id);
+        if (clusterId === 'practical_info') clusterStats.info.completed++;
+        else if (clusterId === 'practical_competency') clusterStats.competency.completed++;
+        else if (clusterId === 'practical_experience') clusterStats.experience.completed++;
+        else if (clusterId === 'practical_career') clusterStats.career.completed++;
+      });
+
+      let updatedItem = {
+        ...item,
+        seasonPoints: {
+          stars: seasonPoints.stars,           // 단감
+          shields: netShields,                 // 인절미 (계산된 값)
+          lightnings: seasonPoints.lightnings  // 어흥
+        },
+        seasonStats: {
+          // 주차 활용도
+          weekUsageRate,
+          approvedWeeks: approvedWeeksCount,
+          totalOperatingWeeks,
+          // 일정 신뢰도
+          reliabilityRate,
+          reliableWeeks,
+          // 시즌 성장률
+          growthRate,
+          completedActivities: totalCompletedActivities,
+          totalActivities: totalOpenedActivities,
+          // 클러스터별 활동 통계 (실무 강화율)
+          clusterStats
+        }
+      };
+
       if (onboardingSeasonId && item.seasons?.id === onboardingSeasonId) {
-        return {
-          ...item,
-          approved_weeks: (item.approved_weeks || 0) + 1
+        // 온보딩 주차 반영
+        const newApprovedWeeks = approvedWeeksCount + 1;
+        const newWeekUsageRate = totalOperatingWeeks > 0
+          ? Math.round((newApprovedWeeks / totalOperatingWeeks) * 100)
+          : 0;
+        const newReliableWeeks = newApprovedWeeks + restWeeksInSeason;
+        const newReliabilityRate = totalOperatingWeeks > 0
+          ? Math.round((newReliableWeeks / totalOperatingWeeks) * 100)
+          : 0;
+
+        updatedItem = {
+          ...updatedItem,
+          approved_weeks: newApprovedWeeks,
+          seasonStats: {
+            ...updatedItem.seasonStats,
+            weekUsageRate: newWeekUsageRate,
+            approvedWeeks: newApprovedWeeks,
+            reliabilityRate: newReliabilityRate,
+            reliableWeeks: newReliableWeeks
+          }
         };
       }
-      return item;
+      return updatedItem;
     });
 
     return NextResponse.json({
