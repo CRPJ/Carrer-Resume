@@ -252,7 +252,7 @@ const Sidebar = () => {
     customGpaMax: '',
     additionalMajor: '',
     additionalMajorType: '',
-    slogan: ''
+    vision: ''
   });
   const [isCustomEmailDomain, setIsCustomEmailDomain] = useState(false);
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
@@ -427,6 +427,8 @@ const Sidebar = () => {
 
         // 학력 데이터 로드 (최종학력)
         fetchEducations();
+        // 슬로건 데이터 로드 (user_introductions에서)
+        fetchSlogan();
 
         // DB status → crewStatus 매핑
         const statusMap: Record<string, 'Running' | 'Complete' | 'On Rest' | 'Recharging' | 'Next Challenge'> = {
@@ -484,6 +486,27 @@ const Sidebar = () => {
       }
     } catch (error) {
       console.error('학력 로드 오류:', error);
+    }
+  };
+
+  // 슬로건 데이터 가져오기 (user_introductions에서)
+  const fetchSlogan = async () => {
+    try {
+      const apiUrl = targetUserId ? `/api/slogans?userId=${targetUserId}` : '/api/slogans';
+      const response = await fetch(apiUrl);
+      const result = await response.json();
+
+      if (result.success && result.data?.slogan1?.content) {
+        setUserProfile(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            quote: result.data.slogan1.content,
+          };
+        });
+      }
+    } catch (error) {
+      console.error('슬로건 로드 오류:', error);
     }
   };
 
@@ -642,7 +665,7 @@ const Sidebar = () => {
           phone: phoneParts.length >= 2 ? `${phoneParts[0]}-${phoneParts[1]}` : profile.phone?.replace(/^010-?/, '') || '',
           emailId,
           emailDomain,
-          slogan: profile.bio || '',
+          vision: profile.vision || '',
           phoneComment: profile.contact_available || '',
         }));
       }
@@ -694,7 +717,7 @@ const Sidebar = () => {
         email: formData.emailId && formData.emailDomain
           ? `${formData.emailId}@${formData.emailDomain === '직접입력' ? formData.customEmailDomain : formData.emailDomain}`
           : null,
-        bio: formData.slogan || null,
+        vision: formData.vision || null,
         portfolio_files: iconLink3 || null,
         contact_available: formData.phoneComment || null,
       };
@@ -2804,40 +2827,37 @@ const Sidebar = () => {
                 )}
               </div>
 
-              {/* 슬로건 섹션 */}
-              <div style={{ marginBottom: '24px', borderTop: '1px solid #333', paddingTop: '24px' }}>
+              {/* 비전 섹션 */}
+              <div style={{ marginBottom: '24px' }}>
                 <label style={{ color: '#8a8d98', fontSize: '14px', display: 'block', marginBottom: '10px' }}>
-                  슬로건
+                  비전
                 </label>
-                <textarea
+                <input
                   className="modal-input chamfer-box"
-                  name="slogan"
-                  value={formData.slogan}
+                  type="text"
+                  name="vision"
+                  value={formData.vision}
                   onChange={(e) => {
-                    if (e.target.value.length <= 70) {
-                      setFormData(prev => ({ ...prev, slogan: e.target.value }));
+                    if (e.target.value.length <= 10) {
+                      setFormData(prev => ({ ...prev, vision: e.target.value }));
                     }
                   }}
-                  placeholder="나만의 슬로건을 입력해주세요 (예: 가장 어두운 순간에도 빛을 향해 용기 있게...)"
-                  maxLength={70}
-                  rows={3}
+                  placeholder="가고 싶은 기업/브랜드를 기재합니다. (ex.구글)"
+                  maxLength={10}
                   style={{
                     width: '100%',
-                    padding: '12px',
+                    padding: '12px 16px',
                     backgroundColor: '#252836',
                     border: '1px solid transparent',
                     borderRadius: '0',
                     color: '#fff',
                     fontSize: '14px',
                     outline: 'none',
-                    boxSizing: 'border-box',
-                    resize: 'vertical',
-                    minHeight: '80px',
-                    lineHeight: '1.5'
+                    boxSizing: 'border-box'
                   }}
                 />
                 <span style={{ color: '#8a8d98', fontSize: '11px', marginTop: '4px', display: 'block' }}>
-                  {formData.slogan.length}/70자
+                  {formData.vision.length}/10자 (공백 포함)
                 </span>
               </div>
 

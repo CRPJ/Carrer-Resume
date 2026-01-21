@@ -340,11 +340,13 @@ const Cluster2Content = () => {
   const [section2ModalOpen, setSection2ModalOpen] = useState(false);
   const [sloganData, setSloganData] = useState({
     slogan1: { option: "", content: "" },
-    slogan2: { option: "", content: "" }
+    slogan2: { option: "", content: "" },
+    slogan3: { option: "", content: "" }
   });
   const [editingSloganData, setEditingSloganData] = useState(sloganData);
   const [dropdown1Open, setDropdown1Open] = useState(false);
   const [dropdown2Open, setDropdown2Open] = useState(false);
+  const [dropdown3Open, setDropdown3Open] = useState(false);
   const [sloganSaving, setSloganSaving] = useState(false);
   const [sloganAuthorName, setSloganAuthorName] = useState("");
 
@@ -365,6 +367,10 @@ const Cluster2Content = () => {
           slogan2: {
             option: result.data.slogan2?.option || "",
             content: result.data.slogan2?.content || ""
+          },
+          slogan3: {
+            option: result.data.slogan3?.option || "",
+            content: result.data.slogan3?.content || ""
           }
         };
         setSloganData(newSloganData);
@@ -397,6 +403,7 @@ const Cluster2Content = () => {
         body: JSON.stringify({
           slogan1: editingSloganData.slogan1,
           slogan2: editingSloganData.slogan2,
+          slogan3: editingSloganData.slogan3,
         }),
       });
 
@@ -1250,14 +1257,14 @@ const Cluster2Content = () => {
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
               <p className="quote-text">
-                {sloganData.slogan1.content}
+                {sloganData.slogan2.content}
               </p>
               <div className="quote-footer">
                 <div className="quote-author">
                   <img src={subPhotos[0] || "/images/0/cluster 2/이안1.webp"} alt="" />
                   <div className="author-info">
                     <span className="author-name">{sloganAuthorName || 'Unknown'}</span>
-                    <span className="author-role">{sloganData.slogan1.option}</span>
+                    <span className="author-role">{sloganData.slogan2.option}</span>
                   </div>
                 </div>
                 <div className="quote-score">
@@ -1288,14 +1295,14 @@ const Cluster2Content = () => {
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
               <p className="quote-text">
-                {sloganData.slogan2.content}
+                {sloganData.slogan3.content}
               </p>
               <div className="quote-footer">
                 <div className="quote-author">
                   <img src={subPhotos[2] || "/images/0/cluster 2/이안3.jpg"} alt="" />
                   <div className="author-info">
                     <span className="author-name">{sloganAuthorName || 'Unknown'}</span>
-                    <span className="author-role">{sloganData.slogan2.option}</span>
+                    <span className="author-role">{sloganData.slogan3.option}</span>
                   </div>
                 </div>
                 <div className="quote-score">
@@ -1854,7 +1861,7 @@ const Cluster2Content = () => {
                 <div className="slogan-dropdown-wrapper">
                   <button
                     className="slogan-dropdown-btn"
-                    onClick={() => { setDropdown1Open(!dropdown1Open); setDropdown2Open(false); }}
+                    onClick={() => { setDropdown1Open(!dropdown1Open); setDropdown2Open(false); setDropdown3Open(false); }}
                   >
                     <span>{editingSloganData.slogan1.option}</span>
                     <i className={`ti ti-chevron-down ${dropdown1Open ? 'rotate' : ''}`}></i>
@@ -1903,7 +1910,7 @@ const Cluster2Content = () => {
                 <div className="slogan-dropdown-wrapper">
                   <button
                     className="slogan-dropdown-btn"
-                    onClick={() => { setDropdown2Open(!dropdown2Open); setDropdown1Open(false); }}
+                    onClick={() => { setDropdown2Open(!dropdown2Open); setDropdown1Open(false); setDropdown3Open(false); }}
                   >
                     <span>{editingSloganData.slogan2.option}</span>
                     <i className={`ti ti-chevron-down ${dropdown2Open ? 'rotate' : ''}`}></i>
@@ -1943,6 +1950,55 @@ const Cluster2Content = () => {
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
                   <span className="char-count">{editingSloganData.slogan2.content.length}/86</span>
+                </div>
+              </div>
+
+              {/* 슬로건 3 */}
+              <div className="slogan-edit-item">
+                <span className="slogan-label">슬로건 3</span>
+                <div className="slogan-dropdown-wrapper">
+                  <button
+                    className="slogan-dropdown-btn"
+                    onClick={() => { setDropdown3Open(!dropdown3Open); setDropdown1Open(false); setDropdown2Open(false); }}
+                  >
+                    <span>{editingSloganData.slogan3.option}</span>
+                    <i className={`ti ti-chevron-down ${dropdown3Open ? 'rotate' : ''}`}></i>
+                  </button>
+                  {dropdown3Open && (
+                    <div className="slogan-dropdown-menu">
+                      {sloganOptions.map((option) => (
+                        <div
+                          key={option}
+                          className={`dropdown-item ${editingSloganData.slogan3.option === option ? 'selected' : ''}`}
+                          onClick={() => {
+                            setEditingSloganData({
+                              ...editingSloganData,
+                              slogan3: { ...editingSloganData.slogan3, option }
+                            });
+                            setDropdown3Open(false);
+                          }}
+                        >
+                          {option}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="slogan-textarea-wrapper">
+                  <textarea
+                    value={editingSloganData.slogan3.content}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 86) {
+                        setEditingSloganData({
+                          ...editingSloganData,
+                          slogan3: { ...editingSloganData.slogan3, content: e.target.value }
+                        });
+                      }
+                    }}
+                    maxLength={86}
+                    placeholder="슬로건 내용을 입력하세요 (최대 86자)"
+                  />
+                  <span className="char-count">{editingSloganData.slogan3.content.length}/86</span>
                 </div>
               </div>
             </div>

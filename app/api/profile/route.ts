@@ -105,7 +105,10 @@ export async function GET(request: NextRequest) {
       userActivityDetailsResult,
       activityTypesResult,
       activityPointsResult,
-      seasonPointsResult
+      seasonPointsResult,
+      userTeamPartsResult,
+      teamsResult,
+      partsResult
     ] = await Promise.all([
       // 성장 시작일 (joined_week_id로 weeks 조회) - 시즌 정보 포함
       profile.joined_week_id
@@ -182,7 +185,16 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
 
       // 해당 유저의 시즌별 포인트 (week_id를 통해 season 조인)
-      supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id)
+      supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id),
+
+      // 해당 유저의 팀/파트 이력 (시즌 상태 표시용)
+      supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+
+      // 팀 목록
+      supabaseAdmin.from("teams").select("id, name"),
+
+      // 파트 목록
+      supabaseAdmin.from("parts").select("id, name, team_id")
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -898,6 +910,12 @@ export async function GET(request: NextRequest) {
       restWeekIds: allRests?.map((r: { week_id: string }) => r.week_id) || [],
       // 역할 이력 (클라이언트에서 사용)
       userRoleHistory: userRoleHistoryResult.data || [],
+      // 팀/파트 이력 (시즌 상태 표시용)
+      userTeamParts: userTeamPartsResult.data || [],
+      // 팀 목록
+      teams: teamsResult.data || [],
+      // 파트 목록
+      parts: partsResult.data || [],
       // 승인된 활동 전체 (주차별 강화 집계용) - activity_records에서 is_completed=true인 것
       approvedActivities: activitiesData || [],
       // 활동 이행 기록 전체 (강화 상태 판단용: is_completed 포함)
@@ -963,6 +981,7 @@ export async function PUT(request: Request) {
     if (body.phone !== undefined) updateData.phone = body.phone;
     if (body.email !== undefined) updateData.email = body.email;
     if (body.bio !== undefined) updateData.bio = body.bio;
+    if (body.vision !== undefined) updateData.vision = body.vision;
     if (body.profile_photo_url !== undefined) updateData.profile_photo_url = body.profile_photo_url;
     if (body.portfolio_files !== undefined) updateData.portfolio_files = body.portfolio_files;
     if (body.contact_available !== undefined) updateData.contact_available = body.contact_available;
