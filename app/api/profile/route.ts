@@ -142,6 +142,9 @@ export async function GET(request: NextRequest) {
         total_weeks,
         progress_status,
         review_status,
+        rating,
+        review,
+        review_link,
         seasons (
           id,
           year,
@@ -564,6 +567,9 @@ export async function GET(request: NextRequest) {
             total_weeks,
             progress_status,
             review_status,
+            rating,
+            review,
+            review_link,
             seasons (
               id,
               year,

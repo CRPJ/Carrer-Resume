@@ -22,6 +22,7 @@ const defaultSeasonData = {
   stats: { dangam: 0, injeolmi: 0, eoheung: 0 },
   rating: 0,
   review: '',
+  reviewLink: '',
   circles: {
     weekUsage: 0,
     scheduleReliability: 0,
@@ -105,6 +106,17 @@ const Cluster4Content = () => {
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
   const [selectedReputation, setSelectedReputation] = useState<SeasonReputationData | null>(null);
 
+  // 시즌 리뷰 모달 상태 (본인의 시즌 평가)
+  const [seasonReviewModalOpen, setSeasonReviewModalOpen] = useState(false);
+  const [seasonReviewEditData, setSeasonReviewEditData] = useState<{
+    rating: number;
+    review: string;
+    link: string;
+  }>({ rating: 0, review: "", link: "" });
+  const [seasonReviewSaving, setSeasonReviewSaving] = useState(false);
+  const [seasonReviewError, setSeasonReviewError] = useState<string | null>(null);
+  const [seasonReviewSuccess, setSeasonReviewSuccess] = useState(false);
+
   // 활동 통계 (주차 성장률)
   const [activityStats, setActivityStats] = useState<{
     info: { total: number; success: number };
@@ -185,6 +197,7 @@ const Cluster4Content = () => {
     stats: { dangam: number; injeolmi: number; eoheung: number };
     rating: number;
     review: string;
+    reviewLink: string;
     circles: {
       weekUsage: number;
       scheduleReliability: number;
@@ -622,6 +635,9 @@ const Cluster4Content = () => {
       approved_weeks: number;
       total_weeks: number;
       progress_status: string;
+      rating?: number;
+      review?: string;
+      review_link?: string;
       seasons: {
         id: string;
         year: number;
@@ -714,6 +730,9 @@ const Cluster4Content = () => {
       approved_weeks: number;
       total_weeks: number;
       progress_status: string;
+      rating?: number;
+      review?: string;
+      review_link?: string;
       seasons: {
         id: string;
         year: number;
@@ -955,8 +974,9 @@ const Cluster4Content = () => {
           injeolmi: seasonPoints.shields,
           eoheung: seasonPoints.lightnings
         },
-        rating: 0,
-        review: '',
+        rating: sh.rating || 0,
+        review: sh.review || '',
+        reviewLink: sh.review_link || '',
         // 시즌별 통계 (주차 활용도, 일정 신뢰도, 시즌 성장률)
         circles: {
           weekUsage: seasonStats.weekUsageRate,
@@ -1116,6 +1136,91 @@ const Cluster4Content = () => {
       setSeasonReputationError("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReputationSaving(false);
+    }
+  };
+
+  // 시즌 리뷰 모달 열기
+  const openSeasonReviewModal = () => {
+    // 현재 시즌의 rating, review, link 값을 가져와서 초기화
+    setSeasonReviewEditData({
+      rating: currentSeason.rating || 0,
+      review: currentSeason.review || "",
+      link: currentSeason.reviewLink || "",
+    });
+    setSeasonReviewError(null);
+    setSeasonReviewSuccess(false);
+    setSeasonReviewModalOpen(true);
+  };
+
+  // 시즌 리뷰 저장
+  const handleSaveSeasonReview = async () => {
+    if (!currentSeason?.id) {
+      setSeasonReviewError("시즌 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 0.0~5.0 범위, 0.5 단위 검증
+    if (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 5 || (seasonReviewEditData.rating * 2) % 1 !== 0) {
+      setSeasonReviewError("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
+      return;
+    }
+
+    if (!seasonReviewEditData.review.trim()) {
+      setSeasonReviewError("리뷰를 입력해주세요.");
+      return;
+    }
+
+    if (seasonReviewEditData.review.length > 30) {
+      setSeasonReviewError("리뷰는 30자 이내로 작성해주세요.");
+      return;
+    }
+
+    if (!seasonReviewEditData.link.trim()) {
+      setSeasonReviewError("링크를 입력해주세요.");
+      return;
+    }
+
+    setSeasonReviewSaving(true);
+    setSeasonReviewError(null);
+
+    try {
+      const res = await fetch("/api/season-review", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          seasonHistoryId: currentSeason.id,
+          rating: seasonReviewEditData.rating,
+          review: seasonReviewEditData.review.trim(),
+          link: seasonReviewEditData.link.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSeasonReviewError(data.error || "저장에 실패했습니다.");
+        return;
+      }
+
+      setSeasonReviewSuccess(true);
+
+      // 현재 시즌 데이터 업데이트
+      setSeasonHistories(prev => prev.map((season, idx) =>
+        idx === currentSeasonInfo.index
+          ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() }
+          : season
+      ));
+
+      // 1.5초 후 모달 닫기
+      setTimeout(() => {
+        setSeasonReviewModalOpen(false);
+        setSeasonReviewSuccess(false);
+      }, 1500);
+    } catch (error) {
+      console.error("시즌 리뷰 저장 오류:", error);
+      setSeasonReviewError("서버 오류가 발생했습니다.");
+    } finally {
+      setSeasonReviewSaving(false);
     }
   };
 
@@ -1380,27 +1485,75 @@ const Cluster4Content = () => {
               </div>
 
               {/* 영역 5: 평점 및 리뷰 */}
-              <div className="area-5-rating">
+              <div
+                className="area-5-rating"
+                style={{
+                  position: 'relative',
+                  cursor: currentSeason.reviewLink ? 'pointer' : 'default',
+                }}
+                onClick={() => {
+                  if (currentSeason.reviewLink) {
+                    let url = currentSeason.reviewLink;
+                    if (!/^https?:\/\//i.test(url)) {
+                      url = 'https://' + url;
+                    }
+                    window.open(url, '_blank');
+                  }
+                }}
+              >
                 <div className="rating-avatar">
-                  <img src="/images/0/crew profile/이안2.webp" alt="Profile" />
+                  <img src={profilePhotoUrl || '/images/avatar/avatar.png'} alt="Profile" />
                 </div>
                 <div className="rating-content">
                   <div className="top-row">
                     <div className="stars-row">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <img
-                          key={star}
-                          className={`star-icon ${star <= currentSeason.rating ? '' : 'empty'}`}
-                          src="/images/0/cluster 4/icon - star.png"
-                          alt="star"
-                        />
-                      ))}
-                      <span className="rating-text">{currentSeason.rating} / 5</span>
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isFull = currentSeason.rating >= star;
+                        const isHalf = currentSeason.rating >= star - 0.5 && currentSeason.rating < star;
+                        return (
+                          <img
+                            key={star}
+                            className={`star-icon ${isFull ? '' : isHalf ? 'half' : 'empty'}`}
+                            src="/images/0/cluster 4/icon - star.png"
+                            alt="star"
+                            style={{ opacity: isFull ? 1 : isHalf ? 0.6 : 0.3 }}
+                          />
+                        );
+                      })}
+                      <span className="rating-text">{(currentSeason.rating || 0).toFixed(1)} / 5.0</span>
                     </div>
                     <span className="review-label">Season Review</span>
                   </div>
-                  <p className="review-comment">"{currentSeason.review}"</p>
+                  <p className="review-comment">"{currentSeason.review || '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나'}"</p>
                 </div>
+                {/* 편집 아이콘 (본인만 표시) */}
+                {isOwner && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openSeasonReviewModal(); }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      right: '8px',
+                      background: 'rgba(255, 165, 0, 0.2)',
+                      border: '1px solid #FFA500',
+                      borderRadius: '50%',
+                      width: '28px',
+                      height: '28px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* 영역 6: 원형 차트 3개 */}
@@ -2042,6 +2195,198 @@ const Cluster4Content = () => {
           </div>
         );
       })()}
+
+      {/* ========== 시즌 리뷰 모달 ========== */}
+      {seasonReviewModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            backdropFilter: 'blur(5px)',
+          }}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReviewModalOpen(false); }}
+        >
+          <div style={{
+            width: '450px',
+            maxWidth: '90vw',
+            background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
+            border: '1px solid #FFA500',
+            borderRadius: '12px',
+            overflow: 'hidden',
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
+              background: 'rgba(255, 165, 0, 0.05)',
+            }}>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FFA500' }}>✦ 시즌 리뷰</h3>
+              <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 나의 평가를 남겨주세요</span>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '20px 24px' }}>
+              {/* 평점 선택 */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <select
+                    value={seasonReviewEditData.rating.toString()}
+                    onChange={(e) => setSeasonReviewEditData(prev => ({ ...prev, rating: parseFloat(e.target.value) }))}
+                    style={{
+                      display: 'block',
+                      width: '100px',
+                      height: '48px',
+                      padding: '12px 14px',
+                      background: '#1a1f2e',
+                      border: '2px solid #FFA500',
+                      borderRadius: '8px',
+                      color: '#FFA500',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      outline: 'none',
+                    }}
+                  >
+                    {[0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0].map((val) => (
+                      <option key={val} value={val.toString()} style={{ background: '#1a1f2e', color: '#fff' }}>{val.toFixed(1)}</option>
+                    ))}
+                  </select>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const isFull = seasonReviewEditData.rating >= starIndex;
+                      const isHalf = seasonReviewEditData.rating >= starIndex - 0.5 && seasonReviewEditData.rating < starIndex;
+                      return (
+                        <div key={starIndex} style={{ width: '24px', height: '24px', position: 'relative' }}>
+                          <img
+                            src="/images/0/cluster 4/icon - star.png"
+                            alt="star"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              opacity: isFull ? 1 : isHalf ? 0.6 : 0.2,
+                              filter: isFull || isHalf ? 'none' : 'grayscale(100%)',
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FFA500' }}>
+                    {seasonReviewEditData.rating.toFixed(1)} / 5.0
+                  </span>
+                </div>
+              </div>
+
+              {/* 리뷰 입력 */}
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                  한줄평 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 30자)</span>
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    placeholder="이번 시즌은 어땠나요? (30자 이내)"
+                    maxLength={30}
+                    value={seasonReviewEditData.review}
+                    onChange={(e) => setSeasonReviewEditData(prev => ({ ...prev, review: e.target.value }))}
+                    style={{
+                      width: '100%',
+                      height: '56px',
+                      padding: '16px 60px 16px 16px',
+                      background: 'rgba(0,0,0,0.3)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '16px',
+                      outline: 'none',
+                    }}
+                  />
+                  <span style={{
+                    position: 'absolute',
+                    right: '14px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '12px',
+                    color: 'rgba(255,255,255,0.4)',
+                  }}>
+                    {seasonReviewEditData.review.length} / 30
+                  </span>
+                </div>
+              </div>
+
+              {/* 링크 입력 */}
+              <div style={{ marginTop: '20px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                  링크
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={seasonReviewEditData.link}
+                  onChange={(e) => setSeasonReviewEditData(prev => ({ ...prev, link: e.target.value }))}
+                  style={{
+                    width: '100%',
+                    height: '48px',
+                    padding: '12px 16px',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '14px',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 에러/성공 메시지 */}
+            {seasonReviewError && (
+              <div style={{ padding: '12px 24px', background: 'rgba(255, 59, 48, 0.1)', borderTop: '1px solid rgba(255, 59, 48, 0.3)' }}>
+                <p style={{ margin: 0, color: '#FF3B30', fontSize: '14px' }}>{seasonReviewError}</p>
+              </div>
+            )}
+            {seasonReviewSuccess && (
+              <div style={{ padding: '12px 24px', background: 'rgba(52, 199, 89, 0.1)', borderTop: '1px solid rgba(52, 199, 89, 0.3)' }}>
+                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>시즌 리뷰가 저장되었습니다!</p>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(255, 165, 0, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+              <button
+                onClick={() => setSeasonReviewModalOpen(false)}
+                disabled={seasonReviewSaving}
+                style={{ padding: '10px 24px', border: '1px solid rgba(255,255,255,0.3)', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: '14px', borderRadius: '6px', cursor: seasonReviewSaving ? 'not-allowed' : 'pointer', opacity: seasonReviewSaving ? 0.5 : 1 }}
+              >취소</button>
+              <button
+                onClick={handleSaveSeasonReview}
+                disabled={seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()}
+                style={{
+                  padding: '10px 24px',
+                  border: 'none',
+                  background: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? '#444' : 'linear-gradient(135deg, #FFA500 0%, #FF8C00 100%)',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  borderRadius: '6px',
+                  cursor: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {seasonReviewSaving ? '저장 중...' : seasonReviewSuccess ? '완료!' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
