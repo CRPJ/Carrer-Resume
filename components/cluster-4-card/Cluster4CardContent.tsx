@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -36,6 +36,7 @@ interface SelectedColleague {
   nickname: string;
   rank: number;
   message: string;
+  createdAt?: string;
 }
 
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
@@ -787,48 +788,114 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setCareerStats({ total, success });
   }, [careerRecords]);
 
+  // 키워드 목록 가져오기
+  useEffect(() => {
+    const fetchKeywords = async () => {
+      try {
+        const res = await fetch("/api/reputation-keywords");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setReputationKeywords(json.data);
+          }
+        }
+      } catch (error) {
+        console.error("키워드 목록 가져오기 오류:", error);
+      }
+    };
+    fetchKeywords();
+  }, []);
+
+  // 주차 평판 데이터 가져오기 함수
+  const fetchWeeklyReputations = async () => {
+    if (!urlUserId || !weekId) return;
+    try {
+      const res = await fetch(`/api/weekly-reputations?targetUserId=${urlUserId}&weekCardId=${weekId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setWeeklyReputations(json.data);
+        }
+      }
+    } catch (error) {
+      console.error("주차 평판 데이터 가져오기 오류:", error);
+    }
+  };
+
+  // 주차 평판 데이터 초기 로드
+  useEffect(() => {
+    fetchWeeklyReputations();
+  }, [urlUserId, weekId]);
+
+  // 크루 목록 가져오기
+  useEffect(() => {
+    const fetchCrewList = async () => {
+      try {
+        // 자신을 제외한 크루 목록 가져오기 (urlUserId 또는 session.user.id 사용)
+        const excludeId = urlUserId || session?.user?.id || '';
+        const res = await fetch(`/api/crews?excludeUserId=${excludeId}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setAllCrewList(json.data);
+          }
+        }
+      } catch (error) {
+        console.error("크루 목록 가져오기 오류:", error);
+      }
+    };
+    fetchCrewList();
+  }, [urlUserId, session?.user?.id]);
+
+  // 연계 동료 데이터 가져오기
+  const fetchWeeklyColleagues = async () => {
+    const targetUserId = urlUserId || session?.user?.id;
+    if (!targetUserId || !weekId) return;
+    try {
+      const res = await fetch(`/api/weekly-colleagues?userId=${targetUserId}&weekCardId=${weekId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          // API 데이터를 selectedColleagues 형식으로 변환
+          const colleagues = json.data.map((item: any) => ({
+            id: item.colleague?.id || item.colleague_id,
+            name: item.colleague?.name || '-',
+            gender: item.colleague?.gender || '-',
+            age: item.colleague?.age || '-',
+            profileImg: item.colleague?.profileImg || '',
+            university: item.colleague?.university || '-',
+            major: item.colleague?.major || '-',
+            team: item.colleague?.team || '-',
+            part: item.colleague?.part || '-',
+            nickname: item.colleague?.nickname || '-',
+            rank: item.rank,
+            message: item.message || '',
+            createdAt: item.created_at || '',
+          }));
+          setSelectedColleagues(colleagues);
+        }
+      }
+    } catch (error) {
+      console.error("연계 동료 데이터 가져오기 오류:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeeklyColleagues();
+  }, [urlUserId, weekId, session?.user?.id]);
+
   // 모달 상태 관리
   const [workInfoModalOpen, setWorkInfoModalOpen] = useState(false);
   const [workAbilityModalOpen, setWorkAbilityModalOpen] = useState(false);
   const [workExpModalOpen, setWorkExpModalOpen] = useState(false);
   const [workCareerModalOpen, setWorkCareerModalOpen] = useState(false);
 
-  // 상단 섹션 선택 모달 상태
-  const [selectionModalOpen, setSelectionModalOpen] = useState(false);
+  // 상단 섹션 모달 상태
   const [headerModalOpen, setHeaderModalOpen] = useState(false);
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
 
   // 연계 동료 선택 상태 (1st, 2nd, 3rd 각각 별도 저장)
-  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([
-    {
-      id: 7,
-      name: "윤서영",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 5.jpg",
-      university: "중앙대",
-      major: "영화학과",
-      team: "엔터테인먼트",
-      part: "로봇",
-      nickname: "영상편집마스터",
-      rank: 1,
-      message: "",
-    },
-    {
-      id: 10,
-      name: "오승우",
-      gender: "남",
-      age: 25,
-      profileImg: "/images/0/crew profile/남 8.webp",
-      university: "건국대",
-      major: "미디어콘텐츠학과",
-      team: "미디어",
-      part: "AI",
-      nickname: "아이디어뱅크",
-      rank: 2,
-      message: "",
-    },
-  ]);
+  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([]);
 
   // 크루 검색어 상태
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
@@ -841,6 +908,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     keyword: string;
   }>({ rating: 0, content: "", keyword: "" });
   const [otherCrewSearchQuery, setOtherCrewSearchQuery] = useState("");
+
+  // 주차 평판 키워드 목록 및 저장 상태
+  const [reputationKeywords, setReputationKeywords] = useState<{
+    id: string;
+    cluster_number: number;
+    cluster_name: string;
+    cluster_color: string;
+    keyword: string;
+  }[]>([]);
+  const [reputationSaving, setReputationSaving] = useState(false);
+  const [reputationSaveSuccess, setReputationSaveSuccess] = useState(false);
+  const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
+
+  // 주차 평판 데이터 (API에서 가져옴)
+  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
+
+  // 크루 목록 (API에서 가져옴)
+  const [allCrewList, setAllCrewList] = useState<any[]>([]);
+
+  // 연계 동료 저장 상태
+  const [colleagueSaving, setColleagueSaving] = useState(false);
+  const [colleagueSaveSuccess, setColleagueSaveSuccess] = useState(false);
+  const [colleagueSaveError, setColleagueSaveError] = useState<string | null>(null);
 
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
@@ -872,7 +962,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 동료 추가 함수 (순위 지정)
-  const addColleague = (user: typeof allCrewData[0], rank: number) => {
+  const addColleague = (user: any, rank: number) => {
     if (selectedColleagues.length >= 3) return;
     if (selectedColleagues.find(c => c.id === user.id)) return;
     // 해당 순위가 이미 사용중인지 확인
@@ -911,6 +1001,119 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const backToCrewList = () => {
     setSelectedCrewForReputation(null);
     setReputationEditData({ rating: 0, content: "", keyword: "" });
+  };
+
+  // 연계 동료 저장 함수
+  const saveWeeklyColleagues = async () => {
+    if (!weekId) {
+      setColleagueSaveError("주차 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    setColleagueSaving(true);
+    setColleagueSaveError(null);
+    setColleagueSaveSuccess(false);
+
+    try {
+      const colleagues = selectedColleagues.map(c => ({
+        colleagueId: c.id,
+        rank: c.rank,
+        message: c.message || '',
+      }));
+
+      const res = await fetch("/api/weekly-colleagues", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          weekCardId: weekId,
+          colleagues,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        setColleagueSaveError(json.error || "저장에 실패했습니다.");
+        return;
+      }
+
+      setColleagueSaveSuccess(true);
+      // 연계 동료 데이터 새로고침
+      fetchWeeklyColleagues();
+      // 2초 후 모달 닫기 및 상태 초기화
+      setTimeout(() => {
+        setHeaderModalOpen(false);
+        setColleagueSaveSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("연계 동료 저장 오류:", error);
+      setColleagueSaveError("서버 오류가 발생했습니다.");
+    } finally {
+      setColleagueSaving(false);
+    }
+  };
+
+  // 주차 평판 저장 함수
+  const saveWeeklyReputation = async () => {
+    if (!urlUserId || !weekId) {
+      setReputationSaveError("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    if (reputationEditData.rating === 0) {
+      setReputationSaveError("평점을 입력해주세요.");
+      return;
+    }
+
+    if (!reputationEditData.content.trim()) {
+      setReputationSaveError("내용을 입력해주세요.");
+      return;
+    }
+
+    if (!reputationEditData.keyword) {
+      setReputationSaveError("키워드를 선택해주세요.");
+      return;
+    }
+
+    setReputationSaving(true);
+    setReputationSaveError(null);
+    setReputationSaveSuccess(false);
+
+    try {
+      const res = await fetch("/api/weekly-reputations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetUserId: urlUserId,
+          weekCardId: weekId,
+          rating: reputationEditData.rating,
+          content: reputationEditData.content.trim(),
+          keyword: reputationEditData.keyword,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        setReputationSaveError(json.error || "저장에 실패했습니다.");
+        return;
+      }
+
+      setReputationSaveSuccess(true);
+      // 주차 평판 데이터 새로고침
+      fetchWeeklyReputations();
+      // 2초 후 모달 닫기 및 상태 초기화
+      setTimeout(() => {
+        setHeaderModalOpen(false);
+        setReputationEditData({ rating: 0, content: "", keyword: "" });
+        setReputationSaveSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("주차 평판 저장 오류:", error);
+      setReputationSaveError("서버 오류가 발생했습니다.");
+    } finally {
+      setReputationSaving(false);
+    }
   };
 
   // 서브 타이틀 글자수 관리
@@ -1011,287 +1214,121 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 태그 색상 배열
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
 
-  // 주차 평판 데이터
-  const reputationData = [
-    {
-      id: 1,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 3.jpg",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-      rating: 3.5,
-      ratingCount: "7 / 10",
-      description: "팀 프로젝트에서 항상 적극적으로 참여하고 아이디어를 제시해주셔서 정말 감사했습니다. 덕분에 좋은 결과물을 만들 수 있었어요. 앞으로도 함께 일하고 싶은 동료입니다.",
-      fm: 325,
-      tagColor: 'tag--mint',
-      tagText: '#추진력추진력추',
-    },
-    {
-      id: 2,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/남 5.jpg",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-      rating: 4.5,
-      ratingCount: "9 / 10",
-      description: "리더십이 뛰어나고 팀원들을 잘 이끌어주셨습니다. 어려운 상황에서도 침착하게 문제를 해결하는 모습이 인상적이었어요. 배울 점이 정말 많은 분이십니다.",
-      fm: 325,
-      tagColor: 'tag--purple',
-      tagText: '#리더십리더십리',
-    },
-    {
-      id: 3,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 7.webp",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-      rating: 2.5,
-      ratingCount: "5 / 10",
-      description: "창의적인 아이디어로 프로젝트에 새로운 방향을 제시해주셨습니다. 독특한 시각으로 문제를 바라보는 능력이 탁월해요. 함께 브레인스토밍하면 좋은 결과가 나옵니다.",
-      fm: 325,
-      tagColor: 'tag--yellow',
-      tagText: '#창의력창의력창',
-    },
-    {
-      id: 4,
-      name: "-",
-      gender: "",
-      age: "",
-      profileImg: "",
-      university: "",
-      major: "",
-      team: "",
-      part: "",
-      nickname: "",
-      rating: 0,
-      ratingCount: "- / 10",
-      description: "-",
-      fm: "-",
-      tagColor: 'tag--dark',
-      tagText: '-',
-      isEmpty: true,
-    },
-  ];
+  // 주차 평판 데이터 (API 데이터 기반)
+  const reputationData = useMemo(() => {
+    // 태그 색상 배열
+    const colors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint'];
 
-  // 크루 검색용 더미 데이터
-  const allCrewData = [
-    {
-      id: 1,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 3.jpg",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-    },
-    {
-      id: 2,
-      name: "이준혁",
-      gender: "남",
-      age: 26,
-      profileImg: "/images/0/crew profile/남 2.jpg",
-      university: "연세대",
-      major: "경영학과",
-      team: "미디어",
-      part: "브랜드",
-      nickname: "마케팅마스터",
-    },
-    {
-      id: 3,
-      name: "박소연",
-      gender: "여",
-      age: 23,
-      profileImg: "/images/0/crew profile/여 1.jpg",
-      university: "고려대",
-      major: "심리학과",
-      team: "콘텐츠",
-      part: "스타일",
-      nickname: "콘텐츠퀸",
-    },
-    {
-      id: 4,
-      name: "정민수",
-      gender: "남",
-      age: 27,
-      profileImg: "/images/0/crew profile/남 4.jpg",
-      university: "성균관대",
-      major: "컴퓨터공학",
-      team: "헬스케어",
-      part: "AI",
-      nickname: "코딩천재개발자",
-    },
-    {
-      id: 5,
-      name: "최유진",
-      gender: "여",
-      age: 25,
-      profileImg: "/images/0/crew profile/여 6.jpg",
-      university: "이화여대",
-      major: "디자인학부",
-      team: "스타일",
-      part: "브랜드",
-      nickname: "디자인요정",
-    },
-    {
-      id: 6,
-      name: "강동현",
-      gender: "남",
-      age: 28,
-      profileImg: "/images/0/crew profile/남 7.jpg",
-      university: "한양대",
-      major: "광고홍보학과",
-      team: "라이프",
-      part: "자동차",
-      nickname: "광고의신",
-    },
-    {
-      id: 7,
-      name: "윤서영",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 5.jpg",
-      university: "중앙대",
-      major: "영화학과",
-      team: "엔터테인먼트",
-      part: "로봇",
-      nickname: "영상편집마스터",
-    },
-    {
-      id: 8,
-      name: "임재현",
-      gender: "남",
-      age: 26,
-      profileImg: "/images/0/crew profile/남 5.jpg",
-      university: "서강대",
-      major: "경제학과",
-      team: "푸드",
-      part: "디저트",
-      nickname: "전략가임재현",
-    },
-    {
-      id: 9,
-      name: "한지민",
-      gender: "여",
-      age: 23,
-      profileImg: "/images/0/crew profile/여 7.webp",
-      university: "숙명여대",
-      major: "언론정보학부",
-      team: "콘텐츠",
-      part: "내돈내산",
-      nickname: "소통의달인",
-    },
-    {
-      id: 10,
-      name: "오승우",
-      gender: "남",
-      age: 25,
-      profileImg: "/images/0/crew profile/남 8.webp",
-      university: "건국대",
-      major: "미디어콘텐츠학과",
-      team: "미디어",
-      part: "AI",
-      nickname: "아이디어뱅크",
-    },
-    {
-      id: 11,
-      name: "김하늘",
-      gender: "여",
-      age: 22,
-      profileImg: "/images/0/crew profile/여 2.jpg",
-      university: "동국대",
-      major: "광고홍보학과",
-      team: "스타일",
-      part: "스타일",
-      nickname: "카피라이터하늘",
-    },
-    {
-      id: 12,
-      name: "신동욱",
-      gender: "남",
-      age: 27,
-      profileImg: "/images/0/crew profile/남 3.jpg",
-      university: "홍익대",
-      major: "시각디자인과",
-      team: "헬스케어",
-      part: "로봇",
-      nickname: "UX디자이너",
-    },
-  ];
+    // API에서 가져온 데이터를 UI 형식으로 변환
+    const apiData = weeklyReputations.map((rep, index) => {
+      const reviewer = rep.reviewer;
+      // 나이 계산
+      let age = '-';
+      if (reviewer?.birth_date) {
+        const birthYear = new Date(reviewer.birth_date).getFullYear();
+        const currentYear = new Date().getFullYear();
+        age = currentYear - birthYear;
+      }
+
+      return {
+        id: rep.id,
+        name: reviewer?.display_name || '-',
+        gender: reviewer?.gender || '-',
+        age: age,
+        profileImg: reviewer?.profile_photo_url || '',
+        university: reviewer?.university || '-',
+        major: reviewer?.major_first || '-',
+        team: reviewer?.teamName || '-',
+        part: reviewer?.partName || '-',
+        nickname: reviewer?.vision || '-',
+        rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
+        ratingCount: `${rep.rating} / 10`,
+        description: rep.content || '-',
+        fm: 1, // FM은 항상 1
+        tagColor: colors[index % colors.length],
+        tagText: `#${rep.keyword || '-'}`,
+        isEmpty: false,
+      };
+    });
+
+    // 최대 3개까지, 빈 슬롯 채우기
+    const result = [...apiData];
+    while (result.length < 3) {
+      result.push({
+        id: `empty-${result.length}`,
+        name: "-",
+        gender: "",
+        age: "",
+        profileImg: "",
+        university: "",
+        major: "",
+        team: "",
+        part: "",
+        nickname: "",
+        rating: 0,
+        ratingCount: "- / 10",
+        description: "-",
+        fm: "-",
+        tagColor: 'tag--dark',
+        tagText: '-',
+        isEmpty: true,
+      });
+    }
+
+    return result.slice(0, 3); // 최대 3개만 반환
+  }, [weeklyReputations]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
-  const filteredCrewData = allCrewData.filter(user => {
+  const filteredCrewData = allCrewList.filter(user => {
     if (!crewSearchQuery) return true;
     const query = crewSearchQuery.toLowerCase();
     return (
-      user.name.toLowerCase().includes(query) ||
-      user.nickname.toLowerCase().includes(query)
+      (user.name?.toLowerCase() || '').includes(query) ||
+      (user.nickname?.toLowerCase() || '').includes(query)
     );
   }).filter(user => !selectedColleagues.find(c => c.id === user.id));
 
-  // 연계 동료 데이터
-  const colleagueData = [
-    {
-      id: 1,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/여 5.jpg",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-      date: "2025 - 12 - 22 (월)",
-      message: "프로젝트에서 많은 도움을 주셔서 정말 감사합니다. 덕분에 성장할 수 있었어요! 앞으로도 함께 좋은 결과물 만들어가요. 항상 응원하겠습니다. 파이팅!일이삼사오육칠팔구십",
-    },
-    {
-      id: 2,
-      name: "김미현",
-      gender: "여",
-      age: 24,
-      profileImg: "/images/0/crew profile/남 8.webp",
-      university: "서울대",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트",
-      part: "내돈내산",
-      nickname: "엔비디아구글태슬라킹",
-      date: "2025 - 12 - 22 (월)",
-      message: "항상 응원해주시고 조언해주셔서 감사합니다. 앞으로도 잘 부탁드려요! 함께 성장하며 멋진 프로젝트 완성해봐요. 최고의 파트너입니다!일이삼사오육칠팔구십 최고의 파트너입니다!!!!!!!",
-    },
-    {
-      id: 3,
-      name: "-",
-      gender: "-",
-      age: "-",
-      profileImg: "",
-      university: "-",
-      major: "-",
-      team: "-",
-      part: "-",
-      nickname: "-",
-      date: "0000 - 00 - 00 (일)",
-      message: "",
-      isEmpty: true,
-    },
-  ];
+  // 연계 동료 데이터 (API 데이터 기반)
+  const colleagueData = useMemo(() => {
+    // API에서 가져온 selectedColleagues를 UI 형식으로 변환
+    const apiData = selectedColleagues.map((c) => ({
+      id: c.id,
+      name: c.name || '-',
+      gender: c.gender || '-',
+      age: c.age || '-',
+      profileImg: c.profileImg || '',
+      university: c.university || '-',
+      major: c.major || '-',
+      team: c.team || '-',
+      part: c.part || '-',
+      nickname: c.nickname || '-',
+      date: c.createdAt ? formatDate(c.createdAt) : '-',
+      message: c.message || '',
+      isEmpty: false,
+    }));
+
+    // 최대 3개까지, 빈 슬롯 채우기
+    const result = [...apiData];
+    while (result.length < 3) {
+      result.push({
+        id: `empty-${result.length}`,
+        name: "-",
+        gender: "-",
+        age: "-",
+        profileImg: "",
+        university: "-",
+        major: "-",
+        team: "-",
+        part: "-",
+        nickname: "-",
+        date: "-",
+        message: "",
+        isEmpty: true,
+      });
+    }
+
+    return result.slice(0, 3); // 최대 3개만 반환
+  }, [selectedColleagues]);
 
   // 실무 정보 activity_type_id → UI 매핑
   const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
@@ -1922,11 +1959,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
-        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+        {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => setSelectionModalOpen(true)} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            <div className="edit-icon" onClick={() => { setHeaderModalType('본인'); setHeaderModalOpen(true); }} style={{ cursor: 'pointer' }}>
+              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1934,6 +1971,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <path d="M21 21l-4.35-4.35" />
               </svg>
               <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
+          </div>
+        )}
+        {/* 타인 카드일 때 - 주차 평판 남기기 버튼 */}
+        {session && !isOwner && (
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <div className="edit-icon" onClick={() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
+              <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>
         )}
@@ -2020,7 +2065,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-row">
               <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="주차 평판" className="section-icon" />
               <span className="section-label">주차 평판</span>
-              <span className="section-count"><span className="count-num">3</span>/3</span>
+              <span className="section-count"><span className="count-num">{weeklyReputations.length}</span>/3</span>
             </div>
             <div className="reputation-cards-grid">
               {reputationData.map((user, index) => {
@@ -2082,7 +2127,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-row">
               <img src="/images/0/cluster 4/icon/icon - 연계 동료.png" alt="연계 동료" className="section-icon" />
               <span className="section-label">연계 동료</span>
-              <span className="section-count"><span className="count-num">2</span>/3</span>
+              <span className="section-count"><span className="count-num">{selectedColleagues.length}</span>/3</span>
             </div>
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
@@ -3272,52 +3317,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 상단 섹션 선택 모달 ========== */}
-      {selectionModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectionModalOpen(false); }}>
-          <div className="section-modal section-modal-selection">
-            <div className="section-modal-header">
-              <h3>편집 대상 선택</h3>
-            </div>
-            <div className="section-modal-body selection-body">
-              <p className="selection-desc">편집할 대상을 선택해주세요</p>
-              <div className="selection-buttons">
-                <button
-                  className="selection-btn self"
-                  onClick={() => {
-                    setSelectionModalOpen(false);
-                    setHeaderModalType('본인');
-                    setHeaderModalOpen(true);
-                  }}
-                >
-                  <div className="selection-icon">
-                    <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="연계 동료 작성하기" />
-                  </div>
-                  <span className="selection-label">연계 동료<br />작성하기</span>
-                  <span className="selection-sublabel">내 정보 편집하기</span>
-                </button>
-                <button
-                  className="selection-btn other"
-                  onClick={() => {
-                    setSelectionModalOpen(false);
-                    setHeaderModalType('타크루');
-                    setHeaderModalOpen(true);
-                  }}
-                >
-                  <div className="selection-icon">
-                    <img src="/images/0/cluster 4/icon/icon - 연계 동료.png" alt="주차평판 남기기" />
-                  </div>
-                  <span className="selection-label">주차평판<br />남기기</span>
-                  <span className="selection-sublabel">다른 크루 정보 보기</span>
-                </button>
-              </div>
-            </div>
-            <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setSelectionModalOpen(false)}>닫기</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
       {headerModalOpen && headerModalType === '본인' && (
@@ -3331,7 +3330,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* 안내 문구 */}
                 <div className="header-edit-section colleague-guide">
                   <div className="guide-text">
-                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span></p>
+                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명, 최대 3명)</span></p>
                   </div>
                 </div>
 
@@ -3364,16 +3363,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                         </div>
                         <div className="colleague-message-section">
-                          <label>Thank you message <span className="char-limit">(최대 50자)</span></label>
+                          <label>Thank you message <span className="char-limit">(최대 100자)</span></label>
                           <div className="message-input-wrapper">
                             <textarea
                               placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={50}
+                              maxLength={100}
                               rows={1}
                               value={colleague.message}
                               onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}
                             ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 50</span>
+                            <span className="char-counter">{colleague.message.length} / 100</span>
                           </div>
                         </div>
                       </div>
@@ -3469,9 +3468,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
+            {/* 저장 상태 메시지 */}
+            {colleagueSaveError && (
+              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{colleagueSaveError}</p>
+              </div>
+            )}
+            {colleagueSaveSuccess && (
+              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>연계 동료가 성공적으로 저장되었습니다!</p>
+              </div>
+            )}
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setHeaderModalOpen(false)}>취소</button>
-              <button className="save-btn" onClick={() => setHeaderModalOpen(false)}>저장</button>
+              <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setColleagueSaveError(null); setColleagueSaveSuccess(false); }}>취소</button>
+              <button
+                className="save-btn"
+                onClick={saveWeeklyColleagues}
+                disabled={colleagueSaving || colleagueSaveSuccess}
+              >{colleagueSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -3564,28 +3578,69 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                   {/* 키워드 */}
                   <div className="form-field">
-                    <label>키워드 <span className="char-limit">(최대 7자)</span></label>
-                    <div className="keyword-row">
-                      <span className="hashtag">#</span>
-                      <input
-                        type="text"
-                        placeholder="키워드를 입력하세요"
+                    <label>
+                      키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(1개 선택, 총 {reputationKeywords.length}개)</span>
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#</span>
+                      <select
                         value={reputationEditData.keyword}
                         onChange={(e) => setReputationEditData(prev => ({ ...prev, keyword: e.target.value }))}
-                        maxLength={7}
-                      />
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          height: '48px',
+                          padding: '12px 14px',
+                          background: '#1a1f2e',
+                          border: '2px solid #FFA500',
+                          borderRadius: '8px',
+                          color: '#fff',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          outline: 'none',
+                        }}
+                      >
+                        <option value="">키워드를 선택해주세요</option>
+                        {reputationKeywords.length === 0 ? (
+                          <option value="" disabled>키워드 로딩 중...</option>
+                        ) : (
+                          [1, 2, 3, 4, 5].map(clusterNum => {
+                            const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
+                            if (clusterKeywords.length === 0) return null;
+                            const clusterInfo = clusterKeywords[0];
+                            return (
+                              <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
+                                {clusterKeywords.map(k => (
+                                  <option key={k.id} value={k.keyword}>{k.keyword}</option>
+                                ))}
+                              </optgroup>
+                            );
+                          })
+                        )}
+                      </select>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            {/* 저장 상태 메시지 */}
+            {reputationSaveError && (
+              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{reputationSaveError}</p>
+              </div>
+            )}
+            {reputationSaveSuccess && (
+              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>주차 평판이 성공적으로 저장되었습니다!</p>
+              </div>
+            )}
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setHeaderModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setReputationSaveError(null); setReputationSaveSuccess(false); }}>취소</button>
               <button
                 className="save-btn"
-                onClick={() => setHeaderModalOpen(false)}
-                disabled={reputationEditData.rating === 0 || reputationEditData.content.trim() === '' || reputationEditData.keyword.trim() === ''}
-              >저장</button>
+                onClick={saveWeeklyReputation}
+                disabled={reputationSaving || reputationSaveSuccess || reputationEditData.rating === 0 || reputationEditData.content.trim() === '' || reputationEditData.keyword === ''}
+              >{reputationSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>

@@ -46,6 +46,9 @@ const Cluster41Content = () => {
   }
   const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>(null);
 
+  // 주차별 평판 개수 (week_card_id -> count)
+  const [weeklyReputationCounts, setWeeklyReputationCounts] = useState<{ [key: string]: number }>({});
+
   // 성장 시작/종료 주차 정보 상태
   interface WeekInfo {
     year: number | null;
@@ -74,6 +77,30 @@ const Cluster41Content = () => {
   }
   const [seasonCards, setSeasonCards] = useState<SeasonCardData[]>([]);
   const [isLoadingSeasons, setIsLoadingSeasons] = useState(true);
+
+  // 주차별 평판 개수 가져오기
+  useEffect(() => {
+    const fetchWeeklyReputationCounts = async () => {
+      if (!targetUserId) return;
+      try {
+        const res = await fetch(`/api/weekly-reputations?targetUserId=${targetUserId}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            // 주차별로 그룹화
+            const counts: { [key: string]: number } = {};
+            json.data.forEach((rep: { week_card_id: string }) => {
+              counts[rep.week_card_id] = (counts[rep.week_card_id] || 0) + 1;
+            });
+            setWeeklyReputationCounts(counts);
+          }
+        }
+      } catch (error) {
+        console.error("주차 평판 개수 가져오기 오류:", error);
+      }
+    };
+    fetchWeeklyReputationCounts();
+  }, [targetUserId]);
 
   // 현재 시즌 정보 가져오기
   useEffect(() => {
@@ -1675,8 +1702,8 @@ const Cluster41Content = () => {
                           <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : careerRate.count}</span>/{careerRate.total})</span></span>
                         </div>
                         <div className="weekly-card-extra-stats">
-                          <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
-                          <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : 0}</span></span>
+                          <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
+                          <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span></span>
                           <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
                           <span className="stat empty"></span>
                         </div>
