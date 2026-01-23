@@ -222,6 +222,21 @@ const Cluster41Content = () => {
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivityData[]>([]);
 
+  // 온보딩 주차 ID 상태 (무적 주차)
+  const [onboardingWeekId, setOnboardingWeekId] = useState<string | null>(null);
+
+  // 경력 기록 데이터 (실무 경력 강화율 계산용) - career_records 테이블 사용
+  interface CareerRecordData {
+    id: string;
+    user_id: string;
+    week_id: string;
+    project_id: string;
+    enhancement_status: 'not_applicable' | 'pending' | 'enhanced';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    weeks?: any;
+  }
+  const [userCareerRecords, setUserCareerRecords] = useState<CareerRecordData[]>([]);
+
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
     'crew_regular': '일반',
@@ -340,6 +355,10 @@ const Cluster41Content = () => {
   // 주차별 실무 강화율 계산 함수들 (소수점 올림 처리)
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
+    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 0 };
+    }
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypes.includes(wa.activity_type_id)).length;
@@ -350,20 +369,27 @@ const Cluster41Content = () => {
     return { count: infoCount, total, rate: total > 0 ? Math.ceil((infoCount / total) * 100) : 0 };
   };
 
-  // 주차별 실무 역량 강화율 (competency)
+  // 주차별 실무 역량 강화율 (competency) - 매주 분모는 항상 1
   const getWeeklyCompetencyRate = (weekId: string) => {
-    // 해당 주차에 열린 활동 중 competency 타입 개수 (total)
-    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
-    const total = weekOpenActivities.filter(wa => competencyTypeIds.includes(wa.activity_type_id)).length;
-    // 유저가 완료한 competency 타입 활동 개수 (count)
+    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 0 };
+    }
+    // 실무 역량은 매주 분모가 항상 1
+    const total = 1;
+    // 유저가 완료한 competency 타입 활동 개수 (count) - 최대 1
     const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const competencyCount = userWeekActivities.filter(a => competencyTypeIds.includes(a.activity_type_id)).length;
+    const competencyCount = Math.min(userWeekActivities.filter(a => competencyTypeIds.includes(a.activity_type_id)).length, 1);
     // 소수점 올림 처리
     return { count: competencyCount, total, rate: total > 0 ? Math.ceil((competencyCount / total) * 100) : 0 };
   };
 
   // 주차별 실무 경험 강화율 (experience) - 유저의 누적 활동 주차에 따라 P값 동적 계산
   const getWeeklyExperienceRate = (weekId: string) => {
+    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 0 };
+    }
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
@@ -428,17 +454,26 @@ const Cluster41Content = () => {
     };
   };
 
-  // 주차별 실무 경력 강화율 (career) - 최대 5개 제한
+  // 주차별 실무 경력 강화율 (career) - career_records 기반, 최대 5개 제한
+  // P(분모) = 해당 주차에 진행 중인 경력 프로젝트 수 (참여한 것 - pending/enhanced)
+  // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수
   const getWeeklyCareerRate = (weekId: string) => {
-    // 해당 주차에 열린 활동 중 career 타입 개수 (total)
-    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
-    const rawTotal = weekOpenActivities.filter(wa => careerTypeIds.includes(wa.activity_type_id)).length;
-    // 유저가 완료한 career 타입 활동 개수 (count)
-    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const rawCount = userWeekActivities.filter(a => careerTypeIds.includes(a.activity_type_id)).length;
-    // 실무 경력은 한 주에 최대 5개까지만 계산
-    const total = rawTotal === 0 ? 0 : Math.min(rawTotal, 5);
-    const count = rawTotal === 0 ? 0 : Math.min(rawCount, total);
+    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 0 };
+    }
+
+    // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
+    const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
+
+    // P(분모) = 해당 주차 경력 프로젝트 수 (최대 5개)
+    const rawTotal = weekCareerRecords.length;
+    const total = Math.min(rawTotal, 5);
+
+    // R(분자) = enhanced 상태인 경력 프로젝트 수 (최대 P개)
+    const enhancedCount = weekCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
+    const count = Math.min(enhancedCount, total);
+
     // 소수점 올림 처리
     return { count, total, rate: total > 0 ? Math.ceil((count / total) * 100) : 0 };
   };
@@ -447,6 +482,11 @@ const Cluster41Content = () => {
   // k = {(a' + b' + c' + d') / (a + b + c + d)} * 100% (소수점 올림)
   // 주의: 각 파트 강화율(p,q,r,s)은 k 계산에 포함되지 않음
   const getWeeklyGrowthRate = (weekId: string) => {
+    // 온보딩 주차(무적 주차)는 무조건 100% (분모 0, 분자 0이지만 100% 표시)
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 100 };
+    }
+
     const info = getWeeklyInfoRate(weekId);
     const competency = getWeeklyCompetencyRate(weekId);
     const experience = getWeeklyExperienceRate(weekId);
@@ -660,6 +700,7 @@ const Cluster41Content = () => {
           // API에서 온보딩 주차 ID 가져오기
           if (response.ok && result.onboardingWeekId) {
             apiOnboardingWeekId = result.onboardingWeekId;
+            setOnboardingWeekId(apiOnboardingWeekId);
             console.log('[DEBUG] API Onboarding week ID:', apiOnboardingWeekId);
           }
 
@@ -717,15 +758,17 @@ const Cluster41Content = () => {
           }
           console.log('[DEBUG] User weekly growth data:', userWeeklyGrowthMap.size, 'records');
 
-          // 4. 팀/파트/역할/포인트/활동/활동타입 데이터 가져오기
-          const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult, activityTypesResult] = await Promise.all([
+          // 4. 팀/파트/역할/포인트/활동/활동타입/경력기록 데이터 가져오기
+          const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult, activityTypesResult, careerRecordsResult] = await Promise.all([
             supabase.from('teams').select('id, name'),
             supabase.from('parts').select('id, name, team_id'),
             supabase.from('user_team_parts').select('id, user_id, team_id, part_id, joined_at, left_at, is_current, season_id').eq('user_id', userId),
             supabase.from('user_role_history').select('id, user_id, role, started_at, ended_at').eq('user_id', userId),
             supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
             supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
-            supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true)
+            supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
+            // 경력 기록 (실무 경력 강화율 계산용) - pending/enhanced 상태만
+            supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced'])
           ]);
 
           // weekly_activities는 페이지네이션으로 모든 데이터 가져오기 (Supabase 기본 1000개 제한 우회)
@@ -755,6 +798,10 @@ const Cluster41Content = () => {
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
           if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
+          if (careerRecordsResult.data) {
+            setUserCareerRecords(careerRecordsResult.data as CareerRecordData[]);
+            console.log('[DEBUG] User career records:', careerRecordsResult.data);
+          }
 
           // activity_types에서 클러스터별 ID 분류
           if (activityTypesResult.data) {

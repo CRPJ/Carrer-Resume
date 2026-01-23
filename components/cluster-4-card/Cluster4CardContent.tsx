@@ -127,6 +127,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
+  // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함) - cluster-4-1과 동일
+  interface ExperienceTypeInfo {
+    id: string;
+    eligible_min_approved_weeks: number | null;
+    eligible_max_approved_weeks: number | null;
+    count_once_in_total: boolean;
+  }
+  const [experienceTypeInfos, setExperienceTypeInfos] = useState<ExperienceTypeInfo[]>([]);
+
+  // 유저의 모든 완료된 활동 기록 (experience eligible 체크용) - cluster-4-1과 동일
+  const [allUserCompletedActivities, setAllUserCompletedActivities] = useState<{week_id: string; activity_type_id: string}[]>([]);
+
   // DB에서 가져온 실무 경력 데이터 (프로젝트 기반)
   interface CareerRecord {
     // 프로젝트 정보
@@ -279,10 +291,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       try {
         setIsLoadingWeek(true);
 
-        // 0. activity_types 정보 가져오기 (클러스터별 분류용)
+        // 0. activity_types 정보 가져오기 (클러스터별 분류용 + eligible 조건)
         const { data: activityTypesData } = await supabase
           .from('activity_types')
-          .select('id, name, line_code, cluster_id, description')
+          .select('id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total')
           .eq('is_active', true);
 
         // 변수를 if 블록 밖에 선언해서 나중에 사용 가능하게 함
@@ -290,6 +302,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const competencyIds: string[] = [];
         const experienceIds: string[] = [];
         const careerIds: string[] = [];
+        const experienceInfos: ExperienceTypeInfo[] = [];
 
         if (activityTypesData) {
           activityTypesData.forEach((at) => {
@@ -298,6 +311,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               competencyIds.push(at.id);
             } else if (at.cluster_id === 'practical_experience') {
               experienceIds.push(at.id);
+              // eligible 조건 저장 (cluster-4-1과 동일)
+              experienceInfos.push({
+                id: at.id,
+                eligible_min_approved_weeks: at.eligible_min_approved_weeks,
+                eligible_max_approved_weeks: at.eligible_max_approved_weeks,
+                count_once_in_total: at.count_once_in_total || false
+              });
             } else if (at.cluster_id === 'practical_career') {
               careerIds.push(at.id);
             }
@@ -307,6 +327,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           setCompetencyTypeIds(competencyIds);
           setExperienceTypeIds(experienceIds);
           setCareerTypeIds(careerIds);
+          setExperienceTypeInfos(experienceInfos);
         }
 
         // 1. 현재 주차 정보 가져오기
@@ -343,6 +364,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiActivityPoints = profileResult.activityPoints || [];
 
         console.log('[DEBUG] Profile API Response for userId:', userId);
+        console.log('[DEBUG] apiActivityWeekIds (all success weeks):', apiActivityWeekIds.length, apiActivityWeekIds);
         console.log('[DEBUG] apiApprovedActivities:', apiApprovedActivities.length, apiApprovedActivities);
         console.log('[DEBUG] apiActivityRecords:', apiActivityRecords.length);
         console.log('[DEBUG] apiActivityDetails:', apiActivityDetails.length);
@@ -494,12 +516,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
         }
 
-        // 7. 누적 성공 주차 수 계산
-        if (allWeeksUntilCurrent) {
-          const weekIds = allWeeksUntilCurrent.map(w => w.id);
-          const approvedCount = weekIds.filter(wId => apiActivityWeekIds.includes(wId)).length;
-          setCumulativeApprovedWeeks(approvedCount);
+        // 7. 누적 성공 주차 수 계산 (experience eligible 체크에서도 사용)
+        // cluster-4-1과 완전히 동일한 방식: 해당 주차 종료일까지 성공한 주차 수
+        let currentApprovedCount = 0;
+
+        // user_weekly_growth에서 해당 주차 종료일까지 성공한 주차 직접 쿼리
+        const { data: successWeeksData } = await supabase
+          .from('user_weekly_growth')
+          .select('week_id, weeks!inner(end_date)')
+          .eq('user_id', userId)
+          .eq('is_success', true);
+
+        if (successWeeksData && allWeeksUntilCurrent) {
+          // 현재 주차 종료일까지의 성공 주차만 카운트 (cluster-4-1과 동일)
+          currentApprovedCount = successWeeksData.filter((sw: any) => {
+            const weekEndDate = sw.weeks?.end_date;
+            return weekEndDate && weekEndDate <= currentWeek.end_date;
+          }).length;
+
+          console.log('[DEBUG] successWeeksData:', successWeeksData.length, successWeeksData);
+          console.log('[DEBUG] currentWeek.end_date:', currentWeek.end_date);
+          console.log('[DEBUG] currentApprovedCount (filtered by end_date):', currentApprovedCount);
         }
+
+        setCumulativeApprovedWeeks(currentApprovedCount);
 
         // 8. 이전/다음 주차 ID 가져오기
         const today = new Date().toISOString().split('T')[0];
@@ -601,26 +641,100 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           console.log('[DEBUG] activityRatings:', ratingsMap);
           setActivityRatings(ratingsMap);
 
-          // 각 파트별 집계 (is_completed=true인 활동 수 - weekly-ranking과 동일한 방식)
-          const calcStats = (types: string[]) => {
-            const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
-            const success = activeActivities.filter(a => {
-              if (!types.includes(a.activity_type_id)) return false;
-              return approvedActivityTypes.has(a.activity_type_id); // is_completed = true
-            }).length;
+          // cluster-4-1과 동일한 로직으로 해당 주차 데이터 계산
+          // 온보딩 주차 확인
+          const onboardingWeekId = profileResult.onboardingWeekId;
+          const isOnboardingWeek = weekId === onboardingWeekId;
 
-            return { total, success };
-          };
+          // 유저의 모든 완료 활동 저장 (experience eligible 체크용)
+          const allCompletedActivities = apiActivityRecords
+            .filter((ar: { is_completed: boolean }) => ar.is_completed)
+            .map((ar: { week_id: string; activity_type_id: string }) => ({
+              week_id: ar.week_id,
+              activity_type_id: ar.activity_type_id
+            }));
+          setAllUserCompletedActivities(allCompletedActivities);
 
-          setInfoStats(calcStats(infoTypesList));
-          setCompetencyStats(calcStats(competencyTypesList));
-          setExperienceStats(calcStats(experienceTypesList));
-          setCareerStats(calcStats(careerTypesList));
+          // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 값 사용
+          const currentCumulativeApproved = currentApprovedCount;
 
-          console.log('[DEBUG] Stats calculated - info:', calcStats(infoTypesList),
-            'competency:', calcStats(competencyTypesList),
-            'experience:', calcStats(experienceTypesList),
-            'career:', calcStats(careerTypesList));
+          // 실무 정보: 해당 주차의 활성화된 활동 수
+          const infoTotal = activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
+
+          // 실무 역량: 온보딩 주차가 아니면 1, 온보딩 주차면 0
+          const competencyTotal = isOnboardingWeek ? 0 : 1;
+
+          // 실무 경험: eligible 조건 체크 (cluster-4-1과 동일한 로직)
+          let experienceTotal = 0;
+          if (!isOnboardingWeek) {
+            const experienceActivities = activeActivities.filter(a => experienceTypesList.includes(a.activity_type_id));
+
+            console.log('[DEBUG experience] currentCumulativeApproved:', currentCumulativeApproved);
+            console.log('[DEBUG experience] experienceActivities:', experienceActivities.map(a => a.activity_type_id));
+            console.log('[DEBUG experience] experienceInfos:', experienceInfos);
+
+            experienceActivities.forEach(a => {
+              const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
+              console.log('[DEBUG experience] activity:', a.activity_type_id, 'typeInfo:', typeInfo);
+
+              if (!typeInfo) {
+                experienceTotal++; // 정보가 없으면 기본 포함
+                console.log('[DEBUG experience] No typeInfo, adding to total. experienceTotal:', experienceTotal);
+                return;
+              }
+
+              // eligible_min/max 체크 (null이면 제한 없음)
+              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+
+              console.log('[DEBUG experience] minWeek:', minWeek, 'maxWeek:', maxWeek, 'cumulativeApproved:', currentCumulativeApproved);
+
+              // 누적 주차가 eligible 범위 내인지 확인
+              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                // count_once_in_total 체크 (1회만 가능한 활동)
+                if (typeInfo.count_once_in_total) {
+                  // 이미 이전 주차에서 완료했는지 확인
+                  const previouslyCompleted = allCompletedActivities.some(
+                    ca => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+                  );
+                  console.log('[DEBUG experience] count_once_in_total, previouslyCompleted:', previouslyCompleted);
+                  if (!previouslyCompleted) {
+                    experienceTotal++;
+                  }
+                } else {
+                  experienceTotal++;
+                }
+                console.log('[DEBUG experience] Added to total. experienceTotal:', experienceTotal);
+              } else {
+                console.log('[DEBUG experience] Not eligible (out of range)');
+              }
+            });
+          }
+          console.log('[DEBUG experience] Final experienceTotal:', experienceTotal);
+
+          // 실무 경력: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
+          // 여기서는 초기값 0으로 설정, career_records 로드 후 덮어씀
+
+          // success 계산 (cluster-4-1과 동일 - is_completed 기준)
+          // 해당 주차의 완료된 활동만 필터링
+          const weekCompletedActivities = allCompletedActivities.filter(a => a.week_id === weekId);
+
+          const infoSuccess = weekCompletedActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
+          // 실무 역량 success: 온보딩 아니고 해당 활동이 완료됐으면 1 (최대 1)
+          const competencySuccess = isOnboardingWeek ? 0 : Math.min(weekCompletedActivities.filter(a => competencyTypesList.includes(a.activity_type_id)).length, 1);
+          const experienceSuccess = isOnboardingWeek ? 0 : weekCompletedActivities.filter(a => experienceTypesList.includes(a.activity_type_id)).length;
+          // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
+
+          console.log('[DEBUG] isOnboardingWeek:', isOnboardingWeek, 'onboardingWeekId:', onboardingWeekId, 'weekId:', weekId);
+          console.log('[DEBUG] currentCumulativeApproved:', currentCumulativeApproved);
+          console.log('[DEBUG] Calculated stats - info:', { total: infoTotal, success: infoSuccess },
+            'competency:', { total: competencyTotal, success: competencySuccess },
+            'experience:', { total: experienceTotal, success: experienceSuccess });
+
+          setInfoStats({ total: infoTotal, success: infoSuccess });
+          setCompetencyStats({ total: competencyTotal, success: competencySuccess });
+          setExperienceStats({ total: experienceTotal, success: experienceSuccess });
+          // careerStats는 career_records useEffect에서 설정됨
         }
 
       } catch (error) {
@@ -657,13 +771,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     fetchCareerRecords();
   }, [currentUserId, weekId]);
 
-  // 실무 경력 통계 업데이트 (career records 기반)
-  // total: 참여한 프로젝트 수 (pending, enhanced, failed)
-  // success: 강화 성공한 프로젝트 수 (enhanced)
+  // 실무 경력 통계 업데이트 (career records 기반) - cluster-4-1과 동일한 로직
+  // total: 참여한 프로젝트 수 (pending, enhanced만 - 최대 5개)
+  // success: 강화 성공한 프로젝트 수 (enhanced - 최대 total개)
   useEffect(() => {
-    const participatingRecords = careerRecords.filter(r => r.enhancement_status !== 'not_applicable');
-    const total = participatingRecords.length;
-    const success = participatingRecords.filter(r => r.enhancement_status === 'enhanced').length;
+    // pending 또는 enhanced 상태만 포함 (cluster-4-1과 동일)
+    const participatingRecords = careerRecords.filter(r =>
+      r.enhancement_status === 'pending' || r.enhancement_status === 'enhanced'
+    );
+    // 최대 5개 제한 (cluster-4-1과 동일)
+    const rawTotal = participatingRecords.length;
+    const total = Math.min(rawTotal, 5);
+    const enhancedCount = participatingRecords.filter(r => r.enhancement_status === 'enhanced').length;
+    const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
   }, [careerRecords]);
 

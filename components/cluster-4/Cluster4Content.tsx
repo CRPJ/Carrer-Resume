@@ -18,6 +18,7 @@ const defaultSeasonData = {
   approvedWeeks: 0,
   totalWeeks: 0,
   roleInSeason: '',
+  isQualified: false,
   seasonRoles: [],
   stats: { dangam: 0, injeolmi: 0, eoheung: 0 },
   rating: 0,
@@ -191,6 +192,8 @@ const Cluster4Content = () => {
     approvedWeeks: number;
     totalWeeks: number;
     roleInSeason: string;
+    // Qualified 승인 상태 (Part, Team, Cluv, Supervise 4개 도장)
+    isQualified: boolean;
     // 시즌 상태 (역할/팀/파트 이력)
     seasonRoles?: SeasonRoleItem[];
     // 하드코딩 데이터와 호환을 위한 기본값 필드
@@ -635,6 +638,7 @@ const Cluster4Content = () => {
       approved_weeks: number;
       total_weeks: number;
       progress_status: string;
+      is_qualified?: boolean;
       rating?: number;
       review?: string;
       review_link?: string;
@@ -730,6 +734,7 @@ const Cluster4Content = () => {
       approved_weeks: number;
       total_weeks: number;
       progress_status: string;
+      is_qualified?: boolean;
       rating?: number;
       review?: string;
       review_link?: string;
@@ -966,6 +971,8 @@ const Cluster4Content = () => {
         approvedWeeks: sh.approved_weeks || 0,
         totalWeeks: sh.total_weeks || 0,
         roleInSeason: sh.role_in_season || '',
+        // Qualified 승인 상태 (Part, Team, Cluv, Supervise 4개 도장)
+        isQualified: sh.is_qualified || false,
         // 시즌 상태 (역할/팀/파트 이력) - 최대 6개, 발생 순서대로
         seasonRoles: seasonRoleItems.slice(0, 6),
         // 시즌별 포인트 (단감=별, 인절미=방패, 어흥=번개)
@@ -1420,32 +1427,48 @@ const Cluster4Content = () => {
             <div className={`area-2-qualified ${isTextFading ? 'fading' : ''}`}>
               <span className="qualified-text">Qualified</span>
               <div className="qualified-items">
-                <div className="item-group">
+                <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Part</span>
                   <img src="/images/0/cluster 4/icon/icon - part.png" alt="Part" className="qualified-icon" />
-                  <div className="tooltip">
-                    <img src="/images/0/cluster 4/sign 1.png" alt="Part tooltip" />
+                  <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
+                    {currentSeason.isQualified ? (
+                      <img src="/images/0/cluster 4/sign 1.png" alt="Part tooltip" />
+                    ) : (
+                      <span className="unqualified-text">UnQualified</span>
+                    )}
                   </div>
                 </div>
-                <div className="item-group inactive">
+                <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Team</span>
                   <img src="/images/0/cluster 4/icon/icon - team.png" alt="Team" className="qualified-icon" />
-                  <div className="tooltip unqualified">
-                    <span className="unqualified-text">UnQualified</span>
+                  <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
+                    {currentSeason.isQualified ? (
+                      <img src="/images/0/cluster 4/sign 2.png" alt="Team tooltip" />
+                    ) : (
+                      <span className="unqualified-text">UnQualified</span>
+                    )}
                   </div>
                 </div>
-                <div className="item-group">
+                <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Cluv</span>
                   <img src="/images/0/cluster 4/icon/icon - cluv.png" alt="Cluv" className="qualified-icon" />
-                  <div className="tooltip">
-                    <img src="/images/0/cluster 4/sign 3.png" alt="Cluv tooltip" />
+                  <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
+                    {currentSeason.isQualified ? (
+                      <img src="/images/0/cluster 4/sign 3.png" alt="Cluv tooltip" />
+                    ) : (
+                      <span className="unqualified-text">UnQualified</span>
+                    )}
                   </div>
                 </div>
-                <div className="item-group">
+                <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Supervise</span>
                   <img src="/images/0/cluster 4/icon/icon - supervise.png" alt="Supervise" className="qualified-icon" />
-                  <div className="tooltip">
-                    <img src="/images/0/cluster 4/sign 4.png" alt="Supervise tooltip" />
+                  <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
+                    {currentSeason.isQualified ? (
+                      <img src="/images/0/cluster 4/sign 4.png" alt="Supervise tooltip" />
+                    ) : (
+                      <span className="unqualified-text">UnQualified</span>
+                    )}
                   </div>
                 </div>
               </div>
