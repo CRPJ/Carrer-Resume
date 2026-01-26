@@ -1,6 +1,7 @@
 import Bootstrap from "@/components/shared/Bootstrap";
 import Progress from "@/components/shared/Progress";
 import SessionProvider from "@/components/providers/SessionProvider";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 import type { Metadata } from "next";
 import { Khula, Black_Ops_One, Chakra_Petch, Lobster, Rajdhani } from "next/font/google";
 import "./assets/scss/main.scss";
@@ -29,8 +30,10 @@ export default function RootLayout({
       </head>
       <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
         <SessionProvider>
-          <Progress />
-          <Bootstrap>{children}</Bootstrap>
+          <ProfileProvider>
+            <Progress />
+            <Bootstrap>{children}</Bootstrap>
+          </ProfileProvider>
         </SessionProvider>
       </body>
     </html>

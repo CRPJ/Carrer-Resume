@@ -282,8 +282,9 @@ const Cluster41Content = () => {
       const startDate = new Date(utp.joined_at);
       const endDate = utp.left_at ? new Date(utp.left_at) : null;
 
-      // joined_at <= date && (left_at is null OR left_at >= date)
-      return startDate <= dateObj && (!endDate || endDate >= dateObj);
+      // joined_at <= date && (left_at is null OR left_at > date)
+      // left_at은 떠난 날이므로 그 날짜에는 이미 해당 팀/파트에 속하지 않음
+      return startDate <= dateObj && (!endDate || endDate > dateObj);
     });
 
     if (!activeTeamPart) return { teamName: null, partName: null };
@@ -304,12 +305,13 @@ const Cluster41Content = () => {
     const dateObj = new Date(date);
 
     // 1순위: 해당 날짜에 활성화된 역할 이력 찾기
+    // ended_at은 종료 날이므로 그 날짜에는 이미 해당 역할이 아님
     const activeRole = userRoleHistory.find(urh => {
       const startDate = new Date(urh.started_at);
       const endDate = urh.ended_at ? new Date(urh.ended_at) : null;
 
-      // started_at <= date && (ended_at is null OR ended_at >= date)
-      return startDate <= dateObj && (!endDate || endDate >= dateObj);
+      // started_at <= date && (ended_at is null OR ended_at > date)
+      return startDate <= dateObj && (!endDate || endDate > dateObj);
     });
 
     if (activeRole) {
@@ -527,105 +529,66 @@ const Cluster41Content = () => {
     return { count: totalCount, total: totalMax, rate };
   };
 
-  // 프로필 API에서 성장 기간 집계 데이터 가져오기
-  useEffect(() => {
-    let isMounted = true; // 컴포넌트 마운트 상태 추적
+  // 프로필 API 결과 처리 헬퍼 함수 (fetchWeeklyData와 통합됨)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processProfileResult = (result: any) => {
+    // 성장 기간 집계 데이터 설정
+    if (result.growthPeriodStats) {
+      setGrowthPeriodStats(result.growthPeriodStats);
+    }
 
-    const fetchGrowthStats = async () => {
-      try {
-        const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
-        console.log('[Cluster41] fetchGrowthStats - targetUserId:', targetUserId, ', API URL:', apiUrl);
-        const response = await fetch(apiUrl);
-        const result = await response.json();
-        console.log('[Cluster41] fetchGrowthStats - Response user ID:', result.data?.id);
-        console.log('[Cluster41] fetchGrowthStats - isMounted:', isMounted);
+    // 성장 시작/종료 주차 정보 설정
+    if (result.growthInfo) {
+      setStartWeekInfo(result.growthInfo.startWeekInfo || null);
+      setEndWeekInfo(result.growthInfo.endWeekInfo || null);
+      setUserStatus(result.growthInfo.status || null);
+      setGrowthStatus(result.growthInfo.growthStatus || null);
+    }
 
-        // 컴포넌트가 언마운트됐으면 state 업데이트 스킵
-        if (!isMounted) {
-          console.log('[Cluster41] Component unmounted, skipping state update');
-          return;
-        }
+    // user_profiles.role 기본값 저장
+    if (result.data?.role) {
+      setUserDefaultRole(result.data.role);
+    }
 
-        if (response.ok) {
-          // 성장 기간 집계 데이터 설정
-          if (result.growthPeriodStats) {
-            setGrowthPeriodStats(result.growthPeriodStats);
-          }
+    // profile API에서 제공하는 teams, parts, userTeamParts 사용 (중복 쿼리 제거)
+    if (result.teams) {
+      setTeams(result.teams);
+    }
+    if (result.parts) {
+      setParts(result.parts);
+    }
+    if (result.userTeamParts) {
+      setUserTeamParts(result.userTeamParts);
+    }
 
-          // 성장 시작/종료 주차 정보 설정
-          if (result.growthInfo) {
-            setStartWeekInfo(result.growthInfo.startWeekInfo);
-            setEndWeekInfo(result.growthInfo.endWeekInfo);
-            setUserStatus(result.growthInfo.status || null);
-            setGrowthStatus(result.growthInfo.growthStatus || null);
-          }
-
-          // user_profiles.role 기본값 저장
-          if (result.data?.role) {
-            setUserDefaultRole(result.data.role);
-          }
-
-          // 시즌 카드 데이터 설정
-          console.log('[Cluster41] seasonHistories from API:', result.seasonHistories);
-          console.log('[Cluster41] seasonHistories length:', result.seasonHistories?.length);
-          if (result.seasonHistories && result.seasonHistories.length > 0) {
-            const seasonNameMap: { [key: string]: string } = {
-              'spring': '봄',
-              'summer': '여름',
-              'fall': '가을',
-              'winter': '겨울'
-            };
-
-            const cards: SeasonCardData[] = result.seasonHistories.map((sh: {
-              id: string;
-              role_in_season: string;
-              approved_weeks: number;
-              total_weeks: number;
-              progress_status: string;
-              seasons: {
-                id: string;
-                year: number;
-                name: string;
-                start_date: string;
-                end_date?: string;
-              };
-            }) => ({
-              id: sh.id,
-              seasonId: sh.seasons?.id || '',
-              year: sh.seasons?.year || 0,
-              seasonName: seasonNameMap[sh.seasons?.name] || sh.seasons?.name || '',
-              startDate: sh.seasons?.start_date || '',
-              endDate: sh.seasons?.end_date || '',
-              progressStatus: sh.progress_status,
-              approvedWeeks: sh.approved_weeks || 0,
-              totalWeeks: sh.total_weeks || 0,
-              roleInSeason: sh.role_in_season || '',
-            }));
-            console.log('[Cluster41] Parsed season cards:', cards);
-            console.log('[Cluster41] Setting seasonCards state with', cards.length, 'items');
-            setSeasonCards(cards);
-          } else {
-            console.log('[Cluster41] No seasonHistories data or empty array');
-            setSeasonCards([]);
-          }
-        } else {
-          console.log('[Cluster41] Response not ok:', response.status);
-        }
-        setIsLoadingSeasons(false);
-      } catch (error) {
-        console.error("성장 데이터 로드 오류:", error);
-        if (isMounted) {
-          setIsLoadingSeasons(false);
-        }
-      }
+    // 시즌 카드 데이터 설정
+    const seasonNameMap: { [key: string]: string } = {
+      'spring': '봄',
+      'summer': '여름',
+      'fall': '가을',
+      'winter': '겨울'
     };
 
-    fetchGrowthStats();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [targetUserId]);
+    if (result.seasonHistories && result.seasonHistories.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cards: SeasonCardData[] = result.seasonHistories.map((sh: any) => ({
+        id: sh.id,
+        seasonId: sh.seasons?.id || '',
+        year: sh.seasons?.year || 0,
+        seasonName: seasonNameMap[sh.seasons?.name] || sh.seasons?.name || '',
+        startDate: sh.seasons?.start_date || '',
+        endDate: sh.seasons?.end_date || '',
+        progressStatus: sh.progress_status,
+        approvedWeeks: sh.approved_weeks || 0,
+        totalWeeks: sh.total_weeks || 0,
+        roleInSeason: sh.role_in_season || '',
+      }));
+      setSeasonCards(cards);
+    } else {
+      setSeasonCards([]);
+    }
+    setIsLoadingSeasons(false);
+  };
 
   // 성장 상태를 badge 텍스트로 변환 (status와 growth_status 두 개 사용)
   const getGrowthBadgeText = (status: string | null, growthStatus: string | null): string => {
@@ -731,11 +694,17 @@ const Cluster41Content = () => {
             console.log('[DEBUG] API Onboarding week ID:', apiOnboardingWeekId);
           }
 
+          // 프로필 API 결과로 성장 데이터 설정 (기존 fetchGrowthStats 역할 통합)
+          if (response.ok) {
+            processProfileResult(result);
+          }
+
           // 요청 중 targetUserId가 바뀌었으면 중단
           if (abortController.signal.aborted) return;
         } catch (err) {
           if (err instanceof Error && err.name === 'AbortError') return;
           console.error('[DEBUG] Failed to fetch profile:', err);
+          setIsLoadingSeasons(false);
         }
 
         // 1. 모든 주차 가져오기 (완료된 주차만, 가입 주차 이후만)
@@ -769,13 +738,32 @@ const Cluster41Content = () => {
         // user_weekly_growth 데이터 가져오기 (성장 상태 결정용)
         let userWeeklyGrowthMap = new Map<string, { is_success: boolean; is_resting: boolean; is_club_break: boolean }>();
         if (userId) {
-          const { data: weeklyGrowthData } = await supabase
-            .from('user_weekly_growth')
-            .select('week_id, is_success, is_resting, is_club_break')
-            .eq('user_id', userId);
+          // 모든 데이터 병렬로 가져오기 (성능 최적화)
+          const [
+            weeklyGrowthResult,
+            userPointsResult,
+            userActivitiesResult,
+            activityTypesResult,
+            careerRecordsResult,
+            weeklyActivitiesResult
+          ] = await Promise.all([
+            // user_weekly_growth
+            supabase.from('user_weekly_growth').select('week_id, is_success, is_resting, is_club_break').eq('user_id', userId),
+            // points
+            supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
+            // activity_records
+            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
+            // activity_types
+            supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
+            // career_records
+            supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced']),
+            // weekly_activities (첫 5000개 - 대부분의 경우 충분)
+            supabase.from('weekly_activities').select('week_id, activity_type_id, is_active').limit(5000)
+          ]);
 
-          if (weeklyGrowthData) {
-            weeklyGrowthData.forEach((wg) => {
+          // user_weekly_growth 처리
+          if (weeklyGrowthResult.data) {
+            weeklyGrowthResult.data.forEach((wg) => {
               userWeeklyGrowthMap.set(wg.week_id, {
                 is_success: wg.is_success,
                 is_resting: wg.is_resting,
@@ -785,43 +773,7 @@ const Cluster41Content = () => {
           }
           console.log('[DEBUG] User weekly growth data:', userWeeklyGrowthMap.size, 'records');
 
-          // 4. 팀/파트/역할/포인트/활동/활동타입/경력기록 데이터 가져오기
-          const [teamsResult, partsResult, userTeamPartsResult, userRoleHistoryResult, userPointsResult, userActivitiesResult, activityTypesResult, careerRecordsResult] = await Promise.all([
-            supabase.from('teams').select('id, name'),
-            supabase.from('parts').select('id, name, team_id'),
-            supabase.from('user_team_parts').select('id, user_id, team_id, part_id, joined_at, left_at, is_current, season_id').eq('user_id', userId),
-            supabase.from('user_role_history').select('id, user_id, role, started_at, ended_at').eq('user_id', userId),
-            supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
-            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
-            supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
-            // 경력 기록 (실무 경력 강화율 계산용) - pending/enhanced 상태만
-            supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced'])
-          ]);
-
-          // weekly_activities는 페이지네이션으로 모든 데이터 가져오기 (Supabase 기본 1000개 제한 우회)
-          let allWeeklyActivities: { week_id: string; activity_type_id: string; is_active: boolean }[] = [];
-          let page = 0;
-          const pageSize = 1000;
-          while (true) {
-            const { data, error } = await supabase
-              .from('weekly_activities')
-              .select('week_id, activity_type_id, is_active')
-              .range(page * pageSize, (page + 1) * pageSize - 1);
-            if (error) {
-              console.error('Error fetching weekly_activities:', error);
-              break;
-            }
-            if (!data || data.length === 0) break;
-            allWeeklyActivities = allWeeklyActivities.concat(data);
-            if (data.length < pageSize) break;
-            page++;
-          }
-          const weeklyActivitiesResult = { data: allWeeklyActivities, error: null };
-
-          if (teamsResult.data) setTeams(teamsResult.data);
-          if (partsResult.data) setParts(partsResult.data);
-          if (userTeamPartsResult.data) setUserTeamParts(userTeamPartsResult.data);
-          if (userRoleHistoryResult.data) setUserRoleHistory(userRoleHistoryResult.data);
+          // profile API에서 이미 제공하는 데이터 사용 (teams, parts, userTeamParts는 processProfileResult에서 처리됨)
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
           if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
@@ -865,10 +817,6 @@ const Cluster41Content = () => {
             console.log('[DEBUG] Experience type infos:', experienceInfos);
           }
 
-          console.log('[DEBUG] Teams:', teamsResult.data);
-          console.log('[DEBUG] Parts:', partsResult.data);
-          console.log('[DEBUG] User team parts:', userTeamPartsResult.data);
-          console.log('[DEBUG] User role history:', userRoleHistoryResult.data);
           console.log('[DEBUG] User points:', userPointsResult.data);
           console.log('[DEBUG] User activities:', userActivitiesResult.data);
           console.log('[DEBUG] Weekly activities:', weeklyActivitiesResult.data?.length, 'records');
@@ -1119,6 +1067,11 @@ const Cluster41Content = () => {
 
   // DB 주차 데이터에서 이미지 경로 생성 (시즌명과 주차번호로 월/주차 계산)
   const getWeekImagePath = (week: DBWeekData) => {
+    // 휴식 주차(개인/공식)일 때는 휴식 전용 이미지 사용
+    if (week.growthStatus.includes('휴식')) {
+      return "/images/0/cluster 4/주차 이미지/휴식(개인,공식).png";
+    }
+
     // 시즌별 시작 월 매핑
     const seasonStartMonth: { [key: string]: number } = {
       '겨울': 1,  // 1월

@@ -818,8 +818,8 @@ const Cluster4Content = () => {
 
       // 팀/파트 이력 중 해당 시즌과 겹치는 것들 필터링
       const relevantTeamParts = teamParts.filter(tp => {
-        const tpStart = tp.joined_at;
-        const tpEnd = tp.left_at || new Date().toISOString().split('T')[0];
+        const tpStart = tp.joined_at?.split(' ')[0].split('T')[0] || '';
+        const tpEnd = tp.left_at?.split(' ')[0].split('T')[0] || new Date().toISOString().split('T')[0];
         return tpStart <= seasonEndDate && tpEnd >= seasonStartDate;
       });
 
@@ -859,11 +859,12 @@ const Cluster4Content = () => {
           return roleStart <= changePoint && roleEnd >= changePoint;
         });
 
-        // 해당 시점에 유효한 팀/파트 찾기
+        // 해당 시점에 유효한 팀/파트 찾기 (left_at은 미포함, 즉 [joined_at, left_at) 범위)
         const activeTeamPart = relevantTeamParts.find(tp => {
-          const tpStart = tp.joined_at;
-          const tpEnd = tp.left_at || new Date().toISOString().split('T')[0];
-          return tpStart <= changePoint && tpEnd >= changePoint;
+          const tpStart = tp.joined_at?.split(' ')[0].split('T')[0] || '';
+          const tpEnd = tp.left_at?.split(' ')[0].split('T')[0] || '9999-12-31';
+          // left_at이 없으면(is_current) 포함, 있으면 미포함으로 처리
+          return tpStart <= changePoint && (tp.left_at === null || changePoint < tpEnd);
         });
 
         if (activeRole || activeTeamPart) {

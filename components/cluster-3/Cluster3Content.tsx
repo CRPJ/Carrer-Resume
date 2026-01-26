@@ -389,13 +389,15 @@ const Cluster3Content = () => {
   // API에서 일정 신뢰도 데이터 가져오기
   useEffect(() => {
     const fetchReliabilityRate = async () => {
-      if (!session?.user?.email) {
+      if (!session?.user?.email && !urlUserId) {
         setHasReliabilityData(false);
         return;
       }
 
       try {
-        const response = await fetch('/api/profile');
+        // URL에 userId가 있으면 해당 유저의 데이터를 가져옴
+        const apiUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : '/api/profile';
+        const response = await fetch(apiUrl);
         const result = await response.json();
 
         if (response.ok && result.reliabilityRate !== undefined) {
@@ -442,7 +444,7 @@ const Cluster3Content = () => {
     };
 
     fetchReliabilityRate();
-  }, [session?.user?.email]);
+  }, [session?.user?.email, urlUserId]);
 
   // 일정 신뢰도 프로그레스 애니메이션
   useEffect(() => {

@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 
     // reviewer 정보를 별도로 조회해서 합치기
     if (data && data.length > 0) {
-      const reviewerIds = [...new Set(data.map(d => d.reviewer_id))];
+      const reviewerIds = Array.from(new Set(data.map(d => d.reviewer_id)));
 
       // reviewer 프로필 조회
       const { data: reviewers, error: reviewerError } = await supabase
@@ -88,7 +88,8 @@ export async function GET(request: Request) {
       });
 
       // Object로 매핑
-      const reviewerObj: { [key: string]: (typeof reviewers extends (infer T)[] ? T : never) & { teamName?: string | null; partName?: string | null } } = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const reviewerObj: { [key: string]: any } = {};
       reviewers?.forEach(r => {
         const teamPart = userTeamPartMap[r.id];
         reviewerObj[r.id] = {

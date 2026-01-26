@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 
     // colleague 정보를 별도로 조회해서 합치기
     if (data && data.length > 0) {
-      const colleagueIds = [...new Set(data.map(d => d.colleague_id))];
+      const colleagueIds = Array.from(new Set(data.map(d => d.colleague_id)));
 
       // colleague 프로필 조회
       const { data: colleagues } = await supabase

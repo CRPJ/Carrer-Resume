@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useProfile } from "@/contexts/ProfileContext";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -13,6 +14,7 @@ const Sidebar = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId');
+  const { fetchProfile: fetchCachedProfile, profileData: cachedProfile } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
@@ -386,15 +388,29 @@ const Sidebar = () => {
     photo: userProfile.photo || defaultProfile.photo,
   } : defaultProfile;
 
-  // 페이지 로드 시 프로필 데이터 가져오기
+  // 페이지 로드 시 프로필 데이터 가져오기 (캐시 활용)
   const fetchUserProfile = async () => {
     // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
     if (!targetUserId && !session) return;
 
     try {
-      const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
-      const response = await fetch(apiUrl);
-      const result = await response.json();
+      // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
+      const cachedResult = await fetchCachedProfile(targetUserId || undefined);
+
+      if (!cachedResult || !cachedResult.data) {
+        console.error('Failed to fetch profile from cache');
+        return;
+      }
+
+      const result = {
+        success: true,
+        data: cachedResult.data,
+        completionRate: cachedResult.completionRate,
+        reliabilityRate: cachedResult.reliabilityRate,
+        practicalCounts: cachedResult.practicalCounts,
+        badges: cachedResult.badges,
+        seasonHistories: cachedResult.seasonHistories,
+      };
 
       if (result.success && result.data) {
         const profile = result.data;
@@ -425,10 +441,8 @@ const Sidebar = () => {
           photo: profile.profile_photo_url || '',
         });
 
-        // 학력 데이터 로드 (최종학력)
-        fetchEducations();
-        // 슬로건 데이터 로드 (user_introductions에서)
-        fetchSlogan();
+        // 학력 + 슬로건 데이터 병렬 로드 (성능 최적화)
+        Promise.all([fetchEducations(), fetchSlogan()]);
 
         // DB status → crewStatus 매핑
         const statusMap: Record<string, 'Running' | 'Complete' | 'On Rest' | 'Recharging' | 'Next Challenge'> = {
@@ -450,6 +464,43 @@ const Sidebar = () => {
         } else {
           setHasCompletionData(false);
           setCompletionRate(null);
+        }
+
+        // reliabilityRate (일정 신뢰도) - API 응답에서 가져오기 (별도 supabase 쿼리 불필요)
+        if (result.reliabilityRate !== undefined && result.reliabilityRate !== null) {
+          setHasReliabilityData(true);
+          setReliabilityRate(result.reliabilityRate);
+        } else {
+          setHasReliabilityData(false);
+          setReliabilityRate(null);
+        }
+
+        // 스킬 카드 데이터 - API 응답에서 가져오기 (중복 호출 제거)
+        if (result.practicalCounts) {
+          const { competency, experience, info, career } = result.practicalCounts;
+          setPracticalCompetency(competency);
+          setPracticalExperience(experience);
+          setPracticalInfo(info);
+          setPracticalCareer(career);
+          setHasActivityData(competency > 0 || experience > 0 || info > 0 || career > 0);
+        } else {
+          setHasActivityData(false);
+        }
+
+        // 배지 데이터 설정 (별, 번개, 방패)
+        if (result.badges) {
+          setBadgeData(result.badges);
+          setHasBadgeData(true);
+        } else {
+          setHasBadgeData(false);
+        }
+
+        // 시즌 히스토리 데이터 설정
+        if (result.seasonHistories && result.seasonHistories.length > 0) {
+          setSeasonHistories(result.seasonHistories);
+          setHasSeasonData(true);
+        } else {
+          setHasSeasonData(false);
         }
       }
     } catch (error) {
@@ -748,39 +799,8 @@ const Sidebar = () => {
     }
   };
 
-  // 일정 신뢰도(reliability_rate) 가져오기 - user_growth_stats에서 조회
-  useEffect(() => {
-    const fetchReliabilityRate = async () => {
-      const userId = targetUserId || session?.user?.id;
-      if (!userId) {
-        setHasReliabilityData(false);
-        setReliabilityRate(null);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from("user_growth_stats")
-          .select("reliability_rate")
-          .eq("user_id", userId)
-          .maybeSingle();
-
-        if (error || !data) {
-          setHasReliabilityData(false);
-          setReliabilityRate(null);
-        } else {
-          setHasReliabilityData(true);
-          setReliabilityRate(parseFloat(data.reliability_rate) || 0);
-        }
-      } catch (err) {
-        console.error("일정 신뢰도 조회 오류:", err);
-        setHasReliabilityData(false);
-        setReliabilityRate(null);
-      }
-    };
-
-    fetchReliabilityRate();
-  }, [session?.user?.id, targetUserId]);
+  // 일정 신뢰도(reliability_rate) - fetchUserProfile에서 /api/profile 응답으로 처리하므로 별도 쿼리 불필요
+  // (성능 최적화: 중복 supabase 쿼리 제거)
 
   // 활동 완료율: fetchUserProfile에서 /api/profile 응답으로 처리하므로 별도 쿼리 불필요
   // (RLS 정책으로 인해 클라이언트 직접 쿼리 시 실패)
@@ -914,73 +934,8 @@ const Sidebar = () => {
   }, [session?.user?.id, targetUserId]);
   */
 
-  // 스킬 카드 데이터 가져오기 (API 통해 activities 데이터 조회)
-  useEffect(() => {
-    const fetchActivityCounts = async () => {
-      // targetUserId가 있거나 로그인한 사용자가 있어야 함
-      if (!targetUserId && !session?.user?.email) {
-        console.log("세션에 이메일 없음");
-        setHasActivityData(false);
-        return;
-      }
-
-      try {
-        console.log("=== 스킬카드 API 호출 시작 ===");
-        const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
-        const response = await fetch(apiUrl);
-        const result = await response.json();
-
-        console.log("API 응답:", result);
-
-        if (!response.ok) {
-          console.log("API 에러:", result.error);
-          setHasActivityData(false);
-          return;
-        }
-
-        // 실무 데이터 설정
-        if (result.practicalCounts) {
-          console.log("실무 데이터:", result.practicalCounts);
-          const { competency, experience, info, career } = result.practicalCounts;
-          setPracticalCompetency(competency);
-          setPracticalExperience(experience);
-          setPracticalInfo(info);
-          setPracticalCareer(career);
-          setHasActivityData(competency > 0 || experience > 0 || info > 0 || career > 0);
-        } else {
-          setHasActivityData(false);
-        }
-
-        // reliability_rate는 user_growth_stats에서 직접 조회한 값을 사용 (719줄 useEffect)
-        // API 실시간 계산값으로 덮어쓰지 않음
-
-        // 배지 데이터 설정 (별, 번개, 방패)
-        if (result.badges) {
-          console.log("배지 데이터:", result.badges);
-          setBadgeData(result.badges);
-          setHasBadgeData(true);
-        } else {
-          setHasBadgeData(false);
-        }
-
-        // 시즌 히스토리 데이터 설정
-        if (result.seasonHistories && result.seasonHistories.length > 0) {
-          console.log("시즌 히스토리 데이터:", result.seasonHistories);
-          setSeasonHistories(result.seasonHistories);
-          setHasSeasonData(true);
-        } else {
-          setHasSeasonData(false);
-        }
-      } catch (err) {
-        console.error("활동 데이터 조회 오류:", err);
-        setHasActivityData(false);
-        setHasBadgeData(false);
-        setHasSeasonData(false);
-      }
-    };
-
-    fetchActivityCounts();
-  }, [session?.user?.email, targetUserId]);
+  // 스킬 카드 데이터 - fetchUserProfile에서 /api/profile 응답으로 처리하므로 별도 호출 불필요
+  // (성능 최적화: 중복 API 호출 제거)
 
   useEffect(() => {
     // 0에서 올라가는 애니메이션
@@ -1044,7 +999,7 @@ const Sidebar = () => {
       // 배지 데이터는 실제 API 데이터 사용 (hasBadgeData가 true인 경우)
       animateNumber(setBadge1, hasBadgeData ? badgeData.stars : currentStats.badge1, 1000),       // 별 (단감)
       animateNumber(setBadge2, hasBadgeData ? badgeData.shields : currentStats.badge2, 1000),    // 방패 (인절미) - DB에서 이미 계산된 값
-      animateNumber(setBadge3, hasBadgeData ? -badgeData.lightnings : currentStats.badge3, 1000),  // 번개 (어흥) - 음수로 표시
+      animateNumber(setBadge3, hasBadgeData ? (badgeData.lightnings > 0 ? -badgeData.lightnings : 0) : currentStats.badge3, 1000),  // 번개 (어흥) - 0보다 클 때만 음수로 표시
       animateNumber(setSkill1, currentStats.skill1, 1000),
       animateNumber(setSkill2, currentStats.skill2, 1000),
       animateNumber(setSkill3, currentStats.skill3, 1000),
