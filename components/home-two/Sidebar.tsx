@@ -75,6 +75,8 @@ const Sidebar = () => {
       case 'completed': return { text: '정상 완료', className: 'complete' };
       case 'in_progress': return { text: '진행중', className: 'active' };
       case 'full_rest': return { text: '휴식', className: 'rest' };
+      case 'suspended':
+      case 'discontinued': return { text: '활동 중단', className: 'suspended' };
       default: return { text: status, className: '' };
     }
   };

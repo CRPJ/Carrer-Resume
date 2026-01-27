@@ -286,8 +286,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const fetchWeekData = async () => {
       if (!weekId) return;
 
-      console.log('[DEBUG] fetchWeekData started for weekId:', weekId);
-
       // 상태 리셋
       setPrevWeekId(null);
       setNextWeekId(null);
@@ -375,9 +373,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiTeams = profileResult.teams || [];
         const apiParts = profileResult.parts || [];
         const apiUserTeamParts = profileResult.userTeamParts || [];
-
-        console.log('[DEBUG] Profile API Response for userId:', userId);
-        console.log('[DEBUG] urlUserId:', urlUserId, '| fetched userId:', userId);
 
         // ========== 2단계: userId 의존 데이터 병렬 로드 ==========
         const today = new Date().toISOString().split('T')[0];
@@ -571,7 +566,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           console.error('주간 활동 데이터 로드 오류:', activitiesError);
         } else if (activitiesData) {
           setWeeklyActivities(activitiesData);
-          console.log('[DEBUG] weeklyActivities loaded:', activitiesData.length);
 
           // 11. 파트별 강화 집계 계산
           // activity_type_id별 파트 분류 (DB에서 가져온 데이터 사용)
@@ -582,26 +576,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           // P (열린 총 활동 수): is_active=true인 weekly_activities
           const activeActivities = activitiesData.filter(a => a.is_active);
-          console.log('[DEBUG] activeActivities:', activeActivities.length, activeActivities.map(a => a.activity_type_id));
 
           // 10. 유저 활동 데이터 (profile API에서 가져온 데이터 활용 - RLS 우회)
           // 해당 주차의 approved activity_type_id 목록 추출
           const weekApprovedActivities = apiApprovedActivities.filter(
             (a: { week_id: string; activity_type_id: string }) => a.week_id === weekId
           );
-          console.log('[DEBUG] weekApprovedActivities:', weekApprovedActivities.length, weekApprovedActivities);
 
           const approvedActivityTypes = new Set<string>(
             weekApprovedActivities.map((a: { activity_type_id: string }) => a.activity_type_id)
           );
-          console.log('[DEBUG] approvedActivityTypes:', Array.from(approvedActivityTypes));
 
           // 11. 강화 상태 판단용 데이터 설정
           // 해당 주차의 activity_records 필터링
           const filteredActivityRecords = apiActivityRecords.filter(
             (ar: { week_id: string }) => ar.week_id === weekId
           );
-          console.log('[DEBUG] weekActivityRecords:', filteredActivityRecords.length, filteredActivityRecords);
           setWeekActivityRecords(filteredActivityRecords);
           setWeekApprovedTypes(approvedActivityTypes);
 
@@ -609,7 +599,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const filteredActivityDetails = apiActivityDetails.filter(
             (ad: { week_id: string }) => ad.week_id === weekId
           );
-          console.log('[DEBUG] weekActivityDetails:', filteredActivityDetails.length, filteredActivityDetails);
           setWeekActivityDetails(filteredActivityDetails);
 
           // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
@@ -620,7 +609,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               ratingsMap.set(ar.activity_type_id, pointData.points);
             }
           });
-          console.log('[DEBUG] activityRatings:', ratingsMap);
           setActivityRatings(ratingsMap);
 
           // cluster-4-1과 동일한 로직으로 해당 주차 데이터 계산
@@ -641,10 +629,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 값 사용
           const currentCumulativeApproved = currentApprovedCount;
 
-          // 실무 정보: 해당 주차의 활성화된 활동 수
-          const infoTotal = activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
+          // 실무 정보: 온보딩 주차면 0, 아니면 해당 주차의 활성화된 활동 수
+          const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
 
-          // 실무 역량: 온보딩 주차가 아니면 1, 온보딩 주차면 0
+          // 실무 역량: 온보딩 주차면 0, 아니면 1 (매주 최대 1개 선택 가능)
           const competencyTotal = isOnboardingWeekLocal ? 0 : 1;
 
           // 실무 경험: eligible 조건 체크 (cluster-4-1과 동일한 로직)
@@ -652,25 +640,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           if (!isOnboardingWeekLocal) {
             const experienceActivities = activeActivities.filter(a => experienceTypesList.includes(a.activity_type_id));
 
-            console.log('[DEBUG experience] currentCumulativeApproved:', currentCumulativeApproved);
-            console.log('[DEBUG experience] experienceActivities:', experienceActivities.map(a => a.activity_type_id));
-            console.log('[DEBUG experience] experienceInfos:', experienceInfos);
-
             experienceActivities.forEach(a => {
               const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
-              console.log('[DEBUG experience] activity:', a.activity_type_id, 'typeInfo:', typeInfo);
 
               if (!typeInfo) {
                 experienceTotal++; // 정보가 없으면 기본 포함
-                console.log('[DEBUG experience] No typeInfo, adding to total. experienceTotal:', experienceTotal);
                 return;
               }
 
               // eligible_min/max 체크 (null이면 제한 없음)
               const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
               const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
-
-              console.log('[DEBUG experience] minWeek:', minWeek, 'maxWeek:', maxWeek, 'cumulativeApproved:', currentCumulativeApproved);
 
               // 누적 주차가 eligible 범위 내인지 확인
               if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
@@ -680,20 +660,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   const previouslyCompleted = allCompletedActivities.some(
                     (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
                   );
-                  console.log('[DEBUG experience] count_once_in_total, previouslyCompleted:', previouslyCompleted);
                   if (!previouslyCompleted) {
                     experienceTotal++;
                   }
                 } else {
                   experienceTotal++;
                 }
-                console.log('[DEBUG experience] Added to total. experienceTotal:', experienceTotal);
-              } else {
-                console.log('[DEBUG experience] Not eligible (out of range)');
               }
             });
           }
-          console.log('[DEBUG experience] Final experienceTotal:', experienceTotal);
 
           // 실무 경력: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
           // 여기서는 초기값 0으로 설정, career_records 로드 후 덮어씀
@@ -708,12 +683,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const competencySuccess = isOnboardingWeekLocal ? 0 : Math.min(weekCompletedActivities.filter((a: CompletedActivity) => competencyTypesList.includes(a.activity_type_id)).length, 1);
           const experienceSuccess = isOnboardingWeekLocal ? 0 : weekCompletedActivities.filter((a: CompletedActivity) => experienceTypesList.includes(a.activity_type_id)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
-
-          console.log('[DEBUG] isOnboardingWeekLocal:', isOnboardingWeekLocal, 'onboardingWeekId:', onboardingWeekId, 'weekId:', weekId);
-          console.log('[DEBUG] currentCumulativeApproved:', currentCumulativeApproved);
-          console.log('[DEBUG] Calculated stats - info:', { total: infoTotal, success: infoSuccess },
-            'competency:', { total: competencyTotal, success: competencySuccess },
-            'experience:', { total: experienceTotal, success: experienceSuccess });
 
           setInfoStats({ total: infoTotal, success: infoSuccess });
           setCompetencyStats({ total: competencyTotal, success: competencySuccess });
@@ -743,7 +712,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
         if (result.success && result.data) {
           setCareerRecords(result.data);
-          console.log('[DEBUG] Fetched career records:', result.data);
         }
       } catch (error) {
         console.error('Error fetching career records:', error);
@@ -1354,6 +1322,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return null;
   };
 
+  // 실무 역량: 유저가 선택한(record가 있는) 활동 찾기
+  const findFirstSelectedAbilityActivity = () => {
+    for (const actType of workAbilityActivityTypes) {
+      const activity = weeklyActivities.find(a => a.activity_type_id === actType && a.is_active);
+      const record = weekActivityRecords.find(ar => ar.activity_type_id === actType);
+      if (activity && record) return activity; // record가 있으면 유저가 선택한 것
+    }
+    return null;
+  };
+
   // 실무 역량: 첫 번째 존재하는 활동 타입 ID 가져오기
   const getFirstAbilityActivityType = (): string => {
     const activity = findFirstAbilityActivity();
@@ -1611,7 +1589,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         return;
       }
 
-      console.log('[DEBUG] Activity detail saved for:', activityType);
     } catch (error) {
       console.error('Error saving activity detail:', error);
       alert('저장 중 오류가 발생했습니다.');
@@ -1636,10 +1613,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
-    setInfoStats(calcStats(infoTypes));
-    setCompetencyStats(calcStats(competencyTypeIds));
-    setExperienceStats(calcStats(experienceTypeIds));
-    setCareerStats(calcStats(careerTypeIds));
+    // 온보딩 주차면 모든 파트 total=0, 아니면 정상 계산
+    if (isOnboardingWeek) {
+      setInfoStats({ total: 0, success: 0 });
+      setCompetencyStats({ total: 0, success: 0 });
+      setExperienceStats({ total: 0, success: 0 });
+      setCareerStats({ total: 0, success: 0 });
+    } else {
+      setInfoStats(calcStats(infoTypes));
+      const competencyCalc = calcStats(competencyTypeIds);
+      setCompetencyStats({ total: 1, success: competencyCalc.success });
+      setExperienceStats(calcStats(experienceTypeIds));
+      setCareerStats(calcStats(careerTypeIds));
+    }
   };
 
   // 저장 후 weekActivityDetails 상태 즉시 업데이트 (공통 함수)
@@ -1697,8 +1683,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
       const config = activityTypeConfig[activityType];
       const enhancementStatus = getEnhancementStatus(activityType);
-      // DEBUG: 실무 정보 카드 데이터 확인
-      console.log(`[workInfoCards] ${activityType}: title="${activity?.title}", status=${enhancementStatus}`);
 
       // Output Links 병합 (운영진 링크 + 사용자 링크)
       const adminLinks = activity?.output_links || [];
@@ -2172,11 +2156,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-count"><img src="/images/0/cluster 4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
             <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : 0}%` }}></div>
+              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
             </div>
           </div>
           <div className="growth-center">
-            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : 0}</span><span className="percent">%</span></span>
+            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}</span><span className="percent">%</span></span>
           </div>
           <div className="growth-right">
             <span className="growth-label">라인별 강화 결과</span>
@@ -2307,13 +2291,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           {(() => {
-            // 유저가 완료한 활동 또는 개설된 활동 찾기
+            // 유저가 완료한 활동 또는 선택한(record가 있는) 활동 찾기
             const completedActivity = findFirstCompletedAbilityActivity();
-            const openedActivity = findFirstAbilityActivity();
-            const displayActivity = completedActivity || openedActivity;
+            const selectedActivity = findFirstSelectedAbilityActivity(); // 유저가 선택한 활동 (record 있음)
+            const displayActivity = completedActivity || selectedActivity; // 완료했거나 선택한 활동만 표시
             const activityTypeInfo = displayActivity ? getActivityTypeInfo(displayActivity.activity_type_id) : null;
             const enhancementStatus = displayActivity ? getEnhancementStatus(displayActivity.activity_type_id) : 'not_applicable';
-            const hasActivity = !!displayActivity;
+            const hasActivity = !!displayActivity; // 유저가 선택한 활동이 있는지
+            const hasCompletedActivity = !!completedActivity; // 완료된 활동이 있는지 여부
 
             return (
               <div

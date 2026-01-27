@@ -314,11 +314,12 @@ const Cluster4Content = () => {
       if (!session?.user?.id && !urlUserId) return;
 
       const today = new Date().toISOString().split('T')[0];
+      const targetUserId = urlUserId || session?.user?.id;
 
       // 1. 현재 주차 정보 가져오기
       const { data: currentWeekData } = await supabase
         .from('weeks')
-        .select('id')
+        .select('id, end_date')
         .lte('start_date', today)
         .gte('end_date', today)
         .maybeSingle();
@@ -327,27 +328,38 @@ const Cluster4Content = () => {
 
       const weekId = currentWeekData.id;
 
-      // 2. activity_types 정보 가져오기 (cluster_id 분류용)
+      // 2. activity_types 정보 가져오기 (eligible 조건 포함)
       const { data: activityTypesData } = await supabase
         .from('activity_types')
-        .select('id, cluster_id')
+        .select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total')
         .eq('is_active', true);
 
       if (!activityTypesData) return;
 
-      // 클러스터별 activity_type_id 분류
-      const infoTypeIds: string[] = [];
+      // cluster-4-card와 동일한 하드코딩 리스트 사용
+      const infoTypeIds = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
       const competencyTypeIds: string[] = [];
       const experienceTypeIds: string[] = [];
       const careerTypeIds: string[] = [];
+      type ExperienceTypeInfo = {
+        id: string;
+        eligible_min_approved_weeks: number | null;
+        eligible_max_approved_weeks: number | null;
+        count_once_in_total: boolean | null;
+      };
+      const experienceInfos: ExperienceTypeInfo[] = [];
 
       activityTypesData.forEach((at) => {
-        if (at.cluster_id === 'practical_info') {
-          infoTypeIds.push(at.id);
-        } else if (at.cluster_id === 'practical_competency') {
+        if (at.cluster_id === 'practical_competency') {
           competencyTypeIds.push(at.id);
         } else if (at.cluster_id === 'practical_experience') {
           experienceTypeIds.push(at.id);
+          experienceInfos.push({
+            id: at.id,
+            eligible_min_approved_weeks: at.eligible_min_approved_weeks,
+            eligible_max_approved_weeks: at.eligible_max_approved_weeks,
+            count_once_in_total: at.count_once_in_total,
+          });
         } else if (at.cluster_id === 'practical_career') {
           careerTypeIds.push(at.id);
         }
@@ -364,13 +376,52 @@ const Cluster4Content = () => {
       const activeActivities = activitiesData.filter(a => a.is_active);
 
       // 4. 프로필 API에서 activity_records, activity_details 가져오기
-      const targetUserId = urlUserId || session?.user?.id;
       const res = await fetch(urlUserId ? `/api/users/${urlUserId}` : '/api/profile');
       if (!res.ok) return;
 
       const profileResult = await res.json();
       const apiActivityRecords = profileResult.activityRecords || [];
       const apiActivityDetails = profileResult.activityDetails || [];
+      const onboardingWeekId = profileResult.onboardingWeekId || null;
+
+      // 온보딩 주차 여부 확인
+      const isOnboardingWeek = weekId === onboardingWeekId;
+
+      // 5. 누적 성공 주차 수 계산 (cluster-4-card와 동일한 로직)
+      const { data: successWeeksData } = await supabase
+        .from('success_weeks')
+        .select('week_id, weeks!inner(end_date)')
+        .eq('user_id', targetUserId);
+
+      let currentCumulativeApproved = 0;
+      if (successWeeksData && successWeeksData.length > 0) {
+        currentCumulativeApproved = successWeeksData.filter((sw: any) => {
+          const weekEndDate = sw.weeks?.end_date;
+          return weekEndDate && weekEndDate <= currentWeekData.end_date;
+        }).length;
+      }
+      // 온보딩 주차도 누적에 포함 (success_weeks에 없는 경우)
+      if (onboardingWeekId) {
+        const onboardingAlreadyCounted = successWeeksData?.some((sw: any) => sw.week_id === onboardingWeekId);
+        if (!onboardingAlreadyCounted) {
+          const { data: onboardingWeekInfo } = await supabase
+            .from('weeks')
+            .select('end_date')
+            .eq('id', onboardingWeekId)
+            .maybeSingle();
+          if (onboardingWeekInfo && onboardingWeekInfo.end_date <= currentWeekData.end_date) {
+            currentCumulativeApproved += 1;
+          }
+        }
+      }
+
+      // 6. 유저의 모든 완료 활동 저장 (experience eligible - count_once_in_total 체크용)
+      const allCompletedActivities = apiActivityRecords
+        .filter((ar: { is_completed: boolean }) => ar.is_completed)
+        .map((ar: { week_id: string; activity_type_id: string }) => ({
+          week_id: ar.week_id,
+          activity_type_id: ar.activity_type_id
+        }));
 
       // 해당 주차의 approved activity_type_id 목록
       const weekApprovedActivities = apiActivityRecords.filter(
@@ -385,7 +436,7 @@ const Cluster4Content = () => {
         (ad: { week_id: string }) => ad.week_id === weekId
       );
 
-      // 5. 각 클러스터별 통계 계산
+      // 7. 각 클러스터별 통계 계산
       const calcStats = (typeIds: string[]) => {
         const total = activeActivities.filter(a => typeIds.includes(a.activity_type_id)).length;
         const now = Date.now();
@@ -418,12 +469,73 @@ const Cluster4Content = () => {
         return { total, success };
       };
 
-      setActivityStats({
-        info: calcStats(infoTypeIds),
-        competency: calcStats(competencyTypeIds),
-        experience: calcStats(experienceTypeIds),
-        career: calcStats(careerTypeIds),
-      });
+      // 8. 실무 경험 eligible 조건 체크 (cluster-4-card와 동일한 로직)
+      const calcExperienceStats = () => {
+        let experienceTotal = 0;
+        const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
+
+        experienceActivities.forEach(a => {
+          const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
+
+          if (!typeInfo) {
+            experienceTotal++; // 정보가 없으면 기본 포함
+            return;
+          }
+
+          // eligible_min/max 체크 (null이면 제한 없음)
+          const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+          const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+
+          // 누적 주차가 eligible 범위 내인지 확인
+          if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+            // count_once_in_total 체크 (1회만 가능한 활동)
+            if (typeInfo.count_once_in_total) {
+              // 이미 이전 주차에서 완료했는지 확인
+              const previouslyCompleted = allCompletedActivities.some(
+                (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+              );
+              if (!previouslyCompleted) {
+                experienceTotal++;
+              }
+            } else {
+              experienceTotal++;
+            }
+          }
+        });
+
+        // success 계산
+        const weekCompletedActivities = allCompletedActivities.filter(
+          (a: { week_id: string }) => a.week_id === weekId
+        );
+        const experienceSuccess = weekCompletedActivities.filter(
+          (a: { activity_type_id: string }) => experienceTypeIds.includes(a.activity_type_id)
+        ).length;
+
+        return { total: experienceTotal, success: experienceSuccess };
+      };
+
+      // 온보딩 주차면 모든 파트 total=0, 아니면 정상 계산
+      if (isOnboardingWeek) {
+        setActivityStats({
+          info: { total: 0, success: 0 },
+          competency: { total: 0, success: 0 },
+          experience: { total: 0, success: 0 },
+          career: { total: 0, success: 0 },
+        });
+      } else {
+        const infoStats = calcStats(infoTypeIds);
+        const competencyStats = calcStats(competencyTypeIds);
+        const experienceStats = calcExperienceStats(); // eligible 조건 적용
+        const careerStats = calcStats(careerTypeIds);
+
+        setActivityStats({
+          info: infoStats,
+          // 실무 역량: 항상 total=1 (매주 최대 1개 선택 가능)
+          competency: { total: 1, success: Math.min(competencyStats.success, 1) },
+          experience: experienceStats,
+          career: careerStats,
+        });
+      }
     };
 
     fetchActivityStats();
@@ -1626,42 +1738,42 @@ const Cluster4Content = () => {
                 </div>
               </div>
 
-              {/* 영역 7: 실무 성장률 프로그레스 바 (시즌별 데이터) */}
+              {/* 영역 7: 실무 성장률 프로그레스 바 (현재 주차 데이터) */}
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress?.info?.rate ?? 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.info?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.info?.completed ?? 0}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.info.total} 개 중 <span className="highlight">{activityStats.info.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.info?.rate ?? 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress?.competency?.rate ?? 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.competency?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.competency?.completed ?? 0}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.competency.total} 개 중 <span className="highlight">{activityStats.competency.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.competency?.rate ?? 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress?.experience?.rate ?? 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.experience?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.experience?.completed ?? 0}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.experience.total} 개 중 <span className="highlight">{activityStats.experience.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.experience?.rate ?? 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress?.career?.rate ?? 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress?.career?.total ?? 0} 개 중 <span className="highlight">{currentSeason.progress?.career?.completed ?? 0}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.career.total} 개 중 <span className="highlight">{activityStats.career.success}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${currentSeason.progress?.career?.rate ?? 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%` }}></div>
                   </div>
                 </div>
               </div>

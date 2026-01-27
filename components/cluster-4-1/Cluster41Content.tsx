@@ -10,8 +10,6 @@ const Cluster41Content = () => {
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId');
 
-  // 디버그: 컴포넌트 렌더링 시 targetUserId 확인
-  console.log('[Cluster41 RENDER] targetUserId from URL:', targetUserId);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
   const [resultDropdownOpen, setResultDropdownOpen] = useState(false);
@@ -227,7 +225,7 @@ const Cluster41Content = () => {
   const [userActivities, setUserActivities] = useState<ActivityData[]>([]);
 
   // 활동 타입별 분류 (실무 카테고리) - DB에서 동적으로 가져옴
-  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+  const [infoTypeIds, setInfoTypeIds] = useState<string[]>([]);
   const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
   const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
@@ -390,10 +388,10 @@ const Cluster41Content = () => {
     }
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
-    const total = weekOpenActivities.filter(wa => infoTypes.includes(wa.activity_type_id)).length;
+    const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
     // 유저가 완료한 info 타입 활동 개수 (count)
     const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const infoCount = userWeekActivities.filter(a => infoTypes.includes(a.activity_type_id)).length;
+    const infoCount = userWeekActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
     // 소수점 올림 처리: ex) 0.4333..% → 1%
     return { count: infoCount, total, rate: total > 0 ? Math.ceil((infoCount / total) * 100) : 0 };
   };
@@ -431,15 +429,6 @@ const Cluster41Content = () => {
     // 3. 해당 주차에 열린 experience 활동 중 유저의 누적 주차에 eligible한 것만 필터링
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const experienceActivities = weekOpenActivities.filter(wa => experienceTypeIds.includes(wa.activity_type_id));
-
-    // 디버그 로그
-    console.log('[DEBUG getWeeklyExperienceRate] weekId:', weekId);
-    console.log('[DEBUG getWeeklyExperienceRate] cumulativeApproved:', cumulativeApproved);
-    console.log('[DEBUG getWeeklyExperienceRate] experienceTypeIds:', experienceTypeIds);
-    console.log('[DEBUG getWeeklyExperienceRate] weekOpenActivities count:', weekOpenActivities.length);
-    console.log('[DEBUG getWeeklyExperienceRate] weekOpenActivities activity_type_ids:', weekOpenActivities.map(wa => wa.activity_type_id));
-    console.log('[DEBUG getWeeklyExperienceRate] experienceActivities:', experienceActivities);
-    console.log('[DEBUG getWeeklyExperienceRate] experienceTypeInfos:', experienceTypeInfos);
 
     let eligibleTotal = 0;
     experienceActivities.forEach(wa => {
@@ -655,43 +644,33 @@ const Cluster41Content = () => {
 
         try {
           const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
-          console.log('[Cluster41] fetchWeeklyData - targetUserId:', currentTargetUserId, ', API URL:', apiUrl);
           const response = await fetch(apiUrl, { signal: abortController.signal });
           const result = await response.json();
 
-          console.log('[DEBUG] Profile API result:', result);
-          console.log('[Cluster41] fetchWeeklyData - Response user ID:', result.data?.id);
-
           if (response.ok && result.data?.id) {
             userId = result.data.id;
-            console.log('[DEBUG] User ID:', userId);
           }
 
           if (response.ok && result.growthInfo?.startDate) {
             userJoinedWeekStartDate = result.growthInfo.startDate;
             setJoinedWeekStartDate(userJoinedWeekStartDate);
-            console.log('[DEBUG] User joined week start date:', userJoinedWeekStartDate);
           }
 
           // API에서 활동/휴식 주차 ID 가져오기
           if (response.ok && result.activityWeekIds) {
             apiActivityWeekIds = result.activityWeekIds;
-            console.log('[DEBUG] API Activity week IDs:', apiActivityWeekIds);
           }
           if (response.ok && result.restWeekIds) {
             apiRestWeekIds = result.restWeekIds;
-            console.log('[DEBUG] API Rest week IDs:', apiRestWeekIds);
           }
           // API에서 역할 이력 가져오기
           if (response.ok && result.userRoleHistory) {
             setUserRoleHistory(result.userRoleHistory);
-            console.log('[DEBUG] API User role history:', result.userRoleHistory);
           }
           // API에서 온보딩 주차 ID 가져오기
           if (response.ok && result.onboardingWeekId) {
             apiOnboardingWeekId = result.onboardingWeekId;
             setOnboardingWeekId(apiOnboardingWeekId);
-            console.log('[DEBUG] API Onboarding week ID:', apiOnboardingWeekId);
           }
 
           // 프로필 API 결과로 성장 데이터 설정 (기존 fetchGrowthStats 역할 통합)
@@ -703,7 +682,7 @@ const Cluster41Content = () => {
           if (abortController.signal.aborted) return;
         } catch (err) {
           if (err instanceof Error && err.name === 'AbortError') return;
-          console.error('[DEBUG] Failed to fetch profile:', err);
+          console.error('Failed to fetch profile:', err);
           setIsLoadingSeasons(false);
         }
 
@@ -718,22 +697,18 @@ const Cluster41Content = () => {
         // 가입 주차 이후만 필터링
         if (userJoinedWeekStartDate) {
           weeksQuery = weeksQuery.gte('start_date', userJoinedWeekStartDate);
-          console.log('[DEBUG] Filtering weeks >= ', userJoinedWeekStartDate);
-        } else {
-          console.log('[DEBUG] No joined week start date, showing all weeks');
         }
 
         const { data: weeksData, error: weeksError } = await weeksQuery;
-
-        console.log('[DEBUG] Weeks data count:', weeksData?.length);
 
         if (weeksError) throw weeksError;
 
         // 2. API에서 받은 활동/휴식 주차 ID 사용
         const activityWeekIds = new Set<string>(apiActivityWeekIds);
         const restWeekIds = new Set<string>(apiRestWeekIds);
-        console.log('[DEBUG] User activities weeks:', activityWeekIds);
-        console.log('[DEBUG] User rest weeks:', restWeekIds);
+
+        // 사용자의 주차 ID 목록 추출 (weekly_activities 필터링용)
+        const userWeekIds = weeksData?.map(w => w.id) || [];
 
         // user_weekly_growth 데이터 가져오기 (성장 상태 결정용)
         let userWeeklyGrowthMap = new Map<string, { is_success: boolean; is_resting: boolean; is_club_break: boolean }>();
@@ -757,8 +732,10 @@ const Cluster41Content = () => {
             supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
             // career_records
             supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced']),
-            // weekly_activities (첫 5000개 - 대부분의 경우 충분)
-            supabase.from('weekly_activities').select('week_id, activity_type_id, is_active').limit(5000)
+            // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회)
+            userWeekIds.length > 0
+              ? supabase.from('weekly_activities').select('week_id, activity_type_id, is_active').in('week_id', userWeekIds)
+              : Promise.resolve({ data: [], error: null })
           ]);
 
           // user_weekly_growth 처리
@@ -771,19 +748,17 @@ const Cluster41Content = () => {
               });
             });
           }
-          console.log('[DEBUG] User weekly growth data:', userWeeklyGrowthMap.size, 'records');
-
           // profile API에서 이미 제공하는 데이터 사용 (teams, parts, userTeamParts는 processProfileResult에서 처리됨)
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
           if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
           if (careerRecordsResult.data) {
             setUserCareerRecords(careerRecordsResult.data as CareerRecordData[]);
-            console.log('[DEBUG] User career records:', careerRecordsResult.data);
           }
 
           // activity_types에서 클러스터별 ID 분류
           if (activityTypesResult.data) {
+            const infoIds: string[] = [];
             const competencyIds: string[] = [];
             const experienceIds: string[] = [];
             const careerIds: string[] = [];
@@ -795,7 +770,9 @@ const Cluster41Content = () => {
               eligible_max_approved_weeks: number | null;
               count_once_in_total: boolean;
             }) => {
-              if (at.cluster_id === 'practical_competency') {
+              if (at.cluster_id === 'practical_info') {
+                infoIds.push(at.id);
+              } else if (at.cluster_id === 'practical_competency') {
                 competencyIds.push(at.id);
               } else if (at.cluster_id === 'practical_experience') {
                 experienceIds.push(at.id);
@@ -809,17 +786,12 @@ const Cluster41Content = () => {
                 careerIds.push(at.id);
               }
             });
+            setInfoTypeIds(infoIds);
             setCompetencyTypeIds(competencyIds);
             setExperienceTypeIds(experienceIds);
             setExperienceTypeInfos(experienceInfos);
             setCareerTypeIds(careerIds);
-            console.log('[DEBUG] Activity types - competency:', competencyIds, 'experience:', experienceIds, 'career:', careerIds);
-            console.log('[DEBUG] Experience type infos:', experienceInfos);
           }
-
-          console.log('[DEBUG] User points:', userPointsResult.data);
-          console.log('[DEBUG] User activities:', userActivitiesResult.data);
-          console.log('[DEBUG] Weekly activities:', weeklyActivitiesResult.data?.length, 'records');
         }
 
         // 5. 데이터 변환
