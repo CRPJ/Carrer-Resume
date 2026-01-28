@@ -124,86 +124,104 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 해당 주차의 성장 기록
-    const { data: weeklyGrowthData } = await supabaseAdmin
-      .from('user_weekly_growth')
-      .select('user_id, is_success, is_resting, is_club_break')
-      .eq('week_id', weekId);
-
-    // 해당 주차까지의 모든 성장 기록 가져오기 (누적 성공 주차 수 계산용)
-    const { data: allGrowthData } = await supabaseAdmin
-      .from('user_weekly_growth')
-      .select('user_id, week_id, is_success')
-      .in('user_id', Array.from(userIds));
-
     // 주차별 종료 날짜 매핑 (누적 주차 필터링용)
     const weekEndDateMap = new Map<string, string>();
     (allWeeks || []).forEach(w => weekEndDateMap.set(w.id, w.end_date));
 
-    // user_weekly_growth 테이블에서 성공 주차 가져오기 (cluster-4-card와 동일)
-    const { data: successWeeksData } = await supabaseAdmin
-      .from('user_weekly_growth')
-      .select('user_id, week_id, weeks!inner(end_date)')
-      .in('user_id', Array.from(userIds))
-      .eq('is_success', true);
+    const userIdArray = Array.from(userIds);
 
-    // 해당 주차에 포인트가 있는 사용자들 (해당 주차만)
-    const { data: pointsData } = await supabaseAdmin
-      .from('points')
-      .select('user_id, point_type, points')
-      .eq('week_id', weekId);
+    // ============ 모든 독립적인 쿼리를 병렬로 실행 ============
+    const [
+      weeklyGrowthResult,
+      successWeeksResult,
+      pointsResult,
+      allPointsResult,
+      teamsResult,
+      partsResult,
+      userTeamPartsResult,
+      roleHistoriesResult,
+      activityTypesResult,
+      weeklyActivitiesResult,
+      allCompletedActivityRecordsResult,
+      careerRecordsResult
+    ] = await Promise.all([
+      // 해당 주차의 성장 기록
+      supabaseAdmin
+        .from('user_weekly_growth')
+        .select('user_id, is_success, is_resting, is_club_break')
+        .eq('week_id', weekId),
+      // 성공 주차 데이터 (누적 계산용)
+      supabaseAdmin
+        .from('user_weekly_growth')
+        .select('user_id, week_id, weeks!inner(end_date)')
+        .in('user_id', userIdArray)
+        .eq('is_success', true),
+      // 해당 주차 포인트
+      supabaseAdmin
+        .from('points')
+        .select('user_id, point_type, points')
+        .eq('week_id', weekId),
+      // 모든 포인트 데이터 (누적 인절미 계산용)
+      supabaseAdmin
+        .from('points')
+        .select('user_id, week_id, point_type, points')
+        .in('user_id', userIdArray),
+      // 팀 정보
+      supabaseAdmin.from('teams').select('id, name'),
+      // 파트 정보
+      supabaseAdmin.from('parts').select('id, name, team_id'),
+      // 사용자 팀/파트 정보
+      supabaseAdmin.from('user_team_parts').select('user_id, team_id, part_id, joined_at, left_at').in('user_id', userIdArray),
+      // 역할 이력
+      supabaseAdmin
+        .from('user_role_history')
+        .select('user_id, role, started_at, ended_at')
+        .in('user_id', userIdArray),
+      // 활동 타입 정보
+      supabaseAdmin
+        .from('activity_types')
+        .select('id, line_code, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total'),
+      // 해당 주차 열린 활동
+      supabaseAdmin
+        .from('weekly_activities')
+        .select('id, activity_type_id, is_active, opened_at')
+        .eq('week_id', weekId)
+        .eq('is_active', true),
+      // 모든 완료된 활동 기록 (해당 주차 + 이전 주차 모두)
+      supabaseAdmin
+        .from('activity_records')
+        .select('user_id, week_id, activity_type_id')
+        .in('user_id', userIdArray)
+        .eq('is_completed', true),
+      // 실무 경력 데이터
+      supabaseAdmin
+        .from('career_records')
+        .select('user_id, week_id, enhancement_status')
+        .eq('week_id', weekId)
+        .in('user_id', userIdArray)
+        .in('enhancement_status', ['pending', 'enhanced'])
+    ]);
 
-    // 모든 주차의 포인트 데이터 (누적 인절미 계산용)
-    const { data: allPointsData } = await supabaseAdmin
-      .from('points')
-      .select('user_id, week_id, point_type, points')
-      .in('user_id', Array.from(userIds));
+    const weeklyGrowthData = weeklyGrowthResult.data;
+    const successWeeksData = successWeeksResult.data;
+    const pointsData = pointsResult.data;
+    const allPointsData = allPointsResult.data;
+    const teams = teamsResult.data || [];
+    const parts = partsResult.data || [];
+    const userTeamParts = userTeamPartsResult.data || [];
+    const roleHistories = roleHistoriesResult.data;
+    const activityTypes = activityTypesResult.data;
+    const activeActivities = weeklyActivitiesResult.data || [];
+    const allCompletedActivityRecords = allCompletedActivityRecordsResult.data;
+    const careerRecordsData = careerRecordsResult.data;
 
     // 4. 사용자 프로필 정보 (이미 가져옴)
     const profiles = eligibleProfiles;
 
-    // 5. 팀/파트 정보 가져오기
-    const [teamsResult, partsResult, userTeamPartsResult] = await Promise.all([
-      supabaseAdmin.from('teams').select('id, name'),
-      supabaseAdmin.from('parts').select('id, name, team_id'),
-      supabaseAdmin.from('user_team_parts').select('user_id, team_id, part_id, joined_at, left_at').in('user_id', Array.from(userIds))
-    ]);
-
-    const teams = teamsResult.data || [];
-    const parts = partsResult.data || [];
-    const userTeamParts = userTeamPartsResult.data || [];
-
-    // 6. 역할 이력 가져오기
-    const { data: roleHistories } = await supabaseAdmin
-      .from('user_role_history')
-      .select('user_id, role, started_at, ended_at')
-      .in('user_id', Array.from(userIds));
-
-    // 7. 활동 기록 가져오기 (강화율 계산용 - 해당 주차)
-    const { data: activityRecords } = await supabaseAdmin
-      .from('activity_records')
-      .select('user_id, activity_type_id, is_completed')
-      .eq('week_id', weekId)
-      .eq('is_completed', true);
-
-    // 7-1. 모든 활동 기록 가져오기 (누적 주차 계산용 - 활동이 있는 주차 = 성공)
-    const { data: allActivityRecords } = await supabaseAdmin
-      .from('activity_records')
-      .select('user_id, week_id')
-      .in('user_id', Array.from(userIds))
-      .eq('is_completed', true);
-
-    // 8. 활동 타입 정보 가져오기 (cluster_id, eligible 조건 포함)
-    const { data: activityTypes } = await supabaseAdmin
-      .from('activity_types')
-      .select('id, line_code, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total');
-
     // 활동 타입 ID -> 정보 매핑
-    // weekly_activities.activity_type_id는 activity_types.id와 동일 (line_code 형식의 문자열)
     const competencyTypeIds: string[] = [];
     const experienceTypeIds: string[] = [];
 
-    // 실무 경험 타입 상세 정보 (eligible 조건 포함)
     interface ExperienceTypeInfo {
       id: string;
       eligible_min_approved_weeks: number | null;
@@ -225,83 +243,111 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // 9. 해당 주차의 열린 활동 가져오기 (weekly_activities) - opened_at 포함
-    const { data: weeklyActivities } = await supabaseAdmin
-      .from('weekly_activities')
-      .select('id, activity_type_id, is_active, opened_at')
-      .eq('week_id', weekId)
-      .eq('is_active', true);
+    // ============ 빠른 조회를 위한 Map 생성 ============
+    // 사용자별 포인트 Map
+    const userPointsMap = new Map<string, typeof pointsData>();
+    (pointsData || []).forEach(p => {
+      if (!userPointsMap.has(p.user_id)) userPointsMap.set(p.user_id, []);
+      userPointsMap.get(p.user_id)!.push(p);
+    });
 
-    const activeActivities = weeklyActivities || [];
+    // 사용자별 전체 포인트 Map
+    const userAllPointsMap = new Map<string, typeof allPointsData>();
+    (allPointsData || []).forEach(p => {
+      if (!userAllPointsMap.has(p.user_id)) userAllPointsMap.set(p.user_id, []);
+      userAllPointsMap.get(p.user_id)!.push(p);
+    });
 
-    // 10. 모든 사용자의 모든 완료된 활동 기록 가져오기 (count_once_in_total 체크용)
-    const { data: allCompletedActivityRecords } = await supabaseAdmin
-      .from('activity_records')
-      .select('user_id, week_id, activity_type_id')
-      .in('user_id', Array.from(userIds))
-      .eq('is_completed', true);
+    // 사용자별 성장 기록 Map
+    const userGrowthMap = new Map<string, { is_success: boolean; is_resting: boolean; is_club_break: boolean }>();
+    (weeklyGrowthData || []).forEach(wg => {
+      userGrowthMap.set(wg.user_id, wg);
+    });
 
-    // 11. 실무 경력 데이터 가져오기 (career_records)
-    const { data: careerRecordsData } = await supabaseAdmin
-      .from('career_records')
-      .select('user_id, week_id, enhancement_status')
-      .eq('week_id', weekId)
-      .in('user_id', Array.from(userIds))
-      .in('enhancement_status', ['pending', 'enhanced']);
+    // 사용자별 성공 주차 Map
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userSuccessWeeksMap = new Map<string, any[]>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (successWeeksData || []).forEach((sw: any) => {
+      if (!userSuccessWeeksMap.has(sw.user_id)) userSuccessWeeksMap.set(sw.user_id, []);
+      userSuccessWeeksMap.get(sw.user_id)!.push(sw);
+    });
 
-    // 12. 활동 상세 정보 가져오기 (2차 정보: sub_title, output_links)
-    const { data: activityDetailsData } = await supabaseAdmin
-      .from('activity_details')
-      .select('user_id, activity_type_id, sub_title, output_links')
-      .eq('week_id', weekId)
-      .in('user_id', Array.from(userIds));
+    // 사용자별 완료 활동 Map
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userCompletedActivitiesMap = new Map<string, any[]>();
+    (allCompletedActivityRecords || []).forEach(ar => {
+      if (!userCompletedActivitiesMap.has(ar.user_id)) userCompletedActivitiesMap.set(ar.user_id, []);
+      userCompletedActivitiesMap.get(ar.user_id)!.push(ar);
+    });
 
-    // 디버그 로그
-    console.log('[Ranking API] activeActivities:', activeActivities.length, activeActivities.map(a => a.activity_type_id));
-    console.log('[Ranking API] infoTypeIds:', infoTypeIds);
-    console.log('[Ranking API] competencyTypeIds:', competencyTypeIds);
-    console.log('[Ranking API] experienceTypeIds:', experienceTypeIds);
-    console.log('[Ranking API] activityRecords count:', (activityRecords || []).length);
-    console.log('[Ranking API] careerRecordsData count:', (careerRecordsData || []).length);
-    console.log('[Ranking API] allGrowthData count:', (allGrowthData || []).length);
+    // 사용자별 경력 기록 Map
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userCareerMap = new Map<string, any[]>();
+    (careerRecordsData || []).forEach(cr => {
+      if (!userCareerMap.has(cr.user_id)) userCareerMap.set(cr.user_id, []);
+      userCareerMap.get(cr.user_id)!.push(cr);
+    });
+
+    // 프로필 Map
+    const profileMap = new Map<string, typeof profiles[0]>();
+    profiles.forEach(p => profileMap.set(p.id, p));
 
     // 역할 라벨 매핑
     const roleLabels: { [key: string]: string } = {
       'crew_regular': '일반',
+      'crew_normal': '일반',
       'part_leader': '심화(파트장)',
+      'crew_partleader': '심화(파트장)',
+      'crew_advanced_part_leader': '심화(파트장)',
       'crew_agent': '심화(에이전트)',
+      'crew_advanced_agent': '심화(에이전트)',
       'crew_ambassador': '운영진(앰배서더)',
+      'admin_ambassador': '운영진(앰배서더)',
+      'operations_ambassador': '운영진(앰배서더)',
       'crew_team_leader': '운영진(팀장)',
+      'admin_team_leader': '운영진(팀장)',
     };
+
+    // 팀/파트 Map 생성 (O(1) 조회용)
+    const teamMap = new Map(teams.map(t => [t.id, t]));
+    const partMap = new Map(parts.map(p => [p.id, p]));
+
+    // 주차 시작일 (한 번만 계산)
+    const weekStartDate = new Date(selectedWeek.startDate);
+    const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
 
     // 9. 사용자별 데이터 집계
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rankings: any[] = [];
-    const userIdArray = Array.from(userIds);
 
     for (const userId of userIdArray) {
-      const profile = (profiles || []).find(p => p.id === userId);
+      const profile = profileMap.get(userId);
       if (!profile) continue;
 
-      // 해당 주차 포인트 계산
-      const userPoints = (pointsData || []).filter(p => p.user_id === userId);
-      const star = userPoints.filter(p => p.point_type === 'star').reduce((sum, p) => sum + p.points, 0);
-      const lightning = userPoints.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
-      const shield = userPoints.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+      // 해당 주차 포인트 계산 (Map 사용 - O(1))
+      const userPoints = userPointsMap.get(userId) || [];
+      let star = 0, lightning = 0, shield = 0;
+      for (const p of userPoints) {
+        if (p.point_type === 'star') star += p.points;
+        else if (p.point_type === 'lightning') lightning += p.points;
+        else if (p.point_type === 'shield') shield += p.points;
+      }
 
-      // 누적 인절미 계산 (해당 주차까지의 모든 주차, cluster-4-card와 동일)
-      const selectedWeekEndDateForPoints = weekEndDateMap.get(weekId) || selectedWeek.endDate;
-      const userAllPoints = (allPointsData || []).filter(p => {
-        if (p.user_id !== userId) return false;
+      // 누적 인절미 계산 (Map 사용 - O(1) 조회 후 필터)
+      const userAllPoints = userAllPointsMap.get(userId) || [];
+      let cumulativeShield = 0, cumulativeLightning = 0;
+      for (const p of userAllPoints) {
         const pointWeekEndDate = weekEndDateMap.get(p.week_id);
-        return pointWeekEndDate && pointWeekEndDate <= selectedWeekEndDateForPoints;
-      });
-      const cumulativeShield = userAllPoints.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
-      const cumulativeLightning = userAllPoints.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
+        if (pointWeekEndDate && pointWeekEndDate <= selectedWeekEndDate) {
+          if (p.point_type === 'shield') cumulativeShield += p.points;
+          else if (p.point_type === 'lightning') cumulativeLightning += p.points;
+        }
+      }
       const cumulativeInjeolmi = cumulativeShield - cumulativeLightning;
 
-      // 성장 상태
-      const weeklyGrowth = (weeklyGrowthData || []).find(wg => wg.user_id === userId);
+      // 성장 상태 (Map 사용 - O(1))
+      const weeklyGrowth = userGrowthMap.get(userId);
       let growthStatus = '실패';
       if (weeklyGrowth) {
         if (weeklyGrowth.is_club_break) growthStatus = '휴식(공식)';
@@ -309,18 +355,17 @@ export async function GET(request: NextRequest) {
         else if (weeklyGrowth.is_success) growthStatus = '성공';
       }
 
-      // 팀/파트 정보 (cluster-4-card와 동일한 조건: leftAt > weekStart)
-      const weekStartDate = new Date(selectedWeek.startDate);
+      // 팀/파트 정보 (filter 대신 find 사용 - 첫 번째 매칭만 필요)
       const userTP = userTeamParts.find(utp => {
         if (utp.user_id !== userId) return false;
         const joinedAt = new Date(utp.joined_at);
         const leftAt = utp.left_at ? new Date(utp.left_at) : null;
         return joinedAt <= weekStartDate && (!leftAt || leftAt > weekStartDate);
       });
-      const team = teams.find(t => t.id === userTP?.team_id);
-      const part = parts.find(p => p.id === userTP?.part_id);
+      const team = userTP?.team_id ? teamMap.get(userTP.team_id) : null;
+      const part = userTP?.part_id ? partMap.get(userTP.part_id) : null;
 
-      // 역할 정보 (cluster-4-card와 동일한 조건: endedAt > weekStart)
+      // 역할 정보
       const userRole = (roleHistories || []).find(rh => {
         if (rh.user_id !== userId) return false;
         const startedAt = new Date(rh.started_at);
@@ -333,20 +378,19 @@ export async function GET(request: NextRequest) {
       const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
       const isOnboardingWeek = weekId === userOnboardingWeekId;
 
-      // 해당 주차까지의 누적 성공 주차 수 계산 (success_weeks 테이블 기반 - cluster-4-card와 동일)
-      const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
-
-      // 해당 유저의 성공 주차 필터링 (선택된 주차까지만)
-      const userSuccessWeeks = (successWeeksData || []).filter((sw: any) => {
-        if (sw.user_id !== userId) return false;
+      // 해당 유저의 성공 주차 필터링 (Map 사용 - O(1) 조회)
+      const allUserSuccessWeeks = userSuccessWeeksMap.get(userId) || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userSuccessWeeks = allUserSuccessWeeks.filter((sw: any) => {
         const weekEndDate = sw.weeks?.end_date;
         return weekEndDate && weekEndDate <= selectedWeekEndDate;
       });
 
       let cumulativeApprovedWeeks = userSuccessWeeks.length;
 
-      // 온보딩 주차 추가 (온보딩 주차가 success_weeks에 없더라도 성공으로 카운트)
+      // 온보딩 주차 추가
       if (userOnboardingWeekId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const onboardingAlreadyCounted = userSuccessWeeks.some((sw: any) => sw.week_id === userOnboardingWeekId);
         if (!onboardingAlreadyCounted) {
           const onboardingEndDate = weekEndDateMap.get(userOnboardingWeekId);
@@ -356,14 +400,9 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // 유저의 모든 완료된 활동 (count_once_in_total 체크용)
-      const userAllCompletedActivities = (allCompletedActivityRecords || [])
-        .filter(ar => ar.user_id === userId)
+      // 유저의 모든 완료된 활동 (Map 사용 - O(1))
+      const userAllCompletedActivities = (userCompletedActivitiesMap.get(userId) || [])
         .map(ar => ({ week_id: ar.week_id, activity_type_id: ar.activity_type_id }));
-
-      // 해당 주차 완료된 활동
-      const userWeekCompletedActivities = (activityRecords || []).filter(ar => ar.user_id === userId);
-      const completedTypeIds = new Set(userWeekCompletedActivities.map(ar => ar.activity_type_id));
 
       // ===== 실무 정보 (info) - cluster-4-card와 동일: is_completed 기준 =====
       const infoTotal = isOnboardingWeek ? 0 : activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
@@ -416,10 +455,10 @@ export async function GET(request: NextRequest) {
         a.week_id === weekId && experienceTypeIds.includes(a.activity_type_id)
       ).length;
 
-      // ===== 실무 경력 (career) - career_records 기반 =====
+      // ===== 실무 경력 (career) - career_records 기반 (Map 사용) =====
       // total: pending 또는 enhanced 상태인 프로젝트 수 (최대 5개)
       // count: enhanced 상태인 프로젝트 수 (최대 total개)
-      const userCareerRecords = (careerRecordsData || []).filter(cr => cr.user_id === userId);
+      const userCareerRecords = userCareerMap.get(userId) || [];
       const careerRawTotal = userCareerRecords.length;
       const careerTotal = Math.min(careerRawTotal, 5);
       const careerEnhancedCount = userCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
@@ -427,43 +466,6 @@ export async function GET(request: NextRequest) {
 
       const totalActivities = infoTotal + competencyTotal + experienceTotal + careerTotal;
       const completedActivities = infoCount + competencyCount + experienceCount + careerCount;
-
-      // 디버그: 특정 사용자의 데이터 상세 로그
-      const debugUserId = 'a5c2189e-173e-4e42-ab6b-f14094c8beef';
-      if (userId === debugUserId) {
-        console.log('\n========== [Ranking API DEBUG] ==========');
-        console.log('userId:', userId);
-        console.log('displayName:', profile.display_name);
-        console.log('weekId:', weekId);
-        console.log('isOnboardingWeek:', isOnboardingWeek);
-        console.log('userOnboardingWeekId:', userOnboardingWeekId);
-        console.log('cumulativeApprovedWeeks:', cumulativeApprovedWeeks);
-        console.log('--- 활동 데이터 ---');
-        console.log('activeActivities (열린 활동):', activeActivities.map(a => a.activity_type_id));
-        console.log('completedTypeIds (완료된 타입):', Array.from(completedTypeIds));
-        console.log('userAllCompletedActivities (이 유저의 모든 완료 활동):', userAllCompletedActivities);
-        console.log('--- 실무 정보 ---');
-        console.log('infoTypeIds:', infoTypeIds);
-        console.log('infoTotal:', infoTotal);
-        console.log('infoCount:', infoCount);
-        console.log('--- 실무 역량 ---');
-        console.log('competencyTypeIds:', competencyTypeIds);
-        console.log('competencyTotal:', competencyTotal);
-        console.log('competencyCount:', competencyCount, '(rawCompetencyCount:', rawCompetencyCount, ')');
-        console.log('--- 실무 경험 ---');
-        console.log('experienceTypeIds:', experienceTypeIds);
-        console.log('experienceTotal:', experienceTotal);
-        console.log('experienceCount:', experienceCount);
-        console.log('--- 실무 경력 ---');
-        console.log('userCareerRecords:', userCareerRecords);
-        console.log('careerTotal:', careerTotal);
-        console.log('careerCount:', careerCount);
-        console.log('--- 총합 ---');
-        console.log('totalActivities:', totalActivities);
-        console.log('completedActivities:', completedActivities);
-        console.log('growthRate:', totalActivities > 0 ? Math.round((completedActivities / totalActivities) * 100) : 0, '%');
-        console.log('==========================================\n');
-      }
 
       // 성장률 계산 (cluster-4-card와 동일: 온보딩 주차이고 total=0이면 100%)
       const growthRateValue = totalActivities > 0
