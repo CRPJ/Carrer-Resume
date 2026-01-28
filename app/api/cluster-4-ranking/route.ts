@@ -140,11 +140,24 @@ export async function GET(request: NextRequest) {
     const weekEndDateMap = new Map<string, string>();
     (allWeeks || []).forEach(w => weekEndDateMap.set(w.id, w.end_date));
 
-    // 해당 주차에 포인트가 있는 사용자들
+    // user_weekly_growth 테이블에서 성공 주차 가져오기 (cluster-4-card와 동일)
+    const { data: successWeeksData } = await supabaseAdmin
+      .from('user_weekly_growth')
+      .select('user_id, week_id, weeks!inner(end_date)')
+      .in('user_id', Array.from(userIds))
+      .eq('is_success', true);
+
+    // 해당 주차에 포인트가 있는 사용자들 (해당 주차만)
     const { data: pointsData } = await supabaseAdmin
       .from('points')
       .select('user_id, point_type, points')
       .eq('week_id', weekId);
+
+    // 모든 주차의 포인트 데이터 (누적 인절미 계산용)
+    const { data: allPointsData } = await supabaseAdmin
+      .from('points')
+      .select('user_id, week_id, point_type, points')
+      .in('user_id', Array.from(userIds));
 
     // 4. 사용자 프로필 정보 (이미 가져옴)
     const profiles = eligibleProfiles;
@@ -180,39 +193,76 @@ export async function GET(request: NextRequest) {
       .in('user_id', Array.from(userIds))
       .eq('is_completed', true);
 
-    // 8. 활동 타입 정보 가져오기 (cluster_id 포함)
+    // 8. 활동 타입 정보 가져오기 (cluster_id, eligible 조건 포함)
     const { data: activityTypes } = await supabaseAdmin
       .from('activity_types')
-      .select('id, line_code, cluster_id');
+      .select('id, line_code, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total');
 
     // 활동 타입 ID -> 정보 매핑
     // weekly_activities.activity_type_id는 activity_types.id와 동일 (line_code 형식의 문자열)
     const competencyTypeIds: string[] = [];
     const experienceTypeIds: string[] = [];
-    const careerTypeIds: string[] = [];
+
+    // 실무 경험 타입 상세 정보 (eligible 조건 포함)
+    interface ExperienceTypeInfo {
+      id: string;
+      eligible_min_approved_weeks: number | null;
+      eligible_max_approved_weeks: number | null;
+      count_once_in_total: boolean;
+    }
+    const experienceTypeInfos: ExperienceTypeInfo[] = [];
 
     (activityTypes || []).forEach(at => {
       if (at.cluster_id === 'practical_competency') competencyTypeIds.push(at.id);
-      else if (at.cluster_id === 'practical_experience') experienceTypeIds.push(at.id);
-      else if (at.cluster_id === 'practical_career') careerTypeIds.push(at.id);
+      else if (at.cluster_id === 'practical_experience') {
+        experienceTypeIds.push(at.id);
+        experienceTypeInfos.push({
+          id: at.id,
+          eligible_min_approved_weeks: at.eligible_min_approved_weeks,
+          eligible_max_approved_weeks: at.eligible_max_approved_weeks,
+          count_once_in_total: at.count_once_in_total || false
+        });
+      }
     });
 
-    // 9. 해당 주차의 열린 활동 가져오기 (weekly_activities)
+    // 9. 해당 주차의 열린 활동 가져오기 (weekly_activities) - opened_at 포함
     const { data: weeklyActivities } = await supabaseAdmin
       .from('weekly_activities')
-      .select('id, activity_type_id, is_active')
+      .select('id, activity_type_id, is_active, opened_at')
       .eq('week_id', weekId)
       .eq('is_active', true);
 
     const activeActivities = weeklyActivities || [];
+
+    // 10. 모든 사용자의 모든 완료된 활동 기록 가져오기 (count_once_in_total 체크용)
+    const { data: allCompletedActivityRecords } = await supabaseAdmin
+      .from('activity_records')
+      .select('user_id, week_id, activity_type_id')
+      .in('user_id', Array.from(userIds))
+      .eq('is_completed', true);
+
+    // 11. 실무 경력 데이터 가져오기 (career_records)
+    const { data: careerRecordsData } = await supabaseAdmin
+      .from('career_records')
+      .select('user_id, week_id, enhancement_status')
+      .eq('week_id', weekId)
+      .in('user_id', Array.from(userIds))
+      .in('enhancement_status', ['pending', 'enhanced']);
+
+    // 12. 활동 상세 정보 가져오기 (2차 정보: sub_title, output_links)
+    const { data: activityDetailsData } = await supabaseAdmin
+      .from('activity_details')
+      .select('user_id, activity_type_id, sub_title, output_links')
+      .eq('week_id', weekId)
+      .in('user_id', Array.from(userIds));
 
     // 디버그 로그
     console.log('[Ranking API] activeActivities:', activeActivities.length, activeActivities.map(a => a.activity_type_id));
     console.log('[Ranking API] infoTypeIds:', infoTypeIds);
     console.log('[Ranking API] competencyTypeIds:', competencyTypeIds);
     console.log('[Ranking API] experienceTypeIds:', experienceTypeIds);
-    console.log('[Ranking API] careerTypeIds:', careerTypeIds);
     console.log('[Ranking API] activityRecords count:', (activityRecords || []).length);
+    console.log('[Ranking API] careerRecordsData count:', (careerRecordsData || []).length);
     console.log('[Ranking API] allGrowthData count:', (allGrowthData || []).length);
 
     // 역할 라벨 매핑
@@ -233,11 +283,22 @@ export async function GET(request: NextRequest) {
       const profile = (profiles || []).find(p => p.id === userId);
       if (!profile) continue;
 
-      // 포인트 계산
+      // 해당 주차 포인트 계산
       const userPoints = (pointsData || []).filter(p => p.user_id === userId);
       const star = userPoints.filter(p => p.point_type === 'star').reduce((sum, p) => sum + p.points, 0);
       const lightning = userPoints.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
       const shield = userPoints.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+
+      // 누적 인절미 계산 (해당 주차까지의 모든 주차, cluster-4-card와 동일)
+      const selectedWeekEndDateForPoints = weekEndDateMap.get(weekId) || selectedWeek.endDate;
+      const userAllPoints = (allPointsData || []).filter(p => {
+        if (p.user_id !== userId) return false;
+        const pointWeekEndDate = weekEndDateMap.get(p.week_id);
+        return pointWeekEndDate && pointWeekEndDate <= selectedWeekEndDateForPoints;
+      });
+      const cumulativeShield = userAllPoints.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+      const cumulativeLightning = userAllPoints.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
+      const cumulativeInjeolmi = cumulativeShield - cumulativeLightning;
 
       // 성장 상태
       const weeklyGrowth = (weeklyGrowthData || []).find(wg => wg.user_id === userId);
@@ -248,96 +309,166 @@ export async function GET(request: NextRequest) {
         else if (weeklyGrowth.is_success) growthStatus = '성공';
       }
 
-      // 팀/파트 정보
+      // 팀/파트 정보 (cluster-4-card와 동일한 조건: leftAt > weekStart)
       const weekStartDate = new Date(selectedWeek.startDate);
       const userTP = userTeamParts.find(utp => {
         if (utp.user_id !== userId) return false;
-        const startDate = new Date(utp.joined_at);
-        const endDate = utp.left_at ? new Date(utp.left_at) : null;
-        return startDate <= weekStartDate && (!endDate || endDate >= weekStartDate);
+        const joinedAt = new Date(utp.joined_at);
+        const leftAt = utp.left_at ? new Date(utp.left_at) : null;
+        return joinedAt <= weekStartDate && (!leftAt || leftAt > weekStartDate);
       });
       const team = teams.find(t => t.id === userTP?.team_id);
       const part = parts.find(p => p.id === userTP?.part_id);
 
-      // 역할 정보
+      // 역할 정보 (cluster-4-card와 동일한 조건: endedAt > weekStart)
       const userRole = (roleHistories || []).find(rh => {
         if (rh.user_id !== userId) return false;
-        const startDate = new Date(rh.started_at);
-        const endDate = rh.ended_at ? new Date(rh.ended_at) : null;
-        return startDate <= weekStartDate && (!endDate || endDate >= weekStartDate);
+        const startedAt = new Date(rh.started_at);
+        const endedAt = rh.ended_at ? new Date(rh.ended_at) : null;
+        return startedAt <= weekStartDate && (!endedAt || endedAt > weekStartDate);
       });
       const roleLabel = userRole ? (roleLabels[userRole.role] || userRole.role) : (profile.role ? roleLabels[profile.role] || profile.role : '일반');
 
-      // 활동 강화율 계산 (cluster-4와 동일한 방식)
-      // weekly_activities.activity_type_id는 activity_types.id와 동일 (예: 'calendar', 'essay', 'optional_unit' 등)
-      const userCompletedActivities = (activityRecords || []).filter(ar => ar.user_id === userId);
-      const completedTypeIds = new Set(userCompletedActivities.map(ar => ar.activity_type_id));
+      // 온보딩 주차 확인
+      const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
+      const isOnboardingWeek = weekId === userOnboardingWeekId;
 
-      // 열린 활동 수 (total) - weekly_activities에서 is_active=true인 것
-      const infoTotal = activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
-      const competencyTotal = activeActivities.filter(a => competencyTypeIds.includes(a.activity_type_id)).length;
-      const experienceTotal = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id)).length;
-      const careerTotal = activeActivities.filter(a => careerTypeIds.includes(a.activity_type_id)).length;
+      // 해당 주차까지의 누적 성공 주차 수 계산 (success_weeks 테이블 기반 - cluster-4-card와 동일)
+      const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
 
-      // 완료된 활동 수 (count) - activity_records에서 is_completed=true인 것
-      const infoCount = activeActivities.filter(a =>
-        infoTypeIds.includes(a.activity_type_id) && completedTypeIds.has(a.activity_type_id)
+      // 해당 유저의 성공 주차 필터링 (선택된 주차까지만)
+      const userSuccessWeeks = (successWeeksData || []).filter((sw: any) => {
+        if (sw.user_id !== userId) return false;
+        const weekEndDate = sw.weeks?.end_date;
+        return weekEndDate && weekEndDate <= selectedWeekEndDate;
+      });
+
+      let cumulativeApprovedWeeks = userSuccessWeeks.length;
+
+      // 온보딩 주차 추가 (온보딩 주차가 success_weeks에 없더라도 성공으로 카운트)
+      if (userOnboardingWeekId) {
+        const onboardingAlreadyCounted = userSuccessWeeks.some((sw: any) => sw.week_id === userOnboardingWeekId);
+        if (!onboardingAlreadyCounted) {
+          const onboardingEndDate = weekEndDateMap.get(userOnboardingWeekId);
+          if (onboardingEndDate && onboardingEndDate <= selectedWeekEndDate) {
+            cumulativeApprovedWeeks++;
+          }
+        }
+      }
+
+      // 유저의 모든 완료된 활동 (count_once_in_total 체크용)
+      const userAllCompletedActivities = (allCompletedActivityRecords || [])
+        .filter(ar => ar.user_id === userId)
+        .map(ar => ({ week_id: ar.week_id, activity_type_id: ar.activity_type_id }));
+
+      // 해당 주차 완료된 활동
+      const userWeekCompletedActivities = (activityRecords || []).filter(ar => ar.user_id === userId);
+      const completedTypeIds = new Set(userWeekCompletedActivities.map(ar => ar.activity_type_id));
+
+      // ===== 실무 정보 (info) - cluster-4-card와 동일: is_completed 기준 =====
+      const infoTotal = isOnboardingWeek ? 0 : activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
+      const infoCount = isOnboardingWeek ? 0 : userAllCompletedActivities.filter(a =>
+        a.week_id === weekId && infoTypeIds.includes(a.activity_type_id)
       ).length;
-      const competencyCount = activeActivities.filter(a =>
-        competencyTypeIds.includes(a.activity_type_id) && completedTypeIds.has(a.activity_type_id)
+
+      // ===== 실무 역량 (competency) - cluster-4-card와 동일: is_completed 기준, total=1 =====
+      const competencyTotal = isOnboardingWeek ? 0 : 1;
+      const rawCompetencyCount = userAllCompletedActivities.filter(a =>
+        a.week_id === weekId && competencyTypeIds.includes(a.activity_type_id)
       ).length;
-      const experienceCount = activeActivities.filter(a =>
-        experienceTypeIds.includes(a.activity_type_id) && completedTypeIds.has(a.activity_type_id)
+      const competencyCount = isOnboardingWeek ? 0 : Math.min(rawCompetencyCount, 1);
+
+      // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + is_completed 기준 =====
+      let experienceTotal = 0;
+      if (!isOnboardingWeek) {
+        const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
+
+        experienceActivities.forEach(a => {
+          const typeInfo = experienceTypeInfos.find(info => info.id === a.activity_type_id);
+
+          if (!typeInfo) {
+            experienceTotal++;
+            return;
+          }
+
+          // eligible_min/max 체크 (null이면 제한 없음)
+          const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+          const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+
+          // 누적 주차가 eligible 범위 내인지 확인
+          if (cumulativeApprovedWeeks >= minWeek && cumulativeApprovedWeeks <= maxWeek) {
+            // count_once_in_total 체크 (1회만 가능한 활동)
+            if (typeInfo.count_once_in_total) {
+              // 이미 이전 주차에서 완료했는지 확인
+              const previouslyCompleted = userAllCompletedActivities.some(
+                ca => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+              );
+              if (!previouslyCompleted) {
+                experienceTotal++;
+              }
+            } else {
+              experienceTotal++;
+            }
+          }
+        });
+      }
+      const experienceCount = isOnboardingWeek ? 0 : userAllCompletedActivities.filter(a =>
+        a.week_id === weekId && experienceTypeIds.includes(a.activity_type_id)
       ).length;
-      const careerCount = activeActivities.filter(a =>
-        careerTypeIds.includes(a.activity_type_id) && completedTypeIds.has(a.activity_type_id)
-      ).length;
+
+      // ===== 실무 경력 (career) - career_records 기반 =====
+      // total: pending 또는 enhanced 상태인 프로젝트 수 (최대 5개)
+      // count: enhanced 상태인 프로젝트 수 (최대 total개)
+      const userCareerRecords = (careerRecordsData || []).filter(cr => cr.user_id === userId);
+      const careerRawTotal = userCareerRecords.length;
+      const careerTotal = Math.min(careerRawTotal, 5);
+      const careerEnhancedCount = userCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
+      const careerCount = Math.min(careerEnhancedCount, careerTotal);
 
       const totalActivities = infoTotal + competencyTotal + experienceTotal + careerTotal;
       const completedActivities = infoCount + competencyCount + experienceCount + careerCount;
 
-      // 디버그: 첫 번째 사용자의 데이터 로그
-      if (userId === userIdArray[0]) {
-        console.log('[Ranking API] First user stats:', {
-          userId,
-          displayName: profile.display_name,
-          infoTotal, infoCount,
-          competencyTotal, competencyCount,
-          experienceTotal, experienceCount,
-          careerTotal, careerCount,
-          totalActivities, completedActivities,
-          completedTypeIds: Array.from(completedTypeIds)
-        });
+      // 디버그: 특정 사용자의 데이터 상세 로그
+      const debugUserId = 'a5c2189e-173e-4e42-ab6b-f14094c8beef';
+      if (userId === debugUserId) {
+        console.log('\n========== [Ranking API DEBUG] ==========');
+        console.log('userId:', userId);
+        console.log('displayName:', profile.display_name);
+        console.log('weekId:', weekId);
+        console.log('isOnboardingWeek:', isOnboardingWeek);
+        console.log('userOnboardingWeekId:', userOnboardingWeekId);
+        console.log('cumulativeApprovedWeeks:', cumulativeApprovedWeeks);
+        console.log('--- 활동 데이터 ---');
+        console.log('activeActivities (열린 활동):', activeActivities.map(a => a.activity_type_id));
+        console.log('completedTypeIds (완료된 타입):', Array.from(completedTypeIds));
+        console.log('userAllCompletedActivities (이 유저의 모든 완료 활동):', userAllCompletedActivities);
+        console.log('--- 실무 정보 ---');
+        console.log('infoTypeIds:', infoTypeIds);
+        console.log('infoTotal:', infoTotal);
+        console.log('infoCount:', infoCount);
+        console.log('--- 실무 역량 ---');
+        console.log('competencyTypeIds:', competencyTypeIds);
+        console.log('competencyTotal:', competencyTotal);
+        console.log('competencyCount:', competencyCount, '(rawCompetencyCount:', rawCompetencyCount, ')');
+        console.log('--- 실무 경험 ---');
+        console.log('experienceTypeIds:', experienceTypeIds);
+        console.log('experienceTotal:', experienceTotal);
+        console.log('experienceCount:', experienceCount);
+        console.log('--- 실무 경력 ---');
+        console.log('userCareerRecords:', userCareerRecords);
+        console.log('careerTotal:', careerTotal);
+        console.log('careerCount:', careerCount);
+        console.log('--- 총합 ---');
+        console.log('totalActivities:', totalActivities);
+        console.log('completedActivities:', completedActivities);
+        console.log('growthRate:', totalActivities > 0 ? Math.round((completedActivities / totalActivities) * 100) : 0, '%');
+        console.log('==========================================\n');
       }
 
-      // 해당 주차까지의 누적 성공 주차 수 계산 (활동 기록 기반 + 온보딩 주차)
-      // cluster-4-card와 동일한 방식: activity_records에서 활동이 있는 주차 = 성공
-      const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
-
-      // 해당 사용자의 활동이 있는 주차 ID 목록
-      const userActivityWeekIds = new Set(
-        (allActivityRecords || [])
-          .filter(ar => ar.user_id === userId)
-          .map(ar => ar.week_id)
-      );
-
-      // 해당 주차까지의 모든 주차 중 활동이 있는 주차 수 계산
-      let cumulativeApprovedWeeks = 0;
-      weekEndDateMap.forEach((wEndDate, wId) => {
-        if (wEndDate <= selectedWeekEndDate && userActivityWeekIds.has(wId)) {
-          cumulativeApprovedWeeks++;
-        }
-      });
-
-      // 온보딩 주차 추가 (온보딩 주차가 activity_records에 없더라도 성공으로 카운트)
-      const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
-      if (userOnboardingWeekId) {
-        const onboardingEndDate = weekEndDateMap.get(userOnboardingWeekId);
-        // 온보딩 주차가 선택된 주차 이전이고, 아직 카운트되지 않았으면 추가
-        if (onboardingEndDate && onboardingEndDate <= selectedWeekEndDate && !userActivityWeekIds.has(userOnboardingWeekId)) {
-          cumulativeApprovedWeeks++;
-        }
-      }
+      // 성장률 계산 (cluster-4-card와 동일: 온보딩 주차이고 total=0이면 100%)
+      const growthRateValue = totalActivities > 0
+        ? Math.round((completedActivities / totalActivities) * 100)
+        : (isOnboardingWeek ? 100 : 0);
 
       rankings.push({
         userId,
@@ -350,18 +481,18 @@ export async function GET(request: NextRequest) {
         star,
         lightning,
         shield,
-        injeolmi: shield - lightning,
+        injeolmi: cumulativeInjeolmi,
         growthStatus,
         cumulativeApprovedWeeks,
         growthRate: {
           total: totalActivities,
           count: completedActivities,
-          rate: totalActivities > 0 ? Math.round((completedActivities / totalActivities) * 100) : 0
+          rate: growthRateValue
         },
-        infoRate: { total: infoTotal, count: infoCount, rate: infoTotal > 0 ? Math.round((infoCount / infoTotal) * 100) : 0 },
-        competencyRate: { total: competencyTotal, count: competencyCount, rate: competencyTotal > 0 ? Math.round((competencyCount / competencyTotal) * 100) : 0 },
-        experienceRate: { total: experienceTotal, count: experienceCount, rate: experienceTotal > 0 ? Math.round((experienceCount / experienceTotal) * 100) : 0 },
-        careerRate: { total: careerTotal, count: careerCount, rate: careerTotal > 0 ? Math.round((careerCount / careerTotal) * 100) : 0 }
+        infoRate: { total: infoTotal, count: infoCount, rate: infoTotal > 0 ? Math.round((infoCount / infoTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
+        competencyRate: { total: competencyTotal, count: competencyCount, rate: competencyTotal > 0 ? Math.round((competencyCount / competencyTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
+        experienceRate: { total: experienceTotal, count: experienceCount, rate: experienceTotal > 0 ? Math.round((experienceCount / experienceTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
+        careerRate: { total: careerTotal, count: careerCount, rate: careerTotal > 0 ? Math.round((careerCount / careerTotal) * 100) : (isOnboardingWeek ? 100 : 0) }
       });
     }
 
