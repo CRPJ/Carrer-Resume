@@ -246,8 +246,18 @@ const Cluster41Content = () => {
     week_id: string;
     activity_type_id: string;
     is_active: boolean;
+    opened_at: string | null;  // 강화 성공 48시간 판단용
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivityData[]>([]);
+
+  // 2차 정보 데이터 (activity_details 테이블) - 강화 성공 판단용
+  interface ActivityDetailData {
+    week_id: string;
+    activity_type_id: string;
+    sub_title: string | null;
+    output_links: { desc: string; url: string }[] | null;
+  }
+  const [activityDetails, setActivityDetails] = useState<ActivityDetailData[]>([]);
 
   // 온보딩 주차 ID 상태 (무적 주차)
   const [onboardingWeekId, setOnboardingWeekId] = useState<string | null>(null);
@@ -391,6 +401,38 @@ const Cluster41Content = () => {
   };
 
   // 주차별 실무 강화율 계산 함수들 (소수점 올림 처리)
+  // 강화 성공 여부 판단 헬퍼 함수 (is_completed + (48시간 경과 OR 2차 정보 기입))
+  const isEnhancementSuccess = (weekId: string, activityTypeId: string): boolean => {
+    // 1. 활동 완료 여부 확인
+    const isCompleted = userActivities.some(a =>
+      a.week_id === weekId && a.activity_type_id === activityTypeId
+    );
+    if (!isCompleted) return false;
+
+    // 2. 2차 정보 기입 여부 확인
+    const detail = activityDetails.find(d =>
+      d.week_id === weekId && d.activity_type_id === activityTypeId
+    );
+    const hasSecondaryInfo = detail && (
+      (detail.sub_title && detail.sub_title.trim() !== '') ||
+      (detail.output_links && detail.output_links.some(link => link?.url && link.url.trim() !== ''))
+    );
+    if (hasSecondaryInfo) return true;
+
+    // 3. 48시간 경과 여부 확인
+    const activity = weeklyActivities.find(wa =>
+      wa.week_id === weekId && wa.activity_type_id === activityTypeId
+    );
+    if (!activity?.opened_at) return false;
+
+    const openedTime = new Date(activity.opened_at).getTime();
+    const now = Date.now();
+    const elapsed = now - openedTime;
+    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+    return elapsed >= deadline;
+  };
+
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
     // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
@@ -400,9 +442,10 @@ const Cluster41Content = () => {
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
-    // 유저가 완료한 info 타입 활동 개수 (count)
-    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const infoCount = userWeekActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
+    // 강화 성공한 info 타입 활동 개수 (count)
+    const infoCount = infoTypeIds.filter(activityTypeId =>
+      isEnhancementSuccess(weekId, activityTypeId)
+    ).length;
     // 소수점 올림 처리: ex) 0.4333..% → 1%
     return { count: infoCount, total, rate: total > 0 ? Math.ceil((infoCount / total) * 100) : 0 };
   };
@@ -415,9 +458,10 @@ const Cluster41Content = () => {
     }
     // 실무 역량은 매주 분모가 항상 1
     const total = 1;
-    // 유저가 완료한 competency 타입 활동 개수 (count) - 최대 1
-    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const competencyCount = Math.min(userWeekActivities.filter(a => competencyTypeIds.includes(a.activity_type_id)).length, 1);
+    // 강화 성공한 competency 타입 활동 개수 (count) - 최대 1
+    const competencyCount = competencyTypeIds.some(activityTypeId =>
+      isEnhancementSuccess(weekId, activityTypeId)
+    ) ? 1 : 0;
     // 소수점 올림 처리
     return { count: competencyCount, total, rate: total > 0 ? Math.ceil((competencyCount / total) * 100) : 0 };
   };
@@ -471,9 +515,10 @@ const Cluster41Content = () => {
       }
     });
 
-    // 4. 유저가 완료한 experience 활동 개수
-    const userWeekActivities = userActivities.filter(a => a.week_id === weekId);
-    const experienceCount = userWeekActivities.filter(a => experienceTypeIds.includes(a.activity_type_id)).length;
+    // 4. 강화 성공한 experience 활동 개수 (is_completed + (48시간 경과 OR 2차 정보 기입))
+    const experienceCount = experienceTypeIds.filter(activityTypeId =>
+      isEnhancementSuccess(weekId, activityTypeId)
+    ).length;
 
     // 소수점 올림 처리
     return {
@@ -731,7 +776,8 @@ const Cluster41Content = () => {
             userActivitiesResult,
             activityTypesResult,
             careerRecordsResult,
-            weeklyActivitiesResult
+            weeklyActivitiesResult,
+            activityDetailsResult
           ] = await Promise.all([
             // user_weekly_growth
             supabase.from('user_weekly_growth').select('week_id, is_success, is_resting, is_club_break').eq('user_id', userId),
@@ -743,9 +789,13 @@ const Cluster41Content = () => {
             supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
             // career_records
             supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced']),
-            // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회)
+            // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회) + opened_at 추가
             userWeekIds.length > 0
-              ? supabase.from('weekly_activities').select('week_id, activity_type_id, is_active').in('week_id', userWeekIds)
+              ? supabase.from('weekly_activities').select('week_id, activity_type_id, is_active, opened_at').in('week_id', userWeekIds)
+              : Promise.resolve({ data: [], error: null }),
+            // activity_details - 2차 정보 (강화 성공 판단용)
+            userWeekIds.length > 0
+              ? supabase.from('activity_details').select('week_id, activity_type_id, sub_title, output_links').eq('user_id', userId).in('week_id', userWeekIds)
               : Promise.resolve({ data: [], error: null })
           ]);
 
@@ -763,6 +813,7 @@ const Cluster41Content = () => {
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
           if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
+          if (activityDetailsResult.data) setActivityDetails(activityDetailsResult.data);
           if (careerRecordsResult.data) {
             setUserCareerRecords(careerRecordsResult.data as CareerRecordData[]);
           }

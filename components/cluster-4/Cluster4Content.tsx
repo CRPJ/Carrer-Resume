@@ -541,13 +541,32 @@ const Cluster4Content = () => {
           }
         });
 
-        // success 계산
-        const weekCompletedActivities = allCompletedActivities.filter(
-          (a: { week_id: string }) => a.week_id === weekId
-        );
-        const experienceSuccess = weekCompletedActivities.filter(
-          (a: { activity_type_id: string }) => experienceTypeIds.includes(a.activity_type_id)
-        ).length;
+        // success 계산 (강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
+        const now = Date.now();
+        const deadline = 48 * 60 * 60 * 1000; // 48시간
+
+        const experienceSuccess = experienceActivities.filter(a => {
+          if (!approvedActivityTypes.has(a.activity_type_id)) return false;
+
+          // 2차 정보 확인
+          const detail = filteredActivityDetails.find(
+            (d: { activity_type_id: string }) => d.activity_type_id === a.activity_type_id
+          );
+          const hasSecondaryInfo = detail && (
+            (detail.sub_title && detail.sub_title.trim() !== '') ||
+            (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+          );
+
+          if (hasSecondaryInfo) return true;
+
+          // 48시간 경과 확인
+          if (a.opened_at) {
+            const openedTime = new Date(a.opened_at).getTime();
+            if (now - openedTime >= deadline) return true;
+          }
+
+          return false;
+        }).length;
 
         return { total: experienceTotal, success: experienceSuccess };
       };
@@ -1714,7 +1733,7 @@ const Cluster4Content = () => {
                 {/* 편집 아이콘 (본인만 표시) */}
                 {isOwner && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); openSeasonReviewModal(); }}
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(openSeasonReviewModal); }}
                     style={{
                       position: 'absolute',
                       bottom: '8px',

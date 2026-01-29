@@ -698,9 +698,26 @@ const Sidebar = () => {
         const profile = result.data;
 
         // user_profiles → formData 변환
-        const displayNameParts = (profile.display_name || '').split(' ');
-        const lastName = displayNameParts[0] || '';
-        const firstName = displayNameParts.slice(1).join(' ') || '';
+        // 한글 이름 분리: 공백이 있으면 공백 기준, 없으면 첫 글자(또는 2글자 성)를 성으로 분리
+        const displayName = profile.display_name || '';
+        let lastName = '';
+        let firstName = '';
+        if (displayName.includes(' ')) {
+          const displayNameParts = displayName.split(' ');
+          lastName = displayNameParts[0] || '';
+          firstName = displayNameParts.slice(1).join(' ') || '';
+        } else if (displayName.length > 0) {
+          // 2글자 성 목록 (복성)
+          const twoCharLastNames = ['남궁', '제갈', '황보', '선우', '독고', '동방', '사공', '서문', '소봉', '장곡'];
+          const firstTwo = displayName.substring(0, 2);
+          if (displayName.length > 2 && twoCharLastNames.includes(firstTwo)) {
+            lastName = firstTwo;
+            firstName = displayName.substring(2);
+          } else {
+            lastName = displayName.substring(0, 1);
+            firstName = displayName.substring(1);
+          }
+        }
 
         const engNameParts = (profile.eng_name || '').split(' ');
         const lastNameEng = engNameParts[0] || '';

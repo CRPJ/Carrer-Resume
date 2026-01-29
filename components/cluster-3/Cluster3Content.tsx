@@ -639,16 +639,16 @@ const Cluster3Content = () => {
 
   // Top Works 슬라이드 데이터 (5개)
   const [topWorksSlides, setTopWorksSlides] = useState([
-    { id: 1, active: false, link: "https://www.youtube.com/watch?v=eD5A-tOjZaw" },
-    { id: 2, active: false, link: "https://www.youtube.com/watch?v=eD5A-tOjZaw" },
-    { id: 3, active: true, link: "https://www.youtube.com/watch?v=eD5A-tOjZaw" },
-    { id: 4, active: false, link: "https://www.youtube.com/watch?v=eD5A-tOjZaw" },
-    { id: 5, active: false, link: "https://www.youtube.com/watch?v=eD5A-tOjZaw" },
+    { id: 1, active: false, link: "https://www.example.com" },
+    { id: 2, active: false, link: "https://www.example.com" },
+    { id: 3, active: true, link: "https://www.example.com" },
+    { id: 4, active: false, link: "https://www.example.com" },
+    { id: 5, active: false, link: "https://www.example.com" },
   ]);
 
   // Detail 10 썸네일 데이터 (10개, 2줄 5개)
   const [detailThumbnails, setDetailThumbnails] = useState([
-    { id: 1, link: 'https://www.youtube.com/watch?v=eD5A-tOjZaw' },
+    { id: 1, link: 'https://www.example.com' },
     { id: 2, link: 'https://kr.pinterest.com/' },
     { id: 3, link: 'https://blog.naver.com/oranke_official/223247582032' },
     { id: 4, link: 'https://www.youtube.com/watch?v=kCxf76VkRmY' },
