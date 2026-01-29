@@ -183,6 +183,8 @@
         margin-top: 24px;
         margin-bottom: 0;
         font-style: italic;
+        word-break: break-word;
+        overflow-wrap: break-word;
       }
 
       .quote-highlight {
@@ -784,7 +786,8 @@
           line-height: 1.4;
           margin: 5px 0 0 0;
           font-weight: 400;
-          word-break: keep-all;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
 
         .quote-footer {
@@ -2220,6 +2223,8 @@
             line-height: 1.5;
             margin: 0;
             width: 350px;
+            word-break: break-word;
+            overflow-wrap: break-word;
           }
         }
       }

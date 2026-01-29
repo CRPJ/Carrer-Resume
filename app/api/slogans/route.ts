@@ -112,6 +112,27 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { slogan1, slogan2, slogan3 } = body;
 
+    // 글자수 검증 (최대 86자)
+    const MAX_SLOGAN_LENGTH = 86;
+    if (slogan1?.content && slogan1.content.length > MAX_SLOGAN_LENGTH) {
+      return NextResponse.json(
+        { error: `슬로건 1이 ${MAX_SLOGAN_LENGTH}자를 초과했습니다. (현재 ${slogan1.content.length}자)` },
+        { status: 400 }
+      );
+    }
+    if (slogan2?.content && slogan2.content.length > MAX_SLOGAN_LENGTH) {
+      return NextResponse.json(
+        { error: `슬로건 2가 ${MAX_SLOGAN_LENGTH}자를 초과했습니다. (현재 ${slogan2.content.length}자)` },
+        { status: 400 }
+      );
+    }
+    if (slogan3?.content && slogan3.content.length > MAX_SLOGAN_LENGTH) {
+      return NextResponse.json(
+        { error: `슬로건 3이 ${MAX_SLOGAN_LENGTH}자를 초과했습니다. (현재 ${slogan3.content.length}자)` },
+        { status: 400 }
+      );
+    }
+
     // user_profiles에서 사용자 ID 조회
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("user_profiles")

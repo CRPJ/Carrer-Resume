@@ -289,6 +289,8 @@
         margin-top: 24px;
         margin-bottom: 0;
         font-style: italic;
+        word-break: break-word;
+        overflow-wrap: break-word;
       }
 
       .quote-highlight {

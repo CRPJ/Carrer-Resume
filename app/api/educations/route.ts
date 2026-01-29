@@ -218,6 +218,19 @@ export async function PUT(request: Request) {
       );
     }
 
+    // 졸업 상태일 때 졸업년도 필수 검증
+    for (let i = 0; i < educations.length; i++) {
+      const edu = educations[i];
+      const status = edu.status;
+      // 졸업 또는 중퇴/자퇴 상태일 때 졸업년도 필수
+      if ((status === '졸업' || status === '중퇴' || status === '자퇴') && !edu.endYear) {
+        return NextResponse.json(
+          { error: `${i + 1}번째 학력: '${status}' 상태에서는 졸업년도를 입력해야 합니다.` },
+          { status: 400 }
+        );
+      }
+    }
+
     if (!supabaseAdmin) {
       return NextResponse.json(
         { error: "서버 설정 오류" },
