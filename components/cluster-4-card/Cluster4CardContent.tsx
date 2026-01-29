@@ -39,6 +39,22 @@ interface SelectedColleague {
   createdAt?: string;
 }
 
+// 학교/학과 표시값에서 suffix 제거 함수 (라벨과 중복 방지)
+const formatSchool = (value: string) => {
+  if (!value || value === '-') return '-';
+  if (value.endsWith('대학교')) return value.slice(0, -2); // "냥멍대학교" → "냥멍대" (+ 학교 라벨)
+  if (value.endsWith('대학')) return value.slice(0, -1);   // "서울대학" → "서울대" (+ 학교 라벨)
+  if (value.endsWith('학교')) return value.slice(0, -2);   // "OO학교" → "OO" (+ 학교 라벨)
+  return value;
+};
+
+const formatMajor = (value: string) => {
+  if (!value || value === '-') return '-';
+  if (value.endsWith('학과')) return value.slice(0, -1);   // "컴퓨터공학과" → "컴퓨터공학" (+ 학과 라벨)
+  if (value.endsWith('학부')) return value.slice(0, -1);   // "소프트웨어학부" → "소프트웨어학" (+ 부 라벨은 안 맞지만 일단)
+  return value;
+};
+
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -710,15 +726,42 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 경력: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
           // 여기서는 초기값 0으로 설정, career_records 로드 후 덮어씀
 
-          // success 계산 (cluster-4-1과 동일 - is_completed 기준)
+          // success 계산 (강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
           // 해당 주차의 완료된 활동만 필터링
           type CompletedActivity = { week_id: string; activity_type_id: string };
           const weekCompletedActivities = allCompletedActivities.filter((a: CompletedActivity) => a.week_id === weekId);
 
-          const infoSuccess = weekCompletedActivities.filter((a: CompletedActivity) => infoTypesList.includes(a.activity_type_id)).length;
-          // 실무 역량 success: 온보딩 아니고 해당 활동이 완료됐으면 1 (최대 1)
-          const competencySuccess = isOnboardingWeekLocal ? 0 : Math.min(weekCompletedActivities.filter((a: CompletedActivity) => competencyTypesList.includes(a.activity_type_id)).length, 1);
-          const experienceSuccess = isOnboardingWeekLocal ? 0 : weekCompletedActivities.filter((a: CompletedActivity) => experienceTypesList.includes(a.activity_type_id)).length;
+          // 강화 성공 여부 판단 헬퍼 함수 (getEnhancementStatus와 동일한 로직)
+          const isEnhancementSuccess = (activityTypeId: string): boolean => {
+            // 1. 활동 완료 여부 확인
+            const isCompleted = weekCompletedActivities.some(
+              (a: CompletedActivity) => a.activity_type_id === activityTypeId
+            );
+            if (!isCompleted) return false;
+
+            // 2. 2차 정보 기입 여부 확인
+            const detail = filteredActivityDetails.find(
+              (d: { activity_type_id: string; sub_title: string | null; output_links: OutputLink[] | null }) => d.activity_type_id === activityTypeId
+            );
+            const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
+            if (hasSecondaryInfo) return true;
+
+            // 3. 48시간 경과 여부 확인
+            const activity = activitiesData.find(a => a.activity_type_id === activityTypeId);
+            if (!activity?.opened_at) return false;
+
+            const openedTime = new Date(activity.opened_at).getTime();
+            const now = Date.now();
+            const elapsed = now - openedTime;
+            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+            return elapsed >= deadline;
+          };
+
+          const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
+          // 실무 역량 success: 온보딩 아니고 강화 성공한 활동이 있으면 1 (최대 1)
+          const competencySuccess = isOnboardingWeekLocal ? 0 : (competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0);
+          const experienceSuccess = isOnboardingWeekLocal ? 0 : experienceTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
           setInfoStats({ total: infoTotal, success: infoSuccess });
@@ -1634,17 +1677,36 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 통계 재계산 함수 (저장 후 즉시 업데이트용 - is_completed=true 기준)
+  // 통계 재계산 함수 (저장 후 즉시 업데이트용 - 강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const recalculateStats = (updatedDetails: ActivityDetail[]) => {
     const activeActivities = weeklyActivities.filter(a => a.is_active);
 
+    // 강화 성공 여부 판단 헬퍼 함수
+    const isEnhancementSuccessLocal = (activityTypeId: string): boolean => {
+      // 1. 활동 완료 여부 확인
+      if (!weekApprovedTypes.has(activityTypeId)) return false;
+
+      // 2. 2차 정보 기입 여부 확인 (저장 후 업데이트된 데이터 사용)
+      const detail = updatedDetails.find(d => d.activity_type_id === activityTypeId);
+      const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
+      if (hasSecondaryInfo) return true;
+
+      // 3. 48시간 경과 여부 확인
+      const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
+      if (!activity?.opened_at) return false;
+
+      const openedTime = new Date(activity.opened_at).getTime();
+      const now = Date.now();
+      const elapsed = now - openedTime;
+      const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+      return elapsed >= deadline;
+    };
+
     const calcStats = (types: string[]) => {
       const total = activeActivities.filter(a => types.includes(a.activity_type_id)).length;
-      const success = activeActivities.filter(a => {
-        if (!types.includes(a.activity_type_id)) return false;
-        return weekApprovedTypes.has(a.activity_type_id); // is_completed = true
-      }).length;
+      const success = types.filter(activityTypeId => isEnhancementSuccessLocal(activityTypeId)).length;
 
       return { total, success };
     };
@@ -1659,7 +1721,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     } else {
       setInfoStats(calcStats(infoTypes));
       const competencyCalc = calcStats(competencyTypeIds);
-      setCompetencyStats({ total: 1, success: competencyCalc.success });
+      setCompetencyStats({ total: 1, success: competencyCalc.success > 0 ? 1 : 0 });
       setExperienceStats(calcStats(experienceTypeIds));
       setCareerStats(calcStats(careerTypeIds));
     }
@@ -2106,7 +2168,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </>
                         ) : (
                           <>
-                            <div className="detail-line"><span className="text">{user.university}</span><span className="label">학교</span> | <span className="text">{user.major}</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span></div>
                             <div className="detail-line"><span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                           </>
@@ -2170,7 +2232,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isEmpty ? (
                           <span className="text">-</span>
                         ) : (
-                          <><span className="text">{user.university}</span><span className="label">학교</span> | <span className="text">{user.major}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
                         )}
                       </div>
                     </div>
@@ -3676,7 +3738,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{selectedReputationCard.university}</span><span className="label">학교</span> | <span className="text">{selectedReputationCard.major}</span><span className="label">학과</span>
+                      <span className="text">{formatSchool(selectedReputationCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedReputationCard.major)}</span><span className="label">학과</span>
                     </div>
                     <div className="detail-line">
                       <span className="text">{selectedReputationCard.team}</span><span className="label">팀</span> | <span className="text">{selectedReputationCard.part}</span><span className="label">파트</span>
@@ -3751,7 +3813,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{selectedColleagueCard.university}</span><span className="label">학교</span> | <span className="text">{selectedColleagueCard.major}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                      <span className="text">{formatSchool(selectedColleagueCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedColleagueCard.major)}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
                     </div>
                   </div>
                 </div>

@@ -12,10 +12,10 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    // 활성 크루만 조회 (status가 active, suspended 등)
+    // 활성 크루만 조회 (status가 active, suspended 등) - university, major_first 제거
     let query = supabase
       .from("user_profiles")
-      .select("id, display_name, gender, birth_date, university, major_first, profile_photo_url, vision")
+      .select("id, display_name, gender, birth_date, profile_photo_url, vision")
       .in("status", ["active", "suspended", "seasonal_rest"])
       .not("display_name", "is", null)
       .order("display_name", { ascending: true });
@@ -43,6 +43,24 @@ export async function GET(request: Request) {
 
     // 각 유저의 팀/파트 정보 조회
     const userIds = users.map(u => u.id);
+
+    // 학력 정보 조회 (user_educations에서)
+    const { data: educations } = await supabase
+      .from("user_educations")
+      .select("user_id, school_name, major_name_1, sort_order")
+      .in("user_id", userIds)
+      .order("sort_order", { ascending: true });
+
+    // user_id별 학력 정보 Map (첫 번째 학력만 사용)
+    const educationMap: { [key: string]: { school_name: string | null; major_name_1: string | null } } = {};
+    educations?.forEach(edu => {
+      if (!educationMap[edu.user_id]) {
+        educationMap[edu.user_id] = {
+          school_name: edu.school_name,
+          major_name_1: edu.major_name_1,
+        };
+      }
+    });
 
     const { data: userTeamParts } = await supabase
       .from("user_team_parts")
@@ -80,6 +98,7 @@ export async function GET(request: Request) {
       }
 
       const teamPart = userTeamPartMap[user.id];
+      const education = educationMap[user.id];
 
       return {
         id: user.id,
@@ -87,8 +106,8 @@ export async function GET(request: Request) {
         gender: user.gender || '-',
         age: age || '-',
         profileImg: user.profile_photo_url || '',
-        university: user.university || '-',
-        major: user.major_first || '-',
+        university: education?.school_name || '-',
+        major: education?.major_name_1 || '-',
         team: teamPart?.teamName || '-',
         part: teamPart?.partName || '-',
         nickname: user.vision || '-',

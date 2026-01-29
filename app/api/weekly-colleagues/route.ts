@@ -50,11 +50,29 @@ export async function GET(request: Request) {
     if (data && data.length > 0) {
       const colleagueIds = Array.from(new Set(data.map(d => d.colleague_id)));
 
-      // colleague 프로필 조회
+      // colleague 프로필 조회 (university, major_first 제거)
       const { data: colleagues } = await supabase
         .from("user_profiles")
-        .select("id, display_name, gender, birth_date, university, major_first, profile_photo_url, vision")
+        .select("id, display_name, gender, birth_date, profile_photo_url, vision")
         .in("id", colleagueIds);
+
+      // colleague 학력 정보 조회 (user_educations에서)
+      const { data: educations } = await supabase
+        .from("user_educations")
+        .select("user_id, school_name, major_name_1, sort_order")
+        .in("user_id", colleagueIds)
+        .order("sort_order", { ascending: true });
+
+      // user_id별 학력 정보 Map (첫 번째 학력만 사용)
+      const educationMap: { [key: string]: { school_name: string | null; major_name_1: string | null } } = {};
+      educations?.forEach(edu => {
+        if (!educationMap[edu.user_id]) {
+          educationMap[edu.user_id] = {
+            school_name: edu.school_name,
+            major_name_1: edu.major_name_1,
+          };
+        }
+      });
 
       // colleague의 팀/파트 정보 조회
       const { data: userTeamParts } = await supabase
@@ -94,14 +112,15 @@ export async function GET(request: Request) {
         }
 
         const teamPart = userTeamPartMap[c.id];
+        const education = educationMap[c.id];
         colleagueObj[c.id] = {
           id: c.id,
           name: c.display_name || '-',
           gender: c.gender || '-',
           age: age || '-',
           profileImg: c.profile_photo_url || '',
-          university: c.university || '-',
-          major: c.major_first || '-',
+          university: education?.school_name || '-',
+          major: education?.major_name_1 || '-',
           team: teamPart?.teamName || '-',
           part: teamPart?.partName || '-',
           nickname: c.vision || '-',

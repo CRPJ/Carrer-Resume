@@ -51,15 +51,33 @@ export async function GET(request: Request) {
     if (data && data.length > 0) {
       const reviewerIds = Array.from(new Set(data.map(d => d.reviewer_id)));
 
-      // reviewer 프로필 조회
+      // reviewer 프로필 조회 (university, major_first 제거)
       const { data: reviewers, error: reviewerError } = await supabase
         .from("user_profiles")
-        .select("id, display_name, gender, birth_date, university, major_first, profile_photo_url, vision")
+        .select("id, display_name, gender, birth_date, profile_photo_url, vision")
         .in("id", reviewerIds);
 
       if (reviewerError) {
         console.error("[weekly-reputations] reviewer 조회 오류:", reviewerError);
       }
+
+      // reviewer 학력 정보 조회 (user_educations에서)
+      const { data: educations } = await supabase
+        .from("user_educations")
+        .select("user_id, school_name, major_name_1, sort_order")
+        .in("user_id", reviewerIds)
+        .order("sort_order", { ascending: true });
+
+      // user_id별 학력 정보 Map (첫 번째 학력만 사용)
+      const educationMap: { [key: string]: { school_name: string | null; major_name_1: string | null } } = {};
+      educations?.forEach(edu => {
+        if (!educationMap[edu.user_id]) {
+          educationMap[edu.user_id] = {
+            school_name: edu.school_name,
+            major_name_1: edu.major_name_1,
+          };
+        }
+      });
 
       // reviewer의 팀/파트 정보 조회 (현재 활성화된 것만)
       const { data: userTeamParts } = await supabase
@@ -92,8 +110,11 @@ export async function GET(request: Request) {
       const reviewerObj: { [key: string]: any } = {};
       reviewers?.forEach(r => {
         const teamPart = userTeamPartMap[r.id];
+        const education = educationMap[r.id];
         reviewerObj[r.id] = {
           ...r,
+          university: education?.school_name || null,
+          major_first: education?.major_name_1 || null,
           teamName: teamPart?.teamName || null,
           partName: teamPart?.partName || null,
         };
