@@ -42,17 +42,16 @@ export async function GET(request: NextRequest) {
       'winter': '겨울'
     };
 
-    // break 시즌 이름 파싱 (spring_summer_break -> "봄→여름, 전환")
+    // break 시즌 이름 파싱 (spring_summer_break -> "여름", 전환 주차로 표시)
     const parseBreakSeasonName = (rawName: string): { displayName: string; isBreak: boolean } => {
       if (!rawName || !rawName.toLowerCase().includes('break')) {
         return { displayName: seasonNameMap[rawName] || rawName, isBreak: false };
       }
-      // spring_summer_break -> ['spring', 'summer']
+      // spring_summer_break -> ['spring', 'summer'] -> "여름" (다음 시즌 이름)
       const parts = rawName.replace('_break', '').split('_');
       if (parts.length >= 2) {
-        const fromSeason = seasonNameMap[parts[0]] || parts[0];
         const toSeason = seasonNameMap[parts[1]] || parts[1];
-        return { displayName: `${fromSeason}→${toSeason}, 전환`, isBreak: true };
+        return { displayName: toSeason, isBreak: true };
       }
       return { displayName: rawName, isBreak: true };
     };
@@ -74,8 +73,8 @@ export async function GET(request: NextRequest) {
         isBreakSeason: isBreak,
         holidayName: week.holiday_name,
         label: isBreak
-          ? `${seasonData?.year}년 ${displayName} ${week.week_number}주차`
-          : `${seasonData?.year}년 ${displayName} 시즌, ${week.week_number}주차`
+          ? `${seasonData?.year}년, ${displayName} 시즌, 전환 주차`
+          : `${seasonData?.year}년, ${displayName} 시즌, ${week.week_number}주차`
       };
     });
 

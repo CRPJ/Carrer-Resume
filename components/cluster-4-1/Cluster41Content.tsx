@@ -167,6 +167,7 @@ const Cluster41Content = () => {
     startDate: string;
     endDate: string;
     isClubBreak: boolean;
+    isBreakSeason: boolean; // 전환 주차 여부
     holidayName: string | null;
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
@@ -802,17 +803,16 @@ const Cluster41Content = () => {
           }
         }
 
-        // break 시즌 이름 파싱 (spring_summer_break -> "봄→여름, 전환")
+        // break 시즌 이름 파싱 (spring_summer_break -> "여름", 전환 주차로 표시)
         const parseBreakSeasonName = (rawName: string): { displayName: string; isBreak: boolean } => {
           if (!rawName || !rawName.toLowerCase().includes('break')) {
             return { displayName: seasonNameMap[rawName] || rawName, isBreak: false };
           }
-          // spring_summer_break -> ['spring', 'summer']
+          // spring_summer_break -> ['spring', 'summer'] -> "여름" (다음 시즌 이름)
           const parts = rawName.replace('_break', '').split('_');
           if (parts.length >= 2) {
-            const fromSeason = seasonNameMap[parts[0]] || parts[0];
             const toSeason = seasonNameMap[parts[1]] || parts[1];
-            return { displayName: `${fromSeason}→${toSeason}, 전환`, isBreak: true };
+            return { displayName: toSeason, isBreak: true };
           }
           return { displayName: rawName, isBreak: true };
         };
@@ -867,6 +867,7 @@ const Cluster41Content = () => {
             startDate: week.start_date,
             endDate: week.end_date,
             isClubBreak: week.is_club_break || isBreakSeason, // break 시즌도 공식 휴식으로 처리
+            isBreakSeason, // 전환 주차 여부
             holidayName: week.holiday_name,
             growthStatus: status
           };
@@ -1523,7 +1524,7 @@ const Cluster41Content = () => {
             <Link href={`/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               {/* 왼쪽 이미지 */}
               <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
-                <img src={getWeekImagePath(week)} alt={`${week.seasonYear} ${week.seasonName} 시즌, ${week.weekNumber}주차`} />
+                <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
                 {week.growthStatus === '휴식(개인)' && (
                   <div className="rest-message">
                     <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
@@ -1544,7 +1545,7 @@ const Cluster41Content = () => {
               <div className="weekly-card-content">
                 {/* 첫 번째 줄: 타이틀, 날짜, 주차 */}
                 <div className="weekly-card-header">
-                  <h4 className="weekly-card-title">{week.seasonYear} {week.seasonName} 시즌, {week.weekNumber}주차</h4>
+                  <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
                   <span className="weekly-card-date">
                     <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />
                     {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
