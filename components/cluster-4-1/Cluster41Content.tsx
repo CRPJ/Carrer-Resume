@@ -1060,13 +1060,8 @@ const Cluster41Content = () => {
 
   // DB 주차 데이터에서 이미지 경로 생성 (시즌명과 주차번호로 월/주차 계산)
   const getWeekImagePath = (week: DBWeekData) => {
-    // 전환 주차(break 시즌)일 때는 전환 주차 전용 이미지 사용
-    if (week.isBreakSeason) {
-      return `/images/0/cluster 4/주차 이미지/${week.seasonName} 시즌, 전환 주차.png`;
-    }
-
-    // 휴식 주차(개인/공식)일 때는 휴식 전용 이미지 사용
-    if (week.growthStatus.includes('휴식')) {
+    // 전환 주차(break 시즌) 또는 휴식 주차(개인/공식)일 때는 휴식 전용 이미지 사용
+    if (week.isBreakSeason || week.growthStatus.includes('휴식')) {
       return "/images/0/cluster 4/주차 이미지/휴식(개인,공식).png";
     }
 
