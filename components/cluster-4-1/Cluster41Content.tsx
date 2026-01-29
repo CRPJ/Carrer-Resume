@@ -802,25 +802,37 @@ const Cluster41Content = () => {
           }
         }
 
-        // 5. 데이터 변환
+        // break 시즌 이름 파싱 (spring_summer_break -> "봄→여름, 전환")
+        const parseBreakSeasonName = (rawName: string): { displayName: string; isBreak: boolean } => {
+          if (!rawName || !rawName.toLowerCase().includes('break')) {
+            return { displayName: seasonNameMap[rawName] || rawName, isBreak: false };
+          }
+          // spring_summer_break -> ['spring', 'summer']
+          const parts = rawName.replace('_break', '').split('_');
+          if (parts.length >= 2) {
+            const fromSeason = seasonNameMap[parts[0]] || parts[0];
+            const toSeason = seasonNameMap[parts[1]] || parts[1];
+            return { displayName: `${fromSeason}→${toSeason}, 전환`, isBreak: true };
+          }
+          return { displayName: rawName, isBreak: true };
+        };
+
+        // 5. 데이터 변환 (break 시즌도 포함)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formattedData: DBWeekData[] = (weeksData || []).map((week: any) => {
           const seasonData = week.seasons;
           const rawSeasonName = seasonData?.name || '';
+          const { displayName: seasonName, isBreak: isBreakSeason } = parseBreakSeasonName(rawSeasonName);
 
-          // break 시즌 제외
-          if (rawSeasonName.toLowerCase().includes('break')) {
-            return null;
-          }
-
-          const seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
-
-          // 성장 상태 결정 (온보딩 주차 → user_weekly_growth → 기존 로직)
+          // 성장 상태 결정 (온보딩 주차 → break 시즌 → user_weekly_growth → 기존 로직)
           let status = '실패';
 
           // 온보딩 주차는 무조건 성공 처리
           if (apiOnboardingWeekId && week.id === apiOnboardingWeekId) {
             status = '성공';
+          } else if (isBreakSeason) {
+            // break 시즌(전환 주차)은 기본적으로 휴식(공식)
+            status = '휴식(공식)';
           } else {
             const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
 
@@ -854,11 +866,11 @@ const Cluster41Content = () => {
             seasonName,
             startDate: week.start_date,
             endDate: week.end_date,
-            isClubBreak: week.is_club_break || false,
+            isClubBreak: week.is_club_break || isBreakSeason, // break 시즌도 공식 휴식으로 처리
             holidayName: week.holiday_name,
             growthStatus: status
           };
-        }).filter(Boolean) as DBWeekData[];
+        }) as DBWeekData[];
 
         // 요청 중 targetUserId가 바뀌지 않았는지 확인
         if (abortController.signal.aborted) return;
