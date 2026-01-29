@@ -213,14 +213,31 @@ export async function GET(request: NextRequest) {
       'winter': '겨울'
     };
 
+    // break 시즌 이름 변환 함수 (spring_summer_break → 여름)
+    // isBreak=true일 때 프론트에서 "시즌, 전환 주차"를 붙임
+    const parseBreakSeasonName = (rawName: string): { seasonName: string; isBreak: boolean } => {
+      if (!rawName || !rawName.toLowerCase().includes('break')) {
+        return { seasonName: seasonNameKoreanMap[rawName] || rawName, isBreak: false };
+      }
+      // spring_summer_break → ['spring', 'summer']
+      const parts = rawName.replace('_break', '').split('_');
+      if (parts.length >= 2) {
+        const toSeason = seasonNameKoreanMap[parts[1]] || parts[1];
+        return { seasonName: toSeason, isBreak: true };
+      }
+      return { seasonName: rawName, isBreak: false };
+    };
+
     // 결과 처리
     const growthStartDate = joinedWeekResult.data?.start_date || null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const joinedWeekData = joinedWeekResult.data as any;
+    const startSeasonParsed = joinedWeekData?.seasons?.name ? parseBreakSeasonName(joinedWeekData.seasons.name) : null;
     const growthStartWeekInfo = joinedWeekData ? {
       year: joinedWeekData.seasons?.year || null,
-      seasonName: seasonNameKoreanMap[joinedWeekData.seasons?.name] || joinedWeekData.seasons?.name || null,
-      weekNumber: joinedWeekData.week_number || null
+      seasonName: startSeasonParsed?.seasonName || null,
+      weekNumber: startSeasonParsed?.isBreak ? null : (joinedWeekData.week_number || null),
+      isBreak: startSeasonParsed?.isBreak || false
     } : null;
 
     let growthEndDate = null;
@@ -229,19 +246,23 @@ export async function GET(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const endWeekData = growthEndDateResult.data as any;
       growthEndDate = endWeekData?.end_date || null;
+      const endSeasonParsed = endWeekData?.seasons?.name ? parseBreakSeasonName(endWeekData.seasons.name) : null;
       growthEndWeekInfo = endWeekData ? {
         year: endWeekData.seasons?.year || null,
-        seasonName: seasonNameKoreanMap[endWeekData.seasons?.name] || endWeekData.seasons?.name || null,
-        weekNumber: endWeekData.week_number || null
+        seasonName: endSeasonParsed?.seasonName || null,
+        weekNumber: endSeasonParsed?.isBreak ? null : (endWeekData.week_number || null),
+        isBreak: endSeasonParsed?.isBreak || false
       } : null;
     } else if (profile.status === 'graduated') {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const graduatedData = growthEndDateResult.data as any;
       growthEndDate = graduatedData?.seasons?.end_date || null;
+      const graduatedSeasonParsed = graduatedData?.seasons?.name ? parseBreakSeasonName(graduatedData.seasons.name) : null;
       growthEndWeekInfo = graduatedData?.seasons ? {
         year: graduatedData.seasons.year || null,
-        seasonName: seasonNameKoreanMap[graduatedData.seasons.name] || graduatedData.seasons.name || null,
-        weekNumber: null // 졸업의 경우 주차 정보 없음
+        seasonName: graduatedSeasonParsed?.seasonName || null,
+        weekNumber: null, // 졸업의 경우 주차 정보 없음
+        isBreak: graduatedSeasonParsed?.isBreak || false
       } : null;
     }
 
@@ -439,7 +460,8 @@ export async function GET(request: NextRequest) {
     // completionRate 계산: (R / P) × 100
     // P = 가입 주차 이후 열린 모든 활동 수 (weekly_activities, break 시즌 제외)
     // R = 완료한 활동 수 (activity_records에서 is_completed=true)
-    let completionRate = 0;
+    // weekly_activities가 비어있거나 totalP가 0이면 null 반환 (프론트에서 '-' 표시)
+    let completionRate: number | null = null;
     console.log('[Profile API] completionRate 계산 시작 - growthStartDate:', growthStartDate, ', weeklyActivities count:', weeklyActivities?.length);
     if (growthStartDate && weeklyActivities && weeklyActivities.length > 0) {
       // 가입 주차 이후의 유효한 주차 ID 목록 (break 시즌 제외)
@@ -461,9 +483,10 @@ export async function GET(request: NextRequest) {
       if (totalP > 0) {
         completionRate = Math.round((totalR / totalP) * 100);
       }
+      // totalP가 0이면 completionRate는 null 유지
       console.log('[Profile API] completionRate 결과:', completionRate);
     } else {
-      console.log('[Profile API] completionRate 계산 스킵 - 조건 불충족');
+      console.log('[Profile API] completionRate 계산 스킵 - 조건 불충족 (null 반환)');
     }
 
     // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
@@ -811,64 +834,21 @@ export async function GET(request: NextRequest) {
         return true;
       });
 
-      // 실무 역량용 운영 주차 수 계산 (공식 휴식 + 개인 휴식 + 온보딩 주차 제외)
-      // operatingWeeks는 공식 휴식만 제외된 상태이므로, 개인 휴식과 온보딩 주차도 추가로 제외
-      // 온보딩 주차가 해당 시즌의 운영 주차에 포함되어 있는지 확인
-      const isOnboardingInThisSeason = profile.onboarding_week_id && operatingWeekIds.has(profile.onboarding_week_id);
-      const competencyOperatingWeeks = totalOperatingWeeks - restWeeksInSeason - (isOnboardingInThisSeason ? 1 : 0);
-
-      // 실무 경험용 "진행 주차" 기반 분모 계산
-      // 진행 주차별 가능한 실무 경험 개수:
-      // - 진행 1주차: 0개 (온보딩)
-      // - 진행 2주차: 2개 (커리어 Launch 1회 + 콘텐츠)
-      // - 진행 3주차: 2개 (생산성 + 콘텐츠)
-      // - 진행 4주차~: 3개 (생산성 + 콘텐츠 + 퍼포먼스)
-      const calculateExperienceTotal = () => {
-        // 해당 시즌의 운영 주차 중 유저가 참여 가능한 주차 (개인 휴식 제외)
-        const participatingWeeks = totalOperatingWeeks - restWeeksInSeason;
-        if (participatingWeeks <= 0) return 0;
-
-        // 온보딩 시즌인지 확인 (온보딩 주차가 이 시즌에 있는지)
-        const isOnboardingSeason = isOnboardingInThisSeason;
-
-        // 온보딩 시즌이 아니면 이미 진행 4주차 이상이므로 매주 3개
-        if (!isOnboardingSeason) {
-          return participatingWeeks * 3;
-        }
-
-        // 온보딩 시즌인 경우 진행 주차별로 계산
-        let total = 0;
-        for (let progressWeek = 1; progressWeek <= participatingWeeks; progressWeek++) {
-          if (progressWeek === 1) {
-            // 진행 1주차 (온보딩): 0개
-            total += 0;
-          } else if (progressWeek === 2) {
-            // 진행 2주차: 2개 (커리어 Launch 1회 + 콘텐츠)
-            total += 2;
-          } else if (progressWeek === 3) {
-            // 진행 3주차: 2개 (생산성 + 콘텐츠)
-            total += 2;
-          } else {
-            // 진행 4주차~: 3개 (생산성 + 콘텐츠 + 퍼포먼스)
-            total += 3;
-          }
-        }
-        return total;
-      };
-      const experienceOpenedByProgressWeek = calculateExperienceTotal();
+      // 모든 시즌에서 weekly_activities 기준으로 열린 활동 수 카운트
+      // (26년 겨울 4주차 이전 시즌은 weekly_activities에 데이터가 없으므로 0개로 표시됨)
 
       // 클러스터별로 열린 활동 분류
       let infoOpenedCount = 0;
-      let competencyOpenedCount = Math.max(0, competencyOperatingWeeks);  // 실무 역량: 한 주에 1개만 가능, 음수 방지
-      let experienceOpenedCount = experienceOpenedByProgressWeek;  // 실무 경험: 진행 주차 기반 계산
+      let competencyOpenedCount = 0;
+      let experienceOpenedCount = 0;
       let careerOpenedCount = 0;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       seasonOpenedActivities.forEach((wa: any) => {
         const clusterId = typeToClusterMapForSeason.get(wa.activity_type_id);
         if (clusterId === 'practical_info') infoOpenedCount++;
-        // competency는 운영 주차 수로 이미 설정됨
-        // experience는 진행 주차 기반으로 이미 설정됨
+        else if (clusterId === 'practical_competency') competencyOpenedCount++;
+        else if (clusterId === 'practical_experience') experienceOpenedCount++;
         else if (clusterId === 'practical_career') careerOpenedCount++;
       });
 

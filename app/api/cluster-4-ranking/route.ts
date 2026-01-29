@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "주차 데이터를 가져오는데 실패했습니다." }, { status: 500 });
     }
 
-    // break 시즌 필터링
+    // 시즌 이름 매핑 (break 시즌도 포함)
     const seasonNameMap: { [key: string]: string } = {
       'spring': '봄',
       'summer': '여름',
@@ -42,24 +42,40 @@ export async function GET(request: NextRequest) {
       'winter': '겨울'
     };
 
+    // break 시즌 이름 파싱 (spring_summer_break -> "봄→여름, 전환")
+    const parseBreakSeasonName = (rawName: string): { displayName: string; isBreak: boolean } => {
+      if (!rawName || !rawName.toLowerCase().includes('break')) {
+        return { displayName: seasonNameMap[rawName] || rawName, isBreak: false };
+      }
+      // spring_summer_break -> ['spring', 'summer']
+      const parts = rawName.replace('_break', '').split('_');
+      if (parts.length >= 2) {
+        const fromSeason = seasonNameMap[parts[0]] || parts[0];
+        const toSeason = seasonNameMap[parts[1]] || parts[1];
+        return { displayName: `${fromSeason}→${toSeason}, 전환`, isBreak: true };
+      }
+      return { displayName: rawName, isBreak: true };
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filteredWeeks = (allWeeks || []).filter((week: any) => {
+    const filteredWeeks = (allWeeks || []).map((week: any) => {
       const seasonData = week.seasons;
       const rawSeasonName = seasonData?.name || '';
-      return !rawSeasonName.toLowerCase().includes('break');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }).map((week: any) => {
-      const seasonData = week.seasons;
+      const { displayName, isBreak } = parseBreakSeasonName(rawSeasonName);
       return {
         id: week.id,
         weekNumber: week.week_number,
         seasonYear: seasonData?.year || 0,
-        seasonName: seasonNameMap[seasonData?.name] || seasonData?.name || '',
+        seasonName: displayName,
+        rawSeasonName: rawSeasonName,
         startDate: week.start_date,
         endDate: week.end_date,
         isClubBreak: week.is_club_break || false,
+        isBreakSeason: isBreak,
         holidayName: week.holiday_name,
-        label: `${seasonData?.year}년 ${seasonNameMap[seasonData?.name] || seasonData?.name} 시즌, ${week.week_number}주차`
+        label: isBreak
+          ? `${seasonData?.year}년 ${displayName} ${week.week_number}주차`
+          : `${seasonData?.year}년 ${displayName} 시즌, ${week.week_number}주차`
       };
     });
 
@@ -346,10 +362,22 @@ export async function GET(request: NextRequest) {
       }
       const cumulativeInjeolmi = cumulativeShield - cumulativeLightning;
 
+      // 온보딩 주차 확인 (위에서 한 번만 선언하고 이후 재사용)
+      const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
+      const isOnboardingWeek = weekId === userOnboardingWeekId;
+
       // 성장 상태 (Map 사용 - O(1))
       const weeklyGrowth = userGrowthMap.get(userId);
       let growthStatus = '실패';
-      if (weeklyGrowth) {
+
+      // 전환 주차(break 시즌)인 경우 특별 처리
+      if (selectedWeek.isBreakSeason) {
+        if (isOnboardingWeek) {
+          growthStatus = '성공'; // 전환 주차에 온보딩 했으면 성공
+        } else {
+          growthStatus = '휴식(공식)'; // 전환 주차는 기본적으로 휴식(공식)
+        }
+      } else if (weeklyGrowth) {
         if (weeklyGrowth.is_club_break) growthStatus = '휴식(공식)';
         else if (weeklyGrowth.is_resting) growthStatus = '휴식(개인)';
         else if (weeklyGrowth.is_success) growthStatus = '성공';
@@ -373,10 +401,6 @@ export async function GET(request: NextRequest) {
         return startedAt <= weekStartDate && (!endedAt || endedAt > weekStartDate);
       });
       const roleLabel = userRole ? (roleLabels[userRole.role] || userRole.role) : (profile.role ? roleLabels[profile.role] || profile.role : '일반');
-
-      // 온보딩 주차 확인
-      const userOnboardingWeekId = userOnboardingWeekMap.get(userId);
-      const isOnboardingWeek = weekId === userOnboardingWeekId;
 
       // 해당 유저의 성공 주차 필터링 (Map 사용 - O(1) 조회)
       const allUserSuccessWeeks = userSuccessWeeksMap.get(userId) || [];

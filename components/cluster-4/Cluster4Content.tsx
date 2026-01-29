@@ -154,6 +154,7 @@ const Cluster4Content = () => {
     year: number | null;
     seasonName: string | null;
     weekNumber: number | null;
+    isBreak?: boolean;
   } | null>(null);
 
   // 성장 시작 정보
@@ -161,6 +162,7 @@ const Cluster4Content = () => {
     year: number | null;
     seasonName: string | null;
     weekNumber: number | null;
+    isBreak?: boolean;
   } | null>(null);
 
   // 성장 기간 통계 (시즌 기반)
@@ -561,7 +563,8 @@ const Cluster4Content = () => {
               setGrowthStartInfo({
                 year: json.growthInfo.startWeekInfo.year,
                 seasonName: json.growthInfo.startWeekInfo.seasonName,
-                weekNumber: json.growthInfo.startWeekInfo.weekNumber
+                weekNumber: json.growthInfo.startWeekInfo.weekNumber,
+                isBreak: json.growthInfo.startWeekInfo.isBreak
               });
             } else {
               setGrowthStartInfo(null);
@@ -571,7 +574,8 @@ const Cluster4Content = () => {
               setGrowthEndInfo({
                 year: json.growthInfo.endWeekInfo.year,
                 seasonName: json.growthInfo.endWeekInfo.seasonName,
-                weekNumber: json.growthInfo.endWeekInfo.weekNumber
+                weekNumber: json.growthInfo.endWeekInfo.weekNumber,
+                isBreak: json.growthInfo.endWeekInfo.isBreak
               });
             } else {
               setGrowthEndInfo(null);
@@ -618,7 +622,8 @@ const Cluster4Content = () => {
               setGrowthStartInfo({
                 year: json.growthInfo.startWeekInfo.year,
                 seasonName: json.growthInfo.startWeekInfo.seasonName,
-                weekNumber: json.growthInfo.startWeekInfo.weekNumber
+                weekNumber: json.growthInfo.startWeekInfo.weekNumber,
+                isBreak: json.growthInfo.startWeekInfo.isBreak
               });
             } else {
               setGrowthStartInfo(null);
@@ -628,7 +633,8 @@ const Cluster4Content = () => {
               setGrowthEndInfo({
                 year: json.growthInfo.endWeekInfo.year,
                 seasonName: json.growthInfo.endWeekInfo.seasonName,
-                weekNumber: json.growthInfo.endWeekInfo.weekNumber
+                weekNumber: json.growthInfo.endWeekInfo.weekNumber,
+                isBreak: json.growthInfo.endWeekInfo.isBreak
               });
             } else {
               setGrowthEndInfo(null);
@@ -1438,7 +1444,9 @@ const Cluster4Content = () => {
                   <span className="detail-label">성장 시작 시즌</span>
                   <span className="detail-value">
                     {growthStartInfo && growthStartInfo.year
-                      ? `${growthStartInfo.year}년, ${growthStartInfo.seasonName} 시즌, ${growthStartInfo.weekNumber}주차`
+                      ? growthStartInfo.isBreak
+                        ? `${growthStartInfo.year}년, ${growthStartInfo.seasonName} 시즌, 전환 주차`
+                        : `${growthStartInfo.year}년, ${growthStartInfo.seasonName} 시즌, ${growthStartInfo.weekNumber}주차`
                       : '-'}
                   </span>
                 </div>
@@ -1460,7 +1468,7 @@ const Cluster4Content = () => {
                     {growthEndInfo ? (
                       <>
                         {growthEndInfo.year}년, {growthEndInfo.seasonName} 시즌
-                        {growthEndInfo.weekNumber ? `, ${growthEndInfo.weekNumber}주차` : ''} ({getGrowthBadgeText(userStatus, growthStatus)})
+                        {growthEndInfo.isBreak ? ', 전환 주차' : (growthEndInfo.weekNumber ? `, ${growthEndInfo.weekNumber}주차` : '')} ({getGrowthBadgeText(userStatus, growthStatus)})
                       </>
                     ) : (
                       <>~ing ({getGrowthBadgeText(userStatus, growthStatus)})</>
@@ -1740,42 +1748,42 @@ const Cluster4Content = () => {
                 </div>
               </div>
 
-              {/* 영역 7: 실무 성장률 프로그레스 바 (현재 주차 데이터) */}
+              {/* 영역 7: 실무 성장률 프로그레스 바 (시즌 전체 데이터) */}
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.info.total} 개 중 <span className="highlight">{activityStats.info.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress.info.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.info.total} 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.info.total > 0 ? Math.round((activityStats.info.success / activityStats.info.total) * 100) : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress.info.rate}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.competency.total} 개 중 <span className="highlight">{activityStats.competency.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress.competency.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.competency.total} 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.competency.total > 0 ? Math.round((activityStats.competency.success / activityStats.competency.total) * 100) : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress.competency.rate}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.experience.total} 개 중 <span className="highlight">{activityStats.experience.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress.experience.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.experience.total} 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.experience.total > 0 ? Math.round((activityStats.experience.success / activityStats.experience.total) * 100) : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress.experience.rate}%` }}></div>
                   </div>
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {activityStats.career.total} 개 중 <span className="highlight">{activityStats.career.success}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress.career.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.career.total} 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개</span>
                   </div>
                   <div className="bar">
-                    <div className="fill yellow" style={{ width: `${activityStats.career.total > 0 ? Math.round((activityStats.career.success / activityStats.career.total) * 100) : 0}%` }}></div>
+                    <div className="fill yellow" style={{ width: `${currentSeason.progress.career.rate}%` }}></div>
                   </div>
                 </div>
               </div>

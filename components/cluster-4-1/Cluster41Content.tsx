@@ -52,6 +52,7 @@ const Cluster41Content = () => {
     year: number | null;
     seasonName: string | null;
     weekNumber: number | null;
+    isBreak?: boolean;
   }
   const [startWeekInfo, setStartWeekInfo] = useState<WeekInfo | null>(null);
   const [endWeekInfo, setEndWeekInfo] = useState<WeekInfo | null>(null);
@@ -1282,7 +1283,9 @@ const Cluster41Content = () => {
                   <span className="detail-label">성장 시작 주차</span>
                   <span className="detail-value">
                     {startWeekInfo && startWeekInfo.year
-                      ? `${startWeekInfo.year}년, ${startWeekInfo.seasonName} 시즌, ${startWeekInfo.weekNumber}주차`
+                      ? startWeekInfo.isBreak
+                        ? `${startWeekInfo.year}년, ${startWeekInfo.seasonName} 시즌, 전환 주차`
+                        : `${startWeekInfo.year}년, ${startWeekInfo.seasonName} 시즌, ${startWeekInfo.weekNumber}주차`
                       : '-'}
                   </span>
                 </div>
@@ -1314,7 +1317,7 @@ const Cluster41Content = () => {
                   <span className="detail-label">성장 종료 주차</span>
                   <span className="detail-value">
                     {endWeekInfo && endWeekInfo.year
-                      ? `${endWeekInfo.year}년, ${endWeekInfo.seasonName} 시즌${endWeekInfo.weekNumber ? `, ${endWeekInfo.weekNumber}주차` : ''} (${getGrowthBadgeText(userStatus, growthStatus)})`
+                      ? `${endWeekInfo.year}년, ${endWeekInfo.seasonName} 시즌${endWeekInfo.isBreak ? ', 전환 주차' : (endWeekInfo.weekNumber ? `, ${endWeekInfo.weekNumber}주차` : '')} (${getGrowthBadgeText(userStatus, growthStatus)})`
                       : `~ing (${getGrowthBadgeText(userStatus, growthStatus)})`}
                   </span>
                 </div>
