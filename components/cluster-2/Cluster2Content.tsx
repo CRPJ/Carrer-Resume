@@ -84,6 +84,48 @@ const Cluster2Content = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEdu, setSelectedEdu] = useState<EduData | null>(null);
 
+  // 승인 상태 관련
+  const [isApproved, setIsApproved] = useState(false);
+
+  // 승인 상태 확인 함수
+  const checkApprovalStatus = async () => {
+    if (!session) return false;
+
+    try {
+      const response = await fetch('/api/auth/check-status');
+      const result = await response.json();
+
+      if (result.success && result.status === 'approved') {
+        setIsApproved(true);
+        return true;
+      } else {
+        setIsApproved(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('승인 상태 확인 오류:', error);
+      setIsApproved(false);
+      return false;
+    }
+  };
+
+  // 수정 버튼 클릭 핸들러 (승인 상태 체크)
+  const handleEditClick = async (openModalFn: () => void) => {
+    if (!session) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const approved = await checkApprovalStatus();
+
+    if (!approved) {
+      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      return;
+    }
+
+    openModalFn();
+  };
+
   // 섹션 1 모달 (프로필 사진 수정)
   const [section1ModalOpen, setSection1ModalOpen] = useState(false);
   const [mainPhoto, setMainPhoto] = useState<string | null>(null);
@@ -1025,7 +1067,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => setSection1ModalOpen(true)}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1129,7 +1171,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); })}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1230,7 +1272,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); })}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1332,7 +1374,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); })}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1430,7 +1472,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); })}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -2143,12 +2185,12 @@ const Cluster2Content = () => {
                 ) : (
                   <button
                     className="edit-btn"
-                    onClick={() => {
+                    onClick={() => handleEditClick(() => {
                       setEditingIntroData({
                         content: introCards[selectedIntroCard].content
                       });
                       setIsEditingIntro(true);
-                    }}
+                    })}
                   >
                     <i className="ti ti-pencil"></i>
                     수정
