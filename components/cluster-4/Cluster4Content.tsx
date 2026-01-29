@@ -49,6 +49,42 @@ const Cluster4Content = () => {
   const urlUserId = searchParams.get('userId');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
+  // 승인 상태 확인 함수
+  const checkApprovalStatus = async () => {
+    if (!session) return false;
+
+    try {
+      const response = await fetch('/api/auth/check-status');
+      const result = await response.json();
+
+      if (result.success && result.status === 'approved') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('승인 상태 확인 오류:', error);
+      return false;
+    }
+  };
+
+  // 수정 버튼 클릭 핸들러 (승인 상태 체크)
+  const handleEditClick = async (openModalFn: () => void) => {
+    if (!session) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const approved = await checkApprovalStatus();
+
+    if (!approved) {
+      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      return;
+    }
+
+    openModalFn();
+  };
+
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isTextFading, setIsTextFading] = useState(false);
@@ -1496,7 +1532,7 @@ const Cluster4Content = () => {
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           {session && !isOwner && urlUserId && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={openSeasonReputationModal}>
+              <div className="edit-icon" onClick={() => handleEditClick(openSeasonReputationModal)}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">

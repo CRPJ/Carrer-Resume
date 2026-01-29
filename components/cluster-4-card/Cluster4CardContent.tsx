@@ -46,6 +46,42 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const urlUserId = searchParams.get('userId');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
+  // 승인 상태 확인 함수
+  const checkApprovalStatus = async () => {
+    if (!session) return false;
+
+    try {
+      const response = await fetch('/api/auth/check-status');
+      const result = await response.json();
+
+      if (result.success && result.status === 'approved') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('승인 상태 확인 오류:', error);
+      return false;
+    }
+  };
+
+  // 수정 버튼 클릭 핸들러 (승인 상태 체크)
+  const handleEditClick = async (openModalFn: () => void) => {
+    if (!session) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const approved = await checkApprovalStatus();
+
+    if (!approved) {
+      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      return;
+    }
+
+    openModalFn();
+  };
+
   // DB에서 가져온 주차 데이터 상태
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
@@ -1935,7 +1971,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setHeaderModalType('본인'); setHeaderModalOpen(true); }} style={{ cursor: 'pointer' }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
             </div>
             <div className="edit-icon search-icon">
@@ -1950,7 +1986,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 타인 카드일 때 - 주차 평판 남기기 버튼 */}
         {session && !isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <img src="/images/0/cluster 4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>
@@ -2179,10 +2215,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => {
+              <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
-              }} style={{ cursor: 'pointer' }}>
+              })} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -2265,10 +2301,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => {
+              <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkAbilityModalOpen(true);
-              }} style={{ cursor: 'pointer' }}>
+              })} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -2375,14 +2411,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => {
+              <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workExpActivityTypes)) {
                   alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
                   return;
                 }
                 initializeEditingDetails();
                 setWorkExpModalOpen(true);
-              }} style={{ cursor: 'pointer' }}>
+              })} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">
@@ -2487,14 +2523,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {session && isOwner && (
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => {
+              <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workCareerActivityTypes)) {
                   alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
                   return;
                 }
                 initializeEditingDetails();
                 setWorkCareerModalOpen(true);
-              }} style={{ cursor: 'pointer' }}>
+              })} style={{ cursor: 'pointer' }}>
                 <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
               </div>
               <div className="edit-icon search-icon">

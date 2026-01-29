@@ -10,6 +10,43 @@ const Cluster3Content = () => {
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+
+  // 승인 상태 확인 함수
+  const checkApprovalStatus = async () => {
+    if (!session) return false;
+
+    try {
+      const response = await fetch('/api/auth/check-status');
+      const result = await response.json();
+
+      if (result.success && result.status === 'approved') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('승인 상태 확인 오류:', error);
+      return false;
+    }
+  };
+
+  // 수정 버튼 클릭 핸들러 (승인 상태 체크)
+  const handleEditClick = async (openModalFn: () => void) => {
+    if (!session) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const approved = await checkApprovalStatus();
+
+    if (!approved) {
+      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      return;
+    }
+
+    openModalFn();
+  };
+
   // 현재 활성화된 슬라이드 인덱스
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -947,11 +984,11 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => {
+            <div className="edit-icon" onClick={() => handleEditClick(() => {
               // 포트폴리오 아카이빙은 10개만 DB 저장
               setEditingSection3Links([...portfolioArchives]);
               setSection3ModalOpen(true);
-            }} style={{ cursor: 'pointer' }}>
+            })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1047,11 +1084,11 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => {
+            <div className="edit-icon" onClick={() => handleEditClick(() => {
               setEditingSection4Links(topWorksSlides.map(slide => slide.link || ""));
               setEditingOutputChannels([...portfolioOutputChannels]);
               setSection4ModalOpen(true);
-            }} style={{ cursor: 'pointer' }}>
+            })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1175,11 +1212,11 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => {
+            <div className="edit-icon" onClick={() => handleEditClick(() => {
               setEditingSection5Links([...portfolioDetails]);
               setEditingDetailChannels([...portfolioDetailChannels]);
               setSection5ModalOpen(true);
-            }} style={{ cursor: 'pointer' }}>
+            })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
