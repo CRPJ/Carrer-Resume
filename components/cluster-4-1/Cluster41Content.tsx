@@ -271,6 +271,7 @@ const Cluster41Content = () => {
     'part_leader': '심화(파트장)',
     'crew_partleader': '심화(파트장)',
     'crew_advanced_part_leader': '심화(파트장)',
+    'operations_partleader': '심화(파트장)',
     'crew_agent': '심화(에이전트)',
     'crew_advanced_agent': '심화(에이전트)',
     'crew_ambassador': '운영진(앰배서더)',
@@ -278,6 +279,7 @@ const Cluster41Content = () => {
     'operations_ambassador': '운영진(앰배서더)',
     'crew_team_leader': '운영진(팀장)',
     'admin_team_leader': '운영진(팀장)',
+    'operations_teamleader': '운영진(팀장)',
   };
 
   // 특정 날짜에 해당하는 팀/파트 정보 찾기

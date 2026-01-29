@@ -205,6 +205,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'crew_regular': '일반',
     'part_leader': '심화(파트장)',
     'crew_partleader': '심화(파트장)',
+    'operations_partleader': '심화(파트장)',
     'crew_agent': '심화(에이전트)',
     'operations_ambassador': '운영진(앰배서더)',
     'operations_teamleader': '운영진(팀장)',

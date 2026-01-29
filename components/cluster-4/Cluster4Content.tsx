@@ -736,9 +736,11 @@ const Cluster4Content = () => {
     'crew_agent': '심화(에이전트)',
     'crew_advanced_part_leader': '심화(파트장)',
     'crew_partleader': '심화(파트장)',
+    'operations_partleader': '심화(파트장)',
     'part_leader': '심화(파트장)',
     'admin_team_leader': '운영진(팀장)',
     'crew_team_leader': '운영진(팀장)',
+    'operations_teamleader': '운영진(팀장)',
     'admin_ambassador': '운영진(앰배서더)',
     'crew_ambassador': '운영진(앰배서더)',
     'operations_ambassador': '운영진(앰배서더)',
@@ -746,7 +748,7 @@ const Cluster4Content = () => {
 
   // 운영진 역할인지 확인
   const isAdminRole = (role: string): boolean => {
-    return ['admin_team_leader', 'crew_team_leader', 'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
+    return ['admin_team_leader', 'crew_team_leader', 'operations_teamleader', 'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
   };
 
   // 시즌 히스토리 포맷팅 함수
@@ -960,6 +962,7 @@ const Cluster4Content = () => {
         'part_leader': '심화(파트장)',
         'admin_team_leader': '운영진(팀장)',
         'crew_team_leader': '운영진(팀장)',
+        'operations_teamleader': '운영진(팀장)',
         'admin_ambassador': '운영진(앰배서더)',
         'crew_ambassador': '운영진(앰배서더)',
         'operations_ambassador': '운영진(앰배서더)',
@@ -967,7 +970,7 @@ const Cluster4Content = () => {
 
       // 운영진 역할 확인 함수
       const checkIsAdmin = (role: string): boolean => {
-        return ['admin_team_leader', 'crew_team_leader', 'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
+        return ['admin_team_leader', 'crew_team_leader', 'operations_teamleader', 'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
       };
 
       // 각 변경 시점에서의 상태 계산
