@@ -261,7 +261,7 @@ export async function PUT(request: Request) {
     if (deleteError) {
       console.error("기존 학력 삭제 오류:", deleteError);
       return NextResponse.json(
-        { error: "학력 저장에 실패했습니다." },
+        { error: `학력 저장에 실패했습니다: ${deleteError.message}` },
         { status: 500 }
       );
     }
@@ -299,7 +299,6 @@ export async function PUT(request: Request) {
         const majorCategory = categoryToDb[edu.category || ''] || edu.category || null;
 
         return {
-          id: crypto.randomUUID(),
           user_id: profile.id,
           education_level: educationLevel,
           school_name: edu.school || null,
@@ -314,8 +313,6 @@ export async function PUT(request: Request) {
           grade_value: edu.gradeValue || null,
           note: edu.description || null,
           sort_order: edu.isFinal ? 0 : index + 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         };
       });
 
@@ -326,7 +323,7 @@ export async function PUT(request: Request) {
       if (insertError) {
         console.error("학력 저장 오류:", insertError);
         return NextResponse.json(
-          { error: "학력 저장에 실패했습니다." },
+          { error: `학력 저장에 실패했습니다: ${insertError.message}` },
           { status: 500 }
         );
       }

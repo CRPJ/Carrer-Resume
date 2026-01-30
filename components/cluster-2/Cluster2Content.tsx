@@ -3047,13 +3047,36 @@ const Cluster2Content = () => {
                     return;
                   }
 
-                  // 저장 로직 - 빈 전공 필드를 "-"로 변환 후 저장
-                  const processedData = editingEduData.map(edu => ({
-                    ...edu,
-                    major1: edu.major1.trim() === '' ? '-' : edu.major1,
-                    major2: edu.major2.trim() === '' ? '-' : edu.major2,
-                    major3: edu.major3.trim() === '' ? '-' : edu.major3,
-                  }));
+                  // 저장 로직 - 빈 전공 필드를 "-"로 변환 + period 계산 후 저장
+                  const processedData = editingEduData.map(edu => {
+                    // period 계산: startYear/startMonth, endYear/endMonth, status 기반
+                    const startStr = edu.startYear && edu.startMonth
+                      ? `${edu.startYear}.${edu.startMonth}`
+                      : edu.startYear || "";
+                    const endStr = edu.endYear && edu.endMonth
+                      ? `${edu.endYear}.${edu.endMonth}`
+                      : edu.endYear || "";
+                    const isOngoing = ['재학', '졸예', '졸업예정', '휴학'].includes(edu.status);
+
+                    let period = "";
+                    if (startStr) {
+                      if (isOngoing) {
+                        period = `${startStr} - ~ing`;
+                      } else if (endStr) {
+                        period = `${startStr} - ${endStr}`;
+                      } else {
+                        period = `${startStr} -`;
+                      }
+                    }
+
+                    return {
+                      ...edu,
+                      period,
+                      major1: edu.major1.trim() === '' ? '-' : edu.major1,
+                      major2: edu.major2.trim() === '' ? '-' : edu.major2,
+                      major3: edu.major3.trim() === '' ? '-' : edu.major3,
+                    };
+                  });
                   handleSaveEducations(processedData);
                 }}
               >

@@ -14,7 +14,7 @@ const Sidebar = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId');
-  const { fetchProfile: fetchCachedProfile, profileData: cachedProfile } = useProfile();
+  const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
@@ -816,7 +816,8 @@ const Sidebar = () => {
       if (result.success) {
         alert('프로필이 성공적으로 저장되었습니다.');
         setIsEditModalOpen(false);
-        // 프로필 데이터 새로고침
+        // 캐시 무효화 후 프로필 데이터 새로고침
+        clearProfileCache();
         fetchUserProfile();
       } else {
         alert(result.error || '프로필 저장에 실패했습니다.');
