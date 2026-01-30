@@ -4,6 +4,8 @@ import { createAdminClient } from "@/lib/supabase-server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const isValidUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 // GET: 크루 목록 조회
 export async function GET(request: Request) {
   try {
@@ -12,24 +14,24 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    // 활성 크루만 조회 (status가 active, suspended 등) - university, major_first 제거
+    // 활성 크루만 조회
     let query = supabase
       .from("user_profiles")
       .select("id, display_name, gender, birth_date, profile_photo_url, vision")
-      .in("status", ["active", "suspended", "seasonal_rest"])
+      .in("growth_status", ["active", "suspended", "seasonal_rest"])
       .not("display_name", "is", null)
       .order("display_name", { ascending: true });
 
-    if (excludeUserId) {
+    if (excludeUserId && isValidUUID(excludeUserId)) {
       query = query.neq("id", excludeUserId);
     }
 
     const { data: users, error } = await query;
 
     if (error) {
-      console.error("크루 목록 조회 오류:", error);
+      console.error("크루 목록 조회 오류:", JSON.stringify(error));
       return NextResponse.json(
-        { error: "크루 목록 조회에 실패했습니다." },
+        { error: "크루 목록 조회에 실패했습니다.", detail: error.message, code: error.code },
         { status: 500 }
       );
     }

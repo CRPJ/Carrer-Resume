@@ -6,6 +6,8 @@ import { createAdminClient } from "@/lib/supabase-server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const isValidUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 // GET: 연계 동료 조회
 export async function GET(request: Request) {
   try {
@@ -28,11 +30,11 @@ export async function GET(request: Request) {
       `)
       .order("rank", { ascending: true });
 
-    if (userId) {
+    if (userId && isValidUUID(userId)) {
       query = query.eq("user_id", userId);
     }
 
-    if (weekCardId) {
+    if (weekCardId && isValidUUID(weekCardId)) {
       query = query.eq("week_card_id", weekCardId);
     }
 
