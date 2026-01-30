@@ -33,6 +33,7 @@ const categoryToDb: { [key: string]: string } = {
   '자연': 'natural_science',
   '공학': 'engineering',
   '경영': 'business',
+  '상경': 'business',
   '예체능': 'arts_physical',
   '기타': 'other',
 };
@@ -69,7 +70,7 @@ const categoryFromDb: { [key: string]: string } = {
   'social_science': '사회',
   'natural_science': '자연',
   'engineering': '공학',
-  'business': '경영',
+  'business': '상경',
   'arts_physical': '예체능',
   'other': '기타',
 };
@@ -293,10 +294,13 @@ export async function PUT(request: Request) {
           ? `${edu.endYear}.${edu.endMonth}`
           : edu.endYear || null;
 
-        // 한글 → 영문 변환
-        const educationLevel = eduLevelToDb[edu.eduLevel || ''] || edu.eduLevel || null;
-        const status = statusToDb[edu.status || ''] || edu.status || null;
-        const majorCategory = categoryToDb[edu.category || ''] || edu.category || null;
+        // 한글 → 영문 변환 ('-' 값은 null 처리)
+        const rawEduLevel = edu.eduLevel === '-' ? '' : edu.eduLevel || '';
+        const rawStatus = edu.status === '-' ? '' : edu.status || '';
+        const rawCategory = edu.category === '-' ? '' : edu.category || '';
+        const educationLevel = eduLevelToDb[rawEduLevel] || rawEduLevel || null;
+        const status = statusToDb[rawStatus] || rawStatus || null;
+        const majorCategory = categoryToDb[rawCategory] || rawCategory || null;
 
         return {
           user_id: profile.id,
