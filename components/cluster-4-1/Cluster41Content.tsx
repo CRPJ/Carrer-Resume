@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
-  const targetUserId = searchParams.get('userId');
+  const targetUserId = searchParams.get('userId') || searchParams.get('userID');
 
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);

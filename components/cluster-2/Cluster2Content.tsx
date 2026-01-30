@@ -74,7 +74,7 @@ const Cluster2Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const urlUserId = searchParams.get('userId');
+  const urlUserId = searchParams.get('userId') || searchParams.get('userID');
 
   // 본인 프로필인지 확인: URL에 userId가 없거나, 로그인한 사용자 ID와 같으면 본인
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);

@@ -8,7 +8,7 @@ const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const urlUserId = searchParams.get('userId');
+  const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   // 승인 상태 확인 함수

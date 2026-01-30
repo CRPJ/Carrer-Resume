@@ -13,7 +13,7 @@ const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 const Sidebar = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const targetUserId = searchParams.get('userId');
+  const targetUserId = searchParams.get('userId') || searchParams.get('userID');
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
