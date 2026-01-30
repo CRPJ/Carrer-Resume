@@ -783,13 +783,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // DB에서 실무 경력 데이터 가져오기
   useEffect(() => {
     const fetchCareerRecords = async () => {
-      if (!currentUserId || !weekId) return;
+      if (!weekId) return;
 
       setIsLoadingCareerRecords(true);
       try {
-        const response = await fetch(`/api/career-records?user_id=${currentUserId}&week_id=${weekId}`);
+        const params = new URLSearchParams({ week_id: weekId });
+        if (currentUserId) params.set('user_id', currentUserId);
+        const url = `/api/career-records?${params.toString()}`;
+        console.log('[cluster-4-card] fetchCareerRecords URL:', url);
+        const response = await fetch(url);
         const result = await response.json();
 
+        console.log('[cluster-4-card] fetchCareerRecords result:', { success: result.success, count: result.count });
         if (result.success && result.data) {
           setCareerRecords(result.data);
         }
@@ -803,18 +808,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     fetchCareerRecords();
   }, [currentUserId, weekId]);
 
-  // 실무 경력 통계 업데이트 (career records 기반) - cluster-4-1과 동일한 로직
-  // total: 참여한 프로젝트 수 (pending, enhanced만 - 최대 5개)
+  // 실무 경력 통계 업데이트 (career records 기반)
+  // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
   // success: 강화 성공한 프로젝트 수 (enhanced - 최대 total개)
   useEffect(() => {
-    // pending 또는 enhanced 상태만 포함 (cluster-4-1과 동일)
-    const participatingRecords = careerRecords.filter(r =>
-      r.enhancement_status === 'pending' || r.enhancement_status === 'enhanced'
-    );
-    // 최대 5개 제한 (cluster-4-1과 동일)
-    const rawTotal = participatingRecords.length;
+    // 전체 프로젝트 수 (최대 5개)
+    const rawTotal = careerRecords.length;
     const total = Math.min(rawTotal, 5);
-    const enhancedCount = participatingRecords.filter(r => r.enhancement_status === 'enhanced').length;
+    const enhancedCount = careerRecords.filter(r => r.enhancement_status === 'enhanced').length;
     const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
   }, [careerRecords]);
@@ -1856,8 +1857,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)
   const workCareerCards = careerRecords.length > 0
     ? careerRecords
-        // 참여한 프로젝트만 표시 (pending, enhanced, failed)
-        .filter(record => record.enhancement_status !== 'not_applicable')
         .map((record, index) => {
           // 강화 상태에 따른 배지 결정
           const getStatusBadge = (enhStatus: string) => {
@@ -1884,7 +1883,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             supervisorPosition: record.supervisor_position || '',
             statusBadge: getStatusBadge(record.enhancement_status),
             grade: record.grade || '',
-            isNotApplicable: false,
+            isNotApplicable: record.enhancement_status === 'not_applicable',
             isEmpty: false,
             isFailed: record.enhancement_status === 'failed',
             // 추가 정보 (상세 보기용)

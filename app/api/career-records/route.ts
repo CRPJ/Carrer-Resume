@@ -16,60 +16,37 @@ export async function GET(request: NextRequest) {
     const weekId = searchParams.get('week_id')
     const seasonId = searchParams.get('season_id')
 
-    if (!userId) {
-      return NextResponse.json({ error: 'user_id is required' }, { status: 400 })
-    }
-
     // 주차별 프로젝트와 사용자 기록을 함께 조회
     if (weekId) {
       // 1. 해당 주차의 모든 프로젝트 조회
       const { data: projects, error: projectsError } = await supabaseAdmin
         .from('career_projects')
-        .select(`
-          id,
-          week_id,
-          company_name,
-          company_logo_url,
-          job_position,
-          project_name,
-          project_description,
-          line_code,
-          line_name,
-          output_links,
-          is_active,
-          created_at,
-          weeks!career_projects_week_id_fkey (
-            id,
-            week_number,
-            start_date,
-            end_date,
-            season_id,
-            seasons (
-              id,
-              year,
-              name
-            )
-          )
-        `)
+        .select('*')
         .eq('week_id', weekId)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
+
+      console.log('[career-records API] weekId:', weekId, 'projects found:', projects?.length, 'error:', projectsError)
 
       if (projectsError) {
         console.error('Error fetching career projects:', projectsError)
         return NextResponse.json({ error: projectsError.message }, { status: 500 })
       }
 
-      // 2. 해당 사용자의 해당 주차 경력 기록 조회
-      const { data: records, error: recordsError } = await supabaseAdmin
-        .from('career_records')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('week_id', weekId)
+      // 2. 해당 사용자의 해당 주차 경력 기록 조회 (userId가 있는 경우만)
+      let records: any[] = []
+      if (userId) {
+        const { data, error: recordsError } = await supabaseAdmin
+          .from('career_records')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('week_id', weekId)
 
-      if (recordsError) {
-        console.error('Error fetching career records:', recordsError)
-        return NextResponse.json({ error: recordsError.message }, { status: 500 })
+        if (recordsError) {
+          console.error('Error fetching career records:', recordsError)
+          return NextResponse.json({ error: recordsError.message }, { status: 500 })
+        }
+        records = data || []
       }
 
       // 3. 프로젝트와 기록을 매핑
@@ -96,7 +73,7 @@ export async function GET(request: NextRequest) {
           line_code: project.line_code,
           line_name: project.line_name,
           output_links: project.output_links,
-          weeks: project.weeks,
+          weeks: null,
           created_at: project.created_at,
 
           // 사용자 기록 상태
@@ -123,7 +100,11 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // 시즌별 또는 전체 조회 (기존 로직)
+    // 시즌별 또는 전체 조회 (userId 필수)
+    if (!userId) {
+      return NextResponse.json({ error: 'user_id is required for non-week queries' }, { status: 400 })
+    }
+
     let query = supabaseAdmin
       .from('career_records')
       .select(`
