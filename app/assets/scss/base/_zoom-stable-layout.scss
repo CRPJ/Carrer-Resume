@@ -1,0 +1,270 @@
+// =============================================
+// 반응형 레이아웃 시스템 - 모니터 크기별 대응
+// =============================================
+// 파일 위치: app/assets/scss/base/_zoom-stable-layout.scss
+
+// ===== CSS 변수 정의 (기본값 - 1920px 기준) =====
+:root {
+    // 레이아웃 크기
+    --content-max-width: 1325px;
+    --sidebar-width: 520px;
+    --sidebar-left-offset: 110px;
+    --header-height: 100px;
+    
+    // 간격
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 40px;
+    --spacing-xl: 60px;
+    
+    // 폰트 크기
+    --font-title-xl: 72px;
+    --font-title-lg: 48px;
+    --font-title-md: 36px;
+    --font-title-sm: 24px;
+    --font-body-lg: 18px;
+    --font-body: 16px;
+    --font-body-sm: 14px;
+    --font-caption: 12px;
+    
+    // 탭 버튼 크기 (기본값 - 1920px 기준)
+    --tab-width: 250px;
+    --tab-height: 48px;
+    --tab-font-size: 14px;
+  }
+  
+  // ===== 2560px 이상 (27인치 QHD 등 대형 모니터) =====
+  @media (min-width: 2560px) {
+    :root {
+      --content-max-width: 1600px;
+      --sidebar-width: 620px;
+      --sidebar-left-offset: 160px;
+      
+      --spacing-lg: 50px;
+      --spacing-xl: 80px;
+      
+      --font-title-xl: 84px;
+      --font-title-lg: 56px;
+      --font-title-md: 42px;
+      --font-title-sm: 28px;
+      --font-body-lg: 20px;
+      --font-body: 18px;
+      --font-body-sm: 16px;
+      
+      // 탭 버튼 크기
+      --tab-width: 300px;
+      --tab-height: 58px;
+      --tab-font-size: 17px;
+    }
+  }
+  
+  // ===== 3840px 이상 (32인치 4K 등 초대형 모니터) =====
+  @media (min-width: 3840px) {
+    :root {
+      --content-max-width: 2000px;
+      --sidebar-width: 720px;
+      --sidebar-left-offset: 200px;
+      
+      --spacing-lg: 60px;
+      --spacing-xl: 100px;
+      
+      --font-title-xl: 96px;
+      --font-title-lg: 64px;
+      --font-title-md: 48px;
+      --font-title-sm: 32px;
+      --font-body-lg: 22px;
+      --font-body: 20px;
+      --font-body-sm: 18px;
+      
+      // 탭 버튼 크기
+      --tab-width: 350px;
+      --tab-height: 68px;
+      --tab-font-size: 20px;
+    }
+  }
+  
+  // ===== 1920px ~ 2559px (24~27인치 FHD/QHD) =====
+  // 기본값 사용
+  
+  // ===== 1600px ~ 1919px (작은 데스크톱, 노트북) =====
+  @media (max-width: 1919px) {
+    :root {
+      --content-max-width: 1200px;
+      --sidebar-width: 480px;
+      --sidebar-left-offset: 90px;
+      
+      --font-title-xl: 64px;
+      --font-title-lg: 44px;
+      --font-title-md: 32px;
+    }
+  }
+  
+  // ===== 1400px ~ 1599px (노트북) =====
+  @media (max-width: 1599px) {
+    :root {
+      --content-max-width: 1100px;
+      --sidebar-width: 440px;
+      --sidebar-left-offset: 70px;
+      
+      --spacing-lg: 32px;
+      --spacing-xl: 48px;
+      
+      --font-title-xl: 56px;
+      --font-title-lg: 40px;
+      --font-title-md: 28px;
+      --font-title-sm: 22px;
+    }
+  }
+  
+  // ===== 1200px ~ 1399px (작은 노트북) =====
+  @media (max-width: 1399px) {
+    :root {
+      --content-max-width: 100%;
+      --sidebar-width: 400px;
+      --sidebar-left-offset: 50px;
+      
+      --spacing-lg: 28px;
+      --spacing-xl: 40px;
+      
+      --font-title-xl: 48px;
+      --font-title-lg: 36px;
+      --font-title-md: 26px;
+      --font-title-sm: 20px;
+      --font-body-lg: 17px;
+    }
+  }
+  
+  // ===== 1200px 이하 (태블릿/사이드바 숨김) =====
+  @media (max-width: 1199px) {
+    :root {
+      --sidebar-width: 0px;
+      --sidebar-left-offset: 0px;
+      
+      --font-title-xl: 42px;
+      --font-title-lg: 32px;
+      --font-title-md: 24px;
+      --font-title-sm: 18px;
+    }
+  }
+  
+  
+  // ===== 공통 레이아웃 스타일 =====
+  
+  // 전체 너비 섹션 (배경만 확장, 콘텐츠는 중앙 고정)
+  .full-width-section {
+    width: 100%;
+    position: relative;
+    
+    // 배경용 가상 요소
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    // 콘텐츠는 중앙 고정
+    .section-inner {
+      max-width: var(--content-max-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+  }
+  
+  // 메인 콘텐츠 영역
+  .main-content {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  // 사이드바 컨테이너
+  .sidebar-container {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    flex-shrink: 0;
+    
+    @media (max-width: 1199px) {
+      display: none;
+    }
+  }
+  
+  // 콘텐츠 그리드
+  .content-grid {
+    display: flex;
+    gap: var(--spacing-md);
+    
+    .content-main {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .content-sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      
+      @media (max-width: 1199px) {
+        display: none;
+      }
+    }
+  }
+  
+  
+  // ===== Cluster2 전용 반응형 =====
+  
+  .cluster2-content,
+  .home-two-content {
+    max-width: var(--content-max-width);
+    
+    // 섹션 제목
+    .section-title,
+    .c2-title {
+      font-size: var(--font-title-lg);
+    }
+    
+    // 섹션 간격
+    .section-gap {
+      margin-bottom: var(--spacing-xl);
+    }
+  }
+  
+  // 탭 메뉴 반응형
+  .cluster-tabs {
+    .cluster-tabs-inner {
+      max-width: var(--content-max-width);
+    }
+    
+    .cluster-tab {
+      // CSS 변수로 크기 제어 (모니터별 자동 조정)
+      width: var(--tab-width, 250px);
+      min-width: var(--tab-width, 250px);
+      height: var(--tab-height, 48px);
+      font-size: var(--tab-font-size, 14px);
+      
+      @media (max-width: 1599px) {
+        width: 220px;
+        min-width: 220px;
+        height: 44px;
+        font-size: 13px;
+      }
+      
+      @media (max-width: 1399px) {
+        width: 200px;
+        min-width: 200px;
+        height: 42px;
+        font-size: 12px;
+      }
+      
+      @media (max-width: 1199px) {
+        width: 180px;
+        min-width: 180px;
+        height: 40px;
+        font-size: 11px;
+      }
+    }
+  }

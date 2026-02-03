@@ -15,6 +15,7 @@
      2.01 --> reset
      2.02 --> typography
      2.03 --> global
+     2.04 --> zoom-stable-layout (반응형 CSS 변수)
 
  03. components
      3.01 --> buttons
@@ -111,6 +112,7 @@
 @import "./base/reset";
 @import "./base/typography";
 @import "./base/global";
+@import "./base/zoom-stable-layout"; // ★ 반응형 CSS 변수 시스템 추가
 
 // component styles
 @import "./components/buttons";
