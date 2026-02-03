@@ -69,7 +69,7 @@
 }
 
 // Resume Card - Exact Design Match
-// 474px x 810px 고정 (transform: scale로 크기 조절)
+// 474px x 810px 고정 (데스크탑용, 모바일에서는 유연하게)
 .resume-card {
   width: 474px !important;
   min-width: 474px !important;
@@ -85,6 +85,43 @@
   padding: 0;
   position: relative;
   box-sizing: border-box !important;
+  
+  // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
+  @media only screen and (max-width: 1199px) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    padding: 16px !important;
+    
+    // 내부 고정 너비 요소들 모두 100%로 변경
+    .resume-header,
+    .resume-intro,
+    .resume-three-column,
+    .resume-stats,
+    .resume-badges,
+    .resume-medal,
+    .resume-activities,
+    .resume-bottom-section,
+    .resume-skills,
+    .resume-notices,
+    .activity-row,
+    .stat-row,
+    .progress-bar {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+    }
+    
+    // 사진 영역도 유연하게
+    .resume-photo {
+      width: auto !important;
+      min-width: auto !important;
+      max-width: 100% !important;
+    }
+  }
 
   * {
     box-sizing: border-box;
