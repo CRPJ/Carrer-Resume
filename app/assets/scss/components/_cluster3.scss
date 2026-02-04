@@ -158,8 +158,10 @@
     .section1-bg {
       position: absolute;
       top: 0;
-      left: 0;
-      width: 1330px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 1330px;
       height: 736px;
       z-index: 0;
       overflow: hidden;
@@ -237,6 +239,7 @@
       left: 3px;
       z-index: 0;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     // 타이틀
@@ -251,6 +254,7 @@
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     // 설명 텍스트
@@ -659,13 +663,24 @@
 
   // Section 2: 졸업 자격 조건
   .cluster3-section2 {
+    // Section2 우측 상단 타이포/퍼센트(겹침/잘림/내부 스크롤 방지)
+    --c3-s2-right: clamp(24px, 4vw, 96px);
+    --c3-s2-title-size: clamp(40px, 5.4vw, 92px);
+
     width: 100%;
     max-width: 100%;
-    height: 500px;
+    height: auto;
+    min-height: 0;
     margin-bottom: 40px;
     position: relative;
-    overflow: visible;
+    // 아주 미세한 오버플로우로 스크롤바가 생기는 것 방지
+    overflow: hidden;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 22px 0 26px;
 
     // 상단 주황색 선
     &::before {
@@ -708,27 +723,44 @@
       }
     }
 
+    // 우측 상단(타이틀 + 상위 0%)을 하나로 묶어서 겹침/잘림/스크롤바 방지
+    .section2-right {
+      position: relative;
+      z-index: 3; // 카드 위에 항상 표시
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      max-width: min(560px, calc(100% - 32px));
+      pointer-events: none; // 클릭 타겟과 겹쳐도 카드 인터랙션 방해 X
+      margin-left: auto;
+      padding-right: var(--c3-s2-right);
+      overflow: visible !important;
+    }
+
     .section2-text {
-      position: absolute;
-      top: 105px;
-      right: 80px;
-      z-index: 1;
+      position: relative;
+      max-width: 100%;
+      text-align: right;
+      overflow: visible !important;
 
       .handwriting {
         font-family: 'HappinessGoheung', sans-serif;
-        font-size: 100px;
+        font-size: var(--c3-s2-title-size);
+        line-height: 1.05;
+        white-space: nowrap;
         color: #fff;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        overflow: visible !important;
       }
     }
 
-    // 프로그레스 바와 상위 90%
+    // 프로그레스 바와 상위 0%
     .section2-progress {
-      position: absolute;
-      top: 158px;
-      right: 60px;
-      width: 350px;
-      z-index: 1;
+      position: relative;
+      width: min(350px, 46vw);
+      z-index: 3;
+      overflow: visible !important;
 
       .progress-info {
         display: flex;
@@ -777,10 +809,7 @@
 
     // 10개 카드 일렬 배치
     .section2-cards {
-      position: absolute;
-      bottom: 50px;
-      left: 0;
-      right: 0;
+      position: relative;
       display: flex;
       gap: 0;
       z-index: 1;
@@ -789,6 +818,7 @@
       padding: 0;
       justify-content: flex-start;
       align-items: flex-end;
+      overflow: visible;
 
       .rank-card {
         width: calc(100% / 10);
@@ -966,7 +996,8 @@
   .cluster3-section3 {
     width: 100%;
     max-width: 1330px;
-    height: 1150px;
+    height: auto;
+    min-height: 1150px;
     margin-bottom: 0;
     margin-top: -40px;
     position: relative;

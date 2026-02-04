@@ -523,74 +523,27 @@
   // Activities
   .resume-activities {
     width: 472px;
+    // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
+    // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
+    // → 스크롤은 유지하되 스크롤바만 숨겨 OS/모니터별 표시 편차를 제거.
     height: 95px;
     max-height: 95px;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     padding: 0;
     margin: 0;
     display: block;
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE/Edge legacy
 
-    // Custom scrollbar
+    // Hide scrollbar (Chromium/Safari)
     &::-webkit-scrollbar {
-      width: 2px;
-      display: block;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #2a2a2a;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #FFEC8F;
-      border-radius: 2px;
-
-      .resume-card.px-theme & {
-        background: #B2FF8F !important;
-      }
-
-      .resume-card.ec-theme & {
-        background: #FF98A6 !important;
-      }
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: #FFD700;
-
-      .resume-card.px-theme & {
-        background: #90EE90 !important;
-      }
-
-      .resume-card.ec-theme & {
-        background: #FF6B8A !important;
-      }
-    }
-
-    // Remove scrollbar arrows - all button types
-    &::-webkit-scrollbar-button {
       display: none !important;
       width: 0 !important;
       height: 0 !important;
     }
-    &::-webkit-scrollbar-button:single-button {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:start:decrement {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:end:increment {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:vertical:start:increment {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:vertical:end:decrement {
-      display: none !important;
-    }
 
-    // Firefox
-    scrollbar-width: thin;
-    scrollbar-color: #FFEC8F #2a2a2a;
+    // (스크롤바 커스텀/색상 지정은 제거: 숨김 처리와 충돌 방지)
 
     .activity-row {
       display: flex;

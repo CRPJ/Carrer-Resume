@@ -8,8 +8,11 @@ import Animations from "@/components/shared/Animations";
 
 const Cluster3Page = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [sidebarTop, setSidebarTop] = useState(124);
+  // 콘텐츠 영역 추가 너비 계산(데스크톱 zoom 상한에서 남는 여백 흡수)
+  const [contentExtraWidth, setContentExtraWidth] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
+  const sidebarShellRef = useRef<HTMLDivElement>(null);
+  const sidebarInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 화면 크기 체크
@@ -17,37 +20,123 @@ const Cluster3Page = () => {
       setIsMobile(window.innerWidth < 1200);
     };
 
-    // 스크롤 핸들러 (데스크탑에서만 작동)
-    const handleScroll = () => {
-      if (isMobile) return;
-      
-      const footer = document.querySelector('footer');
-      if (!footer) {
-        setSidebarTop(124);
-        return;
-      }
-
-      const footerRect = footer.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      if (footerRect.top < windowHeight) {
-        const moveUp = windowHeight - footerRect.top;
-        setSidebarTop(124 - moveUp);
-      } else {
-        setSidebarTop(124);
-      }
-    };
-
     // 초기 실행
     checkMobile();
-    handleScroll();
 
     window.addEventListener('resize', checkMobile);
-    window.addEventListener('scroll', handleScroll);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    // 모바일에서는 데스크톱 보정값을 사용하지 않음
+    if (isMobile) {
+      setContentExtraWidth(0);
+      return;
+    }
+
+    const calculateContentWidth = () => {
+      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const maxZoom = 1.5;
+      const windowWidth = window.innerWidth;
+
+      if (cssZoom >= maxZoom) {
+        const visibleWidth = windowWidth / cssZoom;
+        const extraWidth = visibleWidth - 1977;
+        setContentExtraWidth(extraWidth > 0 ? extraWidth : 0);
+      } else {
+        setContentExtraWidth(0);
+      }
+    };
+
+    calculateContentWidth();
+    window.addEventListener('resize', calculateContentWidth);
+    const timer = setTimeout(calculateContentWidth, 100);
+
+    return () => {
+      window.removeEventListener('resize', calculateContentWidth);
+      clearTimeout(timer);
+    };
+  }, [isMobile]);
+
+  // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
+  useEffect(() => {
+    if (isMobile || !sidebarShellRef.current || !sidebarInnerRef.current) return;
+
+    const shell = sidebarShellRef.current;
+    const inner = sidebarInnerRef.current;
+    const headerTopPx = 100;
+
+    let rafId: number | null = null;
+    let isFixed = false;
+    const apply = () => {
+      rafId = null;
+
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const shellRect = shell.getBoundingClientRect();
+      const shouldFix = shellRect.top <= headerTopPx;
+
+      if (!isFixed && shouldFix) {
+        const width = shell.offsetWidth;
+        const height = inner.offsetHeight;
+        const left = shellRect.left / zoom;
+        const top = headerTopPx / zoom;
+
+        shell.style.width = `${width}px`;
+        shell.style.height = `${height}px`;
+
+        inner.style.position = "fixed";
+        inner.style.top = `${top}px`;
+        inner.style.left = `${left}px`;
+        inner.style.width = `${width}px`;
+        inner.style.zIndex = "9999";
+
+        isFixed = true;
+        return;
+      }
+
+      if (isFixed && !shouldFix) {
+        shell.style.width = "";
+        shell.style.height = "";
+
+        inner.style.position = "relative";
+        inner.style.top = "0";
+        inner.style.left = "0";
+        inner.style.width = "";
+        inner.style.zIndex = "100";
+
+        isFixed = false;
+      }
+    };
+
+    const handleScroll = () => {
+      if (rafId != null) return;
+      rafId = window.requestAnimationFrame(apply);
+    };
+
+    const handleResize = () => {
+      isFixed = false;
+      shell.style.width = "";
+      shell.style.height = "";
+      inner.style.position = "relative";
+      inner.style.top = "0";
+      inner.style.left = "0";
+      inner.style.width = "";
+
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(apply);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize);
+    rafId = window.requestAnimationFrame(apply);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+      if (rafId != null) window.cancelAnimationFrame(rafId);
     };
   }, [isMobile]);
 
@@ -78,32 +167,34 @@ const Cluster3Page = () => {
     );
   }
 
-  // 데스크탑 레이아웃 (기존)
+  // 데스크탑 레이아웃 - JavaScript로 sticky 동작 구현
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      {/* 고정 사이드바 */}
-      <div 
-        style={{
-          position: 'fixed',
-          left: '110px',
-          top: `${sidebarTop}px`,
-          overflow: 'visible',
-          zIndex: 100,
-        }}
-      >
-        <Sidebar />
-      </div>
-      {/* 메인 콘텐츠 */}
-      <div className="container-fluid">
-        <div className="row">
-          {/* 사이드바 공간 확보용 빈 영역 */}
-          <div style={{ width: 'var(--sidebar-width, 520px)', flexShrink: 0 }}></div>
-          <div className="home-two-content-col">
-            <ClusterTabs />
-            <div className="home-two-content">
-              <Cluster3Content />
-            </div>
+      
+      <div className="desktop-layout" style={{
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'flex-start',
+        position: 'relative',
+        width: contentExtraWidth > 0 ? `calc(100% + ${contentExtraWidth}px)` : '100%',
+      }}>
+        {/* 사이드바 - JS로 스크롤 따라오기 */}
+        <div
+          ref={sidebarShellRef}
+          className="sidebar-sticky-wrapper"
+          style={{ flexShrink: 0, zIndex: 100 }}
+        >
+          <div ref={sidebarInnerRef} style={{ position: 'relative', zIndex: 100 }}>
+            <Sidebar />
+          </div>
+        </div>
+        
+        {/* 메인 콘텐츠 */}
+        <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
+          <ClusterTabs />
+          <div className="home-two-content">
+            <Cluster3Content />
           </div>
         </div>
       </div>

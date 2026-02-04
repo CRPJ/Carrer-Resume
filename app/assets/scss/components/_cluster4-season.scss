@@ -56,7 +56,8 @@
   .cluster4-section1 {
     width: 100%;
     max-width: 1330px;
-    height: 1180px;
+    height: auto;
+    min-height: 1180px;
     padding: 0;
     text-align: left;
     background-image: url('/images/0/cluster 4/img 01.png');
@@ -204,6 +205,7 @@
       left: 3px;
       z-index: 0;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     // 타이틀
@@ -218,6 +220,7 @@
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     .section1-description {
@@ -305,7 +308,8 @@
       position: relative;
       width: 100%;
       max-width: 1320px;
-      height: 600px;
+      height: auto;
+      min-height: 600px;
       background-image: url('/images/0/cluster 4/4-1/bg image.png');
       background-size: cover;
       background-repeat: no-repeat;
@@ -384,6 +388,7 @@
           left: 3px;
           z-index: 0;
           white-space: nowrap;
+          @include stacked-title-layer(1.08, true);
         }
 
         .season-title {
@@ -396,6 +401,7 @@
           position: relative;
           z-index: 1;
           white-space: nowrap;
+          @include stacked-title-layer(1.08, true);
         }
 
         .season-badge {
@@ -2246,8 +2252,13 @@
     background-repeat: no-repeat;
     position: relative;
     padding: 30px 40px;
-    width: 1330px;
-    height: 720px;
+    width: 100%;
+    max-width: 1330px;
+    height: auto;
+    min-height: 720px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
     transition: background-image 0.5s ease-out;
     display: flex;
     flex-direction: column;
@@ -3045,8 +3056,9 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
-            max-height: 100px;
-            overflow-y: auto;
+            // 내부 스크롤 제거(기기/OS별 스크롤바 표시 편차 방지)
+            max-height: none;
+            overflow-y: visible;
             overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
@@ -3183,8 +3195,9 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 400px;
-            overflow-y: auto;
+            // 내부 스크롤 제거(기기/OS별 스크롤바 표시 편차 방지)
+            max-height: none;
+            overflow-y: visible;
             overflow-x: hidden;
             padding: 3px 14px 3px 3px;
 
@@ -4255,6 +4268,391 @@
     .no-results {
       color: #888;
       font-size: 14px;
+    }
+  }
+
+  // =========================================================
+  // Mobile UX: 필터 바텀시트 + 카드 요약/펼침
+  // =========================================================
+  @media (max-width: 1199px) {
+    max-width: 100%;
+    padding: 40px 16px 24px 16px;
+    margin-top: 20px;
+
+    .weekly-filter-bar {
+      justify-content: flex-start;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .weekly-filter-bar--mobile {
+      padding: 0;
+    }
+
+    .filter-mobile-btn {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      color: #fff;
+      cursor: pointer;
+
+      .card-icon {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        opacity: 0.9;
+      }
+
+      .filter-mobile-text {
+        flex: 1;
+        text-align: left;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.95;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .filter-mobile-count {
+        min-width: 28px;
+        height: 22px;
+        border-radius: 999px;
+        background: rgba(250, 171, 7, 0.2);
+        border: 1px solid rgba(250, 171, 7, 0.35);
+        color: #FAAB07;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 8px;
+      }
+    }
+
+    .filter-sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 999999;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .filter-sheet {
+      width: 100%;
+      max-width: 720px;
+      background: #141414;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 16px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .filter-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+
+      .filter-sheet-title {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .filter-sheet-close {
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 8px 10px;
+      }
+    }
+
+    .filter-sheet-body {
+      display: grid;
+      gap: 10px;
+
+      .filter-sheet-label {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 4px;
+      }
+
+      .filter-sheet-select {
+        width: 100%;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        padding: 0 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        outline: none;
+      }
+    }
+
+    .filter-sheet-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+
+      .filter-sheet-btn {
+        height: 44px;
+        border-radius: 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+
+        &.secondary {
+          background: rgba(255, 255, 255, 0.06);
+          color: #fff;
+        }
+
+        &.primary {
+          background: #FAAB07;
+          border-color: #FAAB07;
+          color: #111;
+        }
+      }
+    }
+
+    .weekly-cards {
+      align-items: stretch;
+    }
+
+    .weekly-card--mobile {
+      width: 100%;
+      height: auto;
+      padding: 12px;
+      gap: 12px;
+      background: #1f1f1f;
+      border-color: rgba(255, 255, 255, 0.12);
+
+      &:hover {
+        transform: none;
+        background: #1f1f1f;
+        box-shadow: none;
+      }
+
+      .weekly-card-main {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .weekly-card-image {
+        width: 110px;
+        height: 110px;
+        margin: 0;
+        border-radius: 10px;
+
+        &::before {
+          height: 44px;
+        }
+      }
+
+      .weekly-card-content {
+        margin-top: 0;
+        gap: 8px;
+        min-width: 0;
+
+        .weekly-card-header {
+          gap: 6px;
+        }
+
+        .weekly-card-title {
+          font-size: 14px;
+          line-height: 1.25;
+        }
+
+        .weekly-card-date {
+          border: none;
+          padding: 0;
+          height: auto;
+          font-size: 12px;
+          opacity: 0.85;
+          gap: 6px;
+
+          .date-icon {
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        .weekly-card-main-progress {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 8px;
+          margin: 0;
+
+          .progress-bar-wrapper {
+            width: 100%;
+          }
+        }
+      }
+
+      .weekly-card-expand {
+        width: 100%;
+        margin-top: 10px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .weekly-card-details {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        .weekly-card-details-top {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+
+        .detail-chip {
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 999px;
+          padding: 6px 10px;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.92);
+
+          strong {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 800;
+            margin-right: 4px;
+          }
+        }
+
+        .weekly-card-details-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 8px;
+          margin-bottom: 10px;
+
+          .detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            .k {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 13px;
+              font-weight: 700;
+              color: rgba(255, 255, 255, 0.85);
+            }
+
+            .v {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 13px;
+              font-weight: 800;
+              color: #FAAB07;
+
+              .sub {
+                margin-left: 6px;
+                color: rgba(255, 255, 255, 0.65);
+                font-weight: 700;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+
+        .weekly-card-details-bottom {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+
+          .metric {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'Pretendard', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.85);
+
+            strong {
+              color: #fff;
+              font-weight: 900;
+              margin-left: 6px;
+            }
+
+            .sub {
+              margin-left: 4px;
+              color: rgba(255, 255, 255, 0.65);
+              font-weight: 700;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+
+    .weekly-pagination--mobile {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+      text-align: center;
+
+      .weekly-pagination-summary {
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .weekly-load-more-btn {
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+      }
     }
   }
 }

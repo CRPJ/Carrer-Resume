@@ -185,19 +185,27 @@ const Sidebar = () => {
 
   useEffect(() => {
     const calculateScale = () => {
-      // 줌 레벨 감지 (visualViewport 사용)
-      const zoom = window.visualViewport?.scale || 1;
+      // 브라우저 줌 레벨 감지 (visualViewport 사용)
+      const browserZoom = window.visualViewport?.scale || 1;
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      
+      // ★ CSS zoom 값 가져오기 (ResponsiveScale에서 적용한 값)
+      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
 
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
-      const availableHeight = viewportHeight - (130 / zoom);
+      const availableHeight = viewportHeight - (130 / browserZoom);
 
       // 기준 카드 크기: 474 x 810
       const baseCardWidth = 474;
       const baseCardHeight = 810;
 
       // 높이 기준으로 스케일 계산 (화면 높이에 딱 맞도록)
-      const scale = availableHeight / baseCardHeight;
+      let scale = availableHeight / baseCardHeight;
+      
+      // ★ CSS zoom 역보정: zoom이 1보다 크면 카드를 작게 만들어서 상쇄
+      if (cssZoom > 1) {
+        scale = scale / cssZoom;
+      }
 
       setCardScale(scale);
       setAvailHeight(availableHeight);
@@ -212,14 +220,8 @@ const Sidebar = () => {
       document.documentElement.style.setProperty('--sidebar-width', `${scaledWidth}px`);
       document.documentElement.style.setProperty('--container-height', `${availableHeight}px`);
 
-      // 부모 컨테이너들의 높이를 직접 설정 (CSS 100vh가 줌을 무시하므로)
-      const contentHome = document.querySelector('.nftg-content-home') as HTMLElement;
-      const containerFluid = contentHome?.querySelector('.container-fluid') as HTMLElement;
-      const row = containerFluid?.querySelector('.row') as HTMLElement;
-
-      if (contentHome) contentHome.style.height = `${availableHeight}px`;
-      if (containerFluid) containerFluid.style.height = `${availableHeight}px`;
-      if (row) row.style.height = `${availableHeight}px`;
+      // 부모 컨테이너 높이 제한 제거 - 스크롤 시 프로필 잘림 방지
+      // (기존 코드 삭제됨)
     };
 
     calculateScale();

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
@@ -918,16 +918,18 @@ const Cluster3Content = () => {
         <div className="section2-bg">
           <img src="/images/0/cluster 3/bg2.png" alt="Background" />
         </div>
-        <div className="section2-text">
-          <span className="handwriting">클럽 강화 품계</span>
-        </div>
+        <div className="section2-right">
+          <div className="section2-text">
+            <span className="handwriting">클럽 강화 품계</span>
+          </div>
 
-        {/* 오른쪽 상단: 상위 퍼센트 */}
-        <div className="section2-progress">
-          <div className="progress-info">
-            <span className="progress-label">상위</span>
-            <span className="progress-percent">{topPercent}</span>
-            <span className="progress-unit">%</span>
+          {/* 오른쪽 상단: 상위 퍼센트 */}
+          <div className="section2-progress">
+            <div className="progress-info">
+              <span className="progress-label">상위</span>
+              <span className="progress-percent">{topPercent}</span>
+              <span className="progress-unit">%</span>
+            </div>
           </div>
         </div>
 

@@ -3,10 +3,18 @@
  ==== */
 
 // Home 페이지에서 body/html 설정 - 푸터 표시를 위해 스크롤 허용
-body:has(.nftg-content-home),
+// NOTE: html + body 모두에 overflow-y를 주면(특히 Windows) "이중 스크롤바"가 보일 수 있음
+// → 스크롤 컨테이너를 html로 통일하고, body는 overflow-y를 풀어준다.
 html:has(.nftg-content-home) {
   overflow-x: hidden !important;
   overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+body:has(.nftg-content-home) {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
   height: auto !important;
   min-height: 100vh !important;
 }
@@ -17,6 +25,31 @@ html:has(.nftg-content-home) {
   height: auto !important;
   min-height: calc(100vh - 124px) !important;
   overflow: visible !important;
+  overflow-x: visible !important; // sticky 작동을 위해 필수
+
+  // 데스크탑 레이아웃 - sticky 사이드바
+  .desktop-layout {
+    display: flex !important;
+    gap: 20px !important;
+    align-items: flex-start !important;
+    overflow: visible !important; // sticky 작동을 위해 필수
+    
+    .sidebar-sticky-wrapper {
+      position: sticky !important;
+      top: 100px !important;
+      flex-shrink: 0 !important;
+      z-index: 100 !important;
+      align-self: flex-start !important;
+      height: fit-content !important;
+      overflow: visible !important;
+    }
+    
+    .home-two-content-col {
+      flex: 1 !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+    }
+  }
 
   > .container-fluid {
     max-width: 100% !important;

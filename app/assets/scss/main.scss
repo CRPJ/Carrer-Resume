@@ -74,8 +74,7 @@
     ==================================
 ============== */
 
-// main.scss에 추가
-@import "./components/mobile-responsive";
+// (moved) mobile-responsive는 가장 마지막에 로드 (오버라이드)
 
 // Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
@@ -136,3 +135,6 @@
 
 // responsive styles
 @import "./responsive";
+
+// 모바일/태블릿 오버라이드(반드시 마지막)
+@import "./components/mobile-responsive";

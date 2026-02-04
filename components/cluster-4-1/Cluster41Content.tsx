@@ -15,10 +15,23 @@ const Cluster41Content = () => {
   const [resultDropdownOpen, setResultDropdownOpen] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState("역대 시즌");
   const [selectedResult, setSelectedResult] = useState("주차 결과");
+  const [isMobile, setIsMobile] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [draftSeason, setDraftSeason] = useState("역대 시즌");
+  const [draftResult, setDraftResult] = useState("주차 결과");
+  const [mobileVisibleCount, setMobileVisibleCount] = useState(10);
+  const [expandedWeekId, setExpandedWeekId] = useState<string | null>(null);
   const [seasonBtnPos, setSeasonBtnPos] = useState({ top: 0, left: 0 });
   const [resultBtnPos, setResultBtnPos] = useState({ top: 0, left: 0 });
   const seasonBtnRef = useRef<HTMLDivElement>(null);
   const resultBtnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1200);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // 현재 시즌 정보 상태
   const [currentSeasonInfo, setCurrentSeasonInfo] = useState<{
@@ -1495,259 +1508,482 @@ const Cluster41Content = () => {
       {/* Section 3: 주차별 리스트 */}
       <section className="cluster4-weekly-list">
         {/* 필터 바 */}
-        <div className="weekly-filter-bar">
-          {/* 254x40 Reset 카드 */}
+        {isMobile ? (
+          <div className="weekly-filter-bar weekly-filter-bar--mobile">
+            <button
+              type="button"
+              className="filter-mobile-btn"
+              onClick={() => {
+                setDraftSeason(selectedSeason);
+                setDraftResult(selectedResult);
+                setFilterSheetOpen(true);
+              }}
+            >
+              <img src="/images/0/cluster 4/icon/icon - 3.png" alt="filter" className="card-icon" />
+              <span className="filter-mobile-text">
+                {selectedSeason} · {selectedResult}
+              </span>
+              <span className="filter-mobile-count">{filteredDbData.length}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="weekly-filter-bar">
+            {/* 254x40 Reset 카드 */}
+            <div
+              className="filter-card filter-card-large"
+              onClick={() => {
+                setSelectedSeason("역대 시즌");
+                setSelectedResult("주차 결과");
+                setSeasonDropdownOpen(false);
+                setResultDropdownOpen(false);
+              }}
+            >
+              <div className="card-left">
+                <img src="/images/0/cluster 4/icon/icon - 1.png" alt="reset" className="filter-icon" />
+                <span>Reset</span>
+              </div>
+            </div>
+            {/* 역대 시즌 버튼 */}
+            <div
+              ref={seasonBtnRef}
+              className="filter-card filter-dropdown"
+              style={{
+                borderColor: selectedSeason !== "역대 시즌" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
+                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+              }}
+              onClick={() => {
+                updateSeasonPos();
+                setSeasonDropdownOpen(!seasonDropdownOpen);
+                setResultDropdownOpen(false);
+              }}
+            >
+              <div className="card-left">
+                <img src="/images/0/cluster 4/icon/icon - 2.png" alt="calendar" className="card-icon" />
+                <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
+              </div>
+              <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
+            </div>
+            {/* 주차 결과 버튼 */}
+            <div
+              ref={resultBtnRef}
+              className="filter-card filter-dropdown"
+              style={{
+                borderColor: selectedResult !== "주차 결과" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
+                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+              }}
+              onClick={() => {
+                updateResultPos();
+                setResultDropdownOpen(!resultDropdownOpen);
+                setSeasonDropdownOpen(false);
+              }}
+            >
+              <div className="card-left">
+                <img src="/images/0/cluster 4/icon/icon - 3.png" alt="setting" className="card-icon" />
+                <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>{selectedResult}</span>
+              </div>
+              <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>▼</span>
+            </div>
+            <div className="filter-card">
+              <div className="card-left">
+                <img src="/images/0/cluster 4/icon/icon - 4.png" alt="search" className="card-icon" />
+                <span className="card-label">검색 결과</span>
+              </div>
+              <span className="card-value">{filteredDbData.length}</span>
+            </div>
+            <div className="filter-card">
+              <div className="card-left">
+                <img src="/images/0/cluster 4/icon/icon - 5.png" alt="clock" className="card-icon" />
+                <span className="card-label">전체 주차 수</span>
+              </div>
+              <span className="card-value">{dbWeeklyData.length}</span>
+            </div>
+          </div>
+        )}
+
+        {/* 모바일: 필터 바텀시트 */}
+        {isMobile && filterSheetOpen && (
           <div
-            className="filter-card filter-card-large"
-            onClick={() => {
-              setSelectedSeason("역대 시즌");
-              setSelectedResult("주차 결과");
-              setSeasonDropdownOpen(false);
-              setResultDropdownOpen(false);
+            className="filter-sheet-overlay"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) setFilterSheetOpen(false);
             }}
           >
-            <div className="card-left">
-              <img src="/images/0/cluster 4/icon/icon - 1.png" alt="reset" className="filter-icon" />
-              <span>Reset</span>
+            <div className="filter-sheet" onMouseDown={(e) => e.stopPropagation()}>
+              <div className="filter-sheet-header">
+                <div className="filter-sheet-title">필터</div>
+                <button type="button" className="filter-sheet-close" onClick={() => setFilterSheetOpen(false)}>
+                  닫기
+                </button>
+              </div>
+
+              <div className="filter-sheet-body">
+                <label className="filter-sheet-label">시즌</label>
+                <select
+                  className="filter-sheet-select"
+                  value={draftSeason}
+                  onChange={(e) => setDraftSeason(e.target.value)}
+                >
+                  <option value="역대 시즌">역대 시즌</option>
+                  {seasonOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+
+                <label className="filter-sheet-label">주차 결과</label>
+                <select
+                  className="filter-sheet-select"
+                  value={draftResult}
+                  onChange={(e) => setDraftResult(e.target.value)}
+                >
+                  {resultOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-sheet-actions">
+                <button
+                  type="button"
+                  className="filter-sheet-btn secondary"
+                  onClick={() => {
+                    setDraftSeason("역대 시즌");
+                    setDraftResult("주차 결과");
+                  }}
+                >
+                  리셋
+                </button>
+                <button
+                  type="button"
+                  className="filter-sheet-btn primary"
+                  onClick={() => {
+                    setSelectedSeason(draftSeason);
+                    setSelectedResult(draftResult);
+                    setFilterSheetOpen(false);
+                    setExpandedWeekId(null);
+                    setMobileVisibleCount(10);
+                  }}
+                >
+                  적용
+                </button>
+              </div>
             </div>
           </div>
-          {/* 역대 시즌 버튼 */}
-          <div
-            ref={seasonBtnRef}
-            className="filter-card filter-dropdown"
-            style={{
-              borderColor: selectedSeason !== "역대 시즌" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-              background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
-            }}
-            onClick={() => {
-              updateSeasonPos();
-              setSeasonDropdownOpen(!seasonDropdownOpen);
-              setResultDropdownOpen(false);
-            }}
-          >
-            <div className="card-left">
-              <img src="/images/0/cluster 4/icon/icon - 2.png" alt="calendar" className="card-icon" />
-              <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
-            </div>
-            <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
-          </div>
-          {/* 주차 결과 버튼 */}
-          <div
-            ref={resultBtnRef}
-            className="filter-card filter-dropdown"
-            style={{
-              borderColor: selectedResult !== "주차 결과" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-              background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
-            }}
-            onClick={() => {
-              updateResultPos();
-              setResultDropdownOpen(!resultDropdownOpen);
-              setSeasonDropdownOpen(false);
-            }}
-          >
-            <div className="card-left">
-              <img src="/images/0/cluster 4/icon/icon - 3.png" alt="setting" className="card-icon" />
-              <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>{selectedResult}</span>
-            </div>
-            <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>▼</span>
-          </div>
-          <div className="filter-card">
-            <div className="card-left">
-              <img src="/images/0/cluster 4/icon/icon - 4.png" alt="search" className="card-icon" />
-              <span className="card-label">검색 결과</span>
-            </div>
-            <span className="card-value">{filteredDbData.length}</span>
-          </div>
-          <div className="filter-card">
-            <div className="card-left">
-              <img src="/images/0/cluster 4/icon/icon - 5.png" alt="clock" className="card-icon" />
-              <span className="card-label">전체 주차 수</span>
-            </div>
-            <span className="card-value">{dbWeeklyData.length}</span>
-          </div>
-        </div>
+        )}
 
         {/* 주차 카드 리스트 */}
         <div className="weekly-cards">
           {isLoadingWeeks ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>주차 데이터 로딩 중...</div>
-          ) : paginatedDbData.length === 0 ? (
+          ) : (isMobile ? filteredDbData.slice(0, mobileVisibleCount) : paginatedDbData).length === 0 ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>표시할 주차가 없습니다.</div>
-          ) : paginatedDbData.map((week) => (
-            <Link href={`/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-              {/* 왼쪽 이미지 */}
-              <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
-                <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
-                {week.growthStatus === '휴식(개인)' && (
-                  <div className="rest-message">
-                    <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
-                    <span className="rest-text-line">쉬었나요..?</span>
-                  </div>
-                )}
-                <div className="image-badges">
-                  <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
-                  <div className="badge-like">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
+          ) : (
+            (isMobile ? filteredDbData.slice(0, mobileVisibleCount) : paginatedDbData).map((week) => {
+              const weekHref = `/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`;
+              const isExpanded = expandedWeekId === week.id;
+              const isRest = week.growthStatus.includes('휴식');
+              const growthRate = getWeeklyGrowthRate(week.id);
 
-              {/* 중앙 콘텐츠 */}
-              <div className="weekly-card-content">
-                {/* 첫 번째 줄: 타이틀, 날짜, 주차 */}
-                <div className="weekly-card-header">
-                  <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
-                  <span className="weekly-card-date">
-                    <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />
-                    {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
-                  </span>
-                  <span className="weekly-card-week">
-                    <img src="/images/0/cluster 4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                    <span className="week-number">{getCumulativeApprovedWeeks(week.endDate)}</span> / 30 주차
-                  </span>
-                </div>
-
-                {/* 두 번째 줄: 팀, 파트, 역할, 아이템 */}
-                <div className="weekly-card-info">
-                  {/* 그룹 1: 팀, 파트 */}
-                  {(() => {
-                    // 전환 주차는 팀/파트/역할을 '-'로 표시
-                    const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
-                    const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
-                    return (
-                      <>
-                        <div className="info-group">
-                          <span className="info-item team">
-                            <strong>[팀]</strong>{' '}
-                            <span className="text-gray">{teamPart.teamName || '-'}</span>
-                          </span>
-                          <span className="info-divider">|</span>
-                          <span className="info-item part">
-                            <strong>[파트]</strong>{' '}
-                            <span className="text-gray">{teamPart.partName || '-'}</span>
-                          </span>
+              if (isMobile) {
+                return (
+                  <div
+                    key={week.id}
+                    className={`weekly-card weekly-card--mobile ${isExpanded ? "is-expanded" : ""}`}
+                  >
+                    <Link
+                      href={weekHref}
+                      className="weekly-card-main"
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                        <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
+                        <div className="image-badges">
+                          <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
                         </div>
-                        {/* 그룹 2: 역할 */}
-                        <div className="info-group">
-                          <span className="info-badge role">
-                            <img src="/images/0/cluster 4/icon/icon - 8.png" alt="role" className="role-icon" />
-                            <span>{roleInfo?.roleLabel || '-'}</span>
-                          </span>
-                        </div>
-                      </>
-                    );
-                  })()}
-                  {/* 그룹 3: 아이템들 */}
-                  {(() => {
-                    const weekPoints = getPointsForWeek(week.id);
-                    const injeolmi = getCumulativeInjeolmi(week.endDate);
-                    return (
-                      <div className="info-group items">
-                        <span className="info-divider">·</span>
-                        <span className="info-item with-icon">
-                          단감
-                          <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="item-icon" />
-                          <strong className="number-value">{weekPoints.star}</strong>
-                          개
-                        </span>
-                        <span className="info-divider">·</span>
-                        <span className="info-item with-icon">
-                          인절미
-                          <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                          <strong className="number-value">{injeolmi}</strong>
-                          개
-                        </span>
-                        <span className="info-divider">·</span>
-                        <span className="info-item with-icon">
-                          어흥
-                          <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                          <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
-                          개
-                        </span>
                       </div>
-                    );
-                  })()}
-                </div>
 
-                {/* 세 번째 줄: 주차 성장률 프로그레스 바 */}
-                {(() => {
-                  const growthRate = getWeeklyGrowthRate(week.id);
-                  const infoRate = getWeeklyInfoRate(week.id);
-                  const competencyRate = getWeeklyCompetencyRate(week.id);
-                  const experienceRate = getWeeklyExperienceRate(week.id);
-                  const careerRate = getWeeklyCareerRate(week.id);
-                  const isRest = week.growthStatus.includes('휴식');
+                      <div className="weekly-card-content">
+                        <div className="weekly-card-header">
+                          <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                          <span className="weekly-card-date">
+                            <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />
+                            {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
+                          </span>
+                        </div>
 
-                  return (
-                    <>
-                      <div className="weekly-card-main-progress">
-                        <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong>{isRest ? '-' : growthRate.rate}%</strong></span>
-                        <div className="progress-bar-wrapper">
-                          <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: `${isRest ? 0 : growthRate.rate}%` }}></div>
+                        <div className="weekly-card-main-progress">
+                          <span className="progress-label">
+                            <span className="dot">·</span> 주차 성장률 <strong>{isRest ? "-" : `${growthRate.rate}%`}</strong>
+                          </span>
+                          <div className="progress-bar-wrapper">
+                            <div className="progress-bar">
+                              <div className="progress-fill" style={{ width: `${isRest ? 0 : growthRate.rate}%` }} />
+                            </div>
                           </div>
                         </div>
-                        <span className="total-count">
-                          <img src="/images/0/cluster 4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
-                          총 {growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
-                        </span>
                       </div>
+                    </Link>
 
-                      {/* 네 번째, 다섯 번째 줄: 스탯들 */}
-                      <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                        <div className="weekly-card-stats">
-                          <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{isRest ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : infoRate.count}</span>/{infoRate.total})</span></span>
-                          <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : competencyRate.count}</span>/{competencyRate.total})</span></span>
-                          <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{isRest ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : experienceRate.count}</span>/{experienceRate.total})</span></span>
-                          <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : careerRate.count}</span>/{careerRate.total})</span></span>
-                        </div>
-                        <div className="weekly-card-extra-stats">
-                          <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
-                          <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span></span>
-                          <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
-                          <span className="stat empty"></span>
-                        </div>
+                    <button
+                      type="button"
+                      className="weekly-card-expand"
+                      aria-expanded={isExpanded}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setExpandedWeekId(isExpanded ? null : week.id);
+                      }}
+                    >
+                      {isExpanded ? "접기" : "상세"}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="weekly-card-details">
+                        {(() => {
+                          const infoRate = getWeeklyInfoRate(week.id);
+                          const competencyRate = getWeeklyCompetencyRate(week.id);
+                          const experienceRate = getWeeklyExperienceRate(week.id);
+                          const careerRate = getWeeklyCareerRate(week.id);
+                          const weekPoints = getPointsForWeek(week.id);
+                          const injeolmi = getCumulativeInjeolmi(week.endDate);
+                          const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                          const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+
+                          return (
+                            <>
+                              <div className="weekly-card-details-top">
+                                <div className="detail-chip"><strong>[팀]</strong> {teamPart.teamName || "-"}</div>
+                                <div className="detail-chip"><strong>[파트]</strong> {teamPart.partName || "-"}</div>
+                                <div className="detail-chip"><strong>[역할]</strong> {roleInfo?.roleLabel || "-"}</div>
+                              </div>
+
+                              <div className="weekly-card-details-grid">
+                                <div className="detail-row">
+                                  <span className="k">정보 강화율</span>
+                                  <span className="v">{isRest ? "-" : `${infoRate.rate}%`} <span className="sub">({isRest ? "-" : infoRate.count}/{infoRate.total})</span></span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="k">역량 강화율</span>
+                                  <span className="v">{isRest ? "-" : `${competencyRate.rate}%`} <span className="sub">({isRest ? "-" : competencyRate.count}/{competencyRate.total})</span></span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="k">경험 강화율</span>
+                                  <span className="v">{isRest ? "-" : `${experienceRate.rate}%`} <span className="sub">({isRest ? "-" : experienceRate.count}/{experienceRate.total})</span></span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="k">경력 강화율</span>
+                                  <span className="v">{isRest ? "-" : `${careerRate.rate}%`} <span className="sub">({isRest ? "-" : careerRate.count}/{careerRate.total})</span></span>
+                                </div>
+                              </div>
+
+                              <div className="weekly-card-details-bottom">
+                                <div className="metric">단감 <strong>{weekPoints.star}</strong></div>
+                                <div className="metric">인절미 <strong>{injeolmi}</strong></div>
+                                <div className="metric">어흥 <strong>{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong></div>
+                                <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/3</span></div>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
-                    </>
-                  );
-                })()}
-              </div>
+                    )}
+                  </div>
+                );
+              }
 
-              {/* 우측 성장 상태 */}
-              <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus : `성장 (${week.growthStatus})`}</span>
-                <img src={`/images/0/cluster%204/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
-              </div>
+              // 데스크톱: 기존 카드 UI 유지
+              return (
+                <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {/* 왼쪽 이미지 */}
+                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                    <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
+                    {week.growthStatus === '휴식(개인)' && (
+                      <div className="rest-message">
+                        <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
+                        <span className="rest-text-line">쉬었나요..?</span>
+                      </div>
+                    )}
+                    <div className="image-badges">
+                      <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
+                      <div className="badge-like">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* 더보기 버튼 */}
-              <div className="weekly-card-more-btn">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="8" cy="8" r="7" stroke="#fff" strokeWidth="2" fill="none" />
-                  <path d="M7 5.5L10 8L7 10.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                </svg>
-              </div>
-            </Link>
-          ))}
+                  {/* 중앙 콘텐츠 */}
+                  <div className="weekly-card-content">
+                    {/* 첫 번째 줄: 타이틀, 날짜, 주차 */}
+                    <div className="weekly-card-header">
+                      <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                      <span className="weekly-card-date">
+                        <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />
+                        {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
+                      </span>
+                      <span className="weekly-card-week">
+                        <img src="/images/0/cluster 4/icon/icon - 7.png" alt="clock" className="week-icon" />
+                        <span className="week-number">{getCumulativeApprovedWeeks(week.endDate)}</span> / 30 주차
+                      </span>
+                    </div>
+
+                    {/* 두 번째 줄: 팀, 파트, 역할, 아이템 */}
+                    <div className="weekly-card-info">
+                      {/* 그룹 1: 팀, 파트 */}
+                      {(() => {
+                        // 전환 주차는 팀/파트/역할을 '-'로 표시
+                        const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                        const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+                        return (
+                          <>
+                            <div className="info-group">
+                              <span className="info-item team">
+                                <strong>[팀]</strong>{' '}
+                                <span className="text-gray">{teamPart.teamName || '-'}</span>
+                              </span>
+                              <span className="info-divider">|</span>
+                              <span className="info-item part">
+                                <strong>[파트]</strong>{' '}
+                                <span className="text-gray">{teamPart.partName || '-'}</span>
+                              </span>
+                            </div>
+                            {/* 그룹 2: 역할 */}
+                            <div className="info-group">
+                              <span className="info-badge role">
+                                <img src="/images/0/cluster 4/icon/icon - 8.png" alt="role" className="role-icon" />
+                                <span>{roleInfo?.roleLabel || '-'}</span>
+                              </span>
+                            </div>
+                          </>
+                        );
+                      })()}
+                      {/* 그룹 3: 아이템들 */}
+                      {(() => {
+                        const weekPoints = getPointsForWeek(week.id);
+                        const injeolmi = getCumulativeInjeolmi(week.endDate);
+                        return (
+                          <div className="info-group items">
+                            <span className="info-divider">·</span>
+                            <span className="info-item with-icon">
+                              단감
+                              <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                              <strong className="number-value">{weekPoints.star}</strong>
+                              개
+                            </span>
+                            <span className="info-divider">·</span>
+                            <span className="info-item with-icon">
+                              인절미
+                              <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                              <strong className="number-value">{injeolmi}</strong>
+                              개
+                            </span>
+                            <span className="info-divider">·</span>
+                            <span className="info-item with-icon">
+                              어흥
+                              <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                              <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
+                              개
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* 세 번째 줄: 주차 성장률 프로그레스 바 */}
+                    {(() => {
+                      const infoRate = getWeeklyInfoRate(week.id);
+                      const competencyRate = getWeeklyCompetencyRate(week.id);
+                      const experienceRate = getWeeklyExperienceRate(week.id);
+                      const careerRate = getWeeklyCareerRate(week.id);
+                      const isRest = week.growthStatus.includes('휴식');
+
+                      return (
+                        <>
+                          <div className="weekly-card-main-progress">
+                            <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong>{isRest ? '-' : growthRate.rate}%</strong></span>
+                            <div className="progress-bar-wrapper">
+                              <div className="progress-bar">
+                                <div className="progress-fill" style={{ width: `${isRest ? 0 : growthRate.rate}%` }}></div>
+                              </div>
+                            </div>
+                            <span className="total-count">
+                              <img src="/images/0/cluster 4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
+                              총 {growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
+                            </span>
+                          </div>
+
+                          {/* 네 번째, 다섯 번째 줄: 스탯들 */}
+                          <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
+                            <div className="weekly-card-stats">
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{isRest ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : infoRate.count}</span>/{infoRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : competencyRate.count}</span>/{competencyRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{isRest ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : experienceRate.count}</span>/{experienceRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : careerRate.count}</span>/{careerRate.total})</span></span>
+                            </div>
+                            <div className="weekly-card-extra-stats">
+                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
+                              <span className="stat empty"></span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* 우측 성장 상태 */}
+                  <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
+                    <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus : `성장 (${week.growthStatus})`}</span>
+                    <img src={`/images/0/cluster%204/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
+                  </div>
+
+                  {/* 더보기 버튼 */}
+                  <div className="weekly-card-more-btn">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="8" cy="8" r="7" stroke="#fff" strokeWidth="2" fill="none" />
+                      <path d="M7 5.5L10 8L7 10.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
 
         {/* 페이지네이션 */}
-        <div className="weekly-pagination">
-          {totalPages > 0 ? (
-            Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-              <span
-                key={num}
-                className={`page-num ${currentPage === num ? 'active' : ''} ${num === totalPages ? 'last' : ''}`}
-                onClick={() => setCurrentPage(num)}
+        {isMobile ? (
+          <div className="weekly-pagination weekly-pagination--mobile">
+            <div className="weekly-pagination-summary">
+              전체 {filteredDbData.length}개 중 {Math.min(mobileVisibleCount, filteredDbData.length)}개 표시
+            </div>
+            {filteredDbData.length > mobileVisibleCount && (
+              <button
+                type="button"
+                className="weekly-load-more-btn"
+                onClick={() => setMobileVisibleCount((c) => c + 10)}
               >
-                {num}
-              </span>
-            ))
-          ) : (
-            <span className="no-results">검색 결과가 없습니다</span>
-          )}
-        </div>
+                더 보기
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="weekly-pagination">
+            {totalPages > 0 ? (
+              Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+                <span
+                  key={num}
+                  className={`page-num ${currentPage === num ? 'active' : ''} ${num === totalPages ? 'last' : ''}`}
+                  onClick={() => setCurrentPage(num)}
+                >
+                  {num}
+                </span>
+              ))
+            ) : (
+              <span className="no-results">검색 결과가 없습니다</span>
+            )}
+          </div>
+        )}
       </section>
     </div>
     </>

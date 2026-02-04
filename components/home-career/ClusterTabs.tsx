@@ -7,9 +7,9 @@ const ClusterTabs = () => {
   const pathname = usePathname();
   const scrollRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [isAtEnd, setIsAtEnd] = useState(false);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
-  // 클러스터 1은 사이드바(독립), 탭은 클러스터 2부터 시작 (2x5 구조)
   const tabs = [
     { name: "Personal Profile", path: "/cluster-2", cluster: 2 },
     { name: "Club Final Index", path: "/cluster-3", cluster: 3 },
@@ -36,10 +36,12 @@ const ClusterTabs = () => {
     return pathname === tabPath || pathname === tabPath + "/";
   };
 
+  // 스크롤 위치에 따라 화살표 표시 여부 결정
   const checkScrollPosition = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 10);
+      setShowLeftArrow(scrollLeft > 10);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
     }
   };
 
@@ -60,7 +62,7 @@ const ClusterTabs = () => {
       const tabWidth = tab.offsetWidth;
       const containerWidth = container.clientWidth;
       const scrollPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
-      container.scrollLeft = scrollPosition;
+      container.scrollTo({ left: scrollPosition, behavior: "smooth" });
     }
   };
 
@@ -74,21 +76,34 @@ const ClusterTabs = () => {
     }
   }, [pathname]);
 
-  const handleArrowClick = () => {
+  // 화살표 클릭 시 스크롤
+  const handleScrollLeft = () => {
     if (scrollRef.current) {
-      if (isAtEnd) {
-        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scrollRef.current.scrollTo({ left: scrollRef.current.scrollWidth, behavior: "smooth" });
-      }
+      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
   };
 
   return (
     <div className="cluster-tabs">
+      {/* 왼쪽 화살표 */}
+      {showLeftArrow && (
+        <button 
+          className="cluster-tabs-arrow left"
+          onClick={handleScrollLeft}
+          aria-label="이전 탭 보기"
+        >
+          <i className="ti ti-chevron-left"></i>
+        </button>
+      )}
+      
       <div className="cluster-tabs-inner" ref={scrollRef}>
         {tabs.map((tab, index) => {
-          // 긴 탭 이름에는 wide-deco 클래스 추가
           const isWideDeco = tab.cluster === 9 || tab.cluster === 10;
           return tab.path ? (
             <Link
@@ -112,6 +127,17 @@ const ClusterTabs = () => {
           );
         })}
       </div>
+      
+      {/* 오른쪽 화살표 */}
+      {showRightArrow && (
+        <button 
+          className="cluster-tabs-arrow right"
+          onClick={handleScrollRight}
+          aria-label="다음 탭 보기"
+        >
+          <i className="ti ti-chevron-right"></i>
+        </button>
+      )}
     </div>
   );
 };

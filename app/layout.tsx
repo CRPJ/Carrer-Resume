@@ -3,6 +3,7 @@ import Progress from "@/components/shared/Progress";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import ZoomPrevention from "@/components/shared/ZoomPrevention";
+import ResponsiveScale from "@/components/shared/ResponsiveScale";
 import type { Metadata, Viewport } from "next";
 import { Khula, Black_Ops_One, Chakra_Petch, Lobster, Rajdhani } from "next/font/google";
 import "./assets/scss/main.scss";
@@ -44,6 +45,7 @@ export default function RootLayout({
         <SessionProvider>
           <ProfileProvider>
             <ZoomPrevention />
+            <ResponsiveScale />
             <Progress />
             <Bootstrap>{children}</Bootstrap>
           </ProfileProvider>

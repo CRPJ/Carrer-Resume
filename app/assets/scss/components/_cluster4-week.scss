@@ -5808,8 +5808,9 @@
           flex-direction: column;
           gap: 8px;
           margin-top: 12px;
-          max-height: 200px;
-          overflow-y: auto;
+          // 내부 스크롤 제거(기기/OS별 스크롤바 표시 편차 방지)
+          max-height: none;
+          overflow-y: visible;
 
           .crew-search-item {
             display: flex;

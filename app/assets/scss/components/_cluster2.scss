@@ -149,19 +149,28 @@
 
     // 설명 텍스트
     .section1-description {
-      max-width: 1100px;
+      // 기기 폭 변화에도 "의미 단위"로 안정적으로 줄바꿈되도록
+      // - ch 기반으로 한 줄 길이를 제어해 렌더링 차이를 완화
+      // - text-wrap 지원 브라우저에서 더 자연스럽게 동작
+      max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
-      line-height: 22px;
+      line-height: 1.7;
       position: relative;
       z-index: 1;
       text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      hyphens: auto;
+      text-wrap: pretty;
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         margin-bottom: 0;
         color: #FFF;
+        text-wrap: pretty;
 
         &:nth-child(2) {
           margin-bottom: 22px;
@@ -170,26 +179,30 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
         margin-bottom: 0;
         font-style: italic;
-        word-break: break-word;
+        // 인용문은 단어 단위 우선 + 긴 토큰만 예외적으로 줄바꿈
+        word-break: keep-all;
         overflow-wrap: break-word;
+        line-break: strict;
+        hyphens: auto;
+        text-wrap: pretty;
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 24px;
+        font-size: 26px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -197,11 +210,12 @@
         background-clip: text;
         margin: 0;
         font-style: italic;
+        text-wrap: balance;
       }
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -225,6 +239,7 @@
     left: calc(50% - 3px);
     transform: translateX(-50%);
     z-index: 0;
+    @include stacked-title-layer(1.05, true);
   }
 
   .cluster2-title {
@@ -237,6 +252,7 @@
     margin: 0;
     position: relative;
     z-index: 1;
+    @include stacked-title-layer(1.05, true);
   }
 
   // 상단 연결 프레임
@@ -2085,6 +2101,7 @@
       transform: translateX(-50%);
       z-index: 0;
       white-space: nowrap;
+      @include stacked-title-layer(1.08, true);
     }
 
     .review-banner-title {
@@ -2098,6 +2115,7 @@
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      @include stacked-title-layer(1.08, true);
     }
   }
 
@@ -2452,6 +2470,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    // 폰트 로딩/대체폰트 차이로 텍스트가 살짝 커져도 겹침이 나지 않도록
+    // (특히 타이틀 + 서브타이틀 구간)
+    isolation: isolate;
 
     &:hover .floating-icons {
       display: flex;
@@ -2522,12 +2543,7 @@
     }
 
     .intro-title-wrapper {
-      position: relative;
-      text-align: center;
-      margin: 0 0 25px 0;
-      z-index: 1;
-      overflow: visible;
-      width: 100%;
+      @include stacked-title-wrapper(clamp(14px, 2.2vw, 26px), center);
     }
 
     .intro-title-shadow {
@@ -2545,6 +2561,7 @@
       left: calc(50% - 3px);
       transform: translateX(-50%);
       z-index: 0;
+      @include stacked-title-layer(1.08, true);
     }
 
     .intro-title {
@@ -2557,6 +2574,7 @@
       margin: 0;
       position: relative;
       z-index: 1;
+      @include stacked-title-layer(1.08, true);
     }
 
     .intro-sub {
@@ -2564,10 +2582,12 @@
       font-size: 25px;
       color: #fff;
       letter-spacing: 0;
-      margin: 0 0 72px 0;
+      // 타이틀 높이가 조금 달라도 겹치지 않게 위쪽 여유 확보
+      margin: clamp(6px, 1.6vw, 14px) 0 72px 0;
       position: relative;
       z-index: 1;
       display: inline-block;
+      @include stacked-title-sub(null, null, 1.15);
 
       &::after {
         content: '';

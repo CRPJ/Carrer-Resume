@@ -883,6 +883,7 @@ const Cluster2Content = () => {
   // 섹션 5 물결 파동 상태
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const introRef = useRef<HTMLDivElement>(null);
+  const videosRef = useRef<HTMLDivElement>(null);
   const rippleIdRef = useRef(0);
   const lastRippleTime = useRef(0);
 
@@ -955,6 +956,8 @@ const Cluster2Content = () => {
   const handleWithUsClick = () => {
     setIsWiggling(true);
     setTimeout(() => setIsWiggling(false), 1000);
+    // 모바일 CTA 성격: 자기소개서 섹션으로 스크롤
+    introRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // 드래그 시작
@@ -1167,7 +1170,7 @@ const Cluster2Content = () => {
       </div>
 
       {/* 섹션 2-1: 비디오 섹션 */}
-      <div className="cluster2-videos" style={{ position: 'relative' }}>
+      <div ref={videosRef} className="cluster2-videos" style={{ position: 'relative' }}>
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>

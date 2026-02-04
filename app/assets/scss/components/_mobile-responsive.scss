@@ -802,7 +802,9 @@
             padding: 24px 20px !important;
             height: auto !important;
             min-height: 200px;
-            margin-bottom: -60px !important;
+            // 데스크톱에서 섹션이 겹치던 구조를 모바일에서는 완화
+            // ("너 자신을 알라" 섹션과 Adventure 섹션이 너무 붙어 보이는 문제 해결)
+            margin-bottom: 16px !important;
             
             &::before {
               width: 100% !important;
@@ -819,12 +821,12 @@
               max-width: 100% !important;
               
               p, .quote-text, .small-text {
-                font-size: 15px !important;
+                font-size: 16px !important;
                 line-height: 1.6 !important;
               }
               
               .quote-highlight {
-                font-size: 17px !important;
+                font-size: 19px !important;
               }
             }
           }
@@ -836,6 +838,7 @@
             height: auto !important;
             min-height: auto !important;
             padding: 16px !important;
+            margin-top: 12px !important;
             flex-direction: column !important;
             align-items: center !important;
             background-size: cover !important;
@@ -877,11 +880,55 @@
             
             .frame-center {
               margin: 16px auto !important;
+              // 데스크톱 absolute 배치 해제 (모바일/태블릿에서 한 번에 보이게)
+              position: static !important;
+              left: auto !important;
+              top: auto !important;
+              transform: none !important;
+              width: min(320px, 100%) !important;
+              height: auto !important;
+              aspect-ratio: 3 / 4;
             }
             
             .frame-right {
               width: 100% !important;
               align-items: center !important;
+              // 데스크톱 absolute 배치 해제 + 섹션 내부 스크롤 방지
+              position: static !important;
+              right: auto !important;
+              top: auto !important;
+              transform: none !important;
+              overflow: visible !important;
+
+              .mascot-icon {
+                width: 110px !important;
+                height: 90px !important;
+              }
+
+              .progress-label {
+                margin-top: 4px !important;
+                font-size: 13px !important;
+              }
+
+              .progress-value {
+                font-size: 24px !important;
+              }
+            }
+
+            // 작은 모바일에서는 상단 프레임을 한 화면에 담기 위해 좌측 정보 축소
+            @media only screen and (max-width: 767.98px) {
+              .frame-left {
+                margin-bottom: 8px !important;
+
+                .hexagon-large-row,
+                .avatar-row {
+                  display: none !important;
+                }
+
+                .adventure-title {
+                  margin-bottom: 8px !important;
+                }
+              }
             }
           }
           
@@ -929,13 +976,235 @@
             max-width: 100% !important;
             padding: 16px !important;
           }
+
+          // ===== Cluster 2: 모바일 섹션 재배치(정보 과밀 완화) =====
+          // 목표: 모바일에서는 정보 과밀을 줄이고, 섹션 흐름을 자연스럽게
+          // - 프로필 카드/상단 섹션 → (영상/학력/리뷰/인용문) → 자기소개(맨 아래)
+          .cluster2-title-wrapper { order: 1; }
+          .cluster2-top-frame { order: 2; }
+          .cluster2-videos { order: 3; }
+          .cluster2-education { order: 4; }
+          .cluster2-review-banner { order: 5; }
+          .cluster2-section4 { order: 6; }
+          .cluster2-quotes { order: 7; }
+          .cluster2-intro { order: 8; } // 자기소개서는 모바일에서도 맨 아래
+
+          // 섹션 간 여백(모바일에서 답답함 완화)
+          .cluster2-top-frame,
+          .cluster2-videos,
+          .cluster2-quotes,
+          .cluster2-education,
+          .cluster2-review-banner,
+          .cluster2-section4,
+          .cluster2-intro {
+            margin-bottom: 28px !important;
+          }
+
+          // ===== 자기소개서(Cluster2 Intro) 모바일 그리드 재구성 =====
+          .cluster2-intro {
+            padding: 20px 16px !important;
+
+            .intro-cards {
+              display: grid !important;
+              grid-template-columns: 1fr !important; // 1열 스택(모바일 가독성)
+              gap: 14px !important;
+
+              .intro-row {
+                display: contents !important;
+              }
+
+              .intro-card {
+                width: 100% !important;
+                min-width: 0 !important;
+              }
+            }
+          }
+
+          // ===== Club Review 모바일 재구성(PC 그리드 느낌 제거) =====
+          .cluster2-section4 {
+            padding: 20px 16px !important;
+
+            // 좌/우 2컬럼 → 1컬럼 스택
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+
+            .section4-left,
+            .section4-right {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+
+            // 9그리드 → 1열 카드 리스트(터치/가독성 우선)
+            .review-grid-9 {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+            }
+          }
+
+          // (삭제됨) 모바일 하단 CTA 바 + 그에 따른 하단 여백 보정
+        }
+
+        // ===== Cluster 3: 모바일 레이아웃 재구성(그리드/절대배치 그대로 금지) =====
+        .cluster3-content {
+          padding: 0 16px !important;
+          box-sizing: border-box;
+
+          // Section3: 포트폴리오 아카이빙 Channel → 모바일 1열
+          .cluster3-section3 {
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+
+            .section3-header {
+              width: 100% !important;
+              margin-left: 0 !important;
+              margin-right: 0 !important;
+              padding: 18px 0 0 !important;
+            }
+
+            .channel-cards {
+              width: 100% !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+            }
+
+            .channel-card {
+              width: 100% !important;
+              height: auto !important;
+
+              .card-image {
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 16 / 10;
+              }
+            }
+          }
+
+          // Section2: "클럽 강화 품계" (타이틀/퍼센트/카드) 모바일 재배치
+          .cluster3-section2 {
+            padding: 18px 0 18px !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+
+            &::before,
+            &::after {
+              width: 100% !important;
+            }
+
+            .section2-right {
+              padding-right: 0 !important;
+              max-width: 100% !important;
+              align-items: flex-end;
+              gap: 6px;
+            }
+
+            .section2-text .handwriting {
+              font-size: clamp(26px, 7vw, 44px) !important;
+            }
+
+            .section2-progress {
+              width: min(260px, 78vw) !important;
+
+              .progress-info {
+                .progress-label,
+                .progress-unit {
+                  font-size: 14px !important;
+                }
+                .progress-percent {
+                  font-size: 30px !important;
+                }
+              }
+            }
+
+            // 10개 카드: 모바일에서는 2열 그리드로(가독성 우선)
+            .section2-cards {
+              display: grid !important;
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 10px !important;
+              align-items: stretch !important;
+
+              position: relative !important;
+              left: auto !important;
+              right: auto !important;
+              bottom: auto !important;
+              margin-top: 14px !important;
+              padding: 0 !important;
+
+              .rank-card {
+                width: 100% !important;
+                flex: initial !important;
+                height: 140px !important;
+                border-radius: 12px !important;
+                overflow: hidden !important;
+              }
+
+              .rank-card.active {
+                width: 100% !important;
+                height: 150px !important;
+              }
+            }
+          }
+
+          // Section4/5: World Of Top Works / The Detail 10 → 모바일 1열(특히 The Detail 10)
+          .cluster3-section4 {
+            padding: 28px 0 !important;
+            overflow: hidden !important;
+
+            .section4-top-header {
+              width: 100% !important;
+              margin-left: 0 !important;
+              margin-right: 0 !important;
+            }
+          }
+
+          .cluster3-section5 {
+            .detail-grid {
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+              justify-content: stretch !important;
+
+              .detail-item {
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 16 / 11;
+                border-radius: 14px !important;
+              }
+            }
+          }
         }
       }
     }
     
     // 푸터
     .footer {
-      padding: 30px 16px !important;
+      // 데스크탑 고정 height(693px) 때문에 모바일에서 불필요한 검은 여백이 생김
+      // → 모바일/태블릿에서는 콘텐츠 높이에 맞게 자동으로 줄어들도록
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      padding: 30px 16px 18px !important;
+
+      // 우하단 장식 이미지는 모바일에서 공간만 차지하므로 숨김
+      .footer-thumb {
+        display: none !important;
+      }
+
+      // 카피라이트 영역 간격 축소(모바일에서는 위젯이 접히거나 스택되기 때문에 과한 여백 제거)
+      .footer__copyright {
+        margin-top: 24px !important;
+        padding: 18px 0 0 !important;
+      }
+
+      // 모바일에서는 nowrap이 오히려 레이아웃을 깨뜨릴 수 있어 완화
+      .footer__widget-text--alt,
+      .footer__widget-contact .footer__widget-content p,
+      .footer__widget-contact .footer__widget-content span,
+      .footer__widget-contact .footer__widget-content li {
+        white-space: normal !important;
+      }
     }
   }
   
@@ -943,13 +1212,17 @@
   // iPhone 12 Pro와 동일한 크기로 완벽한 중앙 정렬
   @media only screen and (min-width: 768px) and (max-width: 1199.98px) {
     .nftg-content-home.mobile-layout {
+      // 태블릿 폭에 따라 카드/탭/콘텐츠 폭이 자연스럽게 커지도록
+      // (고정 366px 때문에 여백이 과해지는 문제 해결)
+      --tablet-shell-width: clamp(360px, 56vw, 520px);
+
       .mobile-sidebar-section {
         padding: 20px 0 !important; // 좌우 패딩 제거
         justify-content: center !important;
         
         .resume-card {
-          width: 366px !important;
-          max-width: 366px !important;
+          width: var(--tablet-shell-width) !important;
+          max-width: var(--tablet-shell-width) !important;
           margin: 0 auto !important;
           padding: 14px !important;
           border: 1px solid #666 !important;
@@ -964,7 +1237,7 @@
         padding: 0 20px;
         
         .cluster-tabs {
-          max-width: 366px !important;
+          max-width: var(--tablet-shell-width) !important;
           width: 100% !important;
         }
         
@@ -986,8 +1259,40 @@
         .cluster2-content,
         .cluster3-content,
         .cluster4-content {
-          max-width: 500px !important;
+          max-width: var(--tablet-shell-width) !important;
           width: 100% !important;
+
+          // 태블릿에서는 정보 밀도를 살짝 올리되, 과밀은 방지
+          .cluster2-intro {
+            .intro-cards {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 14px !important;
+            }
+          }
+
+          .cluster2-section4 {
+            .review-grid-9 {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 12px !important;
+            }
+          }
+        }
+
+        // ===== Cluster3: 태블릿에서는 3열까지 =====
+        .cluster3-content {
+          .cluster3-section2 {
+            .section2-cards {
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 12px !important;
+
+              .rank-card {
+                height: 150px !important;
+              }
+              .rank-card.active {
+                height: 160px !important;
+              }
+            }
+          }
         }
       }
     }
@@ -1121,7 +1426,11 @@
             
             .section1-description {
               p, .quote-text, .small-text {
-                font-size: 12px !important;
+                font-size: 14px !important;
+              }
+
+              .quote-highlight {
+                font-size: 16px !important;
               }
             }
           }
@@ -1252,7 +1561,11 @@
             
             .section1-description {
               p, .quote-text, .small-text {
-                font-size: 14px !important;
+                font-size: 15px !important;
+              }
+
+              .quote-highlight {
+                font-size: 17px !important;
               }
             }
           }

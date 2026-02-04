@@ -889,7 +889,11 @@ svg {
   .nftg-sidebar {
     width: 97px;
 
+    // Windows에서 사이드바가 scrollable일 때 스크롤바가 튀어나와 보이지 않게
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     &::-webkit-scrollbar {
+      display: none;
       width: 0px;
     }
   }
@@ -898,13 +902,20 @@ svg {
     width: calc(100% - 97px);
     flex-grow: 1;
     margin-left: 97px;
-    height: 100%;
+    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    min-height: 100vh;
   }
 
   .nftg-content {
     padding: 0px 12px;
     margin-top: 100px;
     overflow-x: clip;
+    
+    // nftg-content-home은 sticky 작동을 위해 overflow: visible 필요
+    &.nftg-content-home {
+      overflow: visible;
+      overflow-x: visible;
+    }
   }
 
   .nftg-content-home {
@@ -931,7 +942,8 @@ svg {
     width: 100%;
     flex-grow: 1;
     margin-left: 0px;
-    height: 100%;
+    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    min-height: 100vh;
   }
 
   .header {
