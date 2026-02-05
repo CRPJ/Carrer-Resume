@@ -38,6 +38,24 @@ const Cluster3Page = () => {
 
     let rafId: number | null = null;
     let isFixed = false;
+
+    // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
+    const computeTop = (zoom: number, height: number) => {
+      const defaultTop = headerTopPx / zoom;
+      let top = defaultTop;
+
+      const footer = document.querySelector("footer");
+      if (footer) {
+        const footerTop = footer.getBoundingClientRect().top / zoom;
+        // 하단 테두리/그림자까지 안전하게 보이도록 여유를 조금 더 확보
+        const margin = 68 / zoom;
+        const maxTop = Math.floor(footerTop - height - margin);
+        top = Math.min(defaultTop, maxTop);
+      }
+
+      return top;
+    };
+
     const apply = () => {
       rafId = null;
 
@@ -47,12 +65,12 @@ const Cluster3Page = () => {
 
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
-        const height = inner.offsetHeight;
+        const height = inner.getBoundingClientRect().height / zoom;
         const left = shellRect.left / zoom;
-        const top = headerTopPx / zoom;
+        const top = computeTop(zoom, height);
 
         shell.style.width = `${width}px`;
-        shell.style.height = `${height}px`;
+        shell.style.height = `${inner.offsetHeight}px`;
 
         inner.style.position = "fixed";
         inner.style.top = `${top}px`;
@@ -61,6 +79,14 @@ const Cluster3Page = () => {
         inner.style.zIndex = "9999";
 
         isFixed = true;
+        return;
+      }
+
+      // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
+      if (isFixed && shouldFix) {
+        const height = inner.getBoundingClientRect().height / zoom;
+        const top = computeTop(zoom, height);
+        inner.style.top = `${top}px`;
         return;
       }
 

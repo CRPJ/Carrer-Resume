@@ -887,7 +887,8 @@
               transform: none !important;
               width: min(320px, 100%) !important;
               height: auto !important;
-              aspect-ratio: 3 / 4;
+              // 데스크톱(Figma) 컨테이너 비율: 422 x 603
+              aspect-ratio: 422 / 603;
             }
             
             .frame-right {

@@ -533,6 +533,14 @@ body:has(.nftg-content-home) {
   .header {
     padding: 0px;
 
+    @media (min-width: 1200px) {
+      // "CA"만 안 잘리게: 헤더 전체를 밀지 않고(로고/레이아웃 변화 최소화)
+      // 첫 메뉴가 시작되는 리스트만 아주 조금 우측으로 이동
+      .navbar__list {
+        margin-left: 16px;
+      }
+    }
+
     .navbar__items,
     .navbar__items-inner,
     .navbar__items-wrapper {

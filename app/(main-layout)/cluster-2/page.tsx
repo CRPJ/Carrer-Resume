@@ -36,6 +36,23 @@ const Cluster2Page = () => {
     let rafId: number | null = null;
     let isFixed = false;
 
+    // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
+    const computeTop = (zoom: number, height: number) => {
+      const defaultTop = headerTopPx / zoom;
+      let top = defaultTop;
+
+      const footer = document.querySelector("footer");
+      if (footer) {
+        const footerTop = footer.getBoundingClientRect().top / zoom;
+        // 하단 테두리/그림자까지 안전하게 보이도록 여유를 조금 더 확보
+        const margin = 68 / zoom;
+        const maxTop = Math.floor(footerTop - height - margin);
+        top = Math.min(defaultTop, maxTop);
+      }
+
+      return top;
+    };
+
     const apply = () => {
       rafId = null;
 
@@ -48,14 +65,17 @@ const Cluster2Page = () => {
       // 고정 진입
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
-        const height = inner.offsetHeight;
+        // offsetHeight는 transform/zoom 체감 높이와 달라 footer 직전에서 하단이 잘릴 수 있어
+        // "보이는 높이" 기반으로 계산한다.
+        const height = inner.getBoundingClientRect().height / zoom;
         
         // ★ zoom 보정: fixed 요소의 left는 zoom으로 나눠줘야 함
         const left = shellRect.left / zoom;
-        const top = headerTopPx / zoom;
+        const top = computeTop(zoom, height);
 
         shell.style.width = `${width}px`;
-        shell.style.height = `${height}px`;
+        // 레이아웃 자리 유지용 shell 높이는 기존(레이아웃) 기준으로 유지
+        shell.style.height = `${inner.offsetHeight}px`;
 
         inner.style.position = 'fixed';
         inner.style.top = `${top}px`;
@@ -64,6 +84,14 @@ const Cluster2Page = () => {
         inner.style.zIndex = '9999';
 
         isFixed = true;
+        return;
+      }
+
+      // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
+      if (isFixed && shouldFix) {
+        const height = inner.getBoundingClientRect().height / zoom;
+        const top = computeTop(zoom, height);
+        inner.style.top = `${top}px`;
         return;
       }
 

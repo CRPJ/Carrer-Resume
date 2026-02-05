@@ -230,8 +230,15 @@ const Sidebar = () => {
       scale = Math.min(1, scale);
 
       // 1366x768급 노트북(세로가 낮은 환경)에서는 카드가 지나치게 작게 보일 수 있어
-      // Cluster3/4에서만, "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
-      const isCluster34 = (pathname || '').includes('/cluster-3') || (pathname || '').includes('/cluster-4');
+      // "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
+      // (Cluster2에서도 동일 UX가 필요함)
+      const isClusterPages =
+        (pathname || '').includes('/cluster-2') ||
+        (pathname || '').includes('/cluster-3') ||
+        (pathname || '').includes('/cluster-4') ||
+        (pathname || '').includes('/cluster-4-1') ||
+        (pathname || '').includes('/cluster-4-card') ||
+        (pathname || '').includes('/career');
       const isLaptop1366 =
         !mobile &&
         viewportWidth >= 1280 &&
@@ -239,7 +246,7 @@ const Sidebar = () => {
         viewportHeight >= 700 &&
         viewportHeight <= 820;
 
-      if (isCluster34 && isLaptop1366) {
+      if (isClusterPages && isLaptop1366) {
         // 레이아웃 상수(페이지에서 desktop-layout gap=20px)
         const GAP_PX = 20;
         const BASE_SIDEBAR_WIDTH = 520;
@@ -257,11 +264,17 @@ const Sidebar = () => {
 
       setCardScale(scale);
 
+      // ★ 레이아웃 가드레일: 실제 사이드바 점유 폭을 CSS 변수로 동기화
+      // - fixed+spacer 방식(예: cluster-4-card)에서도 콘텐츠 침범이 발생하지 않게 함
+      // - scale < 1인 경우에도 "컬럼 폭"은 기본 520px을 유지
+      const BASE_SIDEBAR_WIDTH = 520;
+      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * Math.max(1, scale));
+      document.documentElement.style.setProperty('--sidebar-width', `${effectiveSidebarWidth}px`);
+
       // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
       document.documentElement.style.removeProperty('--card-width');
       document.documentElement.style.removeProperty('--card-height');
       document.documentElement.style.removeProperty('--card-scale');
-      document.documentElement.style.removeProperty('--sidebar-width');
       document.documentElement.style.removeProperty('--container-height');
 
       // 부모 컨테이너 높이 제한 제거 - 스크롤 시 프로필 잘림 방지
@@ -278,7 +291,7 @@ const Sidebar = () => {
       window.removeEventListener('resize', calculateScale);
       window.visualViewport?.removeEventListener('resize', calculateScale);
     };
-  }, []);
+  }, [pathname]);
 
   // Form state
   const [formData, setFormData] = useState({

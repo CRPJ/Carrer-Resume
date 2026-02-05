@@ -278,6 +278,7 @@
     position: relative;
     // 중앙 사진이 위로 튀어나오는 오버랩을 허용 (Figma Mask Group 느낌)
     overflow: visible;
+    // NOTE: 프레임 전체를 clip-path로 자르면 배경/레이어가 의도치 않게 잘릴 수 있어 사용하지 않음.
 
     // 하단 프레임(노란 테두리)만 "앞 레이어"로 한 번 더 덮어씌움
     // => 위쪽은 사진이 프레임보다 앞에 오고, 아래쪽은 프레임이 사진 위로 올라오는 효과
@@ -466,33 +467,30 @@
     .frame-center {
       width: 422.39px;
       max-width: 422.4px;
-      height: 663px; // ★ 원래 크기 유지
+      // Figma 컨테이너(frame-center) 기준: 422 x 603
+      height: 603px;
       flex-shrink: 0;
       position: absolute;
       left: 576px;
-      // 아래쪽은 프레임 하단에 "딱" 맞추고, 그 결과로 위쪽만 올라오게
-      // (해상도/zoom에서 프레임 높이가 미세하게 달라도 아래쪽은 절대 튀어나오지 않게)
+      // Figma 컨테이너 배치와 동일하게: 하단 기준으로 자연스럽게 정렬
+      // (과도한 '위로 튀어나옴'을 제거해서 실제 시안과 동일한 시각적 중심을 맞춤)
       top: auto;
-      // 프레임(570px) 대비 사진(603px) 기본 오버행은 33px.
-      // "위로 60px" 튀어나오게 하려면 bottom inset을 27px로 주면 됨 (33 + 27 = 60)
-      bottom: 27px;
+      // 프레임 이미지(노란 테두리)의 하단 영역을 침범하지 않도록 "안쪽 여백"만큼 띄움
+      // (bottom=0이면 하단 테두리 아래로 삐져나와 보일 수 있음)
+      // 프레임 내부 하단까지 최대한 채우되(빈 공간 최소화),
+      // 하단 테두리 바깥으로 "요소 자체"가 내려가진 않게 한다.
+      bottom: calc(27px / var(--app-zoom, 1));
       // 하단 프레임 오버레이(::after, z-index:12) 아래로 들어가게
       z-index: 11;
-      // Figma "Mask Group" 느낌: 라운드 대신 컷 코너(챔퍼) 마스크로 자연스럽게 클리핑
-      // (라운드 모서리로 인한 '인위적으로 잘린' 인상을 줄임)
-      --c2-photo-chamfer: 22px;
-      clip-path: polygon(
-        0 var(--c2-photo-chamfer),
-        var(--c2-photo-chamfer) 0,
-        calc(100% - var(--c2-photo-chamfer)) 0,
-        100% var(--c2-photo-chamfer),
-        100% calc(100% - var(--c2-photo-chamfer)),
-        calc(100% - var(--c2-photo-chamfer)) 100%,
-        var(--c2-photo-chamfer) 100%,
-        0 calc(100% - var(--c2-photo-chamfer))
-      );
+      // 모서리: 8각형(챔퍼) → 4각형(직각)
+      clip-path: none;
+      border-radius: 0;
       overflow: hidden;
-      filter: drop-shadow(0px 0px 20px rgba(255, 255, 255, 1));
+      // 바깥(특히 하단)으로 새어 보이는 drop-shadow는 제거하고, 프레임 안쪽 글로우로 대체
+      filter: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+        inset 0 0 26px rgba(255, 255, 255, 0.22);
 
       // 이미지가 마스크를 꽉 채우도록
       img {
@@ -541,7 +539,7 @@
       // 빈 상태 스타일
       &.empty {
         background: linear-gradient(145deg, #3a3a3a 0%, #1a1a1a 100%);
-        border-radius: 8px;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
