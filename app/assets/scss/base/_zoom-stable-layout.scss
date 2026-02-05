@@ -146,12 +146,16 @@ body {
 // ===== Cluster2 전용 반응형 =====
 
 .cluster2-content,
+.cluster3-content,
+.cluster4-content,
 .home-two-content {
   max-width: var(--content-max-width);
   
   // ★ 모든 자식 요소 잘림 방지
   & > *,
   .c2-section,
+  .cluster3-section,
+  .cluster4-section,
   .club-review,
   .self-introduction,
   .resume-section,

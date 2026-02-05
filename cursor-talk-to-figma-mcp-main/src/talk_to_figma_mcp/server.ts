@@ -898,23 +898,42 @@ server.tool(
 // Set Text Content Tool
 server.tool(
   "set_text_content",
-  "Set the text content of an existing text node in Figma",
+  "Set the text content of an existing text node in Figma (optionally adjust style too)",
   {
     nodeId: z.string().describe("The ID of the text node to modify"),
-    text: z.string().describe("New text content"),
+    text: z.string().optional().describe("New text content (optional)"),
+    applyText: z
+      .boolean()
+      .optional()
+      .describe("Whether to apply the 'text' update (default: true). Set false to style-only."),
+    textAlignHorizontal: z
+      .enum(["LEFT", "CENTER", "RIGHT", "JUSTIFIED"])
+      .optional()
+      .describe("Horizontal text alignment (optional)"),
+    fontSize: z.number().positive().optional().describe("Set absolute font size (optional)"),
+    fontSizeDelta: z
+      .number()
+      .optional()
+      .describe("Increase/decrease font size by this amount (optional)"),
+    lineHeightPx: z.number().positive().optional().describe("Set line height in pixels (optional)"),
   },
-  async ({ nodeId, text }: any) => {
+  async ({ nodeId, text, applyText, textAlignHorizontal, fontSize, fontSizeDelta, lineHeightPx }: any) => {
     try {
       const result = await sendCommandToFigma("set_text_content", {
         nodeId,
         text,
+        applyText,
+        textAlignHorizontal,
+        fontSize,
+        fontSizeDelta,
+        lineHeightPx,
       });
       const typedResult = result as { name: string };
       return {
         content: [
           {
             type: "text",
-            text: `Updated text content of node "${typedResult.name}" to "${text}"`,
+            text: `Updated text node "${typedResult.name}"`,
           },
         ],
       };
@@ -925,6 +944,94 @@ server.tool(
             type: "text",
             text: `Error setting text content: ${error instanceof Error ? error.message : String(error)
               }`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// Set Text Style Tool
+server.tool(
+  "set_text_style",
+  "Set style properties of an existing text node in Figma (alignment, font size, line height)",
+  {
+    nodeId: z.string().describe("The ID of the text node to modify"),
+    textAlignHorizontal: z
+      .enum(["LEFT", "CENTER", "RIGHT", "JUSTIFIED"])
+      .optional()
+      .describe("Horizontal text alignment"),
+    fontSize: z.number().positive().optional().describe("Set absolute font size"),
+    fontSizeDelta: z
+      .number()
+      .optional()
+      .describe("Increase/decrease font size by this amount"),
+    lineHeightPx: z.number().positive().optional().describe("Set line height in pixels"),
+  },
+  async ({ nodeId, textAlignHorizontal, fontSize, fontSizeDelta, lineHeightPx }: any) => {
+    try {
+      const result = await sendCommandToFigma("set_text_style", {
+        nodeId,
+        textAlignHorizontal,
+        fontSize,
+        fontSizeDelta,
+        lineHeightPx,
+      });
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error setting text style: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// Set Multiple Text Styles Tool
+server.tool(
+  "set_multiple_text_styles",
+  "Set style properties for multiple text nodes efficiently",
+  {
+    styles: z
+      .array(
+        z.object({
+          nodeId: z.string().describe("The ID of the text node"),
+          textAlignHorizontal: z.enum(["LEFT", "CENTER", "RIGHT", "JUSTIFIED"]).optional(),
+          fontSize: z.number().positive().optional(),
+          fontSizeDelta: z.number().optional(),
+          lineHeightPx: z.number().positive().optional(),
+        })
+      )
+      .describe("Array of text node style updates"),
+  },
+  async ({ styles }: any) => {
+    try {
+      const result = await sendCommandToFigma("set_multiple_text_styles", { styles });
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error setting multiple text styles: ${error instanceof Error ? error.message : String(error)}`,
           },
         ],
       };
@@ -2633,6 +2740,8 @@ type FigmaCommand =
   | "set_corner_radius"
   | "clone_node"
   | "set_text_content"
+  | "set_text_style"
+  | "set_multiple_text_styles"
   | "scan_text_nodes"
   | "set_multiple_text_contents"
   | "get_annotations"
@@ -2755,10 +2864,26 @@ type CommandParams = {
     nodeId: string;
     text: string;
   };
+  set_text_style: {
+    nodeId: string;
+    textAlignHorizontal?: "LEFT" | "CENTER" | "RIGHT" | "JUSTIFIED";
+    fontSize?: number;
+    fontSizeDelta?: number;
+    lineHeightPx?: number;
+  };
   scan_text_nodes: {
     nodeId: string;
     useChunking: boolean;
     chunkSize: number;
+  };
+  set_multiple_text_styles: {
+    styles: Array<{
+      nodeId: string;
+      textAlignHorizontal?: "LEFT" | "CENTER" | "RIGHT" | "JUSTIFIED";
+      fontSize?: number;
+      fontSizeDelta?: number;
+      lineHeightPx?: number;
+    }>;
   };
   set_multiple_text_contents: {
     nodeId: string;

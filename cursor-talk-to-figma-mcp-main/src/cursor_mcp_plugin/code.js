@@ -153,6 +153,10 @@ async function handleCommand(command, params) {
       return await setCornerRadius(params);
     case "set_text_content":
       return await setTextContent(params);
+    case "set_text_style":
+      return await setTextStyle(params);
+    case "set_multiple_text_styles":
+      return await setMultipleTextStyles(params);
     case "clone_node":
       return await cloneNode(params);
     case "scan_text_nodes":
@@ -236,6 +240,90 @@ async function handleCommand(command, params) {
     default:
       throw new Error(`Unknown command: ${command}`);
   }
+}
+
+async function loadTextNodeFontSafely(node) {
+  // For style changes, Figma requires loading fonts for the text node.
+  if (node.fontName === figma.mixed) {
+    const first = node.getRangeFontName(0, 1);
+    await figma.loadFontAsync(first);
+    return;
+  }
+  await figma.loadFontAsync(node.fontName);
+}
+
+async function setTextStyle(params) {
+  const { nodeId, textAlignHorizontal, fontSize, fontSizeDelta, lineHeightPx } = params || {};
+
+  if (!nodeId) throw new Error("Missing nodeId parameter");
+
+  const node = await figma.getNodeByIdAsync(nodeId);
+  if (!node) throw new Error(`Node not found with ID: ${nodeId}`);
+  if (node.type !== "TEXT") throw new Error(`Node is not a text node: ${nodeId}`);
+
+  await loadTextNodeFontSafely(node);
+
+  // Alignment
+  if (textAlignHorizontal) {
+    node.textAlignHorizontal = textAlignHorizontal;
+  }
+
+  // Font size
+  if (typeof fontSize === "number") {
+    node.fontSize = fontSize;
+  } else if (typeof fontSizeDelta === "number") {
+    if (node.fontSize === figma.mixed) {
+      // Mixed fontSize can't be delta-adjusted safely without per-range ops.
+      // Skip in this case unless absolute fontSize is provided.
+    } else {
+      node.fontSize = Math.max(1, node.fontSize + fontSizeDelta);
+    }
+  }
+
+  // Line height (px)
+  if (typeof lineHeightPx === "number") {
+    node.lineHeight = { value: lineHeightPx, unit: "PIXELS" };
+  }
+
+  return {
+    id: node.id,
+    name: node.name,
+    characters: node.characters,
+    fontName: node.fontName,
+    fontSize: node.fontSize,
+    textAlignHorizontal: node.textAlignHorizontal,
+    lineHeight: node.lineHeight,
+  };
+}
+
+async function setMultipleTextStyles(params) {
+  const { styles } = params || {};
+  if (!Array.isArray(styles) || styles.length === 0) {
+    throw new Error("Missing or invalid styles parameter");
+  }
+
+  const results = [];
+  let applied = 0;
+  let failed = 0;
+
+  for (const s of styles) {
+    try {
+      const r = await setTextStyle(s);
+      results.push({ success: true, nodeId: s.nodeId, result: r });
+      applied++;
+    } catch (error) {
+      results.push({ success: false, nodeId: s.nodeId, error: error.message || String(error) });
+      failed++;
+    }
+  }
+
+  return {
+    success: applied > 0,
+    totalCount: styles.length,
+    applied,
+    failed,
+    results,
+  };
 }
 
 // Command implementations
@@ -1356,14 +1444,22 @@ async function setCornerRadius(params) {
 }
 
 async function setTextContent(params) {
-  const { nodeId, text } = params || {};
+  const { nodeId, text, applyText, textAlignHorizontal, fontSize, fontSizeDelta, lineHeightPx } = params || {};
 
   if (!nodeId) {
     throw new Error("Missing nodeId parameter");
   }
 
-  if (text === undefined) {
-    throw new Error("Missing text parameter");
+  const shouldApplyText = applyText !== false; // default true
+  const hasTextUpdate = text !== undefined && shouldApplyText;
+  const hasStyleUpdate =
+    textAlignHorizontal !== undefined ||
+    fontSize !== undefined ||
+    fontSizeDelta !== undefined ||
+    lineHeightPx !== undefined;
+
+  if (!hasTextUpdate && !hasStyleUpdate) {
+    throw new Error("Missing text/style parameters");
   }
 
   const node = await figma.getNodeByIdAsync(nodeId);
@@ -1376,15 +1472,46 @@ async function setTextContent(params) {
   }
 
   try {
-    await figma.loadFontAsync(node.fontName);
+    // Apply style that doesn't require font loading first (alignment)
+    if (textAlignHorizontal !== undefined) {
+      node.textAlignHorizontal = textAlignHorizontal;
+    }
 
-    await setCharacters(node, text);
+    // Font-size / line-height / characters require fonts to be loaded.
+    const needsFont =
+      hasTextUpdate ||
+      typeof fontSize === "number" ||
+      typeof fontSizeDelta === "number" ||
+      typeof lineHeightPx === "number";
+
+    if (needsFont) {
+      await loadTextNodeFontSafely(node);
+    }
+
+    if (hasTextUpdate) {
+      await setCharacters(node, text);
+    }
+
+    if (typeof fontSize === "number") {
+      node.fontSize = fontSize;
+    } else if (typeof fontSizeDelta === "number") {
+      if (node.fontSize !== figma.mixed) {
+        node.fontSize = Math.max(1, node.fontSize + fontSizeDelta);
+      }
+    }
+
+    if (typeof lineHeightPx === "number") {
+      node.lineHeight = { value: lineHeightPx, unit: "PIXELS" };
+    }
 
     return {
       id: node.id,
       name: node.name,
       characters: node.characters,
       fontName: node.fontName,
+      fontSize: node.fontSize,
+      textAlignHorizontal: node.textAlignHorizontal,
+      lineHeight: node.lineHeight,
     };
   } catch (error) {
     throw new Error(`Error setting text content: ${error.message}`);

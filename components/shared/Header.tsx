@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Cart from "./Cart";
-import ColorPalate from "./ColorPalate";
 import Message from "./header/Message";
 import Notification from "./header/Notification";
 import Profile from "./header/Profile";
@@ -248,7 +247,6 @@ const Header = () => {
   const isLoading = status === "loading";
   const [search, setSearch] = useState(false);
   const [cartIsOpen, setCartIsOpen] = useState(false);
-  const [colorPalete, setColorPalete] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [submenu1, setSubmenu1] = useState("");
   const [submenu2, setSubmenu2] = useState("");
@@ -533,8 +531,6 @@ const Header = () => {
       <MouseCursor />
 
       <Cart cartIsOpen={cartIsOpen} setCartIsOpen={setCartIsOpen} />
-
-      <ColorPalate colorPalete={colorPalete} setColorPalete={setColorPalete} />
     </>
   );
 };

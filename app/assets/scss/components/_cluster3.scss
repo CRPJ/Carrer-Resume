@@ -260,16 +260,19 @@
     // 설명 텍스트
     .section1-description {
       max-width: 1100px;
-      margin: 0 auto;
+      // 좌측 정렬은 유지하되, 블록 자체를 우측으로 조금 이동
+      margin-left: auto;
+      margin-right: clamp(0px, 3vw, 60px);
       padding: 30px 40px 0;
-      line-height: 22px;
+      // 가독성 개선: 우측 정렬 + 약간 큰 타이포
+      line-height: 1.45;
       position: relative;
       z-index: 1;
       text-align: left;
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         margin-bottom: 0;
         color: #FFF;
 
@@ -280,14 +283,14 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
@@ -299,7 +302,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 24px;
+        font-size: 26px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -311,7 +314,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 22px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -747,7 +750,9 @@
       .handwriting {
         font-family: 'HappinessGoheung', sans-serif;
         font-size: var(--c3-s2-title-size);
-        line-height: 1.05;
+        // Figma: fontSize=100, lineHeight=100 (즉 1.0)
+        // 브라우저 기본 line-height 차이로 높이가 달라보여서 고정
+        line-height: 1;
         white-space: nowrap;
         color: #fff;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -772,7 +777,9 @@
         .progress-label {
           font-family: 'Pretendard', sans-serif;
           font-size: 22px;
-          font-weight: 400;
+          // Figma: Pretendard Medium 22 / lineHeight 33
+          font-weight: 500;
+          line-height: 33px;
           color: #767676;
         }
 
@@ -780,13 +787,16 @@
           font-family: var(--black-ops-one), 'Black Ops One', cursive;
           font-size: 50px;
           font-weight: 400;
+          // Figma: 50 / lineHeight 75
+          line-height: 75px;
           color: #FED402;
         }
 
         .progress-unit {
           font-family: 'Pretendard', sans-serif;
           font-size: 22px;
-          font-weight: 400;
+          font-weight: 500;
+          line-height: 33px;
           color: #767676;
         }
       }

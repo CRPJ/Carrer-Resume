@@ -10,6 +10,15 @@ html:has(.nftg-content-home) {
   overflow-y: auto !important;
   height: auto !important;
   min-height: 100vh !important;
+
+  // Windows/Chromium에서 메인 스크롤바(흰 바) 숨기기: 스크롤은 유지
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // legacy Edge/IE
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
 }
 
 body:has(.nftg-content-home) {
@@ -25,14 +34,42 @@ body:has(.nftg-content-home) {
   height: auto !important;
   min-height: calc(100vh - 124px) !important;
   overflow: visible !important;
-  overflow-x: visible !important; // sticky 작동을 위해 필수
+  // sticky는 유지하면서 "가로 오버플로우"만 차단 (Cluster3/4 가로 스크롤바 방지)
+  overflow-x: clip !important;
+  @supports not (overflow-x: clip) {
+    overflow-x: hidden !important;
+  }
+
+  // 스크롤은 유지하되 "막대"만 숨기기 (Cluster3/4에서 보이는 내부/외부 스크롤바 공통 대응)
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  // 하위 스크롤 컨테이너(overflow-y:auto/scroll)까지 막대 숨김
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
 
   // 데스크탑 레이아웃 - sticky 사이드바
   .desktop-layout {
     display: flex !important;
     gap: 20px !important;
     align-items: flex-start !important;
-    overflow: visible !important; // sticky 작동을 위해 필수
+    overflow: visible !important; // sticky 작동을 위해 필수 (y)
+    overflow-x: clip !important;
+    @supports not (overflow-x: clip) {
+      overflow-x: hidden !important;
+    }
     
     .sidebar-sticky-wrapper {
       position: sticky !important;
@@ -124,7 +161,12 @@ body:has(.nftg-content-home) {
         }
 
         .home-two-content {
+          // 세로는 보이되, 가로만 차단해서 "이중/불필요 스크롤바" 방지
           overflow: visible !important;
+          overflow-x: clip !important;
+          @supports not (overflow-x: clip) {
+            overflow-x: hidden !important;
+          }
           max-width: 100% !important;
         }
 
