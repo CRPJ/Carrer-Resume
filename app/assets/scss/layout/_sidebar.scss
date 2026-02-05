@@ -17,6 +17,26 @@
   transition-duration: 300ms;
   border-right: 1px solid #39424c;
 
+  // =========================================================
+  // 로고 영역(사이드바) 하단 라인과 헤더 하단 라인(Y)을 "항상" 일치
+  // - 모니터 높이/미디어쿼리(패딩 압축)로 logo widget의 ::after 위치가 흔들리던 문제 방지
+  // - 레이아웃(간격/패딩/로고 위치)은 그대로 두고, 라인만 고정 위치에 그린다
+  // =========================================================
+  @media (min-width: 1200px) {
+    &::after {
+      content: "";
+      position: fixed;
+      left: 0;
+      // 헤더 "divider(=border-bottom)" 위치와 동기화 (서브픽셀/1px 어긋남 방지)
+      top: var(--header-divider-y, var(--header-height, 100px));
+      width: 97px; // `.nftg-app .nftg-sidebar` 기본 폭과 동일
+      height: 1px;
+      background-color: #39424c;
+      pointer-events: none;
+      z-index: 100001;
+    }
+  }
+
   .sidebar__wrapper {
     display: flex;
     flex-direction: column;
@@ -41,7 +61,13 @@
   }
 
   .sidebar__widget:nth-of-type(1) {
-    padding: 12.5px 0px;
+    // 로고가 "정중앙"에 오도록, 헤더 divider까지의 높이를 고정
+    // (모니터 높이/미디어쿼리로 padding이 바뀌어도 위치가 흔들리지 않게)
+    height: var(--header-divider-y, var(--header-height, 100px));
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .sidebar__widget {
@@ -53,14 +79,9 @@
       position: relative;
 
       &::after {
-        content: "";
-        position: absolute;
-        left: -12px;
-        right: 0px;
-        bottom: 0px;
-        width: calc(100% + 24px);
-        height: 1px;
-        background-color: #39424c;
+        // 라인은 `.nftg-sidebar::after`로 고정(헤더 라인과 항상 일치)해서 그린다.
+        content: none;
+        display: none;
       }
     }
     &:nth-last-of-type(1) {
