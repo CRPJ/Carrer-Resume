@@ -11,15 +11,15 @@ const ClusterTabs = () => {
   const [showRightArrow, setShowRightArrow] = useState(true);
 
   const tabs = [
-    { name: "Personal Profile", path: "/cluster-2", cluster: 2 },
-    { name: "Club Final Index", path: "/cluster-3", cluster: 3 },
-    { name: "Club Challenge Growth", path: "/cluster-4", cluster: 4 },
-    { name: "Societal Reputation", path: "/cluster-5", cluster: 5 },
-    { name: "Working Level - Experience", path: "/cluster-6", cluster: 6 },
-    { name: "Working Level - Ability", path: "/cluster-7", cluster: 7 },
-    { name: "Working Level - Career", path: "/cluster-8", cluster: 8 },
-    { name: "Working Level - Information", path: "/cluster-9", cluster: 9 },
-    { name: "Working Level - Skill & Tools", path: "/cluster-10", cluster: 10 },
+    { name: "PERSONAL PROFILE", path: "/cluster-2", cluster: 2 },
+    { name: "CLUB FINAL INDEX", path: "/cluster-3", cluster: 3 },
+    { name: "CLUB CHALLENGE GROWTH", path: "/cluster-4", cluster: 4 },
+    { name: "SOCIETAL REPUTATION", path: "/cluster-5", cluster: 5 },
+    { name: "WORKING LEVEL - EXPERIENCE", path: "/cluster-6", cluster: 6 },
+    { name: "WORKING LEVEL - ABILITY", path: "/cluster-7", cluster: 7 },
+    { name: "WORKING LEVEL - CAREER", path: "/cluster-8", cluster: 8 },
+    { name: "WORKING LEVEL - INFORMATION", path: "/cluster-9", cluster: 9 },
+    { name: "WORKING LEVEL - SKILL & TOOLS", path: "/cluster-10", cluster: 10 },
     { name: "-", path: "", cluster: 0, isPlaceholder: true },
   ];
 

@@ -134,6 +134,14 @@ const Cluster2Content = () => {
   const [photoLoading, setPhotoLoading] = useState(false);
   const [photoSaving, setPhotoSaving] = useState(false);
 
+  // Section1 좌측 4개 육각형 기본 이미지 (업로드 없을 때 표시)
+  const defaultSubPhotos = [
+    "/images/0/cluster 2/이안1.webp",
+    "/images/0/cluster 2/이안2.webp",
+    "/images/0/cluster 2/이안3.jpg",
+    "/images/0/cluster 2/이안4.jpg",
+  ];
+
   // 이미지 압축 함수 (2MB 이하로)
   const compressImage = async (file: File, maxSizeMB: number = 2): Promise<File> => {
     return new Promise((resolve) => {
@@ -1089,42 +1097,42 @@ const Cluster2Content = () => {
           {/* 큰 육각형 이미지 4개 */}
           <div className="hexagon-large-row">
             <div
-              className={`hexagon-large-item ${!subPhotos[0] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[0] || defaultSubPhotos[0]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(0)}
-              style={{ cursor: subPhotos[0] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[0] || defaultSubPhotos[0]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[0] ? <img src={subPhotos[0]} alt="Joy" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[0] || defaultSubPhotos[0]) ? <img src={subPhotos[0] || defaultSubPhotos[0]} alt="Joy" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Joy</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[1] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[1] || defaultSubPhotos[1]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(1)}
-              style={{ cursor: subPhotos[1] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[1] || defaultSubPhotos[1]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[1] ? <img src={subPhotos[1]} alt="Blue" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[1] || defaultSubPhotos[1]) ? <img src={subPhotos[1] || defaultSubPhotos[1]} alt="Blue" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Blue</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[2] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[2] || defaultSubPhotos[2]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(2)}
-              style={{ cursor: subPhotos[2] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[2] || defaultSubPhotos[2]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[2] ? <img src={subPhotos[2]} alt="Passion" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[2] || defaultSubPhotos[2]) ? <img src={subPhotos[2] || defaultSubPhotos[2]} alt="Passion" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Passion</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[3] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[3] || defaultSubPhotos[3]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(3)}
-              style={{ cursor: subPhotos[3] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[3] || defaultSubPhotos[3]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[3] ? <img src={subPhotos[3]} alt="Moments" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[3] || defaultSubPhotos[3]) ? <img src={subPhotos[3] || defaultSubPhotos[3]} alt="Moments" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Moments</span>
             </div>
@@ -1144,14 +1152,10 @@ const Cluster2Content = () => {
 
         {/* 중앙 프로필 사진 */}
         <div className={`frame-center ${!mainPhoto ? 'empty' : ''}`}>
-          {mainPhoto ? (
-            <img src={mainPhoto} alt="Profile" />
-          ) : (
-            <div className="empty-photo-placeholder">
-              <i className="ti ti-photo-plus"></i>
-              <span>사진을 등록해주세요</span>
-            </div>
-          )}
+          <img
+            src={mainPhoto || "/images/0/cluster 2/이안0.png"}
+            alt="Profile"
+          />
         </div>
 
         {/* 오른쪽 카드 */}

@@ -283,17 +283,11 @@
     // 하단 프레임(노란 테두리)만 "앞 레이어"로 한 번 더 덮어씌움
     // => 위쪽은 사진이 프레임보다 앞에 오고, 아래쪽은 프레임이 사진 위로 올라오는 효과
     &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url('/images/0/cluster 2/section 01.png');
-      background-size: 100% 100%;
-      background-repeat: no-repeat;
-      background-position: center;
-      pointer-events: none;
-      z-index: 12;
-      // 하단 테두리 영역만 노출 (아바타/버튼 영역은 가리지 않게)
-      clip-path: inset(calc(100% - 110px) 0 0 0);
+      // 이 오버레이는 사진 위에 불투명 영역이 올라오면서
+      // "사진이 중간에서 잘린 것처럼" 보이는 부작용이 커서 비활성화.
+      // 프레임 테두리는 base background(`section 01.png`)로 충분히 표현됨.
+      content: none;
+      display: none;
     }
 
     &:hover .floating-icons {
@@ -467,40 +461,69 @@
     .frame-center {
       width: 422.39px;
       max-width: 422.4px;
-      // Figma 컨테이너(frame-center) 기준: 422 x 603
       height: 603px;
       flex-shrink: 0;
       position: absolute;
       left: 576px;
-      // Figma 컨테이너 배치와 동일하게: 하단 기준으로 자연스럽게 정렬
-      // (과도한 '위로 튀어나옴'을 제거해서 실제 시안과 동일한 시각적 중심을 맞춤)
+      // ★ 피그마 시안: 프레임(573px) 안에서 아래 고정, 위로 30px 튀어나옴
       top: auto;
-      // 프레임 이미지(노란 테두리)의 하단 영역을 침범하지 않도록 "안쪽 여백"만큼 띄움
-      // (bottom=0이면 하단 테두리 아래로 삐져나와 보일 수 있음)
-      // 프레임 내부 하단까지 최대한 채우되(빈 공간 최소화),
-      // 하단 테두리 바깥으로 "요소 자체"가 내려가진 않게 한다.
-      bottom: calc(27px / var(--app-zoom, 1));
+      // 프레임(컨테이너) 바닥에서 살짝 띄워서 "프레임 자체"를 위로 올림
+      // (요청: 약 37px)
+      bottom: calc(var(--c2-frame-center-bottom, 43px) / var(--app-zoom, 1));
       // 하단 프레임 오버레이(::after, z-index:12) 아래로 들어가게
       z-index: 11;
-      // 모서리: 8각형(챔퍼) → 4각형(직각)
       clip-path: none;
       border-radius: 0;
-      overflow: hidden;
-      // 바깥(특히 하단)으로 새어 보이는 drop-shadow는 제거하고, 프레임 안쪽 글로우로 대체
+      overflow: hidden; // ★ 다시 hidden - 내부 이미지가 넘치지 않게
       filter: none;
       box-shadow:
         inset 0 0 0 1px rgba(255, 255, 255, 0.08),
         inset 0 0 26px rgba(255, 255, 255, 0.22);
+
+      // Figma 느낌의 좌/우 테두리 은은한 빛 (프레임 내부에서만)
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+        box-shadow:
+          inset 22px 0 26px rgba(255, 255, 255, 0.16),
+          inset -22px 0 26px rgba(255, 255, 255, 0.16),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+        opacity: 0.95;
+      }
 
       // 이미지가 마스크를 꽉 채우도록
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        // 기본은 중앙 기준 (Figma Image Fill 기본 동작과 동일)
+        object-position: center;
         display: block;
-        // Figma: 내부 Image가 Container 대비 y=-7px
-        // (이미지 크롭/구도 차이를 맞추기 위해 동일하게 위로 7px 당김)
-        transform: translateY(calc(-7px / var(--app-zoom, 1)));
+        transform: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      // 기본 이미지(이안0.png) - empty 상태에서는 잘림 없이 "전체가" 보이도록
+      &.empty {
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+          transform: none;
+        }
+      }
+
+      // 업로드 사진도 Figma 기본과 동일하게 중앙 기준(예상치 못한 크롭 방지)
+      &:not(.empty) {
+        img {
+          // Y축 기준점을 살짝 위로 (원하면 35%~45% 사이로 미세 조정)
+          object-position: 50% var(--c2-main-photo-y, 38%);
+        }
       }
 
       // 빛이 지나가는 효과
@@ -522,6 +545,7 @@
         transform: skewX(-25deg);
         animation: shine-effect 10s infinite;
         pointer-events: none;
+        z-index: 3;
       }
 
       @keyframes shine-effect {

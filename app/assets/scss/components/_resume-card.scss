@@ -497,6 +497,13 @@
       background-position: center;
       transition: width 0.3s ease;
 
+      // Running 상태: Figma처럼 미세하게 반짝이며 눈에 띄도록
+      // (다른 상태에는 영향 없음)
+      &:not(.short-medium):not(.medium):not(.long) {
+        // 애니메이션 없이 "고정 글로우"만 유지
+        filter: drop-shadow(0 0 10px rgba(255, 236, 143, 0.6));
+      }
+
       // 짧은-중간 길이 (Complete)
       &.short-medium {
         width: 90px;
@@ -518,6 +525,8 @@
         font-size: 12px;
       }
     }
+
+    // NOTE: running-glow keyframes는 고정 글로우로 전환되어 미사용
   }
 
   // Activities
