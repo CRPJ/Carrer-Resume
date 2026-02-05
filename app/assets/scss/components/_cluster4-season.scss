@@ -224,54 +224,66 @@
     }
 
     .section1-description {
-      max-width: 1100px;
+      // Cluster2/3와 동일한 여백/줄바꿈 전략으로 통일
+      max-width: min(62ch, 1100px);
       margin: 0 auto;
-      padding: 0 40px;
-      line-height: 1.8;
+      padding: 30px 40px 0;
+      line-height: 1.6;
       position: relative;
       z-index: 1;
+      text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      hyphens: auto;
+      text-wrap: pretty;
+
+      // Cluster2/3와 동일하게 데스크탑에서만 살짝 우측 이동
+      @media (min-width: 1200px) {
+        transform: translateX(clamp(0px, 2.2vw, 72px));
+      }
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
-        margin-bottom: 15px;
+        font-size: 23px;
+        margin-bottom: 0;
         color: #FFF;
-        border-left: none;
-        padding-left: 0;
+        text-wrap: pretty;
 
         &:first-child {
           margin-bottom: 0;
         }
 
-        &:nth-child(2) {
-          white-space: nowrap;
-        }
-
         &.small-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 20px;
+          font-size: 23px;
           color: #FFF;
-          margin-top: 20px;
-          border-left: none !important;
-          padding-left: 0 !important;
+          margin-top: 0;
         }
 
         &.quote-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 20px;
+          font-size: 23px;
           line-height: 1.4;
           color: #FFF;
           margin-top: 24px;
           margin-bottom: 0;
           font-style: italic;
-          border-left: none !important;
-          padding-left: 0 !important;
+          word-break: keep-all;
+          overflow-wrap: break-word;
+          line-break: strict;
+          hyphens: auto;
+          text-wrap: pretty;
+        }
+
+        &:nth-child(2) {
+          margin-bottom: 22px;
         }
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 24px;
+        font-size: 27px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -279,11 +291,12 @@
         background-clip: text;
         margin: 0;
         font-style: italic;
+        text-wrap: balance;
       }
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;

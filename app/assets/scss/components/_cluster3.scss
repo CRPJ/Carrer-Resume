@@ -259,22 +259,31 @@
 
     // 설명 텍스트
     .section1-description {
-      max-width: 1100px;
-      // 좌측 정렬은 유지하되, 블록 자체를 우측으로 조금 이동
-      margin-left: auto;
-      margin-right: clamp(0px, 3vw, 60px);
+      // Cluster2와 동일한 여백/줄바꿈 전략으로 통일
+      max-width: min(62ch, 1100px);
+      margin: 0 auto;
       padding: 30px 40px 0;
-      // 가독성 개선: 우측 정렬 + 약간 큰 타이포
-      line-height: 1.45;
+      line-height: 1.6;
       position: relative;
       z-index: 1;
       text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      hyphens: auto;
+      text-wrap: pretty;
+
+      // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
+      @media (min-width: 1200px) {
+        transform: translateX(clamp(0px, 2.2vw, 72px));
+      }
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         margin-bottom: 0;
         color: #FFF;
+        text-wrap: pretty;
 
         &:nth-child(2) {
           margin-bottom: 22px;
@@ -283,26 +292,29 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
         margin-bottom: 0;
         font-style: italic;
-        word-break: break-word;
+        word-break: keep-all;
         overflow-wrap: break-word;
+        line-break: strict;
+        hyphens: auto;
+        text-wrap: pretty;
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 26px;
+        font-size: 27px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -310,11 +322,12 @@
         background-clip: text;
         margin: 0;
         font-style: italic;
+        text-wrap: balance;
       }
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
