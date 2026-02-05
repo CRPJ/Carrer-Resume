@@ -8,8 +8,6 @@ import Animations from "@/components/shared/Animations";
 
 const Cluster2Page = () => {
   const [isMobile, setIsMobile] = useState(false);
-  // 콘텐츠 영역 추가 너비 계산(데스크톱 전용이지만 Hook은 항상 선언되어야 함)
-  const [contentExtraWidth, setContentExtraWidth] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
   const sidebarShellRef = useRef<HTMLDivElement>(null);
   const sidebarInnerRef = useRef<HTMLDivElement>(null);
@@ -26,49 +24,6 @@ const Cluster2Page = () => {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
-
-  useEffect(() => {
-    // 모바일에서는 데스크톱 보정값을 사용하지 않음
-    if (isMobile) {
-      setContentExtraWidth(0);
-      return;
-    }
-
-    const calculateContentWidth = () => {
-      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
-      const maxZoom = 1.5;
-      const windowWidth = window.innerWidth;
-
-      // zoom이 maxZoom으로 제한되었을 때, 남은 여백 계산
-      if (cssZoom >= maxZoom) {
-        // 현재 보이는 콘텐츠 너비 (zoom 적용 후)
-        const visibleWidth = windowWidth / cssZoom;
-        // 기본 콘텐츠 너비 (1977px 기준에서 프로필 제외)
-        const baseContentWidth = 1977 - 520; // 약 1457px
-        void baseContentWidth; // lint: 문서화 용도(추후 계산 확장 대비)
-        // 추가로 필요한 너비
-        const extraWidth = visibleWidth - 1977;
-
-        if (extraWidth > 0) {
-          setContentExtraWidth(extraWidth);
-        } else {
-          setContentExtraWidth(0);
-        }
-      } else {
-        setContentExtraWidth(0);
-      }
-    };
-
-    calculateContentWidth();
-    window.addEventListener('resize', calculateContentWidth);
-
-    const timer = setTimeout(calculateContentWidth, 100);
-
-    return () => {
-      window.removeEventListener('resize', calculateContentWidth);
-      clearTimeout(timer);
-    };
-  }, [isMobile]);
 
   // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
   useEffect(() => {
@@ -193,8 +148,6 @@ const Cluster2Page = () => {
         gap: '20px',
         alignItems: 'flex-start',
         position: 'relative',
-        // 추가 너비만큼 컨테이너 확장
-        width: contentExtraWidth > 0 ? `calc(100% + ${contentExtraWidth}px)` : '100%',
       }}>
         {/* 사이드바 */}
         <div

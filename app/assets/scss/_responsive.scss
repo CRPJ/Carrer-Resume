@@ -481,24 +481,7 @@ body:has(.nftg-content-home) {
   }
 
   // layout
-  .nftg-app {
-    .nftg-sidebar {
-      display: none;
-    }
-
-    .nftg-layout {
-      width: 100%;
-      margin-left: 0px;
-    }
-
-    .nftg-content {
-      padding: 0px;
-    }
-
-    .home-two-sidebar {
-      margin-top: 60px;
-    }
-  }
+  // NOTE: 사이드 네비(.nftg-sidebar)는 1200px 미만에서만 숨김 (1366px 등 소형 데스크톱에서는 유지)
 
   .nftg-app.sidebar-remove .header {
     padding-left: 0px !important;
@@ -611,6 +594,26 @@ body:has(.nftg-content-home) {
 }
 
 @media only screen and (max-width: 1199.98px) {
+  // layout (tablet/mobile)
+  .nftg-app {
+    .nftg-sidebar {
+      display: none;
+    }
+
+    .nftg-layout {
+      width: 100%;
+      margin-left: 0px;
+    }
+
+    .nftg-content {
+      padding: 0px;
+    }
+
+    .home-two-sidebar {
+      margin-top: 60px;
+    }
+  }
+
   // typography
   .text-xxl {
     font-size: 20px;

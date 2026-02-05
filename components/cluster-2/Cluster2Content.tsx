@@ -1301,6 +1301,9 @@ const Cluster2Content = () => {
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
+              <p className="quote-subtext">
+                지금의 한 걸음이 작아 보여도 결국 미래를 바꾸는 결정적 힘이 된다 흔들려도 멈추지 않으면 결국 도착한다 그게 성장의 증거다
+              </p>
               <p className="quote-text">
                 {sloganData.slogan2.content}
               </p>
@@ -1339,6 +1342,9 @@ const Cluster2Content = () => {
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
+              <p className="quote-subtext">
+                지금의 한 걸음이 작아 보여도 결국 미래를 바꾸는 결정적 힘이 된다 흔들려도 멈추지 않으면 결국 도착한다 그게 성장의 증거다
+              </p>
               <p className="quote-text">
                 {sloganData.slogan3.content}
               </p>

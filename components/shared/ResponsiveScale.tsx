@@ -15,6 +15,7 @@ const ResponsiveScale = () => {
       // 반응형 CSS(_mobile-responsive.scss)가 레이아웃을 책임지도록 한다.
       if (windowWidth < MOBILE_BREAKPOINT) {
         document.documentElement.style.zoom = '1';
+        document.documentElement.style.setProperty('--app-zoom', '1');
         document.documentElement.style.overflowX = 'hidden';
         document.body.style.overflowX = 'hidden';
         return;
@@ -28,6 +29,7 @@ const ResponsiveScale = () => {
       }
       
       document.documentElement.style.zoom = String(scale);
+      document.documentElement.style.setProperty('--app-zoom', String(scale));
       document.documentElement.style.overflowX = 'hidden';
       document.body.style.overflowX = 'hidden';
     };
@@ -38,6 +40,7 @@ const ResponsiveScale = () => {
     return () => {
       window.removeEventListener('resize', applyScale);
       document.documentElement.style.zoom = '';
+      document.documentElement.style.removeProperty('--app-zoom');
       document.documentElement.style.overflowX = '';
       document.body.style.overflowX = '';
     };

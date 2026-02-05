@@ -180,11 +180,16 @@ const Sidebar = () => {
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
+  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(520px)으로 유지하고
+  // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
-  const [availHeight, setAvailHeight] = useState(810);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   useEffect(() => {
     const calculateScale = () => {
+      const mobile = window.innerWidth < 1200;
+      setIsMobileView(mobile);
+
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
       const browserZoom = window.visualViewport?.scale || 1;
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -196,8 +201,20 @@ const Sidebar = () => {
       const availableHeight = viewportHeight - (130 / browserZoom);
 
       // 기준 카드 크기: 474 x 810
-      const baseCardWidth = 474;
       const baseCardHeight = 810;
+
+      // 모바일에서는 CSS 반응형(1199px 이하: width 100% / height auto)을 그대로 사용
+      if (mobile) {
+        setCardScale(1);
+
+        // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
+        document.documentElement.style.removeProperty('--card-width');
+        document.documentElement.style.removeProperty('--card-height');
+        document.documentElement.style.removeProperty('--card-scale');
+        document.documentElement.style.removeProperty('--sidebar-width');
+        document.documentElement.style.removeProperty('--container-height');
+        return;
+      }
 
       // 높이 기준으로 스케일 계산 (화면 높이에 딱 맞도록)
       let scale = availableHeight / baseCardHeight;
@@ -207,18 +224,17 @@ const Sidebar = () => {
         scale = scale / cssZoom;
       }
 
-      setCardScale(scale);
-      setAvailHeight(availableHeight);
+      // 4K 등 큰 화면에서 카드가 커지며 좌/우 비율이 깨지지 않도록 "확대"는 금지
+      scale = Math.min(1, scale);
 
-      // 카드 실제 크기를 CSS 변수로 설정
-      const scaledWidth = baseCardWidth * scale;
-      const scaledHeight = baseCardHeight * scale;
-      document.documentElement.style.setProperty('--card-width', `${scaledWidth}px`);
-      document.documentElement.style.setProperty('--card-height', `${scaledHeight}px`);
-      document.documentElement.style.setProperty('--card-scale', `${scale}`);
-      // scaledWidth만 (margin-left: 16px가 CSS에서 적용됨)
-      document.documentElement.style.setProperty('--sidebar-width', `${scaledWidth}px`);
-      document.documentElement.style.setProperty('--container-height', `${availableHeight}px`);
+      setCardScale(scale);
+
+      // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
+      document.documentElement.style.removeProperty('--card-width');
+      document.documentElement.style.removeProperty('--card-height');
+      document.documentElement.style.removeProperty('--card-scale');
+      document.documentElement.style.removeProperty('--sidebar-width');
+      document.documentElement.style.removeProperty('--container-height');
 
       // 부모 컨테이너 높이 제한 제거 - 스크롤 시 프로필 잘림 방지
       // (기존 코드 삭제됨)
@@ -1187,11 +1203,21 @@ const Sidebar = () => {
       `}} />
       {/* 스케일된 카드 - 비율 유지하며 화면에 맞춤 */}
       <div style={{
-        width: `${474 * cardScale}px`,
-        height: `${810 * cardScale}px`,
-        overflow: 'hidden'
+        width: isMobileView ? '100%' : 'var(--sidebar-width, 520px)',
+        height: isMobileView ? 'auto' : `${810 * cardScale}px`,
+        overflow: isMobileView ? 'visible' : 'hidden',
+        display: isMobileView ? 'block' : 'flex',
+        justifyContent: isMobileView ? undefined : 'center'
       }}>
-        <div className={`resume-card ${debugPanelType === 'EC' ? 'ec-theme' : debugPanelType === 'PX' ? 'px-theme' : ''}`} style={{ position: 'relative', transform: `scale(${cardScale})`, transformOrigin: 'top left' }}>
+        <div
+          className={`resume-card ${debugPanelType === 'EC' ? 'ec-theme' : debugPanelType === 'PX' ? 'px-theme' : ''}`}
+          style={{
+            position: 'relative',
+            ...(isMobileView
+              ? {}
+              : { transform: `scale(${cardScale})`, transformOrigin: 'top center' }),
+          }}
+        >
         {/* Header Section */}
         <div className="resume-header" style={{ position: 'relative' }}>
           <div className="resume-photo" style={{ position: 'relative' }}>

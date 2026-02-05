@@ -8,8 +8,6 @@ import Animations from "@/components/shared/Animations";
 
 const Cluster4Page = () => {
   const [isMobile, setIsMobile] = useState(false);
-  // 콘텐츠 영역 추가 너비 계산(데스크톱 zoom 상한에서 남는 여백 흡수)
-  const [contentExtraWidth, setContentExtraWidth] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
   const sidebarShellRef = useRef<HTMLDivElement>(null);
   const sidebarInnerRef = useRef<HTMLDivElement>(null);
@@ -29,37 +27,6 @@ const Cluster4Page = () => {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
-
-  useEffect(() => {
-    // 모바일에서는 데스크톱 보정값을 사용하지 않음
-    if (isMobile) {
-      setContentExtraWidth(0);
-      return;
-    }
-
-    const calculateContentWidth = () => {
-      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
-      const maxZoom = 1.5;
-      const windowWidth = window.innerWidth;
-
-      if (cssZoom >= maxZoom) {
-        const visibleWidth = windowWidth / cssZoom;
-        const extraWidth = visibleWidth - 1977;
-        setContentExtraWidth(extraWidth > 0 ? extraWidth : 0);
-      } else {
-        setContentExtraWidth(0);
-      }
-    };
-
-    calculateContentWidth();
-    window.addEventListener('resize', calculateContentWidth);
-    const timer = setTimeout(calculateContentWidth, 100);
-
-    return () => {
-      window.removeEventListener('resize', calculateContentWidth);
-      clearTimeout(timer);
-    };
-  }, [isMobile]);
 
   // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
   useEffect(() => {
@@ -179,7 +146,6 @@ const Cluster4Page = () => {
         gap: '20px',
         alignItems: 'flex-start',
         position: 'relative',
-        width: contentExtraWidth > 0 ? `calc(100% + ${contentExtraWidth}px)` : '100%',
       }}>
         {/* 사이드바 - JS로 스크롤 따라오기 */}
         <div

@@ -8,7 +8,8 @@
 :root {
   // 레이아웃 크기 (고정)
   --content-max-width: 1977px;
-  --sidebar-width: 474px;
+  // 사이드바(프로필) 영역은 고정 폭으로 안정화 (해상도/높이/zoom에 의해 변동되지 않게)
+  --sidebar-width: 520px;
   --sidebar-left-offset: 110px;
   --header-height: 100px;
   // zoom 상한(예: 4K)에서 남는 영역까지 포용하는 "외곽" 최대 폭
