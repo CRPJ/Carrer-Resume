@@ -304,6 +304,18 @@
     position: relative;
     z-index: 5;
 
+    // ===== 스크롤 시 카드 고정(Sticky) =====
+    // UX 목표: 아래 리스트(주차/시즌 목록)를 스크롤해도, 이 카드(section2)는 화면 상단에 유지
+    // 모바일에서는 화면을 너무 많이 가리므로 비활성화
+    @media (min-width: 1200px) {
+      position: sticky;
+      top: 124px; // header 높이와 맞춤 (nftg-content-home margin-top과 동일 계열)
+      z-index: 50;
+      align-self: flex-start;
+      // sticky가 동작하려면 상위/자기 자신이 overflow로 잘리지 않아야 함
+      overflow: visible;
+    }
+
     .season-growth-card {
       position: relative;
       width: 100%;
