@@ -1642,7 +1642,6 @@ const Cluster41Content = () => {
                   {/* 그룹 3: 아이템들 */}
                   {(() => {
                     const weekPoints = getPointsForWeek(week.id);
-                    const injeolmi = getCumulativeInjeolmi(week.endDate);
                     return (
                       <div className="info-group items">
                         <span className="info-divider">·</span>
@@ -1656,7 +1655,7 @@ const Cluster41Content = () => {
                         <span className="info-item with-icon">
                           인절미
                           <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                          <strong className="number-value">{injeolmi}</strong>
+                          <strong className="number-value">{weekPoints.shield}</strong>
                           개
                         </span>
                         <span className="info-divider">·</span>

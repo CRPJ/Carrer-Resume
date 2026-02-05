@@ -90,13 +90,6 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const targetUserId = searchParams.get('userId');
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
-    }
-
     if (!supabaseAdmin) {
       return NextResponse.json(
         { error: "서버 설정 오류" },
@@ -107,9 +100,17 @@ export async function GET(request: Request) {
     let userId: string;
 
     if (targetUserId) {
-      // targetUserId가 있으면 해당 유저의 학력 조회
+      // targetUserId가 있으면 해당 유저의 학력 조회 (로그인 불필요)
       userId = targetUserId;
     } else {
+      // 본인 학력 조회 시에는 로그인 필요
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+
       // user_profiles에서 사용자 ID 조회
       const { data: profile, error: profileError } = await supabaseAdmin
         .from("user_profiles")
