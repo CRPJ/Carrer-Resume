@@ -155,7 +155,7 @@
       max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
-      line-height: 1.7;
+      line-height: 1.6;
       position: relative;
       z-index: 1;
       text-align: left;
@@ -165,9 +165,15 @@
       hyphens: auto;
       text-wrap: pretty;
 
+      // Figma(Image 프레임) 대비: 텍스트 블록이 조금 더 "오른쪽"에 위치
+      // - 작은 화면에서는 밀림이 과해질 수 있어 데스크톱에서만 적용
+      @media (min-width: 1200px) {
+        transform: translateX(clamp(0px, 2.2vw, 72px));
+      }
+
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
@@ -179,14 +185,14 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
@@ -202,7 +208,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 26px;
+        font-size: 27px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -215,7 +221,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 22px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -494,6 +500,9 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        // Figma: 내부 Image가 Container 대비 y=-7px
+        // (이미지 크롭/구도 차이를 맞추기 위해 동일하게 위로 7px 당김)
+        transform: translateY(calc(-7px / var(--app-zoom, 1)));
       }
 
       // 빛이 지나가는 효과

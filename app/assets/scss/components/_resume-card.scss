@@ -1218,7 +1218,9 @@
     min-width: 250px;
     padding: 0 20px;
     border-radius: 0;
-    font-family: var(--black-ops-one), 'Black Ops One', cursive;
+    // Figma(Group 2121454060) 탭 라벨 폰트: Chakra Petch Bold
+    // (요청대로 "폰트만" 시안과 동일하게 맞춤)
+    font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.3px;
@@ -1234,6 +1236,9 @@
     flex-shrink: 0;
 
     .tab-text {
+      // Bold가 얇게 보이는 이슈 방지: 텍스트 노드에 굵기/폰트 명시
+      font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+      font-weight: 700;
       line-height: 1.4;
       background: linear-gradient(to right, #FED402, #FFF1AA);
       background-clip: text;
@@ -1286,6 +1291,8 @@
       }
 
       .tab-text {
+        font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+        font-weight: 700;
         background: none !important;
         -webkit-text-fill-color: #000 !important;
         -webkit-background-clip: unset !important;
