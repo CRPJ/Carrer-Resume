@@ -312,7 +312,8 @@ body {
   position: relative;
   
   .cluster-tabs-inner {
-    max-width: var(--content-max-width);
+    // 기본은 콘텐츠 폭(가독성)을 따르되, 4K급 와이드 화면에서는 탭을 더 많이 노출
+    max-width: min(100%, var(--content-max-width));
     margin-left: auto;
     margin-right: auto;
     
@@ -325,6 +326,12 @@ body {
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding: 0 50px; // 화살표 공간 확보
+
+    // 4K(3840px) 등 초광폭 화면: 탭 영역은 더 넓게 사용해서 한 번에 더 많이 보이도록
+    @media (min-width: 2000px) {
+      // 양쪽 화살표/그라데이션 여백을 고려해 살짝 더 넓게
+      max-width: min(2400px, calc(100vw - 160px));
+    }
     
     &::-webkit-scrollbar {
       display: none;

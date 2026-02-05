@@ -51,6 +51,8 @@
   width: 100%;
   max-width: 1330px;
   overflow: visible;
+  // 섹션 간 기본 여백(너무 붙어 보이는 문제 완화)
+  --c4-section-gap: clamp(22px, 2.6vw, 60px);
 
   // Section 1: CLUB CHALLENGE GROWTH
   .cluster4-section1 {
@@ -311,7 +313,7 @@
     max-width: 1330px;
     padding: 0;
     margin-top: -50px;
-    margin-bottom: 30px;
+    margin-bottom: clamp(36px, 3vw, 72px);
     display: flex;
     justify-content: center;
     position: relative;
@@ -650,7 +652,7 @@
     width: 100%;
     max-width: 1330px;
     padding: 40px 0;
-    margin-bottom: 40px;
+    margin-bottom: clamp(48px, 3.4vw, 88px);
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster 4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
@@ -690,6 +692,7 @@
 .cluster4-section4 {
   width: 100%;
   max-width: 1330px;
+  margin-top: var(--c4-section-gap);
   padding: 0 0 100px 0;
 
   .main-grid {

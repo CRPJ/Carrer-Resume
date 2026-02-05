@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import koreaRegionsData from "@/data/korea-regions.json";
@@ -13,6 +13,7 @@ const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 const Sidebar = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
@@ -192,6 +193,7 @@ const Sidebar = () => {
 
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
       const browserZoom = window.visualViewport?.scale || 1;
+      const viewportWidth = window.visualViewport?.width || window.innerWidth;
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
       
       // ★ CSS zoom 값 가져오기 (ResponsiveScale에서 적용한 값)
@@ -224,8 +226,34 @@ const Sidebar = () => {
         scale = scale / cssZoom;
       }
 
-      // 4K 등 큰 화면에서 카드가 커지며 좌/우 비율이 깨지지 않도록 "확대"는 금지
+      // 기본 정책: 큰 화면에서 임의 확대 금지(비율 깨짐 방지)
       scale = Math.min(1, scale);
+
+      // 1366x768급 노트북(세로가 낮은 환경)에서는 카드가 지나치게 작게 보일 수 있어
+      // Cluster3/4에서만, "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
+      const isCluster34 = (pathname || '').includes('/cluster-3') || (pathname || '').includes('/cluster-4');
+      const isLaptop1366 =
+        !mobile &&
+        viewportWidth >= 1280 &&
+        viewportWidth <= 1440 &&
+        viewportHeight >= 700 &&
+        viewportHeight <= 820;
+
+      if (isCluster34 && isLaptop1366) {
+        // 레이아웃 상수(페이지에서 desktop-layout gap=20px)
+        const GAP_PX = 20;
+        const BASE_SIDEBAR_WIDTH = 520;
+        // 오른쪽 콘텐츠가 너무 좁아지지 않게 "최소 확보 폭" (침범 방지 가드레일)
+        const MIN_RIGHT_CONTENT = 760;
+
+        // 뷰포트에서 오른쪽 최소 폭을 남기고, 남는 만큼만 사이드바를 키울 수 있다.
+        const maxSidebarWidth = Math.max(BASE_SIDEBAR_WIDTH, viewportWidth - GAP_PX - MIN_RIGHT_CONTENT);
+        const maxScaleByWidth = maxSidebarWidth / BASE_SIDEBAR_WIDTH;
+
+        // "가능한 만큼" 확대(최대 상한은 과도 확대 방지)
+        const desiredScale = Math.min(1.5, maxScaleByWidth);
+        scale = Math.max(scale, desiredScale);
+      }
 
       setCardScale(scale);
 
@@ -1203,9 +1231,13 @@ const Sidebar = () => {
       `}} />
       {/* 스케일된 카드 - 비율 유지하며 화면에 맞춤 */}
       <div style={{
-        width: isMobileView ? '100%' : 'var(--sidebar-width, 520px)',
+        // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
+        // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
+        width: isMobileView
+          ? '100%'
+          : (cardScale > 1 ? `${520 * cardScale}px` : 'var(--sidebar-width, 520px)'),
         height: isMobileView ? 'auto' : `${810 * cardScale}px`,
-        overflow: isMobileView ? 'visible' : 'hidden',
+        overflow: isMobileView || cardScale > 1 ? 'visible' : 'hidden',
         display: isMobileView ? 'block' : 'flex',
         justifyContent: isMobileView ? undefined : 'center'
       }}>
