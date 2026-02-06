@@ -1,0 +1,528 @@
+// ============================================================
+// Cluster 3 - Mobile-First 반응형 패치
+// ============================================================
+// 적용: _cluster3.scss 파일 맨 끝(모든 블록 바깥)에 @import
+//       @import './cluster3-responsive';
+//
+// 파일 위치: app/assets/scss/components/cluster3-responsive.scss
+// ============================================================
+
+$c3-bp-tablet: 768px;
+$c3-bp-desktop: 1200px;
+
+@mixin c3-mobile-only {
+  @media (max-width: #{$c3-bp-tablet - 1px}) { @content; }
+}
+
+@mixin c3-tablet-only {
+  @media (min-width: $c3-bp-tablet) and (max-width: #{$c3-bp-desktop - 1px}) { @content; }
+}
+
+@mixin c3-desktop {
+  @media (min-width: $c3-bp-desktop) { @content; }
+}
+
+
+.cluster3-content {
+
+  // ─────────────────────────────────────────
+  // [1] Section 1: CLUB FINAL INDEX
+  // ─────────────────────────────────────────
+
+  .cluster3-section1 {
+    @include c3-mobile-only {
+      overflow: visible;
+    }
+    @include c3-tablet-only {
+      overflow: visible;
+    }
+
+    // 타이틀 - nowrap 해제 + 줄바꿈 허용
+    .section1-title-wrapper {
+      @include c3-mobile-only {
+        padding-top: 30px;
+      }
+    }
+
+    .section1-title-shadow,
+    .section1-title {
+      @include c3-mobile-only {
+        font-size: clamp(28px, 7vw, 72px);
+        white-space: normal !important;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        line-height: 1.1;
+      }
+      @include c3-tablet-only {
+        font-size: clamp(42px, 5.5vw, 72px);
+        white-space: normal !important;
+        word-break: keep-all;
+      }
+    }
+
+    // 그림자 레이어도 동일하게 흐르도록
+    .section1-title-shadow {
+      @include c3-mobile-only {
+        position: absolute;
+      }
+      @include c3-tablet-only {
+        position: absolute;
+      }
+    }
+
+    // 설명 텍스트
+    .section1-description {
+      @include c3-mobile-only {
+        padding: 20px 16px 0;
+        p, .small-text, .quote-text, .quote-author {
+          font-size: clamp(16px, 3.5vw, 23px);
+        }
+        .quote-highlight {
+          font-size: clamp(18px, 4vw, 27px);
+        }
+      }
+    }
+
+    // 배경 이미지 높이
+    .section1-bg {
+      @include c3-mobile-only {
+        height: auto;
+        min-height: 500px;
+
+        .char-left, .char-right {
+          display: none; // 모바일에서 장식 캐릭터 숨김
+        }
+      }
+      @include c3-tablet-only {
+        .char-left { left: 40px; }
+        .char-right { right: 40px; }
+      }
+    }
+
+    // 프로그레스 반원
+    .progress-area {
+      @include c3-mobile-only {
+        margin: -10px 0 -40px;
+
+        .progress-semi-circle {
+          width: 100%;
+          max-width: 400px;
+          height: auto;
+          aspect-ratio: 604 / 320;
+
+          .progress-text {
+            bottom: 60px;
+
+            .progress-percent {
+              font-size: clamp(28px, 7vw, 48px);
+            }
+            .progress-label {
+              font-size: clamp(14px, 3.5vw, 24px);
+            }
+          }
+        }
+      }
+
+      @include c3-tablet-only {
+        .progress-semi-circle {
+          width: 100%;
+          max-width: 500px;
+          height: auto;
+          aspect-ratio: 604 / 320;
+
+          .progress-text {
+            bottom: 80px;
+          }
+        }
+      }
+    }
+
+    // 스탯 카드 3개
+    .stats-cards {
+      @include c3-mobile-only {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 0 16px;
+        margin-top: -30px;
+
+        .stat-card {
+          width: 100% !important;
+          max-width: 400px;
+          flex-shrink: 1;
+
+          &:nth-child(1),
+          &:nth-child(3) {
+            height: auto;
+          }
+
+          &.wide {
+            width: 100% !important;
+          }
+
+          // 노란 박스 폭도 반응형
+          &::before {
+            width: min(330px, 85%);
+          }
+        }
+      }
+
+      @include c3-tablet-only {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        padding: 0 24px;
+        margin-top: -40px;
+
+        .stat-card {
+          width: calc(50% - 16px) !important;
+          min-width: 300px;
+          flex-shrink: 1;
+
+          &:nth-child(1),
+          &:nth-child(3) {
+            height: auto;
+          }
+
+          &.wide {
+            width: calc(50% - 16px) !important;
+          }
+
+          &::before {
+            width: min(330px, 85%);
+          }
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [2] Section 2: 졸업 자격 조건 (10카드)
+  // ─────────────────────────────────────────
+
+  .cluster3-section2 {
+
+    // 상하 구분선 반응형
+    &::before,
+    &::after {
+      @include c3-mobile-only {
+        width: min(1023px, 95%) !important;
+      }
+      @include c3-tablet-only {
+        width: min(1023px, 95%) !important;
+      }
+    }
+
+    .section2-cards {
+      @include c3-mobile-only {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 10px;
+        &::-webkit-scrollbar { display: none; }
+
+        .rank-card {
+          min-width: 80px;
+          height: 160px;
+
+          &.active {
+            height: 180px;
+            min-width: 90px;
+          }
+
+          .rank-label {
+            .rank-prefix, .rank-number, .rank-suffix {
+              font-size: 18px;
+            }
+          }
+        }
+      }
+
+      @include c3-tablet-only {
+        .rank-card {
+          height: 180px;
+
+          &.active {
+            height: 210px;
+          }
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [3] Section 3: 포트폴리오 Channel (4열 그리드)
+  // ─────────────────────────────────────────
+
+  .cluster3-section3 {
+
+    @include c3-mobile-only {
+      min-height: auto;
+
+      .section3-header {
+        width: 100% !important;
+        padding: 60px 16px 0;
+
+        .header-left .subtitle {
+          font-size: clamp(18px, 4.5vw, 28px);
+        }
+      }
+
+      .channel-cards {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        padding: 0 16px;
+        gap: 16px;
+        justify-items: center;
+
+        .channel-card {
+          width: 100%;
+          max-width: 350px;
+          height: auto;
+
+          .card-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 235 / 244;
+          }
+        }
+      }
+    }
+
+    @include c3-tablet-only {
+      min-height: auto;
+
+      .section3-header {
+        width: 100% !important;
+        max-width: 1080px;
+        padding: 80px 24px 0;
+      }
+
+      .channel-cards {
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+        max-width: 1080px;
+        padding: 0 24px;
+        gap: 16px;
+
+        .channel-card {
+          width: 100%;
+          height: auto;
+
+          .card-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 235 / 244;
+          }
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [4] Section 4: World Of Top Works (슬라이더)
+  // ─────────────────────────────────────────
+
+  .cluster3-section4 {
+
+    @include c3-mobile-only {
+      padding: 40px 16px;
+
+      .section4-top-header {
+        width: 100% !important;
+
+        .header-left .subtitle {
+          font-size: clamp(18px, 4.5vw, 28px);
+        }
+      }
+
+      .section4-title {
+        font-size: clamp(24px, 5vw, 48px);
+      }
+
+      .section4-desc {
+        font-size: 14px;
+        padding: 0 8px;
+      }
+
+      .section4-tabs {
+        flex-wrap: wrap;
+        gap: 10px;
+
+        .tab-btn {
+          width: auto;
+          min-width: 140px;
+          padding: 0 16px;
+          font-size: 13px;
+        }
+      }
+
+      // 슬라이더 모바일 축소
+      .top-works-slider {
+        height: 400px;
+
+        .slider-item {
+          width: 240px;
+          height: 320px;
+
+          // 양쪽 끝 카드 숨김
+          &.position--2,
+          &.position-2 {
+            display: none !important;
+          }
+
+          &.position--1 {
+            transform: translateX(-130px) scale(0.8) !important;
+          }
+
+          &.position-0 {
+            transform: translateX(0) scale(1) !important;
+          }
+
+          &.position-1 {
+            transform: translateX(130px) scale(0.8) !important;
+          }
+        }
+      }
+
+      // 하단 노란선 반응형
+      &::after {
+        width: min(1023px, 95%) !important;
+      }
+    }
+
+    @include c3-tablet-only {
+      padding: 50px clamp(24px, 4vw, 125px);
+
+      .section4-top-header {
+        width: 100% !important;
+        max-width: 1080px;
+      }
+
+      .section4-title {
+        font-size: clamp(32px, 4vw, 48px);
+      }
+
+      // 슬라이더 태블릿 축소
+      .top-works-slider {
+        height: 460px;
+
+        .slider-item {
+          width: 300px;
+          height: 400px;
+
+          &.position--2 {
+            transform: translateX(-320px) scale(0.7) !important;
+          }
+
+          &.position--1 {
+            transform: translateX(-200px) scale(0.85) !important;
+          }
+
+          &.position-0 {
+            transform: translateX(0) scale(1) !important;
+          }
+
+          &.position-1 {
+            transform: translateX(200px) scale(0.85) !important;
+          }
+
+          &.position-2 {
+            transform: translateX(320px) scale(0.7) !important;
+          }
+        }
+      }
+
+      &::after {
+        width: min(1023px, 95%) !important;
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [5] Section 5: The Detail 10 (5열 그리드)
+  // ─────────────────────────────────────────
+
+  .cluster3-section5 {
+
+    @include c3-mobile-only {
+      padding: 40px 16px 0;
+
+      .section5-header {
+        .header-left .subtitle {
+          font-size: clamp(18px, 4.5vw, 28px);
+        }
+      }
+
+      // 플로팅 아이콘 위치 조정
+      .floating-icons {
+        right: 0 !important;
+      }
+
+      .detail-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px;
+
+        .detail-item {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 1;
+        }
+      }
+    }
+
+    @include c3-tablet-only {
+      padding: 60px 24px 0;
+
+      .floating-icons {
+        right: 0 !important;
+      }
+
+      .detail-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 16px;
+
+        .detail-item {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 1;
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [6] 모달 반응형
+  // ─────────────────────────────────────────
+
+  .section-modal-overlay {
+    @include c3-mobile-only {
+      .section-modal {
+        width: 98%;
+        max-height: 90vh;
+
+        .section-modal-header {
+          padding: 16px;
+
+          h3 {
+            font-size: 18px;
+          }
+        }
+
+        .section-modal-body {
+          padding: 12px 16px;
+        }
+
+        .section-modal-footer {
+          padding: 12px 16px;
+        }
+      }
+    }
+  }
+
+} // .cluster3-content

@@ -1168,7 +1168,7 @@ const Cluster2Content = () => {
           <span className="progress-value">99.9%</span>
           <button className={`with-us-btn ${isWiggling ? 'wiggle' : ''}`} onClick={handleWithUsClick}>
             <img src="/images/0/cluster 2/button box.png" alt="" />
-            <span>Wiht us</span>
+            <span>With us</span>
           </button>
         </div>
       </div>
@@ -2167,8 +2167,24 @@ const Cluster2Content = () => {
                 <img src={introCards[selectedIntroCard].icon} alt="" className="modal-icon" />
                 <h3>{introCards[selectedIntroCard].title}</h3>
               </div>
+              {!isEditingIntro && (
+                <button
+                  className="intro-edit-btn"
+                  aria-label="수정"
+                  onClick={() =>
+                    handleEditClick(() => {
+                      setEditingIntroData({
+                        content: introCards[selectedIntroCard].content,
+                      });
+                      setIsEditingIntro(true);
+                    })
+                  }
+                >
+                  <i className="ti ti-pencil"></i>
+                </button>
+              )}
               <div className="header-right">
-                {isEditingIntro ? (
+                {isEditingIntro && (
                   <>
                     <button
                       className="cancel-edit-btn"
@@ -2195,19 +2211,6 @@ const Cluster2Content = () => {
                       {introSaving ? '저장 중...' : '저장'}
                     </button>
                   </>
-                ) : (
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEditClick(() => {
-                      setEditingIntroData({
-                        content: introCards[selectedIntroCard].content
-                      });
-                      setIsEditingIntro(true);
-                    })}
-                  >
-                    <i className="ti ti-pencil"></i>
-                    수정
-                  </button>
                 )}
                 <button className="modal-close-btn" onClick={() => {
                   if (isEditingIntro && editingIntroData.content !== introCards[selectedIntroCard].content) {
