@@ -582,106 +582,207 @@
       margin: 0 !important;
       overflow: visible !important;
       
-      // 프로필 카드 - iPhone 12 Pro 기준 고정 너비 + 완벽한 중앙 정렬
-      .resume-card {
+      // 프로필 카드 - 모바일 반응형 (specificity 극대화)
+      .resume-card.resume-card {
         display: block !important;
-        width: 520px !important; // 원래 크기 유지, JS에서 transform: scale()로 축소
-        min-width: 520px !important;
+        width: min(366px, calc(100vw - 24px)) !important;
+        max-width: calc(100vw - 24px) !important;
+        min-width: 0 !important;
         height: auto !important;
         min-height: auto !important;
         max-height: none !important;
-        margin: 0 !important; // wrapper가 중앙 정렬
-        padding: 16px !important;
+        margin: 0 auto !important;
+        padding: 12px !important;
         box-sizing: border-box !important;
-        overflow: visible !important;
+        overflow: hidden !important;
         border: 1px solid #666 !important;
         border-radius: 8px !important;
         background-color: var(--template-bg, #0a0a0a) !important;
         position: relative !important;
         left: 0 !important;
         right: 0 !important;
-        transform-origin: top center !important;
-        
-        // scale 방식: 자식 요소는 데스크톱 크기 유지
-        &,
-        & *,
-        & *::before,
-        & *::after {
-          box-sizing: border-box !important;
+        transform: none !important;
+
+        // 인라인 width:474px (activities wrapper) override
+        > div[style*="474"] {
+          width: 100% !important;
+          max-width: 100% !important;
         }
-        
-        // 헤더 (사진 + 정보) - CSS 변수로 일관된 크기 유지
-        .resume-header {
+
+        // 헤더 (사진 + 정보)
+        .resume-header.resume-header {
           display: flex !important;
           flex-direction: row !important;
           align-items: flex-start !important;
-          justify-content: flex-start !important;
-          gap: 18px !important; // 16 → 18
+          gap: 10px !important; // 원본 0 해제
           width: 100% !important;
-          margin: 0 0 18px 0 !important; // 16 → 18
+          margin: 0 0 10px 0 !important; // 원본 -20px 해제
           padding: 0 !important;
-          
+          overflow: hidden !important;
+
+          // ★ 사진 크기 강제 축소 — 원본 mask/margin 포함 override
           .resume-photo {
-            width: var(--profile-photo-width) !important;
-            height: var(--profile-photo-height) !important;
-            min-width: var(--profile-photo-width) !important;
-            max-width: var(--profile-photo-width) !important;
-            margin: 0 !important;
+            width: 90px !important;
+            height: 113px !important;
+            min-width: 90px !important;
+            max-width: 90px !important;
+            min-height: 113px !important;
+            max-height: 113px !important;
+            margin: 0 !important; // 원본 -20px 0 0 -15px 해제
             flex-shrink: 0 !important;
+            overflow: hidden !important;
+            border-radius: 4px !important;
+            // 원본 mask 해제 — 모바일에서는 사각형으로
+            -webkit-mask-image: none !important;
+            mask-image: none !important;
+
+            // ★ <img width="240" height="273"> HTML 속성 override
+            img,
+            img[width],
+            img[width="240"],
+            img[height="273"] {
+              width: 90px !important;
+              height: 113px !important;
+              min-width: 90px !important;
+              max-width: 90px !important;
+              object-fit: cover !important;
+              display: block !important;
+            }
+
+            .resume-edit-btn {
+              width: 22px !important;
+              height: 22px !important;
+              bottom: 4px !important;
+              right: 4px !important;
+
+              i { font-size: 11px !important; }
+            }
           }
-          
+
+          // ★ hexagon 버튼: 인라인 left:213px override
+          > div[style*="213"] {
+            left: auto !important;
+            right: 4px !important;
+            top: 4px !important;
+            gap: 4px !important;
+
+            button {
+              width: 18px !important;
+              height: 18px !important;
+
+              img { width: 18px !important; height: 18px !important; }
+              img:not(.hexagon-border) { width: 9px !important; height: 9px !important; }
+            }
+          }
+
+          // ★ 정보 영역 — 폰트 축소 + overflow
           .resume-info {
             flex: 1 !important;
             min-width: 0 !important;
+            max-width: calc(100% - 100px) !important;
             padding: 0 !important;
             margin: 0 !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: flex-start !important;
-            
+            overflow: hidden !important;
+
             .resume-icons {
               justify-content: flex-start !important;
-              margin-bottom: 6px !important;
+              margin-bottom: 4px !important;
             }
-            
+
             .resume-name {
-              font-size: var(--profile-name-size) !important;
+              font-size: 16px !important;
               line-height: 1.3 !important;
-              margin: 0 0 10px 0 !important;
+              margin: 0 0 6px 0 !important;
               padding: 0 !important;
-              white-space: normal !important;
-              word-break: break-word !important;
-              text-align: left !important;
+              white-space: nowrap !important;
+              overflow: hidden !important;
+              text-overflow: ellipsis !important;
+              max-width: 100% !important;
+              display: block !important;
+
+              .back-arrow img { width: 14px !important; height: 14px !important; }
+              .name-eng { font-size: 11px !important; }
             }
-            
+
             .resume-details {
-              gap: 6px !important;
-              align-items: flex-start !important;
-              
+              gap: 2px !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              overflow: hidden !important;
+
               .detail-row {
-                font-size: var(--profile-detail-size) !important;
-                gap: 8px !important;
-                flex-wrap: wrap;
-                justify-content: flex-start !important;
-                
-                .text {
-                  word-break: break-word;
+                font-size: 11px !important;
+                gap: 4px !important;
+                line-height: 1.4 !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
+                display: flex !important;
+                align-items: center !important;
+
+                .detail-icon,
+                img.detail-icon {
+                  width: 12px !important;
+                  height: 12px !important;
+                  min-width: 12px !important;
+                  flex-shrink: 0 !important;
+                }
+
+                // 인라인 이미지 아이콘 (span 안 img)
+                img[width="13"] {
+                  width: 10px !important;
+                  height: 10px !important;
+                }
+
+                span {
+                  overflow: hidden !important;
+                  text-overflow: ellipsis !important;
+                  white-space: nowrap !important;
+                  max-width: 100% !important;
+                  font-size: 11px !important;
+                }
+
+                // 인라인 max-width:180px → 100%
+                span[style*="max-width"] {
+                  max-width: 100% !important;
+                }
+
+                // 인라인 font-size:14px → 11px
+                span[style*="font-size: 14px"],
+                span[style*="font-size:14px"] {
+                  font-size: 11px !important;
+                }
+
+                // 인라인 width:16px spacer → 12px
+                span[style*="width: 16px"],
+                span[style*="width:16px"] {
+                  width: 12px !important;
+                  min-width: 12px !important;
                 }
               }
             }
           }
         }
-        
-        // 소개글 - CSS 변수로 일관된 크기
+
+        // 소개글 — 원본 크기에 가깝게 유지
         .resume-intro {
           width: 100% !important;
           height: auto !important;
-          min-height: 60px;
-          font-size: var(--profile-intro-size) !important;
-          line-height: 1.6 !important; // 1.5 → 1.6
-          padding: 14px 16px !important;
-          margin: 0 0 18px 0 !important; // 16 → 18
+          min-height: 80px;
+          font-size: 18px !important; // 원본 22px → 모바일 18px
+          line-height: 1.5 !important;
+          padding: 14px 20px !important;
+          margin: 0 0 10px 0 !important;
           box-sizing: border-box !important;
+          word-break: keep-all !important;
+          overflow-wrap: break-word !important;
+
+          .intro-icon {
+            width: 22px !important;
+            height: 22px !important;
+          }
         }
         
         // 3단 영역 - 그리드로 균등 배치 (모든 기기에서 일관)
@@ -760,11 +861,15 @@
               }
               
               .skill-label {
-                font-size: 8px !important;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                font-size: 10px !important;
+                white-space: normal !important; // nowrap 해제
+                word-break: keep-all !important; // 의미 단위 줄바꿈
+                overflow-wrap: break-word !important;
+                overflow: visible !important;
+                text-overflow: unset !important;
                 max-width: 100%;
+                line-height: 1.3 !important;
+                text-align: center !important;
               }
             }
           }
@@ -2139,14 +2244,16 @@
       justify-content: center !important;
       
       .resume-card {
-        width: 520px !important;
-        min-width: 520px !important;
-        margin: 0 !important;
-        padding: 16px !important;
+        width: min(390px, calc(100vw - 24px)) !important;
+        max-width: calc(100vw - 24px) !important;
+        min-width: 0 !important;
+        margin: 0 auto !important;
+        padding: 12px !important;
         border: 1px solid #666 !important;
         border-radius: 8px !important;
         left: 0 !important;
         right: 0 !important;
+        overflow: hidden !important;
       }
     }
     
@@ -2251,14 +2358,16 @@
       justify-content: center !important;
       
       .resume-card {
-        width: 520px !important;
-        min-width: 520px !important;
-        padding: 16px !important;
-        margin: 0 !important;
+        width: min(366px, calc(100vw - 28px)) !important;
+        max-width: calc(100vw - 28px) !important;
+        min-width: 0 !important;
+        padding: 12px !important;
+        margin: 0 auto !important;
         border: 1px solid #666 !important;
         border-radius: 8px !important;
         left: 0 !important;
         right: 0 !important;
+        overflow: hidden !important;
         
         .resume-header {
           gap: 10px !important;
@@ -2397,14 +2506,16 @@
     }
     
     .mobile-sidebar-section .resume-card {
-      width: 520px !important;
-      min-width: 520px !important;
-      margin: 0 !important;
-      padding: 14px !important;
+      width: min(366px, calc(100vw - 20px)) !important;
+      max-width: calc(100vw - 20px) !important;
+      min-width: 0 !important;
+      margin: 0 auto !important;
+      padding: 10px !important;
       border: 1px solid #666 !important;
       border-radius: 8px !important;
       left: 0 !important;
       right: 0 !important;
+      overflow: hidden !important;
       
       .resume-header {
         gap: 10px !important;
