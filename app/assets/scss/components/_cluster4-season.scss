@@ -5004,3 +5004,34 @@
   }
 }
 
+
+// ★ 4K 대응: zoom 1.5 적용 시 viewport ≈ 2560px → 1330px이 너무 좁음
+@media screen and (min-width: 1800px) {
+  .cluster4-content {
+    max-width: 100% !important;
+  }
+
+  .cluster4-section1,
+  .cluster4-section2,
+  .cluster4-section3-banner,
+  .cluster4-section3,
+  .cluster4-section4,
+  .cluster4-weekly-list {
+    max-width: 100% !important;
+  }
+
+  .season-detail-container {
+    max-width: 100% !important;
+
+    // 3열 그리드 비율 조정: 고정px → 비율 기반
+    .main-content-grid {
+      grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(300px, 1.2fr) !important;
+      gap: 30px !important;
+    }
+
+    // 상단 헤더도 비율 맞춤
+    .top-header-row {
+      gap: 30px !important;
+    }
+  }
+}
