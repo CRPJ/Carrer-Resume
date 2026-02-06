@@ -185,6 +185,7 @@ const Sidebar = () => {
   // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
   useEffect(() => {
     const calculateScale = () => {
@@ -1192,7 +1193,8 @@ const Sidebar = () => {
     );
   }
 
-  return (
+  // ★ 모바일: 슬라이드 패널 전체를 body에 Portal 렌더링
+  const sidebarContent = (
     <div className="home-two-sidebar-col">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shake {
@@ -3309,6 +3311,123 @@ const Sidebar = () => {
       )}
     </div>
   );
+
+  // ★ 모바일: Portal로 슬라이드 패널 렌더링
+  if (isMobileView && isMounted) {
+    return (
+      <>
+        {/* 세로 탭 버튼 — 항상 왼쪽에 고정 */}
+        {createPortal(
+          <button
+            onClick={() => setIsProfileOpen(true)}
+            style={{
+              position: 'fixed',
+              left: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 9989,
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              background: isProfileOpen
+                ? 'transparent'
+                : 'linear-gradient(180deg, #FAAB07 0%, #e09600 100%)',
+              color: '#000',
+              fontSize: '12px',
+              fontWeight: 800,
+              letterSpacing: '3px',
+              padding: isProfileOpen ? '0' : '16px 7px',
+              borderRadius: '0 8px 8px 0',
+              cursor: 'pointer',
+              userSelect: 'none' as const,
+              boxShadow: isProfileOpen ? 'none' : '2px 2px 12px rgba(250, 171, 7, 0.3)',
+              border: 'none',
+              fontFamily: 'Pretendard, sans-serif',
+              opacity: isProfileOpen ? 0 : 1,
+              pointerEvents: isProfileOpen ? 'none' as const : 'auto' as const,
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            PROFILE
+          </button>,
+          document.body
+        )}
+
+        {/* 오버레이 + 슬라이드 패널 */}
+        {createPortal(
+          <>
+            {/* 배경 오버레이 */}
+            <div
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.6)',
+                zIndex: 9990,
+                opacity: isProfileOpen ? 1 : 0,
+                pointerEvents: isProfileOpen ? 'auto' : 'none',
+                transition: 'opacity 0.3s ease',
+              }}
+            />
+
+            {/* 슬라이드 패널 */}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: '380px',
+                maxWidth: '85vw',
+                background: '#0a0a0a',
+                zIndex: 9991,
+                transform: isProfileOpen ? 'translateX(0)' : 'translateX(-100%)',
+                transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                borderRight: isProfileOpen ? '1px solid #FAAB07' : '1px solid #333',
+                boxShadow: isProfileOpen ? '4px 0 20px rgba(0, 0, 0, 0.5)' : 'none',
+              }}
+            >
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setIsProfileOpen(false)}
+                style={{
+                  position: 'sticky',
+                  top: '12px',
+                  float: 'right',
+                  marginRight: '12px',
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid #444',
+                  borderRadius: '50%',
+                  color: '#ccc',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                }}
+              >
+                ✕
+              </button>
+
+              {/* 실제 사이드바 콘텐츠 */}
+              {sidebarContent}
+            </div>
+          </>,
+          document.body
+        )}
+      </>
+    );
+  }
+
+  // ★ 데스크톱: 기존 그대로
+  return sidebarContent;
 };
 
 export default Sidebar;

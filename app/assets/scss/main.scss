@@ -136,5 +136,11 @@
 // responsive styles
 @import "./responsive";
 
+// ★ Cluster 반응형 패치 (responsive 뒤, mobile-responsive 앞)
+@import "./components/cluster2-responsive";
+@import "./components/cluster3-responsive";
+@import "./components/cluster4-season-responsive";
+@import "./components/cluster4-week-responsive";
+
 // 모바일/태블릿 오버라이드(반드시 마지막)
 @import "./components/mobile-responsive";

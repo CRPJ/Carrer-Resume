@@ -1,0 +1,605 @@
+// ============================================================
+// Cluster 4 (Season) - Mobile-First 반응형 패치
+// ============================================================
+// 적용: _cluster4-season.scss 파일 맨 끝에
+//       @import './cluster4-season-responsive';
+// ============================================================
+
+$c4-bp-tablet: 768px;
+$c4-bp-desktop: 1200px;
+
+@mixin c4-mobile-only {
+  @media (max-width: #{$c4-bp-tablet - 1px}) { @content; }
+}
+
+@mixin c4-tablet-only {
+  @media (min-width: $c4-bp-tablet) and (max-width: #{$c4-bp-desktop - 1px}) { @content; }
+}
+
+@mixin c4-desktop {
+  @media (min-width: $c4-bp-desktop) { @content; }
+}
+
+
+// ─────────────────────────────────────────
+// [1] Section 1: CLUB CHALLENGE GROWTH
+// ─────────────────────────────────────────
+
+.cluster4-content {
+
+  .cluster4-section1 {
+
+    @include c4-mobile-only {
+      min-height: auto;
+      margin-bottom: 0 !important; // 겹침 효과 완전 제거
+      padding-bottom: 40px;
+    }
+
+    @include c4-tablet-only {
+      min-height: auto;
+      margin-bottom: -150px; // 대폭 축소
+    }
+
+    // 하단 구분선 반응형
+    &::after {
+      @include c4-mobile-only { width: min(1023px, 95%) !important; }
+      @include c4-tablet-only { width: min(1023px, 95%) !important; }
+    }
+
+    // 타이틀 nowrap 해제
+    .section1-title-shadow,
+    .section1-title {
+      @include c4-mobile-only {
+        font-size: clamp(28px, 7vw, 72px);
+        white-space: normal !important;
+        word-break: keep-all;
+        line-height: 1.1;
+      }
+      @include c4-tablet-only {
+        font-size: clamp(42px, 5.5vw, 72px);
+        white-space: normal !important;
+        word-break: keep-all;
+      }
+    }
+
+    .section1-title-shadow {
+      @include c4-mobile-only { position: absolute; }
+      @include c4-tablet-only { position: absolute; }
+    }
+
+    // 설명 텍스트
+    .section1-description {
+      @include c4-mobile-only {
+        padding: 20px 16px 0;
+        p, .quote-text, .quote-author {
+          font-size: clamp(16px, 3.5vw, 23px);
+        }
+        .quote-highlight {
+          font-size: clamp(18px, 4vw, 27px);
+        }
+      }
+    }
+
+    // 좌측 탭
+    .top-tabs {
+      @include c4-mobile-only {
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 8px;
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [2] Section 2: SEASON GROWTH 카드
+  // ─────────────────────────────────────────
+
+  .cluster4-section2 {
+
+    @include c4-mobile-only {
+      margin-top: 0 !important;
+      position: relative !important; // sticky 비활성화
+    }
+
+    @include c4-tablet-only {
+      margin-top: -20px;
+      position: relative !important; // sticky 비활성화
+    }
+
+    .season-growth-card {
+
+      @include c4-mobile-only {
+        min-height: auto;
+        background-position: center center;
+
+        .card-left {
+          width: 100%;
+          padding: 40px 16px 30px;
+
+          .season-title-shadow,
+          .season-title {
+            font-size: clamp(28px, 6vw, 55px);
+            white-space: normal !important;
+            word-break: keep-all;
+          }
+
+          .season-title-shadow {
+            position: absolute;
+          }
+
+          .season-badge {
+            width: auto;
+            min-width: 100px;
+            margin-left: 10px;
+
+            .badge-text {
+              font-size: 14px;
+            }
+          }
+
+          .season-header-row {
+            flex-wrap: wrap;
+            gap: 12px;
+          }
+
+          .collection-card {
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            gap: 16px;
+
+            .collection-text {
+              white-space: normal;
+            }
+          }
+
+          .details-card {
+            width: 100%;
+          }
+        }
+
+        .card-right {
+          display: none !important; // 캐릭터 이미지 숨김
+        }
+      }
+
+      @include c4-tablet-only {
+        min-height: auto;
+
+        .card-left {
+          width: 65%;
+          padding: 50px 30px 30px 40px;
+
+          .season-title-shadow,
+          .season-title {
+            font-size: clamp(36px, 4.5vw, 55px);
+            white-space: normal !important;
+          }
+
+          .season-title-shadow {
+            position: absolute;
+          }
+
+          .collection-card {
+            .collection-text {
+              white-space: normal;
+            }
+          }
+
+          .details-card {
+            width: 100%;
+            max-width: 422px;
+          }
+        }
+
+        .card-right {
+          width: 320px;
+          height: auto;
+          opacity: 0.4;
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [3] Section 3 배너: SEASON CHALLENGE
+  // ─────────────────────────────────────────
+
+  .cluster4-section3-banner {
+    @include c4-mobile-only {
+      .banner-content {
+        padding: 40px 16px;
+
+        .banner-title {
+          font-size: clamp(28px, 6vw, 56px);
+        }
+
+        .banner-description {
+          font-size: 16px;
+        }
+
+        .banner-info {
+          font-size: 14px;
+        }
+      }
+    }
+
+    @include c4-tablet-only {
+      .banner-content {
+        padding: 50px 30px;
+
+        .banner-title {
+          font-size: clamp(36px, 4.5vw, 56px);
+        }
+      }
+    }
+  }
+
+
+  // ─────────────────────────────────────────
+  // [4] Section 4: 9-area 그리드
+  // ─────────────────────────────────────────
+
+} // .cluster4-content 닫기
+
+// ─────────────────────────────────────────
+// [★ 겹침 방지] 최고 우선순위 - 모든 card-right 숨김
+// week/season 모두 적용되도록 독립 블록
+// ─────────────────────────────────────────
+
+@include c4-mobile-only {
+  // Season 뷰
+  .cluster4-content .cluster4-section2 .season-growth-card .card-right {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  // Week 뷰 (더 높은 특이성)
+  .cluster4-content.cluster4-content--week .cluster4-section2 .season-growth-card .card-right {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  // Section 1 겹침 완전 제거
+  .cluster4-content .cluster4-section1 {
+    margin-bottom: 0 !important;
+  }
+
+  // Section 2 겹침 완전 제거
+  .cluster4-content .cluster4-section2 {
+    margin-top: 0 !important;
+    position: relative !important;
+  }
+}
+
+@include c4-tablet-only {
+  .cluster4-content .cluster4-section2 .season-growth-card .card-right {
+    width: 280px !important;
+    height: auto !important;
+    opacity: 0.3;
+    bottom: 0;
+  }
+
+  .cluster4-content.cluster4-content--week .cluster4-section2 .season-growth-card .card-right {
+    width: 280px !important;
+    height: auto !important;
+    opacity: 0.3;
+    bottom: 0;
+  }
+}
+
+.cluster4-section4 {
+
+  @include c4-mobile-only {
+    padding: 0 0 60px;
+
+    .main-grid {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto !important;
+      padding: 20px 16px;
+      gap: 16px;
+
+      // 모든 area를 1열로 스택
+      .area-1-image-stack {
+        grid-row: auto !important;
+        grid-column: 1 !important;
+      }
+
+      .area-2-title { grid-column: 1 !important; grid-row: auto !important; }
+      .area-3-qualified { grid-column: 1 !important; grid-row: auto !important; align-items: flex-start; }
+      .area-4-stats { grid-column: 1 !important; grid-row: auto !important; }
+
+      .area-5-circles {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+
+        .circle-item .circle {
+          width: 70px;
+          height: 70px;
+        }
+      }
+
+      // area-6 ~ area-9 (내부 그리드도 1열화)
+      .area-6-weekly,
+      .area-7-growth,
+      .area-8-records,
+      .area-9-badges {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+      }
+    }
+  }
+
+  @include c4-tablet-only {
+    .main-grid {
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: auto !important;
+      padding: 30px 24px;
+      gap: 16px;
+
+      .area-1-image-stack {
+        grid-row: 1 / 3;
+        grid-column: 1;
+      }
+
+      .area-2-title { grid-column: 2; }
+      .area-3-qualified { grid-column: 2; }
+      .area-4-stats { grid-column: 1 / 3; }
+
+      .area-5-circles {
+        grid-column: 1 / 3;
+        flex-wrap: wrap;
+      }
+
+      .area-6-weekly,
+      .area-7-growth,
+      .area-8-records,
+      .area-9-badges {
+        grid-column: 1 / 3;
+      }
+    }
+  }
+}
+
+
+// ─────────────────────────────────────────
+// [5] Section 3 시즌 상세 (cluster4-section3)
+// ─────────────────────────────────────────
+
+.cluster4-section3 {
+
+  @include c4-mobile-only {
+    padding: 20px 0 10px;
+
+    .section3-banner {
+      padding: 30px 16px;
+
+      .section3-banner-text-shadow,
+      .section3-banner-text {
+        font-size: clamp(24px, 5.5vw, 60px);
+        white-space: normal !important;
+        word-break: keep-all;
+      }
+
+      .section3-banner-text-shadow {
+        position: absolute;
+      }
+
+      .section3-banner-description,
+      .section3-banner-notice {
+        font-size: 16px;
+      }
+    }
+  }
+
+  @include c4-tablet-only {
+    .section3-banner {
+      padding: 35px 24px;
+
+      .section3-banner-text-shadow,
+      .section3-banner-text {
+        font-size: clamp(36px, 4.5vw, 60px);
+        white-space: normal !important;
+      }
+
+      .section3-banner-text-shadow {
+        position: absolute;
+      }
+    }
+  }
+}
+
+
+// ─────────────────────────────────────────
+// [6] Weekly List 보강 (기존 @media 보완)
+// ─────────────────────────────────────────
+
+.cluster4-weekly-list {
+
+  @include c4-mobile-only {
+    padding: 40px 0 24px;
+
+    .weekly-filter-bar {
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .filter-card {
+        width: 100%;
+      }
+    }
+
+    // ★ 핵심: .weekly-card 고정 치수 해제
+    .weekly-card {
+      width: 100% !important;
+      height: auto !important;
+      flex-wrap: wrap;
+
+      // 이미지 축소
+      .weekly-card-image {
+        width: 110px !important;
+        height: 110px !important;
+        margin: 0 !important;
+        flex-shrink: 0;
+
+        .rest-message .rest-text-line {
+          font-size: 20px;
+        }
+      }
+
+      // 콘텐츠 줄바꿈
+      .weekly-card-content {
+        flex: 1;
+        min-width: 0;
+        white-space: normal !important;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        margin-top: 0;
+
+        .weekly-card-header {
+          flex-wrap: wrap;
+          gap: 4px;
+
+          .weekly-card-title {
+            font-size: 14px;
+            width: 100%;
+          }
+
+          .weekly-card-date {
+            border: none;
+            padding: 0;
+            height: auto;
+            font-size: 12px;
+          }
+
+          .weekly-card-week {
+            border: none;
+            padding: 0;
+            height: auto;
+            font-size: 12px;
+          }
+        }
+
+        .weekly-card-info {
+          flex-wrap: wrap;
+          gap: 4px;
+          font-size: 12px;
+
+          .info-group {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+        }
+
+        .weekly-card-main-progress {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 6px;
+
+          .progress-bar-wrapper {
+            width: 100%;
+          }
+        }
+
+        .weekly-card-stats-wrapper {
+          .weekly-card-stats,
+          .weekly-card-extra-stats {
+            flex-wrap: wrap;
+            gap: 2px;
+
+            .stat {
+              font-size: 11px;
+              white-space: normal;
+            }
+          }
+        }
+      }
+
+      // 우측 상태 뱃지
+      .weekly-card-status-badge {
+        position: relative !important;
+        width: auto;
+        align-self: flex-end;
+      }
+
+      // 더보기 버튼
+      .weekly-card-more-btn {
+        position: relative !important;
+      }
+    }
+  }
+
+  @include c4-tablet-only {
+    .weekly-filter-bar {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .weekly-card {
+      width: 100% !important;
+      height: auto !important;
+
+      .weekly-card-image {
+        width: 180px !important;
+        height: 180px !important;
+      }
+
+      .weekly-card-content {
+        min-width: 0;
+
+        .weekly-card-header {
+          flex-wrap: wrap;
+        }
+
+        .weekly-card-stats-wrapper {
+          .weekly-card-stats,
+          .weekly-card-extra-stats {
+            flex-wrap: wrap;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// ─────────────────────────────────────────
+// [7] 모달 반응형
+// ─────────────────────────────────────────
+
+.section-modal-overlay {
+  @include c4-mobile-only {
+    .section-modal {
+      width: 98%;
+      max-height: 90vh;
+
+      &.section-modal-wide {
+        width: 98%;
+      }
+
+      .section-modal-header {
+        padding: 16px;
+        h3 { font-size: 18px; }
+      }
+
+      .section-modal-body {
+        padding: 12px 16px;
+      }
+
+      .section-modal-footer {
+        padding: 12px 16px;
+      }
+    }
+  }
+}

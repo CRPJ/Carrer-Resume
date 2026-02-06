@@ -131,6 +131,34 @@ const Cluster41Page = () => {
     };
   }, [isMobile]);
 
+  // 모바일 레이아웃
+  if (isMobile) {
+    return (
+      <main ref={mainRef} className="nftg-content nftg-content-home mobile-layout">
+        <Animations />
+        
+        {/* 모바일: 세로 배치 */}
+        <div className="mobile-container">
+          {/* 1. 프로필 카드 (상단) */}
+          <div className="mobile-sidebar-section">
+            <Sidebar />
+          </div>
+          
+          {/* 2. 클러스터 탭 */}
+          <div className="mobile-tabs-section">
+            <ClusterTabs />
+          </div>
+          
+          {/* 3. 메인 콘텐츠 */}
+          <div className="mobile-content-section">
+            <Cluster4Content />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // 데스크톱 레이아웃
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
