@@ -1,5 +1,7 @@
 // Cluster 3 - Club Final Index Styles
 
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=swap');
+
 @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=Black+Ops+One&display=swap');
 
 @font-face {
@@ -1074,9 +1076,11 @@
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
+          line-height: 44px;
+          text-transform: capitalize;
           display: flex;
           align-items: center;
           gap: 10px;
@@ -1086,7 +1090,7 @@
           .title-text {
             position: relative;
             display: inline-block;
-            z-index: 1;
+            z-index: 0;
 
             .triangle-icon {
               position: absolute;
@@ -1112,8 +1116,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 19px;
+            text-transform: capitalize;
             color: #FED402;
             cursor: pointer;
             display: flex;
@@ -1546,15 +1553,17 @@
             position: relative;
             display: inline-block;
             z-index: 1;
+            overflow: visible;
 
             .triangle-icon {
               position: absolute;
-              left: -23px;
+              left: -28px;
               top: calc(50% - 8px);
               transform: translateY(-50%);
               width: 39px;
               height: 39px;
               z-index: -1;
+              overflow: visible;
             }
           }
         }
@@ -2062,6 +2071,7 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0;
+        overflow: visible;
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
@@ -2073,6 +2083,7 @@
           gap: 10px;
           margin: 0;
           line-height: 1;
+          overflow: visible;
 
           .title-text {
             position: relative;
