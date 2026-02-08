@@ -565,7 +565,7 @@ const Cluster2Content = () => {
       viewers: "9.9k Viewers",
       thumbnail: "/images/0/cluster 2/영상 01.jpeg",
       isBookmarked: true,
-      videoUrl: ""
+      videoUrl: "https://youtu.be/B5buG5eQknw?si=t2NM_EM0eBd7GkRU"
     },
     {
       id: 2,
@@ -1125,14 +1125,37 @@ const Cluster2Content = () => {
           <p className="quote-text">"Know thyself"</p>
           <p className="quote-highlight">"너 자신을 알라"</p>
           <p className="quote-author">- 소크라테스 (Socrates) -</p>
-        </div>
-      </div>
+
+          {/* Floating Icons - 설명 영역 우측 하단 */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '5px',
+            marginTop: '10px',
+            marginRight: '40px'    
+          }}>
+            <div className="edit-icon">
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" />
+            </div>
+            <div className="edit-icon">
+              <img src="/images/0/cluster 2/icon - help.png" alt="Help" />
+            </div>
+          </div>
+        </div>  {/* section1-description 닫힘 */}
+      </div>    {/* cluster2-title-wrapper 닫힘 */}
 
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame" style={{ position: 'relative' }}>
-        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {/* Floating Icons - PROFILE 영역 우측 하단 */}
         {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="floating-icons" style={{
+            display: 'flex',
+            position: 'absolute',
+            bottom: '220px',
+            right: '40px',
+            zIndex: 100,
+            gap: '5px'
+          }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
@@ -1234,7 +1257,7 @@ const Cluster2Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); })}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster /icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
