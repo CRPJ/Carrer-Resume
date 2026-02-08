@@ -17,15 +17,15 @@ const Sidebar = () => {
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
-  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
-  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
-  const [completionRate, setCompletionRate] = useState<number | null>(null);
-  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(0); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(0); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(0); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(0); // 실무 경력 누적
-  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(true);
+  const [completionRate, setCompletionRate] = useState<number | null>(80);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(true);
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
+  const [hasActivityData, setHasActivityData] = useState<boolean>(true);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
@@ -33,11 +33,11 @@ const Sidebar = () => {
   const [badge3, setBadge3] = useState(0);
   // 배지 데이터 상태 (user_cumulative_points 테이블)
   const [badgeData, setBadgeData] = useState({
-    stars: 0,       // 별
-    lightnings: 0,  // 번개
-    shields: 0      // 방패
+    stars: 99999,       // 별
+    lightnings: 9999,   // 번개
+    shields: 99999      // 방패
   });
-  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(true);
 
   // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
   interface SeasonHistory {
@@ -54,8 +54,36 @@ const Sidebar = () => {
       start_date: string;
     };
   }
-  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
-  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([
+    {
+      id: 'dummy-1',
+      role_in_season: 'admin',
+      approved_weeks: 3,
+      total_weeks: 16,
+      progress_status: 'in_progress',
+      review_status: 'pending',
+      seasons: { id: 's1', year: 2025, name: 'winter', start_date: '2025-01-01' }
+    },
+    {
+      id: 'dummy-2',
+      role_in_season: 'crew_advanced',
+      approved_weeks: 8,
+      total_weeks: 8,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's2', year: 2025, name: 'fall', start_date: '2024-09-01' }
+    },
+    {
+      id: 'dummy-3',
+      role_in_season: 'crew_regular',
+      approved_weeks: 12,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's3', year: 2025, name: 'summer', start_date: '2024-06-01' }
+    }
+  ]);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(true);
 
   // 시즌 이름 한글 변환
   const seasonNameKorean: { [key: string]: string } = {
@@ -368,24 +396,24 @@ const Sidebar = () => {
   // OK/EC/PX별 프로필 데이터
   const profileData = {
     OK: {
-      name: '이름',
-      nameEng: 'English Name',
+      name: '정이안',
+      nameEng: 'Jung Ian',
       gender: '여',
-      birthDate: '0000.00.00',
-      city: '00시',
-      district: '00구',
+      birthDate: '2002.02.02',
+      city: '서울특별시',
+      district: '강남구',
       phone: '010-1***-****',
-      email: 'writeyoureamil@gmail.com',
-      school: '한국대학교',
-      major: '한국학과',
-      major2: '경영학과',
-      major3: '컴퓨터학과',
-      enrollPeriod: '0000. 00',
-      graduationStatus: 'ing',
-      gpa: '0.0',
-      gpaMax: '0.0',
-      photo: '/images/0/crew profile/이안0.png',
-      quote: '로그인 후에 상단 연필 아이콘을 클릭하여 프로필을 완성해보세요 !',
+      email: 'gildong@naver.com',
+      school: '성균관대학교',
+      major: '사학과',
+      major2: '',
+      major3: '',
+      enrollPeriod: '2025.03',
+      graduationStatus: '재학중',
+      gpa: '3.0',
+      gpaMax: '4.5',
+      photo: '/images/0/cluster 1/shape.png',
+      quote: '가장 어두운 순간에도 앞으로 한 걸음 내딛는 자에게 길이 열린다가장 어두운 순간에도 앞으로 한 걸음 내딛는 자에게 길이 열린다',
       lightColor: '#FFEC8F',
       accentColor: '#FFC300'
     },
@@ -1289,30 +1317,6 @@ const Sidebar = () => {
                 <span style={{ color: '#fff', fontSize: '14px', fontFamily: 'Pretendard, sans-serif' }}>사진을 등록하세요.</span>
               </div>
             )}
-            {/* Edit Button - 프로필 이미지 우측 하단 */}
-            <button
-              className="resume-edit-btn"
-              onClick={handleEditButtonClick}
-              style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
-                border: 'none',
-                display: isOwner && debugProfileType === '본인' ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 5,
-                padding: 0,
-                boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-              }}
-            >
-              <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
-            </button>
           </div>
 
           {/* Hexagon Buttons */}
@@ -1403,6 +1407,28 @@ const Sidebar = () => {
                   >
                     <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
                   </span>{currentProfile.name} <span className="name-eng">{currentProfile.nameEng}</span>
+                  <button
+                    className="resume-edit-btn"
+                    onClick={handleEditButtonClick}
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
+                      border: 'none',
+                      display: isOwner && debugProfileType === '본인' ? 'inline-flex' : 'none',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      padding: 0,
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                      marginLeft: '8px',
+                      verticalAlign: 'middle',
+                      flexShrink: 0
+                    }}
+                  >
+                    <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
+                  </button>
                 </h1>
 
                 <div className="resume-details">
@@ -1474,40 +1500,14 @@ const Sidebar = () => {
                         cursor: 'default'
                       }}
                     >
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school}
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school} <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
                     </span>
                   </div>
+
                   <div className="detail-row">
                     <span style={{ width: '16px' }}></span>
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span style={{ color: currentProfile.lightColor }}>·</span>
-                      <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
-                          setTooltipVisible(tooltipVisible === 'major' ? null : 'major');
-                        }}
-                        style={{
-                          color: currentProfile.accentColor,
-                          fontSize: '14px',
-                          cursor: 'pointer',
-                          marginLeft: '-2px',
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}
-                      ><i className="ti ti-chevron-right"></i></span>
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span style={{ width: '16px' }}></span>
-                    <span className="sub-text" style={{ color: currentProfile.lightColor }}><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod}</span>
+                    <span className="sub-text" style={{ color: currentProfile.lightColor }}>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod} ~ {currentProfile.graduationStatus}</span>
                   </div>
                 </div>
               </>
@@ -1780,16 +1780,14 @@ const Sidebar = () => {
                 {debugPanelType === 'EC' ? '전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레' : debugPanelType === 'PX' ? '전국청춘연합 기획/컨설팅 클럽, 팔랑크스' : '전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐'}
               </span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
             <div className="notice-box green">
               <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
           </div>
