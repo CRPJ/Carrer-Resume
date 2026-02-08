@@ -1540,14 +1540,15 @@
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
           display: flex;
           align-items: center;
           gap: 10px;
-          margin: 0;
-          line-height: 1;
+          margin: 0 0 -8px 0;
+          line-height: 44px;
+          text-transform: capitalize;
 
           .title-text {
             position: relative;
@@ -1575,8 +1576,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 19px;
+            text-transform: capitalize;
             color: #FED402;
             cursor: pointer;
             display: flex;
@@ -1631,28 +1635,29 @@
     .section4-header {
       position: relative;
       z-index: 1;
+      text-align: center;
     }
 
     // 메인 타이틀
     .section4-title {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 48px;
+      font-family: 'Manrope', 'Pretendard', sans-serif;
+      font-size: 54px;
       font-weight: 800;
-      color: #fff;
-      margin: 0 0 15px 0;
-      text-align: center;
-      letter-spacing: 2px;
+      line-height: 74px;
+      text-transform: capitalize;
+      margin: 0 0 30px 0;
+      letter-spacing: 0;
     }
 
     .section4-desc {
       font-family: 'Pretendard', sans-serif;
       font-size: 16px;
-      font-weight: 300;
-      color: #999;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.53);
       text-align: center;
-      margin: 0 auto 30px;
+      margin: 0 auto 50px;
       max-width: 800px;
-      line-height: 1.6;
+      line-height: 24px;
     }
 
     // 탭 버튼

@@ -1069,24 +1069,10 @@ const Cluster3Content = () => {
       {/* Section 4: 포트폴리오 아카이빙 Output */}
       <section className="cluster3-section4">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => {
-              setEditingSection4Links(topWorksSlides.map(slide => slide.link || ""));
-              setEditingOutputChannels([...portfolioOutputChannels]);
-              setSection4ModalOpen(true);
-            })} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
-            </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
-        )}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+        </div>
         {/* 배경 이미지 */}
         <div className="section4-bg">
           <img src="/images/0/cluster 3/bg4.png" alt="Background" />
@@ -1094,15 +1080,13 @@ const Cluster3Content = () => {
 
         <div className="section4-top-header">
           <div className="header-left">
-            <h2 className="subtitle">
-              <span className="title-text">
-                <img src="/images/0/cluster 3/icon/triangle-orange.svg" alt="triangle" className="triangle-icon" />
-                포트폴리오 아카이빙 output
-              </span>
-            </h2>
+          <h2 className="subtitle">
+            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '-24px', marginLeft: '-4px', verticalAlign: 'middle' }} />
+            포트폴리오 아카이빙 output
+          </h2>
             <div className="header-sub">
               <span className="view-all" onClick={() => handleArrowClick('section4')} style={{ cursor: 'pointer' }}>
-                View All Bids <span className={`arrow-icon ${arrowAnimating === 'section4' ? 'arrow-bounce' : ''}`}></span>
+                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
               </span>
             </div>
           </div>
