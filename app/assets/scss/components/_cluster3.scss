@@ -1,5 +1,6 @@
 // Cluster 3 - Club Final Index Styles
 
+
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=Black+Ops+One&display=swap');
@@ -1676,16 +1677,18 @@
         width: 190px;
         height: 50px;
         padding: 0;
-        font-family: 'Pretendard', sans-serif;
+        font-family: 'Manrope', sans-serif;
         font-size: 14px;
-        font-weight: 700;
-        color: #FED402;
+        font-weight: 800;
+        color: #161616;
+        line-height: 14px;
+        text-transform: capitalize;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
 
         .btn-arrow {
           width: 16px;
@@ -2062,7 +2065,7 @@
     // 플로팅 아이콘 위치 조정 (다른 섹션과 동일하게)
     .floating-icons {
       top: 80px;
-      right: -105px;
+      right: 0;
     }
 
     .section5-header {
@@ -2080,15 +2083,17 @@
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
           display: flex;
           align-items: center;
           gap: 10px;
           margin: 0;
           line-height: 1;
           overflow: visible;
+          line-height: 44px;
+          text-transform: capitalize;
 
           .title-text {
             position: relative;
@@ -2114,8 +2119,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;  // Pretendard → Manrope
+            font-size: 14px;      // 13px → 14px
+            font-weight: 800;     // 추가
+            line-height: 19px;    // 추가
+            text-transform: capitalize;  // 추가
             color: #FED402;
             cursor: pointer;
             display: flex;

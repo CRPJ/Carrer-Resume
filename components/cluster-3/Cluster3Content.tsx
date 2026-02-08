@@ -71,7 +71,7 @@ const Cluster3Content = () => {
   });
 
   // 영어 이름
-  const [engName, setEngName] = useState<string>('');
+  const [engName, setEngName] = useState<string>('Hwang Yeongyeong');
 
   // 성장 점수 기록 데이터 (단감, 인절미, 어흥)
   interface PointsData {
@@ -218,28 +218,35 @@ const Cluster3Content = () => {
 
   // 포트폴리오 Output 데이터 (DB 저장용)
   const [portfolioOutputs, setPortfolioOutputs] = useState<string[]>(Array(5).fill(""));
-  const [portfolioOutputChannels, setPortfolioOutputChannels] = useState<string[]>(Array(5).fill(""));
+  const [portfolioOutputChannels, setPortfolioOutputChannels] = useState<string[]>([
+    'threads',    // index 0 → 왼쪽2
+    'youtube',    // index 1 → 왼쪽1
+    'tiktok',     // index 2 → 가운데
+    'youtube',    // index 3 → 오른쪽1
+    'tistory',    // index 4 → 오른쪽2
+  ]);
   const [editingOutputChannels, setEditingOutputChannels] = useState<string[]>(Array(5).fill(""));
   const [isSavingOutputs, setIsSavingOutputs] = useState(false);
 
   // Detail 10 데이터 (DB 저장용 - portfolio_output_6~15)
   const [portfolioDetails, setPortfolioDetails] = useState<string[]>(Array(10).fill(""));
-  const [portfolioDetailChannels, setPortfolioDetailChannels] = useState<string[]>(Array(10).fill(""));
+  const [portfolioDetailChannels, setPortfolioDetailChannels] = useState<string[]>([
+    'youtube', 'twitter', 'youtube', 'threads', 'instagram',
+    'instagram', 'instagram', 'instagram', 'youtube', 'threads'
+  ]);
   const [editingDetailChannels, setEditingDetailChannels] = useState<string[]>(Array(10).fill(""));
   const [isSavingDetails, setIsSavingDetails] = useState(false);
 
   // 채널 옵션 목록
   const channelOptions = [
     { value: '', label: '채널 선택', icon: '' },
-    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/icon/Instagram.png' },
-    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/icon/Youtube.png' },
-    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/icon/Naver Blog.png' },
-    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/icon/Tstory.png' },
-    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/icon/X.png' },
-    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/icon/Threads.png' },
-    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/icon/TikTok.png' },
-    { value: 'behance', label: '비핸스', icon: '/images/0/cluster 3/icon/Behance.png' },
-    { value: 'etc', label: '기타', icon: '/images/0/cluster 3/icon/etc 2.png' },
+    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/instagram.png' },
+    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/youtube.png' },
+    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/blog.png' },
+    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/tistory.png' },
+    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/x.png' },
+    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/thread.png' },
+    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/tiktok.png' },
   ];
 
   // 포트폴리오 아카이빙 데이터 가져오기
@@ -1181,35 +1188,19 @@ const Cluster3Content = () => {
         {/* Section 5: The Detail 10 - 섹션4 배경 안에 포함 */}
         <div className="cluster3-section5">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => {
-              setEditingSection5Links([...portfolioDetails]);
-              setEditingDetailChannels([...portfolioDetailChannels]);
-              setSection5ModalOpen(true);
-            })} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
-            </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
-        )}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+        </div>
         <div className="section5-header">
           <div className="header-left">
-            <h2 className="subtitle">
-              <span className="title-text">
-                <img src="/images/0/cluster 3/icon/triangle-orange.svg" alt="triangle" className="triangle-icon" />
-                The Detail 10
-              </span>
-            </h2>
+          <h2 className="subtitle">
+            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '-24px', marginLeft: '-4px', verticalAlign: 'middle' }} />
+            The Detail 10
+          </h2>
             <div className="header-sub">
               <span className="view-all" onClick={() => handleArrowClick('section5')} style={{ cursor: 'pointer' }}>
-                View All Bids <span className={`arrow-icon ${arrowAnimating === 'section5' ? 'arrow-bounce' : ''}`}></span>
+                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
               </span>
             </div>
           </div>
