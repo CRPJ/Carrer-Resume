@@ -30,24 +30,79 @@ interface EduData {
 }
 
 // 학력 데이터 (기본값 - DB에서 로드되면 덮어씀)
+// ※ 피그마 시안용 더미 데이터 — 실제 DB 데이터가 로드되면 자동으로 교체됨
 const initialEducationData: EduData[] = [
   {
-    eduLevel: "-",
-    school: "-",
-    status: "-",
-    category: "-",
-    major1: "-",
-    major2: "-",
-    major3: "-",
-    period: "-",
-    startYear: "",
-    startMonth: "",
+    eduLevel: "대학교",
+    school: "고려 대학교",
+    status: "재학",
+    category: "사회",
+    major1: "콘텐츠전략학",
+    major2: "디지털마케팅학",
+    major3: "",
+    period: "2025.03 - ~ing",
+    startYear: "2025",
+    startMonth: "03",
     endYear: "",
     endMonth: "",
-    gradeMax: "-",
-    gradeValue: "-",
-    description: "-",
+    gradeMax: "4.5",
+    gradeValue: "3.8",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
     isFinal: true
+  },
+  {
+    eduLevel: "대학교",
+    school: "연세 대학교",
+    status: "중퇴",
+    category: "예체능",
+    major1: "미디어커뮤니케이션학과",
+    major2: "",
+    major3: "",
+    period: "2021.03 - 2024.02",
+    startYear: "2021",
+    startMonth: "03",
+    endYear: "2024",
+    endMonth: "02",
+    gradeMax: "4.3",
+    gradeValue: "4.12",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
+  },
+  {
+    eduLevel: "고등학교",
+    school: "서울과학 고등학교",
+    status: "졸업",
+    category: "기타",
+    major1: "",
+    major2: "",
+    major3: "",
+    period: "2018.03 - 2021.02",
+    startYear: "2018",
+    startMonth: "03",
+    endYear: "2021",
+    endMonth: "02",
+    gradeMax: "9등급",
+    gradeValue: "2",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
+  },
+  {
+    eduLevel: "중학교",
+    school: "용산 중학교",
+    status: "졸업",
+    category: "상경",
+    major1: "",
+    major2: "",
+    major3: "",
+    period: "2015.03 - 2018.02",
+    startYear: "2015",
+    startMonth: "03",
+    endYear: "2018",
+    endMonth: "02",
+    gradeMax: "100%",
+    gradeValue: "15",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
   }
 ];
 
@@ -1435,7 +1490,7 @@ const Cluster2Content = () => {
                 <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{edu.major2}</span></li>
                 <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{edu.major3}</span></li>
                 <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period.includes('~ing') ? (<>{edu.period.replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : edu.period}</span></li>
-                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && ` / ${edu.gradeMax}`}</span></li>
+                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && <span className="grade-sub"> / {edu.gradeMax}</span>}</span></li>
               </ul>
               <div
                 className="edu-footer"
