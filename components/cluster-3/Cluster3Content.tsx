@@ -53,8 +53,8 @@ const Cluster3Content = () => {
   // 일정 신뢰도 프로그레스 애니메이션 (섹션 1)
   const [progressOffset, setProgressOffset] = useState(393); // 시작: 0%
   const [progressPercent, setProgressPercent] = useState(0); // 퍼센트 숫자
-  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
-  const [hasReliabilityData, setHasReliabilityData] = useState(false);
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(50);
+  const [hasReliabilityData, setHasReliabilityData] = useState(true);
 
   // 성장 진행 상태 데이터
   interface GrowthInfo {
@@ -63,7 +63,12 @@ const Cluster3Content = () => {
     startDate: string | null;
     endDate: string | null;
   }
-  const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>(null);
+  const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>({
+    status: 'active',
+    growthStatus: 'pending',
+    startDate: '2025-02-22',
+    endDate: null
+  });
 
   // 영어 이름
   const [engName, setEngName] = useState<string>('');
@@ -74,7 +79,7 @@ const Cluster3Content = () => {
     injeolmi: number;  // 인절미 (shield - lightning)
     eoheung: number;   // 어흥 (lightning)
   }
-  const [pointsData, setPointsData] = useState<PointsData>({ dangam: 0, injeolmi: 0, eoheung: 0 });
+  const [pointsData, setPointsData] = useState<PointsData>({ dangam: 99999, injeolmi: 99999, eoheung: 99999 });
 
   // 품계 데이터 (user_grade_stats)
   interface GradeStats {
@@ -82,7 +87,11 @@ const Cluster3Content = () => {
     grade: number;          // 품계 숫자 (1=정승, 2=정1품, ... 10=정9품)
     gradeLabel: string;     // 품계 라벨 (정 7품 등)
   }
-  const [gradeStats, setGradeStats] = useState<GradeStats | null>(null);
+  const [gradeStats, setGradeStats] = useState<GradeStats | null>({
+    avgPercentile: 30,
+    grade: 3,
+    gradeLabel: '정 2품'
+  });
 
   // 성장 기간 집계 데이터 (user_growth_stats)
   interface GrowthPeriodStats {
@@ -94,7 +103,15 @@ const Cluster3Content = () => {
     restSeasons: number;        // 성장 휴식 시즌
     approvedSeasons: number;    // 성장(성공) 시즌
   }
-  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>(null);
+  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>({
+    approvedWeeks: 999,
+    unapprovedWeeks: 999,
+    restWeeks: 999,
+    clubBreakWeeks: 999,
+    availableWeeks: 999,
+    restSeasons: 999,
+    approvedSeasons: 999
+  });
 
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
@@ -709,18 +726,10 @@ const Cluster3Content = () => {
     <div className="cluster3-content">
       {/* Section 1: CLUB FINAL INDEX - 새 디자인 */}
       <section className="cluster3-section1">
-        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
-        )}
+        {/* 플로팅 아이콘 */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+        </div>
         {/* 배경 이미지 영역 */}
         <div className="section1-bg">
           <img src="/images/0/cluster 3/bg1.png" alt="Background" />
@@ -903,18 +912,10 @@ const Cluster3Content = () => {
 
       {/* Section 2: 졸업 자격 조건 - 배경 이미지 영역 */}
       <section className="cluster3-section2" ref={section2Ref}>
-        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
-          </div>
-        )}
+        {/* 플로팅 아이콘 */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+        </div>
         <div className="section2-bg">
           <img src="/images/0/cluster 3/bg2.png" alt="Background" />
         </div>

@@ -227,9 +227,11 @@
 
     // 타이틀 그림자
     .section1-title-shadow {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px;
+      text-transform: uppercase;
       color: #111;
       -webkit-text-stroke: 1px #21E786;
       text-stroke: 1px #21E786;
@@ -246,13 +248,15 @@
 
     // 타이틀
     .section1-title {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px;
+      text-transform: uppercase;
       color: #FFF;
       text-align: center;
       letter-spacing: 0;
-      margin: 0;
+      margin: 0 0 24px 0;  
       position: relative;
       z-index: 1;
       white-space: nowrap;
@@ -265,7 +269,7 @@
       max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
-      line-height: 1.6;
+      line-height: 22px;
       position: relative;
       z-index: 1;
       text-align: left;
@@ -282,7 +286,7 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 20px;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
@@ -294,14 +298,14 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 20px;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 20px;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
@@ -329,7 +333,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 20px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -811,10 +815,10 @@
         }
 
         .progress-unit {
-          font-family: 'Pretendard', sans-serif;
-          font-size: 22px;
-          font-weight: 500;
-          line-height: 33px;
+          font-family: var(--black-ops-one), 'Black Ops One', cursive;
+          font-size: 30px;
+          font-weight: 400;
+          line-height: 75px;
           color: #767676;
         }
       }
