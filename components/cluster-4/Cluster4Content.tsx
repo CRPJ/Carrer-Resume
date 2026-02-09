@@ -1812,7 +1812,7 @@ const Cluster4Content = () => {
                           />
                         );
                       })}
-                      <span className="rating-text">{(currentSeason.rating || 0).toFixed(1)} / 5.0</span>
+                      <span className="rating-text">{currentSeason.rating || 0} / 10</span>
                     </div>
                     <span className="review-label">Season Review</span>
                   </div>
