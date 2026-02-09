@@ -90,15 +90,6 @@ const Cluster4Content = () => {
   };
 
   const headerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = headerRef.current;
-    if (!el) return;
-    const handler = (e: WheelEvent) => { e.preventDefault(); };
-    el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
-  }, []);
-
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isTextFading, setIsTextFading] = useState(false);
