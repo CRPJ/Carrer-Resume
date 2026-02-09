@@ -14,7 +14,7 @@ const defaultSeasonData = {
   dateRange: '2025 - 03 - 23 (월) ~ 2025 - 08 - 22 (일)',
   status: '시즌 진행 중',
   statusClass: 'in-progress',
-  image: '/images/0/cluster4/Cluster4-1/image.png',
+  image: '/images/0/cluster4/cluster4-1/image.png',
   approvedWeeks: 8,
   totalWeeks: 10,
   roleInSeason: '운영진(앰배서더)',
@@ -972,9 +972,9 @@ const Cluster4Content = () => {
 
     const seasonImageMap: { [key: string]: string } = {
       '봄': '/images/0/cluster4/시즌 이미지/봄_후보_1.png',
-      '여름': '/images/0/cluster4/Cluster4-1/image.png',
-      '가을': '/images/0/cluster4/Cluster4-1/image2.png',
-      '겨울': '/images/0/cluster4/Cluster4-1/image3.png'
+      '여름': '/images/0/cluster4/cluster4-1/image.png',
+      '가을': '/images/0/cluster4/cluster4-1/image2.png',
+      '겨울': '/images/0/cluster4/cluster4-1/image3.png'
     };
 
     const getStatusInfo = (progressStatus: string): { status: string; statusClass: string } => {
@@ -1760,12 +1760,12 @@ const Cluster4Content = () => {
               <div className={`season-image-stack ${isFlipping ? 'flipping' : ''}`}>
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/Cluster4-1/image3.png'} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/cluster4-1/image3.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/Cluster4-1/image2.png'} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/cluster4-1/image2.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-front">

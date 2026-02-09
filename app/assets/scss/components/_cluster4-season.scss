@@ -2260,7 +2260,7 @@
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    padding: 30px 40px;
+    padding: 30px 30px;
     width: 100%;
     max-width: 1330px;
     height: 695px;
@@ -2274,7 +2274,6 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    overflow: visible;
 
     // 어두운 오버레이
     &::before {
@@ -2522,8 +2521,8 @@
     // 메인 컨텐츠 그리드 (3열)
     .main-content-grid {
       display: grid;
-      grid-template-columns: 380px 1fr 340px;
-      gap: 20px;
+      grid-template-columns: 300px 1fr 300px;  // 380px 1fr 340px → 축소
+      gap: 15px;                                // 20px → 15px
       position: relative;
       z-index: 1;
 
@@ -3035,9 +3034,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        opacity: 1;
-        transform: translateY(0);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        padding: 0;
+        overflow: hidden;          // 추가: 넘침 방지
 
         &.fading {
           opacity: 0;
@@ -3047,8 +3045,7 @@
 
         // 영역 8: 시즌 상태
         .area-8-season-status {
-          width: 370px;
-          padding: 0;
+          width: 100%;   
 
           .section-title {
             font-size: 16px;
@@ -3076,6 +3073,7 @@
             overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
+            padding: 0;
 
             &::-webkit-scrollbar {
               width: 2px;
@@ -3183,8 +3181,7 @@
 
         // 영역 9: 시즌 평판
         .area-9-season-reputation {
-          width: 370px;
-          padding: 0;
+          width: 100%;   // 370px → 100%  
 
           .section-title {
             font-size: 16px;
@@ -3211,7 +3208,7 @@
             max-height: 340px;         // 카드 2개 + 세번째 살짝 보이는 높이
             overflow-y: auto;          // visible → auto
             overflow-x: hidden;
-            padding: 3px 14px 3px 3px;
+            padding: 3px 3px 3px 0;  
 
             // 커스텀 스크롤바 스타일
             scrollbar-width: thin;
@@ -3232,7 +3229,7 @@
 
             .profile-card {
               position: relative;
-              width: 340px;
+              width: 100%;
               background: radial-gradient(
                 ellipse 51.26% 226.96% at 50% 50%,
                 rgba(15, 30, 26, 0.5) 0%,
