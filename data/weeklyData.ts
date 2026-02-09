@@ -21,7 +21,7 @@ export const growthStatusOptions = ["성공", "실패", "휴식(개인)", "휴�
 export const weeklyData: WeekData[] = [
   {
     id: 1,
-    image: "/images/0/cluster%204/주차 이미지/여름 8주차 (8월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 8주차 (8월 4주차).png",
     title: "2025 여름 시즌, 8주차 (8월 4주차)",
     shortTitle: "2025 여름 시즌, 8주차",
     dateRange: "2025 - 08 - 22 (금) ~ 2025 - 08 - 28 (목)",
@@ -36,7 +36,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 2,
-    image: "/images/0/cluster%204/주차 이미지/여름 7주차 (8월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 7주차 (8월 3주차).png",
     title: "2025 여름 시즌, 7주차 (8월 3주차)",
     shortTitle: "2025 여름 시즌, 7주차",
     dateRange: "2025 - 08 - 15 (금) ~ 2025 - 08 - 21 (목)",
@@ -51,7 +51,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 3,
-    image: "/images/0/cluster%204/주차 이미지/여름 6주차 (8월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 6주차 (8월 2주차).png",
     title: "2025 여름 시즌, 6주차 (8월 2주차)",
     shortTitle: "2025 여름 시즌, 6주차",
     dateRange: "2025 - 08 - 08 (금) ~ 2025 - 08 - 14 (목)",
@@ -66,7 +66,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 4,
-    image: "/images/0/cluster%204/주차 이미지/여름 5주차 (8월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 5주차 (8월 1주차).png",
     title: "2025 여름 시즌, 5주차 (8월 1주차)",
     shortTitle: "2025 여름 시즌, 5주차",
     dateRange: "2025 - 08 - 01 (금) ~ 2025 - 08 - 07 (목)",
@@ -81,7 +81,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 5,
-    image: "/images/0/cluster%204/주차 이미지/여름 4주차 (7월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 4주차 (7월 4주차).png",
     title: "2025 여름 시즌, 4주차 (7월 4주차)",
     shortTitle: "2025 여름 시즌, 4주차",
     dateRange: "2025 - 07 - 25 (금) ~ 2025 - 07 - 31 (목)",
@@ -96,7 +96,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 6,
-    image: "/images/0/cluster%204/주차 이미지/여름 3주차 (7월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 3주차 (7월 3주차).png",
     title: "2025 여름 시즌, 3주차 (7월 3주차)",
     shortTitle: "2025 여름 시즌, 3주차",
     dateRange: "2025 - 07 - 18 (금) ~ 2025 - 07 - 24 (목)",
@@ -111,7 +111,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 7,
-    image: "/images/0/cluster%204/주차 이미지/여름 2주차 (7월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 2주차 (7월 2주차).png",
     title: "2025 여름 시즌, 2주차 (7월 2주차)",
     shortTitle: "2025 여름 시즌, 2주차",
     dateRange: "2025 - 07 - 11 (금) ~ 2025 - 07 - 17 (목)",
@@ -126,7 +126,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 8,
-    image: "/images/0/cluster%204/주차 이미지/여름 1주차 (7월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/여름 1주차 (7월 1주차).png",
     title: "2025 여름 시즌, 1주차 (7월 1주차)",
     shortTitle: "2025 여름 시즌, 1주차",
     dateRange: "2025 - 07 - 04 (금) ~ 2025 - 07 - 10 (목)",
@@ -141,7 +141,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 9,
-    image: "/images/0/cluster%204/주차 이미지/봄 16주차 (6월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 16주차 (6월 4주차).png",
     title: "2025 봄 시즌, 16주차 (6월 4주차)",
     shortTitle: "2025 봄 시즌, 16주차",
     dateRange: "2025 - 06 - 27 (금) ~ 2025 - 07 - 03 (목)",
@@ -156,7 +156,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 10,
-    image: "/images/0/cluster%204/주차 이미지/봄 15주차 (6월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 15주차 (6월 3주차).png",
     title: "2025 봄 시즌, 15주차 (6월 3주차)",
     shortTitle: "2025 봄 시즌, 15주차",
     dateRange: "2025 - 06 - 20 (금) ~ 2025 - 06 - 26 (목)",
@@ -171,7 +171,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 11,
-    image: "/images/0/cluster%204/주차 이미지/봄 14주차 (6월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 14주차 (6월 2주차).png",
     title: "2025 봄 시즌, 14주차 (6월 2주차)",
     shortTitle: "2025 봄 시즌, 14주차",
     dateRange: "2025 - 06 - 13 (금) ~ 2025 - 06 - 19 (목)",
@@ -186,7 +186,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 12,
-    image: "/images/0/cluster%204/주차 이미지/봄 13주차 (6월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 13주차 (6월 1주차).png",
     title: "2025 봄 시즌, 13주차 (6월 1주차)",
     shortTitle: "2025 봄 시즌, 13주차",
     dateRange: "2025 - 06 - 06 (금) ~ 2025 - 06 - 12 (목)",
@@ -201,7 +201,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 13,
-    image: "/images/0/cluster%204/주차 이미지/봄 12주차 (5월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 12주차 (5월 4주차).png",
     title: "2025 봄 시즌, 12주차 (5월 4주차)",
     shortTitle: "2025 봄 시즌, 12주차",
     dateRange: "2025 - 05 - 30 (금) ~ 2025 - 06 - 05 (목)",
@@ -216,7 +216,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 14,
-    image: "/images/0/cluster%204/주차 이미지/봄 11주차 (5월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 11주차 (5월 3주차).png",
     title: "2025 봄 시즌, 11주차 (5월 3주차)",
     shortTitle: "2025 봄 시즌, 11주차",
     dateRange: "2025 - 05 - 23 (금) ~ 2025 - 05 - 29 (목)",
@@ -231,7 +231,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 15,
-    image: "/images/0/cluster%204/주차 이미지/봄 10주차 (5월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 10주차 (5월 2주차).png",
     title: "2025 봄 시즌, 10주차 (5월 2주차)",
     shortTitle: "2025 봄 시즌, 10주차",
     dateRange: "2025 - 05 - 16 (금) ~ 2025 - 05 - 22 (목)",
@@ -246,7 +246,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 16,
-    image: "/images/0/cluster%204/주차 이미지/봄 9주차 (5월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 9주차 (5월 1주차).png",
     title: "2025 봄 시즌, 9주차 (5월 1주차)",
     shortTitle: "2025 봄 시즌, 9주차",
     dateRange: "2025 - 05 - 09 (금) ~ 2025 - 05 - 15 (목)",
@@ -261,7 +261,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 17,
-    image: "/images/0/cluster%204/주차 이미지/봄 8주차 (4월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 8주차 (4월 4주차).png",
     title: "2025 봄 시즌, 8주차 (4월 4주차)",
     shortTitle: "2025 봄 시즌, 8주차",
     dateRange: "2025 - 04 - 25 (금) ~ 2025 - 05 - 01 (목)",
@@ -276,7 +276,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 18,
-    image: "/images/0/cluster%204/주차 이미지/봄 7주차 (4월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 7주차 (4월 3주차).png",
     title: "2025 봄 시즌, 7주차 (4월 3주차)",
     shortTitle: "2025 봄 시즌, 7주차",
     dateRange: "2025 - 04 - 18 (금) ~ 2025 - 04 - 24 (목)",
@@ -291,7 +291,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 19,
-    image: "/images/0/cluster%204/주차 이미지/봄 6주차 (4월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 6주차 (4월 2주차).png",
     title: "2025 봄 시즌, 6주차 (4월 2주차)",
     shortTitle: "2025 봄 시즌, 6주차",
     dateRange: "2025 - 04 - 11 (금) ~ 2025 - 04 - 17 (목)",
@@ -306,7 +306,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 20,
-    image: "/images/0/cluster%204/주차 이미지/봄 5주차 (4월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 5주차 (4월 1주차).png",
     title: "2025 봄 시즌, 5주차 (4월 1주차)",
     shortTitle: "2025 봄 시즌, 5주차",
     dateRange: "2025 - 04 - 04 (금) ~ 2025 - 04 - 10 (목)",
@@ -321,7 +321,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 21,
-    image: "/images/0/cluster%204/주차 이미지/봄 4주차 (3월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 4주차 (3월 4주차).png",
     title: "2025 봄 시즌, 4주차 (3월 4주차)",
     shortTitle: "2025 봄 시즌, 4주차",
     dateRange: "2025 - 03 - 28 (금) ~ 2025 - 04 - 03 (목)",
@@ -336,7 +336,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 22,
-    image: "/images/0/cluster%204/주차 이미지/봄 3주차 (3월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 3주차 (3월 3주차).png",
     title: "2025 봄 시즌, 3주차 (3월 3주차)",
     shortTitle: "2025 봄 시즌, 3주차",
     dateRange: "2025 - 03 - 21 (금) ~ 2025 - 03 - 27 (목)",
@@ -351,7 +351,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 23,
-    image: "/images/0/cluster%204/주차 이미지/봄 2주차 (3월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 2주차 (3월 2주차).png",
     title: "2025 봄 시즌, 2주차 (3월 2주차)",
     shortTitle: "2025 봄 시즌, 2주차",
     dateRange: "2025 - 03 - 14 (금) ~ 2025 - 03 - 20 (목)",
@@ -366,7 +366,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 24,
-    image: "/images/0/cluster%204/주차 이미지/봄 1주차 (3월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/봄 1주차 (3월 1주차).png",
     title: "2025 봄 시즌, 1주차 (3월 1주차)",
     shortTitle: "2025 봄 시즌, 1주차",
     dateRange: "2025 - 03 - 07 (금) ~ 2025 - 03 - 13 (목)",
@@ -381,7 +381,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 25,
-    image: "/images/0/cluster%204/주차 이미지/겨울 12주차 (2월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 12주차 (2월 4주차).png",
     title: "2024 겨울 시즌, 12주차 (2월 4주차)",
     shortTitle: "2024 겨울 시즌, 12주차",
     dateRange: "2025 - 02 - 28 (금) ~ 2025 - 03 - 06 (목)",
@@ -396,7 +396,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 26,
-    image: "/images/0/cluster%204/주차 이미지/겨울 11주차 (2월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 11주차 (2월 3주차).png",
     title: "2024 겨울 시즌, 11주차 (2월 3주차)",
     shortTitle: "2024 겨울 시즌, 11주차",
     dateRange: "2025 - 02 - 21 (금) ~ 2025 - 02 - 27 (목)",
@@ -411,7 +411,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 27,
-    image: "/images/0/cluster%204/주차 이미지/겨울 10주차 (2월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 10주차 (2월 2주차).png",
     title: "2024 겨울 시즌, 10주차 (2월 2주차)",
     shortTitle: "2024 겨울 시즌, 10주차",
     dateRange: "2025 - 02 - 14 (금) ~ 2025 - 02 - 20 (목)",
@@ -426,7 +426,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 28,
-    image: "/images/0/cluster%204/주차 이미지/겨울 9주차 (2월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 9주차 (2월 1주차).png",
     title: "2024 겨울 시즌, 9주차 (2월 1주차)",
     shortTitle: "2024 겨울 시즌, 9주차",
     dateRange: "2025 - 02 - 07 (금) ~ 2025 - 02 - 13 (목)",
@@ -441,7 +441,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 29,
-    image: "/images/0/cluster%204/주차 이미지/겨울 8주차 (1월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 8주차 (1월 4주차).png",
     title: "2024 겨울 시즌, 8주차 (1월 4주차)",
     shortTitle: "2024 겨울 시즌, 8주차",
     dateRange: "2025 - 01 - 31 (금) ~ 2025 - 02 - 06 (목)",
@@ -456,7 +456,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 30,
-    image: "/images/0/cluster%204/주차 이미지/겨울 7주차 (1월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 7주차 (1월 3주차).png",
     title: "2024 겨울 시즌, 7주차 (1월 3주차)",
     shortTitle: "2024 겨울 시즌, 7주차",
     dateRange: "2025 - 01 - 24 (금) ~ 2025 - 01 - 30 (목)",
@@ -471,7 +471,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 31,
-    image: "/images/0/cluster%204/주차 이미지/겨울 6주차 (1월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 6주차 (1월 2주차).png",
     title: "2024 겨울 시즌, 6주차 (1월 2주차)",
     shortTitle: "2024 겨울 시즌, 6주차",
     dateRange: "2025 - 01 - 17 (금) ~ 2025 - 01 - 23 (목)",
@@ -486,7 +486,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 32,
-    image: "/images/0/cluster%204/주차 이미지/겨울 5주차 (1월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 5주차 (1월 1주차).png",
     title: "2024 겨울 시즌, 5주차 (1월 1주차)",
     shortTitle: "2024 겨울 시즌, 5주차",
     dateRange: "2025 - 01 - 10 (금) ~ 2025 - 01 - 16 (목)",
@@ -501,7 +501,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 33,
-    image: "/images/0/cluster%204/주차 이미지/겨울 4주차 (12월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 4주차 (12월 4주차).png",
     title: "2024 겨울 시즌, 4주차 (12월 4주차)",
     shortTitle: "2024 겨울 시즌, 4주차",
     dateRange: "2024 - 12 - 27 (금) ~ 2025 - 01 - 02 (목)",
@@ -516,7 +516,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 34,
-    image: "/images/0/cluster%204/주차 이미지/겨울 3주차 (12월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 3주차 (12월 3주차).png",
     title: "2024 겨울 시즌, 3주차 (12월 3주차)",
     shortTitle: "2024 겨울 시즌, 3주차",
     dateRange: "2024 - 12 - 20 (금) ~ 2024 - 12 - 26 (목)",
@@ -531,7 +531,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 35,
-    image: "/images/0/cluster%204/주차 이미지/겨울 2주차 (12월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 2주차 (12월 2주차).png",
     title: "2024 겨울 시즌, 2주차 (12월 2주차)",
     shortTitle: "2024 겨울 시즌, 2주차",
     dateRange: "2024 - 12 - 13 (금) ~ 2024 - 12 - 19 (목)",
@@ -546,7 +546,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 36,
-    image: "/images/0/cluster%204/주차 이미지/겨울 1주차 (12월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/겨울 1주차 (12월 1주차).png",
     title: "2024 겨울 시즌, 1주차 (12월 1주차)",
     shortTitle: "2024 겨울 시즌, 1주차",
     dateRange: "2024 - 12 - 06 (금) ~ 2024 - 12 - 12 (목)",
@@ -561,7 +561,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 37,
-    image: "/images/0/cluster%204/주차 이미지/가을 6주차 (11월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 6주차 (11월 4주차).png",
     title: "2024 가을 시즌, 6주차 (11월 4주차)",
     shortTitle: "2024 가을 시즌, 6주차",
     dateRange: "2024 - 11 - 29 (금) ~ 2024 - 12 - 05 (목)",
@@ -576,7 +576,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 38,
-    image: "/images/0/cluster%204/주차 이미지/가을 5주차 (11월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 5주차 (11월 3주차).png",
     title: "2024 가을 시즌, 5주차 (11월 3주차)",
     shortTitle: "2024 가을 시즌, 5주차",
     dateRange: "2024 - 11 - 22 (금) ~ 2024 - 11 - 28 (목)",
@@ -591,7 +591,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 39,
-    image: "/images/0/cluster%204/주차 이미지/가을 4주차 (11월 2주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 4주차 (11월 2주차).png",
     title: "2024 가을 시즌, 4주차 (11월 2주차)",
     shortTitle: "2024 가을 시즌, 4주차",
     dateRange: "2024 - 11 - 15 (금) ~ 2024 - 11 - 21 (목)",
@@ -606,7 +606,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 40,
-    image: "/images/0/cluster%204/주차 이미지/가을 3주차 (11월 1주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 3주차 (11월 1주차).png",
     title: "2024 가을 시즌, 3주차 (11월 1주차)",
     shortTitle: "2024 가을 시즌, 3주차",
     dateRange: "2024 - 11 - 08 (금) ~ 2024 - 11 - 14 (목)",
@@ -621,7 +621,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 41,
-    image: "/images/0/cluster%204/주차 이미지/가을 2주차 (10월 4주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 2주차 (10월 4주차).png",
     title: "2024 가을 시즌, 2주차 (10월 4주차)",
     shortTitle: "2024 가을 시즌, 2주차",
     dateRange: "2024 - 11 - 01 (금) ~ 2024 - 11 - 07 (목)",
@@ -636,7 +636,7 @@ export const weeklyData: WeekData[] = [
   },
   {
     id: 42,
-    image: "/images/0/cluster%204/주차 이미지/가을 1주차 (10월 3주차).png",
+    image: "/images/0/cluster4/주차 이미지/가을 1주차 (10월 3주차).png",
     title: "2024 가을 시즌, 1주차 (10월 3주차)",
     shortTitle: "2024 가을 시즌, 1주차",
     dateRange: "2024 - 10 - 25 (금) ~ 2024 - 10 - 31 (목)",

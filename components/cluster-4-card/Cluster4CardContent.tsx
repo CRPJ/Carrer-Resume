@@ -293,9 +293,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const getCompetencyIconPath = (activityTypeId: string): string => {
     const fileName = competencyIconMap[activityTypeId];
     if (fileName) {
-      return `/images/0/cluster%204/icon/실무 역량/${fileName}`;
+      return `/images/0/cluster4/icon/실무 역량/${fileName}`;
     }
-    return '/images/0/cluster%204/icon/실무 역량/실무 역량 - default.png';
+    return '/images/0/cluster4/icon/실무 역량/실무 역량 - default.png';
   };
 
   // 실무 경험 아이콘 매핑 (activity_type_id → 이미지 파일명)
@@ -310,9 +310,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const getExperienceIconPath = (activityTypeId: string): string => {
     const fileName = experienceIconMap[activityTypeId];
     if (fileName) {
-      return `/images/0/cluster%204/icon/실무 경험/${fileName}`;
+      return `/images/0/cluster4/icon/실무 경험/${fileName}`;
     }
-    return '/images/0/cluster%204/icon/실무 경험/실무 경험 - default.png';
+    return '/images/0/cluster4/icon/실무 경험/실무 경험 - default.png';
   };
 
   // 시즌 이름 변환 맵
@@ -1152,7 +1152,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [subTitleText, setSubTitleText] = useState("");
 
   // 기본값 설정
-  const restImage = "/images/0/cluster%204/주차%20이미지/휴식(개인,공식).png";
+  const restImage = "/images/0/cluster4/주차%20이미지/휴식(개인,공식).png";
 
   // 휴식 모드 체크 (휴식(개인), 휴식(공식)일 때 모든 카드 비활성화)
   const isRestMode = weekData?.growthStatus?.includes('휴식') || false;
@@ -1176,7 +1176,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const holidaySuffix = data.holidayName ? ` ${data.holidayName}` : '';
 
     // 파일명 형식: "겨울 1주차 (1월 1주차).png" 또는 "겨울 6주차 (2월 2주차 설,구정).png"
-    return `/images/0/cluster%204/주차 이미지/${data.seasonName} ${data.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+    return `/images/0/cluster4/주차 이미지/${data.seasonName} ${data.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
   };
 
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
@@ -1184,7 +1184,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     ? restImage
     : weekData
       ? getWeekImagePath(weekData)
-      : "/images/0/cluster%204/주차 이미지/겨울 1주차 (1월 1주차).png";
+      : "/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png";
   const currentTitle = weekData
     ? `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
@@ -1212,31 +1212,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         return {
           className: 'success',
           text: '성장(성공)',
-          icon: '/images/0/cluster%204/icon/icon - 성장(성공).png'
+          icon: '/images/0/cluster4/icon/icon - 성장(성공).png'
         };
       case '실패':
         return {
           className: 'fail',
           text: '성장(실패)',
-          icon: '/images/0/cluster%204/icon/icon - 성장(실패).png'
+          icon: '/images/0/cluster4/icon/icon - 성장(실패).png'
         };
       case '휴식(개인)':
         return {
           className: 'rest-personal',
           text: '휴식(개인)',
-          icon: '/images/0/cluster%204/icon/icon - 휴식(개인).png'
+          icon: '/images/0/cluster4/icon/icon - 휴식(개인).png'
         };
       case '휴식(공식)':
         return {
           className: 'rest-official',
           text: '휴식(공식)',
-          icon: '/images/0/cluster%204/icon/icon - 휴식(공식).png'
+          icon: '/images/0/cluster4/icon/icon - 휴식(공식).png'
         };
       default:
         return {
           className: 'success',
           text: '성장(성공)',
-          icon: '/images/0/cluster%204/icon/icon - 성장(성공).png'
+          icon: '/images/0/cluster4/icon/icon - 성장(성공).png'
         };
     }
   };
@@ -1364,13 +1364,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 실무 정보 activity_type_id → UI 매핑
   const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
-    'wisdom': { category: '위즈덤', tagColor: 'tag--red', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 위즈덤.png', isFruit: true },
-    'essay': { category: '에세이', tagColor: 'tag--yellow', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 에세이.png', isFruit: true },
-    'infodesk': { category: '인포데스크', tagColor: 'tag--purple', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 인포데스크.png', isFruit: true },
-    'calendar': { category: '캘린더', tagColor: 'tag--dark', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
-    'forum': { category: '포럼', tagColor: 'tag--green', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 포럼.png', isFruit: true },
-    'session': { category: '세션', tagColor: 'tag--cyan', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 세션.png', isFruit: true },
-    'etc_a': { category: '기타a', tagColor: 'tag--mint', icon: '/images/0/cluster%204/icon/실무 정보/실무 정보 - 기타a.png', isFruit: false },
+    'wisdom': { category: '위즈덤', tagColor: 'tag--red', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 위즈덤.png', isFruit: true },
+    'essay': { category: '에세이', tagColor: 'tag--yellow', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 에세이.png', isFruit: true },
+    'infodesk': { category: '인포데스크', tagColor: 'tag--purple', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 인포데스크.png', isFruit: true },
+    'calendar': { category: '캘린더', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
+    'forum': { category: '포럼', tagColor: 'tag--green', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 포럼.png', isFruit: true },
+    'session': { category: '세션', tagColor: 'tag--cyan', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 세션.png', isFruit: true },
+    'etc_a': { category: '기타a', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: false },
   };
 
   // 실무 정보에 해당하는 activity types
@@ -1489,10 +1489,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 강화 상태별 아이콘
   const enhancementStatusIcons: { [key in EnhancementStatus]: string } = {
-    'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-    'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-    'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-    'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png',
+    'success': '/images/0/cluster4/icon/5 강화 성공.png',
+    'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+    'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+    'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png',
   };
 
   // 특정 activity_type의 2차 정보 가져오기
@@ -1860,10 +1860,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         .map((record, index) => {
           // 강화 상태에 따른 배지 결정
           const getStatusBadge = (enhStatus: string) => {
-            if (enhStatus === 'enhanced') return '/images/0/cluster%204/icon/5 강화 성공.png';
-            if (enhStatus === 'failed') return '/images/0/cluster%204/icon/7 강화 실패.png';
-            if (enhStatus === 'pending') return '/images/0/cluster%204/icon/6 강화 대기.png';
-            return '/images/0/cluster%204/icon/8 해당 없음.png';
+            if (enhStatus === 'enhanced') return '/images/0/cluster4/icon/5 강화 성공.png';
+            if (enhStatus === 'failed') return '/images/0/cluster4/icon/7 강화 실패.png';
+            if (enhStatus === 'pending') return '/images/0/cluster4/icon/6 강화 대기.png';
+            return '/images/0/cluster4/icon/8 해당 없음.png';
           };
 
           return {
@@ -1875,7 +1875,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             date: formatDate(record.created_at),
             likes: record.grade_points ? `${record.grade_points / 10}` : '0',
             hasWeb: (record.output_links?.length || 0) > 0,
-            icon: record.company_logo_url || '/images/0/cluster%204/icon/default-company.png',
+            icon: record.company_logo_url || '/images/0/cluster4/icon/default-company.png',
             supervisorImg: record.supervisor_profile_img || '/images/0/crew profile/default.jpg',
             supervisorName: record.supervisor_name || '-',
             supervisorDept: record.supervisor_department || '',
@@ -1945,7 +1945,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         stars.push(
           <img
             key={i}
-            src="/images/0/cluster%204/icon/icon - star.png"
+            src="/images/0/cluster4/icon/icon - star.png"
             alt="star"
             className="star filled"
           />
@@ -1954,8 +1954,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         // 반개 별
         stars.push(
           <span key={i} className="star half">
-            <img src="/images/0/cluster%204/icon/icon - star.png" alt="star" className="star-half-filled" />
-            <img src="/images/0/cluster%204/icon/icon - empty star.png" alt="star" className="star-half-empty" />
+            <img src="/images/0/cluster4/icon/icon - star.png" alt="star" className="star-half-filled" />
+            <img src="/images/0/cluster4/icon/icon - empty star.png" alt="star" className="star-half-empty" />
           </span>
         );
       } else {
@@ -1963,7 +1963,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         stars.push(
           <img
             key={i}
-            src="/images/0/cluster%204/icon/icon - empty star.png"
+            src="/images/0/cluster4/icon/icon - empty star.png"
             alt="star"
             className="star empty"
           />
@@ -1979,17 +1979,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
           <Link href="/cluster-4" className="tab active">
-            <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
+            <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </Link>
           <Link href="/cluster-4-1" className="tab">
-            <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
+            <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </Link>
         </div>
@@ -2001,27 +2001,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {prevWeekId ? (
             <Link href={`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-prev">
               <span>이전 주</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
             </Link>
           ) : (
             <button className="nav-btn-prev disabled" disabled>
               <span>이전 주</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
             </button>
           )}
           {nextWeekId ? (
             <Link href={`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-next">
               <span>다음 주</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </Link>
           ) : (
             <button className="nav-btn-next disabled" disabled>
               <span>다음 주</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
           <Link href="/cluster-4" className="nav-btn-filled">
-            <img src="/images/0/cluster%204/icon/icon%20-%201.png" alt="list" className="list-icon" />
+            <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
         </div>
@@ -2048,7 +2048,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {session && !isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
-              <img src="/images/0/cluster%204/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
+              <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>
         )}
@@ -2079,15 +2079,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="header-info-row">
               <div className="info-badge date">
-                <img src="/images/0/cluster%204/icon/icon - 6.png" alt="calendar" />
+                <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" />
                 <span>{weekData ? `${formatDate(weekData.startDate)} ~ ${formatDate(weekData.endDate)}` : '로딩 중...'}</span>
               </div>
               <div className="info-badge role">
-                <img src="/images/0/cluster%204/icon/Interface/Star-3.png" alt="role" />
+                <img src="/images/0/cluster4/icon/Interface/Star-3.png" alt="role" />
                 <span>{roleLabel || '-'}</span>
               </div>
               <div className="info-badge week">
-                <img src="/images/0/cluster%204/icon/icon - 7.png" alt="week" />
+                <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
                 <span><span className="highlight">{cumulativeApprovedWeeks}</span> / 30 주차</span>
               </div>
             </div>
@@ -2108,21 +2108,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-group right">
                 <span className="info-item with-icon">
                   단감
-                  <img src="/images/0/cluster%204/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                  <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
                   <strong className="number-value">{weekPoints.star}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   인절미
-                  <img src="/images/0/cluster%204/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                  <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
                   <strong className="number-value">{cumulativeInjeolmi}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   어흥
-                  <img src="/images/0/cluster%204/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                  <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
                   <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
                   개
                 </span>
@@ -2133,7 +2133,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 주차 평판 */}
           <div className="reputation-section">
             <div className="section-title-row">
-              <img src="/images/0/cluster%204/icon/icon - 주차 평판.png" alt="주차 평판" className="section-icon" />
+              <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판" className="section-icon" />
               <span className="section-label">주차 평판</span>
               <span className="section-count"><span className="count-num">{weeklyReputations.length}</span>/3</span>
             </div>
@@ -2180,9 +2180,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
                     <span className="rating-count">{isEmpty ? '- / 10' : user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{isEmpty ? '-' : <>{user.description.slice(0, 20)}... <img src="/images/0/cluster%204/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
+                  <div className="card-description">{isEmpty ? '-' : <>{user.description.slice(0, 20)}... <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
                   <div className="card-footer">
-                    <span className="fm-badge"><img src="/images/0/cluster%204/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
+                    <span className="fm-badge"><img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
                     <span className="footer-divider">|</span>
                     <span className={`tag ${isEmpty ? 'tag--dark' : user.tagColor}`}>{isEmpty ? '-' : user.tagText}</span>
                   </div>
@@ -2195,7 +2195,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 연계 동료 */}
           <div className="colleague-section">
             <div className="section-title-row">
-              <img src="/images/0/cluster%204/icon/icon - 연계 동료.png" alt="연계 동료" className="section-icon" />
+              <img src="/images/0/cluster4/icon/icon - 연계 동료.png" alt="연계 동료" className="section-icon" />
               <span className="section-label">연계 동료</span>
               <span className="section-count"><span className="count-num">{selectedColleagues.length}</span>/3</span>
             </div>
@@ -2224,7 +2224,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
                         <div className="date-view">
                           <span className="date">{isEmpty ? '0000 - 00 - 00 (일)' : user.date}</span>
-                          <img src="/images/0/cluster%204/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
+                          <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
                         </div>
                       </div>
                       <div className="profile-details">
@@ -2251,7 +2251,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-left">
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
-              <span className="growth-count"><img src="/images/0/cluster%204/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
+              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
             <div className="progress-bar-container">
               <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
@@ -2263,10 +2263,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-right">
             <span className="growth-label">라인별 강화 결과</span>
             <div className="legend-items">
-              <span className="legend-item"><img src="/images/0/cluster%204/icon/5 강화 성공.png" alt="강화 성공" className="legend-icon" />강화 성공</span>
-              <span className="legend-item"><img src="/images/0/cluster%204/icon/6 강화 대기.png" alt="강화 대기" className="legend-icon" />강화 대기</span>
-              <span className="legend-item"><img src="/images/0/cluster%204/icon/7 강화 실패.png" alt="강화 실패" className="legend-icon" />강화 실패</span>
-              <span className="legend-item"><img src="/images/0/cluster%204/icon/8 해당 없음.png" alt="해당 없음" className="legend-icon glow" />해당 없음</span>
+              <span className="legend-item"><img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" className="legend-icon" />강화 성공</span>
+              <span className="legend-item"><img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" className="legend-icon" />강화 대기</span>
+              <span className="legend-item"><img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" className="legend-icon" />강화 실패</span>
+              <span className="legend-item"><img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" className="legend-icon glow" />해당 없음</span>
             </div>
           </div>
         </div>
@@ -2293,7 +2293,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster%204/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
+              <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 정보</span>
               <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             </div>
@@ -2319,9 +2319,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               >
                 <div className="card-content-area">
                   <div className="card-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
-                    <img src="/images/0/cluster%204/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                     <span className="verified-text">Verified</span>
                     {!isEmpty && card.category && <span className={`tag ${card.tagColor}`}>{card.category}</span>}
                   </div>
@@ -2343,7 +2343,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       )}
                     </div>
-                    <span className="card-desc">{isEmpty ? '-' : <>{card.title || '-'}<img src="/images/0/cluster%204/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                    <span className="card-desc">{isEmpty ? '-' : <>{card.title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                   </div>
                 </div>
                 {!isEmpty && card.status && card.statusIcon && (
@@ -2379,7 +2379,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster%204/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
+              <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 역량</span>
               <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             </div>
@@ -2426,11 +2426,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="card-content-area">
                   <div className="card-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                     {hasActivity && enhancementStatus === 'success' && (
                       <>
-                        <img src="/images/0/cluster%204/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                        <img src="/images/0/cluster4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                         <span className="verified-text">Verified</span>
                       </>
                     )}
@@ -2443,24 +2443,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <p className="main-desc">{(isRestMode || !hasActivity) ? '-' : (displayActivity?.title || '-')}</p>
                   <div className="sub-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{(isRestMode || !hasActivity) ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster%204/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc">{(isRestMode || !hasActivity) ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                 </div>
                 {!isRestMode && hasActivity && (
                   <div className="status-badge">
-                    {enhancementStatus === 'success' && <img src="/images/0/cluster%204/icon/5 강화 성공.png" alt="강화 성공" />}
-                    {enhancementStatus === 'waiting' && <img src="/images/0/cluster%204/icon/6 강화 대기.png" alt="강화 대기" />}
-                    {enhancementStatus === 'failed' && <img src="/images/0/cluster%204/icon/7 강화 실패.png" alt="강화 실패" />}
-                    {enhancementStatus === 'not_applicable' && <img src="/images/0/cluster%204/icon/8 해당 없음.png" alt="해당 없음" />}
+                    {enhancementStatus === 'success' && <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" />}
+                    {enhancementStatus === 'waiting' && <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" />}
+                    {enhancementStatus === 'failed' && <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />}
+                    {enhancementStatus === 'not_applicable' && <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />}
                   </div>
                 )}
               </div>
             );
           })()}
           <div className="character-image">
-            <img src="/images/0/cluster%204/bg img 2.png" alt="character" />
+            <img src="/images/0/cluster4/bg img 2.png" alt="character" />
           </div>
         </div>
       </div>
@@ -2493,7 +2493,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster%204/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
+              <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 경험</span>
               <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             </div>
@@ -2532,7 +2532,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {[1,2,3,4,5].map((star) => (
                           <img
                             key={star}
-                            src={isEmpty || star > card.rating ? "/images/0/cluster%204/icon/icon - empty star.png" : "/images/0/cluster%204/icon/icon - star.png"}
+                            src={isEmpty || star > card.rating ? "/images/0/cluster4/icon/icon - empty star.png" : "/images/0/cluster4/icon/icon - star.png"}
                             alt="star"
                             className="star"
                           />
@@ -2544,30 +2544,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="card-bottom-area">
                   <div className="card-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                     {!isEmpty && card.verified && (
                       <>
-                        <img src="/images/0/cluster%204/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                        <img src="/images/0/cluster4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                         <span className="verified-text">Verified</span>
                       </>
                     )}
                   </div>
                   <p className="main-desc">{isEmpty ? '-' : card.title}</p>
                   <div className="sub-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster%204/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                 </div>
                 {!isEmpty && (
                   <div className={`status-badge ${card.enhancementStatus}`}>
                     {(() => {
                       const statusImages: Record<string, string> = {
-                        'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-                        'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-                        'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-                        'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png'
+                        'success': '/images/0/cluster4/icon/5 강화 성공.png',
+                        'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+                        'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+                        'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png'
                       };
                       return <img src={statusImages[card.enhancementStatus] || statusImages['not_applicable']} alt="강화 상태" />;
                     })()}
@@ -2605,7 +2605,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster%204/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
+              <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 경력</span>
               <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             </div>
@@ -2636,7 +2636,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="card-header-area">
                     <div className="card-header-row">
-                      <img src="/images/0/cluster%204/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
+                      <img src="/images/0/cluster4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />
                       <span className="verified-text">Verified</span>
                       <span className="code-tag">{isEmpty ? '-' : card.code}</span>
                     </div>
@@ -2652,15 +2652,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="card-bottom-area">
                   <p className="category-text">{isEmpty ? '-' : card.badge.replace('|', ' - ')}</p>
                   <div className="card-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">프로젝트</span>
                   </div>
                   <p className="main-desc-white">{isEmpty ? '-' : card.title}</p>
                   <div className="sub-title-row">
-                    <img src="/images/0/cluster%204/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">설명</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (card.projectDescription || '-')}{!isEmpty && <img src="/images/0/cluster%204/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (card.projectDescription || '-')}{!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
                     <div className="supervisor-info">
@@ -2684,7 +2684,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <i className="ti ti-check"></i>
                       </span>
                     </div>
-                    <span className="likes"><img src="/images/0/cluster%204/icon/icon%20-%209.png" alt="likes" className="likes-icon" />{isEmpty ? '0,99' : card.likes}</span>
+                    <span className="likes"><img src="/images/0/cluster4/icon/icon%20-%209.png" alt="likes" className="likes-icon" />{isEmpty ? '0,99' : card.likes}</span>
                   </div>
                 </div>
                 {!isEmpty && card.statusBadge && (
@@ -2725,25 +2725,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="modal-status-badge">
                         {card.status === "success" && (
                           <>
-                            <img src="/images/0/cluster%204/icon/5 강화 성공.png" alt="강화성공" />
+                            <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화성공" />
                             <span className="status-text success">강화성공</span>
                           </>
                         )}
                         {card.status === "waiting" && (
                           <>
-                            <img src="/images/0/cluster%204/icon/6 강화 대기.png" alt="강화대기" />
+                            <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화대기" />
                             <span className="status-text waiting">강화대기</span>
                           </>
                         )}
                         {card.status === "failed" && (
                           <>
-                            <img src="/images/0/cluster%204/icon/7 강화 실패.png" alt="강화실패" />
+                            <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화실패" />
                             <span className="status-text fail">강화실패</span>
                           </>
                         )}
                         {card.status === "not_applicable" && (
                           <>
-                            <img src="/images/0/cluster%204/icon/8 해당 없음.png" alt="해당없음" />
+                            <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당없음" />
                             <span className="status-text not-applicable">해당없음</span>
                           </>
                         )}
@@ -2904,7 +2904,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="modal-card-header-row">
                   <div className="modal-card-left">
                     <div className="modal-fruit-icon fruit">
-                      <img src={abilityActivity ? getCompetencyIconPath(abilityActivity.activity_type_id) : '/images/0/cluster%204/icon/실무 역량/실무 역량 - default.png'} alt="실무 역량" />
+                      <img src={abilityActivity ? getCompetencyIconPath(abilityActivity.activity_type_id) : '/images/0/cluster4/icon/실무 역량/실무 역량 - default.png'} alt="실무 역량" />
                     </div>
                     <div className="modal-card-info">
                       <span className="modal-card-tag tag--cyan">{abilityActivityTypeInfo?.name || '-'}</span>
@@ -2922,10 +2922,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         'not_applicable': '해당없음'
                       };
                       const statusImages: Record<string, string> = {
-                        'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-                        'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-                        'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-                        'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png'
+                        'success': '/images/0/cluster4/icon/5 강화 성공.png',
+                        'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+                        'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+                        'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png'
                       };
                       return (
                         <div className={`modal-status-badge ${abilityEnhancementStatus}`}>
@@ -3107,10 +3107,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           'not_applicable': '해당없음'
                         };
                         const statusImages: Record<string, string> = {
-                          'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-                          'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-                          'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-                          'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png'
+                          'success': '/images/0/cluster4/icon/5 강화 성공.png',
+                          'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+                          'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+                          'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png'
                         };
                         return (
                           <div className={`modal-status-badge ${enhStatus}`}>
@@ -3131,7 +3131,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           {[1, 2, 3, 4, 5].map((star) => (
                             <img
                               key={star}
-                              src={star <= card.rating ? "/images/0/cluster%204/icon/icon - star.png" : "/images/0/cluster%204/icon/icon - empty star.png"}
+                              src={star <= card.rating ? "/images/0/cluster4/icon/icon - star.png" : "/images/0/cluster4/icon/icon - empty star.png"}
                               alt="star"
                               className="modal-star"
                             />
@@ -3848,25 +3848,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="work-view-right">
                   {selectedWorkInfoCard.status === "success" && (
                     <div className="status-badge success">
-                      <img src="/images/0/cluster%204/icon/5 강화 성공.png" alt="강화성공" />
+                      <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화성공" />
                       <span>강화성공</span>
                     </div>
                   )}
                   {selectedWorkInfoCard.status === "waiting" && (
                     <div className="status-badge waiting">
-                      <img src="/images/0/cluster%204/icon/6 강화 대기.png" alt="강화대기" />
+                      <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화대기" />
                       <span>강화대기</span>
                     </div>
                   )}
                   {selectedWorkInfoCard.status === "failed" && (
                     <div className="status-badge fail">
-                      <img src="/images/0/cluster%204/icon/7 강화 실패.png" alt="강화실패" />
+                      <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화실패" />
                       <span>강화실패</span>
                     </div>
                   )}
                   {selectedWorkInfoCard.status === "not_applicable" && (
                     <div className="status-badge not-applicable">
-                      <img src="/images/0/cluster%204/icon/8 해당 없음.png" alt="해당없음" />
+                      <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당없음" />
                       <span>해당없음</span>
                     </div>
                   )}
@@ -3929,10 +3929,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           'not_applicable': '해당없음'
         };
         const statusImages: Record<string, string> = {
-          'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-          'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-          'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-          'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png'
+          'success': '/images/0/cluster4/icon/5 강화 성공.png',
+          'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+          'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+          'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png'
         };
 
         return (
@@ -3947,7 +3947,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="work-view-header-row">
                   <div className="work-view-left">
                     <div className="work-icon-box fruit">
-                      <img src={displayActivity ? getCompetencyIconPath(displayActivity.activity_type_id) : '/images/0/cluster%204/icon/실무 역량/실무 역량 - default.png'} alt="실무 역량" />
+                      <img src={displayActivity ? getCompetencyIconPath(displayActivity.activity_type_id) : '/images/0/cluster4/icon/실무 역량/실무 역량 - default.png'} alt="실무 역량" />
                     </div>
                     <span className="category-title">{activityTypeInfo?.name || '-'}</span>
                     <span className="code-badge">{activityTypeInfo?.line_code || '-'}</span>
@@ -4037,10 +4037,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       'not_applicable': '해당없음'
                     };
                     const statusImages: Record<string, string> = {
-                      'success': '/images/0/cluster%204/icon/5 강화 성공.png',
-                      'waiting': '/images/0/cluster%204/icon/6 강화 대기.png',
-                      'failed': '/images/0/cluster%204/icon/7 강화 실패.png',
-                      'not_applicable': '/images/0/cluster%204/icon/8 해당 없음.png'
+                      'success': '/images/0/cluster4/icon/5 강화 성공.png',
+                      'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
+                      'failed': '/images/0/cluster4/icon/7 강화 실패.png',
+                      'not_applicable': '/images/0/cluster4/icon/8 해당 없음.png'
                     };
                     return (
                       <div className={`status-badge ${enhStatus}`}>

@@ -67,7 +67,7 @@ const Cluster4Content = () => {
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
               <div className="season-badge">
-                <img src="/images/0/cluster%204/Vector.png" alt="Badge Border" className="badge-border" />
+                <img src="/images/0/cluster4/Vector.png" alt="Badge Border" className="badge-border" />
                 <div className="badge-fill">
                   <span className="badge-text">성장 진행 중</span>
                 </div>
@@ -77,7 +77,7 @@ const Cluster4Content = () => {
             {/* Add new collection 카드 */}
             <div className="collection-card">
               <div className="collection-icon">
-                <img src="/images/0/cluster%204/icon/profile.png" alt="Profile Icon" />
+                <img src="/images/0/cluster4/icon/profile.png" alt="Profile Icon" />
               </div>
               <div className="collection-content">
                 <div className="collection-header">
@@ -124,7 +124,7 @@ const Cluster4Content = () => {
 
           {/* 오른쪽 캐릭터 이미지 */}
           <div className="card-right">
-            <img src="/images/0/cluster%204/bg cha.png" alt="Character" />
+            <img src="/images/0/cluster4/bg cha.png" alt="Character" />
           </div>
         </div>
       </section>
@@ -178,17 +178,17 @@ const Cluster4Content = () => {
               <div className="season-image-stack">
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src="/images/0/cluster%204/Image background.png" alt="Season Card 3" />
+                    <img src="/images/0/cluster4/Image background.png" alt="Season Card 3" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src="/images/0/cluster%204/Image background.png" alt="Season Card 2" />
+                    <img src="/images/0/cluster4/Image background.png" alt="Season Card 2" />
                   </div>
                 </div>
                 <div className="image-card card-front">
                   <div className="card-frame">
-                    <img src="/images/0/cluster%204/Image background.png" alt="Season Card 1" />
+                    <img src="/images/0/cluster4/Image background.png" alt="Season Card 1" />
                   </div>
                 </div>
               </div>
