@@ -20,7 +20,7 @@ const defaultSeasonData = {
   roleInSeason: '운영진(앰배서더)',
   isQualified: true,
   seasonRoles: [
-    { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: true, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 7.png' },
+    { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 7.png' },
     { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 8.png' },
     { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 5, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 9.png' },
   ],
