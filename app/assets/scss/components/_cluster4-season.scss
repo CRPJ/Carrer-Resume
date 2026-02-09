@@ -1,4 +1,5 @@
 // Cluster 4 - Club Challenge Growth Styles
+@import url('https://fonts.googleapis.com/css2?family=Khula:wght@800&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
@@ -183,38 +184,26 @@
       z-index: 1;
       text-align: center;
       padding-top: 48px;
-      margin-bottom: 37px;
+      margin-bottom: 20px;
+      height: 130px;          // 추가
+      overflow: visible;      // 추가
+    
 
       .title-inner {
         position: relative;
-        display: inline-block;
+        display: block;        // inline-block → block
+        width: 100%;           // 추가
+        text-align: center;    // 추가
       }
-    }
-
-    // 타이틀 그림자
-    .section1-title-shadow {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 72px;
-      font-weight: 900;
-      color: #111;
-      -webkit-text-stroke: 1px #21E786;
-      text-stroke: 1px #21E786;
-      text-align: center;
-      letter-spacing: 0;
-      margin: 0;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      z-index: 0;
-      white-space: nowrap;
-      @include stacked-title-layer(1.05, true);
     }
 
     // 타이틀
     .section1-title {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px !important;
+      text-transform: uppercase;
       color: #FFF;
       text-align: center;
       letter-spacing: 0;
@@ -222,6 +211,7 @@
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      text-shadow: 3px 3px 0 #111, 4px 4px 0 rgba(33, 231, 134, 0.7);
       @include stacked-title-layer(1.05, true);
     }
 
@@ -230,7 +220,7 @@
       max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
-      line-height: 1.6;
+      line-height: 22px;
       position: relative;
       z-index: 1;
       text-align: left;
@@ -247,7 +237,7 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 20px;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
@@ -631,8 +621,8 @@
         position: absolute;
         right: 25px;
         bottom: 10px;
-        width: 520px;
-        height: 655px;
+        width: 702px;
+        height: 732px;
         z-index: 10;
         display: flex;
         align-items: flex-end;

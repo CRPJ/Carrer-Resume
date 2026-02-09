@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -84,6 +84,16 @@ const Cluster4Content = () => {
 
     openModalFn();
   };
+
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => { e.preventDefault(); };
+    el.addEventListener('wheel', handler, { passive: false });
+    return () => el.removeEventListener('wheel', handler);
+  }, []);
 
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
@@ -1391,8 +1401,8 @@ const Cluster4Content = () => {
       setSeasonReviewSuccess(true);
 
       // 현재 시즌 데이터 업데이트
-      setSeasonHistories(prev => prev.map((season, idx) =>
-        idx === currentSeasonInfo.index
+      setSeasonHistories(prev => prev.map((season) =>
+        currentSeasonInfo && season.year === String(currentSeasonInfo.year) && season.season === currentSeasonInfo.name
           ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() }
           : season
       ));
@@ -1409,11 +1419,11 @@ const Cluster4Content = () => {
       setSeasonReviewSaving(false);
     }
   };
-
+ 
   return (
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
-      <section className="cluster4-section1">
+      <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
           <Link href="/cluster-4" className="tab">
@@ -1434,10 +1444,9 @@ const Cluster4Content = () => {
 
         {/* 타이틀 */}
         <div className="section1-title-wrapper">
-          <div className="title-inner">
-            <h2 className="section1-title-shadow">CLUB CHALLENGE GROWTH</h2>
-            <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
-          </div>
+        <div className="title-inner">
+          <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
+        </div>
         </div>
 
         {/* 설명 텍스트 */}

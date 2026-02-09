@@ -47,6 +47,16 @@ const Cluster3Content = () => {
     openModalFn();
   };
 
+  const section1Ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = section1Ref.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => { e.preventDefault(); };
+    el.addEventListener('wheel', handler, { passive: false });
+    return () => el.removeEventListener('wheel', handler);
+  }, []);
+
   // 현재 활성화된 슬라이드 인덱스
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -732,7 +742,7 @@ const Cluster3Content = () => {
   return (
     <div className="cluster3-content">
       {/* Section 1: CLUB FINAL INDEX - 새 디자인 */}
-      <section className="cluster3-section1">
+      <section className="cluster3-section1" ref={section1Ref}>
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
           <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
