@@ -506,7 +506,7 @@ export async function GET(request: NextRequest) {
         star,
         lightning,
         shield,
-        injeolmi: cumulativeInjeolmi,
+        injeolmi: shield,
         growthStatus,
         cumulativeApprovedWeeks,
         growthRate: {
