@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     // 활성 크루만 조회
     let query = supabase
       .from("user_profiles")
-      .select("id, display_name, gender, birth_date, profile_photo_url, vision")
+      .select("id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first")
       .in("growth_status", ["active", "suspended", "seasonal_rest"])
       .not("display_name", "is", null)
       .order("display_name", { ascending: true });
@@ -89,6 +89,28 @@ export async function GET(request: Request) {
       };
     });
 
+    // 누적 단감(stars) 조회
+    const { data: cumulativePoints } = await supabase
+      .from("user_cumulative_points")
+      .select("user_id, total_stars")
+      .in("user_id", userIds);
+
+    const starsMap: { [key: string]: number } = {};
+    cumulativePoints?.forEach(cp => {
+      starsMap[cp.user_id] = cp.total_stars || 0;
+    });
+
+    // 누적 주차(approved_weeks) 조회
+    const { data: growthStats } = await supabase
+      .from("user_growth_stats")
+      .select("user_id, approved_weeks")
+      .in("user_id", userIds);
+
+    const weeksMap: { [key: string]: number } = {};
+    growthStats?.forEach(gs => {
+      weeksMap[gs.user_id] = gs.approved_weeks || 0;
+    });
+
     // 데이터 변환
     const crewList = users.map(user => {
       // 나이 계산
@@ -113,6 +135,12 @@ export async function GET(request: Request) {
         team: teamPart?.teamName || '-',
         part: teamPart?.partName || '-',
         nickname: user.vision || '-',
+        club: user.club || '-',
+        universityMajor: [user.university, user.major_first].filter(Boolean).join(' ') || '-',
+        status: user.status || '-',
+        growthStatus: user.growth_status || '-',
+        totalStars: starsMap[user.id] || 0,
+        approvedWeeks: weeksMap[user.id] || 0,
       };
     });
 

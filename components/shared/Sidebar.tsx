@@ -1,10 +1,12 @@
 "use client";
 import logo from "@/public/images/0/header-logo.png";
 import one from "@/public/images/sidebar/one.png";
-import three from "@/public/images/sidebar/three.png";
-import two from "@/public/images/sidebar/two.png";
+import  two from "@/public/images/sidebar/three.png";
+import  three from "@/public/images/sidebar/two.png";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Define the type for the game object
@@ -24,6 +26,18 @@ const games: Game[] = [
   { id: 9, image: three },
 ];
 const Sidebar = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleCareerResumeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (session?.user) {
+      router.push("/cluster-4");
+    } else {
+      alert("현재 활동 중이거나 졸업한 크루여야 합니다");
+    }
+  };
+
   return (
     <aside className="nftg-sidebar">
       <div className="container">
@@ -38,7 +52,7 @@ const Sidebar = () => {
               <div className="sidebar__widget sidebar--links">
                 <ul>
                   <li>
-                    <Link href="/games" aria-label="browse latest games" title="browse latest games">
+                    <Link href="/weekly-ranking" aria-label="주간 랭킹" title="주간 랭킹">
                       <i className="ti ti-layout-grid-add"></i>
                       <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
                         <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
@@ -46,7 +60,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/leaderboard" aria-label="view leaderboard" title="view leaderboard">
+                    <Link href="/crews" aria-label="크루" title="크루">
                       <i className="ti ti-chart-bar"></i>
                       <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
                         <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
@@ -54,20 +68,20 @@ const Sidebar = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/badges" aria-label="view badges" title="view badges">
+                    <a href="#" onClick={(e) => e.preventDefault()} aria-label="졸업 절차" title="졸업 절차" style={{ cursor: "default" }}>
                       <i className="ti ti-tag"></i>
                       <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
                         <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
                       </svg>
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link href="/profile" aria-label="refer and earn" title="refer and earn">
+                    <a href="#" onClick={handleCareerResumeClick} aria-label="커리어 레쥬메" title="커리어 레쥬메">
                       <i className="ti ti-coin"></i>
                       <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
                         <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
                       </svg>
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>
