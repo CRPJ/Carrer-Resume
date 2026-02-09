@@ -425,7 +425,7 @@ const Cluster4RankingContent = () => {
               }}
             >
               <div className="card-left">
-                <img src="/images/0/cluster 4/icon/icon - 1.png" alt="reset" className="filter-icon" />
+                <img src="/images/0/cluster%204/icon/icon - 1.png" alt="reset" className="filter-icon" />
                 <span>Reset</span>
               </div>
             </div>
@@ -444,7 +444,7 @@ const Cluster4RankingContent = () => {
               }}
             >
               <div className="card-left">
-                <img src="/images/0/cluster 4/icon/icon - 2.png" alt="calendar" className="card-icon" />
+                <img src="/images/0/cluster%204/icon/icon - 2.png" alt="calendar" className="card-icon" />
                 <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
               </div>
               <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
@@ -464,7 +464,7 @@ const Cluster4RankingContent = () => {
               }}
             >
               <div className="card-left">
-                <img src="/images/0/cluster 4/icon/icon - 7.png" alt="clock" className="card-icon" />
+                <img src="/images/0/cluster%204/icon/icon - 7.png" alt="clock" className="card-icon" />
                 <span className="card-label" style={{ color: '#FFA500' }}>
                   {selectedWeek ? `${selectedWeek.weekNumber}주차` : '주차 선택'}
                 </span>
@@ -473,7 +473,7 @@ const Cluster4RankingContent = () => {
             </div>
             <div className="filter-card">
               <div className="card-left">
-                <img src="/images/0/cluster 4/icon/icon - 4.png" alt="search" className="card-icon" />
+                <img src="/images/0/cluster%204/icon/icon - 4.png" alt="search" className="card-icon" />
                 <span className="card-label">크루 수</span>
               </div>
               <span className="card-value">{rankings.length}</span>
@@ -534,7 +534,7 @@ const Cluster4RankingContent = () => {
                 id: 'star',
                 title: '단감 획득',
                 subtitle: 'Star Points',
-                icon: '/images/0/cluster 4/icon/icon - 단감.png',
+                icon: '/images/0/cluster%204/icon/icon - 단감.png',
                 emoji: '⭐',
                 color: '#FFD700',
                 bgGradient: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.1) 100%)',
@@ -546,7 +546,7 @@ const Cluster4RankingContent = () => {
                 id: 'injeolmi',
                 title: '인절미 보유',
                 subtitle: 'Injeolmi Balance',
-                icon: '/images/0/cluster 4/icon/icon - 인절미.png',
+                icon: '/images/0/cluster%204/icon/icon - 인절미.png',
                 emoji: '🍡',
                 color: '#FF69B4',
                 bgGradient: 'linear-gradient(135deg, rgba(255, 105, 180, 0.15) 0%, rgba(219, 112, 147, 0.1) 100%)',
@@ -558,7 +558,7 @@ const Cluster4RankingContent = () => {
                 id: 'lightning',
                 title: '어흥 누적',
                 subtitle: 'Lightning Strikes',
-                icon: '/images/0/cluster 4/icon/icon - 어흥.png',
+                icon: '/images/0/cluster%204/icon/icon - 어흥.png',
                 emoji: '⚡',
                 color: '#FF4444',
                 bgGradient: 'linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%)',
@@ -1229,11 +1229,11 @@ const Cluster4RankingContent = () => {
                     {selectedWeek && (
                       <>
                         <span className="weekly-card-date">
-                          <img src="/images/0/cluster 4/icon/icon - 6.png" alt="calendar" className="date-icon" />
+                          <img src="/images/0/cluster%204/icon/icon - 6.png" alt="calendar" className="date-icon" />
                           {formatDate(selectedWeek.startDate)} ~ {formatDate(selectedWeek.endDate)}
                         </span>
                         <span className="weekly-card-week">
-                          <img src="/images/0/cluster 4/icon/icon - 7.png" alt="clock" className="week-icon" />
+                          <img src="/images/0/cluster%204/icon/icon - 7.png" alt="clock" className="week-icon" />
                           <span className="week-number">{user.cumulativeApprovedWeeks}</span> / 30 주차
                         </span>
                       </>
@@ -1255,7 +1255,7 @@ const Cluster4RankingContent = () => {
                     </div>
                     <div className="info-group">
                       <span className="info-badge role">
-                        <img src="/images/0/cluster 4/icon/icon - 8.png" alt="role" className="role-icon" />
+                        <img src="/images/0/cluster%204/icon/icon - 8.png" alt="role" className="role-icon" />
                         <span>{user.roleLabel}</span>
                       </span>
                     </div>
@@ -1263,21 +1263,21 @@ const Cluster4RankingContent = () => {
                       <span className="info-divider">·</span>
                       <span className="info-item with-icon">
                         단감
-                        <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                        <img src="/images/0/cluster%204/icon/icon - 단감.png" alt="단감" className="item-icon" />
                         <strong className="number-value">{user.star}</strong>
                         개
                       </span>
                       <span className="info-divider">·</span>
                       <span className="info-item with-icon">
                         인절미
-                        <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                        <img src="/images/0/cluster%204/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
                         <strong className="number-value">{user.injeolmi}</strong>
                         개
                       </span>
                       <span className="info-divider">·</span>
                       <span className="info-item with-icon">
                         어흥
-                        <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                        <img src="/images/0/cluster%204/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
                         <strong className="number-value">{user.lightning > 0 ? `-${user.lightning}` : user.lightning}</strong>
                         개
                       </span>
@@ -1297,7 +1297,7 @@ const Cluster4RankingContent = () => {
                             </div>
                           </div>
                           <span className="total-count">
-                            <img src="/images/0/cluster 4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
+                            <img src="/images/0/cluster%204/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
                             총 {user.growthRate.total} 개 중 <strong>{isRest ? '-' : user.growthRate.count}</strong> 개
                           </span>
                         </div>

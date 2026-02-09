@@ -59,7 +59,7 @@
     height: 1180px;
     padding: 0;
     text-align: left;
-    background-image: url('/images/0/cluster 4/img 01.png');
+    background-image: url('/images/0/cluster%204/img 01.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center bottom;
@@ -298,7 +298,7 @@
       width: 100%;
       max-width: 1320px;
       height: 600px;
-      background-image: url('/images/0/cluster 4/4-1/bg image.png');
+      background-image: url('/images/0/cluster%204/4-1/bg image.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: calc(50% + 3px) -100px;
@@ -319,7 +319,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/images/0/cluster 4/bg border.png');
+        background-image: url('/images/0/cluster%204/bg border.png');
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-position: center;
@@ -612,7 +612,7 @@
     max-width: 1330px;
     padding: 40px 0;
     margin-bottom: 40px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster 4/Bg img 02 .png');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster%204/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     text-align: center;
@@ -1895,7 +1895,7 @@
     width: 100%;
     padding: 40px 40px;
     margin-bottom: 20px;
-    background-image: url('/images/0/cluster 4/Bg img 02 .png');
+    background-image: url('/images/0/cluster%204/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -3158,7 +3158,7 @@
                 position: absolute;
                 width: 30px;
                 height: 30px;
-                background-image: url('/images/0/cluster 4/detail.png');
+                background-image: url('/images/0/cluster%204/detail.png');
                 background-size: contain;
                 background-repeat: no-repeat;
                 z-index: 10;
@@ -4188,7 +4188,7 @@
     height: 105px;
     position: relative;
     margin-bottom: 20px;
-    background-image: url('/images/0/cluster 4/4-1-card/bg img 1.png');
+    background-image: url('/images/0/cluster%204/4-1-card/bg img 1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
