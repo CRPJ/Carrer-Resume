@@ -2011,7 +2011,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href="/cluster-4" className="nav-btn-filled">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -2107,7 +2107,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">{cumulativeInjeolmi}</strong>
+                  <strong className="number-value">{weekPoints.shield}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>

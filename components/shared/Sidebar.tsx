@@ -1,8 +1,8 @@
 "use client";
 import logo from "@/public/images/0/header-logo.png";
-import ec from "@/public/images/0/ec.png";
-import ok1 from "@/public/images/0/ok-1.png";
-import px from "@/public/images/0/px.png";
+import one from "@/public/images/sidebar/one.png";
+import two from "@/public/images/sidebar/two.png";
+import three from "@/public/images/sidebar/three.png";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,16 +15,15 @@ interface Game {
   image: StaticImageData;
 }
 const games: Game[] = [
-  // 요청: 상단부터 ec → ok-1 → px 이미지로 교체
-  { id: 1, image: ec },
-  { id: 2, image: ok1 },
-  { id: 3, image: px },
-  { id: 4, image: ec },
-  { id: 5, image: ok1 },
-  { id: 6, image: px },
-  { id: 7, image: ec },
-  { id: 8, image: ok1 },
-  { id: 9, image: px },
+  { id: 1, image: one },
+  { id: 2, image: two },
+  { id: 3, image: three },
+  { id: 4, image: one },
+  { id: 5, image: two },
+  { id: 6, image: three },
+  { id: 7, image: one },
+  { id: 8, image: two },
+  { id: 9, image: three },
 ];
 const Sidebar = () => {
   const { data: session } = useSession();

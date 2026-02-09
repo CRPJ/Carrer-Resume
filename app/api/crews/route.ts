@@ -46,12 +46,36 @@ export async function GET(request: Request) {
     // 각 유저의 팀/파트 정보 조회
     const userIds = users.map(u => u.id);
 
-    // 학력 정보 조회 (user_educations에서)
-    const { data: educations } = await supabase
-      .from("user_educations")
-      .select("user_id, school_name, major_name_1, sort_order")
-      .in("user_id", userIds)
-      .order("sort_order", { ascending: true });
+    // ============ 독립 쿼리 6개를 병렬 실행 ============
+    const [
+      { data: educations },
+      { data: userTeamParts },
+      { data: teams },
+      { data: parts },
+      { data: cumulativePoints },
+      { data: growthStats },
+    ] = await Promise.all([
+      supabase
+        .from("user_educations")
+        .select("user_id, school_name, major_name_1, sort_order")
+        .in("user_id", userIds)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("user_team_parts")
+        .select("user_id, team_id, part_id")
+        .in("user_id", userIds)
+        .is("left_at", null),
+      supabase.from("teams").select("id, name"),
+      supabase.from("parts").select("id, name"),
+      supabase
+        .from("user_cumulative_points")
+        .select("user_id, total_stars")
+        .in("user_id", userIds),
+      supabase
+        .from("user_growth_stats")
+        .select("user_id, approved_weeks")
+        .in("user_id", userIds),
+    ]);
 
     // user_id별 학력 정보 Map (첫 번째 학력만 사용)
     const educationMap: { [key: string]: { school_name: string | null; major_name_1: string | null } } = {};
@@ -63,16 +87,6 @@ export async function GET(request: Request) {
         };
       }
     });
-
-    const { data: userTeamParts } = await supabase
-      .from("user_team_parts")
-      .select("user_id, team_id, part_id")
-      .in("user_id", userIds)
-      .is("left_at", null);
-
-    // 팀/파트 이름 조회
-    const { data: teams } = await supabase.from("teams").select("id, name");
-    const { data: parts } = await supabase.from("parts").select("id, name");
 
     // 팀/파트 이름 매핑
     const teamMap: { [key: string]: string } = {};
@@ -89,22 +103,10 @@ export async function GET(request: Request) {
       };
     });
 
-    // 누적 단감(stars) 조회
-    const { data: cumulativePoints } = await supabase
-      .from("user_cumulative_points")
-      .select("user_id, total_stars")
-      .in("user_id", userIds);
-
     const starsMap: { [key: string]: number } = {};
     cumulativePoints?.forEach(cp => {
       starsMap[cp.user_id] = cp.total_stars || 0;
     });
-
-    // 누적 주차(approved_weeks) 조회
-    const { data: growthStats } = await supabase
-      .from("user_growth_stats")
-      .select("user_id, approved_weeks")
-      .in("user_id", userIds);
 
     const weeksMap: { [key: string]: number } = {};
     growthStats?.forEach(gs => {
