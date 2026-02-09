@@ -707,6 +707,13 @@ const Cluster41Content = () => {
             userId = result.data.id;
           }
 
+          // 비로그인 + userId 파라미터 없는 경우: 주차 카드를 표시하지 않음
+          if (!userId && !currentTargetUserId) {
+            setDbWeeklyData([]);
+            setIsLoadingWeeks(false);
+            return;
+          }
+
           if (response.ok && result.growthInfo?.startDate) {
             userJoinedWeekStartDate = result.growthInfo.startDate;
             setJoinedWeekStartDate(userJoinedWeekStartDate);
@@ -1572,7 +1579,7 @@ const Cluster41Content = () => {
           {isLoadingWeeks ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>주차 데이터 로딩 중...</div>
           ) : paginatedDbData.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>표시할 주차가 없습니다.</div>
+            <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>해당되는 주차 카드가 없습니다.</div>
           ) : paginatedDbData.map((week) => (
             <Link href={`/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               {/* 왼쪽 이미지 */}
