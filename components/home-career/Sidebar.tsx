@@ -440,7 +440,7 @@ const Sidebar = () => {
           birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, '.') : '',
           city: addressParts[0] || '',
           district: addressParts.slice(1).join(' ') || '',
-          phone: profile.phone ? profile.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3').replace(/010-/, '010-').replace(/(\d{4})-(\d{4})$/, '$1-****') : '',
+          phone: profile.phone ? profile.phone.replace(/(\d{3})(\d{1})\d{3}(\d{4})/, '$1-$2***-****') : '',
           email: profile.email || '',
           school: '',
           major: '',
