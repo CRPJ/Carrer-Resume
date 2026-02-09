@@ -8,37 +8,41 @@ import { supabase } from "@/lib/supabase";
 
 // 기본 시즌 데이터 (데이터가 없을 때 사용)
 const defaultSeasonData = {
-  id: '',
-  year: '',
-  season: '-',
-  dateRange: '-',
-  status: '-',
-  statusClass: '',
-  image: '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
-  approvedWeeks: 0,
-  totalWeeks: 0,
-  roleInSeason: '',
-  isQualified: false,
-  seasonRoles: [],
-  stats: { dangam: 0, injeolmi: 0, eoheung: 0 },
-  rating: 0,
-  review: '',
+  id: 'dummy-season-1',
+  year: '2025',
+  season: '여름',
+  dateRange: '2025 - 03 - 23 (월) ~ 2025 - 08 - 22 (일)',
+  status: '시즌 진행 중',
+  statusClass: 'in-progress',
+  image: '/images/0/cluster 4/Cluster4-1/image.png',
+  approvedWeeks: 8,
+  totalWeeks: 10,
+  roleInSeason: '운영진(앰배서더)',
+  isQualified: true,
+  seasonRoles: [
+    { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: true, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 7.png' },
+    { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 8.png' },
+    { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 5, startedAt: '2025-03-23', profileImage: '/images/0/cluster 4/cluster4-1/Ellipse 9.png' },
+  ],
+  stats: { dangam: 25, injeolmi: 30, eoheung: -2 },
+  rating: 6,
+  review: '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나',
   reviewLink: '',
   circles: {
-    weekUsage: 0,
-    scheduleReliability: 0,
-    seasonGrowth: 0,
-    approvedWeeks: 0,
-    totalOperatingWeeks: 0,
-    reliableWeeks: 0,
-    completedActivities: 0,
-    totalActivities: 0
+    weekUsage: 80,
+    scheduleReliability: 90,
+    seasonGrowth: 70,
+    approvedWeeks: 8,
+    totalOperatingWeeks: 10,
+    reliableWeeks: 9,
+    completedActivities: 75,
+    totalActivities: 120
   },
   progress: {
-    info: { total: 0, completed: 0, rate: 0 },
-    competency: { total: 0, completed: 0, rate: 0 },
-    experience: { total: 0, completed: 0, rate: 0 },
-    career: { total: 0, completed: 0, rate: 0 }
+    info: { total: 40, completed: 20, rate: 50 },
+    competency: { total: 40, completed: 30, rate: 80 },
+    experience: { total: 40, completed: 40, rate: 100 },
+    career: { total: 40, completed: 4, rate: 10 }
   }
 };
 
@@ -147,7 +151,77 @@ const Cluster4Content = () => {
       vision: string | null;
     } | null;
   }
-  const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
+  const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([
+    {
+      id: 'dummy-rep-1',
+      reviewer_id: 'dummy-reviewer-1',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...',
+      keyword_1: '#추진력추진력',
+      keyword_2: '#추진력추진력',
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-1',
+        display_name: '안유현',
+        gender: '여',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url: '/images/0/cluster 4/cluster4-1/Ellipse 10.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    },
+    {
+      id: 'dummy-rep-2',
+      reviewer_id: 'dummy-reviewer-2',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...',
+      keyword_1: '#추진력추진력',
+      keyword_2: '#추진력추진력',
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-2',
+        display_name: '이지민',
+        gender: '여',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url:  '/images/0/cluster 4/cluster4-1/Ellipse 11.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    },
+    {
+      id: 'dummy-rep-3',
+      reviewer_id: 'dummy-reviewer-3',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '',
+      keyword_1: null,
+      keyword_2: null,
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-3',
+        display_name: '유성이',
+        gender: '남',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url:  '/images/0/cluster 4/cluster4-1/Ellipse 12.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    }
+  ]);
 
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
@@ -226,6 +300,7 @@ const Cluster4Content = () => {
     isAdmin: boolean;  // 운영진(팀장, 앰배서더) 여부
     adminGeneration: number | null;  // 운영진 기수 (예: 3, 4)
     startedAt: string;
+    profileImage?: string;
   }
 
   // 시즌 히스토리 (API에서 가져온 동적 데이터)
@@ -292,7 +367,7 @@ const Cluster4Content = () => {
   const [parts, setParts] = useState<Array<{ id: string; name: string; team_id: string }>>([]);
 
   // 메인 프로필 사진
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>('/images/0/cluster 4/cluster4-1/이안0.png');
 
   // 현재 선택된 시즌 데이터 (동적 데이터 우선, 없으면 기본 데이터)
   const currentSeason: SeasonHistoryData = seasonHistories.length > 0
@@ -883,9 +958,9 @@ const Cluster4Content = () => {
 
     const seasonImageMap: { [key: string]: string } = {
       '봄': '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
-      '여름': '/images/0/cluster 4/시즌 이미지/여름_후보_3.png',
-      '가을': '/images/0/cluster 4/시즌 이미지/가을_후보_1.png',
-      '겨울': '/images/0/cluster 4/시즌 이미지/겨울_후보_1.png'
+      '여름': '/images/0/cluster 4/Cluster4-1/image.png',
+      '가을': '/images/0/cluster 4/Cluster4-1/image2.png',
+      '겨울': '/images/0/cluster 4/Cluster4-1/image3.png'
     };
 
     const getStatusInfo = (progressStatus: string): { status: string; statusClass: string } => {
@@ -1572,7 +1647,6 @@ const Cluster4Content = () => {
             </div>
           )}
           <div className="section3-title-wrapper">
-            <h2 className="section3-banner-text-shadow">SEASON CHALLENGE</h2>
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>
           </div>
           <div className="section3-banner-description">
@@ -1672,12 +1746,12 @@ const Cluster4Content = () => {
               <div className={`season-image-stack ${isFlipping ? 'flipping' : ''}`}>
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : currentSeason.image} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster 4/Cluster4-1/image3.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : currentSeason.image} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster 4/Cluster4-1/image2.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-front">
@@ -1866,7 +1940,7 @@ const Cluster4Content = () => {
                     currentSeason.seasonRoles.map((roleItem, index) => (
                       <div className="badge-item" key={index}>
                         <div className="badge-icon">
-                          <img src={profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                        <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
                         </div>
                         <div className="badge-info">
                           {roleItem.isAdmin ? (
@@ -1941,15 +2015,32 @@ const Cluster4Content = () => {
                           </div>
                           <div
                             className="comment"
-                            style={{ cursor: 'pointer' }}
+                            style={{ cursor: 'pointer', position: 'relative' }}
                             onClick={() => { setSelectedReputation(reputation); setReputationDetailModalOpen(true); }}
                           >
                             <img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" />
                             {reputation.content.length > 30 ? `${reputation.content.substring(0, 30)}...` : reputation.content}
-                            {reputation.content.length > 30 && <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" />}
+                            <span className="arrow-icon" style={{
+                              position: 'absolute',
+                              right: '8px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              width: '14px',
+                              height: '14px',
+                              background: '#FAAB07',
+                              borderRadius: '3px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '2px'
+                            }}>
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </span>
                           </div>
                           <div className="stats">
-                            <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM : 3</span>
+                            <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM :325</span>
                             <span className="rating">
                               {[...Array(fullStars)].map((_, i) => (
                                 <img key={`full-${i}`} className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
@@ -1963,7 +2054,7 @@ const Cluster4Content = () => {
                               {[...Array(emptyStars)].map((_, i) => (
                                 <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
                               ))}
-                              <span className="rating-score">{reputation.rating.toFixed(1)} / 10.0</span>
+                              <span className="rating-score">{reputation.rating} / 10</span>
                             </span>
                           </div>
                         </div>

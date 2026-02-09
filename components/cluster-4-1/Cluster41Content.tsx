@@ -11,14 +11,6 @@ const Cluster41Content = () => {
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
 
   const headerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = headerRef.current;
-    if (!el) return;
-    const handler = (e: WheelEvent) => { e.preventDefault(); };
-    el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
-  }, []);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
   const [resultDropdownOpen, setResultDropdownOpen] = useState(false);
@@ -207,42 +199,36 @@ const Cluster41Content = () => {
   }
 
   const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>([
-    {
-      id: 'dummy-1',
-      weekNumber: 3,
-      seasonYear: 2025,
-      seasonName: '여름',
-      startDate: '2025-03-23',
-      endDate: '2025-03-30',
-      isClubBreak: false,
-      isBreakSeason: false,
-      holidayName: null,
-      growthStatus: '성공',
-    },
-    {
-      id: 'dummy-2',
-      weekNumber: 2,
-      seasonYear: 2025,
-      seasonName: '여름',
-      startDate: '2025-03-16',
-      endDate: '2025-03-22',
-      isClubBreak: false,
-      isBreakSeason: false,
-      holidayName: null,
-      growthStatus: '실패',
-    },
-    {
-      id: 'dummy-3',
-      weekNumber: 1,
-      seasonYear: 2025,
-      seasonName: '여름',
-      startDate: '2025-03-09',
-      endDate: '2025-03-15',
-      isClubBreak: false,
-      isBreakSeason: false,
-      holidayName: null,
-      growthStatus: '휴식(개인)',
-    },
+    { id: 'dummy-1', weekNumber: 3, seasonYear: 2025, seasonName: '여름',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
+    { id: 'dummy-2', weekNumber: 2, seasonYear: 2025, seasonName: '여름',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '실패' },
+    { id: 'dummy-3', weekNumber: 1, seasonYear: 2025, seasonName: '여름',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(개인)' },
+    { id: 'dummy-4', weekNumber: 16, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(공식)' },
+    { id: 'dummy-5', weekNumber: 15, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
+    { id: 'dummy-6', weekNumber: 14, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
+    { id: 'dummy-7', weekNumber: 13, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
+    { id: 'dummy-8', weekNumber: 12, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
+    { id: 'dummy-9', weekNumber: 11, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(공식)' },
+    { id: 'dummy-10', weekNumber: 10, seasonYear: 2025, seasonName: '봄',
+      startDate: '2025-03-23', endDate: '2025-03-30',
+      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(개인)' },
   ]);
   const [isLoadingWeeks, setIsLoadingWeeks] = useState(false);  // true → false
 
@@ -427,8 +413,13 @@ const Cluster41Content = () => {
 
   // 특정 주차의 포인트 정보 계산
   const getPointsForWeek = (weekId: string) => {
-    if (weekId.startsWith('dummy')) return { star: 25, shield: 30, lightning: 2 };
+    if (weekId === 'dummy-1') return { star: 25, shield: 30, lightning: 2 };
+    if (weekId === 'dummy-2') return { star: 25, shield: 30, lightning: 2 };
+    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { star: 25, shield: 30, lightning: 2 };
+    if (weekId.startsWith('dummy')) return { star: 0, shield: 0, lightning: 0 };
+    
     const weekPoints = userPoints.filter(p => p.week_id === weekId);
+    if (weekId.startsWith('dummy')) return { star: 25, shield: 30, lightning: 2 };
 
     const star = weekPoints
       .filter(p => p.point_type === 'star')
@@ -512,11 +503,10 @@ const Cluster41Content = () => {
 
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
-    if (weekId.startsWith('dummy')) return { rate: 100, count: 4, total: 6 };
-    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
-    if (onboardingWeekId && weekId === onboardingWeekId) {
-      return { count: 0, total: 0, rate: 0 };
-    }
+    if (weekId === 'dummy-1') return { rate: 100, count: 4, total: 6 };
+    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
+    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
+    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
@@ -530,11 +520,10 @@ const Cluster41Content = () => {
 
   // 주차별 실무 역량 강화율 (competency) - 매주 분모는 항상 1
   const getWeeklyCompetencyRate = (weekId: string) => {
-    if (weekId.startsWith('dummy')) return { rate: 100, count: 1, total: 1 };
-    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
-    if (onboardingWeekId && weekId === onboardingWeekId) {
-      return { count: 0, total: 0, rate: 0 };
-    }
+    if (weekId === 'dummy-1') return { rate: 100, count: 1, total: 1 };
+    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
+    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
+    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
     // 실무 역량은 매주 분모가 항상 1
     const total = 1;
     // 강화 성공한 competency 타입 활동 개수 (count) - 최대 1
@@ -547,11 +536,10 @@ const Cluster41Content = () => {
 
   // 주차별 실무 경험 강화율 (experience) - 유저의 누적 활동 주차에 따라 P값 동적 계산
   const getWeeklyExperienceRate = (weekId: string) => {
-    if (weekId.startsWith('dummy')) return { rate: 100, count: 3, total: 4 };
-    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
-    if (onboardingWeekId && weekId === onboardingWeekId) {
-      return { count: 0, total: 0, rate: 0 };
-    }
+    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 4 };
+    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
+    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
+    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
@@ -612,11 +600,10 @@ const Cluster41Content = () => {
   // P(분모) = 해당 주차에 진행 중인 경력 프로젝트 수 (참여한 것 - pending/enhanced)
   // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수
   const getWeeklyCareerRate = (weekId: string) => {
-    if (weekId.startsWith('dummy')) return { rate: 100, count: 3, total: 5 };
-    // 온보딩 주차(무적 주차)는 모든 분모 = 0 (해당 사항 없음)
-    if (onboardingWeekId && weekId === onboardingWeekId) {
-      return { count: 0, total: 0, rate: 0 };
-    }
+    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 5 };
+    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
+    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
+    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
 
     // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
     const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
@@ -637,12 +624,10 @@ const Cluster41Content = () => {
   // k = {(a' + b' + c' + d') / (a + b + c + d)} * 100% (소수점 올림)
   // 주의: 각 파트 강화율(p,q,r,s)은 k 계산에 포함되지 않음
   const getWeeklyGrowthRate = (weekId: string) => {
-    // 더미 데이터 fallback
-    if (weekId.startsWith('dummy')) return { rate: 100, count: 13, total: 13 };
-    // 온보딩 주차(무적 주차)는 무조건 100% (분모 0, 분자 0이지만 100% 표시)
-    if (onboardingWeekId && weekId === onboardingWeekId) {
-      return { count: 0, total: 0, rate: 100 };
-    }
+    if (weekId === 'dummy-1') return { rate: 100, count: 13, total: 13 };
+    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 7 };
+    if (weekId.startsWith('dummy-') && ['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 50, count: 7, total: 13 };
+    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 0 };
 
     const info = getWeeklyInfoRate(weekId);
     const competency = getWeeklyCompetencyRate(weekId);
@@ -1200,28 +1185,23 @@ const Cluster41Content = () => {
 
   // DB 주차 데이터에서 이미지 경로 생성 (시즌명과 주차번호로 월/주차 계산)
   const getWeekImagePath = (week: DBWeekData) => {
-    // 전환 주차(break 시즌) 또는 휴식 주차(개인/공식)일 때는 휴식 전용 이미지 사용
-    if (week.isBreakSeason || week.growthStatus.includes('휴식')) {
-      return "/images/0/cluster 4/주차 이미지/휴식(개인,공식).png";
+    // 더미 데이터용 이미지 매핑
+    if (week.id.startsWith('dummy')) {
+      const dummyImages: { [key: string]: string } = {
+        'dummy-1': '/images/0/cluster 4/주차 이미지/여름 3주차 (7월 1주차).png',
+        'dummy-2': '/images/0/cluster 4/주차 이미지/여름 2주차 (7월 1주차).png',
+        'dummy-3': '/images/0/cluster 4/주차 이미지/휴식(개인,공식)1.png',
+        'dummy-4': '/images/0/cluster 4/주차 이미지/휴식(개인,공식)2.png',
+        'dummy-5': '/images/0/cluster 4/주차 이미지/봄 15주차 (6월 4주차).png',
+        'dummy-6': '/images/0/cluster 4/주차 이미지/봄 14주차 (6월 3주차).png',
+        'dummy-7': '/images/0/cluster 4/주차 이미지/봄 13주차 (6월 2주차).png',
+        'dummy-8': '/images/0/cluster 4/주차 이미지/봄 12주차 (6월 1주차).png',
+        'dummy-9': '/images/0/cluster 4/주차 이미지/휴식(개인,공식)3.png',
+        'dummy-10': '/images/0/cluster 4/주차 이미지/휴식(개인,공식)4.png',
+      };
+      return dummyImages[week.id] || '/images/0/cluster 4/주차 이미지/휴식(개인,공식).png';
     }
-
-    // 시즌별 시작 월 매핑
-    const seasonStartMonth: { [key: string]: number } = {
-      '겨울': 1,  // 1월
-      '봄': 3,    // 3월
-      '여름': 7,  // 7월
-      '가을': 9   // 9월
-    };
-
-    const startMonth = seasonStartMonth[week.seasonName] || 1;
-    const monthOffset = Math.floor((week.weekNumber - 1) / 4);
-    const month = startMonth + monthOffset;
-    const weekOfMonth = ((week.weekNumber - 1) % 4) + 1;
-
-    // 공휴일이 있는 경우 파일명에 추가
-    const holidaySuffix = week.holidayName ? ` ${week.holidayName}` : '';
-
-    return `/images/0/cluster 4/주차 이미지/${week.seasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+    return getWeekImagePath(week);
   };
 
   const renderStars = (rating: number) => {
@@ -1347,9 +1327,7 @@ const Cluster41Content = () => {
 
     <div className="cluster4-content cluster4-content--week">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
-      <section className="cluster4-section1" ref={headerRef}
-        onWheel={(e) => e.preventDefault()}
-      >
+      <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
           <div className="tab active">
@@ -1446,7 +1424,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 주차</span>
                   <span className="detail-value">
-                    <span className="number">{growthPeriodStats?.availableWeeks ?? '-'}</span><span className="orange-highlight">({growthPeriodStats?.availableSeasons ?? 0})</span> <span className="white-text">개 주차</span>
+                  <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span>
                   </span>
                 </div>
                 <div className="detail-row">
@@ -1770,7 +1748,7 @@ const Cluster41Content = () => {
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
                       <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
-                        <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
+                        <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
                         <div className="image-badges">
                           <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
                         </div>
@@ -1870,7 +1848,7 @@ const Cluster41Content = () => {
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
                   <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
-                    <img src={getWeekImagePath(week)} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
+                    <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} />
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
                         <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
