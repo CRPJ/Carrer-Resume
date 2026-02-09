@@ -1,5 +1,8 @@
 // Cluster 3 - Club Final Index Styles
 
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=swap');
+
 @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=Black+Ops+One&display=swap');
 
 @font-face {
@@ -64,6 +67,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  // 섹션 간 기본 여백(Cluster3/4 공통 리듬)
+  --c3-section-gap: clamp(22px, 2.6vw, 56px);
 
   // 플로팅 아이콘 공통 스타일
   .floating-icons {
@@ -151,6 +156,7 @@
     width: 100%;
     max-width: 1325px;
     position: relative;
+    margin-top: 51px;
     margin-bottom: 30px;
     padding-bottom: 30px;
 
@@ -158,8 +164,10 @@
     .section1-bg {
       position: absolute;
       top: 0;
-      left: 0;
-      width: 1330px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 1330px;
       height: 736px;
       z-index: 0;
       overflow: hidden;
@@ -223,9 +231,11 @@
 
     // 타이틀 그림자
     .section1-title-shadow {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px;
+      text-transform: uppercase;
       color: #111;
       -webkit-text-stroke: 1px #21E786;
       text-stroke: 1px #21E786;
@@ -237,37 +247,53 @@
       left: 3px;
       z-index: 0;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     // 타이틀
     .section1-title {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px;
+      text-transform: uppercase;
       color: #FFF;
       text-align: center;
       letter-spacing: 0;
-      margin: 0;
+      margin: 0 0 24px 0;  
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      @include stacked-title-layer(1.05, true);
     }
 
     // 설명 텍스트
     .section1-description {
-      max-width: 1100px;
+      // Cluster2와 동일한 여백/줄바꿈 전략으로 통일
+      max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
       line-height: 22px;
       position: relative;
       z-index: 1;
       text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      hyphens: auto;
+      text-wrap: pretty;
+
+      // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
+      @media (min-width: 1200px) {
+        transform: translateX(clamp(0px, 2.2vw, 72px));
+      }
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
         font-size: 20px;
         margin-bottom: 0;
         color: #FFF;
+        text-wrap: pretty;
 
         &:nth-child(2) {
           margin-bottom: 22px;
@@ -289,13 +315,16 @@
         margin-top: 24px;
         margin-bottom: 0;
         font-style: italic;
-        word-break: break-word;
+        word-break: keep-all;
         overflow-wrap: break-word;
+        line-break: strict;
+        hyphens: auto;
+        text-wrap: pretty;
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 24px;
+        font-size: 27px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -303,6 +332,7 @@
         background-clip: text;
         margin: 0;
         font-style: italic;
+        text-wrap: balance;
       }
 
       .quote-author {
@@ -659,13 +689,24 @@
 
   // Section 2: 졸업 자격 조건
   .cluster3-section2 {
+    // Section2 우측 상단 타이포/퍼센트(겹침/잘림/내부 스크롤 방지)
+    --c3-s2-right: clamp(24px, 4vw, 96px);
+    --c3-s2-title-size: clamp(40px, 5.4vw, 92px);
+
     width: 100%;
     max-width: 100%;
-    height: 500px;
+    height: auto;
+    min-height: 0;
     margin-bottom: 40px;
     position: relative;
-    overflow: visible;
+    // 아주 미세한 오버플로우로 스크롤바가 생기는 것 방지
+    overflow: hidden;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 22px 0 26px;
 
     // 상단 주황색 선
     &::before {
@@ -708,27 +749,49 @@
       }
     }
 
+    // 우측 상단(타이틀 + 상위 0%)을 하나로 묶어서 겹침/잘림/스크롤바 방지
+    .section2-right {
+      position: relative;
+      z-index: 3; // 카드 위에 항상 표시
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      max-width: min(560px, calc(100% - 32px));
+      pointer-events: none; // 클릭 타겟과 겹쳐도 카드 인터랙션 방해 X
+      margin-left: auto;
+      padding-right: var(--c3-s2-right);
+      overflow: visible !important;
+    }
+
     .section2-text {
-      position: absolute;
-      top: 105px;
-      right: 80px;
-      z-index: 1;
+      position: relative;
+      max-width: 100%;
+      text-align: right;
+      overflow: visible !important;
 
       .handwriting {
         font-family: 'HappinessGoheung', sans-serif;
-        font-size: 100px;
+        font-size: var(--c3-s2-title-size);
+        // Figma: fontSize=100, lineHeight=100 (즉 1.0)
+        // 브라우저 기본 line-height 차이로 높이가 달라보여서 고정
+        line-height: 1;
+        white-space: nowrap;
         color: #fff;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        overflow: visible !important;
+        // "클럽 강화 품계"를 지금보다 살짝 아래로(미세 조정)
+        position: relative;
+        top: clamp(10px, 1vw, 30px);  
       }
     }
 
-    // 프로그레스 바와 상위 90%
+    // 프로그레스 바와 상위 0%
     .section2-progress {
-      position: absolute;
-      top: 158px;
-      right: 60px;
-      width: 350px;
-      z-index: 1;
+      position: relative;
+      width: min(350px, 46vw);
+      z-index: 3;
+      overflow: visible !important;
 
       .progress-info {
         display: flex;
@@ -740,7 +803,9 @@
         .progress-label {
           font-family: 'Pretendard', sans-serif;
           font-size: 22px;
-          font-weight: 400;
+          // Figma: Pretendard Medium 22 / lineHeight 33
+          font-weight: 500;
+          line-height: 33px;
           color: #767676;
         }
 
@@ -748,13 +813,16 @@
           font-family: var(--black-ops-one), 'Black Ops One', cursive;
           font-size: 50px;
           font-weight: 400;
+          // Figma: 50 / lineHeight 75
+          line-height: 75px;
           color: #FED402;
         }
 
         .progress-unit {
-          font-family: 'Pretendard', sans-serif;
-          font-size: 22px;
+          font-family: var(--black-ops-one), 'Black Ops One', cursive;
+          font-size: 30px;
           font-weight: 400;
+          line-height: 75px;
           color: #767676;
         }
       }
@@ -777,10 +845,7 @@
 
     // 10개 카드 일렬 배치
     .section2-cards {
-      position: absolute;
-      bottom: 50px;
-      left: 0;
-      right: 0;
+      position: relative;
       display: flex;
       gap: 0;
       z-index: 1;
@@ -789,6 +854,7 @@
       padding: 0;
       justify-content: flex-start;
       align-items: flex-end;
+      overflow: visible;
 
       .rank-card {
         width: calc(100% / 10);
@@ -966,9 +1032,11 @@
   .cluster3-section3 {
     width: 100%;
     max-width: 1330px;
-    height: 1150px;
+    height: auto;
+    min-height: 1150px;
     margin-bottom: 0;
-    margin-top: -40px;
+    // 기존 겹침(-40px) 때문에 섹션이 “붙어 보임” → 자연스러운 간격으로 복원
+    margin-top: 0;
     position: relative;
     overflow: hidden;
     border-radius: 0;
@@ -1010,9 +1078,11 @@
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
+          line-height: 44px;
+          text-transform: capitalize;
           display: flex;
           align-items: center;
           gap: 10px;
@@ -1022,7 +1092,7 @@
           .title-text {
             position: relative;
             display: inline-block;
-            z-index: 1;
+            z-index: 0;
 
             .triangle-icon {
               position: absolute;
@@ -1048,8 +1118,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 19px;
+            text-transform: capitalize;
             color: #FED402;
             cursor: pointer;
             display: flex;
@@ -1413,7 +1486,7 @@
     width: 100%;
     max-width: 1330px;
     margin: 0 auto 0;
-    margin-top: 0;
+    margin-top: var(--c3-section-gap);
     padding: 60px 125px 60px;
     position: relative;
     overflow: hidden;
@@ -1469,28 +1542,31 @@
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
           display: flex;
           align-items: center;
           gap: 10px;
-          margin: 0;
-          line-height: 1;
+          margin: 0 0 -8px 0;
+          line-height: 44px;
+          text-transform: capitalize;
 
           .title-text {
             position: relative;
             display: inline-block;
             z-index: 1;
+            overflow: visible;
 
             .triangle-icon {
               position: absolute;
-              left: -23px;
+              left: -28px;
               top: calc(50% - 8px);
               transform: translateY(-50%);
               width: 39px;
               height: 39px;
               z-index: -1;
+              overflow: visible;
             }
           }
         }
@@ -1502,8 +1578,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 19px;
+            text-transform: capitalize;
             color: #FED402;
             cursor: pointer;
             display: flex;
@@ -1558,28 +1637,29 @@
     .section4-header {
       position: relative;
       z-index: 1;
+      text-align: center;
     }
 
     // 메인 타이틀
     .section4-title {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 48px;
+      font-family: 'Manrope', 'Pretendard', sans-serif;
+      font-size: 54px;
       font-weight: 800;
-      color: #fff;
-      margin: 0 0 15px 0;
-      text-align: center;
-      letter-spacing: 2px;
+      line-height: 74px;
+      text-transform: capitalize;
+      margin: 0 0 30px 0;
+      letter-spacing: 0;
     }
 
     .section4-desc {
       font-family: 'Pretendard', sans-serif;
       font-size: 16px;
-      font-weight: 300;
-      color: #999;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.53);
       text-align: center;
-      margin: 0 auto 30px;
+      margin: 0 auto 50px;
       max-width: 800px;
-      line-height: 1.6;
+      line-height: 24px;
     }
 
     // 탭 버튼
@@ -1598,16 +1678,18 @@
         width: 190px;
         height: 50px;
         padding: 0;
-        font-family: 'Pretendard', sans-serif;
+        font-family: 'Manrope', sans-serif;
         font-size: 14px;
-        font-weight: 700;
-        color: #FED402;
+        font-weight: 800;
+        color: #161616;
+        line-height: 14px;
+        text-transform: capitalize;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
 
         .btn-arrow {
           width: 16px;
@@ -1984,7 +2066,7 @@
     // 플로팅 아이콘 위치 조정 (다른 섹션과 동일하게)
     .floating-icons {
       top: 80px;
-      right: -105px;
+      right: 0;
     }
 
     .section5-header {
@@ -1998,17 +2080,21 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0;
+        overflow: visible;
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 32px;
           color: #fff;
-          font-weight: 600;
+          font-weight: 400;
           display: flex;
           align-items: center;
           gap: 10px;
           margin: 0;
           line-height: 1;
+          overflow: visible;
+          line-height: 44px;
+          text-transform: capitalize;
 
           .title-text {
             position: relative;
@@ -2034,8 +2120,11 @@
           margin-left: 0;
 
           .view-all {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-family: 'Manrope', 'Pretendard', sans-serif;  // Pretendard → Manrope
+            font-size: 14px;      // 13px → 14px
+            font-weight: 800;     // 추가
+            line-height: 19px;    // 추가
+            text-transform: capitalize;  // 추가
             color: #FED402;
             cursor: pointer;
             display: flex;

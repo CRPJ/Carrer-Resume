@@ -1,0 +1,787 @@
+// ============================================================
+// Cluster 2 - Mobile-First 반응형 패치
+// ============================================================
+// _cluster2.scss의 .cluster2-content 닫는 괄호 바로 위에 삽입
+// ============================================================
+
+$c2-bp-tablet: 768px;
+$c2-bp-desktop: 1200px;
+
+@mixin c2-mobile-only {
+  @media (max-width: #{$c2-bp-tablet - 1px}) { @content; }
+}
+
+@mixin c2-tablet-only {
+  @media (min-width: $c2-bp-tablet) and (max-width: #{$c2-bp-desktop - 1px}) { @content; }
+}
+
+
+// [1] PROFILE 타이틀
+  .cluster2-title-wrapper {
+    @include c2-mobile-only {
+      height: auto;
+      min-height: 400px;
+      padding: 30px 0 200px;
+      margin-bottom: -160px;
+
+      .section1-description {
+        padding: 20px 20px 0;
+
+        p,
+        .small-text,
+        .quote-text,
+        .quote-author {
+          font-size: clamp(16px, 3.5vw, 23px);
+        }
+
+        .quote-highlight {
+          font-size: clamp(18px, 4vw, 27px);
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      height: auto;
+      min-height: 500px;
+      padding: 35px 0 240px;
+      margin-bottom: -180px;
+
+      .section1-description {
+        padding: 25px 30px 0;
+      }
+    }
+  }
+
+  .cluster2-title-shadow,
+  .cluster2-title {
+    @include c2-mobile-only {
+      font-size: clamp(36px, 10vw, 72px);
+      letter-spacing: 3px;
+    }
+
+    @include c2-tablet-only {
+      font-size: clamp(48px, 7vw, 72px);
+    }
+  }
+
+
+// [2] Section 1: top-frame
+  .cluster2-top-frame {
+
+    @include c2-mobile-only {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: auto;
+      min-height: auto;
+      padding: 24px 16px;
+      gap: 20px;
+      background-size: cover;
+      background-position: center;
+
+      .frame-left {
+        order: 3;
+        align-self: center;
+        margin-bottom: 0;
+        width: 100%;
+        max-width: 380px;
+
+        .adventure-title {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          font-size: clamp(24px, 6vw, 40px);
+          text-align: center;
+          width: 100%;
+        }
+
+        .hexagon-large-row {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          width: 100% !important;
+          max-width: 320px;
+          margin: 0 auto;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .avatar-row {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          width: 100% !important;
+          justify-content: center;
+        }
+      }
+
+      .frame-center {
+        position: static !important;
+        left: auto !important;
+        bottom: auto !important;
+        top: auto !important;
+        order: 1;
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        aspect-ratio: 7 / 10;
+        margin: 0 auto;
+      }
+
+      .frame-right {
+        position: static !important;
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        order: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+
+        .mascot-icon {
+          width: 100px;
+          height: 80px;
+        }
+
+        .progress-value {
+          font-size: 24px;
+        }
+      }
+
+      .floating-icons {
+        top: 10px !important;
+        right: 10px;
+      }
+    }
+
+    @include c2-tablet-only {
+      display: grid !important;
+      grid-template-columns: 1.5fr 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "center  right"
+        "left    left";
+      align-items: center;
+      justify-items: center;
+      height: auto;
+      min-height: 450px;
+      padding: 30px 24px;
+      gap: 24px;
+
+      .frame-left {
+        grid-area: left;
+        align-self: center;
+        margin-bottom: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+
+        .adventure-title {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          font-size: clamp(28px, 4vw, 40px);
+          text-align: center;
+          width: 100%;
+        }
+
+        .hexagon-large-row {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          width: auto !important;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .avatar-row {
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          width: auto !important;
+          justify-content: center;
+        }
+      }
+
+      .frame-center {
+        grid-area: center;
+        position: static !important;
+        left: auto !important;
+        bottom: auto !important;
+        top: auto !important;
+        width: 100%;
+        max-width: 360px;
+        height: auto;
+        aspect-ratio: 7 / 10;
+        justify-self: center;
+      }
+
+      .frame-right {
+        grid-area: right;
+        position: static !important;
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        flex-direction: column;
+        align-self: center;
+      }
+
+      .floating-icons {
+        top: -40px !important;
+      }
+    }
+  }
+
+
+// [3] Videos
+  .cluster2-videos {
+
+    @include c2-mobile-only {
+      margin: 30px 0;
+      padding: 20px 16px;
+
+      .videos-header {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+
+        .videos-title {
+          font-size: clamp(20px, 5vw, 48px);
+          width: 100%;
+        }
+      }
+
+      .videos-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+        margin-left: 0;
+        margin-right: 0;
+
+        .video-card {
+          max-width: 100%;
+          height: auto;
+          aspect-ratio: 16 / 14;
+        }
+      }
+
+      .videos-navigation {
+        .nav-btn {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      padding: 25px 24px;
+
+      .videos-header {
+        .videos-title {
+          font-size: clamp(28px, 4vw, 48px);
+        }
+      }
+
+      .videos-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px;
+        margin-left: 0;
+        margin-right: 0;
+
+        .video-card {
+          max-width: 100%;
+          height: auto;
+          aspect-ratio: 16 / 14;
+        }
+      }
+    }
+  }
+
+
+// [4] Quotes
+  .cluster2-quotes {
+
+    @include c2-mobile-only {
+      height: auto;
+      min-height: 500px;
+      padding: 0;
+
+      .quotes-cards {
+        padding: 20px 16px;
+        align-items: center;
+
+        .quote-card {
+          width: 100%;
+          max-width: 100%;
+          height: auto;
+          min-height: 300px;
+          padding: 40px 20px 20px;
+
+          .quote-body {
+            .quote-badge {
+              margin-top: 20px;
+              font-size: 12px;
+            }
+
+            .quote-subtext {
+              font-size: clamp(16px, 4vw, 26px);
+            }
+
+            .quote-text {
+              font-size: clamp(16px, 4vw, 26px);
+            }
+
+            .quote-footer {
+              flex-direction: column;
+              gap: 12px;
+              align-items: flex-start;
+            }
+          }
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      height: auto;
+      min-height: 650px;
+
+      .quotes-cards {
+        padding: 30px;
+        align-items: flex-end;
+
+        .quote-card {
+          width: min(550px, 85%);
+          height: auto;
+          min-height: 320px;
+        }
+      }
+    }
+  }
+
+
+// [5] Education
+  .cluster2-education {
+
+    @include c2-mobile-only {
+      height: auto;
+      min-height: 500px;
+      overflow: visible;
+
+      .edu-cards-wrapper {
+        padding: 30px 16px;
+        gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        &::-webkit-scrollbar { display: none; }
+      }
+
+      .edu-card {
+        width: 250px;
+        min-width: 250px;
+        max-width: 250px;
+        min-height: 340px;
+        margin-top: 20px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        scroll-snap-align: center;
+        flex-shrink: 0;
+
+        &:first-child,
+        &.first {
+          margin-right: 0 !important;
+          margin-left: 0 !important;
+        }
+      }
+
+      .edu-pagination {
+        bottom: 15px;
+      }
+    }
+
+    @include c2-tablet-only {
+      height: auto;
+      min-height: 600px;
+      overflow: visible;
+
+      .edu-cards-wrapper {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 40px 24px;
+        gap: 20px;
+        transform: none !important;
+      }
+
+      .edu-card {
+        width: calc(50% - 20px);
+        min-width: 250px;
+        max-width: 300px;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+
+        &:first-child,
+        &.first {
+          margin-right: 0 !important;
+          margin-left: 0 !important;
+        }
+      }
+
+      .edu-pagination {
+        display: none;
+      }
+    }
+  }
+
+
+// [6] CLUB REVIEW 배너
+  .cluster2-review-banner {
+
+    @include c2-mobile-only {
+      height: 150px;
+      margin: 24px 0;
+
+      .review-banner-title-shadow,
+      .review-banner-title {
+        font-size: clamp(28px, 8vw, 60px);
+      }
+    }
+
+    @include c2-tablet-only {
+      height: 180px;
+      margin: 30px 0;
+
+      .review-banner-title-shadow,
+      .review-banner-title {
+        font-size: clamp(40px, 6vw, 60px);
+      }
+    }
+  }
+
+
+// [7] Section 4: Cluving Review
+  .cluster2-section4 {
+
+    @include c2-mobile-only {
+      flex-direction: column !important;
+      align-items: center;
+      gap: 24px;
+      padding: 0 16px !important;
+      margin-top: -20px;
+      margin-bottom: 40px;
+
+      .section4-left {
+        width: 100% !important;
+        flex: none !important;
+
+        .quote-card-item {
+          width: 100% !important;
+          min-width: 0 !important;
+          max-width: 100%;
+          height: auto;
+          min-height: 220px;
+
+          .quote-overlay .quote-text {
+            width: 100% !important;
+            font-size: clamp(16px, 4vw, 24px);
+          }
+        }
+      }
+
+      .section4-right {
+        width: 100% !important;
+        flex: none !important;
+
+        .total-complete-box {
+          width: 100% !important;
+          height: auto;
+          min-height: 200px;
+          padding: 24px 16px;
+          flex-direction: column;
+
+          .victory-badge {
+            width: 100px;
+            height: 100px;
+            margin-left: 0;
+          }
+
+          .complete-text {
+            h2 {
+              font-size: clamp(24px, 6vw, 40px);
+            }
+
+            .goto-btn {
+              position: static;
+              transform: none;
+              margin-top: 10px;
+            }
+          }
+        }
+
+        .review-grid-9 {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 12px;
+          width: 100%;
+
+          .review-week-item {
+            width: 100%;
+            height: auto;
+            min-height: 150px;
+          }
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 0 24px !important;
+      margin-top: -30px;
+
+      .section4-left {
+        flex: 1 !important;
+        width: auto !important;
+        min-width: 0;
+
+        .quote-card-item {
+          width: 100% !important;
+          min-width: 0 !important;
+          height: auto;
+          min-height: 220px;
+
+          .quote-overlay .quote-text {
+            width: 100% !important;
+            font-size: clamp(18px, 2.5vw, 24px);
+          }
+        }
+      }
+
+      .section4-right {
+        flex: 1.4 !important;
+        width: auto !important;
+        min-width: 0;
+
+        .total-complete-box {
+          width: 100% !important;
+          height: auto;
+          min-height: 220px;
+
+          .complete-text h2 {
+            font-size: clamp(24px, 3.5vw, 40px);
+          }
+        }
+
+        .review-grid-9 {
+          grid-template-columns: repeat(3, 1fr) !important;
+          gap: 12px;
+          width: 100%;
+
+          .review-week-item {
+            width: 100%;
+            height: auto;
+            min-height: 150px;
+          }
+        }
+      }
+    }
+  }
+
+
+// [8] 자기소개서 - 카드 깨짐 수정
+  .cluster2-intro {
+
+    @include c2-mobile-only {
+      height: auto;
+      min-height: 600px;
+      padding: 40px 16px 40px;
+
+      .intro-title-wrapper {
+        .intro-title-shadow,
+        .intro-title {
+          font-size: clamp(28px, 7vw, 48px);
+        }
+      }
+
+      .intro-sub {
+        font-size: clamp(12px, 3vw, 16px);
+      }
+
+      .intro-cards {
+        width: 100%;
+
+        .intro-row {
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+
+          &.top-row,
+          &.bottom-row {
+            flex-direction: column;
+          }
+        }
+
+        .intro-card {
+          width: 100% !important;
+          max-width: 400px !important;
+          min-width: 0 !important;
+          height: auto !important;
+          min-height: 200px;
+
+          .card-header {
+            h4 {
+              font-size: 20px;
+              white-space: nowrap;
+            }
+
+            .card-icon {
+              width: 45px;
+              height: 45px;
+            }
+          }
+
+          p {
+            font-size: 15px;
+          }
+
+          .card-subtitle {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      height: auto;
+      min-height: 700px;
+      padding: 50px 24px 40px;
+
+      .intro-cards {
+        width: 100%;
+
+        .intro-row {
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+
+          &.top-row,
+          &.bottom-row {
+            flex-direction: column;
+          }
+
+          .intro-card {
+            width: 100% !important;
+            max-width: 500px;
+            min-width: 0 !important;
+            height: auto !important;
+            min-height: 180px;
+          }
+        }
+      }
+    }
+  }
+
+
+// [9] 모달 반응형
+  .section1-modal-overlay {
+    @include c2-mobile-only {
+      .section1-modal {
+        width: 98%;
+        max-width: 100%;
+        max-height: 95vh;
+
+        .section1-modal-header {
+          padding: 16px 20px;
+          h3 { font-size: 18px; }
+        }
+
+        .section1-modal-body {
+          padding: 20px 16px;
+        }
+      }
+    }
+  }
+
+  .section2-modal-overlay {
+    @include c2-mobile-only {
+      .section2-modal {
+        width: 98%;
+        max-height: 95vh;
+
+        .section2-modal-header { padding: 16px 20px; }
+        .section2-modal-body { padding: 20px 16px; }
+      }
+    }
+  }
+
+  .section21-modal-overlay {
+    @include c2-mobile-only {
+      .section21-modal {
+        width: 98%;
+        .section21-modal-body {
+          grid-template-columns: 1fr !important;
+          padding: 20px 16px;
+        }
+      }
+    }
+
+    @include c2-tablet-only {
+      .section21-modal {
+        .section21-modal-body {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+      }
+    }
+  }
+
+  .section3-modal-overlay {
+    @include c2-mobile-only {
+      .section3-modal {
+        width: 98%;
+        .section3-modal-body {
+          padding: 20px 12px;
+
+          .edu-edit-row {
+            flex-direction: column;
+            gap: 12px;
+            .edu-edit-field {
+              min-width: 0;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .section4-modal-overlay {
+    @include c2-mobile-only {
+      .section4-modal {
+        width: 98%;
+        .section4-modal-body { padding: 20px 16px; }
+      }
+    }
+  }
+
+  .intro-modal-overlay {
+    @include c2-mobile-only {
+      .intro-modal {
+        width: 98%;
+        max-height: 95vh;
+        .intro-modal-header { padding: 16px 20px; }
+      }
+    }
+  }
+
+  .delete-confirm-overlay {
+    @include c2-mobile-only {
+      .delete-confirm-modal {
+        width: 90%;
+        max-width: 320px;
+      }
+    }
+  }

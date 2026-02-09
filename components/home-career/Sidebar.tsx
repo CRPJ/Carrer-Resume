@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import koreaRegionsData from "@/data/korea-regions.json";
@@ -13,18 +13,19 @@ const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 const Sidebar = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
-  const [reliabilityRate, setReliabilityRate] = useState<number | null>(null);
-  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
-  const [completionRate, setCompletionRate] = useState<number | null>(null);
-  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(0); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(0); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(0); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(0); // 실무 경력 누적
-  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(true);
+  const [completionRate, setCompletionRate] = useState<number | null>(80);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(true);
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
+  const [hasActivityData, setHasActivityData] = useState<boolean>(true);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
@@ -32,11 +33,11 @@ const Sidebar = () => {
   const [badge3, setBadge3] = useState(0);
   // 배지 데이터 상태 (user_cumulative_points 테이블)
   const [badgeData, setBadgeData] = useState({
-    stars: 0,       // 별
-    lightnings: 0,  // 번개
-    shields: 0      // 방패
+    stars: 99999,       // 별
+    lightnings: 9999,   // 번개
+    shields: 99999      // 방패
   });
-  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(true);
 
   // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
   interface SeasonHistory {
@@ -53,8 +54,36 @@ const Sidebar = () => {
       start_date: string;
     };
   }
-  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
-  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([
+    {
+      id: 'dummy-1',
+      role_in_season: 'admin',
+      approved_weeks: 3,
+      total_weeks: 16,
+      progress_status: 'in_progress',
+      review_status: 'pending',
+      seasons: { id: 's1', year: 2025, name: 'winter', start_date: '2025-01-01' }
+    },
+    {
+      id: 'dummy-2',
+      role_in_season: 'crew_advanced',
+      approved_weeks: 8,
+      total_weeks: 8,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's2', year: 2025, name: 'fall', start_date: '2024-09-01' }
+    },
+    {
+      id: 'dummy-3',
+      role_in_season: 'crew_regular',
+      approved_weeks: 12,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's3', year: 2025, name: 'summer', start_date: '2024-06-01' }
+    }
+  ]);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(true);
 
   // 시즌 이름 한글 변환
   const seasonNameKorean: { [key: string]: string } = {
@@ -180,46 +209,105 @@ const Sidebar = () => {
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
+  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(520px)으로 유지하고
+  // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
-  const [availHeight, setAvailHeight] = useState(810);
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
   useEffect(() => {
     const calculateScale = () => {
-      // 줌 레벨 감지 (visualViewport 사용)
-      const zoom = window.visualViewport?.scale || 1;
+      const mobile = window.innerWidth < 1200;
+      setIsMobileView(mobile);
+
+      // 브라우저 줌 레벨 감지 (visualViewport 사용)
+      const browserZoom = window.visualViewport?.scale || 1;
+      const viewportWidth = window.visualViewport?.width || window.innerWidth;
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      
+      // ★ CSS zoom 값 가져오기 (ResponsiveScale에서 적용한 값)
+      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
 
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
-      const availableHeight = viewportHeight - (130 / zoom);
+      const availableHeight = viewportHeight - (130 / browserZoom);
 
       // 기준 카드 크기: 474 x 810
-      const baseCardWidth = 474;
       const baseCardHeight = 810;
 
+      // 모바일에서는 CSS 반응형(1199px 이하: width 100% / height auto)을 그대로 사용
+      if (mobile) {
+        setCardScale(1);
+
+        // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
+        document.documentElement.style.removeProperty('--card-width');
+        document.documentElement.style.removeProperty('--card-height');
+        document.documentElement.style.removeProperty('--card-scale');
+        document.documentElement.style.removeProperty('--sidebar-width');
+        document.documentElement.style.removeProperty('--container-height');
+        return;
+      }
+
       // 높이 기준으로 스케일 계산 (화면 높이에 딱 맞도록)
-      const scale = availableHeight / baseCardHeight;
+      let scale = availableHeight / baseCardHeight;
+      
+      // ★ CSS zoom 역보정: zoom이 1보다 크면 카드를 작게 만들어서 상쇄
+      if (cssZoom > 1) {
+        scale = scale / cssZoom;
+      }
+
+      // 기본 정책: 큰 화면에서 임의 확대 금지(비율 깨짐 방지)
+      scale = Math.min(1, scale);
+
+      // 1366x768급 노트북(세로가 낮은 환경)에서는 카드가 지나치게 작게 보일 수 있어
+      // "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
+      // (Cluster2에서도 동일 UX가 필요함)
+      const isClusterPages =
+        (pathname || '').includes('/cluster-2') ||
+        (pathname || '').includes('/cluster-3') ||
+        (pathname || '').includes('/cluster-4') ||
+        (pathname || '').includes('/cluster-4-1') ||
+        (pathname || '').includes('/cluster-4-card') ||
+        (pathname || '').includes('/career');
+      const isLaptop1366 =
+        !mobile &&
+        viewportWidth >= 1280 &&
+        viewportWidth <= 1440 &&
+        viewportHeight >= 700 &&
+        viewportHeight <= 820;
+
+      if (isClusterPages && isLaptop1366) {
+        // 레이아웃 상수(페이지에서 desktop-layout gap=20px)
+        const GAP_PX = 20;
+        const BASE_SIDEBAR_WIDTH = 520;
+        // 오른쪽 콘텐츠가 너무 좁아지지 않게 "최소 확보 폭" (침범 방지 가드레일)
+        const MIN_RIGHT_CONTENT = 760;
+
+        // 뷰포트에서 오른쪽 최소 폭을 남기고, 남는 만큼만 사이드바를 키울 수 있다.
+        const maxSidebarWidth = Math.max(BASE_SIDEBAR_WIDTH, viewportWidth - GAP_PX - MIN_RIGHT_CONTENT);
+        const maxScaleByWidth = maxSidebarWidth / BASE_SIDEBAR_WIDTH;
+
+        // "가능한 만큼" 확대(최대 상한은 과도 확대 방지)
+        const desiredScale = Math.min(1.5, maxScaleByWidth);
+        scale = Math.max(scale, desiredScale);
+      }
 
       setCardScale(scale);
-      setAvailHeight(availableHeight);
 
-      // 카드 실제 크기를 CSS 변수로 설정
-      const scaledWidth = baseCardWidth * scale;
-      const scaledHeight = baseCardHeight * scale;
-      document.documentElement.style.setProperty('--card-width', `${scaledWidth}px`);
-      document.documentElement.style.setProperty('--card-height', `${scaledHeight}px`);
-      document.documentElement.style.setProperty('--card-scale', `${scale}`);
-      // scaledWidth만 (margin-left: 16px가 CSS에서 적용됨)
-      document.documentElement.style.setProperty('--sidebar-width', `${scaledWidth}px`);
-      document.documentElement.style.setProperty('--container-height', `${availableHeight}px`);
+      // ★ 레이아웃 가드레일: 실제 사이드바 점유 폭을 CSS 변수로 동기화
+      // - fixed+spacer 방식(예: cluster-4-card)에서도 콘텐츠 침범이 발생하지 않게 함
+      // - scale < 1인 경우에도 "컬럼 폭"은 기본 520px을 유지
+      const BASE_SIDEBAR_WIDTH = 520;
+      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * Math.max(1, scale));
+      document.documentElement.style.setProperty('--sidebar-width', `${effectiveSidebarWidth}px`);
 
-      // 부모 컨테이너들의 높이를 직접 설정 (CSS 100vh가 줌을 무시하므로)
-      const contentHome = document.querySelector('.nftg-content-home') as HTMLElement;
-      const containerFluid = contentHome?.querySelector('.container-fluid') as HTMLElement;
-      const row = containerFluid?.querySelector('.row') as HTMLElement;
+      // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
+      document.documentElement.style.removeProperty('--card-width');
+      document.documentElement.style.removeProperty('--card-height');
+      document.documentElement.style.removeProperty('--card-scale');
+      document.documentElement.style.removeProperty('--container-height');
 
-      if (contentHome) contentHome.style.height = `${availableHeight}px`;
-      if (containerFluid) containerFluid.style.height = `${availableHeight}px`;
-      if (row) row.style.height = `${availableHeight}px`;
+      // 부모 컨테이너 높이 제한 제거 - 스크롤 시 프로필 잘림 방지
+      // (기존 코드 삭제됨)
     };
 
     calculateScale();
@@ -232,7 +320,7 @@ const Sidebar = () => {
       window.removeEventListener('resize', calculateScale);
       window.visualViewport?.removeEventListener('resize', calculateScale);
     };
-  }, []);
+  }, [pathname]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -308,24 +396,24 @@ const Sidebar = () => {
   // OK/EC/PX별 프로필 데이터
   const profileData = {
     OK: {
-      name: '이름',
-      nameEng: 'English Name',
+      name: '정이안',
+      nameEng: 'Jung Ian',
       gender: '여',
-      birthDate: '0000.00.00',
-      city: '00시',
-      district: '00구',
+      birthDate: '2002.02.02',
+      city: '서울특별시',
+      district: '강남구',
       phone: '010-1***-****',
-      email: 'writeyoureamil@gmail.com',
-      school: '한국대학교',
-      major: '한국학과',
-      major2: '경영학과',
-      major3: '컴퓨터학과',
-      enrollPeriod: '0000. 00',
-      graduationStatus: 'ing',
-      gpa: '0.0',
-      gpaMax: '0.0',
-      photo: '/images/0/crew profile/이안0.png',
-      quote: '로그인 후에 상단 연필 아이콘을 클릭하여 프로필을 완성해보세요 !',
+      email: 'gildong@naver.com',
+      school: '성균관대학교',
+      major: '사학과',
+      major2: '',
+      major3: '',
+      enrollPeriod: '2025.03',
+      graduationStatus: '재학중',
+      gpa: '3.0',
+      gpaMax: '4.5',
+      photo: '/images/0/cluster 1/shape.png',
+      quote: '가장 어두운 순간에도 앞으로 한 걸음 내딛는 자에게 길이 열린다가장 어두운 순간에도 앞으로 한 걸음 내딛는 자에게 길이 열린다',
       lightColor: '#FFEC8F',
       accentColor: '#FFC300'
     },
@@ -1133,7 +1221,8 @@ const Sidebar = () => {
     );
   }
 
-  return (
+  // ★ 모바일: 슬라이드 패널 전체를 body에 Portal 렌더링
+  const sidebarContent = (
     <div className="home-two-sidebar-col">
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shake {
@@ -1185,11 +1274,25 @@ const Sidebar = () => {
       `}} />
       {/* 스케일된 카드 - 비율 유지하며 화면에 맞춤 */}
       <div style={{
-        width: `${474 * cardScale}px`,
-        height: `${810 * cardScale}px`,
-        overflow: 'hidden'
+        // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
+        // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
+        width: isMobileView
+          ? '100%'
+          : (cardScale > 1 ? `${520 * cardScale}px` : 'var(--sidebar-width, 520px)'),
+        height: isMobileView ? 'auto' : `${810 * cardScale}px`,
+        overflow: isMobileView || cardScale > 1 ? 'visible' : 'hidden',
+        display: isMobileView ? 'block' : 'flex',
+        justifyContent: isMobileView ? undefined : 'center'
       }}>
-        <div className={`resume-card ${debugPanelType === 'EC' ? 'ec-theme' : debugPanelType === 'PX' ? 'px-theme' : ''}`} style={{ position: 'relative', transform: `scale(${cardScale})`, transformOrigin: 'top left' }}>
+        <div
+          className={`resume-card ${debugPanelType === 'EC' ? 'ec-theme' : debugPanelType === 'PX' ? 'px-theme' : ''}`}
+          style={{
+            position: 'relative',
+            ...(isMobileView
+              ? {}
+              : { transform: `scale(${cardScale})`, transformOrigin: 'top center' }),
+          }}
+        >
         {/* Header Section */}
         <div className="resume-header" style={{ position: 'relative' }}>
           <div className="resume-photo" style={{ position: 'relative' }}>
@@ -1214,30 +1317,6 @@ const Sidebar = () => {
                 <span style={{ color: '#fff', fontSize: '14px', fontFamily: 'Pretendard, sans-serif' }}>사진을 등록하세요.</span>
               </div>
             )}
-            {/* Edit Button - 프로필 이미지 우측 하단 */}
-            <button
-              className="resume-edit-btn"
-              onClick={handleEditButtonClick}
-              style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
-                border: 'none',
-                display: isOwner && debugProfileType === '본인' ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 5,
-                padding: 0,
-                boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-              }}
-            >
-              <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
-            </button>
           </div>
 
           {/* Hexagon Buttons */}
@@ -1328,6 +1407,28 @@ const Sidebar = () => {
                   >
                     <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
                   </span>{currentProfile.name} <span className="name-eng">{currentProfile.nameEng}</span>
+                  <button
+                    className="resume-edit-btn"
+                    onClick={handleEditButtonClick}
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
+                      border: 'none',
+                      display: isOwner && debugProfileType === '본인' ? 'inline-flex' : 'none',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      padding: 0,
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                      marginLeft: '8px',
+                      verticalAlign: 'middle',
+                      flexShrink: 0
+                    }}
+                  >
+                    <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
+                  </button>
                 </h1>
 
                 <div className="resume-details">
@@ -1399,40 +1500,14 @@ const Sidebar = () => {
                         cursor: 'default'
                       }}
                     >
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school}
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school} <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
                     </span>
                   </div>
+
                   <div className="detail-row">
                     <span style={{ width: '16px' }}></span>
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span style={{ color: currentProfile.lightColor }}>·</span>
-                      <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
-                          setTooltipVisible(tooltipVisible === 'major' ? null : 'major');
-                        }}
-                        style={{
-                          color: currentProfile.accentColor,
-                          fontSize: '14px',
-                          cursor: 'pointer',
-                          marginLeft: '-2px',
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}
-                      ><i className="ti ti-chevron-right"></i></span>
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span style={{ width: '16px' }}></span>
-                    <span className="sub-text" style={{ color: currentProfile.lightColor }}><span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod}</span>
+                    <span className="sub-text" style={{ color: currentProfile.lightColor }}>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod} ~ {currentProfile.graduationStatus}</span>
                   </div>
                 </div>
               </>
@@ -1705,16 +1780,14 @@ const Sidebar = () => {
                 {debugPanelType === 'EC' ? '전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레' : debugPanelType === 'PX' ? '전국청춘연합 기획/컨설팅 클럽, 팔랑크스' : '전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐'}
               </span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
             <div className="notice-box green">
               <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
               <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
               <div className="notice-stamp-wrapper" style={{ position: 'relative', width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', order: 3, flexShrink: 0, marginLeft: '8px' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40px', height: '40px', background: 'rgba(0, 0, 0, 0.3)', zIndex: 1 }}></div>
-                {crewStatus === 'Complete' && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />}
+                <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: 'relative', zIndex: 2 }} />
               </div>
             </div>
           </div>
@@ -3236,6 +3309,123 @@ const Sidebar = () => {
       )}
     </div>
   );
+
+  // ★ 모바일: Portal로 슬라이드 패널 렌더링
+  if (isMobileView && isMounted) {
+    return (
+      <>
+        {/* 세로 탭 버튼 — 항상 왼쪽에 고정 */}
+        {createPortal(
+          <button
+            onClick={() => setIsProfileOpen(true)}
+            style={{
+              position: 'fixed',
+              left: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 9989,
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              background: isProfileOpen
+                ? 'transparent'
+                : 'linear-gradient(180deg, #FAAB07 0%, #e09600 100%)',
+              color: '#000',
+              fontSize: '12px',
+              fontWeight: 800,
+              letterSpacing: '3px',
+              padding: isProfileOpen ? '0' : '16px 7px',
+              borderRadius: '0 8px 8px 0',
+              cursor: 'pointer',
+              userSelect: 'none' as const,
+              boxShadow: isProfileOpen ? 'none' : '2px 2px 12px rgba(250, 171, 7, 0.3)',
+              border: 'none',
+              fontFamily: 'Pretendard, sans-serif',
+              opacity: isProfileOpen ? 0 : 1,
+              pointerEvents: isProfileOpen ? 'none' as const : 'auto' as const,
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            PROFILE
+          </button>,
+          document.body
+        )}
+
+        {/* 오버레이 + 슬라이드 패널 */}
+        {createPortal(
+          <>
+            {/* 배경 오버레이 */}
+            <div
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.6)',
+                zIndex: 9990,
+                opacity: isProfileOpen ? 1 : 0,
+                pointerEvents: isProfileOpen ? 'auto' : 'none',
+                transition: 'opacity 0.3s ease',
+              }}
+            />
+
+            {/* 슬라이드 패널 */}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: '380px',
+                maxWidth: '85vw',
+                background: '#0a0a0a',
+                zIndex: 9991,
+                transform: isProfileOpen ? 'translateX(0)' : 'translateX(-100%)',
+                transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                borderRight: isProfileOpen ? '1px solid #FAAB07' : '1px solid #333',
+                boxShadow: isProfileOpen ? '4px 0 20px rgba(0, 0, 0, 0.5)' : 'none',
+              }}
+            >
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setIsProfileOpen(false)}
+                style={{
+                  position: 'sticky',
+                  top: '12px',
+                  float: 'right',
+                  marginRight: '12px',
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid #444',
+                  borderRadius: '50%',
+                  color: '#ccc',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                }}
+              >
+                ✕
+              </button>
+
+              {/* 실제 사이드바 콘텐츠 */}
+              {sidebarContent}
+            </div>
+          </>,
+          document.body
+        )}
+      </>
+    );
+  }
+
+  // ★ 데스크톱: 기존 그대로
+  return sidebarContent;
 };
 
 export default Sidebar;

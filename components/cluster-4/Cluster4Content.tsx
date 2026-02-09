@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -8,37 +8,41 @@ import { supabase } from "@/lib/supabase";
 
 // 기본 시즌 데이터 (데이터가 없을 때 사용)
 const defaultSeasonData = {
-  id: '',
-  year: '',
-  season: '-',
-  dateRange: '-',
-  status: '-',
-  statusClass: '',
-  image: '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
-  approvedWeeks: 0,
-  totalWeeks: 0,
-  roleInSeason: '',
-  isQualified: false,
-  seasonRoles: [],
-  stats: { dangam: 0, injeolmi: 0, eoheung: 0 },
-  rating: 0,
-  review: '',
+  id: 'dummy-season-1',
+  year: '2025',
+  season: '여름',
+  dateRange: '2025 - 03 - 23 (월) ~ 2025 - 08 - 22 (일)',
+  status: '시즌 진행 중',
+  statusClass: 'in-progress',
+  image: '/images/0/cluster4/cluster4-1/image.png',
+  approvedWeeks: 8,
+  totalWeeks: 10,
+  roleInSeason: '운영진(앰배서더)',
+  isQualified: true,
+  seasonRoles: [
+    { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/cluster4/cluster4-1/Ellipse 7.png' },
+    { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/cluster4/cluster4-1/Ellipse 8.png' },
+    { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 5, startedAt: '2025-03-23', profileImage: '/images/0/cluster4/cluster4-1/Ellipse 9.png' },
+  ],
+  stats: { dangam: 25, injeolmi: 30, eoheung: -2 },
+  rating: 6,
+  review: '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나',
   reviewLink: '',
   circles: {
-    weekUsage: 0,
-    scheduleReliability: 0,
-    seasonGrowth: 0,
-    approvedWeeks: 0,
-    totalOperatingWeeks: 0,
-    reliableWeeks: 0,
-    completedActivities: 0,
-    totalActivities: 0
+    weekUsage: 80,
+    scheduleReliability: 90,
+    seasonGrowth: 70,
+    approvedWeeks: 8,
+    totalOperatingWeeks: 10,
+    reliableWeeks: 9,
+    completedActivities: 75,
+    totalActivities: 120
   },
   progress: {
-    info: { total: 0, completed: 0, rate: 0 },
-    competency: { total: 0, completed: 0, rate: 0 },
-    experience: { total: 0, completed: 0, rate: 0 },
-    career: { total: 0, completed: 0, rate: 0 }
+    info: { total: 40, completed: 20, rate: 50 },
+    competency: { total: 40, completed: 30, rate: 80 },
+    experience: { total: 40, completed: 40, rate: 100 },
+    career: { total: 40, completed: 4, rate: 10 }
   }
 };
 
@@ -85,6 +89,7 @@ const Cluster4Content = () => {
     openModalFn();
   };
 
+  const headerRef = useRef<HTMLElement>(null);
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isTextFading, setIsTextFading] = useState(false);
@@ -137,7 +142,77 @@ const Cluster4Content = () => {
       vision: string | null;
     } | null;
   }
-  const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
+  const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([
+    {
+      id: 'dummy-rep-1',
+      reviewer_id: 'dummy-reviewer-1',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...',
+      keyword_1: '#추진력추진력',
+      keyword_2: '#추진력추진력',
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-1',
+        display_name: '안유현',
+        gender: '여',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url: '/images/0/cluster4/cluster4-1/Ellipse 10.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    },
+    {
+      id: 'dummy-rep-2',
+      reviewer_id: 'dummy-reviewer-2',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...',
+      keyword_1: '#추진력추진력',
+      keyword_2: '#추진력추진력',
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-2',
+        display_name: '이지민',
+        gender: '여',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url:  '/images/0/cluster4/cluster4-1/Ellipse 11.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    },
+    {
+      id: 'dummy-rep-3',
+      reviewer_id: 'dummy-reviewer-3',
+      target_user_id: 'dummy-target',
+      season_history_id: 'dummy-season-1',
+      rating: 6,
+      content: '',
+      keyword_1: null,
+      keyword_2: null,
+      created_at: '2025-03-23',
+      reviewer: {
+        id: 'dummy-reviewer-3',
+        display_name: '유성이',
+        gender: '남',
+        birth_date: '2002-01-01',
+        university: '서울대학교',
+        major_first: '미디어커뮤니케이션학과',
+        profile_photo_url:  '/images/0/cluster4/cluster4-1/Ellipse 12.png',
+        teamName: '엔터테인먼트팀',
+        partName: '내돈내산파트',
+        vision: '엔비디아구글테슬라쿵'
+      }
+    }
+  ]);
 
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
@@ -191,7 +266,12 @@ const Cluster4Content = () => {
     seasonName: string | null;
     weekNumber: number | null;
     isBreak?: boolean;
-  } | null>(null);
+  } | null>({
+    year: 2024,
+    seasonName: '가을',
+    weekNumber: 14,
+    isBreak: false
+  });
 
   // 성장 시작 정보
   const [growthStartInfo, setGrowthStartInfo] = useState<{
@@ -199,14 +279,23 @@ const Cluster4Content = () => {
     seasonName: string | null;
     weekNumber: number | null;
     isBreak?: boolean;
-  } | null>(null);
+  } | null>({
+    year: 2024,
+    seasonName: '가을',
+    weekNumber: 14,
+    isBreak: false
+  });
 
   // 성장 기간 통계 (시즌 기반)
   const [growthPeriodStats, setGrowthPeriodStats] = useState<{
     availableSeasons: number;
     approvedSeasons: number;
     restSeasons: number;
-  } | null>(null);
+  } | null>({
+    availableSeasons: 5,
+    approvedSeasons: 4,
+    restSeasons: 1
+  });
 
   // 시즌 역할 이력 타입
   interface SeasonRoleItem {
@@ -216,6 +305,7 @@ const Cluster4Content = () => {
     isAdmin: boolean;  // 운영진(팀장, 앰배서더) 여부
     adminGeneration: number | null;  // 운영진 기수 (예: 3, 4)
     startedAt: string;
+    profileImage?: string;
   }
 
   // 시즌 히스토리 (API에서 가져온 동적 데이터)
@@ -282,7 +372,7 @@ const Cluster4Content = () => {
   const [parts, setParts] = useState<Array<{ id: string; name: string; team_id: string }>>([]);
 
   // 메인 프로필 사진
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>('/images/0/cluster4/cluster4-1/이안0.png');
 
   // 현재 선택된 시즌 데이터 (동적 데이터 우선, 없으면 기본 데이터)
   const currentSeason: SeasonHistoryData = seasonHistories.length > 0
@@ -872,10 +962,10 @@ const Cluster4Content = () => {
     };
 
     const seasonImageMap: { [key: string]: string } = {
-      '봄': '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
-      '여름': '/images/0/cluster 4/시즌 이미지/여름_후보_3.png',
-      '가을': '/images/0/cluster 4/시즌 이미지/가을_후보_1.png',
-      '겨울': '/images/0/cluster 4/시즌 이미지/겨울_후보_1.png'
+      '봄': '/images/0/cluster4/시즌 이미지/봄_후보_1.png',
+      '여름': '/images/0/cluster4/cluster4-1/image.png',
+      '가을': '/images/0/cluster4/cluster4-1/image2.png',
+      '겨울': '/images/0/cluster4/cluster4-1/image3.png'
     };
 
     const getStatusInfo = (progressStatus: string): { status: string; statusClass: string } => {
@@ -1146,7 +1236,7 @@ const Cluster4Content = () => {
         dateRange: `${startDate} - ${endDate}`,
         status: statusInfo.status,
         statusClass: statusInfo.statusClass,
-        image: seasonImageMap[seasonName] || '/images/0/cluster 4/시즌 이미지/봄_후보_1.png',
+        image: seasonImageMap[seasonName] || '/images/0/cluster4/시즌 이미지/봄_후보_1.png',
         approvedWeeks: sh.approved_weeks || 0,
         totalWeeks: sh.total_weeks || 0,
         roleInSeason: sh.role_in_season || '',
@@ -1391,8 +1481,8 @@ const Cluster4Content = () => {
       setSeasonReviewSuccess(true);
 
       // 현재 시즌 데이터 업데이트
-      setSeasonHistories(prev => prev.map((season, idx) =>
-        idx === currentSeasonInfo.index
+      setSeasonHistories(prev => prev.map((season) =>
+        currentSeasonInfo && season.year === String(currentSeasonInfo.year) && season.season === currentSeasonInfo.name
           ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() }
           : season
       ));
@@ -1409,35 +1499,34 @@ const Cluster4Content = () => {
       setSeasonReviewSaving(false);
     }
   };
-
+ 
   return (
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
-      <section className="cluster4-section1">
+      <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
           <Link href="/cluster-4" className="tab">
-            <img src="/images/0/cluster%204/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
+            <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </Link>
           <div className="tab active">
-            <img src="/images/0/cluster%204/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
+            <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
-              <img src="/images/0/cluster%204/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
+              <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </div>
         </div>
 
         {/* 타이틀 */}
         <div className="section1-title-wrapper">
-          <div className="title-inner">
-            <h2 className="section1-title-shadow">CLUB CHALLENGE GROWTH</h2>
-            <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
-          </div>
+        <div className="title-inner">
+          <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
+        </div>
         </div>
 
         {/* 설명 텍스트 */}
@@ -1464,7 +1553,7 @@ const Cluster4Content = () => {
                 <h3 className="season-title-shadow">SEASON GROWTH</h3>
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
-              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster%204/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster4/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
                 <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>
@@ -1472,11 +1561,11 @@ const Cluster4Content = () => {
             {/* Add new collection 카드 */}
             <div className="collection-card">
               <div className="collection-icon">
-                <img src="/images/0/cluster%204/아호%20캐릭터.png" alt="아호 캐릭터" />
+                <img src="/images/0/cluster4/아호%20캐릭터.png" alt="아호 캐릭터" />
               </div>
               <div className="collection-content">
                 <div className="collection-header">
-                  <img src="/images/0/cluster 4/icon/icon - plus.png" alt="plus" className="add-icon" />
+                  <img src="/images/0/cluster4/icon/icon - plus.png" alt="plus" className="add-icon" />
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
@@ -1492,7 +1581,7 @@ const Cluster4Content = () => {
             {/* Details 카드 */}
             <div className="details-card">
               <div className="details-header">
-                <img src="/images/0/cluster 4/icon/icon - ppt.png" alt="details" className="toggle-icon" />
+                <img src="/images/0/cluster4/icon/icon - ppt.png" alt="details" className="toggle-icon" />
                 <span className="toggle-text">Details</span>
                 <span className="arrow-icon"></span>
               </div>
@@ -1539,7 +1628,7 @@ const Cluster4Content = () => {
 
           {/* 오른쪽 캐릭터 이미지 */}
           <div className="card-right">
-            <img src="/images/0/cluster 4/bg cha.png" alt="Character" />
+            <img src="/images/0/cluster4/bg cha.png" alt="Character" />
           </div>
         </div>
       </section>
@@ -1563,7 +1652,6 @@ const Cluster4Content = () => {
             </div>
           )}
           <div className="section3-title-wrapper">
-            <h2 className="section3-banner-text-shadow">SEASON CHALLENGE</h2>
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>
           </div>
           <div className="section3-banner-description">
@@ -1610,10 +1698,10 @@ const Cluster4Content = () => {
               <div className="qualified-items">
                 <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Part</span>
-                  <img src="/images/0/cluster 4/icon/icon - part.png" alt="Part" className="qualified-icon" />
+                  <img src="/images/0/cluster4/icon/icon - part.png" alt="Part" className="qualified-icon" />
                   <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
                     {currentSeason.isQualified ? (
-                      <img src="/images/0/cluster 4/sign 1.png" alt="Part tooltip" />
+                      <img src="/images/0/cluster4/sign 1.png" alt="Part tooltip" />
                     ) : (
                       <span className="unqualified-text">UnQualified</span>
                     )}
@@ -1621,10 +1709,10 @@ const Cluster4Content = () => {
                 </div>
                 <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Team</span>
-                  <img src="/images/0/cluster 4/icon/icon - team.png" alt="Team" className="qualified-icon" />
+                  <img src="/images/0/cluster4/icon/icon - team.png" alt="Team" className="qualified-icon" />
                   <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
                     {currentSeason.isQualified ? (
-                      <img src="/images/0/cluster 4/sign 2.png" alt="Team tooltip" />
+                      <img src="/images/0/cluster4/sign 2.png" alt="Team tooltip" />
                     ) : (
                       <span className="unqualified-text">UnQualified</span>
                     )}
@@ -1632,10 +1720,10 @@ const Cluster4Content = () => {
                 </div>
                 <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Cluv</span>
-                  <img src="/images/0/cluster 4/icon/icon - cluv.png" alt="Cluv" className="qualified-icon" />
+                  <img src="/images/0/cluster4/icon/icon - cluv.png" alt="Cluv" className="qualified-icon" />
                   <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
                     {currentSeason.isQualified ? (
-                      <img src="/images/0/cluster 4/sign 3.png" alt="Cluv tooltip" />
+                      <img src="/images/0/cluster4/sign 3.png" alt="Cluv tooltip" />
                     ) : (
                       <span className="unqualified-text">UnQualified</span>
                     )}
@@ -1643,10 +1731,10 @@ const Cluster4Content = () => {
                 </div>
                 <div className={`item-group ${currentSeason.isQualified ? '' : 'inactive'}`}>
                   <span className="item">Supervise</span>
-                  <img src="/images/0/cluster 4/icon/icon - supervise.png" alt="Supervise" className="qualified-icon" />
+                  <img src="/images/0/cluster4/icon/icon - supervise.png" alt="Supervise" className="qualified-icon" />
                   <div className={`tooltip ${currentSeason.isQualified ? '' : 'unqualified'}`}>
                     {currentSeason.isQualified ? (
-                      <img src="/images/0/cluster 4/sign 4.png" alt="Supervise tooltip" />
+                      <img src="/images/0/cluster4/sign 4.png" alt="Supervise tooltip" />
                     ) : (
                       <span className="unqualified-text">UnQualified</span>
                     )}
@@ -1663,12 +1751,12 @@ const Cluster4Content = () => {
               <div className={`season-image-stack ${isFlipping ? 'flipping' : ''}`}>
                 <div className="image-card card-back">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : currentSeason.image} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 2) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/cluster4-1/image3.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-middle">
                   <div className="card-frame">
-                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : currentSeason.image} alt="시즌" />
+                    <img src={seasonHistories.length > 0 ? (seasonHistories[(section3Page + 1) % seasonHistories.length]?.image || currentSeason.image) : '/images/0/cluster4/cluster4-1/image2.png'} alt="시즌" />
                   </div>
                 </div>
                 <div className="image-card card-front">
@@ -1683,9 +1771,9 @@ const Cluster4Content = () => {
             <div className={`center-column ${isTextFading ? 'fading' : ''}`}>
               {/* 영역 4: 통계 바 */}
               <div className="area-4-stats">
-                <span className="stat">단감 <img src="/images/0/cluster 4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">{currentSeason.stats.dangam}</strong><span className="unit">개</span></span>
-                <span className="stat">인절미 <img src="/images/0/cluster 4/icon/icon - 인절미.png" alt="인절미" className="stat-icon" /> <strong className="number">{currentSeason.stats.injeolmi}</strong><span className="unit">명</span></span>
-                <span className="stat">어흥 <img src="/images/0/cluster 4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">-{currentSeason.stats.eoheung}</strong><span className="unit">개</span></span>
+                <span className="stat">단감 <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">{currentSeason.stats.dangam}</strong><span className="unit">개</span></span>
+                <span className="stat">인절미 <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="stat-icon" /> <strong className="number">{currentSeason.stats.injeolmi}</strong><span className="unit">개</span></span>
+                <span className="stat">어흥 <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">{currentSeason.stats.eoheung}</strong><span className="unit">개</span></span>
               </div>
 
               {/* 영역 5: 평점 및 리뷰 */}
@@ -1718,13 +1806,13 @@ const Cluster4Content = () => {
                           <img
                             key={star}
                             className={`star-icon ${isFull ? '' : isHalf ? 'half' : 'empty'}`}
-                            src="/images/0/cluster 4/icon - star.png"
+                            src="/images/0/cluster4/icon - star.png"
                             alt="star"
                             style={{ opacity: isFull ? 1 : isHalf ? 0.6 : 0.3 }}
                           />
                         );
                       })}
-                      <span className="rating-text">{(currentSeason.rating || 0).toFixed(1)} / 5.0</span>
+                      <span className="rating-text">{currentSeason.rating || 0} / 10</span>
                     </div>
                     <span className="review-label">Season Review</span>
                   </div>
@@ -1768,7 +1856,7 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.weekUsage / 100)} />
                     </svg>
-                    <img src="/images/0/cluster 4/icon/icon - 주차 활용도.png" alt="주차 활용도" className="circle-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 주차 활용도.png" alt="주차 활용도" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.weekUsage}%</div>
                   </div>
                   <div className="circle-label">
@@ -1782,7 +1870,7 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.scheduleReliability / 100)} />
                     </svg>
-                    <img src="/images/0/cluster 4/icon/icon - 일정 신뢰도.png" alt="일정 신뢰도" className="circle-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 일정 신뢰도.png" alt="일정 신뢰도" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.scheduleReliability}%</div>
                   </div>
                   <div className="circle-label">
@@ -1796,7 +1884,7 @@ const Cluster4Content = () => {
                       <circle className="bg" cx="50" cy="50" r="40" />
                       <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.seasonGrowth / 100)} />
                     </svg>
-                    <img src="/images/0/cluster 4/icon/icon - 시즌 성장률.png" alt="시즌 성장률" className="circle-icon" />
+                    <img src="/images/0/cluster4/icon/icon - 시즌 성장률.png" alt="시즌 성장률" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.seasonGrowth}%</div>
                   </div>
                   <div className="circle-label">
@@ -1810,8 +1898,8 @@ const Cluster4Content = () => {
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress.info.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.info.total} 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress.info.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.info.total} 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.info.rate}%` }}></div>
@@ -1819,8 +1907,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress.competency.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.competency.total} 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress.competency.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.competency.total} 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.competency.rate}%` }}></div>
@@ -1828,8 +1916,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress.experience.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.experience.total} 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress.experience.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.experience.total} 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.experience.rate}%` }}></div>
@@ -1837,8 +1925,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster 4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress.career.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster 4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.career.total} 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress.career.rate}%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.career.total} 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.career.rate}%` }}></div>
@@ -1851,13 +1939,13 @@ const Cluster4Content = () => {
             <div className={`right-column ${isTextFading ? 'fading' : ''}`}>
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster 4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
                 <div className="status-badges">
                   {currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0 ? (
                     currentSeason.seasonRoles.map((roleItem, index) => (
                       <div className="badge-item" key={index}>
                         <div className="badge-icon">
-                          <img src={profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                        <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
                         </div>
                         <div className="badge-info">
                           {roleItem.isAdmin ? (
@@ -1892,7 +1980,7 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster 4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
                 <div className="profile-cards">
                   {seasonReputations.length > 0 ? (
                     seasonReputations.slice(0, 3).map((reputation) => {
@@ -1932,29 +2020,46 @@ const Cluster4Content = () => {
                           </div>
                           <div
                             className="comment"
-                            style={{ cursor: 'pointer' }}
+                            style={{ cursor: 'pointer', position: 'relative' }}
                             onClick={() => { setSelectedReputation(reputation); setReputationDetailModalOpen(true); }}
                           >
-                            <img className="speech-icon" src="/images/0/cluster 4/icon - speech.png" alt="speech" />
+                            <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
                             {reputation.content.length > 30 ? `${reputation.content.substring(0, 30)}...` : reputation.content}
-                            {reputation.content.length > 30 && <img className="more-icon" src="/images/0/cluster 4/icon - 더보기.png" alt="more" />}
+                            <span className="arrow-icon" style={{
+                              position: 'absolute',
+                              right: '8px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              width: '14px',
+                              height: '14px',
+                              background: '#FAAB07',
+                              borderRadius: '3px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '2px'
+                            }}>
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </span>
                           </div>
                           <div className="stats">
-                            <span className="pm"><img className="wifi-icon" src="/images/0/cluster 4/icon - wifi.png" alt="wifi" /> FM : 3</span>
+                            <span className="pm"><img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :325</span>
                             <span className="rating">
                               {[...Array(fullStars)].map((_, i) => (
-                                <img key={`full-${i}`} className="star-icon" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                                <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />
                               ))}
                               {hasHalfStar && (
                                 <span className="star-half">
-                                  <img className="star-half-filled" src="/images/0/cluster 4/icon - star.png" alt="star" />
-                                  <img className="star-half-empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                                  <img className="star-half-filled" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                  <img className="star-half-empty" src="/images/0/cluster4/icon - star.png" alt="star" />
                                 </span>
                               )}
                               {[...Array(emptyStars)].map((_, i) => (
-                                <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster 4/icon - star.png" alt="star" />
+                                <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
                               ))}
-                              <span className="rating-score">{reputation.rating.toFixed(1)} / 10.0</span>
+                              <span className="rating-score">{reputation.rating} / 10</span>
                             </span>
                           </div>
                         </div>
@@ -2373,20 +2478,20 @@ const Cluster4Content = () => {
                       <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>평점</span>
                       <div style={{ display: 'flex', gap: '2px' }}>
                         {[...Array(fullStars)].map((_, i) => (
-                          <img key={`full-${i}`} src="/images/0/cluster 4/icon - star.png" alt="star" style={{ width: '18px', height: '18px' }} />
+                          <img key={`full-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: '18px', height: '18px' }} />
                         ))}
                         {hasHalfStar && (
-                          <img src="/images/0/cluster 4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.5 }} />
+                          <img src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.5 }} />
                         )}
                         {[...Array(emptyStars)].map((_, i) => (
-                          <img key={`empty-${i}`} src="/images/0/cluster 4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.2 }} />
+                          <img key={`empty-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.2 }} />
                         ))}
                       </div>
                       <span style={{ color: '#FFA500', fontSize: '14px', fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
                     </div>
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>|</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <img src="/images/0/cluster 4/icon - wifi.png" alt="wifi" style={{ width: '16px', height: '16px', opacity: 0.8 }} />
+                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" style={{ width: '16px', height: '16px', opacity: 0.8 }} />
                       <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>FM : 3</span>
                     </div>
                   </div>
@@ -2471,7 +2576,7 @@ const Cluster4Content = () => {
                       return (
                         <div key={starIndex} style={{ width: '24px', height: '24px', position: 'relative' }}>
                           <img
-                            src="/images/0/cluster 4/icon - star.png"
+                            src="/images/0/cluster4/icon - star.png"
                             alt="star"
                             style={{
                               width: '100%',

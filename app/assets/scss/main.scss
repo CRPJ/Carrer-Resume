@@ -15,6 +15,7 @@
      2.01 --> reset
      2.02 --> typography
      2.03 --> global
+     2.04 --> zoom-stable-layout (반응형 CSS 변수)
 
  03. components
      3.01 --> buttons
@@ -73,6 +74,8 @@
     ==================================
 ============== */
 
+// (moved) mobile-responsive는 가장 마지막에 로드 (오버라이드)
+
 // Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
 
@@ -108,6 +111,7 @@
 @import "./base/reset";
 @import "./base/typography";
 @import "./base/global";
+@import "./base/zoom-stable-layout"; // ★ 반응형 CSS 변수 시스템 추가
 
 // component styles
 @import "./components/buttons";
@@ -131,3 +135,12 @@
 
 // responsive styles
 @import "./responsive";
+
+// ★ Cluster 반응형 패치 (responsive 뒤, mobile-responsive 앞)
+@import "./components/cluster2-responsive";
+@import "./components/cluster3-responsive";
+@import "./components/cluster4-season-responsive";
+@import "./components/cluster4-week-responsive";
+
+// 모바일/태블릿 오버라이드(반드시 마지막)
+@import "./components/mobile-responsive";

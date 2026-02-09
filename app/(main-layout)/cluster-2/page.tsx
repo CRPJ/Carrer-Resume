@@ -7,68 +7,198 @@ import Cluster2Content from "@/components/cluster-2/Cluster2Content";
 import Animations from "@/components/shared/Animations";
 
 const Cluster2Page = () => {
-  // 사이드바 크기는 CSS 변수로 동적 조절됨
-  const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
-    position: 'fixed',
-    left: '110px',
-    top: '124px',
-    overflow: 'visible',
-    zIndex: 100,
-  });
+  const [isMobile, setIsMobile] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
+  const sidebarShellRef = useRef<HTMLDivElement>(null);
+  const sidebarInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const footer = document.querySelector('footer');
-      if (!footer) return;
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1200);
+    };
 
-      const footerRect = footer.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-      // 푸터가 화면에 보이기 시작하면 - 사이드바를 위로 이동
-      if (footerRect.top < windowHeight) {
-        const moveUp = windowHeight - footerRect.top;
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: `${124 - moveUp}px`,
-          overflow: 'visible',
-          zIndex: 100,
-        });
-      } else {
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: '124px',
-          overflow: 'visible',
-          zIndex: 100,
-        });
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
+  useEffect(() => {
+    if (isMobile || !sidebarShellRef.current || !sidebarInnerRef.current) return;
+
+    const shell = sidebarShellRef.current;
+    const inner = sidebarInnerRef.current;
+    const headerTopPx = 100;
+
+    let rafId: number | null = null;
+    let isFixed = false;
+
+    // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
+    const computeTop = (zoom: number, height: number) => {
+      const defaultTop = headerTopPx / zoom;
+      let top = defaultTop;
+
+      const footer = document.querySelector("footer");
+      if (footer) {
+        const footerTop = footer.getBoundingClientRect().top / zoom;
+        // 하단 테두리/그림자까지 안전하게 보이도록 여유를 조금 더 확보
+        const margin = 68 / zoom;
+        const maxTop = Math.floor(footerTop - height - margin);
+        top = Math.min(defaultTop, maxTop);
+      }
+
+      return top;
+    };
+
+    const apply = () => {
+      rafId = null;
+
+      // ★ zoom 값 가져오기
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      
+      const shellRect = shell.getBoundingClientRect();
+      const shouldFix = shellRect.top <= headerTopPx;
+
+      // 고정 진입
+      if (!isFixed && shouldFix) {
+        const width = shell.offsetWidth;
+        // offsetHeight는 transform/zoom 체감 높이와 달라 footer 직전에서 하단이 잘릴 수 있어
+        // "보이는 높이" 기반으로 계산한다.
+        const height = inner.getBoundingClientRect().height / zoom;
+        
+        // ★ zoom 보정: fixed 요소의 left는 zoom으로 나눠줘야 함
+        const left = shellRect.left / zoom;
+        const top = computeTop(zoom, height);
+
+        shell.style.width = `${width}px`;
+        // 레이아웃 자리 유지용 shell 높이는 기존(레이아웃) 기준으로 유지
+        shell.style.height = `${inner.offsetHeight}px`;
+
+        inner.style.position = 'fixed';
+        inner.style.top = `${top}px`;
+        inner.style.left = `${left}px`;
+        inner.style.width = `${width}px`;
+        inner.style.zIndex = '9999';
+
+        isFixed = true;
+        return;
+      }
+
+      // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
+      if (isFixed && shouldFix) {
+        const height = inner.getBoundingClientRect().height / zoom;
+        const top = computeTop(zoom, height);
+        inner.style.top = `${top}px`;
+        return;
+      }
+
+      // 고정 해제
+      if (isFixed && !shouldFix) {
+        shell.style.width = '';
+        shell.style.height = '';
+
+        inner.style.position = 'relative';
+        inner.style.top = '0';
+        inner.style.left = '0';
+        inner.style.width = '';
+        inner.style.zIndex = '100';
+
+        isFixed = false;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // 초기 실행
+    const handleScroll = () => {
+      if (rafId != null) return;
+      rafId = window.requestAnimationFrame(apply);
+    };
 
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleResize = () => {
+      // 리사이즈 시 초기화
+      isFixed = false;
+      
+      shell.style.width = '';
+      shell.style.height = '';
+      inner.style.position = 'relative';
+      inner.style.top = '0';
+      inner.style.left = '0';
+      inner.style.width = '';
+      
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(apply);
+    };
 
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+    
+    // 초기 실행
+    rafId = window.requestAnimationFrame(apply);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+    };
+  }, [isMobile]);
+
+  // 모바일 레이아웃
+  if (isMobile) {
+    return (
+      <main ref={mainRef} className="nftg-content nftg-content-home mobile-layout">
+        <Animations />
+        
+        <div className="mobile-container">
+          <div className="mobile-sidebar-section">
+            <Sidebar />
+          </div>
+          
+          <div className="mobile-tabs-section">
+            <ClusterTabs />
+          </div>
+          
+          <div className="mobile-content-section">
+            <Cluster2Content />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // 데스크탑 레이아웃
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      {/* 고정 사이드바 */}
-      <div style={sidebarStyle}>
-        <Sidebar />
-      </div>
-      {/* 메인 콘텐츠 */}
-      <div className="container-fluid">
-        <div className="row">
-          {/* 사이드바 공간 확보용 빈 영역 - CSS 변수로 동적 조절 */}
-          <div style={{ width: 'var(--sidebar-width, 520px)', flexShrink: 0 }}></div>
-          <div className="home-two-content-col">
-            <ClusterTabs />
-            <div className="home-two-content">
-              <Cluster2Content />
-            </div>
+      
+      <div className="desktop-layout" style={{
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'flex-start',
+        position: 'relative',
+      }}>
+        {/* 사이드바 */}
+        <div
+          ref={sidebarShellRef}
+          className="sidebar-sticky-wrapper"
+          style={{ flexShrink: 0, zIndex: 100 }}
+        >
+          <div ref={sidebarInnerRef} style={{ position: 'relative', zIndex: 100 }}>
+            <Sidebar />
+          </div>
+        </div>
+        
+        {/* 메인 콘텐츠 - flex: 1로 남은 공간 모두 차지 */}
+        <div 
+          className="home-two-content-col" 
+          style={{ 
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <ClusterTabs />
+          <div className="home-two-content">
+            <Cluster2Content />
           </div>
         </div>
       </div>

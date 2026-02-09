@@ -12,6 +12,14 @@
   background-color: var(--template-bg);
   border-bottom: 1px solid #39424c;
 
+  // 1366x768 근처에서 첫 메뉴(CAREER) 좌측이 미세하게 잘리는 현상 방지
+  // - 레이아웃 전체는 유지하고, 메뉴 리스트에만 최소 패딩을 추가
+  @media (min-width: 1200px) and (max-width: 1400px) {
+    .navbar__list {
+      padding-left: 8px;
+    }
+  }
+
   .navbar__logo {
     img {
       max-width: 40px;

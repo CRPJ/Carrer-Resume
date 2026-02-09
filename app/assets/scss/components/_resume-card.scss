@@ -69,7 +69,7 @@
 }
 
 // Resume Card - Exact Design Match
-// 474px x 810px 고정 (transform: scale로 크기 조절)
+// 474px x 810px 고정 (데스크탑용, 모바일에서는 유연하게)
 .resume-card {
   width: 474px !important;
   min-width: 474px !important;
@@ -85,6 +85,119 @@
   padding: 0;
   position: relative;
   box-sizing: border-box !important;
+  
+  // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
+  @media only screen and (max-width: 1199px) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    padding: 12px !important;
+    overflow: hidden !important;
+    
+    // 내부 고정 너비 요소들 모두 100%로 변경
+    .resume-header,
+    .resume-intro,
+    .resume-three-column,
+    .resume-stats,
+    .resume-badges,
+    .resume-medal,
+    .resume-activities,
+    .resume-bottom-section,
+    .resume-skills,
+    .resume-notices,
+    .activity-row,
+    .stat-row,
+    .progress-bar {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .resume-header {
+      gap: 10px !important;
+      margin: 0 0 10px 0 !important;
+      overflow: hidden !important;
+    }
+    
+    // ★ 사진 축소 + mask 해제
+    .resume-photo {
+      width: 90px !important;
+      height: 113px !important;
+      min-width: 90px !important;
+      max-width: 90px !important;
+      min-height: 113px !important;
+      max-height: 113px !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+      border-radius: 4px !important;
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+
+      img {
+        width: 90px !important;
+        height: 113px !important;
+        object-fit: cover !important;
+      }
+    }
+
+    // ★ 정보 영역 폰트 축소
+    .resume-info {
+      padding: 0 !important;
+      margin: 0 !important;
+      margin-top: 0 !important;
+      overflow: hidden !important;
+
+      .resume-name {
+        font-size: 16px !important;
+        line-height: 1.3 !important;
+        margin: 0 0 6px 0 !important;
+        padding: 0 !important;
+        padding-right: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+
+        .name-eng { font-size: 11px !important; }
+      }
+
+      .resume-details .detail-row {
+        font-size: 11px !important;
+        gap: 4px !important;
+
+        .detail-icon { width: 12px !important; height: 12px !important; }
+      }
+    }
+
+    // 소개글 — 원본 크기에 가깝게
+    .resume-intro {
+      font-size: 18px !important;
+      line-height: 1.5 !important;
+      padding: 14px 20px !important;
+      margin: 0 0 10px 0 !important;
+      height: auto !important;
+      min-height: 80px;
+      word-break: keep-all !important;
+    }
+
+    // 실무 역량 skill-label 의미 단위 줄바꿈
+    .resume-skills .skill-card .skill-label {
+      white-space: normal !important;
+      word-break: keep-all !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      font-size: 10px !important;
+      line-height: 1.3 !important;
+    }
+
+    // ★ 인라인 width:474px override
+    > div[style*="474"] {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
 
   * {
     box-sizing: border-box;
@@ -180,13 +293,13 @@
       .resume-details {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 10px;
 
         .detail-row {
           display: flex;
           gap: 10px;
           font-size: 14px;
-          line-height: 1.4;
+          line-height: 1.6;
           color: #FFFFFF;
           align-items: center;
 
@@ -460,6 +573,13 @@
       background-position: center;
       transition: width 0.3s ease;
 
+      // Running 상태: Figma처럼 미세하게 반짝이며 눈에 띄도록
+      // (다른 상태에는 영향 없음)
+      &:not(.short-medium):not(.medium):not(.long) {
+        // 애니메이션 없이 "고정 글로우"만 유지
+        filter: drop-shadow(0 0 10px rgba(255, 236, 143, 0.6));
+      }
+
       // 짧은-중간 길이 (Complete)
       &.short-medium {
         width: 90px;
@@ -481,79 +601,34 @@
         font-size: 12px;
       }
     }
+
+    // NOTE: running-glow keyframes는 고정 글로우로 전환되어 미사용
   }
 
   // Activities
   .resume-activities {
     width: 472px;
+    // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
+    // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
+    // → 스크롤은 유지하되 스크롤바만 숨겨 OS/모니터별 표시 편차를 제거.
     height: 95px;
     max-height: 95px;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     padding: 0;
     margin: 0;
     display: block;
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE/Edge legacy
 
-    // Custom scrollbar
+    // Hide scrollbar (Chromium/Safari)
     &::-webkit-scrollbar {
-      width: 2px;
-      display: block;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #2a2a2a;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #FFEC8F;
-      border-radius: 2px;
-
-      .resume-card.px-theme & {
-        background: #B2FF8F !important;
-      }
-
-      .resume-card.ec-theme & {
-        background: #FF98A6 !important;
-      }
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: #FFD700;
-
-      .resume-card.px-theme & {
-        background: #90EE90 !important;
-      }
-
-      .resume-card.ec-theme & {
-        background: #FF6B8A !important;
-      }
-    }
-
-    // Remove scrollbar arrows - all button types
-    &::-webkit-scrollbar-button {
       display: none !important;
       width: 0 !important;
       height: 0 !important;
     }
-    &::-webkit-scrollbar-button:single-button {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:start:decrement {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:end:increment {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:vertical:start:increment {
-      display: none !important;
-    }
-    &::-webkit-scrollbar-button:vertical:end:decrement {
-      display: none !important;
-    }
 
-    // Firefox
-    scrollbar-width: thin;
-    scrollbar-color: #FFEC8F #2a2a2a;
+    // (스크롤바 커스텀/색상 지정은 제거: 숨김 처리와 충돌 방지)
 
     .activity-row {
       display: flex;
@@ -1208,8 +1283,13 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     row-gap: 8px;
-    // 5개씩 한 줄에 배치 (250px * 5 + gap 6px * 4 = 1274px)
-    max-width: 1274px;
+    // 기본: 5개씩 한 줄에 배치 (250px * 5 + gap 6px * 4 = 1274px)
+    max-width: min(1274px, 100%);
+
+    // 4K(3840px) 등 초광폭 화면에서는 더 많은 탭이 한 줄에 노출되도록 확장
+    @media (min-width: 2000px) {
+      max-width: min(2400px, 100%);
+    }
   }
 
   // 두 줄 모드에서 그라데이션과 화살표 숨김
@@ -1228,7 +1308,9 @@
     min-width: 250px;
     padding: 0 20px;
     border-radius: 0;
-    font-family: var(--black-ops-one), 'Black Ops One', cursive;
+    // Figma(Group 2121454060) 탭 라벨 폰트: Chakra Petch Bold
+    // (요청대로 "폰트만" 시안과 동일하게 맞춤)
+    font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.3px;
@@ -1244,6 +1326,9 @@
     flex-shrink: 0;
 
     .tab-text {
+      // Bold가 얇게 보이는 이슈 방지: 텍스트 노드에 굵기/폰트 명시
+      font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+      font-weight: 700;
       line-height: 1.4;
       background: linear-gradient(to right, #FED402, #FFF1AA);
       background-clip: text;
@@ -1296,6 +1381,8 @@
       }
 
       .tab-text {
+        font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+        font-weight: 700;
         background: none !important;
         -webkit-text-fill-color: #000 !important;
         -webkit-background-clip: unset !important;

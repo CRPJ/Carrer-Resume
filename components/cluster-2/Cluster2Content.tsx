@@ -30,24 +30,79 @@ interface EduData {
 }
 
 // 학력 데이터 (기본값 - DB에서 로드되면 덮어씀)
+// ※ 피그마 시안용 더미 데이터 — 실제 DB 데이터가 로드되면 자동으로 교체됨
 const initialEducationData: EduData[] = [
   {
-    eduLevel: "-",
-    school: "-",
-    status: "-",
-    category: "-",
-    major1: "-",
-    major2: "-",
-    major3: "-",
-    period: "-",
-    startYear: "",
-    startMonth: "",
+    eduLevel: "대학교",
+    school: "고려 대학교",
+    status: "재학",
+    category: "사회",
+    major1: "콘텐츠전략학",
+    major2: "디지털마케팅학",
+    major3: "",
+    period: "2025.03 - ~ing",
+    startYear: "2025",
+    startMonth: "03",
     endYear: "",
     endMonth: "",
-    gradeMax: "-",
-    gradeValue: "-",
-    description: "-",
+    gradeMax: "4.5",
+    gradeValue: "3.8",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
     isFinal: true
+  },
+  {
+    eduLevel: "대학교",
+    school: "연세 대학교",
+    status: "중퇴",
+    category: "예체능",
+    major1: "미디어커뮤니케이션학과",
+    major2: "",
+    major3: "",
+    period: "2021.03 - 2024.02",
+    startYear: "2021",
+    startMonth: "03",
+    endYear: "2024",
+    endMonth: "02",
+    gradeMax: "4.3",
+    gradeValue: "4.12",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
+  },
+  {
+    eduLevel: "고등학교",
+    school: "서울과학 고등학교",
+    status: "졸업",
+    category: "기타",
+    major1: "",
+    major2: "",
+    major3: "",
+    period: "2018.03 - 2021.02",
+    startYear: "2018",
+    startMonth: "03",
+    endYear: "2021",
+    endMonth: "02",
+    gradeMax: "9등급",
+    gradeValue: "2",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
+  },
+  {
+    eduLevel: "중학교",
+    school: "용산 중학교",
+    status: "졸업",
+    category: "상경",
+    major1: "",
+    major2: "",
+    major3: "",
+    period: "2015.03 - 2018.02",
+    startYear: "2015",
+    startMonth: "03",
+    endYear: "2018",
+    endMonth: "02",
+    gradeMax: "100%",
+    gradeValue: "15",
+    description: "나는 우리 학교를 너무너무너무 사랑하고 좋아하고 오예바리 입니다...",
+    isFinal: false
   }
 ];
 
@@ -133,6 +188,14 @@ const Cluster2Content = () => {
   const [starredPhoto, setStarredPhoto] = useState<number | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
   const [photoSaving, setPhotoSaving] = useState(false);
+
+  // Section1 좌측 4개 육각형 기본 이미지 (업로드 없을 때 표시)
+  const defaultSubPhotos = [
+    "/images/0/cluster 2/이안1.webp",
+    "/images/0/cluster 2/이안2.webp",
+    "/images/0/cluster 2/이안3.jpg",
+    "/images/0/cluster 2/이안4.jpg",
+  ];
 
   // 이미지 압축 함수 (2MB 이하로)
   const compressImage = async (file: File, maxSizeMB: number = 2): Promise<File> => {
@@ -502,7 +565,7 @@ const Cluster2Content = () => {
       viewers: "9.9k Viewers",
       thumbnail: "/images/0/cluster 2/영상 01.jpeg",
       isBookmarked: true,
-      videoUrl: ""
+      videoUrl: "https://youtu.be/B5buG5eQknw?si=t2NM_EM0eBd7GkRU"
     },
     {
       id: 2,
@@ -883,6 +946,7 @@ const Cluster2Content = () => {
   // 섹션 5 물결 파동 상태
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const introRef = useRef<HTMLDivElement>(null);
+  const videosRef = useRef<HTMLDivElement>(null);
   const rippleIdRef = useRef(0);
   const lastRippleTime = useRef(0);
 
@@ -955,6 +1019,8 @@ const Cluster2Content = () => {
   const handleWithUsClick = () => {
     setIsWiggling(true);
     setTimeout(() => setIsWiggling(false), 1000);
+    // 모바일 CTA 성격: 자기소개서 섹션으로 스크롤
+    introRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // 드래그 시작
@@ -1059,14 +1125,37 @@ const Cluster2Content = () => {
           <p className="quote-text">"Know thyself"</p>
           <p className="quote-highlight">"너 자신을 알라"</p>
           <p className="quote-author">- 소크라테스 (Socrates) -</p>
-        </div>
-      </div>
+
+          {/* Floating Icons - 설명 영역 우측 하단 */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '5px',
+            marginTop: '10px',
+            marginRight: '40px'    
+          }}>
+            <div className="edit-icon">
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" />
+            </div>
+            <div className="edit-icon">
+              <img src="/images/0/cluster 2/icon - help.png" alt="Help" />
+            </div>
+          </div>
+        </div>  {/* section1-description 닫힘 */}
+      </div>    {/* cluster2-title-wrapper 닫힘 */}
 
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame" style={{ position: 'relative' }}>
-        {/* Floating Icons - 로그인한 본인만 표시 */}
+        {/* Floating Icons - PROFILE 영역 우측 하단 */}
         {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="floating-icons" style={{
+            display: 'flex',
+            position: 'absolute',
+            bottom: '220px',
+            right: '40px',
+            zIndex: 100,
+            gap: '5px'
+          }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
@@ -1086,42 +1175,42 @@ const Cluster2Content = () => {
           {/* 큰 육각형 이미지 4개 */}
           <div className="hexagon-large-row">
             <div
-              className={`hexagon-large-item ${!subPhotos[0] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[0] || defaultSubPhotos[0]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(0)}
-              style={{ cursor: subPhotos[0] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[0] || defaultSubPhotos[0]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[0] ? <img src={subPhotos[0]} alt="Joy" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[0] || defaultSubPhotos[0]) ? <img src={subPhotos[0] || defaultSubPhotos[0]} alt="Joy" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Joy</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[1] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[1] || defaultSubPhotos[1]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(1)}
-              style={{ cursor: subPhotos[1] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[1] || defaultSubPhotos[1]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[1] ? <img src={subPhotos[1]} alt="Blue" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[1] || defaultSubPhotos[1]) ? <img src={subPhotos[1] || defaultSubPhotos[1]} alt="Blue" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Blue</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[2] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[2] || defaultSubPhotos[2]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(2)}
-              style={{ cursor: subPhotos[2] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[2] || defaultSubPhotos[2]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[2] ? <img src={subPhotos[2]} alt="Passion" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[2] || defaultSubPhotos[2]) ? <img src={subPhotos[2] || defaultSubPhotos[2]} alt="Passion" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Passion</span>
             </div>
             <div
-              className={`hexagon-large-item ${!subPhotos[3] ? 'empty' : ''}`}
+              className={`hexagon-large-item ${!(subPhotos[3] || defaultSubPhotos[3]) ? 'empty' : ''}`}
               onClick={() => handleSetStarred(3)}
-              style={{ cursor: subPhotos[3] ? 'pointer' : 'default' }}
+              style={{ cursor: (subPhotos[3] || defaultSubPhotos[3]) ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[3] ? <img src={subPhotos[3]} alt="Moments" /> : <i className="ti ti-photo-plus"></i>}
+                {(subPhotos[3] || defaultSubPhotos[3]) ? <img src={subPhotos[3] || defaultSubPhotos[3]} alt="Moments" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Moments</span>
             </div>
@@ -1141,14 +1230,10 @@ const Cluster2Content = () => {
 
         {/* 중앙 프로필 사진 */}
         <div className={`frame-center ${!mainPhoto ? 'empty' : ''}`}>
-          {mainPhoto ? (
-            <img src={mainPhoto} alt="Profile" />
-          ) : (
-            <div className="empty-photo-placeholder">
-              <i className="ti ti-photo-plus"></i>
-              <span>사진을 등록해주세요</span>
-            </div>
-          )}
+          <img
+            src={mainPhoto || "/images/0/cluster 2/이안0.png"}
+            alt="Profile"
+          />
         </div>
 
         {/* 오른쪽 카드 */}
@@ -1161,18 +1246,18 @@ const Cluster2Content = () => {
           <span className="progress-value">99.9%</span>
           <button className={`with-us-btn ${isWiggling ? 'wiggle' : ''}`} onClick={handleWithUsClick}>
             <img src="/images/0/cluster 2/button box.png" alt="" />
-            <span>Wiht us</span>
+            <span>With us</span>
           </button>
         </div>
       </div>
 
       {/* 섹션 2-1: 비디오 섹션 */}
-      <div className="cluster2-videos" style={{ position: 'relative' }}>
+      <div ref={videosRef} className="cluster2-videos" style={{ position: 'relative' }}>
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); })}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster /icon/Edit_Pencil_Line_01.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1298,6 +1383,9 @@ const Cluster2Content = () => {
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
+              <p className="quote-subtext">
+                지금의 한 걸음이 작아 보여도 결국 미래를 바꾸는 결정적 힘이 된다 흔들려도 멈추지 않으면 결국 도착한다 그게 성장의 증거다
+              </p>
               <p className="quote-text">
                 {sloganData.slogan2.content}
               </p>
@@ -1336,6 +1424,9 @@ const Cluster2Content = () => {
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
               <span className="quote-badge">Per Aspera Ad Astra</span>
+              <p className="quote-subtext">
+                지금의 한 걸음이 작아 보여도 결국 미래를 바꾸는 결정적 힘이 된다 흔들려도 멈추지 않으면 결국 도착한다 그게 성장의 증거다
+              </p>
               <p className="quote-text">
                 {sloganData.slogan3.content}
               </p>
@@ -1422,7 +1513,7 @@ const Cluster2Content = () => {
                 <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{edu.major2}</span></li>
                 <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{edu.major3}</span></li>
                 <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period.includes('~ing') ? (<>{edu.period.replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : edu.period}</span></li>
-                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && ` / ${edu.gradeMax}`}</span></li>
+                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && <span className="grade-sub"> / {edu.gradeMax}</span>}</span></li>
               </ul>
               <div
                 className="edu-footer"
@@ -2154,8 +2245,24 @@ const Cluster2Content = () => {
                 <img src={introCards[selectedIntroCard].icon} alt="" className="modal-icon" />
                 <h3>{introCards[selectedIntroCard].title}</h3>
               </div>
+              {!isEditingIntro && (
+                <button
+                  className="intro-edit-btn"
+                  aria-label="수정"
+                  onClick={() =>
+                    handleEditClick(() => {
+                      setEditingIntroData({
+                        content: introCards[selectedIntroCard].content,
+                      });
+                      setIsEditingIntro(true);
+                    })
+                  }
+                >
+                  <i className="ti ti-pencil"></i>
+                </button>
+              )}
               <div className="header-right">
-                {isEditingIntro ? (
+                {isEditingIntro && (
                   <>
                     <button
                       className="cancel-edit-btn"
@@ -2182,19 +2289,6 @@ const Cluster2Content = () => {
                       {introSaving ? '저장 중...' : '저장'}
                     </button>
                   </>
-                ) : (
-                  <button
-                    className="edit-btn"
-                    onClick={() => handleEditClick(() => {
-                      setEditingIntroData({
-                        content: introCards[selectedIntroCard].content
-                      });
-                      setIsEditingIntro(true);
-                    })}
-                  >
-                    <i className="ti ti-pencil"></i>
-                    수정
-                  </button>
                 )}
                 <button className="modal-close-btn" onClick={() => {
                   if (isEditingIntro && editingIntroData.content !== introCards[selectedIntroCard].content) {

@@ -1,8 +1,8 @@
 "use client";
 import logo from "@/public/images/0/header-logo.png";
-import one from "@/public/images/sidebar/one.png";
-import  two from "@/public/images/sidebar/three.png";
-import  three from "@/public/images/sidebar/two.png";
+import ec from "@/public/images/0/ec.png";
+import ok1 from "@/public/images/0/ok-1.png";
+import px from "@/public/images/0/px.png";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,15 +15,16 @@ interface Game {
   image: StaticImageData;
 }
 const games: Game[] = [
-  { id: 1, image: two },
-  { id: 2, image: one },
-  { id: 3, image: three },
-  { id: 4, image: two },
-  { id: 5, image: one },
-  { id: 6, image: three },
-  { id: 7, image: two },
-  { id: 8, image: one },
-  { id: 9, image: three },
+  // 요청: 상단부터 ec → ok-1 → px 이미지로 교체
+  { id: 1, image: ec },
+  { id: 2, image: ok1 },
+  { id: 3, image: px },
+  { id: 4, image: ec },
+  { id: 5, image: ok1 },
+  { id: 6, image: px },
+  { id: 7, image: ec },
+  { id: 8, image: ok1 },
+  { id: 9, image: px },
 ];
 const Sidebar = () => {
   const { data: session } = useSession();
@@ -46,7 +47,9 @@ const Sidebar = () => {
             <div className="sidebar__wrapper">
               <div className="sidebar__widget">
                 <Link href="/" className="sidebar__logo not-cursor" aria-label="home page" title="logo">
-                  <Image src={logo} alt="Logo" width={77} height={77} />
+                  <Image src={logo} alt="Logo" 
+                    className="w-16 h-16 left-0 top-[4px] absolute"  
+                    width={64} height={64} />
                 </Link>
               </div>
               <div className="sidebar__widget sidebar--links">

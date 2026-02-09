@@ -1,4 +1,5 @@
 // Cluster 4 - Club Challenge Growth Styles
+@import url('https://fonts.googleapis.com/css2?family=Khula:wght@800&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
@@ -51,21 +52,28 @@
   width: 100%;
   max-width: 1330px;
   overflow: visible;
+  // 섹션 간 기본 여백(너무 붙어 보이는 문제 완화)
+  --c4-section-gap: clamp(22px, 2.6vw, 60px);
 
   // Section 1: CLUB CHALLENGE GROWTH
   .cluster4-section1 {
     width: 100%;
     max-width: 1330px;
-    height: 1180px;
+    height: auto;
+    min-height: 1180px;
     padding: 0;
     text-align: left;
-    background-image: url('/images/0/cluster 4/img 01.png');
+    background-image: url('/images/0/cluster4/img 01.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center bottom;
-    position: relative;
+    position: relative;        // sticky → relative로 복원
+    // top: 0; 삭제
+    z-index: 0;
+    margin-top: 51px;
     margin-bottom: -630px;
-    overflow: visible;
+    will-change: transform;
+    transform: translateZ(0);
 
     // 70% 검정 오버레이
     &::before {
@@ -180,37 +188,26 @@
       z-index: 1;
       text-align: center;
       padding-top: 48px;
-      margin-bottom: 37px;
+      margin-bottom: 20px;
+      height: 130px;          // 추가
+      overflow: visible;      // 추가
+    
 
       .title-inner {
         position: relative;
-        display: inline-block;
+        display: block;        // inline-block → block
+        width: 100%;           // 추가
+        text-align: center;    // 추가
       }
-    }
-
-    // 타이틀 그림자
-    .section1-title-shadow {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 72px;
-      font-weight: 900;
-      color: #111;
-      -webkit-text-stroke: 1px #21E786;
-      text-stroke: 1px #21E786;
-      text-align: center;
-      letter-spacing: 0;
-      margin: 0;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      z-index: 0;
-      white-space: nowrap;
     }
 
     // 타이틀
     .section1-title {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Khula', sans-serif;
       font-size: 72px;
-      font-weight: 900;
+      font-weight: 800;
+      line-height: 82px !important;
+      text-transform: uppercase;
       color: #FFF;
       text-align: center;
       letter-spacing: 0;
@@ -218,57 +215,71 @@
       position: relative;
       z-index: 1;
       white-space: nowrap;
+      text-shadow: 3px 3px 0 #111, 4px 4px 0 rgba(33, 231, 134, 0.7);
+      @include stacked-title-layer(1.05, true);
     }
 
     .section1-description {
-      max-width: 1100px;
+      // Cluster2/3와 동일한 여백/줄바꿈 전략으로 통일
+      max-width: min(62ch, 1100px);
       margin: 0 auto;
-      padding: 0 40px;
-      line-height: 1.8;
+      padding: 30px 40px 0;
+      line-height: 22px;
       position: relative;
       z-index: 1;
+      text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      line-break: strict;
+      hyphens: auto;
+      text-wrap: pretty;
+
+      // Cluster2/3와 동일하게 데스크탑에서만 살짝 우측 이동
+      @media (min-width: 1200px) {
+        transform: translateX(clamp(0px, 2.2vw, 72px));
+      }
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
         font-size: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 0;
         color: #FFF;
-        border-left: none;
-        padding-left: 0;
+        text-wrap: pretty;
 
         &:first-child {
           margin-bottom: 0;
         }
 
-        &:nth-child(2) {
-          white-space: nowrap;
-        }
-
         &.small-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 20px;
+          font-size: 23px;
           color: #FFF;
-          margin-top: 20px;
-          border-left: none !important;
-          padding-left: 0 !important;
+          margin-top: 0;
         }
 
         &.quote-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 20px;
+          font-size: 23px;
           line-height: 1.4;
           color: #FFF;
           margin-top: 24px;
           margin-bottom: 0;
           font-style: italic;
-          border-left: none !important;
-          padding-left: 0 !important;
+          word-break: keep-all;
+          overflow-wrap: break-word;
+          line-break: strict;
+          hyphens: auto;
+          text-wrap: pretty;
+        }
+
+        &:nth-child(2) {
+          margin-bottom: 22px;
         }
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 24px;
+        font-size: 27px;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -276,11 +287,12 @@
         background-clip: text;
         margin: 0;
         font-style: italic;
+        text-wrap: balance;
       }
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 23px;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -295,28 +307,43 @@
     max-width: 1330px;
     padding: 0;
     margin-top: -50px;
-    margin-bottom: 30px;
+    margin-bottom: clamp(36px, 3vw, 72px);
     display: flex;
     justify-content: center;
     position: relative;
     z-index: 5;
 
+    // ===== 스크롤 시 카드 고정(Sticky) =====
+    // UX 목표: 아래 리스트(주차/시즌 목록)를 스크롤해도, 이 카드(section2)는 화면 상단에 유지
+    // 모바일에서는 화면을 너무 많이 가리므로 비활성화
+    @media (min-width: 1200px) {
+      position: sticky;
+      top: 124px; // header 높이와 맞춤 (nftg-content-home margin-top과 동일 계열)
+      z-index: 50;
+      align-self: flex-start;
+      // sticky가 동작하려면 상위/자기 자신이 overflow로 잘리지 않아야 함
+      overflow: visible;
+    }
+
     .season-growth-card {
       position: relative;
       width: 100%;
       max-width: 1320px;
-      height: 600px;
-      background-image: url('/images/0/cluster 4/4-1/bg image.png');
+      height: auto;
+      min-height: 600px;
+      background-image: url('/images/0/cluster4/4-1/bg image.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: calc(50% + 3px) -100px;
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(30px) translateZ(0);
+      will-change: transform;
       transition: opacity 0.8s ease, transform 0.8s ease;
+
 
       &.visible {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) translateZ(0);
       }
 
       // 보더 이미지 레이어
@@ -327,7 +354,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/images/0/cluster 4/bg border.png');
+        background-image: url('/images/0/cluster4/bg border.png');
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-position: center;
@@ -384,6 +411,7 @@
           left: 3px;
           z-index: 0;
           white-space: nowrap;
+          @include stacked-title-layer(1.08, true);
         }
 
         .season-title {
@@ -396,6 +424,7 @@
           position: relative;
           z-index: 1;
           white-space: nowrap;
+          @include stacked-title-layer(1.08, true);
         }
 
         .season-badge {
@@ -598,8 +627,8 @@
         position: absolute;
         right: 25px;
         bottom: 10px;
-        width: 520px;
-        height: 655px;
+        width: 702px;
+        height: 732px;
         z-index: 10;
         display: flex;
         align-items: flex-end;
@@ -618,9 +647,9 @@
   .cluster4-section3-banner {
     width: 100%;
     max-width: 1330px;
-    padding: 40px 0;
-    margin-bottom: 40px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster 4/Bg img 02 .png');
+    padding: 79px 0 40px 0;  
+    margin-bottom: clamp(48px, 3.4vw, 88px);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('/images/0/cluster4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     text-align: center;
@@ -629,17 +658,19 @@
       padding: 60px 40px;
 
       .banner-title {
-        font-family: 'Pretendard', sans-serif;
-        font-size: 56px;
-        font-weight: 900;
-        color: #FFF;
-        margin: 0 0 20px 0;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        font-family: 'Khula', sans-serif;
+        font-size: 60px;
+        font-weight: 800;
+        line-height: 82px;
+        text-transform: uppercase;
+        margin: 0 0 30px 0;
       }
 
       .banner-description {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 22px;
         color: #FFF;
         line-height: 1.8;
         margin: 0 0 15px 0;
@@ -659,6 +690,7 @@
 .cluster4-section4 {
   width: 100%;
   max-width: 1330px;
+  margin-top: var(--c4-section-gap);
   padding: 0 0 100px 0;
 
   .main-grid {
@@ -905,8 +937,11 @@
           }
 
           .label-sub {
-            font-size: 10px;
-            color: #888;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: #FFF;
+            line-height: normal;
           }
         }
       }
@@ -1901,9 +1936,9 @@
   // SEASON CHALLENGE 배너
   .section3-banner {
     width: 100%;
-    padding: 40px 40px;
+    padding: 79px 40px 40px 40px; 
     margin-bottom: 20px;
-    background-image: url('/images/0/cluster 4/Bg img 02 .png');
+    background-image: url('/images/0/cluster4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1962,25 +1997,8 @@
     .section3-title-wrapper {
       position: relative;
       display: inline-block;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       z-index: 1;
-    }
-
-    .section3-banner-text-shadow {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 60px;
-      font-weight: 900;
-      color: #111;
-      -webkit-text-stroke: 1px #21E786;
-      text-stroke: 1px #21E786;
-      text-align: center;
-      letter-spacing: 0;
-      margin: 0;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      z-index: 0;
-      white-space: nowrap;
     }
 
     .section3-banner-text {
@@ -2000,7 +2018,8 @@
       font-family: 'HakgyoansimTuho', sans-serif !important;
       font-size: 20px;
       color: #FFF;
-      line-height: 1.8;
+      font-weight: 400;
+      line-height: 22px;
       margin-bottom: 0;
       position: relative;
       z-index: 1;
@@ -2245,14 +2264,20 @@
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    padding: 30px 40px;
-    width: 1330px;
-    height: 720px;
+    padding: 30px 30px;
+    width: 100%;
+    max-width: 1330px;
+    height: 695px;
+    min-height: 695px;
+    max-height: 695px;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
     transition: background-image 0.5s ease-out;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    overflow: visible;
 
     // 어두운 오버레이
     &::before {
@@ -2500,28 +2525,30 @@
     // 메인 컨텐츠 그리드 (3열)
     .main-content-grid {
       display: grid;
-      grid-template-columns: 315px 1fr 380px;
-      gap: 20px;
+      grid-template-columns: 300px 1fr 300px;  // 380px 1fr 340px → 축소
+      gap: 15px;                                // 20px → 15px
       position: relative;
       z-index: 1;
 
       // 영역 3: 왼쪽 이미지 스택
       .area-3-image {
         position: relative;
-        height: 100%;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
+        overflow: visible;
+        padding-top: 30px;    
 
         .season-image-stack {
           width: 315px;
-          height: 450px;
+          height: 520px;
           position: relative;
+          margin-top: 0;
 
           .image-card {
             position: absolute;
             width: 315px;
-            height: 450px;
+            height: 466px;
 
             .card-frame {
               width: 100%;
@@ -2680,7 +2707,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-left: 37px;
+        margin-left: 70px;
         align-items: flex-start;
         opacity: 1;
         transform: translateY(0);
@@ -2913,15 +2940,17 @@
               }
 
               .label-sub {
-                font-size: 16px;
+                font-size: 14px;
+                font-weight: 300;
                 color: #FFF;
                 margin-top: -2px;
                 line-height: 1;
 
                 .highlight {
+                  font-family: 'Pretendard', sans-serif;
                   font-size: 20px;
-                  font-weight: 700;
-                  color: #FFA500;
+                  font-weight: 800;
+                  color: #FAAB07;
                 }
               }
             }
@@ -3009,9 +3038,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        opacity: 1;
-        transform: translateY(0);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        padding: 0;
+        overflow: hidden;          // 추가: 넘침 방지
 
         &.fading {
           opacity: 0;
@@ -3021,8 +3049,7 @@
 
         // 영역 8: 시즌 상태
         .area-8-season-status {
-          width: 370px;
-          padding: 0;
+          width: 100%;   
 
           .section-title {
             font-size: 16px;
@@ -3045,14 +3072,15 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
-            max-height: 100px;
-            overflow-y: auto;
+            max-height: 96px;          // 배지 2개만 보이는 높이
+            overflow-y: auto;          // visible → auto
             overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
+            padding: 0;
 
             &::-webkit-scrollbar {
-              width: 3px;
+              width: 2px;
             }
 
             &::-webkit-scrollbar-track {
@@ -3074,16 +3102,17 @@
             .badge-item {
               display: flex;
               align-items: center;
-              gap: 0;
+              gap: 8px;                    // 0 → 8px
               width: 100%;
-              height: 38px;
-              min-height: 38px;
+              height: auto;                // 38px → auto
+              min-height: auto;            // 38px → auto
               flex-shrink: 0;
-              padding: 5px 0 5px 2px;
+              padding: 5px;                // 5px 0 5px 2px → 5px
               background: #1B1B1B;
               border: 0.5px solid #FFE3AA;
               border-radius: 0;
               box-sizing: border-box;
+              align-self: stretch;
 
               .badge-icon {
                 flex-shrink: 0;
@@ -3114,37 +3143,35 @@
                   font-weight: 700;
                   color: #FFF;
                   white-space: nowrap;
-                  letter-spacing: -0.5px;
-
-                  .separator {
-                    color: #767676;
-                    font-weight: 500;
-                    margin: 0 1px;
-                  }
-
+                  line-height: 28px;
+                  display: flex;
+                  align-items: center;
+                
                   .sub-text {
-                    color: #CFBCBC;
+                    color: rgba(207, 188, 188, 1);    // #D6D3D1 → rgba(207, 188, 188, 1)
+                    font-weight: 700;
+                    line-height: 20px;
                   }
                 }
               }
 
               .badge-status {
                 flex-shrink: 0;
-                height: 21px;
                 font-family: 'Pretendard', sans-serif;
-                font-size: 14px;
-                font-weight: 700;
-                padding: 0 12px;
-                margin: 0 8px 0 4px;
-                border-radius: 10.5px;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 16px;
+                padding: 3px 10px;
+                margin: 0 5px 0 0;
+                border-radius: 20px;
                 white-space: nowrap;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-
+              
                 &.yellow {
-                  background: #FFA500;
-                  color: #000;
+                  background: #FAAB07;
+                  color: #171717;
                 }
 
                 &.orange {
@@ -3158,8 +3185,7 @@
 
         // 영역 9: 시즌 평판
         .area-9-season-reputation {
-          width: 370px;
-          padding: 0;
+          width: 100%;   // 370px → 100%  
 
           .section-title {
             font-size: 16px;
@@ -3183,17 +3209,17 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 400px;
-            overflow-y: auto;
+            max-height: 340px;         // 카드 2개 + 세번째 살짝 보이는 높이
+            overflow-y: auto;          // visible → auto
             overflow-x: hidden;
-            padding: 3px 14px 3px 3px;
+            padding: 3px 3px 3px 0;  
 
             // 커스텀 스크롤바 스타일
             scrollbar-width: thin;
-            scrollbar-color: #FAAB07 transparent;
+            scrollbar-color: #FFD6A5 transparent;
 
             &::-webkit-scrollbar {
-              width: 3px;
+              width: 2px;
             }
 
             &::-webkit-scrollbar-track {
@@ -3201,15 +3227,15 @@
             }
 
             &::-webkit-scrollbar-thumb {
-              background: linear-gradient(180deg, #FAAB07 0%, #FFE3AA 100%);
-              border-radius: 2px;
+              background: #FFD6A5;
+              border-radius: 5px;
             }
 
             .profile-card {
               position: relative;
-              width: 360px;
+              width: 100%;
               background: radial-gradient(
-                circle,
+                ellipse 51.26% 226.96% at 50% 50%,
                 rgba(15, 30, 26, 0.5) 0%,
                 rgba(15, 30, 26, 0.5) 40%,
                 rgba(255, 255, 255, 0.08) 100%
@@ -3220,15 +3246,37 @@
               flex-direction: column;
               flex-shrink: 0;
               overflow: visible;
-
-              .corner {
+              border-left: 1px solid rgba(255, 255, 255, 0.1);
+              border-right: 1px solid rgba(255, 255, 255, 0.1);
+            
+              // 상단 좌측 teal 데코 라인
+              &::before {
+                content: '';
                 position: absolute;
-                width: 30px;
-                height: 30px;
-                background-image: url('/images/0/cluster 4/detail.png');
-                background-size: contain;
-                background-repeat: no-repeat;
-                z-index: 10;
+                top: 0;
+                left: 1px;
+                width: 20px;
+                height: 2px;
+                background: linear-gradient(to right, transparent, #2DD4BF);
+                z-index: 2;
+              }
+            
+              // 상단 우측 teal 데코 라인
+              &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 1px;
+                width: 20px;
+                height: 2px;
+                background: linear-gradient(to left, transparent, #2DD4BF);
+                z-index: 2;
+              }
+            
+              // 코너 장식 숨김 (피그마에 없음)
+              .corner {
+                display: none;
+              }
 
                 &.top-left {
                   top: 0;
@@ -4257,6 +4305,391 @@
       font-size: 14px;
     }
   }
+
+  // =========================================================
+  // Mobile UX: 필터 바텀시트 + 카드 요약/펼침
+  // =========================================================
+  @media (max-width: 1199px) {
+    max-width: 100%;
+    padding: 40px 16px 24px 16px;
+    margin-top: 20px;
+
+    .weekly-filter-bar {
+      justify-content: flex-start;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .weekly-filter-bar--mobile {
+      padding: 0;
+    }
+
+    .filter-mobile-btn {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      color: #fff;
+      cursor: pointer;
+
+      .card-icon {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        opacity: 0.9;
+      }
+
+      .filter-mobile-text {
+        flex: 1;
+        text-align: left;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.95;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .filter-mobile-count {
+        min-width: 28px;
+        height: 22px;
+        border-radius: 999px;
+        background: rgba(250, 171, 7, 0.2);
+        border: 1px solid rgba(250, 171, 7, 0.35);
+        color: #FAAB07;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 8px;
+      }
+    }
+
+    .filter-sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 999999;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .filter-sheet {
+      width: 100%;
+      max-width: 720px;
+      background: #141414;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 16px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .filter-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+
+      .filter-sheet-title {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .filter-sheet-close {
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 8px 10px;
+      }
+    }
+
+    .filter-sheet-body {
+      display: grid;
+      gap: 10px;
+
+      .filter-sheet-label {
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 4px;
+      }
+
+      .filter-sheet-select {
+        width: 100%;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        padding: 0 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        outline: none;
+      }
+    }
+
+    .filter-sheet-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+
+      .filter-sheet-btn {
+        height: 44px;
+        border-radius: 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+
+        &.secondary {
+          background: rgba(255, 255, 255, 0.06);
+          color: #fff;
+        }
+
+        &.primary {
+          background: #FAAB07;
+          border-color: #FAAB07;
+          color: #111;
+        }
+      }
+    }
+
+    .weekly-cards {
+      align-items: stretch;
+    }
+
+    .weekly-card--mobile {
+      width: 100%;
+      height: auto;
+      padding: 12px;
+      gap: 12px;
+      background: #1f1f1f;
+      border-color: rgba(255, 255, 255, 0.12);
+
+      &:hover {
+        transform: none;
+        background: #1f1f1f;
+        box-shadow: none;
+      }
+
+      .weekly-card-main {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .weekly-card-image {
+        width: 110px;
+        height: 110px;
+        margin: 0;
+        border-radius: 10px;
+
+        &::before {
+          height: 44px;
+        }
+      }
+
+      .weekly-card-content {
+        margin-top: 0;
+        gap: 8px;
+        min-width: 0;
+
+        .weekly-card-header {
+          gap: 6px;
+        }
+
+        .weekly-card-title {
+          font-size: 14px;
+          line-height: 1.25;
+        }
+
+        .weekly-card-date {
+          border: none;
+          padding: 0;
+          height: auto;
+          font-size: 12px;
+          opacity: 0.85;
+          gap: 6px;
+
+          .date-icon {
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        .weekly-card-main-progress {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 8px;
+          margin: 0;
+
+          .progress-bar-wrapper {
+            width: 100%;
+          }
+        }
+      }
+
+      .weekly-card-expand {
+        width: 100%;
+        margin-top: 10px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .weekly-card-details {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        .weekly-card-details-top {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+
+        .detail-chip {
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 999px;
+          padding: 6px 10px;
+          font-family: 'Pretendard', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.92);
+
+          strong {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 800;
+            margin-right: 4px;
+          }
+        }
+
+        .weekly-card-details-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 8px;
+          margin-bottom: 10px;
+
+          .detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            .k {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 13px;
+              font-weight: 700;
+              color: rgba(255, 255, 255, 0.85);
+            }
+
+            .v {
+              font-family: 'Pretendard', sans-serif;
+              font-size: 13px;
+              font-weight: 800;
+              color: #FAAB07;
+
+              .sub {
+                margin-left: 6px;
+                color: rgba(255, 255, 255, 0.65);
+                font-weight: 700;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+
+        .weekly-card-details-bottom {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+
+          .metric {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'Pretendard', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.85);
+
+            strong {
+              color: #fff;
+              font-weight: 900;
+              margin-left: 6px;
+            }
+
+            .sub {
+              margin-left: 4px;
+              color: rgba(255, 255, 255, 0.65);
+              font-weight: 700;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+    }
+
+    .weekly-pagination--mobile {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+      text-align: center;
+
+      .weekly-pagination-summary {
+        color: rgba(255, 255, 255, 0.7);
+        font-family: 'Pretendard', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .weekly-load-more-btn {
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 // ============================================
@@ -4576,5 +5009,35 @@
       }
     }
   }
-}
 
+
+// ★ 4K 대응: zoom 1.5 적용 시 viewport ≈ 2560px → 1330px이 너무 좁음
+@media screen and (min-width: 1800px) {
+  .cluster4-content {
+    max-width: 100% !important;
+  }
+
+  .cluster4-section1,
+  .cluster4-section2,
+  .cluster4-section3-banner,
+  .cluster4-section3,
+  .cluster4-section4,
+  .cluster4-weekly-list {
+    max-width: 100% !important;
+  }
+
+  .season-detail-container {
+    max-width: 100% !important;
+
+    // 3열 그리드 비율 조정: 고정px → 비율 기반
+    .main-content-grid {
+      grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(300px, 1.2fr) !important;
+      gap: 30px !important;
+    }
+
+    // 상단 헤더도 비율 맞춤
+    .top-header-row {
+      gap: 30px !important;
+    }
+  }
+}

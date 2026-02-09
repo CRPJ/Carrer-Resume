@@ -21,6 +21,14 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  // 메인 스크롤 컨테이너가 html로 잡히는 경우(특히 .nftg-content-home) 스크롤바만 숨김
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // legacy Edge/IE
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
   width: 100%;
   height: 100%;
 }

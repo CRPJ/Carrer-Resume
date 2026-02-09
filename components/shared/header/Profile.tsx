@@ -1,4 +1,4 @@
-import avatar from "@/public/images/avatar/avatar.png";
+import avatar from "@/public/images/0/profile.png";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +11,7 @@ const Profile = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const isLoading = status === "loading";
 
-  const userName = session?.user?.name || "Guest";
+  const userName = session?.user?.name || "David Malan";
   const userImage = session?.user?.image || avatar;
 
   if (isLoading) {
@@ -28,7 +28,13 @@ const Profile = () => {
               <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
             </svg>
           </span>
-          <span className="text-xl fw-6">{userName}</span>
+          <span style={{
+            fontFamily: "'Khula', sans-serif",
+            fontSize: '20px',
+            fontWeight: 600,
+            lineHeight: '30px',
+            color: '#FFF'
+          }}>{userName}</span>
           <span className="profile-dropdown-btn rotate">
             <i className="ti ti-chevron-down"></i>
           </span>

@@ -138,6 +138,39 @@ h6 {
   font-family: var(--khula);
 }
 
+/* ==========================================
+   Meaningful wrapping (device-robust)
+   - 완전 동일한 줄바꿈은 불가하지만, 의미 단위 줄바꿈 품질을 크게 개선
+   - 최신 브라우저에서 text-wrap 지원 시 더 자연스럽게 동작 (미지원 시 무시)
+========================================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+// 본문 계열: 한글은 단어(공백) 단위 우선, 긴 문자열만 예외적으로 끊기
+p,
+li,
+blockquote,
+td,
+th {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+// 제목 계열: 균형 잡힌 줄바꿈
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
 /* ==== 
  --------- (2.02) typography styles end ---------
  ==== */
