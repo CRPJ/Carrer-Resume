@@ -82,6 +82,87 @@ const Sidebar = () => {
       review_status: 'approved',
       seasons: { id: 's3', year: 2025, name: 'summer', start_date: '2024-06-01' }
     },
+    {
+      id: 'dummy-4',
+      role_in_season: 'crew_basic',
+      approved_weeks: 10,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's4', year: 2024, name: 'spring', start_date: '2024-03-01' }
+    },
+    {
+      id: 'dummy-5',
+      role_in_season: 'admin',
+      approved_weeks: 6,
+      total_weeks: 16,
+      progress_status: 'in_progress',
+      review_status: 'reviewing',
+      seasons: { id: 's5', year: 2024, name: 'winter', start_date: '2024-01-01' }
+    },
+    {
+      id: 'dummy-6',
+      role_in_season: 'crew_advanced',
+      approved_weeks: 12,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's6', year: 2023, name: 'fall', start_date: '2023-09-01' }
+    },
+    {
+      id: 'dummy-7',
+      role_in_season: 'crew_basic',
+      approved_weeks: 4,
+      total_weeks: 16,
+      progress_status: 'in_progress',
+      review_status: 'reviewing',
+      seasons: { id: 's7', year: 2023, name: 'summer', start_date: '2023-06-01' }
+    },
+    {
+      id: 'dummy-8',
+      role_in_season: 'admin',
+      approved_weeks: 16,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's8', year: 2023, name: 'spring', start_date: '2023-03-01' }
+    },
+    {
+      id: 'dummy-9',
+      role_in_season: 'crew_regular',
+      approved_weeks: 16,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's9', year: 2023, name: 'spring', start_date: '2023-03-01' } 
+    },
+    {
+      id: 'dummy-10',
+      role_in_season: 'crew_regular',
+      approved_weeks: 16,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's10', year: 2023, name: 'spring', start_date: '2023-03-01' }
+    },
+    {
+      id: 'dummy-11',
+      role_in_season: 'crew_regular',
+      approved_weeks: 16,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's11', year: 2023, name: 'spring', start_date: '2023-03-01' }
+    },
+    {
+      id: 'dummy-12',
+      role_in_season: 'crew_regular',
+      approved_weeks: 16,
+      total_weeks: 16,
+      progress_status: 'completed',
+      review_status: 'approved',
+      seasons: { id: 's12', year: 2023, name: 'spring', start_date: '2023-03-01' }
+    },
   ]);
   const [hasSeasonData, setHasSeasonData] = useState<boolean>(true);
 
@@ -387,6 +468,7 @@ const Sidebar = () => {
 
   // 커스텀 스크롤바
   const activitiesRef = useRef<HTMLDivElement>(null);
+  const scrollThumbRef = useRef<HTMLDivElement>(null);
   const [scrollThumbTop, setScrollThumbTop] = useState(0);
   const [scrollThumbHeight, setScrollThumbHeight] = useState(30);
   const [isDragging, setIsDragging] = useState(false);
@@ -1133,16 +1215,18 @@ const Sidebar = () => {
   // 커스텀 스크롤바 업데이트
   const updateScrollbar = useCallback(() => {
     const container = activitiesRef.current;
-    if (!container) return;
+    const thumb = scrollThumbRef.current;
+    if (!container || !thumb) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
     const trackHeight = clientHeight;
-    const thumbHeight = Math.max((clientHeight / scrollHeight) * trackHeight, 20);
+    const thumbHeight = 44;
     const maxScrollTop = scrollHeight - clientHeight;
-    const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * (trackHeight - thumbHeight) : 0;
+    const maxThumbTop = trackHeight - thumbHeight;
+    const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * maxThumbTop : 0;
 
-    setScrollThumbHeight(thumbHeight);
-    setScrollThumbTop(thumbTop);
+    thumb.style.top = `${thumbTop}px`;
+    thumb.style.height = `${thumbHeight}px`;
   }, []);
 
   // 스크롤 이벤트 핸들러
@@ -1674,16 +1758,16 @@ const Sidebar = () => {
             }}
           >
             <div
+              ref={scrollThumbRef}
               onMouseDown={handleMouseDown}
               style={{
                 position: 'absolute',
-                top: scrollThumbTop,
+                top: 0,
                 width: '100%',
-                height: scrollThumbHeight,
+                height: 44,
                 background: debugPanelType === 'PX' ? '#36DA60' : debugPanelType === 'EC' ? '#FF4B70' : '#FFA500',
                 borderRadius: '2px',
                 cursor: 'pointer',
-                transition: isDragging ? 'none' : 'top 0.1s ease'
               }}
             />
           </div>
