@@ -145,10 +145,16 @@ export async function GET(request: NextRequest) {
 
     const userIdArray = Array.from(userIds);
 
+    // 선택 주차 이전까지의 week ID만 사전 계산 (쿼리 범위 제한용)
+    const selectedWeekEndDate = selectedWeek.endDate;
+    const relevantWeekIds = (allWeeks || [])
+      .filter(w => w.end_date <= selectedWeekEndDate)
+      .map(w => w.id);
+
     // ============ 모든 독립적인 쿼리를 병렬로 실행 ============
     const [
       weeklyGrowthResult,
-      successWeeksResult,
+      growthStatsResult,
       pointsResult,
       allPointsResult,
       teamsResult,
@@ -165,33 +171,38 @@ export async function GET(request: NextRequest) {
         .from('user_weekly_growth')
         .select('user_id, is_success, is_resting, is_club_break')
         .eq('week_id', weekId),
-      // 성공 주차 데이터 (누적 계산용)
+      // 누적 인정 주차 (user_growth_stats 테이블에서 직접 조회)
       supabaseAdmin
-        .from('user_weekly_growth')
-        .select('user_id, week_id, weeks!inner(end_date)')
-        .in('user_id', userIdArray)
-        .eq('is_success', true),
+        .from('user_growth_stats')
+        .select('user_id, approved_weeks')
+        .in('user_id', userIdArray),
       // 해당 주차 포인트
       supabaseAdmin
         .from('points')
         .select('user_id, point_type, points')
         .eq('week_id', weekId),
-      // 모든 포인트 데이터 (누적 인절미 계산용)
+      // 누적 인절미 계산용 포인트 — 선택 주차 이전까지로 제한
       supabaseAdmin
         .from('points')
         .select('user_id, week_id, point_type, points')
-        .in('user_id', userIdArray),
+        .in('user_id', userIdArray)
+        .in('week_id', relevantWeekIds),
       // 팀 정보
       supabaseAdmin.from('teams').select('id, name'),
       // 파트 정보
       supabaseAdmin.from('parts').select('id, name, team_id'),
-      // 사용자 팀/파트 정보
-      supabaseAdmin.from('user_team_parts').select('user_id, team_id, part_id, joined_at, left_at').in('user_id', userIdArray),
-      // 역할 이력
+      // 사용자 팀/파트 정보 — 선택 주차 시점 이전에 가입된 것만
+      supabaseAdmin
+        .from('user_team_parts')
+        .select('user_id, team_id, part_id, joined_at, left_at')
+        .in('user_id', userIdArray)
+        .lte('joined_at', selectedWeek.startDate),
+      // 역할 이력 — 선택 주차 시점 이전에 시작된 것만
       supabaseAdmin
         .from('user_role_history')
         .select('user_id, role, started_at, ended_at')
-        .in('user_id', userIdArray),
+        .in('user_id', userIdArray)
+        .lte('started_at', selectedWeek.startDate),
       // 활동 타입 정보
       supabaseAdmin
         .from('activity_types')
@@ -202,11 +213,12 @@ export async function GET(request: NextRequest) {
         .select('id, activity_type_id, is_active, opened_at')
         .eq('week_id', weekId)
         .eq('is_active', true),
-      // 모든 완료된 활동 기록 (해당 주차 + 이전 주차 모두)
+      // 완료된 활동 기록 — 선택 주차 이전까지로 제한
       supabaseAdmin
         .from('activity_records')
         .select('user_id, week_id, activity_type_id')
         .in('user_id', userIdArray)
+        .in('week_id', relevantWeekIds)
         .eq('is_completed', true),
       // 실무 경력 데이터
       supabaseAdmin
@@ -218,7 +230,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     const weeklyGrowthData = weeklyGrowthResult.data;
-    const successWeeksData = successWeeksResult.data;
+    const growthStatsData = growthStatsResult.data;
     const pointsData = pointsResult.data;
     const allPointsData = allPointsResult.data;
     const teams = teamsResult.data || [];
@@ -279,13 +291,10 @@ export async function GET(request: NextRequest) {
       userGrowthMap.set(wg.user_id, wg);
     });
 
-    // 사용자별 성공 주차 Map
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userSuccessWeeksMap = new Map<string, any[]>();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (successWeeksData || []).forEach((sw: any) => {
-      if (!userSuccessWeeksMap.has(sw.user_id)) userSuccessWeeksMap.set(sw.user_id, []);
-      userSuccessWeeksMap.get(sw.user_id)!.push(sw);
+    // 사용자별 누적 인정 주차 Map (user_growth_stats 기반)
+    const userApprovedWeeksMap = new Map<string, number>();
+    (growthStatsData || []).forEach(gs => {
+      userApprovedWeeksMap.set(gs.user_id, gs.approved_weeks || 0);
     });
 
     // 사용자별 완료 활동 Map
@@ -330,7 +339,6 @@ export async function GET(request: NextRequest) {
 
     // 주차 시작일 (한 번만 계산)
     const weekStartDate = new Date(selectedWeek.startDate);
-    const selectedWeekEndDate = weekEndDateMap.get(weekId) || selectedWeek.endDate;
 
     // 9. 사용자별 데이터 집계
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -401,27 +409,8 @@ export async function GET(request: NextRequest) {
       });
       const roleLabel = userRole ? (roleLabels[userRole.role] || userRole.role) : (profile.role ? roleLabels[profile.role] || profile.role : '일반');
 
-      // 해당 유저의 성공 주차 필터링 (Map 사용 - O(1) 조회)
-      const allUserSuccessWeeks = userSuccessWeeksMap.get(userId) || [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userSuccessWeeks = allUserSuccessWeeks.filter((sw: any) => {
-        const weekEndDate = sw.weeks?.end_date;
-        return weekEndDate && weekEndDate <= selectedWeekEndDate;
-      });
-
-      let cumulativeApprovedWeeks = userSuccessWeeks.length;
-
-      // 온보딩 주차 추가
-      if (userOnboardingWeekId) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const onboardingAlreadyCounted = userSuccessWeeks.some((sw: any) => sw.week_id === userOnboardingWeekId);
-        if (!onboardingAlreadyCounted) {
-          const onboardingEndDate = weekEndDateMap.get(userOnboardingWeekId);
-          if (onboardingEndDate && onboardingEndDate <= selectedWeekEndDate) {
-            cumulativeApprovedWeeks++;
-          }
-        }
-      }
+      // 누적 인정 주차 (user_growth_stats 테이블 기반 — profile API와 동일한 값)
+      const cumulativeApprovedWeeks = userApprovedWeeksMap.get(userId) || 0;
 
       // 유저의 모든 완료된 활동 (Map 사용 - O(1))
       const userAllCompletedActivities = (userCompletedActivitiesMap.get(userId) || [])
@@ -506,7 +495,7 @@ export async function GET(request: NextRequest) {
         star,
         lightning,
         shield,
-        injeolmi: cumulativeInjeolmi,
+        injeolmi: shield,
         growthStatus,
         cumulativeApprovedWeeks,
         growthRate: {

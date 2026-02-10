@@ -198,39 +198,10 @@ const Cluster41Content = () => {
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
 
-  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>([
-    { id: 'dummy-1', weekNumber: 3, seasonYear: 2025, seasonName: '여름',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
-    { id: 'dummy-2', weekNumber: 2, seasonYear: 2025, seasonName: '여름',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '실패' },
-    { id: 'dummy-3', weekNumber: 1, seasonYear: 2025, seasonName: '여름',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(개인)' },
-    { id: 'dummy-4', weekNumber: 16, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(공식)' },
-    { id: 'dummy-5', weekNumber: 15, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
-    { id: 'dummy-6', weekNumber: 14, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
-    { id: 'dummy-7', weekNumber: 13, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
-    { id: 'dummy-8', weekNumber: 12, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '성공' },
-    { id: 'dummy-9', weekNumber: 11, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(공식)' },
-    { id: 'dummy-10', weekNumber: 10, seasonYear: 2025, seasonName: '봄',
-      startDate: '2025-03-23', endDate: '2025-03-30',
-      isClubBreak: false, isBreakSeason: false, holidayName: null, growthStatus: '휴식(개인)' },
-  ]);
-  const [isLoadingWeeks, setIsLoadingWeeks] = useState(false);  // true → false
+  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>([]);
+  const [isLoadingWeeks, setIsLoadingWeeks] = useState(true);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
+  const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
 
   // 팀/파트/역할 데이터 상태
   interface TeamData {
@@ -775,6 +746,20 @@ const Cluster41Content = () => {
             userId = result.data.id;
           }
 
+          // 비로그인 또는 비승인 사용자: 주차 카드를 표시하지 않음
+          if (!userId && !currentTargetUserId) {
+            if (response.status === 401) {
+              // 로그인하지 않은 경우
+              setIsNotLoggedIn(true);
+            } else if (response.status === 404) {
+              // 로그인은 했지만 승인 안 된 경우 (404: 승인된 프로필 없음)
+              setIsPendingApproval(true);
+            }
+            setDbWeeklyData([]);
+            setIsLoadingWeeks(false);
+            return;
+          }
+
           if (response.ok && result.growthInfo?.startDate) {
             userJoinedWeekStartDate = result.growthInfo.startDate;
             setJoinedWeekStartDate(userJoinedWeekStartDate);
@@ -1201,7 +1186,13 @@ const Cluster41Content = () => {
       };
       return dummyImages[week.id] || '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
     }
-    return getWeekImagePath(week);
+    // startDate에서 월/주차 계산 후 getImagePath 활용
+    const start = new Date(week.startDate);
+    const month = start.getMonth() + 1;
+    const day = start.getDate();
+    const weekInMonth = Math.ceil(day / 7);
+    const title = `${week.seasonYear} ${week.seasonName} 시즌, ${week.weekNumber}주차 (${month}월 ${weekInMonth}주차)`;
+    return getImagePath(title);
   };
 
   const renderStars = (rating: number) => {
@@ -1368,6 +1359,11 @@ const Cluster41Content = () => {
 
       {/* Section 2: WEEKLY GROWTH 카드 */}
       <section className="cluster4-section2">
+        {(isNotLoggedIn || isPendingApproval) && !targetUserId ? (
+          <div className="season-growth-card visible" style={{ justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+            <p style={{ fontSize: '16px', color: '#aaa', textAlign: 'center' }}>현재 해당 하는 시즌이 없습니다.</p>
+          </div>
+        ) : (
         <div className="season-growth-card visible">
           {/* 왼쪽 콘텐츠 */}
           <div className="card-left">
@@ -1424,7 +1420,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 주차</span>
                   <span className="detail-value">
-                  <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span>
+                  <span className="number">{growthPeriodStats?.availableWeeks ?? '-'}</span>
                   </span>
                 </div>
                 <div className="detail-row">
@@ -1462,6 +1458,7 @@ const Cluster41Content = () => {
             <img src="/images/0/cluster4/4-1/image.png" alt="Character" />
           </div>
         </div>
+        )}
       </section>
 
       {/*/!* Section 2.5: 시즌별 카드 리스트 *!/*/}
@@ -1727,8 +1724,12 @@ const Cluster41Content = () => {
         <div className="weekly-cards">
           {isLoadingWeeks ? (
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>주차 데이터 로딩 중...</div>
+          ) : (isNotLoggedIn || isPendingApproval) && !targetUserId ? (
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: '#aaa' }}>
+              <p style={{ fontSize: '16px' }}>현재 해당 하는 시즌이 없습니다.</p>
+            </div>
           ) : (isMobile ? filteredDbData.slice(0, mobileVisibleCount) : paginatedDbData).length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>표시할 주차가 없습니다.</div>
+            <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>현재 해당하는 주차가 없습니다.</div>
           ) : (
             (isMobile ? filteredDbData.slice(0, mobileVisibleCount) : paginatedDbData).map((week) => {
               const weekHref = `/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`;

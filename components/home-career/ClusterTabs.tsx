@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 
 const ClusterTabs = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const userId = searchParams.get("userId") || searchParams.get("userID");
   const scrollRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -105,10 +107,11 @@ const ClusterTabs = () => {
       <div className="cluster-tabs-inner" ref={scrollRef}>
         {tabs.map((tab, index) => {
           const isWideDeco = tab.cluster === 9 || tab.cluster === 10;
+          const tabHref = tab.path && userId ? `${tab.path}?userId=${userId}` : tab.path;
           return tab.path ? (
             <Link
               key={index}
-              href={tab.path}
+              href={tabHref}
               ref={(el) => { tabRefs.current[index] = el; }}
               className={`cluster-tab ${isActive(tab.path) ? "active" : ""} ${isWideDeco ? "wide-deco" : ""}`}
             >

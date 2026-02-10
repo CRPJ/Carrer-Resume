@@ -56,7 +56,7 @@ const RankingCard = ({ user }: RankingCardProps) => {
             누적:
             <span style={{ color: '#f7931a', marginLeft: '4px' }}>⭐{user.total_stars}</span>
             <span style={{ color: '#ffeb3b', marginLeft: '6px' }}>⚡{user.total_lightnings}</span>
-            <span style={{ color: '#4caf50', marginLeft: '6px' }}>🛡️{user.total_shields}</span>
+            <span style={{ color: '#4caf50', marginLeft: '6px' }}>🛡️{user.shields}</span>
           </p>
         </div>
       </div>

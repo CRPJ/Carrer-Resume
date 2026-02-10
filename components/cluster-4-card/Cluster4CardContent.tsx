@@ -109,7 +109,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
   const [roleLabel, setRoleLabel] = useState<string | null>(null);
   const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
-  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
   const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
 
   // 이전/다음 주차 ID
@@ -553,14 +552,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const shield = weekPointsData.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
           setWeekPoints({ star, lightning, shield });
         }
-
-        // 누적 인절미 계산
-        const allWeeksUntilCurrent = allWeeksResult.data || [];
-        const weekIdsUntilCurrent = new Set(allWeeksUntilCurrent.map(w => w.id));
-        const cumulativePointsData = allPointsData.filter(p => weekIdsUntilCurrent.has(p.week_id));
-        const totalShield = cumulativePointsData.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
-        const totalLightning = cumulativePointsData.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
-        setCumulativeInjeolmi(totalShield - totalLightning);
 
         // 누적 성공 주차 수 계산
         let currentApprovedCount = 0;
@@ -2020,7 +2011,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href="/cluster-4" className="nav-btn-filled">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -2116,7 +2107,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">{cumulativeInjeolmi}</strong>
+                  <strong className="number-value">{weekPoints.shield}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
