@@ -27,14 +27,16 @@ const Cluster4CardDynamicPage = () => {
       if (!footer) return;
 
       const footerRect = footer.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+      const sidebarHeight = 810;
+      const sidebarTop = 124;
+      const sidebarBottom = sidebarTop + sidebarHeight;
 
-      if (footerRect.top < windowHeight) {
-        const moveUp = windowHeight - footerRect.top;
+      if (footerRect.top < sidebarBottom) {
+        // footer와 겹칠 때: 사이드바를 딱 footer 위까지만
         setSidebarStyle({
           position: 'fixed',
           left: '110px',
-          top: `${124 - moveUp}px`,
+          top: `${footerRect.top - sidebarHeight}px`,
           overflow: 'visible',
           zIndex: 100,
         });
