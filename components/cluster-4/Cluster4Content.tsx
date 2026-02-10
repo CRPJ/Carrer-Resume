@@ -2029,7 +2029,7 @@ const Cluster4Content = () => {
                               position: 'absolute',
                               right: '8px',
                               top: '50%',
-                              transform: 'translateY(-50%)',
+                              transform: 'none',
                               width: '14px',
                               height: '14px',
                               background: '#FAAB07',
