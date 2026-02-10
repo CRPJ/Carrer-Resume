@@ -3595,6 +3595,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    border-radius: 12px;
 
     &.section-modal-wide {
       width: 700px;
@@ -4376,6 +4377,7 @@
       padding: 16px 24px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
 
       button {
         padding: 10px 24px;
