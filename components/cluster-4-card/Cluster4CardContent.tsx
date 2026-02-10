@@ -2143,7 +2143,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
@@ -2387,8 +2387,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 정보 */}
         <div className="work-info-section">
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-          {session && isOwner && (
-            <div className="floating-icons" style={{ display: 'flex' }}>
+          {(
+         <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
@@ -2473,7 +2473,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 역량 */}
         <div className="work-ability-section">
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
@@ -2583,7 +2583,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 경험 */}
         <div className="work-exp-section">
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workExpActivityTypes)) {
@@ -2695,7 +2695,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 경력 */}
         <div className="work-career-section">
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workCareerActivityTypes)) {
