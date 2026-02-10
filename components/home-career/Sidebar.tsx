@@ -61,7 +61,7 @@ const Sidebar = () => {
       approved_weeks: 3,
       total_weeks: 16,
       progress_status: 'in_progress',
-      review_status: 'pending',
+      review_status: 'reviewing',
       seasons: { id: 's1', year: 2025, name: 'winter', start_date: '2025-01-01' }
     },
     {
@@ -81,7 +81,7 @@ const Sidebar = () => {
       progress_status: 'completed',
       review_status: 'approved',
       seasons: { id: 's3', year: 2025, name: 'summer', start_date: '2024-06-01' }
-    }
+    },
   ]);
   const [hasSeasonData, setHasSeasonData] = useState<boolean>(true);
 
@@ -1181,7 +1181,7 @@ const Sidebar = () => {
       const container = activitiesRef.current;
       const { scrollHeight, clientHeight } = container;
       const trackHeight = clientHeight;
-      const thumbHeight = Math.max((clientHeight / scrollHeight) * trackHeight, 20);
+      const thumbHeight = 44;
       const maxThumbTop = trackHeight - thumbHeight;
       const maxScrollTop = scrollHeight - clientHeight;
 
