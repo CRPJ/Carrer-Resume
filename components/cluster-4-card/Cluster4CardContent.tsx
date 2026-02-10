@@ -99,17 +99,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // DB에서 가져온 주차 데이터 상태
-  const [weekData, setWeekData] = useState<DBWeekData | null>(null);
+  const [weekData, setWeekData] = useState<DBWeekData | null>({
+    id: 'dummy-1',
+    weekNumber: 3,
+    seasonYear: 2025,
+    seasonName: '여름',
+    startDate: '2025-03-23',
+    endDate: '2025-03-30',
+    isClubBreak: false,
+    holidayName: null,
+    growthStatus: '성공',
+  });
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
-  const [teamName, setTeamName] = useState<string | null>(null);
-  const [partName, setPartName] = useState<string | null>(null);
-  const [generation, setGeneration] = useState<number | null>(null);
+  const [teamName, setTeamName] = useState<string | null>('미디어');
+  const [partName, setPartName] = useState<string | null>('웹툰드라마');
+  const [generation, setGeneration] = useState<number | null>(3);
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
-  const [roleLabel, setRoleLabel] = useState<string | null>(null);
-  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
-  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
+  const [roleLabel, setRoleLabel] = useState<string | null>('운영진(앰배서더)');
+  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 25, lightning: 30, shield: -2 });
+  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(30);
+  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(25);
 
   // 이전/다음 주차 ID
   const [prevWeekId, setPrevWeekId] = useState<string | null>(null);
@@ -922,16 +933,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     {
       id: 1, name: '김미현', gender: '여', age: 24,
       profileImg: '/images/0/cluster4/4-1-card/avatar-small-04.jpg',
-      university: '서울대학교', major: '미디어커뮤니케이션학과',
-      team: '엔터테인먼트팀', part: '내돈내산파트',
+      university: '서울대학교', major: '미디어커뮤니케이션',
+      team: '엔터테인먼트', part: '내돈내산',
       nickname: '엔비디아구글테슬라쿵', rank: 1, message: '',
       createdAt: '2025-12-22',
     },
     {
       id: 2, name: '김미현', gender: '여', age: 24,
       profileImg: '/images/0/cluster4/4-1-card/avatar-small-05.jpg',
-      university: '서울대학교', major: '미디어커뮤니케이션학과',
-      team: '엔터테인먼트팀', part: '내돈내산파트',
+      university: '서울대학교', major: '미디어커뮤니케이션',
+      team: '엔터테인먼트', part: '내돈내산',
       nickname: '엔비디아구글테슬라쿵', rank: 2, message: '',
       createdAt: '2025-12-22',
     },
@@ -970,7 +981,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       keyword: '추진력추진력력',
       reviewer: {
         display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
         teamName: '엔터테인먼트', partName: '내돈내산',
         vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-01.jpg',
       },
@@ -982,7 +993,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       keyword: '추진력추진력력',
       reviewer: {
         display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
         teamName: '엔터테인먼트', partName: '내돈내산',
         vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-02.jpg',
       },
@@ -994,7 +1005,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       keyword: '추진력추진력력',
       reviewer: {
         display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
         teamName: '엔터테인먼트', partName: '내돈내산',
         vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-03.jpg',
       },
@@ -1225,11 +1236,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
-  const currentImage = isRestMode
-    ? restImage
-    : weekData
-      ? getWeekImagePath(weekData)
-      : "/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png";
+  const currentImage = "/images/0/cluster4/4-1-card/image.png";
   const currentTitle = weekData
     ? `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
@@ -1330,7 +1337,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
-    while (result.length < 3) {
+    while (result.length < 4) {
       result.push({
         id: `empty-${result.length}`,
         name: "-",
@@ -1352,7 +1359,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
     }
 
-    return result.slice(0, 3); // 최대 3개만 반환
+    return result.slice(0, 4); // 최대 3개만 반환
   }, [weeklyReputations]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
@@ -2019,7 +2026,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   return (
-    <div className="cluster4-card-content weekly-card-detail">
+    <div className="cluster4-card-content weekly-card-detail" style={{ border: '1px solid #365314', marginRight: '27px' }}>
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
