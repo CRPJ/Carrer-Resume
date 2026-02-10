@@ -74,6 +74,8 @@
   width: 100%;
   max-width: 1330px;
   position: relative;
+  outline: 1px solid #365314;
+  outline-offset: -1px;
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {

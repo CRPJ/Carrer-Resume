@@ -918,7 +918,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
 
   // 연계 동료 선택 상태 (1st, 2nd, 3rd 각각 별도 저장)
-  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([]);
+  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([
+    {
+      id: 1, name: '김미현', gender: '여', age: 24,
+      profileImg: '/images/0/cluster4/4-1-card/avatar-small-04.jpg',
+      university: '서울대학교', major: '미디어커뮤니케이션학과',
+      team: '엔터테인먼트팀', part: '내돈내산파트',
+      nickname: '엔비디아구글테슬라쿵', rank: 1, message: '',
+      createdAt: '2025-12-22',
+    },
+    {
+      id: 2, name: '김미현', gender: '여', age: 24,
+      profileImg: '/images/0/cluster4/4-1-card/avatar-small-05.jpg',
+      university: '서울대학교', major: '미디어커뮤니케이션학과',
+      team: '엔터테인먼트팀', part: '내돈내산파트',
+      nickname: '엔비디아구글테슬라쿵', rank: 2, message: '',
+      createdAt: '2025-12-22',
+    },
+  ]);
 
   // 크루 검색어 상태
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
@@ -945,7 +962,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
 
   // 주차 평판 데이터 (API에서 가져옴)
-  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
+  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([
+    {
+      id: 'dummy-1',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-01.jpg',
+      },
+    },
+    {
+      id: 'dummy-2',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-02.jpg',
+      },
+    },
+    {
+      id: 'dummy-3',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-03.jpg',
+      },
+    },
+  ]);
 
   // 크루 목록 (API에서 가져옴)
   const [allCrewList, setAllCrewList] = useState<any[]>([]);
@@ -1334,7 +1388,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const result = [...apiData];
     while (result.length < 3) {
       result.push({
-        id: `empty-${result.length}`,
+        id: Number(`empty-${result.length}`),
         name: "-",
         gender: "-",
         age: "-",
