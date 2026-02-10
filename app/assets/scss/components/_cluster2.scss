@@ -2247,30 +2247,34 @@
     // 전체 섹션(좌측 3장 + 우측 Total/3x3)이 화면 중앙에 오도록
     margin-left: auto;
     margin-right: auto;
-    padding-left: 0 !important;
+    padding-left: 20px !important;
     // zoom-stable-layout에서 우측만 padding을 주는 보정이 있어(40px),
     // 전체가 살짝 왼쪽으로 치우쳐 보일 수 있음 → 데스크톱에서는 0으로 재정렬
-    padding-right: 0 !important;
+    padding-right: 20px !important;
     overflow: visible;
+    box-sizing: border-box;
 
     // 왼쪽 - 명언 카드 3개
     .section4-left {
       display: flex;
       flex-direction: column;
       gap: 15px;
-      // 카드(432px)에 맞춰 컬럼 폭 고정
-      width: 432px;
-      flex: 0 0 432px;
+      width: 436px;          // 432 → 436
+      flex: 0 0 436px;       // 432 → 436
+      padding: 2px;          // 추가: box-shadow 공간 확보
+    
 
       .quote-card-item {
         position: relative;
         border-radius: 24px;
         overflow: hidden;
-        width: 432px;
-        min-width: 432px;
-        height: 275px;
-        min-height: 275px;
-        border: 1px solid #FFA500;
+        width: 100%;
+        min-width: auto;
+        height: 273px;
+        min-height: 273px;
+        border: none;
+        outline: none;     // 추가: border 바깥에 한 번 더
+        box-shadow: 0 0 0 2px #FFA500;
         transform-style: preserve-3d;
         transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
         will-change: transform;
@@ -2281,15 +2285,15 @@
         }
 
         &.card-1 {
-          border-color: #FFA500;
+          box-shadow: 0 0 0 2px #FFA500;
         }
-
+        
         &.card-2 {
-          border-color: #FFE89C;
+          box-shadow: 0 0 0 2px #FFE89C;
         }
-
+        
         &.card-3 {
-          border-color: #FFFAE9;
+          box-shadow: 0 0 0 2px #FFFAE9;
         }
 
         .quote-bg {
