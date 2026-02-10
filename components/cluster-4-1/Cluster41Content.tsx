@@ -1420,7 +1420,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 주차</span>
                   <span className="detail-value">
-                  <span className="number">{growthPeriodStats?.availableWeeks ?? '-'}</span>
+                  <span className="number">{growthPeriodStats?.availableWeeks ?? '-'}</span>  <span className="white-text">개 주차</span>
                   </span>
                 </div>
                 <div className="detail-row">

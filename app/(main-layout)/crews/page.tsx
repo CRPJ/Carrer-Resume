@@ -45,7 +45,7 @@ const page = () => {
   const [nameQuery, setNameQuery] = useState("");
   const [clubFilter, setClubFilter] = useState("");
   const [schoolQuery, setSchoolQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("활동 중");
   const [filteredCrews, setFilteredCrews] = useState<Crew[]>([]);
 
   // 페이지네이션
@@ -91,9 +91,10 @@ const page = () => {
         const res = await fetch("/api/crews");
         const result = await res.json();
         if (result.success) {
-          const sorted = [...result.data].sort(sortByName);
           setCrews(result.data);
-          setFilteredCrews(sorted);
+          const active = result.data.filter((c: Crew) => c.status !== "graduated" && c.status !== "suspended");
+          active.sort((a: Crew, b: Crew) => b.approvedWeeks - a.approvedWeeks);
+          setFilteredCrews(active);
         }
       } catch (err) {
         console.error("크루 목록 조회 실패:", err);
@@ -130,7 +131,7 @@ const page = () => {
       }
     }
 
-    result.sort(sortByName);
+    result.sort((a, b) => b.approvedWeeks - a.approvedWeeks);
     setFilteredCrews(result);
     setCurrentPage(1);
   };
@@ -540,36 +541,36 @@ const page = () => {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                       gap: 24,
                     }}
                     className="crews-grid"
                   >
                     <style>{`
                       @media (min-width: 700px) {
-                        .crews-grid { grid-template-columns: repeat(3, 1fr) !important; }
+                        .crews-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
                       }
                       @media (min-width: 1200px) {
-                        .crews-grid { grid-template-columns: repeat(4, 1fr) !important; }
+                        .crews-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
                       }
                       @media (min-width: 1600px) {
-                        .crews-grid { grid-template-columns: repeat(6, 1fr) !important; }
+                        .crews-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
                       }
                     `}</style>
                     {paginatedCrews.map((crew) => (
-                      <div key={crew.id} className="trending__single">
+                      <div key={crew.id} className="trending__single" style={{ height: "100%" }}>
                         <div className="thumb">
-                          <Link href={`/cluster-4?userId=${crew.id}`}>
+                          <Link href={`/cluster-4?userId=${crew.id}`} style={{ aspectRatio: "1", overflow: "hidden", maxHeight: "none" }}>
                             {crew.profileImg ? (
                               <img
                                 src={crew.profileImg}
                                 alt={crew.name}
-                                style={{ width: "100%", aspectRatio: "1", objectFit: "cover" }}
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
                               />
                             ) : (
                               <div style={{
                                 width: "100%",
-                                aspectRatio: "1",
+                                height: "100%",
                                 background: "#1c242f",
                                 display: "flex",
                                 alignItems: "center",
@@ -585,8 +586,11 @@ const page = () => {
                         <div className="content-wrapper">
                           <div className="info">
                             <p className="text-sm fw-6">
-                              <Link href={`/cluster-4?userId=${crew.id}`}>{crew.club}</Link>
-                              <span>{crew.universityMajor}</span>
+                              <Link href={`/cluster-4?userId=${crew.id}`} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
+                            </p>
+                            <p className="text-sm" style={{ marginTop: "6px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={crew.universityMajor}>
+                              <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
+                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{crew.universityMajor}</span>
                             </p>
                           </div>
                           <div className="trending__single-footer">
