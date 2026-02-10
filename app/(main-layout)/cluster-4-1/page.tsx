@@ -29,7 +29,11 @@ const Cluster41Page = () => {
 
     const shell = sidebarShellRef.current;
     const inner = sidebarInnerRef.current;
-    const headerTopPx = 100;
+    const getHeaderBottom = () => {
+    const header = document.querySelector('header');
+    if (header) return header.getBoundingClientRect().bottom;
+    return 71;
+};
 
     let rafId: number | null = null;
     let isFixed = false;
@@ -39,13 +43,14 @@ const Cluster41Page = () => {
 
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const shellRect = shell.getBoundingClientRect();
-      const shouldFix = shellRect.top <= headerTopPx;
+      const headerBottom = getHeaderBottom();
+      const shouldFix = shellRect.top <= headerBottom;
 
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
         const height = inner.getBoundingClientRect().height / zoom;
         const left = shellRect.left / zoom;
-        const defaultTop = headerTopPx / zoom;
+        const defaultTop = getHeaderBottom() / zoom;
 
         // footer가 올라오면 사이드바가 footer를 덮지 않게 위로 밀어올림
         let top = defaultTop;
@@ -73,7 +78,7 @@ const Cluster41Page = () => {
       if (isFixed && shouldFix) {
         const zoomNow = parseFloat(document.documentElement.style.zoom) || 1;
         const height = inner.getBoundingClientRect().height / zoomNow;
-        const defaultTop = headerTopPx / zoomNow;
+        const defaultTop = getHeaderBottom() / zoomNow;
 
         let top = defaultTop;
         const footer = document.querySelector("footer");

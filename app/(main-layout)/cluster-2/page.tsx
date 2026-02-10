@@ -31,27 +31,30 @@ const Cluster2Page = () => {
 
     const shell = sidebarShellRef.current;
     const inner = sidebarInnerRef.current;
-    const headerTopPx = 100;
+    const getHeaderBottom = () => {
+    const header = document.querySelector('header');
+    if (header) return header.getBoundingClientRect().bottom;
+    return 71;
+};
 
     let rafId: number | null = null;
     let isFixed = false;
 
     // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
     const computeTop = (zoom: number, height: number) => {
-      const defaultTop = headerTopPx / zoom;
+      const defaultTop = getHeaderBottom() / zoom;
       let top = defaultTop;
-
+  
       const footer = document.querySelector("footer");
       if (footer) {
-        const footerTop = footer.getBoundingClientRect().top / zoom;
-        // 하단 테두리/그림자까지 안전하게 보이도록 여유를 조금 더 확보
-        const margin = 68 / zoom;
-        const maxTop = Math.floor(footerTop - height - margin);
-        top = Math.min(defaultTop, maxTop);
+          const footerTop = footer.getBoundingClientRect().top / zoom;
+          const margin = 4 / zoom;
+          const maxTop = footerTop - height - margin;
+          top = Math.min(defaultTop, maxTop);
       }
-
+  
       return top;
-    };
+  };
 
     const apply = () => {
       rafId = null;
@@ -60,7 +63,8 @@ const Cluster2Page = () => {
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       
       const shellRect = shell.getBoundingClientRect();
-      const shouldFix = shellRect.top <= headerTopPx;
+      const headerBottom = getHeaderBottom();
+      const shouldFix = shellRect.top <= headerBottom;
 
       // 고정 진입
       if (!isFixed && shouldFix) {
