@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+
 interface Cluster4CardContentProps {
   weekId: string;
 }
