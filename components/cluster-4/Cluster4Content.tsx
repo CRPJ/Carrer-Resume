@@ -74,8 +74,9 @@ const Cluster4Content = () => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    // 개발 모드: 비로그인 상태에서도 모달 열기 허용
     if (!session) {
-      alert('로그인이 필요합니다.');
+      openModalFn();
       return;
     }
 
@@ -87,7 +88,7 @@ const Cluster4Content = () => {
     }
 
     openModalFn();
-  };
+};
 
   const headerRef = useRef<HTMLElement>(null);
   const [section3Page, setSection3Page] = useState(0);

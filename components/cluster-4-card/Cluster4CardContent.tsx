@@ -83,8 +83,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
-      alert('로그인이 필요합니다.');
+      openModalFn();
       return;
     }
 
@@ -3514,7 +3515,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* 안내 문구 */}
                 <div className="header-edit-section colleague-guide">
                   <div className="guide-text">
-                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명, 최대 3명)</span></p>
+                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span></p>
                   </div>
                 </div>
 
@@ -3547,16 +3548,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                         </div>
                         <div className="colleague-message-section">
-                          <label>Thank you message <span className="char-limit">(최대 100자)</span></label>
+                          <label>Thank you message <span className="char-limit">(최대 50자)</span></label>
                           <div className="message-input-wrapper">
                             <textarea
                               placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={100}
+                              maxLength={50}
                               rows={1}
                               value={colleague.message}
                               onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}
                             ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 100</span>
+                            <span className="char-counter">{colleague.message.length} / 50</span>
                           </div>
                         </div>
                       </div>
