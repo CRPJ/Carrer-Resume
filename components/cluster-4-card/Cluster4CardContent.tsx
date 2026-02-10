@@ -147,6 +147,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 'wa-6', activity_type_id: 'session', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-7', activity_type_id: 'etc_a', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-8', activity_type_id: 'comp-1', title: '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-9', activity_type_id: 'exp-1', title: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-10', activity_type_id: 'exp-2', title: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-11', activity_type_id: 'exp-3', title: '[콘텐츠 마케팅] "어떤 제품/서비스더라도, 마케터가 제대로 \'표현\' 하지 못한다면, 그저 \'낙서\' 에 불과해. 나는 어떻게 내 제품/서비스를 표현할 수 있을까?', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
   ]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
@@ -179,6 +182,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { week_id: 'dummy-1', activity_type_id: 'session', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-3', is_completed: true },
   ]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
@@ -192,10 +200,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
     { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
   ]);
 
   // 활동별 평점 (activity_type_id → points)
-  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
+  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map([
+    ['exp-1', 6],
+    ['exp-2', 6],
+    ['exp-3', 6],
+  ]));
 
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
@@ -207,9 +222,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map([
     ['comp-1', { id: 'comp-1', name: '[실무 Info]인하우스 & 에이전시', line_code: 'CP09 - UN010', cluster_id: 'practical_competency', description: null }],
+    ['exp-1', { id: 'exp-1', name: '[커리어]마케터 Launch', line_code: 'EX01 - SFA01', cluster_id: 'practical_experience', description: null }],
+    ['exp-2', { id: 'exp-2', name: '[생산성]상호 피드백', line_code: 'EX02 - RUA99', cluster_id: 'practical_experience', description: null }],
+    ['exp-3', { id: 'exp-3', name: '[콘텐츠]마케팅 실무', line_code: 'EX03 - CMP01', cluster_id: 'practical_experience', description: null }],
+    ['exp-4', { id: 'exp-4', name: '[퍼포먼스]마케팅 실무', line_code: 'EX04 - PMP01', cluster_id: 'practical_experience', description: null }],
   ]));
   const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(['comp-1']);
-  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
+  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>(['exp-1', 'exp-2', 'exp-3', 'exp-4']);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
   // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함) - cluster-4-1과 동일
@@ -337,6 +356,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'productivity_feedback': '실무 경험 - [생산성]상호 피드백.png',
     'contents_marketing_practical': '실무 경험 - [콘텐츠]마케팅 실무.png',
     'performance_marketing_practical': '실무 경험 - [퍼포먼스]마케팅 실무.png',
+    'exp-1': '실무 경험 - [커리어]마케터 Launch.png',
+    'exp-2': '실무 경험 - [생산성]상호 피드백.png',
+    'exp-3': '실무 경험 - [콘텐츠]마케팅 실무.png',
   };
 
   // 실무 경험 아이콘 경로 가져오기 헬퍼 함수

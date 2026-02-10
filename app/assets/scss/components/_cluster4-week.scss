@@ -2627,22 +2627,26 @@
         }
 
         .section-name {
-          font-size: 28px;
+          font-size: 30px;
           font-weight: 700;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
+          white-space: nowrap;
+          line-height: 40px;
+          overflow: visible;
         }
 
         .section-count {
           font-size: 18px;
-          color: #FFE3AA;
+          font-weight: 800;
+          color: #FED7AA;
           margin-left: 120px;
           font-family: 'Pretendard', sans-serif;
-
+      
           .highlight {
-            font-size: 24px;
-            font-weight: 800;
-            color: #FAAB07;
+              font-size: 24px;
+              font-weight: 800;
+              color: #F59E0B;
           }
         }
       }
@@ -2657,18 +2661,19 @@
           font-size: 18px;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-          font-weight: 700;
+          font-weight: 800;
         }
 
         .rate-value {
           font-size: 18px;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-
+          font-weight: 800;
+      
           .highlight {
-            font-size: 24px;
-            font-weight: 800;
-            color: #FAAB07;
+              font-size: 24px;
+              font-weight: 800;
+              color: #F59E0B;
           }
         }
       }
@@ -2677,10 +2682,10 @@
     // 실무 경험/경력 섹션
     .work-exp-section,
     .work-career-section {
-      margin-bottom: 20px;
-      position: relative;
+        margin-bottom: 20px;
+        position: relative;
+        padding-left: 24px;
     }
-
     .work-career-section {
       margin-top: 70px;
 
@@ -2708,6 +2713,7 @@
         display: grid;
         grid-template-columns: repeat(2, 545px);
         gap: 16px;
+        margin-top: 30px;
 
         .work-exp-card {
           position: relative;
@@ -2767,20 +2773,22 @@
 
                 .code-tag {
                   font-size: 14px;
-                  color: #FFEC8F;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 500;
+                  color: #FEF9C3;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
 
                 .badge-tag {
-                  font-size: 15px;
-                  color: #FAAB07;
-                  background: rgba(250, 171, 7, 0.1);
-                  padding: 5px 8px 3px 8px;
+                  font-size: 16px;
+                  color: #F59E0B;
+                  background: rgba(245, 158, 11, 0.1);
+                  padding: 4px 8px;
                   border-radius: 4px;
                   font-family: 'Pretendard', sans-serif;
-                  font-weight: 400;
+                  font-weight: 600;
                   white-space: nowrap;
-                  line-height: 1;
+                  line-height: 16px;
                 }
               }
 
@@ -2826,9 +2834,11 @@
 
                 .rating-count {
                   font-size: 12px;
-                  font-weight: 600;
-                  color: #FAAB07;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 400;
+                  color: rgba(255, 255, 255, 0.9);
+                  font-family: 'Rajdhani', sans-serif;
+                  letter-spacing: 0.05em;
+                  line-height: 16px;
                 }
               }
             }
@@ -2853,8 +2863,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -2865,9 +2876,12 @@
               }
 
               .verified-text {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.6);
-                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                opacity: 0.6;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -2895,8 +2909,9 @@
               .sub-label {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
