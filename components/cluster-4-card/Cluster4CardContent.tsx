@@ -287,7 +287,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     supervisor_company: string | null;
     supervisor_profile_img: string | null;
   }
-  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([]);
+  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
+    {
+      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r1', user_id: 'u1', enhancement_status: 'enhanced', grade: 'S', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '대리', supervisor_department: '서비스기획팀', supervisor_company: '우아한형제들', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
+    },
+    {
+      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
+    },
+    {
+      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자3.png',
+    },
+    {
+      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r4', user_id: 'u1', enhancement_status: 'enhanced', grade: 'D', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '조지 워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자4.png',
+    },
+    {
+      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r5', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
+    },
+  ]);
   const [isLoadingCareerRecords, setIsLoadingCareerRecords] = useState(false);
 
   // 모달 편집 상태 (activity_type_id별로 관리)
@@ -1996,39 +2022,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     : [];
 
   // 참여한 경력이 없으면 빈 카드 1개 표시
+  // 빈 카드 템플릿
+  const emptyCareerCard = (id: number) => ({
+    id,
+    code: '', badge: '', title: '', verified: false, date: '0000-00-00 (일)', likes: '0,99',
+    hasWeb: false, isEmpty: true, icon: '', supervisorImg: '', supervisorName: '',
+    supervisorDept: '', supervisorCompany: '', supervisorPosition: '',
+    statusBadge: '', grade: '', isNotApplicable: false, isFailed: false,
+    projectDescription: null as string | null, gradePoints: null as number | null,
+    recordId: null as string | null, projectId: null as string | null,
+    lineCode: null as string | null, lineName: null as string | null,
+    outputLinks: null as { desc: string; url: string }[] | null,
+  });
+
+  // 참여한 경력이 없으면 빈 카드 표시, 있으면 6의 배수로 패딩
   const displayWorkCareerCards = workCareerCards.length > 0
-    ? workCareerCards
-    : [
-        {
-          id: 1,
-          code: '',
-          badge: '',
-          title: '',
-          verified: false,
-          date: '-',
-          likes: '0',
-          hasWeb: false,
-          isEmpty: true,
-          icon: '',
-          supervisorImg: '',
-          supervisorName: '',
-          supervisorDept: '',
-          supervisorCompany: '',
-          supervisorPosition: '',
-          statusBadge: '',
-          grade: '',
-          isNotApplicable: false,
-          isFailed: false,
-          // 추가 정보 (빈 카드용 기본값)
-          projectDescription: null as string | null,
-          gradePoints: null as number | null,
-          recordId: null as string | null,
-          projectId: null as string | null,
-          lineCode: null as string | null,
-          lineName: null as string | null,
-          outputLinks: null as { desc: string; url: string }[] | null,
-        },
-      ];
+    ? [
+        ...workCareerCards,
+        ...Array.from(
+          { length: (6 - (workCareerCards.length % 6)) % 6 },
+          (_, i) => emptyCareerCard(workCareerCards.length + i + 1)
+        ),
+      ]
+    : [emptyCareerCard(1)];
 
   // 별점 렌더링 함수 (반개 지원)
   const renderStars = (rating: number) => {
@@ -2717,7 +2733,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               return (
               <div
                 key={card.id}
-                className={`work-career-card ${isEmpty ? 'empty' : ''} ${card.isFailed ? 'failed' : ''}`}
+                className={`work-career-card ${isEmpty ? 'empty' : ''} ${card.isFailed ? 'failed' : ''} ${card.isNotApplicable ? 'not-applicable' : ''}`}
                 onClick={() => {
                   if (!isEmpty) {
                     setSelectedWorkCareerCard(card);

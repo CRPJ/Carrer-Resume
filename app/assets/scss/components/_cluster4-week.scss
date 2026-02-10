@@ -2951,12 +2951,13 @@
 
       .work-career-cards {
         display: grid;
-        grid-template-columns: repeat(3, 413px);
+        grid-template-columns: repeat(3, 384px);
+        grid-template-rows: repeat(2, auto);
         gap: 16px;
 
         .work-career-card {
           position: relative;
-          width: 413px;
+          width: 384px;
           min-height: 457px;
           background: #232323;
           border-radius: 20px;
@@ -2971,23 +2972,17 @@
           }
 
           &.not-applicable {
-            background: #131313;
-
-            .card-overlay {
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background: rgba(0, 0, 0, 0.5);
-              border-radius: 20px;
-              z-index: 1;
-              pointer-events: none;
+            background: #0a0a0a;
+            border: 1px solid #000;
+        
+            .card-top-row,
+            .card-bottom-area {
+                opacity: 0.4;
             }
-
+        
             .status-badge {
-              z-index: 2;
-              right: -10px;
+                z-index: 2;
+                opacity: 1;
             }
           }
 
@@ -3036,15 +3031,20 @@
                 }
 
                 .verified-text {
-                  font-size: 11px;
-                  color: rgba(255, 255, 255, 0.6);
-                  font-family: 'Pretendard', sans-serif;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #fff;
+                  opacity: 0.6;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
 
                 .code-tag {
                   font-size: 14px;
-                  color: #FFEC8F;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 500;
+                  color: #FEF9C3;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
               }
             }
@@ -3070,8 +3070,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -3112,8 +3113,9 @@
               .sub-label {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -3152,9 +3154,10 @@
             }
 
             .not-applicable-text {
-              font-size: 25px;
+              font-size: 24px;
               font-weight: 700;
-              color: #FF0D0D;
+              color: #DC2626;
+              line-height: 20px;
               font-family: 'Pretendard', sans-serif;
               margin-top: 4px;
               margin-right: 20px;
@@ -3175,7 +3178,8 @@
               border-radius: 50%;
               background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
               color: #9C9C9C;
-              font-size: 25px;
+              font-size: 24px;
+              line-height: 24px;
               font-weight: 400;
               display: flex;
               align-items: center;
@@ -3204,15 +3208,15 @@
           .category-text {
             display: inline-block;
             width: fit-content;
-            font-size: 15px;
-            color: #FAAB07;
-            background: rgba(250, 171, 7, 0.1);
-            padding: 5px 8px 3px 8px;
+            font-size: 16px;
+            color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 4px 8px;
             border-radius: 4px;
-            font-family: 'Pretendard', sans-serif;
-            font-weight: 400;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
             white-space: nowrap;
-            line-height: 1;
+            line-height: 16px;
             margin: 0 0 10px 0;
           }
 
@@ -3270,17 +3274,17 @@
 
                   .supervised-text {
                     font-size: 12px;
-                    color: #666666;
-                    font-family: 'Pretendard', sans-serif;
-                    line-height: 1.2;
+                    color: rgba(255, 255, 255, 0.3);
+                    font-family: 'Azeret Mono', monospace;
+                    line-height: 20px;
                   }
 
                   .profile-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 400;
                     color: #fff;
                     font-family: 'Pretendard', sans-serif;
-                    line-height: 1.2;
+                    line-height: 20px;
 
                     strong {
                       font-weight: 700;
@@ -3306,8 +3310,9 @@
 
             .current-bid {
               font-size: 12px;
-              color: rgba(255, 255, 255, 0.4);
-              font-family: 'Pretendard', sans-serif;
+              color: rgba(255, 255, 255, 0.3);
+              font-family: 'Azeret Mono', monospace;
+              line-height: 20px;
             }
 
             .date-view {
@@ -3317,10 +3322,11 @@
               margin-left: auto;
 
               .date {
-                font-size: 12px;
                 color: #fff;
-                font-family: 'Pretendard', sans-serif;
+                font-family: 'Manrope', sans-serif;
                 font-weight: 800;
+                font-size: 12px;
+                line-height: 9px;
                 width: 119px;
                 height: 26px;
                 background: rgba(255, 255, 255, 0.2);
@@ -3356,8 +3362,9 @@
             .likes {
               font-size: 16px;
               color: #fff;
-              font-family: 'Pretendard', sans-serif;
+              font-family: 'Manrope', sans-serif;
               font-weight: 800;
+              line-height: 20px;
               display: flex;
               align-items: center;
               gap: 4px;
