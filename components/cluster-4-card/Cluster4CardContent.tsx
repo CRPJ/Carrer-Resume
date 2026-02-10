@@ -138,7 +138,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     opened_at: string | null;  // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
     output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
-  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
+    { id: 'wa-1', activity_type_id: 'wisdom', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-2', activity_type_id: 'essay', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-3', activity_type_id: 'infodesk', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-4', activity_type_id: 'calendar', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-5', activity_type_id: 'forum', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-6', activity_type_id: 'session', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-7', activity_type_id: 'etc_a', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-8', activity_type_id: 'comp-1', title: '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+  ]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
   interface UserActivity {
@@ -154,14 +163,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number;  // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 4, success: 3 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 3, success: 2 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 3, success: 1 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 3, success: 2 });
 
   // 강화 상태 판단용 (해당 주차 데이터)
   interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
-  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([]);
+  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([
+    { week_id: 'dummy-1', activity_type_id: 'wisdom', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'essay', is_completed: false },
+    { week_id: 'dummy-1', activity_type_id: 'infodesk', is_completed: false },
+    { week_id: 'dummy-1', activity_type_id: 'calendar', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'forum', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'session', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
+  ]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
   // 2차 정보 (서브타이틀, 아웃풋링크) - 해당 주차 데이터
@@ -172,7 +190,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     sub_title: string | null;
     output_links: OutputLink[] | null;
   }
-  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
+  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
+    { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..', output_links: [] },
+  ]);
 
   // 활동별 평점 (activity_type_id → points)
   const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
@@ -185,8 +205,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     cluster_id: string;
     description: string | null;
   }
-  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map());
-  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
+  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map([
+    ['comp-1', { id: 'comp-1', name: '[실무 Info]인하우스 & 에이전시', line_code: 'CP09 - UN010', cluster_id: 'practical_competency', description: null }],
+  ]));
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(['comp-1']);
   const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
@@ -297,6 +319,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'reference_naver': '실무 역량 - 네이버.png',
     'reference_free_choice': '실무 역량 - [Reference]자유 선택.png',
     'practical_planning_online_marketing': '실무 역량 - [실무 기획] 온라인 마케팅.png',
+    'comp-1': '실무 역량 - [실무 Info]인하우스 & 에이전시.png',
   };
 
   // 실무 역량 아이콘 경로 가져오기 헬퍼 함수

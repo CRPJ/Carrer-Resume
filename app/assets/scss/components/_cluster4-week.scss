@@ -1910,15 +1910,21 @@
           width: 494px;
 
           .growth-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             color: #fff;
-          }
+            font-family: 'Chakra Petch', sans-serif;
+            text-transform: uppercase;
+            line-height: 32px;
+        }
 
           .growth-count {
-            font-size: 19px;
+            font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 32px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -1930,9 +1936,10 @@
             }
 
             .highlight {
-              font-size: 21px;
+              font-size: 20px;
               font-weight: 700;
-              color: #FFA500;
+              color: #F59E0B;
+              font-family: 'Chakra Petch', sans-serif;
             }
           }
         }
@@ -1968,17 +1975,19 @@
           align-items: baseline;
 
           .number {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 400;
-            color: #FFA500;
+            color: #F59E0B;
             font-family: 'Black Ops One', cursive;
+            line-height: 36px;
           }
 
           .percent {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 400;
             color: #fff;
             font-family: 'Black Ops One', cursive;
+            line-height: 36px;
           }
         }
       }
@@ -1992,34 +2001,36 @@
         margin-right: 64px;
 
         .growth-label {
-          font-size: 18px;
-          font-weight: 600;
+          font-size: 20px;
+          font-weight: 700;
           color: #fff;
+          font-family: 'Chakra Petch', sans-serif;
+          text-transform: uppercase;
+          line-height: 20px;
           position: relative;
           top: 5px;
-        }
+      }
 
         .legend-items {
           display: flex;
-          gap: 16px;
+          gap: 20px;
 
           .legend-item {
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 5px;
             font-size: 16px;
             font-weight: 600;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Manrope', sans-serif;
             color: #fff;
 
             .legend-icon {
-              width: 45px;
-              height: 45px;
+              width: 44px;
+              height: 44px;
               object-fit: contain;
 
               &.glow {
-                filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.8));
-                transform: scale(0.85);
+                  transform: none;
               }
             }
           }
@@ -2031,6 +2042,8 @@
     .work-info-section {
       margin-bottom: 72px;
       position: relative;
+      padding-left: 24px;
+      padding-right: 46px;
 
       .floating-icons {
         top: 0;
@@ -2055,22 +2068,26 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
+            white-space: nowrap;
+            line-height: 40px;
+            overflow: visible;
           }
 
           .section-count {
             font-size: 18px;
-            color: #FFE3AA;
+            font-weight: 700;
+            color: #FED7AA;
             margin-left: 120px;
             font-family: 'Pretendard', sans-serif;
-
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
             }
           }
         }
@@ -2085,18 +2102,19 @@
             font-size: 18px;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
-            font-weight: 700;
-          }
-
-          .rate-value {
+            font-weight: 800;
+        }
+        
+        .rate-value {
             font-size: 18px;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
-
+            font-weight: 800;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
             }
           }
         }
@@ -2138,8 +2156,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -2150,9 +2169,12 @@
               }
 
               .verified-text {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.6);
-                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                opacity: 0.6;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -2224,7 +2246,7 @@
               }
 
               .card-desc {
-                font-size: 14px;
+                font-size: 12px;
                 color: #fff;
                 line-height: 1.6;
                 font-family: 'Pretendard', sans-serif;
@@ -2253,8 +2275,8 @@
             z-index: 10;
 
             img {
-              width: 55px;
-              height: 55px;
+              width: 58px;
+              height: 58px;
               object-fit: contain;
             }
           }
@@ -2265,7 +2287,12 @@
     // 실무 역량 섹션
     .work-ability-section {
       position: relative;
-      margin-bottom: 28px;
+      margin-top: 120px;
+      margin-bottom: 72px;
+      padding-left: 24px;
+      overflow: visible;
+      max-height: none;
+      height: auto;
 
       .floating-icons {
         top: 0;
@@ -2290,22 +2317,27 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
+            white-space: nowrap;
+            line-height: 40px;
+            overflow: visible;
           }
 
           .section-count {
             font-size: 18px;
-            color: #FFE3AA;
+            font-weight: 800;
+            color: #FED7AA;
             margin-left: 120px;
-            font-family: 'Pretendard', sans-serif;
-
+            font-family: 'Manrope', sans-serif;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
+                font-family: 'Manrope', sans-serif;
             }
           }
         }
@@ -2319,19 +2351,21 @@
           .rate-label {
             font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
-            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
           }
 
           .rate-value {
             font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
-
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
+                font-family: 'Manrope', sans-serif;
             }
           }
         }
@@ -2426,8 +2460,9 @@
             .card-title {
               font-size: 14px;
               font-weight: 500;
-              color: #FFEC8F;
-              font-family: 'Pretendard', sans-serif;
+              color: #FEF9C3;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
 
             .verified-icon {
@@ -2438,27 +2473,32 @@
             }
 
             .verified-text {
-              font-size: 12px;
-              color: rgba(255, 255, 255, 0.6);
-              font-family: 'Pretendard', sans-serif;
+              font-size: 14px;
+              font-weight: 500;
+              color: #fff;
+              opacity: 0.6;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
 
             .code-tag {
               font-size: 14px;
-              color: #FFEC8F;
+              font-weight: 500;
+              color: #FEF9C3;
               font-family: 'Pretendard', sans-serif;
+              line-height: 16px;
             }
 
             .info-tag {
-              font-size: 15px;
-              color: #FAAB07;
-              background: rgba(250, 171, 7, 0.1);
-              padding: 5px 8px 3px 8px;
+              font-size: 16px;
+              color: #F59E0B;
+              background: rgba(245, 158, 11, 0.1);
+              padding: 4px 8px;
               border-radius: 4px;
               font-family: 'Pretendard', sans-serif;
-              font-weight: 400;
+              font-weight: 600;
               white-space: nowrap;
-              line-height: 1;
+              line-height: 16px;
             }
           }
 
@@ -2486,13 +2526,14 @@
             .sub-label {
               font-size: 14px;
               font-weight: 500;
-              color: #FFEC8F;
-              font-family: 'Pretendard', sans-serif;
+              color: #FEF9C3;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
           }
 
           .sub-desc {
-            font-size: 14px;
+            font-size: 12px;
             color: #fff;
             line-height: 1.5;
             font-family: 'Pretendard', sans-serif;
@@ -2528,7 +2569,7 @@
       .character-image {
         position: absolute;
         right: 0;
-        bottom: -70px;
+        top: -48px;
         width: 326px;
         height: 314px;
         overflow: hidden;
@@ -3033,7 +3074,7 @@
             }
 
             .main-desc {
-              font-size: 14px;
+              font-size: 12px;
               color: #fff;
               line-height: 1.6;
               font-family: 'Pretendard', sans-serif;
