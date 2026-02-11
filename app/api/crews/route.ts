@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-server";
+import { getCachedTeams, getCachedParts } from "@/lib/cached-data";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,8 +51,8 @@ export async function GET(request: Request) {
     const [
       { data: educations },
       { data: userTeamParts },
-      { data: teams },
-      { data: parts },
+      teams,
+      parts,
       { data: cumulativePoints },
       { data: growthStats },
     ] = await Promise.all([
@@ -65,8 +66,8 @@ export async function GET(request: Request) {
         .select("user_id, team_id, part_id")
         .in("user_id", userIds)
         .is("left_at", null),
-      supabase.from("teams").select("id, name"),
-      supabase.from("parts").select("id, name"),
+      getCachedTeams(),
+      getCachedParts(),
       supabase
         .from("user_cumulative_points")
         .select("user_id, total_stars")
@@ -75,7 +76,7 @@ export async function GET(request: Request) {
         .from("user_growth_stats")
         .select("user_id, approved_weeks")
         .in("user_id", userIds),
-    ]);
+    ] as const);
 
     // user_id별 학력 정보 Map (첫 번째 학력만 사용)
     const educationMap: { [key: string]: { school_name: string | null; major_name_1: string | null } } = {};

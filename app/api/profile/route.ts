@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -183,8 +184,8 @@ export async function GET(request: NextRequest) {
       // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크)
       supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
 
-      // activity_types (cluster_id 기반 분류용)
-      supabaseAdmin.from("activity_types").select("id, cluster_id"),
+      // activity_types (cluster_id 기반 분류용) - 캐시 사용
+      getCachedActivityTypes(),
 
       // 해당 유저의 활동별 포인트 (평점용) - star 타입만
       supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
@@ -195,11 +196,11 @@ export async function GET(request: NextRequest) {
       // 해당 유저의 팀/파트 이력 (시즌 상태 표시용)
       supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
 
-      // 팀 목록
-      supabaseAdmin.from("teams").select("id, name"),
+      // 팀 목록 - 캐시 사용
+      getCachedTeams(),
 
-      // 파트 목록
-      supabaseAdmin.from("parts").select("id, name, team_id"),
+      // 파트 목록 - 캐시 사용
+      getCachedParts(),
 
       // user_weekly_growth (시즌별 성공 주차 실시간 계산용)
       supabaseAdmin.from("user_weekly_growth").select("week_id, is_success, is_resting, weeks!inner(season_id)").eq("user_id", profile.id)
@@ -456,7 +457,7 @@ export async function GET(request: NextRequest) {
     };
 
     // activity_type_id → cluster_id 매핑 생성
-    const activityTypes = activityTypesResult.data || [];
+    const activityTypes = activityTypesResult || [];
     const typeToClusterMap = new Map<string, string>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     activityTypes.forEach((at: any) => {
@@ -725,7 +726,7 @@ export async function GET(request: NextRequest) {
     const completedActivityRecords = activityRecordsForSeason.filter((ar: any) => ar.is_completed);
 
     // activity_type_id → cluster_id 매핑
-    const activityTypesData = activityTypesResult.data || [];
+    const activityTypesData = activityTypesResult || [];
     const typeToClusterMapForSeason = new Map<string, string>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     activityTypesData.forEach((at: any) => {
@@ -983,9 +984,9 @@ export async function GET(request: NextRequest) {
       // 팀/파트 이력 (시즌 상태 표시용)
       userTeamParts: userTeamPartsResult.data || [],
       // 팀 목록
-      teams: teamsResult.data || [],
+      teams: teamsResult || [],
       // 파트 목록
-      parts: partsResult.data || [],
+      parts: partsResult || [],
       // 승인된 활동 전체 (주차별 강화 집계용) - activity_records에서 is_completed=true인 것
       approvedActivities: activitiesData || [],
       // 활동 이행 기록 전체 (강화 상태 판단용: is_completed 포함)

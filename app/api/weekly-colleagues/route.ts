@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase-server";
+import { getCachedTeams, getCachedParts } from "@/lib/cached-data";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -83,9 +84,9 @@ export async function GET(request: Request) {
         .in("user_id", colleagueIds)
         .is("left_at", null);
 
-      // 팀/파트 이름 조회
-      const { data: teams } = await supabase.from("teams").select("id, name");
-      const { data: parts } = await supabase.from("parts").select("id, name");
+      // 팀/파트 이름 조회 - 캐시 사용
+      const teams = await getCachedTeams();
+      const parts = await getCachedParts();
 
       // 팀/파트 이름 매핑
       const teamMap: { [key: string]: string } = {};

@@ -345,9 +345,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       try {
         setIsLoadingWeek(true);
 
-        // ========== 1단계: 독립적인 초기 데이터 병렬 로드 ==========
+        // ========== 1단계: 독립적인 초기 데이터 병렬 로드 (userId 불필요) ==========
         const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : '/api/profile';
-        const [activityTypesResult, currentWeekResult, profileResponse] = await Promise.all([
+        const [activityTypesResult, currentWeekResult, profileResponse, allUserWeeksResult, activitiesResult] = await Promise.all([
           // activity_types 정보
           supabase.from('activity_types')
             .select('id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total')
@@ -358,7 +358,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             .eq('id', weekId)
             .single(),
           // 프로필 정보
-          fetch(profileUrl)
+          fetch(profileUrl),
+          // 모든 주차 (이전/다음 네비게이션용) - userId 불필요
+          supabase.from('weeks')
+            .select('id, start_date, end_date, season_id, seasons(name)')
+            .order('start_date', { ascending: false }),
+          // weekly_activities - weekId만 필요
+          supabase.from('weekly_activities')
+            .select('id, activity_type_id, title, is_active, opened_at, output_links')
+            .eq('week_id', weekId)
         ]);
 
         const activityTypesData = activityTypesResult.data;
@@ -426,17 +434,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiParts = profileResult.parts || [];
         const apiUserTeamParts = profileResult.userTeamParts || [];
 
-        // ========== 2단계: userId 의존 데이터 병렬 로드 ==========
+        // ========== 2단계: userId 의존 데이터 병렬 로드 (3개 쿼리만) ==========
         const today = new Date().toISOString().split('T')[0];
         const userStartDate = profileResult.growthInfo?.startDate || '1900-01-01';
 
         const [
           weeklyGrowthResult,
           pointsResult,
-          allWeeksResult,
-          successWeeksResult,
-          allUserWeeksResult,
-          activitiesResult
+          successWeeksResult
         ] = await Promise.all([
           // user_weekly_growth (성장 상태)
           supabase.from('user_weekly_growth')
@@ -448,24 +453,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           supabase.from('points')
             .select('week_id, point_type, points')
             .eq('user_id', userId),
-          // 모든 주차 (누적 계산용)
-          supabase.from('weeks')
-            .select('id, end_date')
-            .lte('end_date', currentWeek.end_date),
           // 성공 주차 (누적 계산용)
           supabase.from('user_weekly_growth')
             .select('week_id, weeks!inner(end_date)')
             .eq('user_id', userId)
-            .eq('is_success', true),
-          // 모든 주차 (이전/다음 네비게이션용)
-          supabase.from('weeks')
-            .select('id, start_date, season_id, seasons(name)')
-            .order('start_date', { ascending: false }),
-          // weekly_activities
-          supabase.from('weekly_activities')
-            .select('id, activity_type_id, title, is_active, opened_at, output_links')
-            .eq('week_id', weekId)
+            .eq('is_success', true)
         ]);
+
+        // 누적 주차는 Stage 1의 allUserWeeksResult를 클라이언트 필터로 대체
+        const allWeeksForCumulative = (allUserWeeksResult.data || []).filter(
+          (w: any) => w.end_date && w.end_date <= currentWeek.end_date
+        );
+        const allWeeksResult = { data: allWeeksForCumulative };
 
         // 성장 상태 결정
         const weeklyGrowth = weeklyGrowthResult.data;
@@ -775,11 +774,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   useEffect(() => {
     const fetchCareerRecords = async () => {
       if (!weekId) return;
+      // urlUserId가 있으면 currentUserId 대기 없이 즉시 fetch
+      const targetUserId = urlUserId || currentUserId;
+      if (!targetUserId) return;
 
       setIsLoadingCareerRecords(true);
       try {
         const params = new URLSearchParams({ week_id: weekId });
-        if (currentUserId) params.set('user_id', currentUserId);
+        params.set('user_id', targetUserId);
         const url = `/api/career-records?${params.toString()}`;
         console.log('[cluster-4-card] fetchCareerRecords URL:', url);
         const response = await fetch(url);
@@ -797,7 +799,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     fetchCareerRecords();
-  }, [currentUserId, weekId]);
+  }, [urlUserId, currentUserId, weekId]);
 
   // 실무 경력 통계 업데이트 (career records 기반)
   // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
@@ -850,25 +852,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     fetchWeeklyReputations();
   }, [urlUserId, weekId]);
 
-  // 크루 목록 가져오기
-  useEffect(() => {
-    const fetchCrewList = async () => {
-      try {
-        // 자신을 제외한 크루 목록 가져오기 (urlUserId 또는 session.user.id 사용)
-        const excludeId = urlUserId || session?.user?.id || '';
-        const res = await fetch(`/api/crews?excludeUserId=${excludeId}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.data) {
-            setAllCrewList(json.data);
-          }
+  // 크루 목록 가져오기 (모달 열릴 때 lazy load)
+  const fetchCrewListIfNeeded = async () => {
+    if (allCrewList.length > 0) return; // 이미 로드됨
+    try {
+      const excludeId = urlUserId || session?.user?.id || '';
+      const res = await fetch(`/api/crews?excludeUserId=${excludeId}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setAllCrewList(json.data);
         }
-      } catch (error) {
-        console.error("크루 목록 가져오기 오류:", error);
       }
-    };
-    fetchCrewList();
-  }, [urlUserId, session?.user?.id]);
+    } catch (error) {
+      console.error("크루 목록 가져오기 오류:", error);
+    }
+  };
 
   // 연계 동료 데이터 가져오기
   const fetchWeeklyColleagues = async () => {
@@ -2023,7 +2022,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }}>
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
             </div>
             <div className="edit-icon search-icon">
@@ -2038,7 +2037,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 타인 카드일 때 - 주차 평판 남기기 버튼 */}
         {session && !isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>

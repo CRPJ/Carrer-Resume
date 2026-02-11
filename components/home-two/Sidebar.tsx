@@ -116,7 +116,7 @@ const Sidebar = () => {
 
       try {
         console.log("=== API 호출 시작 ===");
-        const response = await fetch('/api/profile');
+        const response = await fetch('/api/profile/summary');
         const result = await response.json();
 
         console.log("API 응답:", result);
