@@ -74,8 +74,9 @@ const Cluster4Content = () => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    // 개발 모드: 비로그인 상태에서도 모달 열기 허용
     if (!session) {
-      alert('로그인이 필요합니다.');
+      openModalFn();
       return;
     }
 
@@ -87,7 +88,7 @@ const Cluster4Content = () => {
     }
 
     openModalFn();
-  };
+};
 
   const headerRef = useRef<HTMLElement>(null);
   const [section3Page, setSection3Page] = useState(0);
@@ -1638,19 +1639,10 @@ const Cluster4Content = () => {
         {/* SEASON CHALLENGE 배너 */}
         <div className="section3-banner">
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
-          {session && !isOwner && urlUserId && (
-            <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={() => handleEditClick(openSeasonReputationModal)}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
-              </div>
-              <div className="edit-icon search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
-              </div>
-            </div>
-          )}
+          <div className="floating-icons" style={{ display: 'flex' }}>
+            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => openSeasonReputationModal()} />
+            <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          </div>
           <div className="section3-title-wrapper">
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>
           </div>
@@ -2029,7 +2021,7 @@ const Cluster4Content = () => {
                               position: 'absolute',
                               right: '8px',
                               top: '50%',
-                              transform: 'translateY(-50%)',
+                              transform: 'none',
                               width: '14px',
                               height: '14px',
                               background: '#FAAB07',
@@ -2084,6 +2076,7 @@ const Cluster4Content = () => {
       </section>
 
       {/* ========== 시즌 평판 모달 ========== */}
+      
       {seasonReputationModalOpen && (
         <div
           style={{
@@ -2102,7 +2095,7 @@ const Cluster4Content = () => {
           onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReputationModalOpen(false); }}
         >
           <div style={{
-            width: '500px',
+            width: '460px',
             maxWidth: '90vw',
             maxHeight: '80vh',
             background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
@@ -2123,103 +2116,47 @@ const Cluster4Content = () => {
 
             {/* Body */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-              {/* 시즌 선택 */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
-                  시즌 선택 <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>({seasonHistories.length}개 시즌)</span>
-                </label>
-                <select
-                  value={selectedSeasonId}
-                  onChange={(e) => setSelectedSeasonId(e.target.value)}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    height: '48px',
-                    padding: '12px 14px',
-                    background: '#1a1f2e',
-                    border: '2px solid #FFA500',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    outline: 'none',
-                    WebkitAppearance: 'menulist',
-                    MozAppearance: 'menulist',
-                    appearance: 'menulist',
-                  }}
-                >
-                  {seasonHistories.length === 0 ? (
-                    <option value="" style={{ background: '#1a1f2e' }}>시즌 기록이 없습니다</option>
-                  ) : (
-                    <>
-                      <option value="" style={{ background: '#1a1f2e' }}>시즌을 선택해주세요</option>
-                      {seasonHistories.map((season) => (
-                        <option key={season.id} value={season.id} style={{ background: '#1a1f2e' }}>
-                          {season.year}년 {season.season} 시즌
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-              </div>
-
+              
               {/* 평점 */}
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <select
-                    value={seasonReputationEditData.rating.toString()}
-                    onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, rating: parseFloat(e.target.value) }))}
-                    style={{
-                      display: 'block',
-                      width: '120px',
-                      height: '48px',
-                      padding: '12px 14px',
-                      background: '#1a1f2e',
-                      border: '2px solid #FFA500',
-                      borderRadius: '8px',
-                      color: '#FFA500',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      outline: 'none',
-                      WebkitAppearance: 'menulist',
-                      MozAppearance: 'menulist',
-                      appearance: 'menulist',
-                    }}
-                  >
-                    {[0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0].map((val) => (
-                      <option key={val} value={val.toString()} style={{ background: '#1a1f2e', color: '#fff' }}>{val.toFixed(1)}</option>
-                    ))}
-                  </select>
-                  <div style={{ display: 'flex', gap: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
                     {[1, 2, 3, 4, 5].map((starIndex) => {
-                      const fullValue = starIndex * 2;
-                      const halfValue = starIndex * 2 - 1;
-                      const currentRating = seasonReputationEditData.rating * 2;
-                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
-                      const isFull = currentRating >= fullValue;
+                      const starValue = starIndex * 2; // 각 별 = 2점
+                      const isFull = seasonReputationEditData.rating >= starValue;
+                      const isHalf = !isFull && seasonReputationEditData.rating >= starValue - 1;
                       return (
-                        <div key={starIndex} style={{ width: '20px', height: '20px', position: 'relative' }}>
+                        <div
+                          key={starIndex}
+                          style={{ width: '28px', height: '28px', position: 'relative', cursor: 'pointer' }}
+                          onClick={() => {
+                            // 클릭 시: 이미 해당 값이면 -2 (토글), 아니면 해당 값으로
+                            const newRating = seasonReputationEditData.rating === starValue ? starValue - 2 : starValue;
+                            setSeasonReputationEditData(prev => ({ ...prev, rating: Math.max(0, newRating) }));
+                          }}
+                        >
                           <svg viewBox="0 0 24 24" fill={isFull ? '#FFA500' : 'none'} stroke="#FFA500" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                           {isHalf && (
                             <svg viewBox="0 0 24 24" style={{ position: 'absolute', width: '100%', height: '100%' }}>
-                              <defs><clipPath id={`sh${starIndex}`}><rect x="0" y="0" width="12" height="24" /></clipPath></defs>
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#sh${starIndex})`} />
+                              <defs><clipPath id={`sr-half-${starIndex}`}><rect x="0" y="0" width="12" height="24" /></clipPath></defs>
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#sr-half-${starIndex})`} />
                             </svg>
                           )}
                         </div>
                       );
                     })}
                   </div>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FFA500' }}>{seasonReputationEditData.rating.toFixed(1)} / 10.0</span>
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FFA500' }}>
+                    {seasonReputationEditData.rating} / 10
+                  </span>
                 </div>
               </div>
 
               {/* 내용 */}
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
                   내용 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 100자)</span>
                 </label>
@@ -2227,110 +2164,90 @@ const Cluster4Content = () => {
                   <textarea
                     placeholder="해당 시즌에 대한 평가 내용을 작성해주세요..."
                     maxLength={100}
-                    rows={3}
+                    rows={4}
                     value={seasonReputationEditData.content}
                     onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, content: e.target.value }))}
-                    style={{ width: '100%', padding: '12px 14px', paddingBottom: '30px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', color: '#fff', fontSize: '14px', resize: 'none' }}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      paddingBottom: '30px',
+                      background: 'rgba(0,0,0,0.3)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '14px',
+                      resize: 'none',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
                   />
-                  <span style={{ position: 'absolute', right: '12px', bottom: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>{seasonReputationEditData.content.length} / 100</span>
+                  <span style={{ position: 'absolute', right: '12px', bottom: '10px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+                    {seasonReputationEditData.content.length} / 100
+                  </span>
                 </div>
               </div>
 
               {/* 키워드 */}
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
-                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
+                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 2개, 각 7자)</span>
                 </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {/* 키워드 1 */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#1</span>
-                    <select
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '8px',
+                    padding: '0 12px',
+                    height: '44px',
+                  }}>
+                    <span style={{ color: '#FFA500', fontWeight: 700, fontSize: '14px', marginRight: '6px', flexShrink: 0 }}>#</span>
+                    <input
+                      type="text"
+                      placeholder="키워드 1"
+                      maxLength={7}
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword1: e.target.value }))}
                       style={{
-                        display: 'block',
                         width: '100%',
-                        height: '48px',
-                        padding: '12px 14px',
-                        background: '#1a1f2e',
-                        border: '2px solid #FFA500',
-                        borderRadius: '8px',
+                        background: 'transparent',
+                        border: 'none',
                         color: '#fff',
                         fontSize: '14px',
-                        cursor: 'pointer',
                         outline: 'none',
+                        padding: 0,
                       }}
-                    >
-                      <option value="">키워드를 선택해주세요</option>
-                      {reputationKeywords.length === 0 ? (
-                        <option value="" disabled>키워드 로딩 중...</option>
-                      ) : (
-                        [1, 2, 3, 4, 5].map(clusterNum => {
-                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
-                          if (clusterKeywords.length === 0) return null;
-                          const clusterInfo = clusterKeywords[0];
-                          return (
-                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
-                              {clusterKeywords.map(k => (
-                                <option
-                                  key={k.id}
-                                  value={k.keyword}
-                                  disabled={k.keyword === seasonReputationEditData.keyword2}
-                                >
-                                  {k.keyword}
-                                </option>
-                              ))}
-                            </optgroup>
-                          );
-                        })
-                      )}
-                    </select>
+                    />
                   </div>
-                  {/* 키워드 2 */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#2</span>
-                    <select
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '8px',
+                    padding: '0 12px',
+                    height: '44px',
+                  }}>
+                    <span style={{ color: '#FFA500', fontWeight: 700, fontSize: '14px', marginRight: '6px', flexShrink: 0 }}>#</span>
+                    <input
+                      type="text"
+                      placeholder="키워드 2"
+                      maxLength={7}
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword2: e.target.value }))}
                       style={{
-                        display: 'block',
                         width: '100%',
-                        height: '48px',
-                        padding: '12px 14px',
-                        background: '#1a1f2e',
-                        border: '2px solid #FFA500',
-                        borderRadius: '8px',
+                        background: 'transparent',
+                        border: 'none',
                         color: '#fff',
                         fontSize: '14px',
-                        cursor: 'pointer',
                         outline: 'none',
+                        padding: 0,
                       }}
-                    >
-                      <option value="">키워드를 선택해주세요</option>
-                      {reputationKeywords.length === 0 ? (
-                        <option value="" disabled>키워드 로딩 중...</option>
-                      ) : (
-                        [1, 2, 3, 4, 5].map(clusterNum => {
-                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
-                          if (clusterKeywords.length === 0) return null;
-                          const clusterInfo = clusterKeywords[0];
-                          return (
-                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
-                              {clusterKeywords.map(k => (
-                                <option
-                                  key={k.id}
-                                  value={k.keyword}
-                                  disabled={k.keyword === seasonReputationEditData.keyword1}
-                                >
-                                  {k.keyword}
-                                </option>
-                              ))}
-                            </optgroup>
-                          );
-                        })
-                      )}
-                    </select>
+                    />
                   </div>
                 </div>
               </div>
@@ -2349,16 +2266,60 @@ const Cluster4Content = () => {
             )}
 
             {/* Footer */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(255, 165, 0, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              padding: '16px 24px',
+              borderTop: '1px solid rgba(255, 165, 0, 0.2)',
+              background: 'rgba(0,0,0,0.2)',
+            }}>
               <button
                 onClick={() => setSeasonReputationModalOpen(false)}
                 disabled={seasonReputationSaving}
-                style={{ padding: '10px 24px', border: '1px solid rgba(255,255,255,0.3)', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: '14px', borderRadius: '6px', cursor: seasonReputationSaving ? 'not-allowed' : 'pointer', opacity: seasonReputationSaving ? 0.5 : 1 }}
+                style={{
+                  padding: '10px 24px',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  background: 'transparent',
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: '14px',
+                  borderRadius: '6px',
+                  cursor: seasonReputationSaving ? 'not-allowed' : 'pointer',
+                  opacity: seasonReputationSaving ? 0.5 : 1,
+                }}
               >취소</button>
               <button
                 onClick={handleSaveSeasonReputation}
-                disabled={seasonReputationSaving || seasonReputationSuccess || !selectedSeasonId || seasonReputationEditData.content.trim() === '' || (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')}
-                style={{ padding: '10px 24px', border: 'none', background: '#FFA500', color: '#000', fontSize: '14px', fontWeight: 600, borderRadius: '6px', cursor: (seasonReputationSaving || seasonReputationSuccess || !selectedSeasonId || seasonReputationEditData.content.trim() === '' || (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')) ? 'not-allowed' : 'pointer', opacity: (seasonReputationSaving || seasonReputationSuccess || !selectedSeasonId || seasonReputationEditData.content.trim() === '' || (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')) ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '8px' }}
+                disabled={
+                  seasonReputationSaving ||
+                  seasonReputationSuccess ||
+                  seasonReputationEditData.content.trim() === '' ||
+                  (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')
+                }
+                style={{
+                  padding: '10px 24px',
+                  border: 'none',
+                  background: '#FFA500',
+                  color: '#000',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  borderRadius: '6px',
+                  cursor: (
+                    seasonReputationSaving ||
+                    seasonReputationSuccess ||
+                    seasonReputationEditData.content.trim() === '' ||
+                    (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')
+                  ) ? 'not-allowed' : 'pointer',
+                  opacity: (
+                    seasonReputationSaving ||
+                    seasonReputationSuccess ||
+                    seasonReputationEditData.content.trim() === '' ||
+                    (seasonReputationEditData.keyword1.trim() === '' && seasonReputationEditData.keyword2.trim() === '')
+                  ) ? 0.5 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
               >
                 {seasonReputationSaving && (
                   <span style={{ width: '14px', height: '14px', border: '2px solid #000', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>

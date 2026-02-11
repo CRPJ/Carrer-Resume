@@ -625,7 +625,7 @@
 
       .card-right {
         position: absolute;
-        right: 25px;
+        right: -60px;
         bottom: 10px;
         width: 702px;
         height: 732px;
@@ -3074,7 +3074,7 @@
             gap: 2px;
             max-height: 96px;          // 배지 2개만 보이는 높이
             overflow-y: auto;          // visible → auto
-            overflow-x: hidden;
+            overflow-x: visible;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
             padding: 0;
@@ -3149,6 +3149,7 @@
                 
                   .sub-text {
                     color: rgba(207, 188, 188, 1);    // #D6D3D1 → rgba(207, 188, 188, 1)
+                    font-size: 14px;
                     font-weight: 700;
                     line-height: 20px;
                   }
@@ -3162,7 +3163,7 @@
                 font-weight: 600;
                 line-height: 16px;
                 padding: 3px 10px;
-                margin: 0 5px 0 0;
+                margin: 0 5px 0 -7px;
                 border-radius: 20px;
                 white-space: nowrap;
                 display: flex;

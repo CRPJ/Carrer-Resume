@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 const ResponsiveScale = () => {
   useEffect(() => {
     const BASE_WIDTH = 1977;
-    const MAX_ZOOM = 1.5; // ★ 최대 150% - 4K에서 적당히 확대
+    const MAX_ZOOM = 2.0; // ★ 최대 150% - 4K에서 적당히 확대
     const MOBILE_BREAKPOINT = 1200; // 모바일 레이아웃 전환 기준
 
     const updateHeaderDividerY = (scale: number) => {

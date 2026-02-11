@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+
 interface Cluster4CardContentProps {
   weekId: string;
 }
@@ -83,8 +84,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
-      alert('로그인이 필요합니다.');
+      openModalFn();
       return;
     }
 
@@ -99,17 +101,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // DB에서 가져온 주차 데이터 상태
-  const [weekData, setWeekData] = useState<DBWeekData | null>(null);
+  const [weekData, setWeekData] = useState<DBWeekData | null>({
+    id: 'dummy-1',
+    weekNumber: 3,
+    seasonYear: 2025,
+    seasonName: '여름',
+    startDate: '2025-03-23',
+    endDate: '2025-03-30',
+    isClubBreak: false,
+    holidayName: null,
+    growthStatus: '성공',
+  });
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
-  const [teamName, setTeamName] = useState<string | null>(null);
-  const [partName, setPartName] = useState<string | null>(null);
-  const [generation, setGeneration] = useState<number | null>(null);
+  const [teamName, setTeamName] = useState<string | null>('미디어');
+  const [partName, setPartName] = useState<string | null>('웹툰드라마');
+  const [generation, setGeneration] = useState<number | null>(3);
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
-  const [roleLabel, setRoleLabel] = useState<string | null>(null);
-  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
-  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
+  const [roleLabel, setRoleLabel] = useState<string | null>('운영진(앰배서더)');
+  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 25, lightning: 30, shield: -2 });
+  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(30);
+  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(25);
 
   // 이전/다음 주차 ID
   const [prevWeekId, setPrevWeekId] = useState<string | null>(null);
@@ -127,7 +140,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     opened_at: string | null;  // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
     output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
-  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
+    { id: 'wa-1', activity_type_id: 'wisdom', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-2', activity_type_id: 'essay', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-3', activity_type_id: 'infodesk', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-4', activity_type_id: 'calendar', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-5', activity_type_id: 'forum', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-6', activity_type_id: 'session', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-7', activity_type_id: 'etc_a', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-8', activity_type_id: 'comp-1', title: '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-9', activity_type_id: 'exp-1', title: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-10', activity_type_id: 'exp-2', title: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-11', activity_type_id: 'exp-3', title: '[콘텐츠 마케팅] "어떤 제품/서비스더라도, 마케터가 제대로 \'표현\' 하지 못한다면, 그저 \'낙서\' 에 불과해. 나는 어떻게 내 제품/서비스를 표현할 수 있을까?', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+  ]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
   interface UserActivity {
@@ -143,14 +168,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number;  // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 0, success: 0 });
-  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 4, success: 3 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 3, success: 2 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 3, success: 1 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 3, success: 2 });
 
   // 강화 상태 판단용 (해당 주차 데이터)
   interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
-  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([]);
+  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([
+    { week_id: 'dummy-1', activity_type_id: 'wisdom', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'essay', is_completed: false },
+    { week_id: 'dummy-1', activity_type_id: 'infodesk', is_completed: false },
+    { week_id: 'dummy-1', activity_type_id: 'calendar', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'forum', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'session', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-3', is_completed: true },
+  ]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
   // 2차 정보 (서브타이틀, 아웃풋링크) - 해당 주차 데이터
@@ -161,10 +200,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     sub_title: string | null;
     output_links: OutputLink[] | null;
   }
-  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
+  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
+    { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+  ]);
 
   // 활동별 평점 (activity_type_id → points)
-  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
+  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map([
+    ['exp-1', 6],
+    ['exp-2', 6],
+    ['exp-3', 6],
+  ]));
 
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
@@ -174,9 +222,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     cluster_id: string;
     description: string | null;
   }
-  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map());
-  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
-  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
+  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map([
+    ['comp-1', { id: 'comp-1', name: '[실무 Info]인하우스 & 에이전시', line_code: 'CP09 - UN010', cluster_id: 'practical_competency', description: null }],
+    ['exp-1', { id: 'exp-1', name: '[커리어]마케터 Launch', line_code: 'EX01 - SFA01', cluster_id: 'practical_experience', description: null }],
+    ['exp-2', { id: 'exp-2', name: '[생산성]상호 피드백', line_code: 'EX02 - RUA99', cluster_id: 'practical_experience', description: null }],
+    ['exp-3', { id: 'exp-3', name: '[콘텐츠]마케팅 실무', line_code: 'EX03 - CMP01', cluster_id: 'practical_experience', description: null }],
+    ['exp-4', { id: 'exp-4', name: '[퍼포먼스]마케팅 실무', line_code: 'EX04 - PMP01', cluster_id: 'practical_experience', description: null }],
+  ]));
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(['comp-1']);
+  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>(['exp-1', 'exp-2', 'exp-3', 'exp-4']);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
   // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함) - cluster-4-1과 동일
@@ -235,7 +289,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     supervisor_company: string | null;
     supervisor_profile_img: string | null;
   }
-  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([]);
+  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
+    {
+      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r1', user_id: 'u1', enhancement_status: 'enhanced', grade: 'S', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '대리', supervisor_department: '서비스기획팀', supervisor_company: '우아한형제들', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
+    },
+    {
+      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
+    },
+    {
+      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자3.png',
+    },
+    {
+      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r4', user_id: 'u1', enhancement_status: 'enhanced', grade: 'D', grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '조지 워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자4.png',
+    },
+    {
+      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r5', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
+      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
+    },
+  ]);
   const [isLoadingCareerRecords, setIsLoadingCareerRecords] = useState(false);
 
   // 모달 편집 상태 (activity_type_id별로 관리)
@@ -286,6 +366,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'reference_naver': '실무 역량 - 네이버.png',
     'reference_free_choice': '실무 역량 - [Reference]자유 선택.png',
     'practical_planning_online_marketing': '실무 역량 - [실무 기획] 온라인 마케팅.png',
+    'comp-1': '실무 역량 - [실무 Info]인하우스 & 에이전시.png',
   };
 
   // 실무 역량 아이콘 경로 가져오기 헬퍼 함수
@@ -303,6 +384,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'productivity_feedback': '실무 경험 - [생산성]상호 피드백.png',
     'contents_marketing_practical': '실무 경험 - [콘텐츠]마케팅 실무.png',
     'performance_marketing_practical': '실무 경험 - [퍼포먼스]마케팅 실무.png',
+    'exp-1': '실무 경험 - [커리어]마케터 Launch.png',
+    'exp-2': '실무 경험 - [생산성]상호 피드백.png',
+    'exp-3': '실무 경험 - [콘텐츠]마케팅 실무.png',
   };
 
   // 실무 경험 아이콘 경로 가져오기 헬퍼 함수
@@ -966,7 +1050,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
 
   // 연계 동료 선택 상태 (1st, 2nd, 3rd 각각 별도 저장)
-  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([]);
+  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([
+    {
+      id: 1, name: '김미현', gender: '여', age: 24,
+      profileImg: '/images/0/cluster4/4-1-card/avatar-small-04.jpg',
+      university: '서울대학교', major: '미디어커뮤니케이션',
+      team: '엔터테인먼트', part: '내돈내산',
+      nickname: '엔비디아구글테슬라쿵', rank: 1, message: '',
+      createdAt: '2025-12-22',
+    },
+    {
+      id: 2, name: '김미현', gender: '여', age: 24,
+      profileImg: '/images/0/cluster4/4-1-card/avatar-small-05.jpg',
+      university: '서울대학교', major: '미디어커뮤니케이션',
+      team: '엔터테인먼트', part: '내돈내산',
+      nickname: '엔비디아구글테슬라쿵', rank: 2, message: '',
+      createdAt: '2025-12-22',
+    },
+  ]);
 
   // 크루 검색어 상태
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
@@ -993,7 +1094,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
 
   // 주차 평판 데이터 (API에서 가져옴)
-  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
+  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([
+    {
+      id: 'dummy-1',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-01.jpg',
+      },
+    },
+    {
+      id: 'dummy-2',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-02.jpg',
+      },
+    },
+    {
+      id: 'dummy-3',
+      rating: 6,
+      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
+      keyword: '추진력추진력력',
+      reviewer: {
+        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
+        university: '서울대학교', major_first: '미디어커뮤니케이션',
+        teamName: '엔터테인먼트', partName: '내돈내산',
+        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-03.jpg',
+      },
+    },
+  ]);
 
   // 크루 목록 (API에서 가져옴)
   const [allCrewList, setAllCrewList] = useState<any[]>([]);
@@ -1219,11 +1357,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
-  const currentImage = isRestMode
-    ? restImage
-    : weekData
-      ? getWeekImagePath(weekData)
-      : "/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png";
+  const currentImage = "/images/0/cluster4/4-1-card/image.png";
   const currentTitle = weekData
     ? `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
@@ -1324,7 +1458,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
-    while (result.length < 3) {
+    while (result.length < 4) {
       result.push({
         id: `empty-${result.length}`,
         name: "-",
@@ -1346,7 +1480,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
     }
 
-    return result.slice(0, 3); // 최대 3개만 반환
+    return result.slice(0, 4); // 최대 3개만 반환
   }, [weeklyReputations]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
@@ -1382,7 +1516,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const result = [...apiData];
     while (result.length < 3) {
       result.push({
-        id: `empty-${result.length}`,
+        id: Number(`empty-${result.length}`),
         name: "-",
         gender: "-",
         age: "-",
@@ -1938,39 +2072,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     : [];
 
   // 참여한 경력이 없으면 빈 카드 1개 표시
+  // 빈 카드 템플릿
+  const emptyCareerCard = (id: number) => ({
+    id,
+    code: '', badge: '', title: '', verified: false, date: '0000-00-00 (일)', likes: '0,99',
+    hasWeb: false, isEmpty: true, icon: '', supervisorImg: '', supervisorName: '',
+    supervisorDept: '', supervisorCompany: '', supervisorPosition: '',
+    statusBadge: '', grade: '', isNotApplicable: false, isFailed: false,
+    projectDescription: null as string | null, gradePoints: null as number | null,
+    recordId: null as string | null, projectId: null as string | null,
+    lineCode: null as string | null, lineName: null as string | null,
+    outputLinks: null as { desc: string; url: string }[] | null,
+  });
+
+  // 참여한 경력이 없으면 빈 카드 표시, 있으면 6의 배수로 패딩
   const displayWorkCareerCards = workCareerCards.length > 0
-    ? workCareerCards
-    : [
-        {
-          id: 1,
-          code: '',
-          badge: '',
-          title: '',
-          verified: false,
-          date: '-',
-          likes: '0',
-          hasWeb: false,
-          isEmpty: true,
-          icon: '',
-          supervisorImg: '',
-          supervisorName: '',
-          supervisorDept: '',
-          supervisorCompany: '',
-          supervisorPosition: '',
-          statusBadge: '',
-          grade: '',
-          isNotApplicable: false,
-          isFailed: false,
-          // 추가 정보 (빈 카드용 기본값)
-          projectDescription: null as string | null,
-          gradePoints: null as number | null,
-          recordId: null as string | null,
-          projectId: null as string | null,
-          lineCode: null as string | null,
-          lineName: null as string | null,
-          outputLinks: null as { desc: string; url: string }[] | null,
-        },
-      ];
+    ? [
+        ...workCareerCards,
+        ...Array.from(
+          { length: (6 - (workCareerCards.length % 6)) % 6 },
+          (_, i) => emptyCareerCard(workCareerCards.length + i + 1)
+        ),
+      ]
+    : [emptyCareerCard(1)];
 
   // 별점 렌더링 함수 (반개 지원)
   const renderStars = (rating: number) => {
@@ -2013,7 +2137,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   return (
-    <div className="cluster4-card-content weekly-card-detail">
+    <div className="cluster4-card-content weekly-card-detail" style={{ border: '1px solid #365314', marginRight: '27px' }}>
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
@@ -2069,7 +2193,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); })} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
@@ -2313,8 +2437,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 정보 */}
         <div className="work-info-section">
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-          {session && isOwner && (
-            <div className="floating-icons" style={{ display: 'flex' }}>
+          {(
+         <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
@@ -2399,7 +2523,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 역량 */}
         <div className="work-ability-section">
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 initializeEditingDetails();
@@ -2509,7 +2633,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 경험 */}
         <div className="work-exp-section">
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workExpActivityTypes)) {
@@ -2621,7 +2745,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 실무 경력 */}
         <div className="work-career-section">
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
-          {session && isOwner && (
+          {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={() => handleEditClick(() => {
                 if (!isAnyActivityActive(workCareerActivityTypes)) {
@@ -2659,7 +2783,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               return (
               <div
                 key={card.id}
-                className={`work-career-card ${isEmpty ? 'empty' : ''} ${card.isFailed ? 'failed' : ''}`}
+                className={`work-career-card ${isEmpty ? 'empty' : ''} ${card.isFailed ? 'failed' : ''} ${card.isNotApplicable ? 'not-applicable' : ''}`}
                 onClick={() => {
                   if (!isEmpty) {
                     setSelectedWorkCareerCard(card);
@@ -3440,7 +3564,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* 안내 문구 */}
                 <div className="header-edit-section colleague-guide">
                   <div className="guide-text">
-                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명, 최대 3명)</span></p>
+                    <p>이번 주차 동안 클럽에서 성장하며,<br/><span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span></p>
                   </div>
                 </div>
 
@@ -3473,16 +3597,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                         </div>
                         <div className="colleague-message-section">
-                          <label>Thank you message <span className="char-limit">(최대 100자)</span></label>
+                          <label>Thank you message <span className="char-limit">(최대 50자)</span></label>
                           <div className="message-input-wrapper">
                             <textarea
                               placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={100}
+                              maxLength={50}
                               rows={1}
                               value={colleague.message}
                               onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}
                             ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 100</span>
+                            <span className="char-counter">{colleague.message.length} / 50</span>
                           </div>
                         </div>
                       </div>

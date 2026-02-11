@@ -29,7 +29,26 @@ const Cluster41Page = () => {
 
     const shell = sidebarShellRef.current;
     const inner = sidebarInnerRef.current;
-    const headerTopPx = 100;
+    const getHeaderBottom = () => {
+    const header = document.querySelector('header');
+    if (header) return header.getBoundingClientRect().bottom;
+    return 71;
+};
+    const computeTop = (zoom: number, height: number) => {
+    const defaultTop = getHeaderBottom() / zoom;
+    let top = defaultTop;
+    const footer = document.querySelector("footer");
+    if (footer) {
+        const footerTop = footer.getBoundingClientRect().top / zoom;
+        const margin = 2 / zoom;
+        const maxTop = footerTop - height - margin;
+        top = Math.min(defaultTop, maxTop);
+    }
+    const viewportHeight = window.innerHeight / zoom;
+    const minTop = viewportHeight - height - (2 / zoom);
+    top = Math.max(top, minTop);
+    return top;
+};
 
     let rafId: number | null = null;
     let isFixed = false;
@@ -39,20 +58,21 @@ const Cluster41Page = () => {
 
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const shellRect = shell.getBoundingClientRect();
-      const shouldFix = shellRect.top <= headerTopPx;
+      const headerBottom = getHeaderBottom();
+      const shouldFix = shellRect.top <= headerBottom;
 
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
         const height = inner.getBoundingClientRect().height / zoom;
         const left = shellRect.left / zoom;
-        const defaultTop = headerTopPx / zoom;
+        const defaultTop = getHeaderBottom() / zoom;
 
         // footer가 올라오면 사이드바가 footer를 덮지 않게 위로 밀어올림
         let top = defaultTop;
         const footer = document.querySelector("footer");
         if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 44 / zoom;
+          const margin = 2 / zoom;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
         }
@@ -73,7 +93,7 @@ const Cluster41Page = () => {
       if (isFixed && shouldFix) {
         const zoomNow = parseFloat(document.documentElement.style.zoom) || 1;
         const height = inner.getBoundingClientRect().height / zoomNow;
-        const defaultTop = headerTopPx / zoomNow;
+        const defaultTop = getHeaderBottom() / zoomNow;
 
         let top = defaultTop;
         const footer = document.querySelector("footer");

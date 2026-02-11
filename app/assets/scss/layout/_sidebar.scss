@@ -10,6 +10,7 @@
   // html zoom(<1)에서도 화면 하단까지 "꽉" 차도록 보정
   // (vh가 zoom에 의해 같이 축소되는 문제 대응)
   height: calc(100vh / var(--app-zoom, 1));
+  overflow: hidden;
   overflow-y: auto;
   overflow-x: clip;
   z-index: 100000;

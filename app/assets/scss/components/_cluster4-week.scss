@@ -71,13 +71,15 @@
 .cluster4-card-content {
   padding: 0;
   color: #fff;
-  width: 100%;
+  width: calc(100% - 27px);   // 우측 27px 여백 확보
   max-width: 1330px;
   position: relative;
+  overflow-x: hidden;
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {
-    width: 1330px;
+    width: 100%;
+    max-width: 1330px;
     height: 105px;
     position: relative;
     margin-bottom: 20px;
@@ -113,7 +115,7 @@
     // 네비게이션 버튼들
     .nav-buttons {
       position: absolute;
-      right: 60px;
+      right: 20px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -946,7 +948,7 @@
     display: flex;
     position: absolute;
     top: 20px;
-    right: 20px;
+    right: 46px;
     z-index: 100;
     gap: 5px;
 
@@ -1024,11 +1026,14 @@
     gap: 24px;
     width: 100%;
     padding: 0;
-    padding-top: 40px;
+    padding-top: 0;
+    margin-top: 20px;
+    padding-right: 0;
+    overflow: hidden;
 
     .floating-icons {
       top: 0;
-      right: 0;
+      right: 160px;
     }
 
     // 왼쪽: 큰 주차 이미지
@@ -1097,6 +1102,7 @@
     // 오른쪽: 정보 영역
     .section1-right {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -1643,8 +1649,8 @@
               .profile-info {
                 flex: 1;
                 min-width: 0;
-                .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
-                .label { color: #999; font-size: 14px !important; }
+                .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; }
+                .label { color: #a3a3a3; font-size: 14px !important; }
 
                 .profile-name-row {
                   display: flex;
@@ -1672,7 +1678,7 @@
                   line-height: 1.2;
                   white-space: nowrap;
                   .text { font-size: 14px !important; }
-                  .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+                  .nickname { color: #F59E0B; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
                 }
               }
             }
@@ -1691,11 +1697,11 @@
   // 주차 평판 카드 그리드 (2열)
   .reputation-cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 320px);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 
     .reputation-card {
-      width: 320px;
+      width: 100%;
       height: 250px;
       background: rgba(50, 50, 50, 0.8);
       border-radius: 20px;
@@ -1775,16 +1781,16 @@
             }
           }
         }
-        .rating-count { font-size: 12px; font-weight: 600; color: #FAAB07; font-family: 'Pretendard', sans-serif; }
+        .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
       }
 
-      .card-description { font-size: 13px; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
+      .card-description { font-size: 12px; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
 
       .card-footer {
         display: flex; align-items: center; gap: 8px;
-        .fm-badge { font-size: 15px; color: #fff; background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
+        .fm-badge { font-size: 16px; color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em;  background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
         .footer-divider { color: rgba(255, 255, 255, 0.3); }
-        .tag { font-size: 12px; }
+        .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.05em; line-height: 9.6px; }
       }
 
       &.empty {
@@ -1810,7 +1816,7 @@
     gap: 8px;
 
     .colleague-card {
-      width: 645px;
+      width: 100%;
       background: rgba(50, 50, 50, 0.8);
       border-radius: 20px;
       padding: 12px 14px;
@@ -1847,15 +1853,14 @@
         }
         .profile-info {
           flex: 1; min-width: 0;
-          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
-          .label { color: #999; font-size: 14px !important; }
+          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; }
+          .label { color: #a3a3a3; font-size: 14px !important; }
           .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 12px; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; height: 26px; padding: 0 16px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; white-space: nowrap; } .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); } } }
-          .profile-name { font-size: 18px !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 18px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; } }
-          .profile-details { font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; white-space: nowrap; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; } .text { font-size: 14px !important; } .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; } }
+          .profile-name { font-size: 18px !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 18px !important; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 800; } }-family: 'Pretendard', sans-serif; font-weight: 700; } }
+          .profile-details { font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; } .text { font-size: 14px !important; } .nickname { color: #F59E0B; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
         }
       }
     }
-  }
 
   // ============================================
   // 섹션 2 레이아웃
@@ -1869,7 +1874,7 @@
 
     .floating-icons {
       top: 60px;
-      right: 0;
+      right: 46px;
     }
 
     &::before {
@@ -1908,15 +1913,21 @@
           width: 494px;
 
           .growth-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             color: #fff;
-          }
+            font-family: 'Chakra Petch', sans-serif;
+            text-transform: uppercase;
+            line-height: 32px;
+        }
 
           .growth-count {
-            font-size: 19px;
+            font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 32px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -1928,9 +1939,10 @@
             }
 
             .highlight {
-              font-size: 21px;
+              font-size: 20px;
               font-weight: 700;
-              color: #FFA500;
+              color: #F59E0B;
+              font-family: 'Chakra Petch', sans-serif;
             }
           }
         }
@@ -1966,17 +1978,19 @@
           align-items: baseline;
 
           .number {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 400;
-            color: #FFA500;
+            color: #F59E0B;
             font-family: 'Black Ops One', cursive;
+            line-height: 36px;
           }
 
           .percent {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 400;
             color: #fff;
             font-family: 'Black Ops One', cursive;
+            line-height: 36px;
           }
         }
       }
@@ -1990,34 +2004,36 @@
         margin-right: 64px;
 
         .growth-label {
-          font-size: 18px;
-          font-weight: 600;
+          font-size: 20px;
+          font-weight: 700;
           color: #fff;
+          font-family: 'Chakra Petch', sans-serif;
+          text-transform: uppercase;
+          line-height: 20px;
           position: relative;
           top: 5px;
-        }
+      }
 
         .legend-items {
           display: flex;
-          gap: 16px;
+          gap: 20px;
 
           .legend-item {
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 5px;
             font-size: 16px;
             font-weight: 600;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Manrope', sans-serif;
             color: #fff;
 
             .legend-icon {
-              width: 45px;
-              height: 45px;
+              width: 44px;
+              height: 44px;
               object-fit: contain;
 
               &.glow {
-                filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.8));
-                transform: scale(0.85);
+                  transform: none;
               }
             }
           }
@@ -2029,10 +2045,12 @@
     .work-info-section {
       margin-bottom: 72px;
       position: relative;
+      padding-left: 24px;
+      padding-right: 46px;
 
       .floating-icons {
         top: 0;
-        right: 0;
+        right: 46px;
       }
 
       .section-header-row {
@@ -2053,22 +2071,26 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
+            white-space: nowrap;
+            line-height: 40px;
+            overflow: visible;
           }
 
           .section-count {
             font-size: 18px;
-            color: #FFE3AA;
+            font-weight: 700;
+            color: #FED7AA;
             margin-left: 120px;
             font-family: 'Pretendard', sans-serif;
-
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
             }
           }
         }
@@ -2083,18 +2105,19 @@
             font-size: 18px;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
-            font-weight: 700;
-          }
-
-          .rate-value {
+            font-weight: 800;
+        }
+        
+        .rate-value {
             font-size: 18px;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
-
+            font-weight: 800;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
             }
           }
         }
@@ -2136,8 +2159,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -2148,9 +2172,12 @@
               }
 
               .verified-text {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.6);
-                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                opacity: 0.6;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -2222,7 +2249,7 @@
               }
 
               .card-desc {
-                font-size: 14px;
+                font-size: 12px;
                 color: #fff;
                 line-height: 1.6;
                 font-family: 'Pretendard', sans-serif;
@@ -2251,8 +2278,8 @@
             z-index: 10;
 
             img {
-              width: 55px;
-              height: 55px;
+              width: 58px;
+              height: 58px;
               object-fit: contain;
             }
           }
@@ -2263,11 +2290,16 @@
     // 실무 역량 섹션
     .work-ability-section {
       position: relative;
-      margin-bottom: 28px;
+      margin-top: 120px;
+      margin-bottom: 72px;
+      padding-left: 24px;
+      overflow: visible;
+      max-height: none;
+      height: auto;
 
       .floating-icons {
         top: 0;
-        right: 0;
+        right: 46px;
       }
 
       .section-header-row {
@@ -2288,22 +2320,27 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
+            white-space: nowrap;
+            line-height: 40px;
+            overflow: visible;
           }
 
           .section-count {
             font-size: 18px;
-            color: #FFE3AA;
+            font-weight: 800;
+            color: #FED7AA;
             margin-left: 120px;
-            font-family: 'Pretendard', sans-serif;
-
+            font-family: 'Manrope', sans-serif;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
+                font-family: 'Manrope', sans-serif;
             }
           }
         }
@@ -2317,19 +2354,21 @@
           .rate-label {
             font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
-            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
           }
 
           .rate-value {
             font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
-
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+        
             .highlight {
-              font-size: 24px;
-              font-weight: 800;
-              color: #FAAB07;
+                font-size: 24px;
+                font-weight: 800;
+                color: #F59E0B;
+                font-family: 'Manrope', sans-serif;
             }
           }
         }
@@ -2424,8 +2463,9 @@
             .card-title {
               font-size: 14px;
               font-weight: 500;
-              color: #FFEC8F;
-              font-family: 'Pretendard', sans-serif;
+              color: #FEF9C3;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
 
             .verified-icon {
@@ -2436,27 +2476,32 @@
             }
 
             .verified-text {
-              font-size: 12px;
-              color: rgba(255, 255, 255, 0.6);
-              font-family: 'Pretendard', sans-serif;
+              font-size: 14px;
+              font-weight: 500;
+              color: #fff;
+              opacity: 0.6;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
 
             .code-tag {
               font-size: 14px;
-              color: #FFEC8F;
+              font-weight: 500;
+              color: #FEF9C3;
               font-family: 'Pretendard', sans-serif;
+              line-height: 16px;
             }
 
             .info-tag {
-              font-size: 15px;
-              color: #FAAB07;
-              background: rgba(250, 171, 7, 0.1);
-              padding: 5px 8px 3px 8px;
+              font-size: 16px;
+              color: #F59E0B;
+              background: rgba(245, 158, 11, 0.1);
+              padding: 4px 8px;
               border-radius: 4px;
               font-family: 'Pretendard', sans-serif;
-              font-weight: 400;
+              font-weight: 600;
               white-space: nowrap;
-              line-height: 1;
+              line-height: 16px;
             }
           }
 
@@ -2484,13 +2529,14 @@
             .sub-label {
               font-size: 14px;
               font-weight: 500;
-              color: #FFEC8F;
-              font-family: 'Pretendard', sans-serif;
+              color: #FEF9C3;
+              font-family: 'Manrope', sans-serif;
+              line-height: 16px;
             }
           }
 
           .sub-desc {
-            font-size: 14px;
+            font-size: 12px;
             color: #fff;
             line-height: 1.5;
             font-family: 'Pretendard', sans-serif;
@@ -2526,7 +2572,7 @@
       .character-image {
         position: absolute;
         right: 0;
-        bottom: -70px;
+        top: -48px;
         width: 326px;
         height: 314px;
         overflow: hidden;
@@ -2563,7 +2609,7 @@
 
     .floating-icons {
       top: 60px;
-      right: 0;
+      right: 46px;
     }
 
     .section-header-row {
@@ -2584,22 +2630,26 @@
         }
 
         .section-name {
-          font-size: 28px;
+          font-size: 30px;
           font-weight: 700;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
+          white-space: nowrap;
+          line-height: 40px;
+          overflow: visible;
         }
 
         .section-count {
           font-size: 18px;
-          color: #FFE3AA;
+          font-weight: 800;
+          color: #FED7AA;
           margin-left: 120px;
           font-family: 'Pretendard', sans-serif;
-
+      
           .highlight {
-            font-size: 24px;
-            font-weight: 800;
-            color: #FAAB07;
+              font-size: 24px;
+              font-weight: 800;
+              color: #F59E0B;
           }
         }
       }
@@ -2614,18 +2664,19 @@
           font-size: 18px;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-          font-weight: 700;
+          font-weight: 800;
         }
 
         .rate-value {
           font-size: 18px;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-
+          font-weight: 800;
+      
           .highlight {
-            font-size: 24px;
-            font-weight: 800;
-            color: #FAAB07;
+              font-size: 24px;
+              font-weight: 800;
+              color: #F59E0B;
           }
         }
       }
@@ -2634,10 +2685,10 @@
     // 실무 경험/경력 섹션
     .work-exp-section,
     .work-career-section {
-      margin-bottom: 20px;
-      position: relative;
+        margin-bottom: 20px;
+        position: relative;
+        padding-left: 24px;
     }
-
     .work-career-section {
       margin-top: 70px;
 
@@ -2651,7 +2702,7 @@
 
       .floating-icons {
         top: 0;
-        right: 0;
+        right: 46px;
       }
 
       .section-bottom-divider {
@@ -2665,6 +2716,7 @@
         display: grid;
         grid-template-columns: repeat(2, 545px);
         gap: 16px;
+        margin-top: 30px;
 
         .work-exp-card {
           position: relative;
@@ -2724,20 +2776,22 @@
 
                 .code-tag {
                   font-size: 14px;
-                  color: #FFEC8F;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 500;
+                  color: #FEF9C3;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
 
                 .badge-tag {
-                  font-size: 15px;
-                  color: #FAAB07;
-                  background: rgba(250, 171, 7, 0.1);
-                  padding: 5px 8px 3px 8px;
+                  font-size: 16px;
+                  color: #F59E0B;
+                  background: rgba(245, 158, 11, 0.1);
+                  padding: 4px 8px;
                   border-radius: 4px;
                   font-family: 'Pretendard', sans-serif;
-                  font-weight: 400;
+                  font-weight: 600;
                   white-space: nowrap;
-                  line-height: 1;
+                  line-height: 16px;
                 }
               }
 
@@ -2783,9 +2837,11 @@
 
                 .rating-count {
                   font-size: 12px;
-                  font-weight: 600;
-                  color: #FAAB07;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 400;
+                  color: rgba(255, 255, 255, 0.9);
+                  font-family: 'Rajdhani', sans-serif;
+                  letter-spacing: 0.05em;
+                  line-height: 16px;
                 }
               }
             }
@@ -2810,8 +2866,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -2822,9 +2879,12 @@
               }
 
               .verified-text {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.6);
-                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                opacity: 0.6;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -2852,8 +2912,9 @@
               .sub-label {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -2893,12 +2954,13 @@
 
       .work-career-cards {
         display: grid;
-        grid-template-columns: repeat(3, 413px);
+        grid-template-columns: repeat(3, 384px);
+        grid-template-rows: repeat(2, auto);
         gap: 16px;
 
         .work-career-card {
           position: relative;
-          width: 413px;
+          width: 384px;
           min-height: 457px;
           background: #232323;
           border-radius: 20px;
@@ -2913,23 +2975,17 @@
           }
 
           &.not-applicable {
-            background: #131313;
-
-            .card-overlay {
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background: rgba(0, 0, 0, 0.5);
-              border-radius: 20px;
-              z-index: 1;
-              pointer-events: none;
+            background: #0a0a0a;
+            border: 1px solid #000;
+        
+            .card-top-row,
+            .card-bottom-area {
+                opacity: 0.4;
             }
-
+        
             .status-badge {
-              z-index: 2;
-              right: -10px;
+                z-index: 2;
+                opacity: 1;
             }
           }
 
@@ -2978,15 +3034,20 @@
                 }
 
                 .verified-text {
-                  font-size: 11px;
-                  color: rgba(255, 255, 255, 0.6);
-                  font-family: 'Pretendard', sans-serif;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #fff;
+                  opacity: 0.6;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
 
                 .code-tag {
                   font-size: 14px;
-                  color: #FFEC8F;
-                  font-family: 'Pretendard', sans-serif;
+                  font-weight: 500;
+                  color: #FEF9C3;
+                  font-family: 'Manrope', sans-serif;
+                  line-height: 16px;
                 }
               }
             }
@@ -3012,8 +3073,9 @@
               .card-title {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
 
               .verified-icon {
@@ -3031,7 +3093,7 @@
             }
 
             .main-desc {
-              font-size: 14px;
+              font-size: 12px;
               color: #fff;
               line-height: 1.6;
               font-family: 'Pretendard', sans-serif;
@@ -3054,8 +3116,9 @@
               .sub-label {
                 font-size: 14px;
                 font-weight: 500;
-                color: #FFEC8F;
-                font-family: 'Pretendard', sans-serif;
+                color: #FEF9C3;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
@@ -3094,9 +3157,10 @@
             }
 
             .not-applicable-text {
-              font-size: 25px;
+              font-size: 24px;
               font-weight: 700;
-              color: #FF0D0D;
+              color: #DC2626;
+              line-height: 20px;
               font-family: 'Pretendard', sans-serif;
               margin-top: 4px;
               margin-right: 20px;
@@ -3117,7 +3181,8 @@
               border-radius: 50%;
               background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
               color: #9C9C9C;
-              font-size: 25px;
+              font-size: 24px;
+              line-height: 24px;
               font-weight: 400;
               display: flex;
               align-items: center;
@@ -3146,15 +3211,15 @@
           .category-text {
             display: inline-block;
             width: fit-content;
-            font-size: 15px;
-            color: #FAAB07;
-            background: rgba(250, 171, 7, 0.1);
-            padding: 5px 8px 3px 8px;
+            font-size: 16px;
+            color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 4px 8px;
             border-radius: 4px;
-            font-family: 'Pretendard', sans-serif;
-            font-weight: 400;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
             white-space: nowrap;
-            line-height: 1;
+            line-height: 16px;
             margin: 0 0 10px 0;
           }
 
@@ -3212,17 +3277,17 @@
 
                   .supervised-text {
                     font-size: 12px;
-                    color: #666666;
-                    font-family: 'Pretendard', sans-serif;
-                    line-height: 1.2;
+                    color: rgba(255, 255, 255, 0.3);
+                    font-family: 'Azeret Mono', monospace;
+                    line-height: 20px;
                   }
 
                   .profile-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 400;
                     color: #fff;
                     font-family: 'Pretendard', sans-serif;
-                    line-height: 1.2;
+                    line-height: 20px;
 
                     strong {
                       font-weight: 700;
@@ -3248,8 +3313,9 @@
 
             .current-bid {
               font-size: 12px;
-              color: rgba(255, 255, 255, 0.4);
-              font-family: 'Pretendard', sans-serif;
+              color: rgba(255, 255, 255, 0.3);
+              font-family: 'Azeret Mono', monospace;
+              line-height: 20px;
             }
 
             .date-view {
@@ -3259,10 +3325,11 @@
               margin-left: auto;
 
               .date {
-                font-size: 12px;
                 color: #fff;
-                font-family: 'Pretendard', sans-serif;
+                font-family: 'Manrope', sans-serif;
                 font-weight: 800;
+                font-size: 12px;
+                line-height: 9px;
                 width: 119px;
                 height: 26px;
                 background: rgba(255, 255, 255, 0.2);
@@ -3298,8 +3365,9 @@
             .likes {
               font-size: 16px;
               color: #fff;
-              font-family: 'Pretendard', sans-serif;
+              font-family: 'Manrope', sans-serif;
               font-weight: 800;
+              line-height: 20px;
               display: flex;
               align-items: center;
               gap: 4px;
@@ -3530,6 +3598,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    border-radius: 12px;
 
     &.section-modal-wide {
       width: 700px;
@@ -3541,7 +3610,8 @@
       align-items: flex-start;
       flex-wrap: wrap;
       position: relative;
-      padding: 20px 24px;
+      padding: 20px 24px 40px;
+      min-width: 0;
       border-bottom: 1px solid rgba(255, 165, 0, 0.2);
       background: rgba(255, 165, 0, 0.05);
 
@@ -3554,6 +3624,8 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        line-height: 1.6;
+        padding-top: 8px;
 
         &::before {
           content: '✦';
@@ -4308,6 +4380,7 @@
       padding: 16px 24px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
 
       button {
         padding: 10px 24px;

@@ -6,6 +6,7 @@ import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
 import Cluster4CardContent from "@/components/cluster-4-card/Cluster4CardContent";
 import Animations from "@/components/shared/Animations";
+import ResponsiveScale from "@/components/shared/ResponsiveScale";
 
 const Cluster4CardDynamicPage = () => {
   const params = useParams();
@@ -26,14 +27,16 @@ const Cluster4CardDynamicPage = () => {
       if (!footer) return;
 
       const footerRect = footer.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+      const sidebarHeight = 810;
+      const sidebarTop = 124;
+      const sidebarBottom = sidebarTop + sidebarHeight;
 
-      if (footerRect.top < windowHeight) {
-        const moveUp = windowHeight - footerRect.top;
+      if (footerRect.top < sidebarBottom) {
+        // footer와 겹칠 때: 사이드바를 딱 footer 위까지만
         setSidebarStyle({
           position: 'fixed',
           left: '110px',
-          top: `${124 - moveUp}px`,
+          top: `${footerRect.top - sidebarHeight}px`,
           overflow: 'visible',
           zIndex: 100,
         });
@@ -57,6 +60,7 @@ const Cluster4CardDynamicPage = () => {
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
+      <ResponsiveScale />
       {/* 고정 사이드바 */}
       <div style={sidebarStyle}>
         <Sidebar />
@@ -66,7 +70,7 @@ const Cluster4CardDynamicPage = () => {
         <div className="row">
           {/* 사이드바 공간 확보용 빈 영역 */}
           <div style={{ width: 'var(--sidebar-width, 520px)', flexShrink: 0 }}></div>
-          <div className="home-two-content-col">
+          <div className="home-two-content-col" style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
             <ClusterTabs />
             <div className="home-two-content">
               <Cluster4CardContent weekId={weekId} />

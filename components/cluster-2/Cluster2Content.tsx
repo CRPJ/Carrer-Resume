@@ -2182,23 +2182,23 @@ const Cluster2Content = () => {
                 <img src={introCards[selectedIntroCard].icon} alt="" className="modal-icon" />
                 <h3>{introCards[selectedIntroCard].title}</h3>
               </div>
-              {!isEditingIntro && (
-                <button
-                  className="intro-edit-btn"
-                  aria-label="수정"
-                  onClick={() =>
-                    handleEditClick(() => {
-                      setEditingIntroData({
-                        content: introCards[selectedIntroCard].content,
-                      });
-                      setIsEditingIntro(true);
-                    })
-                  }
-                >
-                  <i className="ti ti-pencil"></i>
-                </button>
-              )}
               <div className="header-right">
+                {!isEditingIntro && (
+                  <button
+                    className="intro-edit-btn"
+                    aria-label="수정"
+                    onClick={() =>
+                      handleEditClick(() => {
+                        setEditingIntroData({
+                          content: introCards[selectedIntroCard].content,
+                        });
+                        setIsEditingIntro(true);
+                      })
+                    }
+                  >
+                    <i className="ti ti-pencil"></i> 수정
+                  </button>
+                )}
                 {isEditingIntro && (
                   <>
                     <button
