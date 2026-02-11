@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
+import Animations from "@/components/shared/Animations";
+import ResponsiveScale from "@/components/shared/ResponsiveScale";
 
 // 반짝이 효과 CSS
 const sparkleStyles = `
@@ -50,6 +52,8 @@ const Cluster7Page = () => {
   // 사이드바 고정 너비
   const sidebarWidth = '474px';
   const containerRef = useRef<HTMLDivElement>(null);
+  const sidebarShellRef = useRef<HTMLDivElement>(null);
+  const sidebarInnerRef = useRef<HTMLDivElement>(null);
 
   // 마우스 움직일 때 반짝이 생성
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -85,59 +89,123 @@ const Cluster7Page = () => {
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const footer = document.querySelector('footer');
-      if (!footer) return;
+    if (!sidebarShellRef.current || !sidebarInnerRef.current) return;
 
-      const footerRect = footer.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+    const shell = sidebarShellRef.current;
+    const inner = sidebarInnerRef.current;
 
-      if (footerRect.top < windowHeight) {
-        const moveUp = windowHeight - footerRect.top;
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: `${125 - moveUp}px`,
-          overflowY: 'hidden',
-          zIndex: 100,
-          width: sidebarWidth,
-          height: '810px',
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-        });
-      } else {
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: '125px',
-          overflowY: 'hidden',
-          zIndex: 100,
-          width: sidebarWidth,
-          height: '810px',
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-        });
+    const getHeaderBottom = () => {
+      const header = document.querySelector('header');
+      if (header) return header.getBoundingClientRect().bottom;
+      return 71;
+    };
+
+    let rafId: number | null = null;
+    let isFixed = false;
+
+    const computeTop = (zoom: number, height: number) => {
+      const defaultTop = getHeaderBottom() / zoom;
+      let top = defaultTop;
+  
+      const footer = document.querySelector("footer");
+      if (footer) {
+          const footerTop = footer.getBoundingClientRect().top / zoom;
+          const margin = 2 / zoom;
+          const maxTop = footerTop - height - margin;
+          top = Math.min(defaultTop, maxTop);
+      }
+  
+      return top;
+  };
+
+    const apply = () => {
+      rafId = null;
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const shellRect = shell.getBoundingClientRect();
+      const headerBottom = getHeaderBottom();
+      const shouldFix = shellRect.top <= headerBottom;
+
+      if (!isFixed && shouldFix) {
+        const width = shell.offsetWidth;
+        const height = inner.getBoundingClientRect().height / zoom;
+        const left = shellRect.left / zoom;
+        const top = computeTop(zoom, height);
+
+        shell.style.width = `${width}px`;
+        shell.style.height = `${inner.offsetHeight}px`;
+        inner.style.position = 'fixed';
+        inner.style.top = `${top}px`;
+        inner.style.left = `${left}px`;
+        inner.style.width = `${width}px`;
+        inner.style.zIndex = '9999';
+        isFixed = true;
+        return;
+      }
+
+      if (isFixed && shouldFix) {
+        const height = inner.getBoundingClientRect().height / zoom;
+        const top = computeTop(zoom, height);
+        inner.style.top = `${top}px`;
+        return;
+      }
+
+      if (isFixed && !shouldFix) {
+        shell.style.width = '';
+        shell.style.height = '';
+        inner.style.position = 'relative';
+        inner.style.top = '0';
+        inner.style.left = '0';
+        inner.style.width = '';
+        inner.style.zIndex = '100';
+        isFixed = false;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    const handleScroll = () => {
+      if (rafId != null) return;
+      rafId = window.requestAnimationFrame(apply);
+    };
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleResize = () => {
+      isFixed = false;
+      shell.style.width = '';
+      shell.style.height = '';
+      inner.style.position = 'relative';
+      inner.style.top = '0';
+      inner.style.left = '0';
+      inner.style.width = '';
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(apply);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+    rafId = window.requestAnimationFrame(apply);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
+      <Animations />
+      <ResponsiveScale />
       {/* 고정 사이드바 */}
-      <div style={sidebarStyle}>
-        <Sidebar />
-      </div>
-      {/* 메인 콘텐츠 */}
-      <div className="container-fluid">
-        <div className="row">
-          {/* 사이드바 공간 확보용 빈 영역 */}
-          <div style={{ width: sidebarWidth, flexShrink: 0 }}></div>
-          <div className="home-two-content-col">
+      <div className="desktop-layout" style={{
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-start',
+          position: 'relative',
+      }}>
+          <div ref={sidebarShellRef} className="sidebar-sticky-wrapper" style={{ flexShrink: 0, zIndex: 100 }}>
+            <div ref={sidebarInnerRef} style={{ position: 'relative', zIndex: 100 }}>
+              <Sidebar />
+            </div>
+          </div>
+          <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
             <ClusterTabs />
             {/* 공사중 콘텐츠 */}
             <style>{sparkleStyles}</style>
@@ -150,7 +218,7 @@ const Cluster7Page = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: 'calc(100vh - 200px)',
+                minHeight: '810px',
                 width: '100%',
                 overflow: 'hidden',
               }}
@@ -194,7 +262,6 @@ const Cluster7Page = () => {
             </div>
           </div>
         </div>
-      </div>
     </main>
   );
 };

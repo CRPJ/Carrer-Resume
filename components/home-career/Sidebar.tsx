@@ -343,11 +343,7 @@ const Sidebar = () => {
       // "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
       // (Cluster2에서도 동일 UX가 필요함)
       const isClusterPages =
-        (pathname || '').includes('/cluster-2') ||
-        (pathname || '').includes('/cluster-3') ||
-        (pathname || '').includes('/cluster-4') ||
-        (pathname || '').includes('/cluster-4-1') ||
-        (pathname || '').includes('/cluster-4-card') ||
+        (pathname || '').includes('/cluster-') ||
         (pathname || '').includes('/career');
       const isLaptop1366 =
         !mobile &&
