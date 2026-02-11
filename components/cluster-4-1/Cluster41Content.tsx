@@ -1186,13 +1186,23 @@ const Cluster41Content = () => {
       };
       return dummyImages[week.id] || '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
     }
-    // startDate에서 월/주차 계산 후 getImagePath 활용
-    const start = new Date(week.startDate);
-    const month = start.getMonth() + 1;
-    const day = start.getDate();
-    const weekInMonth = Math.ceil(day / 7);
-    const title = `${week.seasonYear} ${week.seasonName} 시즌, ${week.weekNumber}주차 (${month}월 ${weekInMonth}주차)`;
-    return getImagePath(title);
+    // 시즌별 시작 월 매핑 (cluster-4-card와 동일한 로직)
+    const seasonStartMonth: { [key: string]: number } = {
+      '겨울': 1,
+      '봄': 3,
+      '여름': 7,
+      '가을': 9
+    };
+
+    const startMonth = seasonStartMonth[week.seasonName] || 1;
+    const monthOffset = Math.floor((week.weekNumber - 1) / 4);
+    const month = startMonth + monthOffset;
+    const weekOfMonth = ((week.weekNumber - 1) % 4) + 1;
+
+    // 공휴일이 있는 경우 파일명에 추가
+    const holidaySuffix = week.holidayName ? ` ${week.holidayName}` : '';
+
+    return `/images/0/cluster4/주차 이미지/${week.seasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
   };
 
   const renderStars = (rating: number) => {
