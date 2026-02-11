@@ -163,8 +163,10 @@ export async function GET(request: NextRequest) {
       roleHistoriesResult,
       activityTypesResult,
       weeklyActivitiesResult,
-      allCompletedActivityRecordsResult,
-      careerRecordsResult
+      currentWeekCompletedResult,
+      previousWeeksCompletedResult,
+      careerRecordsResult,
+      activityDetailsResult
     ] = await Promise.all([
       // 해당 주차의 성장 기록
       supabaseAdmin
@@ -186,7 +188,8 @@ export async function GET(request: NextRequest) {
         .from('points')
         .select('user_id, week_id, point_type, points')
         .in('user_id', userIdArray)
-        .in('week_id', relevantWeekIds),
+        .in('week_id', relevantWeekIds)
+        .limit(10000),
       // 팀 정보
       supabaseAdmin.from('teams').select('id, name'),
       // 파트 정보
@@ -213,20 +216,33 @@ export async function GET(request: NextRequest) {
         .select('id, activity_type_id, is_active, opened_at')
         .eq('week_id', weekId)
         .eq('is_active', true),
-      // 완료된 활동 기록 — 선택 주차 이전까지로 제한
+      // 현재 주차의 완료된 활동 기록 (강화 성공 판정용 — 1000건 제한에 안전)
+      supabaseAdmin
+        .from('activity_records')
+        .select('user_id, activity_type_id')
+        .eq('week_id', weekId)
+        .eq('is_completed', true),
+      // 이전 주차의 완료된 활동 기록 (count_once_in_total 판정용)
       supabaseAdmin
         .from('activity_records')
         .select('user_id, week_id, activity_type_id')
         .in('user_id', userIdArray)
-        .in('week_id', relevantWeekIds)
-        .eq('is_completed', true),
+        .neq('week_id', weekId)
+        .eq('is_completed', true)
+        .limit(10000),
       // 실무 경력 데이터
       supabaseAdmin
         .from('career_records')
         .select('user_id, week_id, enhancement_status')
         .eq('week_id', weekId)
         .in('user_id', userIdArray)
-        .in('enhancement_status', ['pending', 'enhanced'])
+        .in('enhancement_status', ['pending', 'enhanced']),
+      // 2차 정보 (강화 성공 판정용: sub_title, output_links)
+      supabaseAdmin
+        .from('user_activity_details')
+        .select('user_id, activity_type_id, sub_title, output_links')
+        .eq('week_id', weekId)
+        .in('user_id', userIdArray)
     ]);
 
     const weeklyGrowthData = weeklyGrowthResult.data;
@@ -239,8 +255,11 @@ export async function GET(request: NextRequest) {
     const roleHistories = roleHistoriesResult.data;
     const activityTypes = activityTypesResult.data;
     const activeActivities = weeklyActivitiesResult.data || [];
-    const allCompletedActivityRecords = allCompletedActivityRecordsResult.data;
+    const currentWeekCompleted = (currentWeekCompletedResult.data || []).map(r => ({ ...r, week_id: weekId }));
+    const previousWeeksCompleted = previousWeeksCompletedResult.data || [];
+    const allCompletedActivityRecords = [...currentWeekCompleted, ...previousWeeksCompleted];
     const careerRecordsData = careerRecordsResult.data;
+    const activityDetailsData = activityDetailsResult.data;
 
     // 4. 사용자 프로필 정보 (이미 가져옴)
     const profiles = eligibleProfiles;
@@ -313,6 +332,14 @@ export async function GET(request: NextRequest) {
       userCareerMap.get(cr.user_id)!.push(cr);
     });
 
+    // 사용자별 2차 정보 Map (강화 성공 판정용)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userActivityDetailsMap = new Map<string, any[]>();
+    (activityDetailsData || []).forEach(d => {
+      if (!userActivityDetailsMap.has(d.user_id)) userActivityDetailsMap.set(d.user_id, []);
+      userActivityDetailsMap.get(d.user_id)!.push(d);
+    });
+
     // 프로필 Map
     const profileMap = new Map<string, typeof profiles[0]>();
     profiles.forEach(p => profileMap.set(p.id, p));
@@ -331,6 +358,7 @@ export async function GET(request: NextRequest) {
       'operations_ambassador': '운영진(앰배서더)',
       'crew_team_leader': '운영진(팀장)',
       'admin_team_leader': '운영진(팀장)',
+      'operations_teamleader': '운영진(팀장)',
     };
 
     // 팀/파트 Map 생성 (O(1) 조회용)
@@ -416,20 +444,46 @@ export async function GET(request: NextRequest) {
       const userAllCompletedActivities = (userCompletedActivitiesMap.get(userId) || [])
         .map(ar => ({ week_id: ar.week_id, activity_type_id: ar.activity_type_id }));
 
-      // ===== 실무 정보 (info) - cluster-4-card와 동일: is_completed 기준 =====
+      // ===== 강화 성공 판정 헬퍼 (cluster-4-card와 동일: is_completed + (48시간 경과 OR 2차정보 기입)) =====
+      const userDetails = userActivityDetailsMap.get(userId) || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const isEnhancementSuccess = (activityTypeId: string): boolean => {
+        // 1. 활동 완료 여부 확인
+        const isCompleted = userAllCompletedActivities.some(
+          a => a.week_id === weekId && a.activity_type_id === activityTypeId
+        );
+        if (!isCompleted) return false;
+
+        // 2. 2차 정보 기입 여부 확인
+        const detail = userDetails.find((d: { activity_type_id: string; sub_title: string | null; output_links: { url?: string }[] | null }) => d.activity_type_id === activityTypeId);
+        if (detail) {
+          const hasSecondaryInfo =
+            (detail.sub_title && detail.sub_title.trim() !== '') ||
+            (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''));
+          if (hasSecondaryInfo) return true;
+        }
+
+        // 3. 48시간 경과 여부 확인
+        const activity = activeActivities.find(a => a.activity_type_id === activityTypeId);
+        if (!activity?.opened_at) return false;
+
+        const openedTime = new Date(activity.opened_at).getTime();
+        const now = Date.now();
+        const elapsed = now - openedTime;
+        const deadline = 48 * 60 * 60 * 1000; // 48시간
+
+        return elapsed >= deadline;
+      };
+
+      // ===== 실무 정보 (info) - cluster-4-card와 동일: 강화 성공 기준 =====
       const infoTotal = isOnboardingWeek ? 0 : activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
-      const infoCount = isOnboardingWeek ? 0 : userAllCompletedActivities.filter(a =>
-        a.week_id === weekId && infoTypeIds.includes(a.activity_type_id)
-      ).length;
+      const infoCount = isOnboardingWeek ? 0 : infoTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
 
-      // ===== 실무 역량 (competency) - cluster-4-card와 동일: is_completed 기준, total=1 =====
+      // ===== 실무 역량 (competency) - cluster-4-card와 동일: 강화 성공 기준, total=1 =====
       const competencyTotal = isOnboardingWeek ? 0 : 1;
-      const rawCompetencyCount = userAllCompletedActivities.filter(a =>
-        a.week_id === weekId && competencyTypeIds.includes(a.activity_type_id)
-      ).length;
-      const competencyCount = isOnboardingWeek ? 0 : Math.min(rawCompetencyCount, 1);
+      const competencyCount = isOnboardingWeek ? 0 : (competencyTypeIds.some(typeId => isEnhancementSuccess(typeId)) ? 1 : 0);
 
-      // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + is_completed 기준 =====
+      // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + 강화 성공 기준 =====
       let experienceTotal = 0;
       if (!isOnboardingWeek) {
         const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
@@ -463,9 +517,7 @@ export async function GET(request: NextRequest) {
           }
         });
       }
-      const experienceCount = isOnboardingWeek ? 0 : userAllCompletedActivities.filter(a =>
-        a.week_id === weekId && experienceTypeIds.includes(a.activity_type_id)
-      ).length;
+      const experienceCount = isOnboardingWeek ? 0 : experienceTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
 
       // ===== 실무 경력 (career) - career_records 기반 (Map 사용) =====
       // total: pending 또는 enhanced 상태인 프로젝트 수 (최대 5개)
