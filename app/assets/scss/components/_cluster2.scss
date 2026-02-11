@@ -3479,7 +3479,8 @@
 
       .header-right {
         position: absolute;
-        top: 16px;
+        top: 50%;
+        transform: translateY(-50%);
         right: 20px;
         display: flex;
         align-items: center;
@@ -3576,27 +3577,30 @@
       // Figma에서 선택한 22x22 연필 아이콘 위치에 맞춘 버튼
       // (모달 닫기 버튼과 겹치지 않게, 우측에서 살짝 안쪽으로 배치)
       .intro-edit-btn {
-        position: absolute;
-        top: 10px;
-        right: 62px;
-        width: 22px;
-        height: 22px;
-        padding: 0;
+        position: relative;
+        top: auto;
+        right: auto;
+        padding: 8px 16px;
+        padding-top: 10px;
         border: none;
-        border-radius: 50px;
+        border-radius: 0;
         background: #faab07;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 6px;
         cursor: pointer;
         z-index: 2;
+        font-size: 14px;
+        font-weight: 600;
+        color: #000;
         transition: transform 0.15s ease, filter 0.15s ease;
-
+    
         i {
           font-size: 14px;
-          color: #fff;
+          color: #000;
         }
-
+    
         &:hover {
           transform: translateY(-1px);
           filter: brightness(1.05);
