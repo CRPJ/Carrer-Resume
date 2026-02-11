@@ -345,29 +345,56 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       try {
         setIsLoadingWeek(true);
 
-        // ========== 1단계: 독립적인 초기 데이터 병렬 로드 (userId 불필요) ==========
+        // ========== 1단계: 모든 독립 데이터 최대 병렬 로드 ==========
         const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : '/api/profile';
-        const [activityTypesResult, currentWeekResult, profileResponse, allUserWeeksResult, activitiesResult] = await Promise.all([
-          // activity_types 정보
+        const earlyUserId = urlUserId || null;
+
+        // 기본 DB + 프로필 쿼리
+        const basePromise = Promise.all([
           supabase.from('activity_types')
             .select('id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total')
             .eq('is_active', true),
-          // 현재 주차 정보
           supabase.from('weeks')
             .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
             .eq('id', weekId)
             .single(),
-          // 프로필 정보
           fetch(profileUrl),
-          // 모든 주차 (이전/다음 네비게이션용) - userId 불필요
           supabase.from('weeks')
             .select('id, start_date, end_date, season_id, seasons(name)')
             .order('start_date', { ascending: false }),
-          // weekly_activities - weekId만 필요
           supabase.from('weekly_activities')
             .select('id, activity_type_id, title, is_active, opened_at, output_links')
-            .eq('week_id', weekId)
+            .eq('week_id', weekId),
         ]);
+
+        // urlUserId가 있으면 API fetch + DB 쿼리도 동시 시작
+        const earlyApiPromise = earlyUserId ? Promise.all([
+          fetch(`/api/career-records?week_id=${weekId}&user_id=${earlyUserId}`).then(r => r.json()).catch(() => null),
+          fetch(`/api/weekly-reputations?targetUserId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
+          fetch(`/api/weekly-colleagues?userId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
+        ]) : Promise.resolve([null, null, null] as const);
+
+        const earlyDbPromise = earlyUserId ? Promise.all([
+          supabase.from('user_weekly_growth')
+            .select('is_success, is_resting, is_club_break, failure_reason')
+            .eq('user_id', earlyUserId)
+            .eq('week_id', weekId)
+            .maybeSingle(),
+          supabase.from('points')
+            .select('week_id, point_type, points')
+            .eq('user_id', earlyUserId),
+          supabase.from('user_weekly_growth')
+            .select('week_id, weeks!inner(end_date)')
+            .eq('user_id', earlyUserId)
+            .eq('is_success', true),
+        ]) : null;
+
+        // 모든 병렬 요청 동시 대기
+        const [baseResults, earlyApiResults, earlyDbResults] = await Promise.all([
+          basePromise, earlyApiPromise, earlyDbPromise
+        ]);
+        const [activityTypesResult, currentWeekResult, profileResponse, allUserWeeksResult, activitiesResult] = baseResults;
+        const [earlyCareerResult, earlyReputationsResult, earlyColleaguesResult] = earlyApiResults;
 
         const activityTypesData = activityTypesResult.data;
         const currentWeek = currentWeekResult.data;
@@ -434,31 +461,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const apiParts = profileResult.parts || [];
         const apiUserTeamParts = profileResult.userTeamParts || [];
 
-        // ========== 2단계: userId 의존 데이터 병렬 로드 (3개 쿼리만) ==========
+        // ========== 2단계: userId 의존 데이터 (Stage 1에서 선행 실행 안 된 경우만) ==========
         const today = new Date().toISOString().split('T')[0];
         const userStartDate = profileResult.growthInfo?.startDate || '1900-01-01';
 
-        const [
-          weeklyGrowthResult,
-          pointsResult,
-          successWeeksResult
-        ] = await Promise.all([
-          // user_weekly_growth (성장 상태)
-          supabase.from('user_weekly_growth')
-            .select('is_success, is_resting, is_club_break, failure_reason')
-            .eq('user_id', userId)
-            .eq('week_id', weekId)
-            .maybeSingle(),
-          // points (해당 주차 + 전체)
-          supabase.from('points')
-            .select('week_id, point_type, points')
-            .eq('user_id', userId),
-          // 성공 주차 (누적 계산용)
-          supabase.from('user_weekly_growth')
-            .select('week_id, weeks!inner(end_date)')
-            .eq('user_id', userId)
-            .eq('is_success', true)
-        ]);
+        let weeklyGrowthResult, pointsResult, successWeeksResult;
+        if (earlyDbResults) {
+          // Stage 1에서 이미 병렬 실행됨
+          [weeklyGrowthResult, pointsResult, successWeeksResult] = earlyDbResults;
+        } else {
+          // urlUserId가 없어서 profile에서 userId를 받은 후에야 실행 가능
+          [weeklyGrowthResult, pointsResult, successWeeksResult] = await Promise.all([
+            supabase.from('user_weekly_growth')
+              .select('is_success, is_resting, is_club_break, failure_reason')
+              .eq('user_id', userId)
+              .eq('week_id', weekId)
+              .maybeSingle(),
+            supabase.from('points')
+              .select('week_id, point_type, points')
+              .eq('user_id', userId),
+            supabase.from('user_weekly_growth')
+              .select('week_id, weeks!inner(end_date)')
+              .eq('user_id', userId)
+              .eq('is_success', true)
+          ]);
+        }
 
         // 누적 주차는 Stage 1의 allUserWeeksResult를 클라이언트 필터로 대체
         const allWeeksForCumulative = (allUserWeeksResult.data || []).filter(
@@ -760,6 +787,32 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // careerStats는 career_records useEffect에서 설정됨
         }
 
+        // Stage 1에서 선행 로드된 데이터 적용
+        if (earlyCareerResult?.success && earlyCareerResult.data) {
+          setCareerRecords(earlyCareerResult.data);
+        }
+        if (earlyReputationsResult?.success && earlyReputationsResult.data) {
+          setWeeklyReputations(earlyReputationsResult.data);
+        }
+        if (earlyColleaguesResult?.success && earlyColleaguesResult.data) {
+          const colleagues = earlyColleaguesResult.data.map((item: any) => ({
+            id: item.colleague?.id || item.colleague_id,
+            name: item.colleague?.name || '-',
+            gender: item.colleague?.gender || '-',
+            age: item.colleague?.age || '-',
+            profileImg: item.colleague?.profileImg || '',
+            university: item.colleague?.university || '-',
+            major: item.colleague?.major || '-',
+            team: item.colleague?.team || '-',
+            part: item.colleague?.part || '-',
+            nickname: item.colleague?.nickname || '-',
+            rank: item.rank,
+            message: item.message || '',
+            createdAt: item.created_at || '',
+          }));
+          setSelectedColleagues(colleagues);
+        }
+
       } catch (error) {
         console.error('주차 데이터 로드 오류:', error);
       } finally {
@@ -771,23 +824,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }, [weekId, urlUserId]);
 
   // DB에서 실무 경력 데이터 가져오기
+  // career-records는 urlUserId가 있으면 Stage 1에서 이미 로드됨 (earlyCareerResult)
+  // currentUserId만 있는 경우(본인 조회)에만 별도 fetch
   useEffect(() => {
     const fetchCareerRecords = async () => {
       if (!weekId) return;
-      // urlUserId가 있으면 currentUserId 대기 없이 즉시 fetch
-      const targetUserId = urlUserId || currentUserId;
-      if (!targetUserId) return;
+      // urlUserId가 있으면 Stage 1에서 이미 처리됨
+      if (urlUserId) return;
+      if (!currentUserId) return;
 
       setIsLoadingCareerRecords(true);
       try {
-        const params = new URLSearchParams({ week_id: weekId });
-        params.set('user_id', targetUserId);
-        const url = `/api/career-records?${params.toString()}`;
-        console.log('[cluster-4-card] fetchCareerRecords URL:', url);
-        const response = await fetch(url);
+        const params = new URLSearchParams({ week_id: weekId, user_id: currentUserId });
+        const response = await fetch(`/api/career-records?${params.toString()}`);
         const result = await response.json();
-
-        console.log('[cluster-4-card] fetchCareerRecords result:', { success: result.success, count: result.count });
         if (result.success && result.data) {
           setCareerRecords(result.data);
         }
@@ -799,7 +849,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     fetchCareerRecords();
-  }, [urlUserId, currentUserId, weekId]);
+  }, [currentUserId, weekId, urlUserId]);
 
   // 실무 경력 통계 업데이트 (career records 기반)
   // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
@@ -813,23 +863,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setCareerStats({ total, success });
   }, [careerRecords]);
 
-  // 키워드 목록 가져오기
-  useEffect(() => {
-    const fetchKeywords = async () => {
-      try {
-        const res = await fetch("/api/reputation-keywords");
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.data) {
-            setReputationKeywords(json.data);
-          }
+  // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
+  const fetchKeywordsIfNeeded = async () => {
+    if (reputationKeywords.length > 0) return;
+    try {
+      const res = await fetch("/api/reputation-keywords");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setReputationKeywords(json.data);
         }
-      } catch (error) {
-        console.error("키워드 목록 가져오기 오류:", error);
       }
-    };
-    fetchKeywords();
-  }, []);
+    } catch (error) {
+      console.error("키워드 목록 가져오기 오류:", error);
+    }
+  };
 
   // 주차 평판 데이터 가져오기 함수
   const fetchWeeklyReputations = async () => {
@@ -847,9 +895,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 주차 평판 데이터 초기 로드
+  // 주차 평판 데이터 초기 로드 (urlUserId가 없는 경우만 - 있으면 Stage 1에서 이미 로드됨)
   useEffect(() => {
-    fetchWeeklyReputations();
+    if (!urlUserId) fetchWeeklyReputations();
   }, [urlUserId, weekId]);
 
   // 크루 목록 가져오기 (모달 열릴 때 lazy load)
@@ -902,8 +950,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
+  // 연계 동료 초기 로드 (urlUserId가 없는 경우만 - 있으면 Stage 1에서 이미 로드됨)
   useEffect(() => {
-    fetchWeeklyColleagues();
+    if (!urlUserId) fetchWeeklyColleagues();
   }, [urlUserId, weekId, session?.user?.id]);
 
   // 모달 상태 관리
@@ -2037,7 +2086,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 타인 카드일 때 - 주차 평판 남기기 버튼 */}
         {session && !isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
+            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>
