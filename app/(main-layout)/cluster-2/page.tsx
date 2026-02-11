@@ -48,10 +48,15 @@ const Cluster2Page = () => {
       const footer = document.querySelector("footer");
       if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 4 / zoom;
+          const margin = 2 / zoom;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
       }
+  
+      // 하단 테두리가 뷰포트 밖으로 나가지 않도록 제한
+      const viewportHeight = window.innerHeight / zoom;
+      const minTop = viewportHeight - height - (2 / zoom);
+      top = Math.max(top, minTop);
   
       return top;
   };

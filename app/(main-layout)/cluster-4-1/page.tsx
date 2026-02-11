@@ -34,6 +34,21 @@ const Cluster41Page = () => {
     if (header) return header.getBoundingClientRect().bottom;
     return 71;
 };
+    const computeTop = (zoom: number, height: number) => {
+    const defaultTop = getHeaderBottom() / zoom;
+    let top = defaultTop;
+    const footer = document.querySelector("footer");
+    if (footer) {
+        const footerTop = footer.getBoundingClientRect().top / zoom;
+        const margin = 2 / zoom;
+        const maxTop = footerTop - height - margin;
+        top = Math.min(defaultTop, maxTop);
+    }
+    const viewportHeight = window.innerHeight / zoom;
+    const minTop = viewportHeight - height - (2 / zoom);
+    top = Math.max(top, minTop);
+    return top;
+};
 
     let rafId: number | null = null;
     let isFixed = false;
@@ -57,7 +72,7 @@ const Cluster41Page = () => {
         const footer = document.querySelector("footer");
         if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 44 / zoom;
+          const margin = 2 / zoom;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
         }

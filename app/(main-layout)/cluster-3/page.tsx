@@ -44,17 +44,16 @@ const Cluster3Page = () => {
     let isFixed = false;
 
     // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
-    const computeTop = (zoom: number, height: number) => {
+        const computeTop = (zoom: number, height: number) => {
       const defaultTop = getHeaderBottom() / zoom;
       let top = defaultTop;
   
       const footer = document.querySelector("footer");
       if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 68 / zoom;
-          const maxTop = Math.floor(footerTop - height - margin);
-          // footer에 밀려도 header 아래로는 유지
-          top = Math.max(Math.min(defaultTop, maxTop), defaultTop);
+          const margin = 4 / zoom;
+          const maxTop = footerTop - height - margin;
+          top = Math.min(defaultTop, maxTop);
       }
   
       return top;

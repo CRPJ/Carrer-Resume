@@ -51,10 +51,9 @@ const Cluster4Page = () => {
       const footer = document.querySelector("footer");
       if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 68 / zoom;
-          const maxTop = Math.floor(footerTop - height - margin);
-          // footer에 밀려도 header 아래로는 유지
-          top = Math.max(Math.min(defaultTop, maxTop), defaultTop);
+          const margin = 4 / zoom;
+          const maxTop = footerTop - height - margin;
+          top = Math.min(defaultTop, maxTop);
       }
   
       return top;
