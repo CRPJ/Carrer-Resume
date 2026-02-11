@@ -2045,7 +2045,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 왼쪽: 큰 주차 이미지 */}
         <div className="section1-left">
           <div className="main-image-container">
-            <img src={currentImage} alt="주차 이미지" className="main-week-image" />
+            <img src={currentImage} alt="주차 이미지" className="main-week-image" onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
             {/* 뱃지 두 개 */}
             <div className="image-badges">
               <div className="badge-item heart-badge">
