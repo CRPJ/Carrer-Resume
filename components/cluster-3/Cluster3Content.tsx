@@ -755,7 +755,6 @@ const Cluster3Content = () => {
         {/* 타이틀 */}
         <div className="section1-title-wrapper">
           <div className="title-inner">
-            <h2 className="section1-title-shadow">CLUB FINAL INDEX</h2>
             <h2 className="section1-title">CLUB FINAL INDEX</h2>
           </div>
         </div>

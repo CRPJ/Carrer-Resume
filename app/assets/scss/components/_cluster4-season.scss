@@ -189,9 +189,10 @@
       text-align: center;
       padding-top: 48px;
       margin-bottom: 20px;
-      height: 130px;          // 추가
-      overflow: visible;      // 추가
-    
+      height: 140px;          // 추가
+      overflow: hidden;      // 추가
+      pointer-events: none;     
+      padding-bottom: 8px;
 
       .title-inner {
         position: relative;
@@ -3074,7 +3075,7 @@
             gap: 2px;
             max-height: 96px;          // 배지 2개만 보이는 높이
             overflow-y: auto;          // visible → auto
-            overflow-x: visible;
+            overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
             padding: 0;
