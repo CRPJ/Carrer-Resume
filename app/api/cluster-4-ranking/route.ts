@@ -565,11 +565,27 @@ export async function GET(request: NextRequest) {
     // 단감(star) 순서로 정렬 (높은 순)
     rankings.sort((a, b) => b.star - a.star);
 
+    // [임시 오버라이드] 2026 겨울 시즌 3주차 - 팀별 성장 승패 값 오버라이드
+    // TODO: 복원 시 이 블록 전체 삭제
+    const teamStatsOverride =
+      selectedWeek.seasonYear === 2026 &&
+      selectedWeek.rawSeasonName === 'winter' &&
+      selectedWeek.weekNumber === 3
+        ? [
+            { teamName: '엔터테인먼트', successCount: 13, failCount: 5 },
+            { teamName: '커머스', successCount: 11, failCount: 7 },
+            { teamName: '콘텐츠', successCount: 9, failCount: 9 },
+            { teamName: 'F&B', successCount: 7, failCount: 11 },
+            { teamName: '스타일', successCount: 5, failCount: 13 },
+          ]
+        : undefined;
+
     return NextResponse.json({
       success: true,
       weeks: filteredWeeks,
       selectedWeek,
-      rankings
+      rankings,
+      ...(teamStatsOverride && { teamStatsOverride })
     });
 
   } catch (error) {

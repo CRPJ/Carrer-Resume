@@ -6,34 +6,57 @@ import { supabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 영상 URL 조회
-export async function GET() {
+// GET: 영상 URL 조회 (userId 파라미터로 다른 유저 조회 가능)
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
-    }
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get("userId");
 
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 사용자 ID와 영어 이름 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id, eng_name")
-      .eq("email", session.user.email)
-      .maybeSingle();
+    let profile;
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
-      );
+    if (targetUserId) {
+      // 특정 유저의 영상 조회 (공개 접근 가능)
+      const { data, error } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, eng_name")
+        .eq("id", targetUserId)
+        .maybeSingle();
+
+      if (error || !data) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      profile = data;
+    } else {
+      // 현재 로그인 유저의 영상 조회 (로그인 필요)
+      const session = await getServerSession(authOptions);
+
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, eng_name")
+        .eq("email", session.user.email)
+        .maybeSingle();
+
+      if (error || !data) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      profile = data;
     }
 
     // user_introductions에서 영상 URL 조회
