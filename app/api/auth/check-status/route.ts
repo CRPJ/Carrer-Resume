@@ -27,11 +27,45 @@ export async function GET() {
     }
 
     // 1. user_profiles에서 승인된 사용자 확인
-    const { data: profile } = await supabaseAdmin
+    let profile = null;
+
+    // 1-1: 이메일 직접 매칭
+    const { data: profileByEmail } = await supabaseAdmin
       .from("user_profiles")
       .select("id, display_name, email, growth_status")
       .eq("email", email)
       .maybeSingle();
+
+    if (profileByEmail) {
+      profile = profileByEmail;
+    }
+
+    // 1-2: auth_email (카카오 로그인 이메일)로 매칭
+    if (!profile) {
+      const { data: profileByAuth } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, display_name, email, growth_status")
+        .eq("auth_email", email)
+        .maybeSingle();
+
+      if (profileByAuth) {
+        profile = profileByAuth;
+      }
+    }
+
+    // 1-3: 카카오 이름으로 display_name 매칭
+    if (!profile && session.user.name) {
+      const cleanName = session.user.name.replace(/\s+/g, "");
+      const { data: profileByName } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, display_name, email, growth_status")
+        .eq("display_name", cleanName)
+        .maybeSingle();
+
+      if (profileByName) {
+        profile = profileByName;
+      }
+    }
 
     if (profile) {
       return NextResponse.json({

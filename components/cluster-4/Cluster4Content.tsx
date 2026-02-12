@@ -695,7 +695,7 @@ const Cluster4Content = () => {
       try {
         // urlUserId가 있으면 해당 사용자, 없으면 본인 프로필 조회
         if (urlUserId) {
-          const res = await fetch(`/api/profile?userId=${urlUserId}`);
+          const res = await fetch(`/api/profile/?userId=${urlUserId}`);
           if (res.ok) {
             const json = await res.json();
             setUserStatus(json.growthInfo?.status || null);
@@ -754,7 +754,7 @@ const Cluster4Content = () => {
             if (json.data?.profile_photo_url) setProfilePhotoUrl(json.data.profile_photo_url);
           }
         } else if (session?.user?.id) {
-          const res = await fetch('/api/profile');
+          const res = await fetch('/api/profile/');
           if (res.ok) {
             const json = await res.json();
             setUserStatus(json.growthInfo?.status || null);
@@ -1507,7 +1507,7 @@ const Cluster4Content = () => {
       <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <Link href="/cluster-4" className="tab">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>

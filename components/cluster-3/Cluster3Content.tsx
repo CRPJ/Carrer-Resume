@@ -995,7 +995,9 @@ const Cluster3Content = () => {
       <section className="cluster3-section3">
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          {isOwner && (
+            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => { setEditingSection3Links([...portfolioArchives]); setSection3ModalOpen(true); }} />
+          )}
           <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
         </div>
         {/* 배경 이미지 */}
@@ -1079,7 +1081,9 @@ const Cluster3Content = () => {
       <section className="cluster3-section4">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          {isOwner && (
+            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => { setEditingSection4Links([...portfolioOutputs]); setEditingOutputChannels([...portfolioOutputChannels]); setSection4ModalOpen(true); }} />
+          )}
           <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
         </div>
         {/* 배경 이미지 */}
@@ -1191,7 +1195,9 @@ const Cluster3Content = () => {
         <div className="cluster3-section5">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          {isOwner && (
+            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => { setEditingSection5Links([...portfolioDetails]); setEditingDetailChannels([...portfolioDetailChannels]); setSection5ModalOpen(true); }} />
+          )}
           <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
         </div>
         <div className="section5-header">

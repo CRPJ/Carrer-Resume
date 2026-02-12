@@ -13,9 +13,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const targetUserId = searchParams.get('userId');
 
-    console.log('[Profile API] Request URL:', request.url);
-    console.log('[Profile API] Target userId:', targetUserId);
-
     if (!supabaseAdmin) {
       return NextResponse.json(
         { error: "서버 설정 오류" },
@@ -60,23 +57,68 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const { data, error } = await supabaseAdmin
+      // 1차: 이메일로 프로필 조회
+      const { data } = await supabaseAdmin
         .from("user_profiles")
         .select("*")
         .eq("email", session.user.email)
         .maybeSingle();
 
-      if (error) {
-        console.error("프로필 조회 오류:", error);
-        return NextResponse.json(
-          { error: "프로필을 가져오는데 실패했습니다." },
-          { status: 500 }
-        );
+      if (data) {
+        profile = data;
       }
 
-      if (!data) {
+      // 2차: auth_email (카카오 로그인 이메일)로 조회
+      if (!profile) {
+        const { data: profileByAuth } = await supabaseAdmin
+          .from("user_profiles")
+          .select("*")
+          .eq("auth_email", session.user.email)
+          .maybeSingle();
+
+        if (profileByAuth) {
+          profile = profileByAuth;
+        }
+      }
+
+      // 3차: 카카오 이름으로 display_name 매칭
+      if (!profile && session.user.name) {
+        const cleanName = session.user.name.replace(/\s+/g, "");
+        const { data: profileByName } = await supabaseAdmin
+          .from("user_profiles")
+          .select("*")
+          .eq("display_name", cleanName)
+          .maybeSingle();
+
+        if (profileByName) {
+          profile = profileByName;
+        }
+      }
+
+      // 매칭 성공 시 auth_email 자동 저장 (다음부터 빠르게 조회)
+      if (profile && !profile.auth_email) {
+        await supabaseAdmin
+          .from("user_profiles")
+          .update({ auth_email: session.user.email })
+          .eq("id", profile.id);
+      }
+
+      if (!profile) {
+        // 디버그: auth_email 조회 결과 확인
+        const { data: debugProfile, error: debugErr } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id, display_name, email, auth_email")
+          .limit(5);
         return NextResponse.json(
-          { error: "승인된 프로필이 없습니다. 어드민 승인을 기다려주세요." },
+          {
+            error: "승인된 프로필이 없습니다.",
+            debug: {
+              sessionEmail: session.user.email,
+              sessionName: session.user.name,
+              profiles: debugProfile,
+              dbError: debugErr
+            }
+          },
           { status: 404 }
         );
       }

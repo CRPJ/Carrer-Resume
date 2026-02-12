@@ -18,14 +18,14 @@ const Sidebar = () => {
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
-  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(true);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
   const [completionRate, setCompletionRate] = useState<number | null>(80);
-  const [hasCompletionData, setHasCompletionData] = useState<boolean>(true);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
   const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
   const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
   const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
   const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
-  const [hasActivityData, setHasActivityData] = useState<boolean>(true);
+  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
@@ -37,7 +37,7 @@ const Sidebar = () => {
     lightnings: 9999,   // 번개
     shields: 99999      // 방패
   });
-  const [hasBadgeData, setHasBadgeData] = useState<boolean>(true);
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
 
   // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
   interface SeasonHistory {
@@ -164,7 +164,7 @@ const Sidebar = () => {
       seasons: { id: 's12', year: 2023, name: 'spring', start_date: '2023-03-01' }
     },
   ]);
-  const [hasSeasonData, setHasSeasonData] = useState<boolean>(true);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
 
   // 시즌 이름 한글 변환
   const seasonNameKorean: { [key: string]: string } = {
@@ -440,7 +440,7 @@ const Sidebar = () => {
   const [debugProfileType, setDebugProfileType] = useState<'본인' | '타크루'>('본인');
   const [debugPanelType, setDebugPanelType] = useState<'OK' | 'EC' | 'PX'>('OK');
   const [crewStatus, setCrewStatus] = useState<'Running' | 'Complete' | 'On Rest' | 'Recharging' | 'Next Challenge'>('Running');
-  const [hasData, setHasData] = useState(true); // 데이터 있음/없음 상태
+  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<'email' | 'school' | 'major' | 'hexagon1' | 'hexagon2' | 'hexagon3' | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -568,16 +568,18 @@ const Sidebar = () => {
   } : defaultProfile;
 
   // 페이지 로드 시 프로필 데이터 가져오기 (캐시 활용)
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (forceRefresh?: boolean) => {
     // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
     if (!targetUserId && !session) return;
 
     try {
       // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
-      const cachedResult = await fetchCachedProfile(targetUserId || undefined);
+      const cachedResult = await fetchCachedProfile(targetUserId || undefined, forceRefresh);
 
       if (!cachedResult || !cachedResult.data) {
         console.error('Failed to fetch profile from cache');
+        setHasData(false);
+        setHasSeasonData(false);
         return;
       }
 
@@ -592,6 +594,7 @@ const Sidebar = () => {
       };
 
       if (result.success && result.data) {
+        setHasData(true);
         const profile = result.data;
 
         // 본인 여부 확인
@@ -684,6 +687,8 @@ const Sidebar = () => {
       }
     } catch (error) {
       console.error('프로필 로드 오류:', error);
+      setHasData(false);
+      setHasSeasonData(false);
     }
   };
 
@@ -857,7 +862,7 @@ const Sidebar = () => {
   // 프로필 데이터 로드 함수
   const loadProfile = async () => {
     try {
-      const response = await fetch('/api/profile');
+      const response = await fetch('/api/profile/');
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -969,7 +974,7 @@ const Sidebar = () => {
         contact_available: formData.phoneComment || null,
       };
 
-      const response = await fetch('/api/profile', {
+      const response = await fetch('/api/profile/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -984,7 +989,7 @@ const Sidebar = () => {
         setIsEditModalOpen(false);
         // 캐시 무효화 후 프로필 데이터 새로고침
         clearProfileCache();
-        fetchUserProfile();
+        fetchUserProfile(true);
       } else {
         alert(result.error || '프로필 저장에 실패했습니다.');
       }
@@ -1529,7 +1534,7 @@ const Sidebar = () => {
                           onClick={async () => {
                             // 모달 열기 전에 기존 값 로드
                             try {
-                              const response = await fetch('/api/profile');
+                              const response = await fetch('/api/profile/');
                               const result = await response.json();
                               if (result.success && result.data) {
                                 setFormData(prev => ({
@@ -3285,7 +3290,7 @@ const Sidebar = () => {
               className="chamfer-box phone-modal-btn"
               onClick={async () => {
                 try {
-                  const response = await fetch('/api/profile', {
+                  const response = await fetch('/api/profile/', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contact_available: formData.phoneComment || null }),

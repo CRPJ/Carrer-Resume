@@ -140,15 +140,55 @@ export const authOptions: AuthOptions = {
       // 카카오 로그인 시 user_profiles ID 확인
       if (account?.provider === "kakao" && user?.email && supabaseAdmin) {
         try {
+          let matchedProfileId: string | null = null;
+
+          // 1차: 이메일로 직접 매칭
           const { data: profile } = await supabaseAdmin
             .from("user_profiles")
-            .select("id")
+            .select("id, auth_email")
             .eq("email", user.email)
             .maybeSingle();
 
           if (profile) {
-            token.id = profile.id;
+            matchedProfileId = profile.id;
+          }
+
+          // 2차: auth_email (카카오 로그인 이메일)로 매칭
+          if (!matchedProfileId) {
+            const { data: profileByAuth } = await supabaseAdmin
+              .from("user_profiles")
+              .select("id, auth_email")
+              .eq("auth_email", user.email)
+              .maybeSingle();
+
+            if (profileByAuth) {
+              matchedProfileId = profileByAuth.id;
+            }
+          }
+
+          // 3차: 카카오 이름으로 display_name 매칭
+          if (!matchedProfileId && user.name) {
+            const cleanName = user.name.replace(/\s+/g, "");
+            const { data: profileByName } = await supabaseAdmin
+              .from("user_profiles")
+              .select("id, auth_email")
+              .eq("display_name", cleanName)
+              .maybeSingle();
+
+            if (profileByName) {
+              matchedProfileId = profileByName.id;
+            }
+          }
+
+          if (matchedProfileId) {
+            token.id = matchedProfileId;
             token.isApproved = true;
+            // auth_email 자동 저장
+            await supabaseAdmin
+              .from("user_profiles")
+              .update({ auth_email: user.email })
+              .eq("id", matchedProfileId)
+              .is("auth_email", null);
           } else {
             token.isApproved = false;
           }

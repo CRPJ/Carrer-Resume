@@ -6,6 +6,7 @@ import three from "@/public/images/sidebar/three.png";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -28,11 +29,29 @@ const games: Game[] = [
 const Sidebar = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [myProfileId, setMyProfileId] = useState<string | null>(null);
+
+  // 로그인 시 user_profiles ID를 미리 가져옴
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch('/api/profile/')
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.data?.id) {
+          setMyProfileId(result.data.id);
+        }
+      })
+      .catch(() => {});
+  }, [session]);
 
   const handleCareerResumeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (session?.user) {
-      router.push("/cluster-4");
+      if (myProfileId) {
+        router.push(`/cluster-4/?userId=${myProfileId}`);
+      } else {
+        router.push("/cluster-4");
+      }
     } else {
       alert("현재 활동 중이거나 졸업한 크루여야 합니다");
     }

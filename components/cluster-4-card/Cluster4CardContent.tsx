@@ -2141,14 +2141,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
-          <Link href="/cluster-4" className="tab active">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab active">
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </Link>
-          <Link href="/cluster-4-1" className="tab">
+          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>

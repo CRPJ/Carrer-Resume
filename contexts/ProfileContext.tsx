@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 
 // Profile 데이터 타입
@@ -31,7 +31,7 @@ interface ProfileContextType {
   profileData: ProfileData | null;
   isLoading: boolean;
   error: string | null;
-  fetchProfile: (userId?: string) => Promise<ProfileData | null>;
+  fetchProfile: (userId?: string, forceRefresh?: boolean) => Promise<ProfileData | null>;
   clearCache: () => void;
   lastFetchedUserId: string | null;
 }
@@ -45,33 +45,73 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedUserId, setLastFetchedUserId] = useState<string | null>(null);
   const [cacheTimestamp, setCacheTimestamp] = useState<number>(0);
+  const [errorTimestamp, setErrorTimestamp] = useState<number>(0);
+  const [lastErrorUserId, setLastErrorUserId] = useState<string | null>(null);
 
   // 캐시 유효 시간 (5분)
   const CACHE_TTL = 5 * 60 * 1000;
+  // 에러 캐시 유효 시간 (30초) - 실패 시 재시도 간격
+  const ERROR_CACHE_TTL = 30 * 1000;
 
-  const fetchProfile = useCallback(async (userId?: string): Promise<ProfileData | null> => {
+  // ref로 현재 값 참조 → useCallback 의존성 배열을 []로 안정화
+  const stateRef = useRef({
+    profileData,
+    lastFetchedUserId,
+    cacheTimestamp,
+    error,
+    lastErrorUserId,
+    errorTimestamp,
+  });
+  useEffect(() => {
+    stateRef.current = {
+      profileData,
+      lastFetchedUserId,
+      cacheTimestamp,
+      error,
+      lastErrorUserId,
+      errorTimestamp,
+    };
+  });
+
+  const fetchProfile = useCallback(async (userId?: string, forceRefresh?: boolean): Promise<ProfileData | null> => {
     const targetUserId = userId || null;
     const now = Date.now();
+    const s = stateRef.current;
 
     // 캐시된 데이터가 있고, 같은 userId이고, 캐시가 유효하면 재사용
     if (
-      profileData &&
-      lastFetchedUserId === targetUserId &&
-      now - cacheTimestamp < CACHE_TTL
+      !forceRefresh &&
+      s.profileData &&
+      s.lastFetchedUserId === targetUserId &&
+      now - s.cacheTimestamp < CACHE_TTL
     ) {
-      return profileData;
+      return s.profileData;
+    }
+
+    // 최근 에러가 있고, 같은 userId이고, 에러 캐시가 유효하면 재요청 방지
+    if (
+      !forceRefresh &&
+      s.error &&
+      s.lastErrorUserId === targetUserId &&
+      now - s.errorTimestamp < ERROR_CACHE_TTL
+    ) {
+      return null;
     }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const apiUrl = targetUserId ? `/api/profile?userId=${targetUserId}` : '/api/profile';
+      const apiUrl = targetUserId ? `/api/profile/?userId=${targetUserId}` : '/api/profile/';
       const response = await fetch(apiUrl);
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        setError(result.error || 'Failed to fetch profile');
+        const errorMsg = result.error || 'Failed to fetch profile';
+        console.warn('[ProfileContext] API 응답 실패:', response.status, errorMsg);
+        setError(errorMsg);
+        setErrorTimestamp(now);
+        setLastErrorUserId(targetUserId);
         setIsLoading(false);
         return null;
       }
@@ -108,15 +148,20 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (err) {
       console.error('Profile fetch error:', err);
       setError('Failed to fetch profile');
+      setErrorTimestamp(now);
+      setLastErrorUserId(targetUserId);
       setIsLoading(false);
       return null;
     }
-  }, [profileData, lastFetchedUserId, cacheTimestamp]);
+  }, []);
 
   const clearCache = useCallback(() => {
     setProfileData(null);
     setLastFetchedUserId(null);
     setCacheTimestamp(0);
+    setError(null);
+    setErrorTimestamp(0);
+    setLastErrorUserId(null);
   }, []);
 
   // 세션 변경 시 캐시 초기화
