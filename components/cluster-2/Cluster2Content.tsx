@@ -111,20 +111,9 @@ const Cluster2Content = () => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
-    if (!session) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
-    const approved = await checkApprovalStatus();
-
-    if (!approved) {
-      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
-      return;
-    }
-
+    // TODO: 프로덕션 배포 전 로그인 체크 복원
     openModalFn();
-  };
+};
 
   // 섹션 1 모달 (프로필 사진 수정)
   const [section1ModalOpen, setSection1ModalOpen] = useState(false);
@@ -1093,8 +1082,8 @@ const Cluster2Content = () => {
             zIndex: 100,
             gap: '5px'
           }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+            <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
+                <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" style={{ pointerEvents: 'none' }} />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
