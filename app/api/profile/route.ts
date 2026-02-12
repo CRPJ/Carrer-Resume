@@ -126,6 +126,61 @@ export async function GET(request: NextRequest) {
       profile = data;
     }
 
+    const context = searchParams.get('context');
+
+    // ========== context=card: 카드 페이지용 경량 응답 (시즌 통계/계산 전부 스킵) ==========
+    if (context === 'card') {
+      const [
+        joinedWeekResult,
+        allRestsResult,
+        userActivitiesResult,
+        userRoleHistoryResult,
+        activityRecordsResult,
+        userActivityDetailsResult,
+        activityPointsResult,
+        userTeamPartsResult,
+        teamsData,
+        partsData,
+      ] = await Promise.all([
+        profile.onboarding_week_id
+          ? supabaseAdmin.from("weeks").select("start_date").eq("id", profile.onboarding_week_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabaseAdmin.from("rest_requests").select("week_id").eq("user_id", profile.id).eq("status", "approved"),
+        supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
+        supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
+        supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
+        supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
+        supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+        supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+        getCachedTeams(),
+        getCachedParts(),
+      ]);
+
+      const activityRecordsData = activityRecordsResult.data || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const completedActivities = activityRecordsData.filter((ar: any) => ar.is_completed);
+
+      return NextResponse.json({
+        success: true,
+        data: profile,
+        onboardingWeekId: profile.onboarding_week_id || null,
+        growthInfo: { startDate: joinedWeekResult.data?.start_date || null },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        activityWeekIds: completedActivities.map((a: any) => a.week_id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        restWeekIds: (allRestsResult.data || []).map((r: any) => r.week_id),
+        approvedActivities: completedActivities,
+        activityRecords: activityRecordsData,
+        activityDetails: userActivityDetailsResult.data || [],
+        activityPoints: activityPointsResult.data || [],
+        userRoleHistory: userRoleHistoryResult.data || [],
+        userTeamParts: userTeamPartsResult.data || [],
+        teams: teamsData || [],
+        parts: partsData || [],
+      });
+    }
+
+    // ========== 기존 전체 프로필 응답 (기존 코드 그대로) ==========
     console.log('[Profile API] Returning profile for:', profile.id, profile.display_name);
 
     const today = new Date().toISOString().split('T')[0];

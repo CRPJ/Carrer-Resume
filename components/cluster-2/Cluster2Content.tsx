@@ -229,6 +229,16 @@ const Cluster2Content = () => {
       const result = await response.json();
 
       if (result.success && result.data) {
+        // 이미지 프리로드: URL을 받자마자 브라우저가 다운로드 시작
+        const allUrls = [result.data.mainPhoto, ...(result.data.subPhotos || [])].filter(Boolean);
+        allUrls.forEach((imgUrl: string) => {
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.as = 'image';
+          link.href = imgUrl;
+          document.head.appendChild(link);
+        });
+
         setMainPhoto(result.data.mainPhoto || null);
         setSubPhotos(result.data.subPhotos || [null, null, null, null]);
       }
@@ -1138,7 +1148,7 @@ const Cluster2Content = () => {
               style={{ cursor: subPhotos[0] ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[0] ? <img src={subPhotos[0]} alt="Joy" /> : <i className="ti ti-photo-plus"></i>}
+                {subPhotos[0] ? <img src={subPhotos[0]} alt="Joy" fetchPriority="high" decoding="async" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Joy</span>
             </div>
@@ -1148,7 +1158,7 @@ const Cluster2Content = () => {
               style={{ cursor: subPhotos[1] ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[1] ? <img src={subPhotos[1]} alt="Blue" /> : <i className="ti ti-photo-plus"></i>}
+                {subPhotos[1] ? <img src={subPhotos[1]} alt="Blue" fetchPriority="high" decoding="async" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Blue</span>
             </div>
@@ -1158,7 +1168,7 @@ const Cluster2Content = () => {
               style={{ cursor: subPhotos[2] ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[2] ? <img src={subPhotos[2]} alt="Passion" /> : <i className="ti ti-photo-plus"></i>}
+                {subPhotos[2] ? <img src={subPhotos[2]} alt="Passion" fetchPriority="high" decoding="async" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Passion</span>
             </div>
@@ -1168,7 +1178,7 @@ const Cluster2Content = () => {
               style={{ cursor: subPhotos[3] ? 'pointer' : 'default' }}
             >
               <div className="hex-large">
-                {subPhotos[3] ? <img src={subPhotos[3]} alt="Moments" /> : <i className="ti ti-photo-plus"></i>}
+                {subPhotos[3] ? <img src={subPhotos[3]} alt="Moments" fetchPriority="high" decoding="async" /> : <i className="ti ti-photo-plus"></i>}
               </div>
               <span className="hex-label">Moments</span>
             </div>

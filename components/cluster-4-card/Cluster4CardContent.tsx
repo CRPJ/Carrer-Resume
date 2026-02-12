@@ -430,7 +430,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         setIsLoadingWeek(true);
 
         // ========== 1단계: 모든 독립 데이터 최대 병렬 로드 ==========
-        const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : '/api/profile';
+        const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}&context=card` : '/api/profile?context=card';
         const earlyUserId = urlUserId || null;
 
         // 기본 DB + 프로필 쿼리

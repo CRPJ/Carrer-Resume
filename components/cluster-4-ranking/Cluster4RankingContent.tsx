@@ -80,6 +80,7 @@ const Cluster4RankingContent = () => {
   const [selectedWeek, setSelectedWeek] = useState<WeekOption | null>(null);
   const [rankings, setRankings] = useState<RankingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [teamStatsOverride, setTeamStatsOverride] = useState<{ teamName: string; successCount: number; failCount: number }[] | null>(null);
 
   // 초기 주차 목록 로드
   useEffect(() => {
@@ -90,10 +91,13 @@ const Cluster4RankingContent = () => {
         if (result.success && result.weeks) {
           setWeeks(result.weeks);
 
-          // 가장 최근 완료된 주차를 기본 선택 (현재 진행 중인 주차는 API에서 제외됨)
+          // [임시] 2026 겨울 시즌 3주차를 기본 선택 (TODO: 복원 시 아래 블록을 원래대로)
           if (result.weeks.length > 0) {
-            setSelectedWeekId(result.weeks[0].id);
-            setSelectedSeason(`${result.weeks[0].seasonYear}년, ${result.weeks[0].seasonName} 시즌`);
+            const defaultWeek = result.weeks.find(
+              (w: WeekOption) => w.seasonYear === 2026 && w.seasonName === '겨울' && w.weekNumber === 3
+            ) || result.weeks[0];
+            setSelectedWeekId(defaultWeek.id);
+            setSelectedSeason(`${defaultWeek.seasonYear}년, ${defaultWeek.seasonName} 시즌`);
           }
         }
       } catch (error) {
@@ -115,6 +119,7 @@ const Cluster4RankingContent = () => {
         if (result.success) {
           setSelectedWeek(result.selectedWeek);
           setRankings(result.rankings || []);
+          setTeamStatsOverride(result.teamStatsOverride || null);
         }
       } catch (error) {
         console.error("랭킹 데이터 로드 오류:", error);
@@ -264,9 +269,23 @@ const Cluster4RankingContent = () => {
       });
     });
 
+    // [임시] 오버라이드 적용: 팀별 승패 값 덮어쓰기 + 5개 팀만 표시 (TODO: 복원 시 이 블록 삭제)
+    if (teamStatsOverride) {
+      const overrideTeamNames = teamStatsOverride.map(o => o.teamName);
+      const filtered = stats.filter(s => overrideTeamNames.includes(s.teamName));
+      for (const override of teamStatsOverride) {
+        const stat = filtered.find(s => s.teamName === override.teamName);
+        if (stat) {
+          stat.successCount = override.successCount;
+          stat.failCount = override.failCount;
+        }
+      }
+      return filtered.sort((a, b) => b.totalStar - a.totalStar);
+    }
+
     // 단감 총합 기준으로 정렬
     return stats.sort((a, b) => b.totalStar - a.totalStar);
-  }, [rankings]);
+  }, [rankings, teamStatsOverride]);
 
   return (
     <>

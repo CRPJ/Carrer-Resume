@@ -20,22 +20,37 @@ export async function GET(request: NextRequest) {
     let profilePhotoUrl: string | null = null;
 
     if (targetUserId) {
-      // 특정 유저 조회 (공개 접근 가능)
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from("user_profiles")
-        .select("id, profile_photo_url")
-        .eq("id", targetUserId)
-        .maybeSingle();
+      // 특정 유저 조회: 프로필 + 서브사진 병렬 조회
+      const [profileResult, introResult] = await Promise.all([
+        supabaseAdmin
+          .from("user_profiles")
+          .select("id, profile_photo_url")
+          .eq("id", targetUserId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("user_introductions")
+          .select("sub_photo_1, sub_photo_2, sub_photo_3, sub_photo_4")
+          .eq("user_id", targetUserId)
+          .maybeSingle(),
+      ]);
 
-      if (profileError || !profile) {
+      if (profileResult.error || !profileResult.data) {
         return NextResponse.json(
           { error: "프로필을 찾을 수 없습니다." },
           { status: 404 }
         );
       }
 
-      profileId = profile.id;
-      profilePhotoUrl = profile.profile_photo_url;
+      const introduction = introResult.data;
+      return NextResponse.json({
+        success: true,
+        data: {
+          mainPhoto: profileResult.data.profile_photo_url,
+          subPhotos: introduction
+            ? [introduction.sub_photo_1, introduction.sub_photo_2, introduction.sub_photo_3, introduction.sub_photo_4]
+            : [null, null, null, null],
+        },
+      });
     } else {
       // 로그인 유저 본인 조회
       const session = await getServerSession(authOptions);
