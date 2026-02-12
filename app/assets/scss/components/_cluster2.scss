@@ -2684,7 +2684,7 @@
     position: relative;
     width: 600px;
     max-width: 90vw;
-    max-height: 80vh;
+    max-height: min(80vh, 700px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #FFA500;
     border-radius: 0;
@@ -2916,7 +2916,7 @@
   .section4-modal {
     width: 500px;
     max-width: 90vw;
-    max-height: 80vh;
+    max-height: min(80vh, 700px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #FFA500;
     overflow: hidden;
@@ -3140,7 +3140,7 @@
   .intro-modal {
     width: 600px;
     max-width: 90vw;
-    max-height: 85vh;
+    max-height: min(85vh, 750px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #FFA500;
     border-radius: 0;
@@ -3612,7 +3612,7 @@
     border: 1px solid #FFA500;
     width: 90%;
     max-width: 960px;
-    max-height: 90vh;
+    max-height: min(90vh, 800px);
     border-radius: 0;
     overflow: hidden;
     box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
@@ -3690,7 +3690,7 @@
 
     .section21-modal-body {
       padding: 40px 32px;
-      max-height: 60vh;
+      max-height: min(60vh, 500px);
       overflow-y: auto;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -4377,8 +4377,8 @@
   border: 1px solid #FFA500;
   border-radius: 0;
   width: 520px;
-  max-height: 80vh;
-  overflow: visible;
+  max-height: min(80vh, 700px);
+  overflow: hidden;
   position: relative;
   animation: modalSlideIn 0.3s ease;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
@@ -4483,6 +4483,7 @@
     padding: 28px;
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     overscroll-behavior: contain;
 
     &::-webkit-scrollbar {
@@ -4741,8 +4742,8 @@
   border: 1px solid #FFA500;
   border-radius: 0;
   width: 680px;
-  max-height: 85vh;
-  overflow: visible;
+  max-height: min(85vh, 750px);
+  overflow: hidden;
   position: relative;
   animation: modalSlideIn 0.3s ease;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
@@ -4879,8 +4880,9 @@
     padding: 28px;
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     overscroll-behavior: contain;
-    max-height: calc(85vh - 160px);
+    max-height: calc(min(85vh, 750px) - 160px);
 
     &::-webkit-scrollbar {
       width: 8px;
