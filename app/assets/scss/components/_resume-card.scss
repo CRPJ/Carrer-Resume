@@ -77,6 +77,9 @@
   height: 810px !important;
   min-height: 810px !important;
   max-height: 810px !important;
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   border: 1px solid #999 !important;
   border-bottom: 2px solid #999 !important;
   box-shadow: none;      
