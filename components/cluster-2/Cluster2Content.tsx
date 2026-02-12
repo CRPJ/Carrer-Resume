@@ -1167,7 +1167,7 @@ const Cluster2Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); })}>
-              <img src="/images/0/cluster /icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1268,7 +1268,7 @@ const Cluster2Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); })}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1376,7 +1376,7 @@ const Cluster2Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); })}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1474,7 +1474,7 @@ const Cluster2Content = () => {
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); })}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">

@@ -1957,6 +1957,8 @@ const Sidebar = () => {
             style={{
               backgroundColor: '#1a1d29',
               borderRadius: '8px',
+              border: '1px solid #FFA500',
+              boxShadow: '0 0 10px rgba(255, 165, 0, 0.15)',
               padding: '40px',
               width: '580px',
               maxHeight: '85vh',
