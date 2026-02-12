@@ -82,34 +82,43 @@ const Cluster4RankingContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [teamStatsOverride, setTeamStatsOverride] = useState<{ teamName: string; successCount: number; failCount: number }[] | null>(null);
 
-  // 초기 주차 목록 로드
+  // 초기 로드: 주차 목록 + 기본 주차 랭킹을 한 번에 가져오기
   useEffect(() => {
-    const fetchWeeks = async () => {
+    const fetchInitial = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/cluster-4-ranking');
+        const response = await fetch('/api/cluster-4-ranking?default=true');
         const result = await response.json();
-        if (result.success && result.weeks) {
-          setWeeks(result.weeks);
-
-          // [임시] 2026 겨울 시즌 3주차를 기본 선택 (TODO: 복원 시 아래 블록을 원래대로)
-          if (result.weeks.length > 0) {
-            const defaultWeek = result.weeks.find(
-              (w: WeekOption) => w.seasonYear === 2026 && w.seasonName === '겨울' && w.weekNumber === 3
-            ) || result.weeks[0];
-            setSelectedWeekId(defaultWeek.id);
-            setSelectedSeason(`${defaultWeek.seasonYear}년, ${defaultWeek.seasonName} 시즌`);
+        if (result.success) {
+          if (result.weeks) setWeeks(result.weeks);
+          if (result.selectedWeek) {
+            setSelectedWeekId(result.selectedWeek.id);
+            setSelectedSeason(`${result.selectedWeek.seasonYear}년, ${result.selectedWeek.seasonName} 시즌`);
+            setSelectedWeek(result.selectedWeek);
           }
+          setRankings(result.rankings || []);
+          setTeamStatsOverride(result.teamStatsOverride || null);
         }
       } catch (error) {
-        console.error("주차 목록 로드 오류:", error);
+        console.error("초기 데이터 로드 오류:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchWeeks();
+    fetchInitial();
   }, []);
 
-  // 선택된 주차의 랭킹 데이터 로드
+  // 사용자가 주차를 변경했을 때만 랭킹 데이터 재로드
+  const initialWeekIdRef = React.useRef<string | null>(null);
   useEffect(() => {
     if (!selectedWeekId) return;
+    // 초기 로드에서 이미 가져온 경우 스킵
+    if (initialWeekIdRef.current === null) {
+      initialWeekIdRef.current = selectedWeekId;
+      return;
+    }
+    if (selectedWeekId === initialWeekIdRef.current) return;
+    initialWeekIdRef.current = selectedWeekId;
 
     const fetchRankings = async () => {
       setIsLoading(true);

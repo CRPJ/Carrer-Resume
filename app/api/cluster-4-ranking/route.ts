@@ -11,7 +11,8 @@ const infoTypeIds = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdo
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const weekId = searchParams.get('weekId');
+    let weekId = searchParams.get('weekId');
+    const useDefault = searchParams.get('default') === 'true';
 
     if (!supabaseAdmin) {
       return NextResponse.json(
@@ -78,6 +79,14 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // default=true인 경우, 기본 주차를 자동 선택
+    if (!weekId && useDefault && filteredWeeks.length > 0) {
+      const defaultWeek = filteredWeeks.find(
+        (w: { seasonYear: number; seasonName: string; weekNumber: number }) => w.seasonYear === 2026 && w.seasonName === '겨울' && w.weekNumber === 3
+      ) || filteredWeeks[0];
+      weekId = defaultWeek.id;
+    }
+
     // 주차 목록만 요청한 경우
     if (!weekId) {
       return NextResponse.json({
@@ -93,13 +102,9 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. 해당 주차에 가입되어 있던 모든 사용자 가져오기
-    // 먼저 모든 주차의 start_date를 가져옴 (가입 주차 비교용)
-    const { data: allWeeksData } = await supabaseAdmin
-      .from('weeks')
-      .select('id, start_date');
-
+    // allWeeks에 이미 start_date가 있으므로 재사용
     const weekStartDateMap = new Map<string, string>();
-    (allWeeksData || []).forEach(w => weekStartDateMap.set(w.id, w.start_date));
+    (allWeeks || []).forEach(w => weekStartDateMap.set(w.id, w.start_date));
 
     const selectedWeekStartDate = selectedWeek.startDate;
 
