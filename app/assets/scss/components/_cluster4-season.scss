@@ -189,9 +189,10 @@
       text-align: center;
       padding-top: 48px;
       margin-bottom: 20px;
-      height: 130px;          // 추가
-      overflow: visible;      // 추가
-    
+      height: 140px;          // 추가
+      overflow: hidden;      // 추가
+      pointer-events: none;     
+      padding-bottom: 8px;
 
       .title-inner {
         position: relative;
