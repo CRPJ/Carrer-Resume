@@ -1051,22 +1051,6 @@ const Cluster2Content = () => {
           <p className="quote-text">"Know thyself"</p>
           <p className="quote-highlight">"너 자신을 알라"</p>
           <p className="quote-author">- 소크라테스 (Socrates) -</p>
-
-          {/* Floating Icons - 설명 영역 우측 하단 */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '5px',
-            marginTop: '10px',
-            marginRight: '40px'    
-          }}>
-            <div className="edit-icon">
-              <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" />
-            </div>
-            <div className="edit-icon">
-              <img src="/images/0/cluster 2/icon - help.png" alt="Help" />
-            </div>
-          </div>
         </div>  {/* section1-description 닫힘 */}
       </div>    {/* cluster2-title-wrapper 닫힘 */}
 
