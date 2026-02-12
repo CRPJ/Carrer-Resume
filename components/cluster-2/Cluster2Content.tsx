@@ -219,11 +219,13 @@ const Cluster2Content = () => {
 
   // DB에서 사진 로드
   const fetchPhotos = async () => {
-    if (!session) return;
-
     setPhotoLoading(true);
     try {
-      const response = await fetch('/api/photos');
+      // 비소유자인 경우 userId 쿼리 파라미터로 조회
+      const url = urlUserId && !isOwner
+        ? `/api/photos?userId=${urlUserId}`
+        : '/api/photos';
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -237,12 +239,14 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 사진 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 사진 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchPhotos();
+    } else if (!isOwner && urlUserId) {
       fetchPhotos();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // 사진 저장 함수
   const handleSavePhotos = async () => {
@@ -394,10 +398,11 @@ const Cluster2Content = () => {
 
   // DB에서 슬로건 로드
   const fetchSlogans = async () => {
-    if (!session) return;
-
     try {
-      const response = await fetch('/api/slogans');
+      const url = urlUserId && !isOwner
+        ? `/api/slogans?userId=${urlUserId}`
+        : '/api/slogans';
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -428,12 +433,14 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 슬로건 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 슬로건 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchSlogans();
+    } else if (!isOwner && urlUserId) {
       fetchSlogans();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // 슬로건 저장
   const handleSaveSlogans = async () => {
@@ -528,10 +535,11 @@ const Cluster2Content = () => {
 
   // DB에서 영상 URL 로드
   const fetchVideos = async () => {
-    if (!session) return;
-
     try {
-      const response = await fetch('/api/videos');
+      const url = urlUserId && !isOwner
+        ? `/api/videos?userId=${urlUserId}`
+        : '/api/videos';
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -562,12 +570,14 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 영상 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 영상 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchVideos();
+    } else if (!isOwner && urlUserId) {
       fetchVideos();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // 영상 URL 저장
   const handleSaveVideos = async () => {
@@ -609,7 +619,10 @@ const Cluster2Content = () => {
   // 학력 데이터 로드
   const fetchEducations = async () => {
     try {
-      const response = await fetch('/api/educations');
+      const url = urlUserId && !isOwner
+        ? `/api/educations?userId=${urlUserId}`
+        : '/api/educations';
+      const response = await fetch(url);
       const result = await response.json();
       if (result.success && result.data && result.data.length > 0) {
         setEducationData(result.data);
@@ -620,12 +633,14 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 학력 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 학력 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchEducations();
+    } else if (!isOwner && urlUserId) {
       fetchEducations();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // 학력 저장 함수
   const handleSaveEducations = async (processedData: EduData[]) => {
@@ -731,10 +746,11 @@ const Cluster2Content = () => {
 
   // DB에서 리뷰 링크 로드
   const fetchReviewLink = async () => {
-    if (!session) return;
-
     try {
-      const response = await fetch('/api/review-link');
+      const url = urlUserId && !isOwner
+        ? `/api/review-link?userId=${urlUserId}`
+        : '/api/review-link';
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -751,19 +767,22 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 리뷰 링크 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 리뷰 링크 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchReviewLink();
+    } else if (!isOwner && urlUserId) {
       fetchReviewLink();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // DB에서 자기소개서 로드
   const fetchIntroductions = async () => {
-    if (!session) return;
-
     try {
-      const response = await fetch('/api/introductions');
+      const url = urlUserId && !isOwner
+        ? `/api/introductions?userId=${urlUserId}`
+        : '/api/introductions';
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -796,12 +815,14 @@ const Cluster2Content = () => {
     }
   };
 
-  // 세션 변경 시 자기소개서 로드
+  // 세션 변경 시 또는 다른 유저 프로필 조회 시 자기소개서 로드
   useEffect(() => {
-    if (session && isOwner) {
+    if (isOwner && session) {
+      fetchIntroductions();
+    } else if (!isOwner && urlUserId) {
       fetchIntroductions();
     }
-  }, [session, isOwner]);
+  }, [session, isOwner, urlUserId]);
 
   // 자기소개서 저장
   const handleSaveIntroduction = async (cardIndex: number, content: string) => {

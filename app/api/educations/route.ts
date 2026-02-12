@@ -149,18 +149,20 @@ export async function GET(request: Request) {
       const graduationParts = edu.graduation_year?.split(".") || [];
 
       // period 문자열 생성 (상태에 따라 다르게)
+      // - 재학/졸예/휴학: 종료시기는 ~ing (종료시기 기재 안됨)
+      // - 졸업/중퇴: 종료시기는 반드시 년/월 기재
       const startStr = edu.admission_year || "";
       const endStr = edu.graduation_year || "";
-      const isOngoing = ['enrolled', 'expected', 'on_leave'].includes(edu.status); // 재학, 졸예, 휴학
+      const isOngoing = ['enrolled', 'expected', 'on_leave'].includes(edu.status);
 
       let period = "";
       if (startStr) {
         if (isOngoing) {
           period = `${startStr} - ~ing`;
         } else if (endStr) {
-          period = `${startStr} - ${endStr}`;
+          period = `${startStr} ~ ${endStr}`;
         } else {
-          period = `${startStr} -`;
+          period = `${startStr}`;
         }
       }
 

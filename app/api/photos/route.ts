@@ -1,52 +1,80 @@
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 사용자 프로필 사진 조회
-export async function GET() {
+// GET: 사용자 프로필 사진 조회 (userId 쿼리 파라미터로 다른 유저 조회 가능)
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
-    }
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get('userId');
 
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 사용자 정보 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id, profile_photo_url")
-      .eq("email", session.user.email)
-      .maybeSingle();
+    let profileId: string;
+    let profilePhotoUrl: string | null = null;
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
-      );
+    if (targetUserId) {
+      // 특정 유저 조회 (공개 접근 가능)
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, profile_photo_url")
+        .eq("id", targetUserId)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+
+      profileId = profile.id;
+      profilePhotoUrl = profile.profile_photo_url;
+    } else {
+      // 로그인 유저 본인 조회
+      const session = await getServerSession(authOptions);
+
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id, profile_photo_url")
+        .eq("email", session.user.email)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+
+      profileId = profile.id;
+      profilePhotoUrl = profile.profile_photo_url;
     }
 
     // user_introductions에서 서브 사진 조회
     const { data: introduction } = await supabaseAdmin
       .from("user_introductions")
       .select("sub_photo_1, sub_photo_2, sub_photo_3, sub_photo_4")
-      .eq("user_id", profile.id)
+      .eq("user_id", profileId)
       .maybeSingle();
 
     return NextResponse.json({
       success: true,
       data: {
-        mainPhoto: profile.profile_photo_url,
+        mainPhoto: profilePhotoUrl,
         subPhotos: introduction
           ? [
               introduction.sub_photo_1,

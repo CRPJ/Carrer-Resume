@@ -609,7 +609,7 @@ const Sidebar = () => {
           birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, '.') : '',
           city: addressParts[0] || '',
           district: addressParts.slice(1).join(' ') || '',
-          phone: profile.phone ? profile.phone.replace(/(\d{3})(\d{1})\d{3}(\d{4})/, '$1-$2***-****') : '',
+          phone: profile.phone ? profile.phone.replace(/-/g, '').replace(/(\d{3})(\d{1})\d{3}(\d{4})/, '$1-$2***-****') : '',
           email: profile.email || '',
           school: '',
           major: '',
@@ -1592,7 +1592,7 @@ const Sidebar = () => {
                   <div className="detail-row">
                     <span style={{ width: '16px' }}></span>
                     <span className="sub-text" style={{ color: currentProfile.lightColor }}>
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod} ~ {currentProfile.graduationStatus}</span>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod}</span>
                   </div>
                 </div>
               </>

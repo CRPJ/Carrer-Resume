@@ -482,7 +482,7 @@ export async function GET(request: NextRequest) {
     const reliabilityDenominator = gsPassedWeeks - gsClubBreakWeeks; // h - d
     let calculatedReliabilityRate = 0;
     if (reliabilityDenominator > 0) {
-      calculatedReliabilityRate = Math.ceil(((gsApprovedWeeks + gsRestWeeks) / reliabilityDenominator) * 100);
+      calculatedReliabilityRate = Math.min(100, Math.ceil(((gsApprovedWeeks + gsRestWeeks) / reliabilityDenominator) * 100));
     }
 
     // 항상 실시간 계산 값 사용 (현재 진행 중인 주차 제외)
@@ -881,7 +881,7 @@ export async function GET(request: NextRequest) {
       // 일정 신뢰도: (인정받은 주차 + 휴식 주차) / 운영 주차
       const reliableWeeks = approvedWeeksCount + restWeeksInSeason;
       const reliabilityRate = totalOperatingWeeks > 0
-        ? Math.round((reliableWeeks / totalOperatingWeeks) * 100)
+        ? Math.min(100, Math.round((reliableWeeks / totalOperatingWeeks) * 100))
         : 0;
 
       // 시즌 성장률: 완료한 활동 / 열린 활동

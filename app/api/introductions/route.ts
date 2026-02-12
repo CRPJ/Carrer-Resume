@@ -6,41 +6,50 @@ import { supabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 자기소개서 조회
-export async function GET() {
+// GET: 자기소개서 조회 (userId 파라미터로 다른 유저 조회 가능)
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
-    }
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get("userId");
 
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 사용자 ID 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
+    let userId: string;
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
-      );
+    if (targetUserId) {
+      userId = targetUserId;
+    } else {
+      const session = await getServerSession(authOptions);
+
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("email", session.user.email)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "프로필을 찾을 수 없습니다." },
+          { status: 404 }
+        );
+      }
+      userId = profile.id;
     }
 
     // user_introductions에서 자기소개서 조회
     const { data: introduction } = await supabaseAdmin
       .from("user_introductions")
       .select("growth_story, social_experience, career_direction, work_style, personal_story")
-      .eq("user_id", profile.id)
+      .eq("user_id", userId)
       .maybeSingle();
 
     return NextResponse.json({
