@@ -1944,7 +1944,7 @@ const Sidebar = () => {
             top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             justifyContent: 'center',
             zIndex: 99999,
             overflowY: 'auto',       // ← 여기 추가
@@ -1960,12 +1960,13 @@ const Sidebar = () => {
               borderRadius: '8px',
               border: '1px solid #FFA500',
               boxShadow: '0 0 10px rgba(255, 165, 0, 0.15)',
-              padding: '40px',           // ← 원래대로 40px
+              padding: '40px 32px 40px 40px',        // ← 원래대로 40px
               width: '580px',
-              maxHeight: 'none',         // ← 제한 제거
-              overflowY: 'visible',     // ← visible로 변경
+              maxHeight: '700px',         // ← 제한 제거
+              overflowY: 'auto',     // ← visible로 변경
               fontFamily: "'Pretendard', sans-serif",
-              marginTop: '0px'
+              marginTop: '0px',
+              paddingLeft: '73px',
             }}
             onClick={(e) => e.stopPropagation()}
           >
