@@ -3075,7 +3075,7 @@
             gap: 2px;
             max-height: 96px;          // 배지 2개만 보이는 높이
             overflow-y: auto;          // visible → auto
-            overflow-x: visible;
+            overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: #FFE3AA #1B1B1B;
             padding: 0;
