@@ -1966,7 +1966,6 @@ const Sidebar = () => {
               overflowY: 'auto',     // ← visible로 변경
               fontFamily: "'Pretendard', sans-serif",
               marginTop: '0px',
-              paddingLeft: '73px',
             }}
             onClick={(e) => e.stopPropagation()}
           >
