@@ -3879,10 +3879,13 @@
   border: 1px solid #FFA500;
   border-radius: 0;
   width: 560px;
-  max-height: none;
+  max-height: 700px !important;       // none → 700px
+  @media (max-height: 900px) {
+    max-height: 80vh !important;
+  }
   height: auto;
   margin: 20px 0;
-  overflow: visible;
+  overflow: hidden;                    // visible → hidden
   position: relative;
   animation: modalSlideIn 0.3s ease;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
