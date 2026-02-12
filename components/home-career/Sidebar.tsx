@@ -1937,21 +1937,22 @@ const Sidebar = () => {
 
       {/* Edit Profile Modal - For 본인 프로필 */}
       {isEditModalOpen && debugProfileType === '본인' && typeof document !== 'undefined' && createPortal(
+        // overlay (부모 div) - 여기에 스크롤과 padding 추가
         <div
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
-            zIndex: 99999
+            zIndex: 99999,
+            overflowY: 'auto',       // ← 여기 추가
+            padding: '40px 0',       // ← 여기 추가
           }}
           onClick={() => setIsEditModalOpen(false)}
         >
+          {/* modal (자식 div) - maxHeight 제거 */}
           <div
             className="edit-modal-content"
             style={{
@@ -1959,12 +1960,12 @@ const Sidebar = () => {
               borderRadius: '8px',
               border: '1px solid #FFA500',
               boxShadow: '0 0 10px rgba(255, 165, 0, 0.15)',
-              padding: '40px',
+              padding: '40px',           // ← 원래대로 40px
               width: '580px',
-              maxHeight: '85vh',
-              overflowY: 'auto',
+              maxHeight: 'none',         // ← 제한 제거
+              overflowY: 'visible',     // ← visible로 변경
               fontFamily: "'Pretendard', sans-serif",
-              marginTop: '60px'
+              marginTop: '0px'
             }}
             onClick={(e) => e.stopPropagation()}
           >
