@@ -1755,11 +1755,14 @@
           }
         }
 
-        .edu-description {
-          display: block;
-          pointer-events: none;
-          position: relative;
-          padding-right: 24px;
+        // 변경
+          .edu-description {
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            position: relative;
+            padding-right: 24px;
+            min-height: 27px; // desc-text line-height 기준 최소 1줄 확보
 
           .edu-scroll-icon {
             width: 24px;
