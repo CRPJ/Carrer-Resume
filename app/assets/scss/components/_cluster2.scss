@@ -530,12 +530,9 @@
       // 업로드 사진도 Figma 기본과 동일하게 중앙 기준(예상치 못한 크롭 방지)
       &:not(.empty) {
         img {
-          // Y축 기준점을 살짝 위로 (원하면 35%~45% 사이로 미세 조정)
           object-position: 50% var(--c2-main-photo-y, 38%);
-          // Tailwind 예시처럼 이미지 자체를 살짝 위로 (top: -7px)
-          position: absolute;
-          left: 0;
-          top: calc(var(--c2-frame-img-top, -7px) / var(--app-zoom, 1));
+          // position: absolute 제거 → relative 유지
+          // top: -7px 미세조정은 object-position Y값(38%)으로 충분
         }
       }
 
