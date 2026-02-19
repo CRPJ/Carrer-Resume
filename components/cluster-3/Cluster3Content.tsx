@@ -1153,7 +1153,7 @@ const Cluster3Content = () => {
                 <div className="card-overlay">
                   <div className="card-top">
                     <div className="info-author">
-                      {!slide.link || !channelIcon ? (
+                      {!channelIcon ? (
                         <div className="sns-icon sns-gradient"></div>
                       ) : (
                         <img src={channelIcon} alt="SNS" className="sns-icon" />
@@ -1231,7 +1231,7 @@ const Cluster3Content = () => {
                     <span>99 Like</span>
                   </div>
                   <div className="item-bottom">
-                    {!thumb.link || !channelIcon ? (
+                    {!channelIcon ? (
                       <div className="sns-icon sns-gradient"></div>
                     ) : (
                       <img src={channelIcon} alt="SNS" className="sns-icon" />

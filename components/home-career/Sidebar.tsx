@@ -252,9 +252,33 @@ const Sidebar = () => {
 
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
+  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
+  const editBtnContainerRef = useRef<HTMLDivElement>(null);
+  const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 수정 버튼 위치 추적 (Portal용 - resume-info 우측 하단 기준)
+  useEffect(() => {
+    if (!editBtnContainerRef.current || !isOwner) return;
+    const updatePos = () => {
+      const el = editBtnContainerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      setEditBtnPos({ top: rect.bottom - 30, left: rect.right - 75 });
+    };
+    updatePos();
+    const resizeObserver = new ResizeObserver(updatePos);
+    resizeObserver.observe(editBtnContainerRef.current);
+    window.addEventListener('scroll', updatePos, true);
+    window.addEventListener('resize', updatePos);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('scroll', updatePos, true);
+      window.removeEventListener('resize', updatePos);
+    };
+  }, [isMounted, isOwner, hasData]);
 
   // 아이콘 링크 state
   const [iconLink1, setIconLink1] = useState('https://www.google.com/');
@@ -440,7 +464,6 @@ const Sidebar = () => {
   const [debugProfileType, setDebugProfileType] = useState<'본인' | '타크루'>('본인');
   const [debugPanelType, setDebugPanelType] = useState<'OK' | 'EC' | 'PX'>('OK');
   const [crewStatus, setCrewStatus] = useState<'Running' | 'Complete' | 'On Rest' | 'Recharging' | 'Next Challenge'>('Running');
-  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<'email' | 'school' | 'major' | 'hexagon1' | 'hexagon2' | 'hexagon3' | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -574,10 +597,23 @@ const Sidebar = () => {
 
     try {
       // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
-      const cachedResult = await fetchCachedProfile(targetUserId || undefined, forceRefresh);
+      let cachedResult = await fetchCachedProfile(targetUserId || undefined, forceRefresh);
+
+      // targetUserId로 조회 실패 시, 로그인 사용자 본인 프로필로 폴백 시도
+      if ((!cachedResult || !cachedResult.data) && targetUserId && session?.user?.id) {
+        const fallbackResult = await fetchCachedProfile(undefined, true);
+        if (fallbackResult?.data?.id === session.user.id) {
+          // 본인 프로필인지 확인: 세션 ID가 URL의 userId를 포함하는지 체크 (UUID 잘림 대응)
+          if (session.user.id === targetUserId || session.user.id.startsWith(targetUserId)) {
+            cachedResult = fallbackResult;
+            setIsOwner(true);
+          }
+        }
+      }
 
       if (!cachedResult || !cachedResult.data) {
         console.error('Failed to fetch profile from cache');
+        console.log('[hasData] cachedResult 실패로 false 설정', cachedResult);
         setHasData(false);
         setHasSeasonData(false);
         return;
@@ -594,12 +630,19 @@ const Sidebar = () => {
       };
 
       if (result.success && result.data) {
+        console.log('[hasData] true로 설정됨');
         setHasData(true);
         const profile = result.data;
 
         // 본인 여부 확인
         const currentUserId = session?.user?.id;
-        setIsOwner(!targetUserId || targetUserId === currentUserId);
+        const fetchedProfileId = profile.id;
+        console.log('[isOwner] session.user.id:', currentUserId, '| targetUserId:', targetUserId, '| profile.id:', fetchedProfileId);
+        if (currentUserId) {
+          const ownerCheck = !targetUserId || targetUserId === currentUserId || fetchedProfileId === currentUserId;
+          console.log('[isOwner] 결과:', ownerCheck, '| !targetUserId:', !targetUserId, '| url일치:', targetUserId === currentUserId, '| profile일치:', fetchedProfileId === currentUserId);
+          setIsOwner(ownerCheck);
+        }
         const addressParts = (profile.address || '').split(' ');
 
         setUserProfile({
@@ -687,6 +730,7 @@ const Sidebar = () => {
       }
     } catch (error) {
       console.error('프로필 로드 오류:', error);
+      console.log('[hasData] catch에서 false로 설정됨', error);
       setHasData(false);
       setHasSeasonData(false);
     }
@@ -1478,7 +1522,33 @@ const Sidebar = () => {
             </button>
           </div>
 
-          <div className="resume-info">
+          <div className="resume-info" ref={editBtnContainerRef}>
+            {/* 프로필 수정 버튼: Portal로 body에 렌더링하여 overflow:hidden 우회 */}
+            {typeof document !== 'undefined' && isOwner && editBtnPos && createPortal(
+              <button
+                onClick={handleEditButtonClick}
+                style={{
+                  position: 'fixed',
+                  top: `${editBtnPos.top}px`,
+                  left: `${editBtnPos.left}px`,
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 999999,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                  padding: 0,
+                }}
+              >
+                <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
+              </button>,
+              document.body
+            )}
             {hasData ? (
               <>
                 <h1 className="resume-name">
@@ -1492,28 +1562,6 @@ const Sidebar = () => {
                   >
                     <Image src="/images/0/cluster 1/small icon/Chevron_Right_MD.png" alt="" width={18} height={18} />
                   </span>{currentProfile.name} <span className="name-eng">{currentProfile.nameEng}</span>
-                  <button
-                    className="resume-edit-btn"
-                    onClick={handleEditButtonClick}
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      backgroundColor: debugPanelType === 'EC' ? '#FF4B70' : debugPanelType === 'PX' ? '#36DA60' : '#FFA500',
-                      border: 'none',
-                      display: isOwner && debugProfileType === '본인' ? 'inline-flex' : 'none',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      padding: 0,
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                      marginLeft: '8px',
-                      verticalAlign: 'middle',
-                      flexShrink: 0
-                    }}
-                  >
-                    <i className="ti ti-pencil" style={{ fontSize: '14px', color: '#fff' }}></i>
-                  </button>
                 </h1>
 
                 <div className="resume-details">

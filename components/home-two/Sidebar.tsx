@@ -226,20 +226,26 @@ const Sidebar = () => {
   return (
     <div className="col-xxl-3 order-xxl-first">
       <style dangerouslySetInnerHTML={{__html: `
-        .resume-activities::-webkit-scrollbar {
+        .resume-card .resume-activities::-webkit-scrollbar {
           width: 4px !important;
+          display: block !important;
+          height: auto !important;
         }
-        .resume-activities::-webkit-scrollbar-button {
+        .resume-card .resume-activities::-webkit-scrollbar-button {
           display: none !important;
           height: 0 !important;
           width: 0 !important;
         }
-        .resume-activities::-webkit-scrollbar-track {
+        .resume-card .resume-activities::-webkit-scrollbar-track {
           background: #2a2a2a !important;
         }
-        .resume-activities::-webkit-scrollbar-thumb {
+        .resume-card .resume-activities::-webkit-scrollbar-thumb {
           background: #FFEC8F !important;
           border-radius: 4px !important;
+        }
+        .resume-card .resume-activities {
+          scrollbar-width: thin !important;
+          scrollbar-color: #FFEC8F #2a2a2a !important;
         }
       `}} />
       <div className="resume-card" style={{ position: 'relative' }}>

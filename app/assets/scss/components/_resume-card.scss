@@ -124,7 +124,7 @@
     .resume-header {
       gap: 10px !important;
       margin: 0 0 10px 0 !important;
-      overflow: hidden !important;
+      overflow: visible !important;
     }
     
     // ★ 사진 축소 + mask 해제
@@ -153,7 +153,7 @@
       padding: 0 !important;
       margin: 0 !important;
       margin-top: 0 !important;
-      overflow: hidden !important;
+      overflow: visible !important;
 
       .resume-name {
         font-size: 16px !important;
@@ -162,10 +162,19 @@
         padding: 0 !important;
         padding-right: 0 !important;
         white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
+        overflow: visible !important;
+        display: flex !important;
+        align-items: center !important;
 
-        .name-eng { font-size: 11px !important; }
+        .name-eng {
+          font-size: 11px !important;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .resume-edit-btn {
+          flex-shrink: 0 !important;
+        }
       }
 
       .resume-details .detail-row {

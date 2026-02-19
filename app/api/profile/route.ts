@@ -23,6 +23,15 @@ export async function GET(request: NextRequest) {
     let profile;
 
     if (targetUserId) {
+      // UUID 형식 검증
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(targetUserId)) {
+        return NextResponse.json(
+          { error: "유효하지 않은 사용자 ID 형식입니다." },
+          { status: 400 }
+        );
+      }
+
       // 특정 유저 조회 (공개 접근 가능)
       const { data, error } = await supabaseAdmin
         .from("user_profiles")

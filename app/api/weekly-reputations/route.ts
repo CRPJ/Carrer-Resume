@@ -31,6 +31,13 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: true });
 
     if (targetUserId) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(targetUserId)) {
+        return NextResponse.json(
+          { error: "유효하지 않은 사용자 ID 형식입니다." },
+          { status: 400 }
+        );
+      }
       query = query.eq("target_user_id", targetUserId);
     }
 
