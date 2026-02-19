@@ -14,8 +14,7 @@ const Cluster2Page = () => {
 
   useEffect(() => {
     const checkMobile = () => {
-      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
-      setIsMobile((window.innerWidth * cssZoom) < 1200);
+      setIsMobile(screen.width < 1400);
     };
 
     checkMobile();

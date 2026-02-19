@@ -28,7 +28,9 @@ const Cluster41Content = () => {
   const resultBtnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1200);
+    const checkMobile = () => {
+      setIsMobile(screen.width < 1400);
+    };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);

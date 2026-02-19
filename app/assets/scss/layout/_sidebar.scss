@@ -1247,3 +1247,28 @@
 /* ====
  --------- (4.02) sidebar styles end ---------
  ==== */
+
+// mobile-layout일 때 사이드바 위젯 + 불필요한 요소 숨기기
+.nftg-app:has(.mobile-layout) .nftg-sidebar {
+  display: none !important;
+}
+
+// mobile-layout일 때 main 여백 제거
+.nftg-content-home.mobile-layout {
+  padding: 0 !important;
+}
+
+// body 직속 연필 버튼: mobile-layout일 때 숨기기
+body:has(.mobile-layout) > button:has(.ti-pencil) {
+  display: none !important;
+}
+
+// mobile-sidebar-section이 빈 공간 차지 방지
+.mobile-layout .mobile-sidebar-section {
+  display: none !important;
+}
+
+// mobile-layout일 때 레이아웃 왼쪽 마진 제거
+.nftg-app:has(.mobile-layout) .nftg-layout {
+  margin-left: 0 !important;
+}

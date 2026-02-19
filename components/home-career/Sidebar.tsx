@@ -322,16 +322,14 @@ const Sidebar = () => {
 
   useEffect(() => {
     const calculateScale = () => {
-      const mobile = window.innerWidth < 1200;
+      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const mobile = screen.width < 1400;
       setIsMobileView(mobile);
 
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
       const browserZoom = window.visualViewport?.scale || 1;
       const viewportWidth = window.visualViewport?.width || window.innerWidth;
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      
-      // ★ CSS zoom 값 가져오기 (ResponsiveScale에서 적용한 값)
-      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
 
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
       const availableHeight = viewportHeight - (130 / browserZoom);
