@@ -26,7 +26,7 @@
 .tag {
   border-radius: 4px;
   font-family: 'Pretendard', sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   white-space: nowrap;
   padding: 5px 8px 3px 8px;
@@ -135,7 +135,7 @@
         border-radius: 12px;
         color: #000;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 700;
         text-shadow: 0.3px 0 0 currentColor;
         cursor: pointer;
@@ -171,7 +171,7 @@
         border-radius: 12px;
         color: #000;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 700;
         text-shadow: 0.3px 0 0 currentColor;
         cursor: pointer;
@@ -207,7 +207,7 @@
         border-radius: 12px;
         color: #000;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 700;
         text-shadow: 0.3px 0 0 currentColor;
         text-decoration: none;
@@ -290,7 +290,7 @@
 
         .badge-text {
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 700;
           color: #000;
         }
@@ -328,7 +328,7 @@
       border-radius: 8px;
       color: #fff;
       text-decoration: none;
-      font-size: 18px;
+      font-size: 1.125rem;
       transition: all 0.3s;
 
       &:hover {
@@ -338,7 +338,7 @@
     }
 
     .nav-text {
-      font-size: 14px;
+      font-size: 0.875rem;
       color: rgba(255, 255, 255, 0.7);
     }
   }
@@ -358,7 +358,7 @@
       margin-bottom: 16px;
 
       .card-main-title {
-        font-size: 28px;
+        font-size: 1.75rem;
         font-weight: bold;
         color: #fff;
         margin: 0;
@@ -370,7 +370,7 @@
         gap: 8px;
         padding: 8px 16px;
         border-radius: 20px;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: bold;
 
         &.success {
@@ -395,7 +395,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 14px;
+        font-size: 0.875rem;
         color: rgba(255, 255, 255, 0.8);
 
         img {
@@ -453,7 +453,7 @@
             margin-bottom: 12px;
 
             .schedule-title {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: rgba(255, 255, 255, 0.9);
             }
 
@@ -482,12 +482,12 @@
               flex-direction: column;
 
               .user-main {
-                font-size: 13px;
+                font-size: 0.8125rem;
                 color: #fff;
               }
 
               .user-sub {
-                font-size: 11px;
+                font-size: 0.6875rem;
                 color: rgba(255, 255, 255, 0.5);
               }
             }
@@ -510,7 +510,7 @@
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
           span {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: rgba(255, 255, 255, 0.8);
           }
 
@@ -534,7 +534,7 @@
           }
 
           span {
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: rgba(255, 255, 255, 0.7);
           }
         }
@@ -555,13 +555,13 @@
 
     .growth-left {
       h3 {
-        font-size: 18px;
+        font-size: 1.125rem;
         color: #fff;
         margin: 0 0 10px 0;
       }
 
       .stat-label {
-        font-size: 14px;
+        font-size: 0.875rem;
         color: rgba(255, 255, 255, 0.7);
       }
     }
@@ -585,13 +585,13 @@
           text-align: center;
 
           .progress-value {
-            font-size: 36px;
+            font-size: 2.25rem;
             font-weight: bold;
             color: #FFA500;
           }
 
           .progress-percent {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #FFA500;
           }
         }
@@ -602,7 +602,7 @@
       text-align: right;
 
       h4 {
-        font-size: 16px;
+        font-size: 1rem;
         color: #fff;
         margin: 0 0 10px 0;
       }
@@ -613,7 +613,7 @@
         gap: 6px;
 
         .line-item {
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: rgba(255, 255, 255, 0.7);
           padding: 4px 12px;
           background: rgba(255, 255, 255, 0.05);
@@ -639,11 +639,11 @@
         gap: 10px;
 
         .icon {
-          font-size: 20px;
+          font-size: 1.25rem;
         }
 
         h3 {
-          font-size: 20px;
+          font-size: 1.25rem;
           font-weight: bold;
           color: #fff;
           margin: 0;
@@ -656,12 +656,12 @@
         gap: 20px;
 
         .stat {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.7);
         }
 
         .stat-progress {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.7);
 
           strong {
@@ -700,7 +700,7 @@
             padding: 4px 12px;
             background: rgba(255, 165, 0, 0.9);
             color: #000;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: bold;
             border-radius: 4px;
           }
@@ -739,7 +739,7 @@
           }
 
           .user-name {
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #fff;
             font-weight: 500;
           }
@@ -749,7 +749,7 @@
             height: 16px;
             background: #1DA1F2;
             color: #fff;
-            font-size: 10px;
+            font-size: 0.625rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -757,14 +757,14 @@
           }
 
           .sub-title {
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: rgba(255, 255, 255, 0.5);
           }
         }
 
         .card-content {
           padding: 0 16px;
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: rgba(255, 255, 255, 0.8);
           line-height: 1.5;
           margin: 0 0 12px 0;
@@ -777,7 +777,7 @@
           margin-bottom: 12px;
 
           .tag {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #FFA500;
           }
         }
@@ -787,7 +787,7 @@
           margin-bottom: 12px;
 
           .card-category {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.5);
             padding: 4px 8px;
             background: rgba(255, 255, 255, 0.05);
@@ -802,12 +802,12 @@
           border-top: 1px solid rgba(255, 255, 255, 0.1);
 
           .date {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.5);
           }
 
           .likes {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #4CAF50;
           }
         }
@@ -835,7 +835,7 @@
 
           .role-badge, .aad-tag, .club-tag {
             padding: 4px 10px;
-            font-size: 11px;
+            font-size: 0.6875rem;
             border-radius: 4px;
           }
 
@@ -870,7 +870,7 @@
           }
 
           .user-name {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             font-weight: 500;
           }
@@ -880,7 +880,7 @@
             height: 16px;
             background: #1DA1F2;
             color: #fff;
-            font-size: 10px;
+            font-size: 0.625rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -889,7 +889,7 @@
         }
 
         .role-content {
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: rgba(255, 255, 255, 0.7);
           margin: 0;
           line-height: 1.5;
@@ -928,14 +928,14 @@
 
   .detail-content {
     h3 {
-      font-size: 24px;
+      font-size: 1.5rem;
       font-weight: bold;
       margin-bottom: 20px;
       color: #FFA500;
     }
 
     p {
-      font-size: 16px;
+      font-size: 1rem;
       color: rgba(255, 255, 255, 0.8);
       line-height: 1.6;
     }
@@ -988,7 +988,7 @@
         background: #222;
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 400;
         padding: 8px 12px;
         border-radius: 8px;
@@ -1074,7 +1074,7 @@
             border-radius: 20px;
 
             .badge-count {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 700;
               color: #fff;
             }
@@ -1084,7 +1084,7 @@
               height: 25px;
 
               i {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #fff;
               }
             }
@@ -1122,7 +1122,7 @@
 
           .section1-title {
             font-family: 'Pretendard', sans-serif;
-            font-size: 32px;
+            font-size: 2rem;
             font-weight: 800;
             color: #fff;
             margin: 0;
@@ -1136,7 +1136,7 @@
 
             &.success {
               span {
-                font-size: 22px;
+                font-size: 1.375rem;
                 font-weight: 700;
                 color: #9DFA07;
                 text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
@@ -1145,7 +1145,7 @@
 
             &.fail {
               span {
-                font-size: 22px;
+                font-size: 1.375rem;
                 font-weight: 700;
                 color: #FF6B6B;
                 text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
@@ -1154,7 +1154,7 @@
 
             &.rest-personal {
               span {
-                font-size: 22px;
+                font-size: 1.375rem;
                 font-weight: 700;
                 color: #65E3FF;
                 text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
@@ -1163,7 +1163,7 @@
 
             &.rest-official {
               span {
-                font-size: 22px;
+                font-size: 1.375rem;
                 font-weight: 700;
                 color: #FFEA48;
                 text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
@@ -1195,7 +1195,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #fff;
             margin-top: -8px;
@@ -1226,7 +1226,7 @@
             align-items: center;
             gap: 10px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
 
             &.right {
               gap: 8px;
@@ -1251,7 +1251,7 @@
               align-items: center;
               gap: 4px;
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
 
               .item-icon {
                 width: 16px;
@@ -1263,7 +1263,7 @@
                 font-family: 'Black Ops One', cursive;
                 color: #fff;
                 font-weight: 400;
-                font-size: 18px;
+                font-size: 1.125rem;
               }
             }
           }
@@ -1273,7 +1273,7 @@
           }
 
           .info-stat {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: rgba(255, 255, 255, 0.6);
 
             .highlight {
@@ -1309,19 +1309,19 @@
 
           .section-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
           }
 
           .section-count {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
 
             .count-num {
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 700;
               color: #FFA500;
             }
@@ -1370,14 +1370,14 @@
                 min-width: 0;
 
                 .profile-name {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 600;
                   color: #fff;
                   margin-bottom: 4px;
                 }
 
                 .profile-details {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.4;
 
@@ -1445,7 +1445,7 @@
               }
 
               .rating-count {
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 600;
                 color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
@@ -1453,12 +1453,12 @@
             }
 
             .card-description {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: rgba(255, 255, 255, 0.7);
               margin-bottom: 10px;
 
               .emoji {
-                font-size: 14px;
+                font-size: 0.875rem;
               }
             }
 
@@ -1468,7 +1468,7 @@
               justify-content: space-between;
 
               .fm-badge {
-                font-size: 11px;
+                font-size: 0.6875rem;
                 color: rgba(255, 255, 255, 0.5);
                 background: rgba(0, 0, 0, 0.3);
                 padding: 4px 10px;
@@ -1476,7 +1476,7 @@
               }
 
               .recommend-btn {
-                font-size: 11px;
+                font-size: 0.6875rem;
                 color: #4fc3f7;
                 background: transparent;
                 border: 1px solid rgba(79, 195, 247, 0.3);
@@ -1506,11 +1506,11 @@
 
                 .profile-info {
                   .profile-name {
-                    font-size: 13px;
+                    font-size: 0.8125rem;
                   }
 
                   .profile-details {
-                    font-size: 10px;
+                    font-size: 0.625rem;
                   }
                 }
               }
@@ -1530,7 +1530,7 @@
                     display: flex;
 
                     .star {
-                      font-size: 11px;
+                      font-size: 0.6875rem;
 
                       &.filled {
                         color: #FFD700;
@@ -1543,13 +1543,13 @@
                   }
 
                   .rating-count {
-                    font-size: 10px;
+                    font-size: 0.625rem;
                     color: rgba(255, 255, 255, 0.5);
                   }
                 }
 
                 .mini-description {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: rgba(255, 255, 255, 0.6);
                   flex: 1;
                 }
@@ -1560,12 +1560,12 @@
                   gap: 8px;
 
                   .fm-badge {
-                    font-size: 10px;
+                    font-size: 0.625rem;
                     padding: 3px 8px;
                   }
 
                   .recommend-btn {
-                    font-size: 10px;
+                    font-size: 0.625rem;
                     padding: 3px 10px;
                   }
                 }
@@ -1590,19 +1590,19 @@
 
           .section-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
           }
 
           .section-count {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
 
             .count-num {
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 700;
               color: #FFA500;
             }
@@ -1650,7 +1650,7 @@
                 flex: 1;
                 min-width: 0;
                 .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; }
-                .label { color: #a3a3a3; font-size: 14px !important; }
+                .label { color: #a3a3a3; font-size: 0.875rem !important; }
 
                 .profile-name-row {
                   display: flex;
@@ -1661,24 +1661,24 @@
                     display: flex;
                     align-items: center;
                     gap: 6px;
-                    .date { font-size: 12px; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; width: 119px; height: 26px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; }
+                    .date { font-size: 0.75rem; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; width: 119px; height: 26px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; }
                     .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); }
                   }
                 }
 
                 .profile-name {
-                  font-size: 18px !important;
+                  font-size: 1.125rem !important;
                   color: rgba(255, 255, 255, 0.5);
-                  .text { font-size: 18px !important; }
+                  .text { font-size: 1.125rem !important; }
                 }
 
                 .profile-details {
-                  font-size: 14px !important;
+                  font-size: 0.875rem !important;
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.2;
                   white-space: nowrap;
-                  .text { font-size: 14px !important; }
-                  .nickname { color: #F59E0B; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+                  .text { font-size: 0.875rem !important; }
+                  .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
                 }
               }
             }
@@ -1732,18 +1732,18 @@
           min-width: 0;
 
           .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
-          .label { color: #999; font-size: 14px !important; }
+          .label { color: #999; font-size: 0.875rem !important; }
           .profile-name {
-            font-size: 18px !important;
+            font-size: 1.125rem !important;
             color: rgba(255, 255, 255, 0.5);
             margin-bottom: 2px;
-            .text { font-size: 18px !important; }
+            .text { font-size: 1.125rem !important; }
           }
           .profile-details {
-            font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2;
-            .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; }
-            .text { font-size: 14px !important; }
-            .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+            font-size: 0.875rem !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2;
+            .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 0.875rem !important; }
+            .text { font-size: 0.875rem !important; }
+            .nickname { color: #FAAB07; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
           }
         }
       }
@@ -1781,16 +1781,16 @@
             }
           }
         }
-        .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+        .rating-count { font-size: 0.75rem; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
       }
 
-      .card-description { font-size: 12px; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
+      .card-description { font-size: 0.75rem; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
 
       .card-footer {
         display: flex; align-items: center; gap: 8px;
-        .fm-badge { font-size: 16px; color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em;  background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
+        .fm-badge { font-size: 1rem; color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em;  background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
         .footer-divider { color: rgba(255, 255, 255, 0.3); }
-        .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.05em; line-height: 9.6px; }
+        .tag { font-size: 0.6rem; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.05em; line-height: 9.6px; }
       }
 
       &.empty {
@@ -1854,10 +1854,10 @@
         .profile-info {
           flex: 1; min-width: 0;
           .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; }
-          .label { color: #a3a3a3; font-size: 14px !important; }
-          .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 12px; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; height: 26px; padding: 0 16px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; white-space: nowrap; } .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); } } }
-          .profile-name { font-size: 18px !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 18px !important; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 800; } }-family: 'Pretendard', sans-serif; font-weight: 700; } }
-          .profile-details { font-size: 14px !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; } .text { font-size: 14px !important; } .nickname { color: #F59E0B; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+          .label { color: #a3a3a3; font-size: 0.875rem !important; }
+          .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 0.75rem; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; height: 26px; padding: 0 16px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; white-space: nowrap; } .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); } } }
+          .profile-name { font-size: 1.125rem !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 1.125rem !important; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 800; } }-family: 'Pretendard', sans-serif; font-weight: 700; } }
+          .profile-details { font-size: 0.875rem !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 0.875rem !important; } .text { font-size: 0.875rem !important; } .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
         }
       }
     }
@@ -1913,7 +1913,7 @@
           width: 494px;
 
           .growth-title {
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
@@ -1922,7 +1922,7 @@
         }
 
           .growth-count {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
@@ -1939,7 +1939,7 @@
             }
 
             .highlight {
-              font-size: 20px;
+              font-size: 1.25rem;
               font-weight: 700;
               color: #F59E0B;
               font-family: 'Chakra Petch', sans-serif;
@@ -1978,7 +1978,7 @@
           align-items: baseline;
 
           .number {
-            font-size: 36px;
+            font-size: 2.25rem;
             font-weight: 400;
             color: #F59E0B;
             font-family: 'Black Ops One', cursive;
@@ -1986,7 +1986,7 @@
           }
 
           .percent {
-            font-size: 30px;
+            font-size: 1.875rem;
             font-weight: 400;
             color: #fff;
             font-family: 'Black Ops One', cursive;
@@ -2004,7 +2004,7 @@
         margin-right: 64px;
 
         .growth-label {
-          font-size: 20px;
+          font-size: 1.25rem;
           font-weight: 700;
           color: #fff;
           font-family: 'Chakra Petch', sans-serif;
@@ -2022,7 +2022,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             font-family: 'Manrope', sans-serif;
             color: #fff;
@@ -2071,7 +2071,7 @@
           }
 
           .section-name {
-            font-size: 30px;
+            font-size: 1.875rem;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
@@ -2081,14 +2081,14 @@
           }
 
           .section-count {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #FED7AA;
             margin-left: 120px;
             font-family: 'Pretendard', sans-serif;
         
             .highlight {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 800;
                 color: #F59E0B;
             }
@@ -2102,20 +2102,20 @@
           margin-left: 120px;
 
           .rate-label {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
             font-weight: 800;
         }
         
         .rate-value {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
             font-weight: 800;
         
             .highlight {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 800;
                 color: #F59E0B;
             }
@@ -2157,7 +2157,7 @@
               }
 
               .card-title {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
@@ -2172,7 +2172,7 @@
               }
 
               .verified-text {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #fff;
                 opacity: 0.6;
@@ -2226,7 +2226,7 @@
                     z-index: 2;
 
                     .failed-text {
-                      font-size: 14px;
+                      font-size: 0.875rem;
                       font-weight: 700;
                       color: #FF0D0D;
                       font-family: 'Pretendard', sans-serif;
@@ -2234,7 +2234,7 @@
                     }
 
                     .failed-emoji {
-                      font-size: 14px;
+                      font-size: 0.875rem;
                       line-height: 1;
                     }
                   }
@@ -2249,7 +2249,7 @@
               }
 
               .card-desc {
-                font-size: 12px;
+                font-size: 0.75rem;
                 color: #fff;
                 line-height: 1.6;
                 font-family: 'Pretendard', sans-serif;
@@ -2320,7 +2320,7 @@
           }
 
           .section-name {
-            font-size: 30px;
+            font-size: 1.875rem;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
@@ -2330,14 +2330,14 @@
           }
 
           .section-count {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 800;
             color: #FED7AA;
             margin-left: 120px;
             font-family: 'Manrope', sans-serif;
         
             .highlight {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 800;
                 color: #F59E0B;
                 font-family: 'Manrope', sans-serif;
@@ -2352,20 +2352,20 @@
           margin-left: 120px;
 
           .rate-label {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #fff;
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
           }
 
           .rate-value {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: #fff;
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
         
             .highlight {
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 800;
                 color: #F59E0B;
                 font-family: 'Manrope', sans-serif;
@@ -2426,7 +2426,7 @@
               z-index: 2;
 
               .failed-text {
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 700;
                 color: #FF0D0D;
                 font-family: 'Pretendard', sans-serif;
@@ -2434,7 +2434,7 @@
               }
 
               .failed-emoji {
-                font-size: 12px;
+                font-size: 0.75rem;
                 line-height: 1;
               }
             }
@@ -2461,7 +2461,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 500;
               color: #FEF9C3;
               font-family: 'Manrope', sans-serif;
@@ -2476,7 +2476,7 @@
             }
 
             .verified-text {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 500;
               color: #fff;
               opacity: 0.6;
@@ -2485,7 +2485,7 @@
             }
 
             .code-tag {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 500;
               color: #FEF9C3;
               font-family: 'Pretendard', sans-serif;
@@ -2493,7 +2493,7 @@
             }
 
             .info-tag {
-              font-size: 16px;
+              font-size: 1rem;
               color: #F59E0B;
               background: rgba(245, 158, 11, 0.1);
               padding: 4px 8px;
@@ -2506,7 +2506,7 @@
           }
 
           .main-desc {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             line-height: 1.6;
             font-family: 'Pretendard', sans-serif;
@@ -2527,7 +2527,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 500;
               color: #FEF9C3;
               font-family: 'Manrope', sans-serif;
@@ -2536,7 +2536,7 @@
           }
 
           .sub-desc {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #fff;
             line-height: 1.5;
             font-family: 'Pretendard', sans-serif;
@@ -2630,7 +2630,7 @@
         }
 
         .section-name {
-          font-size: 30px;
+          font-size: 1.875rem;
           font-weight: 700;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
@@ -2640,14 +2640,14 @@
         }
 
         .section-count {
-          font-size: 18px;
+          font-size: 1.125rem;
           font-weight: 800;
           color: #FED7AA;
           margin-left: 120px;
           font-family: 'Pretendard', sans-serif;
       
           .highlight {
-              font-size: 24px;
+              font-size: 1.5rem;
               font-weight: 800;
               color: #F59E0B;
           }
@@ -2661,20 +2661,20 @@
         margin-left: 120px;
 
         .rate-label {
-          font-size: 18px;
+          font-size: 1.125rem;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
           font-weight: 800;
         }
 
         .rate-value {
-          font-size: 18px;
+          font-size: 1.125rem;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
           font-weight: 800;
       
           .highlight {
-              font-size: 24px;
+              font-size: 1.5rem;
               font-weight: 800;
               color: #F59E0B;
           }
@@ -2775,7 +2775,7 @@
                 margin-bottom: 6px;
 
                 .code-tag {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 500;
                   color: #FEF9C3;
                   font-family: 'Manrope', sans-serif;
@@ -2783,7 +2783,7 @@
                 }
 
                 .badge-tag {
-                  font-size: 16px;
+                  font-size: 1rem;
                   color: #F59E0B;
                   background: rgba(245, 158, 11, 0.1);
                   padding: 4px 8px;
@@ -2836,7 +2836,7 @@
                 }
 
                 .rating-count {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 400;
                   color: rgba(255, 255, 255, 0.9);
                   font-family: 'Rajdhani', sans-serif;
@@ -2864,7 +2864,7 @@
               }
 
               .card-title {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
@@ -2879,7 +2879,7 @@
               }
 
               .verified-text {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #fff;
                 opacity: 0.6;
@@ -2889,7 +2889,7 @@
             }
 
             .main-desc {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
               line-height: 1.6;
               font-family: 'Pretendard', sans-serif;
@@ -2910,7 +2910,7 @@
               }
 
               .sub-label {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
@@ -2919,7 +2919,7 @@
             }
 
             .sub-desc {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
               line-height: 1.5;
               font-family: 'Pretendard', sans-serif;
@@ -3034,7 +3034,7 @@
                 }
 
                 .verified-text {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 500;
                   color: #fff;
                   opacity: 0.6;
@@ -3043,7 +3043,7 @@
                 }
 
                 .code-tag {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 500;
                   color: #FEF9C3;
                   font-family: 'Manrope', sans-serif;
@@ -3071,7 +3071,7 @@
               }
 
               .card-title {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
@@ -3086,14 +3086,14 @@
               }
 
               .verified-text {
-                font-size: 12px;
+                font-size: 0.75rem;
                 color: rgba(255, 255, 255, 0.6);
                 font-family: 'Pretendard', sans-serif;
               }
             }
 
             .main-desc {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #fff;
               line-height: 1.6;
               font-family: 'Pretendard', sans-serif;
@@ -3114,7 +3114,7 @@
               }
 
               .sub-label {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
@@ -3123,7 +3123,7 @@
             }
 
             .sub-desc {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
               line-height: 1.5;
               font-family: 'Pretendard', sans-serif;
@@ -3157,7 +3157,7 @@
             }
 
             .not-applicable-text {
-              font-size: 24px;
+              font-size: 1.5rem;
               font-weight: 700;
               color: #DC2626;
               line-height: 20px;
@@ -3181,7 +3181,7 @@
               border-radius: 50%;
               background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
               color: #9C9C9C;
-              font-size: 24px;
+              font-size: 1.5rem;
               line-height: 24px;
               font-weight: 400;
               display: flex;
@@ -3211,7 +3211,7 @@
           .category-text {
             display: inline-block;
             width: fit-content;
-            font-size: 16px;
+            font-size: 1rem;
             color: #F59E0B;
             background: rgba(245, 158, 11, 0.1);
             padding: 4px 8px;
@@ -3224,7 +3224,7 @@
           }
 
           .main-desc-white {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             line-height: 1.6;
             font-family: 'Pretendard', sans-serif;
@@ -3237,7 +3237,7 @@
             padding-top: 16px;
 
             .supervisor-label {
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 700;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
@@ -3276,14 +3276,14 @@
                   gap: 4px;
 
                   .supervised-text {
-                    font-size: 12px;
+                    font-size: 0.75rem;
                     color: rgba(255, 255, 255, 0.3);
                     font-family: 'Azeret Mono', monospace;
                     line-height: 20px;
                   }
 
                   .profile-name {
-                    font-size: 12px;
+                    font-size: 0.75rem;
                     font-weight: 400;
                     color: #fff;
                     font-family: 'Pretendard', sans-serif;
@@ -3312,7 +3312,7 @@
             margin-top: 12px;
 
             .current-bid {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: rgba(255, 255, 255, 0.3);
               font-family: 'Azeret Mono', monospace;
               line-height: 20px;
@@ -3328,7 +3328,7 @@
                 color: #fff;
                 font-family: 'Manrope', sans-serif;
                 font-weight: 800;
-                font-size: 12px;
+                font-size: 0.75rem;
                 line-height: 9px;
                 width: 119px;
                 height: 26px;
@@ -3349,7 +3349,7 @@
                 justify-content: center;
 
                 i {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   color: #fff;
                   margin-top: 1px;
                 }
@@ -3357,13 +3357,13 @@
                 &.empty {
                   background: transparent;
                   color: #fff;
-                  font-size: 12px;
+                  font-size: 0.75rem;
                 }
               }
             }
 
             .likes {
-              font-size: 16px;
+              font-size: 1rem;
               color: #fff;
               font-family: 'Manrope', sans-serif;
               font-weight: 800;
@@ -3393,20 +3393,20 @@
             .web-badge {
               background: #4CAF50;
               color: #fff;
-              font-size: 10px;
+              font-size: 0.625rem;
               font-weight: 600;
               padding: 3px 8px;
               border-radius: 4px;
             }
 
             .code-tag {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #FFEC8F;
               font-family: 'Pretendard', sans-serif;
             }
 
             .badge-tag {
-              font-size: 10px;
+              font-size: 0.625rem;
               color: #FFA500;
               background: rgba(255, 165, 0, 0.1);
               padding: 3px 8px;
@@ -3456,7 +3456,7 @@
             }
 
             .rating-count {
-              font-size: 12px;
+              font-size: 0.75rem;
               font-weight: 600;
               color: #FAAB07;
               font-family: 'Pretendard', sans-serif;
@@ -3470,19 +3470,19 @@
             margin-bottom: 10px;
 
             .card-title {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 500;
               color: #fff;
             }
 
             .verified-icon {
-              font-size: 11px;
+              font-size: 0.6875rem;
               color: #4fc3f7;
             }
           }
 
           .card-desc {
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: rgba(255, 255, 255, 0.7);
             line-height: 1.5;
             margin-bottom: 12px;
@@ -3499,11 +3499,11 @@
             margin-bottom: 8px;
 
             .sub-icon { width: 16px; height: 16px; object-fit: contain; }
-            .sub-label { font-size: 14px; font-weight: 500; color: #FFEC8F; font-family: 'Pretendard', sans-serif; }
+            .sub-label { font-size: 0.875rem; font-weight: 500; color: #FFEC8F; font-family: 'Pretendard', sans-serif; }
           }
 
           .sub-desc {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             line-height: 1.5;
             font-family: 'Pretendard', sans-serif;
@@ -3526,7 +3526,7 @@
               margin-bottom: 8px;
 
               .label {
-                font-size: 10px;
+                font-size: 0.625rem;
                 color: rgba(255, 255, 255, 0.5);
               }
 
@@ -3536,12 +3536,12 @@
                 gap: 6px;
 
                 .supervisor-badge {
-                  font-size: 9px;
+                  font-size: 0.5625rem;
                   color: rgba(255, 255, 255, 0.4);
                 }
 
                 .supervisor-avatar {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                 }
               }
             }
@@ -3552,17 +3552,17 @@
               justify-content: space-between;
 
               .current-bid {
-                font-size: 10px;
+                font-size: 0.625rem;
                 color: rgba(255, 255, 255, 0.4);
               }
 
               .date {
-                font-size: 10px;
+                font-size: 0.625rem;
                 color: rgba(255, 255, 255, 0.5);
               }
 
               .likes {
-                font-size: 11px;
+                font-size: 0.6875rem;
                 color: #ff6b6b;
               }
             }
@@ -3625,7 +3625,7 @@
       h3 {
         margin: 0;
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 22px;
+        font-size: 1.375rem;
         font-weight: 700;
         color: #FFA500;
         display: flex;
@@ -3636,7 +3636,7 @@
 
         &::before {
           content: '✦';
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #FFA500;
         }
       }
@@ -3646,7 +3646,7 @@
         margin: 8px 0 0 0;
         color: #999;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         order: 3;
       }
@@ -3661,7 +3661,7 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
         color: #999;
-        font-size: 18px;
+        font-size: 1.125rem;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
@@ -3684,7 +3684,7 @@
         color: rgba(255, 255, 255, 0.7);
         padding: 6px 12px;
         border-radius: 6px;
-        font-size: 13px;
+        font-size: 0.8125rem;
         font-family: 'Pretendard', sans-serif;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -3776,7 +3776,7 @@
 
                 .modal-card-tag {
                   color: #fff;
-                  font-size: 18px;
+                  font-size: 1.125rem;
                   font-weight: 700;
                   font-family: 'Cafe24Ohsquare-v2.0', sans-serif;
                   background: none;
@@ -3791,7 +3791,7 @@
                 margin-left: 8px;
 
                 span {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 500;
                   font-family: 'Pretendard', sans-serif;
                   color: #fff;
@@ -3806,7 +3806,7 @@
                 margin-left: 8px;
 
                 span {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 600;
                   font-family: 'Pretendard', sans-serif;
                   color: #FFA500;
@@ -3841,7 +3841,7 @@
                   justify-content: center;
                   border-radius: 4px;
                   background: rgba(255, 255, 255, 0.1);
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 700;
                   font-family: 'Pretendard', sans-serif;
                   color: rgba(255, 255, 255, 0.3);
@@ -3866,7 +3866,7 @@
                 margin-left: 8px;
 
                 span {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 500;
                   font-family: 'Pretendard', sans-serif;
                   color: #fff;
@@ -3887,7 +3887,7 @@
                 }
 
                 .status-text {
-                  font-size: 16px;
+                  font-size: 1rem;
                   font-weight: 700;
                   font-family: 'Pretendard', sans-serif;
                   color: #fff;
@@ -3898,7 +3898,7 @@
 
           .char-limit {
             color: #888;
-            font-size: 11px;
+            font-size: 0.6875rem;
             font-weight: 400;
           }
 
@@ -3914,7 +3914,7 @@
 
               .main-title {
                 color: #FFA500;
-                font-size: 16px;
+                font-size: 1rem;
                 font-weight: 600;
                 font-family: 'Pretendard', sans-serif;
               }
@@ -3932,7 +3932,7 @@
                 }
 
                 .rating-count {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 500;
                   font-family: 'Pretendard', sans-serif;
                   color: rgba(255, 255, 255, 0.7);
@@ -3951,7 +3951,7 @@
                   border-radius: 50%;
                   background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
                   color: #9C9C9C;
-                  font-size: 18px;
+                  font-size: 1.125rem;
                   font-weight: 400;
                   display: flex;
                   align-items: center;
@@ -3982,7 +3982,7 @@
 
             .main-title {
               color: #FFA500;
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
               margin-bottom: 6px;
@@ -3990,7 +3990,7 @@
 
             .content-title {
               color: #fff;
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
               line-height: 1.5;
@@ -4004,7 +4004,7 @@
               margin-top: 10px;
 
               span {
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 500;
                 font-family: 'Pretendard', sans-serif;
                 color: #fff;
@@ -4019,7 +4019,7 @@
               margin-top: 8px;
 
               .rating-label {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 font-family: 'Pretendard', sans-serif;
                 color: rgba(255, 255, 255, 0.7);
@@ -4033,7 +4033,7 @@
               }
 
               .rating-count {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 500;
                 font-family: 'Pretendard', sans-serif;
                 color: rgba(255, 255, 255, 0.7);
@@ -4051,14 +4051,14 @@
 
             .section-label {
               color: #FFA500;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
             }
 
             .char-counter {
               color: rgba(255, 255, 255, 0.4);
-              font-size: 12px;
+              font-size: 0.75rem;
               font-family: 'Pretendard', sans-serif;
 
               span {
@@ -4074,14 +4074,14 @@
 
           .section-label {
             color: #FFA500;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             font-family: 'Pretendard', sans-serif;
             margin-bottom: 8px;
 
             .char-limit {
               color: #888;
-              font-size: 11px;
+              font-size: 0.6875rem;
               font-weight: 400;
             }
           }
@@ -4092,14 +4092,14 @@
 
             label {
               color: #FFA500;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 600;
               margin-bottom: 4px;
             }
 
             .readonly-text {
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-family: 'Pretendard', sans-serif;
               line-height: 1.6;
             }
@@ -4114,14 +4114,14 @@
                 background: #fff;
                 border-radius: 6px;
                 color: #000;
-                font-size: 13px;
+                font-size: 0.8125rem;
                 font-weight: 500;
                 font-family: 'Pretendard', sans-serif;
               }
 
               .date-separator {
                 color: #888;
-                font-size: 16px;
+                font-size: 1rem;
               }
             }
           }
@@ -4138,7 +4138,7 @@
               border: 1px solid rgba(255, 255, 255, 0.15);
               border-radius: 6px;
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-family: 'Pretendard', sans-serif;
 
               &::-webkit-calendar-picker-indicator {
@@ -4154,7 +4154,7 @@
 
             .date-separator {
               color: #888;
-              font-size: 16px;
+              font-size: 1rem;
             }
           }
 
@@ -4187,7 +4187,7 @@
 
                 .link-num {
                   color: rgba(255, 255, 255, 0.4);
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   font-weight: 600;
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -4201,7 +4201,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 6px;
                 color: rgba(255, 255, 255, 0.5);
-                font-size: 13px;
+                font-size: 0.8125rem;
                 font-family: 'Pretendard', sans-serif;
                 transition: all 0.2s ease;
 
@@ -4223,7 +4223,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 6px;
                 color: rgba(255, 255, 255, 0.5);
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-family: 'Pretendard', sans-serif;
                 transition: all 0.2s ease;
 
@@ -4300,7 +4300,7 @@
             gap: 4px;
 
             .modal-card-number {
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 600;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
@@ -4309,7 +4309,7 @@
             .modal-card-tag {
               display: inline-block;
               padding: 2px 8px;
-              font-size: 11px;
+              font-size: 0.6875rem;
               border-radius: 4px;
               font-family: 'Pretendard', sans-serif;
             }
@@ -4326,7 +4326,7 @@
 
             label {
               display: block;
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #FFA500;
               margin-bottom: 6px;
               font-family: 'Pretendard', sans-serif;
@@ -4342,7 +4342,7 @@
               border: 1px solid rgba(255, 255, 255, 0.15);
               border-radius: 6px;
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-family: 'Pretendard', sans-serif;
               transition: all 0.3s ease;
 
@@ -4391,7 +4391,7 @@
 
       button {
         padding: 10px 24px;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -4438,7 +4438,7 @@
 
         .selection-desc {
           color: rgba(255, 255, 255, 0.7);
-          font-size: 16px;
+          font-size: 1rem;
           font-family: 'Pretendard', sans-serif;
           margin-bottom: 32px;
         }
@@ -4485,14 +4485,14 @@
             }
 
             .selection-label {
-              font-size: 20px;
+              font-size: 1.25rem;
               font-weight: 700;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
             }
 
             .selection-sublabel {
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 400;
               color: rgba(255, 255, 255, 0.5);
               font-family: 'Pretendard', sans-serif;
@@ -4527,7 +4527,7 @@
           background: none;
           border: none;
           color: rgba(255, 255, 255, 0.6);
-          font-size: 32px;
+          font-size: 2rem;
           cursor: pointer;
           padding: 0;
           line-height: 1;
@@ -4590,16 +4590,16 @@
 
           .label {
             color: #999;
-            font-size: 14px;
+            font-size: 0.875rem;
           }
 
           .profile-name {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: rgba(255, 255, 255, 0.5);
             margin-bottom: 2px;
 
             .text {
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 700;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
@@ -4607,30 +4607,30 @@
           }
 
           .profile-details {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.2;
 
             .detail-line {
               margin-bottom: 1px;
               white-space: nowrap;
-              font-size: 14px;
+              font-size: 0.875rem;
 
               .text {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #fff;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
               }
 
               .label {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #999;
                 font-family: 'Pretendard', sans-serif;
               }
 
               .nickname {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
@@ -4651,7 +4651,7 @@
         > div:first-child {
           width: 50px;
           flex-shrink: 0;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #FFA500;
           font-family: 'Pretendard', sans-serif;
@@ -4699,7 +4699,7 @@
           }
 
           .rating-count {
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #FAAB07;
             font-family: 'Pretendard', sans-serif;
@@ -4709,7 +4709,7 @@
 
       .reputation-view-content {
         .content-text {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.9);
           font-family: 'Pretendard', sans-serif;
           line-height: 1.6;
@@ -4727,14 +4727,14 @@
           gap: 8px;
 
           .footer-label {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #FAAB07;
             font-family: 'Pretendard', sans-serif;
           }
 
           .footer-value {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
@@ -4743,7 +4743,7 @@
           .tag {
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 500;
             font-family: 'Pretendard', sans-serif;
           }
@@ -4751,7 +4751,7 @@
 
         .footer-divider {
           color: rgba(255, 255, 255, 0.3);
-          font-size: 14px;
+          font-size: 0.875rem;
         }
       }
 
@@ -4774,7 +4774,7 @@
           background: none;
           border: none;
           color: rgba(255, 255, 255, 0.6);
-          font-size: 32px;
+          font-size: 2rem;
           cursor: pointer;
           padding: 0;
           line-height: 1;
@@ -4809,7 +4809,7 @@
         gap: 4px;
 
         .to-text {
-          font-size: 24px;
+          font-size: 1.5rem;
           font-weight: 700;
           color: #FAAB07;
           font-family: 'Georgia', serif;
@@ -4817,7 +4817,7 @@
         }
 
         .rank-number {
-          font-size: 20px;
+          font-size: 1.25rem;
           font-weight: 700;
           color: #FAAB07;
           font-family: 'Georgia', serif;
@@ -4865,16 +4865,16 @@
 
           .label {
             color: #999;
-            font-size: 14px;
+            font-size: 0.875rem;
           }
 
           .profile-name {
-            font-size: 18px;
+            font-size: 1.125rem;
             color: rgba(255, 255, 255, 0.5);
             margin-bottom: 2px;
 
             .text {
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 700;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
@@ -4882,30 +4882,30 @@
           }
 
           .profile-details {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.2;
 
             .detail-line {
               margin-bottom: 1px;
               white-space: nowrap;
-              font-size: 14px;
+              font-size: 0.875rem;
 
               .text {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #fff;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
               }
 
               .label {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #999;
                 font-family: 'Pretendard', sans-serif;
               }
 
               .nickname {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
@@ -4917,7 +4917,7 @@
 
       .colleague-view-message {
         .message-label {
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #FAAB07;
           font-family: 'Pretendard', sans-serif;
@@ -4925,7 +4925,7 @@
         }
 
         .message-content {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.9);
           font-family: 'Pretendard', sans-serif;
           line-height: 1.6;
@@ -4938,7 +4938,7 @@
 
       .colleague-view-date {
         .date-value {
-          font-size: 12px;
+          font-size: 0.75rem;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
           font-weight: 800;
@@ -4971,7 +4971,7 @@
           background: none;
           border: none;
           color: rgba(255, 255, 255, 0.6);
-          font-size: 32px;
+          font-size: 2rem;
           cursor: pointer;
           padding: 0;
           line-height: 1;
@@ -5030,14 +5030,14 @@
           }
 
           .category-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
           }
 
           .code-badge {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #FAAB07;
             font-family: 'Pretendard', sans-serif;
             font-weight: 600;
@@ -5061,7 +5061,7 @@
             }
 
             span {
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 700;
               font-family: 'Pretendard', sans-serif;
               color: #fff;
@@ -5118,7 +5118,7 @@
             }
 
             .rating-count {
-              font-size: 12px;
+              font-size: 0.75rem;
               font-weight: 600;
               color: rgba(255, 255, 255, 0.5);
               font-family: 'Pretendard', sans-serif;
@@ -5136,7 +5136,7 @@
               display: flex;
               align-items: center;
               justify-content: center;
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 400;
               color: #9C9C9C;
               background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
@@ -5164,7 +5164,7 @@
         }
 
         .main-title {
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #FAAB07;
           font-family: 'Pretendard', sans-serif;
@@ -5173,7 +5173,7 @@
         }
 
         .content-text {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.8);
           font-family: 'Pretendard', sans-serif;
           line-height: 1.6;
@@ -5182,7 +5182,7 @@
 
         .date-badge {
           display: inline-block;
-          font-size: 12px;
+          font-size: 0.75rem;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
           font-weight: 600;
@@ -5195,7 +5195,7 @@
       // 섹션 (Sub Title, Output Link)
       .work-view-section {
         .section-label {
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #FAAB07;
           font-family: 'Pretendard', sans-serif;
@@ -5203,7 +5203,7 @@
         }
 
         .section-content {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: rgba(255, 255, 255, 0.9);
           font-family: 'Pretendard', sans-serif;
           line-height: 1.6;
@@ -5240,7 +5240,7 @@
               border-radius: 50%;
               background: #FAAB07;
               color: #000;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 700;
               display: flex;
               align-items: center;
@@ -5252,7 +5252,7 @@
 
             .link-desc {
               flex: 1;
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
               font-weight: 500;
@@ -5261,7 +5261,7 @@
             &::after {
               content: '→';
               color: rgba(255, 255, 255, 0.4);
-              font-size: 16px;
+              font-size: 1rem;
             }
 
             // 비활성화 상태
@@ -5302,7 +5302,7 @@
         }
 
         .header-edit-title {
-          font-size: 16px;
+          font-size: 1rem;
           font-weight: 700;
           color: #FFA500;
           font-family: 'Pretendard', sans-serif;
@@ -5344,7 +5344,7 @@
 
             label {
               display: block;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 500;
               color: rgba(255, 255, 255, 0.6);
               font-family: 'Pretendard', sans-serif;
@@ -5359,7 +5359,7 @@
               border: 1px solid rgba(255, 255, 255, 0.15);
               border-radius: 8px;
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-family: 'Pretendard', sans-serif;
               transition: all 0.2s ease;
 
@@ -5397,7 +5397,7 @@
                 }
 
                 span {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 500;
                   color: rgba(255, 255, 255, 0.7);
                   font-family: 'Pretendard', sans-serif;
@@ -5427,7 +5427,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.15);
                 border-radius: 8px;
                 color: #fff;
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-family: 'Pretendard', sans-serif;
 
                 &:focus {
@@ -5511,7 +5511,7 @@
 
               .crew-info {
                 .crew-name {
-                  font-size: 15px;
+                  font-size: 0.9375rem;
                   font-weight: 600;
                   color: #fff;
                   font-family: 'Pretendard', sans-serif;
@@ -5519,14 +5519,14 @@
                 }
 
                 .crew-details {
-                  font-size: 13px;
+                  font-size: 0.8125rem;
                   color: rgba(255, 255, 255, 0.6);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
                 }
 
                 .crew-nickname {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -5540,7 +5540,7 @@
                 border: 1px solid #FFA500;
                 border-radius: 6px;
                 color: #FFA500;
-                font-size: 13px;
+                font-size: 0.8125rem;
                 font-weight: 600;
                 font-family: 'Pretendard', sans-serif;
                 cursor: pointer;
@@ -5563,7 +5563,7 @@
           .guide-text {
             p {
               color: rgba(255, 255, 255, 0.8);
-              font-size: 16px;
+              font-size: 1rem;
               font-family: 'Pretendard', sans-serif;
               line-height: 1.6;
               margin: 0 0 8px 0;
@@ -5574,7 +5574,7 @@
 
               .guide-requirement {
                 color: #FFA500;
-                font-size: 14px;
+                font-size: 0.875rem;
               }
 
               &:last-child {
@@ -5591,7 +5591,7 @@
           background: rgba(255, 165, 0, 0.2);
           border-radius: 12px;
           color: #FFA500;
-          font-size: 13px;
+          font-size: 0.8125rem;
           font-weight: 600;
           margin-left: 8px;
         }
@@ -5620,7 +5620,7 @@
                 gap: 4px;
 
                 .to-text {
-                  font-size: 20px;
+                  font-size: 1.25rem;
                   font-weight: 700;
                   color: #FFA500;
                   font-family: 'Georgia', serif;
@@ -5628,7 +5628,7 @@
                 }
 
                 .rank-number {
-                  font-size: 24px;
+                  font-size: 1.5rem;
                   font-weight: 800;
                   color: #fff;
                   font-family: 'Georgia', serif;
@@ -5645,7 +5645,7 @@
                 background: #FFA500;
                 border-radius: 50%;
                 color: #000;
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 700;
                 font-family: 'Pretendard', sans-serif;
               }
@@ -5705,7 +5705,7 @@
 
               .colleague-info {
                 .colleague-name {
-                  font-size: 15px;
+                  font-size: 0.9375rem;
                   font-weight: 600;
                   color: #fff;
                   font-family: 'Pretendard', sans-serif;
@@ -5713,26 +5713,26 @@
                 }
 
                 .colleague-details {
-                  font-size: 13px;
+                  font-size: 0.8125rem;
                   color: rgba(255, 255, 255, 0.6);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
                 }
 
                 .colleague-team {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   color: rgba(255, 255, 255, 0.7);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
 
                   .label {
                     color: rgba(255, 255, 255, 0.4);
-                    font-size: 10px;
+                    font-size: 0.625rem;
                   }
                 }
 
                 .colleague-nickname {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -5745,7 +5745,7 @@
 
               label {
                 display: block;
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 600;
                 color: #FFA500;
                 font-family: 'Pretendard', sans-serif;
@@ -5754,7 +5754,7 @@
                 .char-limit {
                   font-weight: 400;
                   color: rgba(255, 255, 255, 0.4);
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                 }
               }
 
@@ -5770,7 +5770,7 @@
                   border: 1px solid rgba(255, 255, 255, 0.15);
                   border-radius: 6px;
                   color: #fff;
-                  font-size: 13px;
+                  font-size: 0.8125rem;
                   font-family: 'Pretendard', sans-serif;
                   resize: none;
                   transition: all 0.2s ease;
@@ -5778,7 +5778,7 @@
 
                   &::placeholder {
                     color: rgba(255, 255, 255, 0.3);
-                    font-size: 12px;
+                    font-size: 0.75rem;
                   }
 
                   &:focus {
@@ -5792,7 +5792,7 @@
                   position: absolute;
                   right: 10px;
                   bottom: 8px;
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: rgba(255, 255, 255, 0.4);
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -5835,14 +5835,14 @@
               }
 
               span {
-                font-size: 15px;
+                font-size: 0.9375rem;
                 font-weight: 600;
                 color: rgba(255, 255, 255, 0.7);
                 font-family: 'Pretendard', sans-serif;
                 transition: all 0.3s ease;
 
                 &.add-sublabel {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 400;
                   color: #FFA500;
                 }
@@ -5878,7 +5878,7 @@
           padding: 24px;
           text-align: center;
           color: rgba(255, 255, 255, 0.5);
-          font-size: 14px;
+          font-size: 0.875rem;
           font-family: 'Pretendard', sans-serif;
         }
 
@@ -5928,7 +5928,7 @@
 
               .crew-info {
                 .crew-name {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 600;
                   color: #fff;
                   font-family: 'Pretendard', sans-serif;
@@ -5936,19 +5936,19 @@
                 }
 
                 .crew-details {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   color: rgba(255, 255, 255, 0.7);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
 
                   .label {
                     color: rgba(255, 255, 255, 0.4);
-                    font-size: 10px;
+                    font-size: 0.625rem;
                   }
                 }
 
                 .crew-nickname {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -5961,7 +5961,7 @@
               border: 1px solid #FFA500;
               border-radius: 6px;
               color: #FFA500;
-              font-size: 12px;
+              font-size: 0.75rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
               cursor: pointer;
@@ -5983,7 +5983,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 6px;
                 color: rgba(255, 255, 255, 0.6);
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 700;
                 font-family: 'Georgia', serif;
                 cursor: pointer;
@@ -6053,7 +6053,7 @@
           .form-field {
             label {
               display: block;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-weight: 600;
               color: #FFA500;
               font-family: 'Pretendard', sans-serif;
@@ -6062,7 +6062,7 @@
               .char-limit {
                 font-weight: 400;
                 color: rgba(255, 255, 255, 0.4);
-                font-size: 12px;
+                font-size: 0.75rem;
               }
             }
 
@@ -6116,7 +6116,7 @@
               }
 
               .rating-value {
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 600;
                 color: #FFA500;
                 font-family: 'Pretendard', sans-serif;
@@ -6134,7 +6134,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.15);
                 border-radius: 8px;
                 color: #fff;
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-family: 'Pretendard', sans-serif;
                 resize: none;
                 transition: all 0.2s ease;
@@ -6154,7 +6154,7 @@
                 position: absolute;
                 right: 12px;
                 bottom: 10px;
-                font-size: 12px;
+                font-size: 0.75rem;
                 color: rgba(255, 255, 255, 0.4);
                 font-family: 'Pretendard', sans-serif;
               }
@@ -6176,7 +6176,7 @@
               }
 
               .hashtag {
-                font-size: 16px;
+                font-size: 1rem;
                 font-weight: 700;
                 color: #FFA500;
                 font-family: 'Pretendard', sans-serif;
@@ -6187,7 +6187,7 @@
                 background: none;
                 border: none;
                 color: #fff;
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-family: 'Pretendard', sans-serif;
 
                 &:focus {
@@ -6227,7 +6227,7 @@
               margin-bottom: 10px;
 
               .reviewer-badge {
-                font-size: 18px;
+                font-size: 1.125rem;
                 font-weight: 700;
                 color: #FFA500;
                 font-family: 'Georgia', serif;
@@ -6282,7 +6282,7 @@
 
               .reviewer-info {
                 .reviewer-name {
-                  font-size: 13px;
+                  font-size: 0.8125rem;
                   font-weight: 600;
                   color: #fff;
                   font-family: 'Pretendard', sans-serif;
@@ -6290,7 +6290,7 @@
                 }
 
                 .reviewer-team {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: rgba(255, 255, 255, 0.6);
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -6306,7 +6306,7 @@
 
               label {
                 display: block;
-                font-size: 11px;
+                font-size: 0.6875rem;
                 font-weight: 600;
                 color: #FFA500;
                 font-family: 'Pretendard', sans-serif;
@@ -6315,7 +6315,7 @@
                 .char-limit {
                   font-weight: 400;
                   color: rgba(255, 255, 255, 0.4);
-                  font-size: 10px;
+                  font-size: 0.625rem;
                 }
               }
 
@@ -6369,7 +6369,7 @@
                 }
 
                 .rating-value {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 600;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
@@ -6383,7 +6383,7 @@
                 border: 1px solid rgba(255, 255, 255, 0.15);
                 border-radius: 6px;
                 color: #fff;
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-family: 'Pretendard', sans-serif;
                 resize: none;
                 transition: all 0.2s ease;
@@ -6415,7 +6415,7 @@
                 }
 
                 .hashtag {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 700;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
@@ -6426,7 +6426,7 @@
                   background: none;
                   border: none;
                   color: #fff;
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-family: 'Pretendard', sans-serif;
                   min-width: 0;
 
@@ -6442,7 +6442,7 @@
                 .tag-chip {
                   padding: 3px 8px;
                   border-radius: 10px;
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   font-weight: 600;
                   font-family: 'Pretendard', sans-serif;
                   white-space: nowrap;
@@ -6493,7 +6493,7 @@
               }
 
               span {
-                font-size: 13px;
+                font-size: 0.8125rem;
                 font-weight: 600;
                 color: rgba(255, 255, 255, 0.6);
                 font-family: 'Pretendard', sans-serif;
@@ -6535,7 +6535,7 @@
           padding: 2px 8px;
           background: rgba(255, 255, 255, 0.1);
           border-radius: 4px;
-          font-size: 11px;
+          font-size: 0.6875rem;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.5);
           margin-left: 8px;
@@ -6546,14 +6546,14 @@
           padding: 2px 8px;
           background: rgba(255, 165, 0, 0.2);
           border-radius: 4px;
-          font-size: 11px;
+          font-size: 0.6875rem;
           font-weight: 600;
           color: #FFA500;
           margin-left: 8px;
         }
 
         .char-limit {
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 400;
           color: rgba(255, 255, 255, 0.4);
           margin-left: 4px;
@@ -6584,7 +6584,7 @@
 
           .profile-info {
             .profile-name {
-              font-size: 15px;
+              font-size: 0.9375rem;
               font-weight: 600;
               color: #fff;
               font-family: 'Pretendard', sans-serif;
@@ -6592,14 +6592,14 @@
             }
 
             .profile-details {
-              font-size: 13px;
+              font-size: 0.8125rem;
               color: rgba(255, 255, 255, 0.6);
               font-family: 'Pretendard', sans-serif;
               margin-bottom: 4px;
             }
 
             .profile-fm {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #FFA500;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
@@ -6643,7 +6643,7 @@
           }
 
           .rating-value {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #FFA500;
             font-family: 'Pretendard', sans-serif;
@@ -6661,7 +6661,7 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 8px;
             color: #fff;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-family: 'Pretendard', sans-serif;
             resize: none;
             transition: all 0.2s ease;
@@ -6682,7 +6682,7 @@
             position: absolute;
             right: 12px;
             bottom: 12px;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.4);
             font-family: 'Pretendard', sans-serif;
           }
@@ -6709,7 +6709,7 @@
             }
 
             .hashtag {
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 700;
               color: #FFA500;
               font-family: 'Pretendard', sans-serif;
@@ -6720,7 +6720,7 @@
               background: none;
               border: none;
               color: #fff;
-              font-size: 14px;
+              font-size: 0.875rem;
               font-family: 'Pretendard', sans-serif;
 
               &:focus {
@@ -6742,7 +6742,7 @@
               display: inline-block;
               padding: 6px 14px;
               border-radius: 20px;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
             }
@@ -6769,7 +6769,7 @@
       align-items: center;
       gap: 10px;
       font-family: 'Pretendard', sans-serif;
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 700;
       color: #fff;
       margin: 0;
@@ -6782,7 +6782,7 @@
 
     .season-count {
       font-family: 'Pretendard', sans-serif;
-      font-size: 14px;
+      font-size: 0.875rem;
       color: #888;
     }
   }
@@ -6828,7 +6828,7 @@
           padding: 6px 12px;
           border-radius: 20px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 600;
           background: rgba(255, 165, 0, 0.9);
           color: #fff;
@@ -6859,7 +6859,7 @@
       .season-card-header {
         .season-card-title {
           font-family: 'Pretendard', sans-serif;
-          font-size: 18px;
+          font-size: 1.125rem;
           font-weight: 700;
           color: #fff;
           margin: 0;
@@ -6871,7 +6871,7 @@
         align-items: center;
         gap: 8px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 0.8125rem;
         color: #aaa;
 
         .date-icon {
@@ -6894,13 +6894,13 @@
 
           .stat-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #888;
           }
 
           .stat-value {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #FFA500;
           }

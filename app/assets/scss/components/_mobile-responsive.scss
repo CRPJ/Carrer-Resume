@@ -153,7 +153,7 @@
       width: 36px !important;
       height: 36px !important;
       min-width: 36px !important;
-      font-size: 18px !important;
+      font-size: 1.125rem !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -272,7 +272,7 @@
       }
       
       .close-mobile-menu {
-        font-size: 24px;
+        font-size: 1.5rem;
         color: #fff;
         cursor: pointer;
         background: none;
@@ -301,7 +301,7 @@
           width: 100% !important;
           padding: 16px 20px !important;
           text-align: left !important;
-          font-size: 14px !important;
+          font-size: 0.875rem !important;
           color: #fff !important;
           text-decoration: none !important;
         }
@@ -315,7 +315,7 @@
             width: 100% !important;
             padding: 16px 20px !important;
             text-align: left !important;
-            font-size: 14px !important;
+            font-size: 0.875rem !important;
             color: #fff !important;
             background: none !important;
             border: none !important;
@@ -324,7 +324,7 @@
             &::after {
               content: '\ea5f';
               font-family: 'tabler-icons';
-              font-size: 16px;
+              font-size: 1rem;
               transition: transform 0.3s;
             }
           }
@@ -358,7 +358,7 @@
               a {
                 display: block !important;
                 padding: 12px 20px 12px 40px !important;
-                font-size: 13px !important;
+                font-size: 0.8125rem !important;
                 color: #ccc !important;
                 text-decoration: none !important;
                 
@@ -376,7 +376,7 @@
                   align-items: center !important;
                   width: 100% !important;
                   padding: 12px 20px 12px 40px !important;
-                  font-size: 13px !important;
+                  font-size: 0.8125rem !important;
                   color: #ccc !important;
                   background: none !important;
                   border: none !important;
@@ -386,7 +386,7 @@
                   &::after {
                     content: '\ea5f';
                     font-family: 'tabler-icons';
-                    font-size: 14px;
+                    font-size: 0.875rem;
                   }
                 }
                 
@@ -400,7 +400,7 @@
                   
                   li a {
                     padding-left: 60px !important;
-                    font-size: 12px !important;
+                    font-size: 0.75rem !important;
                   }
                 }
               }
@@ -655,7 +655,7 @@
               bottom: 4px !important;
               right: 4px !important;
 
-              i { font-size: 11px !important; }
+              i { font-size: 0.6875rem !important; }
             }
           }
 
@@ -693,7 +693,7 @@
             }
 
             .resume-name {
-              font-size: 16px !important;
+              font-size: 1rem !important;
               line-height: 1.3 !important;
               margin: 0 0 6px 0 !important;
               padding: 0 !important;
@@ -705,7 +705,7 @@
 
               .back-arrow img { width: 14px !important; height: 14px !important; }
               .name-eng {
-                font-size: 11px !important;
+                font-size: 0.6875rem !important;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
@@ -722,7 +722,7 @@
               overflow: hidden !important;
 
               .detail-row {
-                font-size: 11px !important;
+                font-size: 0.6875rem !important;
                 gap: 4px !important;
                 line-height: 1.4 !important;
                 max-width: 100% !important;
@@ -749,7 +749,7 @@
                   text-overflow: ellipsis !important;
                   white-space: nowrap !important;
                   max-width: 100% !important;
-                  font-size: 11px !important;
+                  font-size: 0.6875rem !important;
                 }
 
                 // 인라인 max-width:180px → 100%
@@ -757,10 +757,10 @@
                   max-width: 100% !important;
                 }
 
-                // 인라인 font-size:14px → 11px
-                span[style*="font-size: 14px"],
-                span[style*="font-size:14px"] {
-                  font-size: 11px !important;
+                // 인라인 font-size: 0.875rem → 11px
+                span[style*="font-size: 0.875rem"],
+                span[style*="font-size: 0.875rem"] {
+                  font-size: 0.6875rem !important;
                 }
 
                 // 인라인 width:16px spacer → 12px
@@ -779,7 +779,7 @@
           width: 100% !important;
           height: auto !important;
           min-height: 80px;
-          font-size: 18px !important; // 원본 22px → 모바일 18px
+          font-size: 1.125rem !important; // 원본 22px → 모바일 18px
           line-height: 1.5 !important;
           padding: 14px 20px !important;
           margin: 0 0 10px 0 !important;
@@ -865,11 +865,11 @@
               align-items: center !important;
               
               .skill-num {
-                font-size: 14px !important;
+                font-size: 0.875rem !important;
               }
               
               .skill-label {
-                font-size: 10px !important;
+                font-size: 0.625rem !important;
                 white-space: normal !important; // nowrap 해제
                 word-break: keep-all !important; // 의미 단위 줄바꿈
                 overflow-wrap: break-word !important;
@@ -896,7 +896,7 @@
               width: 100% !important;
               max-width: 100% !important;
               padding: 8px !important;
-              font-size: 11px !important;
+              font-size: 0.6875rem !important;
               display: flex !important;
               align-items: center !important;
               justify-content: flex-start !important;
@@ -912,7 +912,7 @@
                 flex: 1 !important;
                 min-width: 0 !important;
                 text-align: left !important;
-                font-size: 11px !important;
+                font-size: 0.6875rem !important;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
@@ -971,7 +971,7 @@
           min-width: 130px !important;
           height: 38px !important;
           padding: 0 12px !important;
-          font-size: 10px !important;
+          font-size: 0.625rem !important;
           flex-shrink: 0;
         }
       }
@@ -1084,7 +1084,7 @@
             .adventure-title {
               position: static !important;
               text-align: center !important;
-              font-size: 20px !important;
+              font-size: 1.25rem !important;
               margin-bottom: 16px !important;
             }
             
@@ -1101,7 +1101,7 @@
                 }
                 
                 .hex-label {
-                  font-size: 10px !important;
+                  font-size: 0.625rem !important;
                 }
               }
             }
@@ -1137,11 +1137,11 @@
 
             .progress-label {
               margin-top: 4px !important;
-              font-size: 13px !important;
+              font-size: 0.8125rem !important;
             }
 
             .progress-value {
-              font-size: 24px !important;
+              font-size: 1.5rem !important;
             }
           }
 
@@ -1174,7 +1174,7 @@
             gap: 12px !important;
             
             h2 {
-              font-size: 18px !important;
+              font-size: 1.125rem !important;
             }
           }
           
@@ -1490,19 +1490,19 @@
             }
 
             .section3-banner-description {
-              font-size: 22px !important;
+              font-size: 1.375rem !important;
               line-height: 1.7 !important;
               padding: 0 4px !important;
 
-              p { font-size: 22px !important; }
+              p { font-size: 1.375rem !important; }
             }
 
             .section3-banner-notice {
-              font-size: 18px !important;
+              font-size: 1.125rem !important;
               line-height: 1.6 !important;
               padding: 0 4px !important;
 
-              p { font-size: 18px !important; }
+              p { font-size: 1.125rem !important; }
             }
           }
 
@@ -1569,8 +1569,8 @@
                   gap: 8px !important;
                   width: 100% !important;
 
-                  .date-range { font-size: 13px !important; }
-                  .status-badge { font-size: 12px !important; padding: 4px 10px !important; }
+                  .date-range { font-size: 0.8125rem !important; }
+                  .status-badge { font-size: 0.75rem !important; padding: 4px 10px !important; }
                 }
               }
 
@@ -1579,7 +1579,7 @@
                 width: 100% !important;
 
                 .qualified-text {
-                  font-size: 20px !important;
+                  font-size: 1.25rem !important;
                 }
 
                 .qualified-items {
@@ -1588,7 +1588,7 @@
                   gap: 10px !important;
 
                   .item-group {
-                    .item { font-size: 13px !important; }
+                    .item { font-size: 0.8125rem !important; }
                     .qualified-icon { width: 22px !important; height: 22px !important; }
 
                     .tooltip {
@@ -1720,18 +1720,18 @@
 
                       .stars-row {
                         .star-icon { width: 10px !important; height: 10px !important; }
-                        .rating-text { font-size: 12px !important; }
+                        .rating-text { font-size: 0.75rem !important; }
                       }
 
                       .review-label {
-                        font-size: 11px !important;
+                        font-size: 0.6875rem !important;
                         padding: 2px 8px !important;
                         white-space: nowrap !important;
                       }
                     }
 
                     .review-comment {
-                      font-size: 13px !important;
+                      font-size: 0.8125rem !important;
                       word-break: break-word !important;
                       overflow-wrap: break-word !important;
                     }
@@ -1785,7 +1785,7 @@
                         top: 26px !important;
                         left: 50% !important;
                         transform: translateX(-50%) !important;
-                        font-size: 18px !important;
+                        font-size: 1.125rem !important;
                         font-weight: 700 !important;
                         line-height: 1 !important;
                       }
@@ -1883,7 +1883,7 @@
                   width: 100% !important;
 
                   .section-title {
-                    font-size: 18px !important;
+                    font-size: 1.125rem !important;
                   }
 
                   .status-badges {
@@ -1892,7 +1892,7 @@
                       flex-wrap: wrap !important;
                       align-items: center !important;
                       gap: 10px !important;
-                      font-size: 14px !important;
+                      font-size: 0.875rem !important;
 
                       .badge-icon {
                         width: 36px !important;
@@ -1903,7 +1903,7 @@
                       }
 
                       .badge-status {
-                        font-size: 13px !important;
+                        font-size: 0.8125rem !important;
                         padding: 4px 12px !important;
                       }
                     }
@@ -1915,7 +1915,7 @@
                   width: 100% !important;
 
                   .section-title {
-                    font-size: 18px !important;
+                    font-size: 1.125rem !important;
                   }
 
                   .profile-cards {
@@ -1944,12 +1944,12 @@
                         .info {
                           flex: 1 !important;
                           min-width: 0 !important;
-                          .row1, .row2 { font-size: 13px !important; word-break: break-word !important; }
+                          .row1, .row2 { font-size: 0.8125rem !important; word-break: break-word !important; }
                         }
                       }
 
-                      .comment { font-size: 14px !important; word-break: break-word !important; }
-                      .stats { font-size: 13px !important; flex-wrap: wrap !important; }
+                      .comment { font-size: 0.875rem !important; word-break: break-word !important; }
+                      .stats { font-size: 0.8125rem !important; flex-wrap: wrap !important; }
                     }
                   }
                 }
@@ -2004,12 +2004,12 @@
                 gap: 4px !important;
                 margin-bottom: 8px !important;
                 .weekly-card-title { font-size: clamp(14px, 3.8vw, 16px) !important; width: 100% !important; word-break: keep-all !important; }
-                .weekly-card-date, .weekly-card-week { border: none !important; padding: 0 !important; height: auto !important; font-size: 12px !important; opacity: 0.8; }
+                .weekly-card-date, .weekly-card-week { border: none !important; padding: 0 !important; height: auto !important; font-size: 0.75rem !important; opacity: 0.8; }
               }
 
-              .weekly-card-info { flex-wrap: wrap !important; gap: 4px !important; font-size: 12px !important; }
+              .weekly-card-info { flex-wrap: wrap !important; gap: 4px !important; font-size: 0.75rem !important; }
               .weekly-card-main-progress { flex-direction: column !important; .progress-bar-wrapper { width: 100% !important; } }
-              .weekly-card-stats, .weekly-card-extra-stats { flex-wrap: wrap !important; .stat { font-size: 11px !important; white-space: normal !important; } }
+              .weekly-card-stats, .weekly-card-extra-stats { flex-wrap: wrap !important; .stat { font-size: 0.6875rem !important; white-space: normal !important; } }
             }
 
             .weekly-card-status-badge { position: relative !important; }
@@ -2142,10 +2142,10 @@
             .progress-info {
               .progress-label,
               .progress-unit {
-                font-size: 14px !important;
+                font-size: 0.875rem !important;
               }
               .progress-percent {
-                font-size: 30px !important;
+                font-size: 1.875rem !important;
               }
             }
           }
@@ -2279,7 +2279,7 @@
       .cluster-tabs .cluster-tab {
         min-width: 80px !important;
         height: 38px !important;
-        font-size: 10px !important;
+        font-size: 0.625rem !important;
       }
     }
     
@@ -2348,7 +2348,7 @@
       width: 32px !important;
       height: 32px !important;
       min-width: 32px !important;
-      font-size: 16px !important;
+      font-size: 1rem !important;
     }
     
     .profile-dropdown .hexagon-wrapper {
@@ -2394,21 +2394,21 @@
             padding: 5px 3px !important;
             
             .skill-num {
-              font-size: 12px !important;
+              font-size: 0.75rem !important;
             }
             
             .skill-label {
-              font-size: 7px !important;
+              font-size: 0.4375rem !important;
             }
           }
         }
         
         .resume-bottom-section .resume-notices .notice-box {
           padding: 6px !important;
-          font-size: 10px !important;
+          font-size: 0.625rem !important;
           
           .notice-text {
-            font-size: 10px !important;
+            font-size: 0.625rem !important;
           }
         }
       }
@@ -2420,7 +2420,7 @@
       .cluster-tabs .cluster-tab {
         min-width: 110px !important;
         height: 34px !important;
-        font-size: 9px !important;
+        font-size: 0.5625rem !important;
       }
     }
     
@@ -2441,16 +2441,16 @@
         
         // 공통 텍스트 스타일
         p, .quote-text, .small-text {
-          font-size: 13px !important;
+          font-size: 0.8125rem !important;
           line-height: 1.5 !important;
         }
         
         h1, h2, .section-title {
-          font-size: 20px !important;
+          font-size: 1.25rem !important;
         }
         
         h3, h4 {
-          font-size: 16px !important;
+          font-size: 1rem !important;
         }
       }
       
@@ -2460,7 +2460,7 @@
           min-height: 150px;
           
           .cluster2-title {
-            font-size: 20px !important;
+            font-size: 1.25rem !important;
           }
 
           .cluster2-title-shadow {
@@ -2469,11 +2469,11 @@
           
           .section1-description {
             p, .quote-text, .small-text {
-              font-size: 14px !important;
+              font-size: 0.875rem !important;
             }
 
             .quote-highlight {
-              font-size: 16px !important;
+              font-size: 1rem !important;
             }
           }
         }
@@ -2482,7 +2482,7 @@
           padding: 12px !important;
           
           .frame-left .adventure-title {
-            font-size: 18px !important;
+            font-size: 1.125rem !important;
           }
           
           .hexagon-large-item {
@@ -2492,7 +2492,7 @@
             }
             
             .hex-label {
-              font-size: 9px !important;
+              font-size: 0.5625rem !important;
             }
           }
         }
@@ -2548,21 +2548,21 @@
           padding: 4px 2px !important;
           
           .skill-num {
-            font-size: 11px !important;
+            font-size: 0.6875rem !important;
           }
           
           .skill-label {
-            font-size: 6px !important;
+            font-size: 0.375rem !important;
           }
         }
       }
       
       .resume-bottom-section .resume-notices .notice-box {
         padding: 5px !important;
-        font-size: 9px !important;
+        font-size: 0.5625rem !important;
         
         .notice-text {
-          font-size: 9px !important;
+          font-size: 0.5625rem !important;
         }
         
         .notice-stamp {
@@ -2574,7 +2574,7 @@
     
     .mobile-tabs-section .cluster-tabs .cluster-tab {
       min-width: 110px !important;
-      font-size: 9px !important;
+      font-size: 0.5625rem !important;
       padding: 0 10px !important;
     }
     
@@ -2588,11 +2588,11 @@
         
         // 공통 텍스트 크기 - 작은 모바일
         p, .quote-text, .small-text {
-          font-size: 13px !important;
+          font-size: 0.8125rem !important;
         }
         
         h1, h2, .section-title {
-          font-size: 18px !important;
+          font-size: 1.125rem !important;
         }
       }
       
@@ -2601,7 +2601,7 @@
           padding: 20px 16px !important;
           
           .cluster2-title {
-            font-size: 22px !important;
+            font-size: 1.375rem !important;
           }
 
           .cluster2-title-shadow {
@@ -2610,11 +2610,11 @@
           
           .section1-description {
             p, .quote-text, .small-text {
-              font-size: 15px !important;
+              font-size: 0.9375rem !important;
             }
 
             .quote-highlight {
-              font-size: 17px !important;
+              font-size: 1.0625rem !important;
             }
           }
         }

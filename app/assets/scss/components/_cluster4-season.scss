@@ -27,7 +27,7 @@
 .tag {
   border-radius: 4px;
   font-family: 'Pretendard', sans-serif;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 400;
   white-space: nowrap;
   padding: 5px 8px 3px 8px;
@@ -163,7 +163,7 @@
 
           .badge-text {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 700;
             color: #000;
           }
@@ -205,7 +205,7 @@
     // 타이틀
     .section1-title {
       font-family: 'Khula', sans-serif;
-      font-size: 72px;
+      font-size: 4.5rem;
       font-weight: 800;
       line-height: 82px !important;
       text-transform: uppercase;
@@ -242,7 +242,7 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
@@ -253,14 +253,14 @@
 
         &.small-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 23px;
+          font-size: 1.4375rem;
           color: #FFF;
           margin-top: 0;
         }
 
         &.quote-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 23px;
+          font-size: 1.4375rem;
           line-height: 1.4;
           color: #FFF;
           margin-top: 24px;
@@ -280,7 +280,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 27px;
+        font-size: 1.6875rem;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -293,7 +293,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 23px;
+        font-size: 1.4375rem;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -400,7 +400,7 @@
 
         .season-title-shadow {
           font-family: 'Pretendard', sans-serif;
-          font-size: 55px;
+          font-size: 3.4375rem;
           font-weight: 900;
           color: #111;
           -webkit-text-stroke: 1px rgba(250, 171, 7, 0.56);
@@ -417,7 +417,7 @@
 
         .season-title {
           font-family: 'Pretendard', sans-serif;
-          font-size: 55px;
+          font-size: 3.4375rem;
           font-weight: 900;
           color: #FFF;
           margin: 0;
@@ -442,7 +442,7 @@
           margin-left: 20px;
 
           .badge-text {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #000;
             white-space: nowrap;
@@ -495,14 +495,14 @@
 
             .collection-label {
               font-family: 'Pretendard', sans-serif;
-              font-size: 18px;
+              font-size: 1.125rem;
               font-weight: 800;
               color: #DDF247;
             }
           }
 
           .collection-text {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 400;
             color: #fff;
             margin: 0;
@@ -510,7 +510,7 @@
             white-space: nowrap;
 
             strong {
-              font-size: 20px;
+              font-size: 1.25rem;
               color: #FF9C9C;
               font-weight: 700;
               animation: blink 1.5s ease-in-out infinite;
@@ -558,7 +558,7 @@
               flex: 1;
               text-align: left;
               font-family: 'Pretendard', sans-serif;
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
               font-weight: 600;
             }
@@ -592,25 +592,25 @@
 
               .detail-label {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #ccc;
                 font-weight: 600;
               }
 
               .detail-value {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #FFEC8F;
                 text-align: right;
                 font-weight: 600;
 
                 .number {
-                  font-size: 16px;
+                  font-size: 1rem;
                   color: #FFEC8F;
                 }
 
                 .orange-highlight {
-                  font-size: 16px;
+                  font-size: 1rem;
                   color: #FAAB07;
                   font-weight: 700;
                 }
@@ -660,7 +660,7 @@
 
       .banner-title {
         font-family: 'Khula', sans-serif;
-        font-size: 60px;
+        font-size: 3.75rem;
         font-weight: 800;
         line-height: 82px;
         text-transform: uppercase;
@@ -669,7 +669,7 @@
 
       .banner-description {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         font-weight: 400;
         line-height: 22px;
         color: #FFF;
@@ -679,7 +679,7 @@
 
       .banner-info {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         color: #FFF;
         margin: 0;
       }
@@ -714,7 +714,7 @@
 
       .season-image-title {
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 32px;
+        font-size: 2rem;
         color: #FFF;
         margin: 0;
         font-weight: 700;
@@ -736,7 +736,7 @@
 
       .season-title {
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 28px;
+        font-size: 1.75rem;
         color: #FFF;
         margin: 0 0 10px 0;
 
@@ -751,7 +751,7 @@
         gap: 12px;
 
         .date-range {
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: #AAA;
         }
 
@@ -760,7 +760,7 @@
           border: none;
           padding: 5px 14px;
           border-radius: 14px;
-          font-size: 12px;
+          font-size: 0.75rem;
           color: #000;
           font-weight: 700;
           cursor: pointer;
@@ -779,7 +779,7 @@
       justify-content: center;
 
       .qualified-text {
-        font-size: 14px;
+        font-size: 0.875rem;
         color: #FFA500;
         font-weight: 700;
         margin: 0;
@@ -795,7 +795,7 @@
           color: #FFA500;
           padding: 4px 10px;
           border-radius: 5px;
-          font-size: 11px;
+          font-size: 0.6875rem;
           font-weight: 600;
         }
       }
@@ -817,7 +817,7 @@
         margin-bottom: 12px;
 
         .stat-item {
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: #CCC;
 
           strong {
@@ -833,12 +833,12 @@
         gap: 12px;
 
         .stars {
-          font-size: 16px;
+          font-size: 1rem;
           color: #FFA500;
         }
 
         .rating-text {
-          font-size: 13px;
+          font-size: 0.8125rem;
           color: #AAA;
         }
 
@@ -847,7 +847,7 @@
           border: none;
           padding: 6px 16px;
           border-radius: 6px;
-          font-size: 12px;
+          font-size: 0.75rem;
           color: #000;
           font-weight: 700;
           cursor: pointer;
@@ -856,7 +856,7 @@
       }
 
       .review-comment {
-        font-size: 11px;
+        font-size: 0.6875rem;
         color: #888;
         font-style: italic;
         margin: 8px 0 0 0;
@@ -922,7 +922,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #FFF;
           }
@@ -932,14 +932,14 @@
           text-align: center;
 
           .label-main {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #CCC;
             margin-bottom: 3px;
           }
 
           .label-sub {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 400;
             color: #FFF;
             line-height: normal;
@@ -958,7 +958,7 @@
       border: 1px solid rgba(80, 80, 90, 0.4);
 
       .progress-title {
-        font-size: 16px;
+        font-size: 1rem;
         color: #FFF;
         font-weight: 700;
         margin: 0 0 16px 0;
@@ -977,12 +977,12 @@
             margin-bottom: 6px;
 
             .name {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #CCC;
             }
 
             .value {
-              font-size: 11px;
+              font-size: 0.6875rem;
               color: #FFA500;
               font-weight: 600;
             }
@@ -1037,7 +1037,7 @@
       }
 
       .status-text {
-        font-size: 14px;
+        font-size: 0.875rem;
         color: #FFF;
         font-weight: 600;
         flex: 1;
@@ -1076,14 +1076,14 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
+          font-size: 1.5rem;
         }
 
         .badge-info {
           flex: 1;
 
           .badge-name {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #FFF;
             font-weight: 600;
             margin-bottom: 4px;
@@ -1093,7 +1093,7 @@
             display: inline-block;
             padding: 2px 8px;
             border-radius: 4px;
-            font-size: 9px;
+            font-size: 0.5625rem;
             font-weight: 600;
 
             &.green {
@@ -1145,7 +1145,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 22px;
+          font-size: 1.375rem;
         }
 
         .info {
@@ -1160,14 +1160,14 @@
             gap: 8px;
 
             .name {
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #FFF;
               font-weight: 600;
               flex: 1;
             }
 
             .deadline {
-              font-size: 10px;
+              font-size: 0.625rem;
               color: #FFA500;
               white-space: nowrap;
 
@@ -1185,7 +1185,7 @@
           }
 
           .row2 {
-            font-size: 10px;
+            font-size: 0.625rem;
             color: #888;
           }
 
@@ -1197,7 +1197,7 @@
             .yellow-box {
               padding: 3px 8px;
               border-radius: 4px;
-              font-size: 9px;
+              font-size: 0.5625rem;
               font-weight: 600;
             }
 
@@ -1215,7 +1215,7 @@
           }
 
           .row4 {
-            font-size: 10px;
+            font-size: 0.625rem;
             color: #888;
             font-style: italic;
           }
@@ -1223,7 +1223,7 @@
           .row5 {
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 0.625rem;
             color: #888;
 
             .rating {
@@ -1265,7 +1265,7 @@
 
         .season-title {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 1.75rem;
           color: #FFF;
           margin: 0 0 12px 0;
 
@@ -1280,7 +1280,7 @@
           gap: 12px;
 
           .date {
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #AAA;
           }
 
@@ -1289,7 +1289,7 @@
             border: none;
             padding: 6px 16px;
             border-radius: 14px;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #000;
             font-weight: 700;
             cursor: pointer;
@@ -1309,7 +1309,7 @@
         border: 1px solid rgba(80, 80, 90, 0.4);
 
         .qualified-label {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #FFA500;
           font-weight: 700;
         }
@@ -1324,7 +1324,7 @@
             color: #FFA500;
             padding: 5px 12px;
             border-radius: 5px;
-            font-size: 11px;
+            font-size: 0.6875rem;
             font-weight: 600;
           }
         }
@@ -1349,7 +1349,7 @@
 
         .season-image-title {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 32px;
+          font-size: 2rem;
           color: #FFF;
           margin: 0;
           font-weight: 700;
@@ -1469,7 +1469,7 @@
 
         .season-main-title {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 1.75rem;
           color: #FFF;
           margin: 0;
 
@@ -1484,7 +1484,7 @@
           gap: 10px;
 
           .date-range {
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #AAA;
           }
 
@@ -1493,7 +1493,7 @@
             border: none;
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #000;
             font-weight: 700;
             cursor: pointer;
@@ -1507,7 +1507,7 @@
           align-items: flex-end;
 
           .qualified-text {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #FFA500;
             font-weight: 700;
           }
@@ -1522,7 +1522,7 @@
               color: #FFA500;
               padding: 3px 8px;
               border-radius: 4px;
-              font-size: 11px;
+              font-size: 0.6875rem;
               font-weight: 600;
             }
           }
@@ -1531,7 +1531,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 0.75rem;
 
             .nav-btn {
               background: #333;
@@ -1573,7 +1573,7 @@
           gap: 20px;
 
           .stat {
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #CCC;
 
             strong {
@@ -1584,7 +1584,7 @@
         }
 
         .status-indicator {
-          font-size: 12px;
+          font-size: 0.75rem;
           color: #888;
 
           .status-line {
@@ -1611,7 +1611,7 @@
             border-radius: 8px;
 
             .stars-row {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #FFA500;
               margin-bottom: 8px;
             }
@@ -1621,7 +1621,7 @@
               border: none;
               padding: 6px 12px;
               border-radius: 6px;
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #000;
               font-weight: 700;
               cursor: pointer;
@@ -1630,7 +1630,7 @@
             }
 
             .review-comment {
-              font-size: 11px;
+              font-size: 0.6875rem;
               color: #888;
               font-style: italic;
               margin: 0;
@@ -1681,7 +1681,7 @@
                   top: 50%;
                   left: 50%;
                   transform: translate(-50%, -50%);
-                  font-size: 16px;
+                  font-size: 1rem;
                   font-weight: 700;
                   color: #FFF;
                 }
@@ -1691,13 +1691,13 @@
                 text-align: center;
 
                 .label-main {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: #CCC;
                   margin-bottom: 2px;
                 }
 
                 .label-sub {
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   color: #888;
                 }
               }
@@ -1712,7 +1712,7 @@
           border-radius: 8px;
 
           .col-title {
-            font-size: 16px;
+            font-size: 1rem;
             color: #FFF;
             font-weight: 700;
             margin: 0 0 14px 0;
@@ -1731,12 +1731,12 @@
                 margin-bottom: 6px;
 
                 .name {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   color: #CCC;
                 }
 
                 .value {
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                   color: #FFA500;
                   font-weight: 600;
                 }
@@ -1781,7 +1781,7 @@
             border-radius: 8px;
 
             .col-title {
-              font-size: 16px;
+              font-size: 1rem;
               color: #FFF;
               font-weight: 700;
               margin: 0;
@@ -1797,7 +1797,7 @@
                 color: #AAA;
                 padding: 4px 10px;
                 border-radius: 6px;
-                font-size: 10px;
+                font-size: 0.625rem;
                 cursor: pointer;
 
                 &.active {
@@ -1832,7 +1832,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 20px;
+                font-size: 1.25rem;
               }
 
               .info {
@@ -1847,14 +1847,14 @@
                   gap: 8px;
 
                   .name {
-                    font-size: 11px;
+                    font-size: 0.6875rem;
                     color: #FFF;
                     font-weight: 600;
                     flex: 1;
                   }
 
                   .deadline {
-                    font-size: 9px;
+                    font-size: 0.5625rem;
                     color: #FFA500;
                     white-space: nowrap;
 
@@ -1872,7 +1872,7 @@
                 }
 
                 .row2 {
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   color: #888;
                 }
 
@@ -1884,7 +1884,7 @@
                   .yellow-box {
                     padding: 2px 6px;
                     border-radius: 4px;
-                    font-size: 9px;
+                    font-size: 0.5625rem;
                     font-weight: 600;
                   }
 
@@ -1902,7 +1902,7 @@
                 }
 
                 .row4 {
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   color: #888;
                   font-style: italic;
                 }
@@ -1910,7 +1910,7 @@
                 .row5 {
                   display: flex;
                   justify-content: space-between;
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   color: #888;
 
                   .rating {
@@ -2004,7 +2004,7 @@
 
     .section3-banner-text {
       font-family: 'Pretendard', sans-serif;
-      font-size: 60px;
+      font-size: 3.75rem;
       font-weight: 900;
       color: #FFF;
       text-align: center;
@@ -2017,7 +2017,7 @@
 
     .section3-banner-description {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 20px;
+      font-size: 1.25rem;
       color: #FFF;
       font-weight: 400;
       line-height: 22px;
@@ -2035,7 +2035,7 @@
 
     .section3-banner-notice {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 20px;
+      font-size: 1.25rem;
       color: #FFF;
       position: relative;
       z-index: 1;
@@ -2061,7 +2061,7 @@
 
     .page-num {
       font-family: 'Pretendard', sans-serif;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       cursor: pointer;
@@ -2325,14 +2325,14 @@
 
         .season-main-title {
           font-family: 'Pretendard', sans-serif;
-          font-size: 36px;
+          font-size: 2.25rem;
           font-weight: 700;
           color: #FFF;
           margin: 0;
 
           .year-orange {
             font-family: 'Pretendard', sans-serif;
-            font-size: 36px;
+            font-size: 2.25rem;
             font-weight: 700;
             color: #FFA500;
           }
@@ -2356,7 +2356,7 @@
 
           .date-range {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #FFF;
 
@@ -2381,7 +2381,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 17.5px;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #FFF;
             font-weight: 700;
             cursor: pointer;
@@ -2410,7 +2410,7 @@
 
         .qualified-text {
           font-family: var(--lobster), cursive;
-          font-size: 24px;
+          font-size: 1.5rem;
           color: #FFF;
           font-weight: 400;
         }
@@ -2457,7 +2457,7 @@
 
             .item {
               font-family: var(--rajdhani), sans-serif;
-              font-size: 12px;
+              font-size: 0.75rem;
               font-weight: 600;
               color: #FAAB07;
               border-bottom: 1px solid rgba(250, 171, 7, 0.5);
@@ -2465,7 +2465,7 @@
             }
 
             .trophy {
-              font-size: 16px;
+              font-size: 1rem;
             }
 
             .tooltip {
@@ -2506,7 +2506,7 @@
 
                 .unqualified-text {
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 700;
                   color: #767676;
                   letter-spacing: 0.5px;
@@ -2727,7 +2727,7 @@
           padding: 12px 0;
 
           .stat {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #CCC;
             display: flex;
             align-items: center;
@@ -2750,14 +2750,14 @@
 
             .number {
               font-family: var(--black-ops-one), cursive;
-              font-size: 22px;
+              font-size: 1.375rem;
               color: #FFF;
               font-weight: 400;
             }
 
             .unit {
               font-family: 'Pretendard', sans-serif;
-              font-size: 16px;
+              font-size: 1rem;
               color: #CCC;
               font-weight: 400;
             }
@@ -2817,7 +2817,7 @@
                 }
 
                 .rating-text {
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   color: #FFF;
                   margin-left: 8px;
                   line-height: 1;
@@ -2826,7 +2826,7 @@
 
               .review-label {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #000;
                 font-weight: 600;
                 background: #FFA500;
@@ -2836,7 +2836,7 @@
             }
 
             .review-comment {
-              font-size: 16px;
+              font-size: 1rem;
               color: rgba(255, 255, 255, 0.7);
               margin: 0;
             }
@@ -2899,7 +2899,7 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 24px;
+                font-size: 1.5rem;
                 line-height: 1;
               }
 
@@ -2919,7 +2919,7 @@
                 top: 33px;
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 700;
                 color: #FFF;
                 line-height: 1;
@@ -2934,14 +2934,14 @@
               z-index: 20;
 
               .label-main {
-                font-size: 20px;
+                font-size: 1.25rem;
                 color: #FFF;
                 margin-bottom: 4px;
                 line-height: 1;
               }
 
               .label-sub {
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 300;
                 color: #FFF;
                 margin-top: -2px;
@@ -2949,7 +2949,7 @@
 
                 .highlight {
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 20px;
+                  font-size: 1.25rem;
                   font-weight: 800;
                   color: #FAAB07;
                 }
@@ -2974,7 +2974,7 @@
               width: 465.572px;
 
               .name {
-                font-size: 16px;
+                font-size: 1rem;
                 color: #FFF;
                 display: flex;
                 align-items: center;
@@ -2988,7 +2988,7 @@
               }
 
               .value {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #FFF;
                 font-weight: 600;
                 display: flex;
@@ -3004,7 +3004,7 @@
                 }
 
                 .highlight {
-                  font-size: 16px;
+                  font-size: 1rem;
                   color: #FFA500;
                   font-weight: 700;
                 }
@@ -3053,7 +3053,7 @@
           width: 100%;   
 
           .section-title {
-            font-size: 16px;
+            font-size: 1rem;
             color: #FFF;
             font-weight: 700;
             margin: 0 0 6px 0;
@@ -3140,7 +3140,7 @@
 
                 .badge-text {
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-weight: 700;
                   color: #FFF;
                   white-space: nowrap;
@@ -3150,7 +3150,7 @@
                 
                   .sub-text {
                     color: rgba(207, 188, 188, 1);    // #D6D3D1 → rgba(207, 188, 188, 1)
-                    font-size: 14px;
+                    font-size: 0.875rem;
                     font-weight: 700;
                     line-height: 20px;
                   }
@@ -3160,7 +3160,7 @@
               .badge-status {
                 flex-shrink: 0;
                 font-family: 'Pretendard', sans-serif;
-                font-size: 12px;
+                font-size: 0.75rem;
                 font-weight: 600;
                 line-height: 16px;
                 padding: 3px 10px;
@@ -3190,7 +3190,7 @@
           width: 100%;   // 370px → 100%  
 
           .section-title {
-            font-size: 16px;
+            font-size: 1rem;
             color: #FFF;
             font-weight: 700;
             margin: 0 0 6px 0;
@@ -3334,7 +3334,7 @@
                   min-width: 0;
 
                   .row1 {
-                    font-size: 12px;
+                    font-size: 0.75rem;
                     color: #FFF;
                     font-weight: 500;
                     white-space: nowrap;
@@ -3349,7 +3349,7 @@
                   }
 
                   .row2 {
-                    font-size: 12px;
+                    font-size: 0.75rem;
                     color: #FFF;
                     white-space: nowrap;
                     overflow: hidden;
@@ -3375,7 +3375,7 @@
                   color: #00FFBE;
                   border-radius: 4px;
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   font-weight: 600;
                   white-space: nowrap;
                   padding: 4px 8px;
@@ -3391,7 +3391,7 @@
                   color: #EBF748;
                   border-radius: 4px;
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 10px;
+                  font-size: 0.625rem;
                   font-weight: 600;
                   white-space: nowrap;
                   padding: 4px 8px;
@@ -3407,7 +3407,7 @@
                 display: flex;
                 align-items: flex-start;
                 gap: 3px;
-                font-size: 12px;
+                font-size: 0.75rem;
                 color: #FFF;
                 margin-top: 16px;
                 line-height: 1.4;
@@ -3442,7 +3442,7 @@
                   display: flex;
                   align-items: center;
                   gap: 10px;
-                  font-size: 15px;
+                  font-size: 0.9375rem;
                   color: #888;
                   margin-top: 3px;
 
@@ -3498,7 +3498,7 @@
                   }
 
                   .rating-score {
-                    font-size: 15px;
+                    font-size: 0.9375rem;
                     color: #888;
                     margin-left: 12px;
                     margin-top: 2px;
@@ -3559,7 +3559,7 @@
 
         span {
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #fff;
         }
@@ -3573,14 +3573,14 @@
 
       .card-label {
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         color: #fff;
       }
 
       .card-arrow {
         font-family: 'Pretendard', sans-serif;
-        font-size: 8px;
+        font-size: 0.5rem;
         font-weight: 600;
         color: #fff;
         transform: scaleY(0.6);
@@ -3593,7 +3593,7 @@
 
       .card-value {
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         color: #fff;
       }
@@ -3645,7 +3645,7 @@
           .dropdown-item {
             padding: 12px 16px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 500;
             color: #fff;
             cursor: pointer;
@@ -3759,7 +3759,7 @@
 
         .rest-text-line {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 38px;
+          font-size: 2.375rem;
           font-weight: 700;
           color: #FF4343;
           text-align: left;
@@ -3771,7 +3771,7 @@
         }
 
         .rest-emoji {
-          font-size: 38px;
+          font-size: 2.375rem;
         }
       }
 
@@ -3812,7 +3812,7 @@
           color: #9DFA07;
           padding: 2px 10px;
           border-radius: 20px;
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 600;
           font-family: 'Cafe24Ohsquare', sans-serif;
 
@@ -3864,7 +3864,7 @@
 
         .weekly-card-title {
           font-family: 'Pretendard', sans-serif;
-          font-size: 18px;
+          font-size: 1.125rem;
           font-weight: 700;
           color: #fff;
           margin: 0;
@@ -3879,7 +3879,7 @@
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 12px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #fff;
 
@@ -3899,7 +3899,7 @@
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 12px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           color: #fff;
 
@@ -3910,7 +3910,7 @@
           }
 
           .week-number {
-            font-size: 16px;
+            font-size: 1rem;
             color: #FAAB07;
             font-weight: 700;
           }
@@ -3923,7 +3923,7 @@
         gap: 10px;
         flex-wrap: wrap;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         color: #fff;
 
@@ -3932,7 +3932,7 @@
           align-items: center;
           gap: 10px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
 
           &.items {
             gap: 10px;
@@ -3983,7 +3983,7 @@
               font-family: 'Black Ops One', cursive;
               color: #fff;
               font-weight: 400;
-              font-size: 18px;
+              font-size: 1.125rem;
             }
           }
         }
@@ -3998,7 +3998,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #fff;
 
@@ -4027,7 +4027,7 @@
         margin-top: 2px;
         margin-bottom: 2px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         color: #fff;
 
@@ -4077,7 +4077,7 @@
 
           strong {
             color: #FAAB07;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 700;
           }
         }
@@ -4088,7 +4088,7 @@
         grid-template-columns: repeat(4, auto);
         gap: 6px 16px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
       }
 
@@ -4130,7 +4130,7 @@
 
             .num {
               color: #FAAB07;
-              font-size: 17px;
+              font-size: 1.0625rem;
               font-weight: 700;
             }
           }
@@ -4150,7 +4150,7 @@
 
         .num {
           color: #FAAB07;
-          font-size: 17px;
+          font-size: 1.0625rem;
           font-weight: 700;
         }
 
@@ -4175,7 +4175,7 @@
       gap: 4px;
 
       .status-text {
-        font-size: 17px;
+        font-size: 1.0625rem;
         font-weight: 700;
         color: #9DFA07;
         text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
@@ -4235,7 +4235,7 @@
 
     .page-num {
       font-family: 'Pretendard', sans-serif;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 700;
       color: #fff;
       cursor: pointer;
@@ -4304,7 +4304,7 @@
 
     .no-results {
       color: #888;
-      font-size: 14px;
+      font-size: 0.875rem;
     }
   }
 
@@ -4350,7 +4350,7 @@
         flex: 1;
         text-align: left;
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 0.8125rem;
         font-weight: 600;
         opacity: 0.95;
         white-space: nowrap;
@@ -4369,7 +4369,7 @@
         align-items: center;
         justify-content: center;
         font-family: 'Pretendard', sans-serif;
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 700;
         padding: 0 8px;
       }
@@ -4405,7 +4405,7 @@
 
       .filter-sheet-title {
         font-family: 'Pretendard', sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 800;
         color: #fff;
       }
@@ -4415,7 +4415,7 @@
         background: transparent;
         color: rgba(255, 255, 255, 0.7);
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 0.8125rem;
         font-weight: 700;
         cursor: pointer;
         padding: 8px 10px;
@@ -4428,7 +4428,7 @@
 
       .filter-sheet-label {
         font-family: 'Pretendard', sans-serif;
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 700;
         color: rgba(255, 255, 255, 0.7);
         margin-top: 4px;
@@ -4443,7 +4443,7 @@
         color: #fff;
         padding: 0 12px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         outline: none;
       }
@@ -4459,7 +4459,7 @@
         height: 44px;
         border-radius: 12px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 800;
         cursor: pointer;
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -4522,7 +4522,7 @@
         }
 
         .weekly-card-title {
-          font-size: 14px;
+          font-size: 0.875rem;
           line-height: 1.25;
         }
 
@@ -4530,7 +4530,7 @@
           border: none;
           padding: 0;
           height: auto;
-          font-size: 12px;
+          font-size: 0.75rem;
           opacity: 0.85;
           gap: 6px;
 
@@ -4561,7 +4561,7 @@
         border: 1px solid rgba(255, 255, 255, 0.12);
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 0.8125rem;
         font-weight: 800;
         cursor: pointer;
       }
@@ -4584,7 +4584,7 @@
           border-radius: 999px;
           padding: 6px 10px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 600;
           color: rgba(255, 255, 255, 0.92);
 
@@ -4613,14 +4613,14 @@
 
             .k {
               font-family: 'Pretendard', sans-serif;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 700;
               color: rgba(255, 255, 255, 0.85);
             }
 
             .v {
               font-family: 'Pretendard', sans-serif;
-              font-size: 13px;
+              font-size: 0.8125rem;
               font-weight: 800;
               color: #FAAB07;
 
@@ -4628,7 +4628,7 @@
                 margin-left: 6px;
                 color: rgba(255, 255, 255, 0.65);
                 font-weight: 700;
-                font-size: 12px;
+                font-size: 0.75rem;
               }
             }
           }
@@ -4645,7 +4645,7 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-size: 0.8125rem;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.85);
 
@@ -4659,7 +4659,7 @@
               margin-left: 4px;
               color: rgba(255, 255, 255, 0.65);
               font-weight: 700;
-              font-size: 12px;
+              font-size: 0.75rem;
             }
           }
         }
@@ -4675,7 +4675,7 @@
       .weekly-pagination-summary {
         color: rgba(255, 255, 255, 0.7);
         font-family: 'Pretendard', sans-serif;
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 600;
       }
 
@@ -4686,7 +4686,7 @@
         border: 1px solid rgba(255, 255, 255, 0.12);
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 800;
         cursor: pointer;
       }
@@ -4744,7 +4744,7 @@
       h3 {
         margin: 0;
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 22px;
+        font-size: 1.375rem;
         font-weight: 700;
         color: #FFA500;
         display: flex;
@@ -4753,7 +4753,7 @@
 
         &::before {
           content: '✦';
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #FFA500;
         }
       }
@@ -4763,7 +4763,7 @@
         margin: 8px 0 0 0;
         color: #999;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         order: 3;
       }
@@ -4815,7 +4815,7 @@
             .form-field {
               label {
                 display: block;
-                font-size: 14px;
+                font-size: 0.875rem;
                 font-weight: 600;
                 color: #FFA500;
                 font-family: 'Pretendard', sans-serif;
@@ -4824,7 +4824,7 @@
                 .char-limit {
                   font-weight: 400;
                   color: rgba(255, 255, 255, 0.4);
-                  font-size: 12px;
+                  font-size: 0.75rem;
                 }
               }
 
@@ -4878,7 +4878,7 @@
                 }
 
                 .rating-value {
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   font-weight: 600;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
@@ -4896,7 +4896,7 @@
                   border: 1px solid rgba(255, 255, 255, 0.15);
                   border-radius: 8px;
                   color: #fff;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-family: 'Pretendard', sans-serif;
                   resize: none;
                   transition: all 0.2s ease;
@@ -4916,7 +4916,7 @@
                   position: absolute;
                   right: 12px;
                   bottom: 10px;
-                  font-size: 12px;
+                  font-size: 0.75rem;
                   color: rgba(255, 255, 255, 0.4);
                   font-family: 'Pretendard', sans-serif;
                 }
@@ -4938,7 +4938,7 @@
                 }
 
                 .hashtag {
-                  font-size: 16px;
+                  font-size: 1rem;
                   font-weight: 700;
                   color: #FFA500;
                   font-family: 'Pretendard', sans-serif;
@@ -4949,7 +4949,7 @@
                   background: none;
                   border: none;
                   color: #fff;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   font-family: 'Pretendard', sans-serif;
 
                   &::placeholder {
@@ -4980,7 +4980,7 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         background: transparent;
         color: rgba(255, 255, 255, 0.7);
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 500;
         font-family: 'Pretendard', sans-serif;
         border-radius: 6px;
@@ -4999,7 +4999,7 @@
         border: none;
         background: #FFA500;
         color: #000;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         font-family: 'Pretendard', sans-serif;
         border-radius: 6px;
