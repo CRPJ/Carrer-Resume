@@ -10,6 +10,7 @@ import Message from "./header/Message";
 import Notification from "./header/Notification";
 import Profile from "./header/Profile";
 import MouseCursor from "./MouseCursor";
+import FontSizeControl from "@/components/shared/FontSizeControl";
 
 const menu = [
   {
@@ -316,6 +317,7 @@ const Header = () => {
                     <div className="navbar__items-inner">
                       <Message />
                       <Notification />
+                      <FontSizeControl />
                     </div>
                     <Profile />
                     <button onClick={() => setMobileMenu(true)} className={`open-offcanvas-nav d-flex d-xl-none open-mobile-menu ${mobileMenu && "open-offcanvas-nav-active"}`} aria-label="toggle mobile menu" title="open offcanvas menu">

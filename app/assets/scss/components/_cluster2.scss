@@ -39,7 +39,7 @@
     }
 
     i {
-      font-size: 12px;
+      font-size: 0.75rem;
       color: #fff;
     }
   }
@@ -89,7 +89,7 @@
         background: #222;
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 12px;
+        font-size: 0.75rem;
         font-weight: 400;
         padding: 8px 12px;
         border-radius: 8px;
@@ -175,7 +175,7 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         line-height: 22px;
         margin-bottom: 0;
         color: #FFF;
@@ -188,14 +188,14 @@
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
@@ -211,7 +211,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 27px;
+        font-size: 1.6875rem;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -224,7 +224,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 20px;
+        font-size: 1.25rem;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -235,7 +235,7 @@
 
   .cluster2-title-shadow {
     font-family:  'Khula', sans-serif;
-    font-size: 72px;
+    font-size: 4.5rem;
     font-weight: 800;
     line-height: 82px;
     text-transform: uppercase;
@@ -255,7 +255,7 @@
 
   .cluster2-title {
     font-family: 'Khula', sans-serif;
-    font-size: 72px;
+    font-size: 4.5rem;
     font-weight: 800;
     line-height: 82px;
     text-transform: uppercase;
@@ -313,15 +313,20 @@
       gap: 15px;
       align-self: flex-end;
       margin-bottom: 80px;
+      overflow: hidden;
 
       .adventure-title {
         font-family: var(--black-ops-one), 'Black Ops One', cursive;
-        font-size: 40px;
+        font-size: 2.5rem;
         color: #fff;
         margin: 0;
         position: absolute;
         top: 137px;
         left: 127px;
+        max-width: calc(100% - 140px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       // 큰 육각형 이미지 row
@@ -362,7 +367,7 @@
 
           .hex-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             transition: color 0.3s ease;
           }
@@ -380,7 +385,7 @@
               justify-content: center;
 
               i {
-                font-size: 24px;
+                font-size: 1.5rem;
                 color: #555;
               }
             }
@@ -438,7 +443,7 @@
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             background: #F5A623;
             color: #000;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -449,7 +454,7 @@
 
         .avatar-count {
           font-family: 'Pretendard', sans-serif;
-          font-size: 16px;
+          font-size: 1rem;
           color: #F5A623;
           font-weight: 500;
           display: flex;
@@ -458,7 +463,7 @@
 
           .joined-text {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             color: #fff;
           }
         }
@@ -585,13 +590,13 @@
           gap: 16px;
 
           i {
-            font-size: 64px;
+            font-size: 4rem;
             color: #555;
           }
 
           span {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             color: #666;
           }
         }
@@ -650,7 +655,7 @@
           background: #111;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 500;
           padding: 6px 12px;
           border-radius: 12px;
@@ -697,7 +702,7 @@
 
       .progress-label {
         font-family: 'Pretendard', sans-serif;
-        font-size: 16px;
+        font-size: 1rem;
         color: #888;
         text-transform: uppercase;
         letter-spacing: 0px;
@@ -706,7 +711,7 @@
 
       .progress-value {
         font-family: 'Pretendard', sans-serif;
-        font-size: 32px;
+        font-size: 2rem;
         font-weight: 900;
         color: #F5A623;
       }
@@ -736,7 +741,7 @@
           left: 45%;
           transform: translate(-50%, -50%);
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 700;
           color: #000;
         }
@@ -868,7 +873,7 @@
           background: transparent;
           color: #FFF;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 500;
           padding: 0;
           margin-top: 46px;
@@ -879,7 +884,7 @@
         .quote-subtext {
           // 피그마 시안처럼 메인 인용문과 동일한 폰트/톤으로 처리
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 26px;
+          font-size: 1.625rem;
           color: #FFF;
           line-height: 1.4;
           font-weight: 400;
@@ -890,7 +895,7 @@
 
         .quote-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 26px;
+          font-size: 1.625rem;
           color: #FFF;
           line-height: 1.4;
           margin: 5px 0 0 0;
@@ -927,14 +932,14 @@
 
             .author-name {
               font-family: 'Pretendard', sans-serif;
-              font-size: 15px;
+              font-size: 0.9375rem;
               color: #fff;
               font-weight: 500;
             }
 
             .author-role {
               font-family: 'Pretendard', sans-serif;
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #888;
             }
           }
@@ -948,7 +953,7 @@
 
           .score-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: #888;
             letter-spacing: 1px;
           }
@@ -960,7 +965,7 @@
           }
 
           .score-stars {
-            font-size: 16px;
+            font-size: 1rem;
             color: #DFF314;
             position: relative;
             top: 2px;
@@ -968,7 +973,7 @@
 
           .score-count {
             font-family: 'Pretendard', sans-serif;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #888;
           }
         }
@@ -1002,7 +1007,7 @@
 
       .videos-title {
         font-family: 'Pretendard', sans-serif;
-        font-size: 48px;
+        font-size: 3rem;
         font-weight: 400;
         color: #fff;
         margin: 0;
@@ -1019,7 +1024,7 @@
         background: #FFC300;
         color: #000;
         border: none;
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -1146,17 +1151,17 @@
           gap: 15px;
 
           .placeholder-icon {
-            font-size: 60px;
+            font-size: 3.75rem;
             color: rgba(255, 255, 255, 0.7);
 
             i {
-              font-size: 60px;
+              font-size: 3.75rem;
             }
           }
 
           .placeholder-text {
             font-family: 'Pretendard', sans-serif;
-            font-size: 16px;
+            font-size: 1rem;
             color: rgba(255, 255, 255, 0.8);
             margin: 0;
           }
@@ -1200,7 +1205,7 @@
 
               .video-title {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 24px;
+                font-size: 1.5rem;
                 font-weight: 600;
                 color: #fff;
                 margin: 0;
@@ -1215,7 +1220,7 @@
 
               .video-author {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 16px;
+                font-size: 1rem;
                 font-weight: 400;
                 color: #e2e8f0;
                 margin: 0;
@@ -1232,12 +1237,12 @@
               font-weight: 400;
 
               .dot-separator {
-                font-size: 8px;
+                font-size: 0.5rem;
                 color: #F5A623;
               }
 
               .viewers-count {
-                font-size: 16px;
+                font-size: 1rem;
                 color: #e2e8f0;
               }
             }
@@ -1624,7 +1629,7 @@
 
         .edu-school {
           font-family: 'Pretendard', sans-serif;
-          font-size: 26px;
+          font-size: 1.625rem;
           font-weight: 700;
           color: #fff;
           line-height: 37px;
@@ -1671,20 +1676,20 @@
           display: flex;
           align-items: center;
           font-family: 'Pretendard', sans-serif;
-          font-size: 16px;
+          font-size: 1rem;
           color: #fff;
           margin-bottom: 8px;
           line-height: 24px;
 
           .dot {
             color: #FAAB07;
-            font-size: 12px;
+            font-size: 0.75rem;
             margin-right: 4px;
           }
 
           .label {
             color: #AAA;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 400;
             line-height: 18px;
             min-width: 45px;
@@ -1692,7 +1697,7 @@
 
           .value {
             color: #fff;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             line-height: 24px;
 
@@ -1703,7 +1708,7 @@
 
             .ing-highlight {
               color: #FFAF36;
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 600;
               line-height: 24px;
             }
@@ -1743,7 +1748,7 @@
           padding: 22px 20px 28px;
 
           .edu-description .desc-text {
-            font-size: 15px;
+            font-size: 0.9375rem;
           }
 
           .arrow svg {
@@ -1772,7 +1777,7 @@
 
           .desc-text {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #FFF;
             margin: 0;
@@ -1788,7 +1793,7 @@
 
           .arrow {
             color: #FFF;
-            font-size: 14px;
+            font-size: 0.875rem;
             position: absolute;
             right: 0;
             top: 50%;
@@ -1845,7 +1850,7 @@
 
           span {
             font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 400;
             color: #000;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
@@ -1940,7 +1945,7 @@
 
     .review-banner-title-shadow {
       font-family: 'Pretendard', sans-serif;
-      font-size: 60px;
+      font-size: 3.75rem;
       font-weight: 900;
       color: #111;
       -webkit-text-stroke: 1px #21E786;
@@ -1959,7 +1964,7 @@
 
     .review-banner-title {
       font-family: 'Pretendard', sans-serif;
-      font-size: 60px;
+      font-size: 3.75rem;
       font-weight: 900;
       color: #FFF;
       text-align: center;
@@ -2095,14 +2100,14 @@
 
             span {
               font-family: 'Pretendard', sans-serif;
-              font-size: 14px;
+              font-size: 0.875rem;
               color: #fff;
             }
           }
 
           .quote-text {
             font-family: 'Cafe24Anemone', sans-serif;
-            font-size: 24px;
+            font-size: 1.5rem;
             color: #fff;
             line-height: 1.5;
             margin: 0;
@@ -2138,7 +2143,9 @@
         justify-content: center;
         gap: 20px;
         width: 604px;
-        height: 260px;
+        max-width: 100%;
+        min-height: 260px;
+        height: auto;
         margin-left: auto;
         margin-right: auto;
         cursor: pointer;
@@ -2190,19 +2197,22 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+          text-align: center;
+          word-break: keep-all;
 
           .complete-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 24px;
+            font-size: 1.5rem;
             color: #fff;
             margin-bottom: 5px;
           }
 
           h2 {
             font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 40px;
+            font-size: 2.5rem;
             color: #fff;
             margin: 0 0 15px 0;
+            word-break: break-word;
 
             .highlight {
               color: #FFA500;
@@ -2214,7 +2224,7 @@
             border: none;
             color: #888;
             font-family: 'Pretendard', sans-serif;
-            font-size: 18px;
+            font-size: 1.125rem;
             cursor: pointer;
             padding: 0;
             transition: color 0.2s ease;
@@ -2303,14 +2313,14 @@
 
           .review-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #fff;
             margin-bottom: 2.5px;
           }
 
           .review-weeks {
             font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 20px;
+            font-size: 1.25rem;
             color: #FFA500;
             margin-bottom: 5px;
           }
@@ -2320,7 +2330,7 @@
             border: none;
             color: #888;
             font-family: 'Pretendard', sans-serif;
-            font-size: 12px;
+            font-size: 0.75rem;
             cursor: pointer;
             padding: 0;
             transition: color 0.2s ease;
@@ -2425,7 +2435,7 @@
 
     .intro-title-shadow {
       font-family: 'Pretendard', sans-serif;
-      font-size: 56px;
+      font-size: 3.5rem;
       font-weight: 900;
       color: #111;
       -webkit-text-stroke: 1px #FFA500;
@@ -2443,7 +2453,7 @@
 
     .intro-title {
       font-family: 'Pretendard', sans-serif;
-      font-size: 56px;
+      font-size: 3.5rem;
       font-weight: 900;
       color: #FFF;
       text-align: center;
@@ -2456,7 +2466,7 @@
 
     .intro-sub {
       font-family: var(--black-ops-one), 'Black Ops One', cursive, Arial, sans-serif;
-      font-size: 25px;
+      font-size: 1.5625rem;
       color: #fff;
       letter-spacing: 0;
       // 타이틀 높이가 조금 달라도 겹치지 않게 위쪽 여유 확보
@@ -2548,7 +2558,7 @@
 
           h4 {
             font-family: 'Cafe24Ohsquare', sans-serif;
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #FFA500;
             margin: 0;
@@ -2587,7 +2597,7 @@
               padding: 8px 12px;
               border-radius: 8px;
               font-family: 'Pretendard', sans-serif;
-              font-size: 12px;
+              font-size: 0.75rem;
               white-space: nowrap;
               opacity: 0;
               visibility: hidden;
@@ -2618,7 +2628,7 @@
 
         p {
           font-family: 'Pretendard', sans-serif;
-          font-size: 18px;
+          font-size: 1.125rem;
           color: #fff;
           line-height: 1.6;
           margin: 0;
@@ -2630,13 +2640,13 @@
           align-items: center;
           gap: 6px;
           font-family: 'Cafe24Anemone', sans-serif;
-          font-size: 16px;
+          font-size: 1rem;
           color: #FFF;
           margin-top: 5px;
 
           &::before {
             content: '▸';
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #FFA500;
           }
         }
@@ -2760,7 +2770,7 @@
 
         h2 {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 28px;
+          font-size: 1.75rem;
           font-weight: 700;
           color: #fff;
           margin: 0;
@@ -2770,7 +2780,7 @@
           background: linear-gradient(135deg, #FFA500 0%, #FFA500 100%);
           color: #000;
           font-family: var(--black-ops-one), 'Black Ops One', cursive, Arial, sans-serif;
-          font-size: 12px;
+          font-size: 0.75rem;
           padding: 4px 12px;
           border-radius: 20px;
           font-weight: 700;
@@ -2800,14 +2810,14 @@
 
           .info-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #999;
             min-width: 60px;
           }
 
           .info-value {
             font-family: 'Pretendard', sans-serif;
-            font-size: 15px;
+            font-size: 0.9375rem;
             color: #fff;
             font-weight: 500;
 
@@ -2835,7 +2845,7 @@
 
         p {
           font-family: 'Pretendard', sans-serif;
-          font-size: 16px;
+          font-size: 1rem;
           color: #fff;
           line-height: 1.7;
           margin: 0;
@@ -2865,7 +2875,7 @@
           }
 
           p {
-            font-size: 15px;
+            font-size: 0.9375rem;
             line-height: 1.8;
           }
         }
@@ -2936,7 +2946,7 @@
       h3 {
         margin: 0;
         font-family: 'Cafe24Ohsquare', sans-serif;
-        font-size: 22px;
+        font-size: 1.375rem;
         font-weight: 700;
         color: #FFA500;
         display: flex;
@@ -2945,7 +2955,7 @@
 
         &::before {
           content: '✦';
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #FFA500;
         }
       }
@@ -2955,7 +2965,7 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         order: 3;
       }
@@ -2969,7 +2979,7 @@
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
-        font-size: 18px;
+        font-size: 1.125rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -3051,7 +3061,7 @@
           }
 
           .link-label {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #fff;
           }
@@ -3065,7 +3075,7 @@
           border: 1px solid #FFA500;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           transition: all 0.2s;
           box-sizing: border-box;
 
@@ -3092,7 +3102,7 @@
 
       button {
         padding: 10px 24px;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -3172,7 +3182,7 @@
         h3 {
           margin: 0;
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 22px;
+          font-size: 1.375rem;
           font-weight: 700;
           color: #FFA500;
           display: flex;
@@ -3181,14 +3191,14 @@
 
           &::before {
             content: '✦';
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #FFA500;
           }
         }
 
         .title-input {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 20px;
+          font-size: 1.25rem;
           font-weight: 700;
           color: #fff;
           background: #151515;
@@ -3210,7 +3220,7 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         order: 3;
       }
@@ -3233,13 +3243,13 @@
           background: rgba(255, 165, 0, 0.2);
           border: 1px solid #FFA500;
           color: #FFA500;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
 
           i {
-            font-size: 16px;
+            font-size: 1rem;
           }
 
           &:hover {
@@ -3254,7 +3264,7 @@
           background: transparent;
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: #999;
-          font-size: 14px;
+          font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.3s ease;
 
@@ -3270,7 +3280,7 @@
           background: linear-gradient(135deg, #FFA500 0%, #FFA500 100%);
           border: none;
           color: #000;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -3287,7 +3297,7 @@
           background: none;
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: #999;
-          font-size: 18px;
+          font-size: 1.125rem;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -3329,13 +3339,13 @@
         gap: 6px;
         cursor: pointer;
         z-index: 2;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         color: #000;
         transition: transform 0.15s ease, filter 0.15s ease;
     
         i {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #000;
         }
     
@@ -3373,7 +3383,7 @@
         text-align: center;
 
         .subtitle-text {
-          font-size: 16px;
+          font-size: 1rem;
           color: rgba(255, 255, 255, 0.7);
           margin: 0;
           font-style: italic;
@@ -3383,14 +3393,14 @@
           &::before {
             content: '"';
             color: #FFA500;
-            font-size: 24px;
+            font-size: 1.5rem;
             margin-right: 4px;
           }
 
           &::after {
             content: '"';
             color: #FFA500;
-            font-size: 24px;
+            font-size: 1.5rem;
             margin-left: 4px;
           }
         }
@@ -3398,7 +3408,7 @@
 
       .content-section {
         .content-text {
-          font-size: 15px;
+          font-size: 0.9375rem;
           line-height: 1.9;
           color: #ddd;
           margin: 0;
@@ -3415,7 +3425,7 @@
           .content-textarea {
             width: 100%;
             min-height: 300px;
-            font-size: 15px;
+            font-size: 0.9375rem;
             line-height: 1.9;
             color: #fff;
             background: #151515;
@@ -3457,7 +3467,7 @@
             display: block;
             text-align: right;
             margin-top: 10px;
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #666;
 
             span {
@@ -3502,7 +3512,7 @@
 
         .waiting-text {
           font-family: 'Black Ops One', sans-serif;
-          font-size: 22px;
+          font-size: 1.375rem;
           font-weight: 400;
           background: linear-gradient(135deg, #8061FF 0%, #7321B9 100%);
           -webkit-background-clip: text;
@@ -3630,7 +3640,7 @@
       h3 {
         font-family: 'Cafe24Anemone', sans-serif;
         color: #FFA500;
-        font-size: 22px;
+        font-size: 1.375rem;
         font-weight: 400;
         margin: 0;
         display: flex;
@@ -3639,7 +3649,7 @@
 
         &::before {
           content: '✦';
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #FFA500;
         }
       }
@@ -3649,7 +3659,7 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         order: 3;
       }
@@ -3661,7 +3671,7 @@
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
-        font-size: 18px;
+        font-size: 1.125rem;
         cursor: pointer;
         width: 32px;
         height: 32px;
@@ -3711,7 +3721,7 @@
           h4 {
             font-family: 'Cafe24Anemone', sans-serif;
             color: #FFA500;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 400;
             margin: 0;
           }
@@ -3722,7 +3732,7 @@
             justify-content: center;
 
             i {
-              font-size: 16px;
+              font-size: 1rem;
               color: #FFA500;
             }
           }
@@ -3738,7 +3748,7 @@
           label {
             display: block;
             color: #94a3b8;
-            font-size: 12px;
+            font-size: 0.75rem;
             margin-bottom: 6px;
           }
 
@@ -3750,7 +3760,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0;
             color: #fff;
-            font-size: 16px;
+            font-size: 1rem;
             font-family: 'Pretendard', sans-serif;
             transition: all 0.2s;
             box-sizing: border-box;
@@ -3763,7 +3773,7 @@
 
             &::placeholder {
               color: #444;
-              font-size: 12px;
+              font-size: 0.75rem;
             }
           }
         }
@@ -3774,7 +3784,7 @@
           label {
             display: block;
             color: #94a3b8;
-            font-size: 12px;
+            font-size: 0.75rem;
             margin-bottom: 6px;
           }
 
@@ -3799,7 +3809,7 @@
 
             .no-thumbnail {
               color: #666;
-              font-size: 11px;
+              font-size: 0.6875rem;
               font-family: 'Pretendard', sans-serif;
               text-align: center;
               padding: 10px;
@@ -3825,7 +3835,7 @@
         color: #888;
         padding: 12px 28px;
         border-radius: 0;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -3843,7 +3853,7 @@
         padding: 12px 28px;
         border-radius: 0;
         border: none;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -3929,14 +3939,14 @@
       gap: 10px;
       color: #FFA500;
       font-family: 'Cafe24Anemone', sans-serif;
-      font-size: 20px;
+      font-size: 1.25rem;
       font-weight: 400;
       margin: 0;
       letter-spacing: 1px;
 
       &::before {
         content: '✦';
-        font-size: 14px;
+        font-size: 0.875rem;
       }
     }
 
@@ -3945,7 +3955,7 @@
       margin: -2px 0 0 0;
       color: #fff;
       font-family: 'Pretendard', sans-serif;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 400;
       order: 3;
     }
@@ -3957,7 +3967,7 @@
       background: none;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #999;
-      font-size: 18px;
+      font-size: 1.125rem;
       cursor: pointer;
       width: 32px;
       height: 32px;
@@ -4012,7 +4022,7 @@
       display: inline-block;
       font-family: 'Cafe24Anemone', sans-serif;
       color: #FFA500;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 400;
       letter-spacing: 1px;
       margin-bottom: 16px;
@@ -4055,12 +4065,12 @@
             align-items: center;
             gap: 8px;
             color: #FFA500;
-            font-size: 12px;
+            font-size: 0.75rem;
             text-align: center;
             padding: 10px;
 
             i {
-              font-size: 32px;
+              font-size: 2rem;
             }
           }
         }
@@ -4082,7 +4092,7 @@
           color: #FFA500;
           padding: 10px 20px;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.3s ease;
           position: relative;
@@ -4109,7 +4119,7 @@
           }
 
           i {
-            font-size: 18px;
+            font-size: 1.125rem;
           }
         }
 
@@ -4159,12 +4169,12 @@
               justify-content: center;
               gap: 4px;
               color: #FFA500;
-              font-size: 10px;
+              font-size: 0.625rem;
               text-align: center;
               background: rgba(255, 165, 0, 0.05);
 
               i {
-                font-size: 24px;
+                font-size: 1.5rem;
               }
             }
           }
@@ -4181,7 +4191,7 @@
               background: none;
               border: none;
               color: #888;
-              font-size: 16px;
+              font-size: 1rem;
               cursor: pointer;
               padding: 4px;
               transition: color 0.2s;
@@ -4196,7 +4206,7 @@
                 transform: translateX(-50%);
                 background: rgba(0, 0, 0, 0.9);
                 color: #fff;
-                font-size: 11px;
+                font-size: 0.6875rem;
                 padding: 6px 10px;
                 border-radius: 4px;
                 white-space: nowrap;
@@ -4295,7 +4305,7 @@
       color: #888;
       padding: 12px 32px;
       font-family: 'Pretendard', sans-serif;
-      font-size: 16px;
+      font-size: 1rem;
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -4312,7 +4322,7 @@
       color: #000;
       padding: 12px 32px;
       font-family: 'Pretendard', sans-serif;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -4424,7 +4434,7 @@
     h3 {
       font-family: 'Cafe24Anemone', sans-serif;
       color: #FFA500;
-      font-size: 22px;
+      font-size: 1.375rem;
       font-weight: 400;
       margin: 0;
       display: flex;
@@ -4433,7 +4443,7 @@
 
       &::before {
         content: '✦';
-        font-size: 14px;
+        font-size: 0.875rem;
         color: #FFA500;
       }
     }
@@ -4443,7 +4453,7 @@
       margin: -2px 0 0 0;
       color: #fff;
       font-family: 'Pretendard', sans-serif;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 400;
       order: 3;
     }
@@ -4455,7 +4465,7 @@
       background: none;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #999;
-      font-size: 18px;
+      font-size: 1.125rem;
       cursor: pointer;
       width: 32px;
       height: 32px;
@@ -4522,7 +4532,7 @@
         display: inline-block;
         font-family: 'Cafe24Anemone', sans-serif;
         color: #FFA500;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 400;
         letter-spacing: 1px;
         margin-bottom: 16px;
@@ -4546,7 +4556,7 @@
           padding: 14px 18px;
           border-radius: 0;
           font-family: 'Pretendard', sans-serif;
-          font-size: 15px;
+          font-size: 0.9375rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
@@ -4557,7 +4567,7 @@
           }
 
           i {
-            font-size: 16px;
+            font-size: 1rem;
             color: #FFA500;
             transition: transform 0.3s ease;
 
@@ -4595,7 +4605,7 @@
             padding: 14px 18px;
             font-family: 'Pretendard', sans-serif;
             color: #999;
-            font-size: 14px;
+            font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.15s;
             border-left: 2px solid transparent;
@@ -4629,7 +4639,7 @@
           padding-bottom: 30px;
           border-radius: 0;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           line-height: 1.6;
           resize: none;
           transition: all 0.2s;
@@ -4651,7 +4661,7 @@
           right: 14px;
           font-family: 'Pretendard', sans-serif;
           color: #555;
-          font-size: 11px;
+          font-size: 0.6875rem;
           font-weight: 500;
           letter-spacing: 0.5px;
         }
@@ -4675,7 +4685,7 @@
       color: #888;
       padding: 12px 28px;
       border-radius: 0;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
@@ -4693,7 +4703,7 @@
       color: #000;
       padding: 12px 36px;
       border-radius: 0;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -4789,7 +4799,7 @@
     h3 {
       font-family: 'Cafe24Anemone', sans-serif;
       color: #FFA500;
-      font-size: 22px;
+      font-size: 1.375rem;
       font-weight: 400;
       margin: 0;
       display: flex;
@@ -4798,7 +4808,7 @@
 
       &::before {
         content: '✦';
-        font-size: 14px;
+        font-size: 0.875rem;
         color: #FFA500;
       }
     }
@@ -4808,7 +4818,7 @@
       margin: -2px 0 0 0;
       color: #fff;
       font-family: 'Pretendard', sans-serif;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 400;
       order: 3;
     }
@@ -4832,13 +4842,13 @@
       border-radius: 0;
       color: #000;
       font-family: 'Pretendard', sans-serif;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
 
       i {
-        font-size: 16px;
+        font-size: 1rem;
       }
 
       &:hover {
@@ -4852,7 +4862,7 @@
       background: none;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #999;
-      font-size: 18px;
+      font-size: 1.125rem;
       cursor: pointer;
       width: 32px;
       height: 32px;
@@ -4947,7 +4957,7 @@
           align-items: center;
           justify-content: center;
           font-family: 'Pretendard', sans-serif;
-          font-size: 14px;
+          font-size: 0.875rem;
           font-weight: 700;
           color: #FFA500;
           border-radius: 4px;
@@ -4961,7 +4971,7 @@
           color: #fff;
           padding: 10px 14px;
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 18px;
+          font-size: 1.125rem;
           font-weight: 700;
           box-sizing: border-box;
 
@@ -4986,14 +4996,14 @@
           justify-content: center;
 
           i {
-            font-size: 20px;
+            font-size: 1.25rem;
             color: #FFA500;
           }
         }
 
         .school-name {
           font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 20px;
+          font-size: 1.25rem;
           color: #fff;
           font-weight: 700;
         }
@@ -5002,7 +5012,7 @@
           background: linear-gradient(135deg, #FFA500 0%, #FFA500 100%);
           color: #000;
           font-family: var(--black-ops-one), 'Black Ops One', cursive;
-          font-size: 11px;
+          font-size: 0.6875rem;
           padding: 3px 10px;
           border-radius: 20px;
           font-weight: 700;
@@ -5028,13 +5038,13 @@
           border-radius: 16px;
           color: #666;
           font-family: 'Pretendard', sans-serif;
-          font-size: 12px;
+          font-size: 0.75rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
 
           i {
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #666;
             transition: all 0.2s;
           }
@@ -5078,7 +5088,7 @@
           transition: all 0.2s;
 
           i {
-            font-size: 16px;
+            font-size: 1rem;
           }
 
           &:hover {
@@ -5098,7 +5108,7 @@
             min-height: 32px;
             padding: 6px 14px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-size: 0.8125rem;
             font-weight: 600;
             background: transparent;
             border: 1px solid rgba(255, 165, 0, 0.5);
@@ -5110,7 +5120,7 @@
             }
 
             i {
-              font-size: 14px;
+              font-size: 0.875rem;
             }
           }
 
@@ -5138,7 +5148,7 @@
             animation: dropdownFadeIn 0.2s ease;
 
             .dropdown-option {
-              font-size: 13px;
+              font-size: 0.8125rem;
               padding: 10px 14px;
               font-family: 'Pretendard', sans-serif;
               color: #aaa;
@@ -5161,7 +5171,7 @@
                 &::before {
                   content: '✓';
                   margin-right: 8px;
-                  font-size: 11px;
+                  font-size: 0.6875rem;
                 }
               }
             }
@@ -5186,7 +5196,7 @@
             align-items: flex-end;
             justify-content: center;
             color: #666;
-            font-size: 18px;
+            font-size: 1.125rem;
             padding-bottom: 4px;
           }
 
@@ -5210,7 +5220,7 @@
 
             .grade-dot {
               color: #fff;
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 700;
               margin: 0 8px;
               position: relative;
@@ -5246,7 +5256,7 @@
 
                   .dropdown-option {
                     padding: 8px 10px;
-                    font-size: 14px;
+                    font-size: 0.875rem;
                     color: #fff;
                     cursor: pointer;
                     transition: background 0.2s;
@@ -5301,7 +5311,7 @@
               }
 
               i {
-                font-size: 16px;
+                font-size: 1rem;
               }
             }
           }
@@ -5315,7 +5325,7 @@
           .major-hint {
             grid-column: 1 / -1;
             font-family: 'Pretendard', sans-serif;
-            font-size: 12px;
+            font-size: 0.75rem;
             color: #888;
             margin: -8px 0 0 0;
           }
@@ -5324,7 +5334,7 @@
           .edu-school-dropdown {
             .dropdown-selected {
               font-family: 'Cafe24Ohsquare', sans-serif;
-              font-size: 16px;
+              font-size: 1rem;
               font-weight: 700;
             }
 
@@ -5341,7 +5351,7 @@
                   color: #fff;
                   padding: 8px 12px;
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   box-sizing: border-box;
                   border-radius: 4px;
 
@@ -5369,7 +5379,7 @@
                   color: #fff;
                   padding: 10px 12px;
                   font-family: 'Pretendard', sans-serif;
-                  font-size: 14px;
+                  font-size: 0.875rem;
                   box-sizing: border-box;
 
                   &:focus {
@@ -5403,7 +5413,7 @@
 
           label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 13px;
+            font-size: 0.8125rem;
             color: #888;
             font-weight: 500;
 
@@ -5424,7 +5434,7 @@
             color: #fff;
             padding: 12px 16px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 0.875rem;
             transition: all 0.2s;
             box-sizing: border-box;
             display: block;
@@ -5453,7 +5463,7 @@
               color: #fff;
               padding: 12px 16px;
               font-family: 'Pretendard', sans-serif;
-              font-size: 14px;
+              font-size: 0.875rem;
               cursor: pointer;
               display: flex;
               align-items: center;
@@ -5467,7 +5477,7 @@
 
               i {
                 color: #FFA500;
-                font-size: 16px;
+                font-size: 1rem;
                 transition: transform 0.2s;
               }
 
@@ -5522,7 +5532,7 @@
               .dropdown-option {
                 padding: 12px 16px;
                 font-family: 'Pretendard', sans-serif;
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #aaa;
                 cursor: pointer;
                 transition: all 0.15s;
@@ -5545,7 +5555,7 @@
                   &::before {
                     content: '✓';
                     margin-right: 8px;
-                    font-size: 12px;
+                    font-size: 0.75rem;
                   }
                 }
               }
@@ -5577,17 +5587,17 @@
                 .dropdown-selected {
                   min-height: 40px;
                   padding: 10px 12px;
-                  font-size: 13px;
+                  font-size: 0.8125rem;
 
                   i {
-                    font-size: 14px;
+                    font-size: 0.875rem;
                   }
                 }
 
                 .dropdown-options {
                   .dropdown-option {
                     padding: 10px 12px;
-                    font-size: 13px;
+                    font-size: 0.8125rem;
                   }
                 }
               }
@@ -5606,7 +5616,7 @@
                   .ing-text {
                     color: #FFA500;
                     font-weight: 600;
-                    font-size: 14px;
+                    font-size: 0.875rem;
                     letter-spacing: 1px;
                   }
 
@@ -5657,7 +5667,7 @@
               text-align: right;
               margin-top: 6px;
               font-family: 'Pretendard', sans-serif;
-              font-size: 12px;
+              font-size: 0.75rem;
               color: #666;
             }
           }
@@ -5682,7 +5692,7 @@
       color: #888;
       padding: 12px 28px;
       border-radius: 0;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
@@ -5700,7 +5710,7 @@
       color: #000;
       padding: 12px 36px;
       border-radius: 0;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -5777,7 +5787,7 @@
     border: 2px solid #FFA500;
 
     i {
-      font-size: 20px;
+      font-size: 1.25rem;
       color: #FFA500;
     }
 
@@ -5793,7 +5803,7 @@
 
   h3 {
     font-family: 'Pretendard', sans-serif;
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #fff;
     margin-bottom: 8px;
@@ -5801,7 +5811,7 @@
 
   p {
     font-family: 'Pretendard', sans-serif;
-    font-size: 17px;
+    font-size: 1.0625rem;
     color: rgba(255, 255, 255, 0.85);
     margin-bottom: 20px;
     line-height: 1.6;
@@ -5809,7 +5819,7 @@
     strong {
       color: #FFA500;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 1.125rem;
     }
   }
 
@@ -5821,7 +5831,7 @@
     button {
       font-family: 'Pretendard', sans-serif;
       padding: 12px 28px;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;

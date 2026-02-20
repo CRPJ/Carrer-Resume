@@ -2,6 +2,12 @@
  --------- (2.03) global styles start ---------
  ==== */
 
+// 한글 의미 단위 줄바꿈 (폰트 크기 조절 시 단어 중간 잘림 방지)
+body {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 img {
   max-width: 100%;
   height: auto;
