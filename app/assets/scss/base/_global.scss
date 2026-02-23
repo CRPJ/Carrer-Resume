@@ -8,13 +8,9 @@
 //   overflow-wrap: break-word;
 // }
 
-// Windows/Mac 스크롤바 차이로 인한 레이아웃 불일치 해소
-// Windows: 스크롤바가 콘텐츠 영역을 17px 줄임
-// Mac: 오버레이 스크롤바라 콘텐츠 영역에 영향 없음
-// → stable로 통일하면 양쪽 모두 스크롤바 공간을 예약하여 동일한 레이아웃 보장
-html {
-  scrollbar-gutter: stable;
-}
+// 스크롤바는 _reset.scss에서 html/body 모두 전역 숨김 처리됨
+// scrollbar-gutter: stable 제거 — 숨겨진 스크롤바에 대해 공간을 예약하면
+// Mac(오버레이 스크롤바)에서 페이지 전환 시 ~15px 너비 점프 발생
 
 img {
   max-width: 100%;
