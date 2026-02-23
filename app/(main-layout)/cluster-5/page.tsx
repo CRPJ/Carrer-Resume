@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
 import Animations from "@/components/shared/Animations";
-import ResponsiveScale from "@/components/shared/ResponsiveScale";
+
 
 // 반짝이 효과 CSS
 const sparkleStyles = `
@@ -192,7 +192,7 @@ const Cluster5Page = () => {
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      <ResponsiveScale />
+
       {/* 고정 사이드바 */}
       <div className="desktop-layout" style={{
           display: 'flex',

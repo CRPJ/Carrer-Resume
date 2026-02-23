@@ -6,7 +6,7 @@ import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
 import Cluster4CardContent from "@/components/cluster-4-card/Cluster4CardContent";
 import Animations from "@/components/shared/Animations";
-import ResponsiveScale from "@/components/shared/ResponsiveScale";
+
 
 const Cluster4CardDynamicPage = () => {
   const params = useParams();
@@ -60,7 +60,7 @@ const Cluster4CardDynamicPage = () => {
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      <ResponsiveScale />
+
       {/* 고정 사이드바 */}
       <div style={sidebarStyle}>
         <Sidebar />
