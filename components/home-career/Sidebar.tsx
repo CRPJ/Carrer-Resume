@@ -314,7 +314,7 @@ const Sidebar = () => {
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
-  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(520px)으로 유지하고
+  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(482px)으로 유지하고
   // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -377,7 +377,7 @@ const Sidebar = () => {
       if (isClusterPages && isLaptop1366) {
         // 레이아웃 상수(페이지에서 desktop-layout gap=20px)
         const GAP_PX = 20;
-        const BASE_SIDEBAR_WIDTH = 520;
+        const BASE_SIDEBAR_WIDTH = 482;
         // 오른쪽 콘텐츠가 너무 좁아지지 않게 "최소 확보 폭" (침범 방지 가드레일)
         const MIN_RIGHT_CONTENT = 760;
 
@@ -392,10 +392,19 @@ const Sidebar = () => {
 
       setCardScale(scale);
 
+      // ★ Mac 보정: 오버레이 스크롤바로 뷰포트가 넓어 여백이 커 보이므로
+      // 카드를 살짝 확대하여 사이드바를 꽉 채움 (Windows는 영향 없음)
+      const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+      if (isMac) {
+        const macScale = Math.max(scale, 482 / 474); // ≈ 1.017배
+        setCardScale(macScale);
+        scale = macScale;
+      }
+
       // ★ 레이아웃 가드레일: 실제 사이드바 점유 폭을 CSS 변수로 동기화
       // - fixed+spacer 방식(예: cluster-4-card)에서도 콘텐츠 침범이 발생하지 않게 함
-      // - scale < 1인 경우에도 "컬럼 폭"은 기본 520px을 유지
-      const BASE_SIDEBAR_WIDTH = 520;
+      // - scale < 1인 경우에도 "컬럼 폭"은 기본 482px을 유지
+      const BASE_SIDEBAR_WIDTH = 482;
       const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * Math.max(1, scale));
       document.documentElement.style.setProperty('--sidebar-width', `${effectiveSidebarWidth}px`);
 
@@ -1405,7 +1414,7 @@ const Sidebar = () => {
         // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
         width: isMobileView
           ? '100%'
-          : (cardScale > 1 ? `${520 * cardScale}px` : 'var(--sidebar-width, 520px)'),
+          : (cardScale > 1 ? `${482 * cardScale}px` : 'var(--sidebar-width, 482px)'),
         height: isMobileView ? 'auto' : `${810 * cardScale}px`,
         overflow: isMobileView || cardScale > 1 ? 'visible' : 'hidden',
         display: isMobileView ? 'block' : 'flex',

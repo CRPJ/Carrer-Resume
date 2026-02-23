@@ -3,9 +3,17 @@
  ==== */
 
 // 한글 의미 단위 줄바꿈 (폰트 크기 조절 시 단어 중간 잘림 방지)
-body {
-  word-break: keep-all;
-  overflow-wrap: break-word;
+// body {
+//   word-break: keep-all;
+//   overflow-wrap: break-word;
+// }
+
+// Windows/Mac 스크롤바 차이로 인한 레이아웃 불일치 해소
+// Windows: 스크롤바가 콘텐츠 영역을 17px 줄임
+// Mac: 오버레이 스크롤바라 콘텐츠 영역에 영향 없음
+// → stable로 통일하면 양쪽 모두 스크롤바 공간을 예약하여 동일한 레이아웃 보장
+html {
+  scrollbar-gutter: stable;
 }
 
 img {

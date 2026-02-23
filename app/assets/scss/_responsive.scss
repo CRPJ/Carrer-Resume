@@ -106,10 +106,10 @@ body:has(.nftg-content-home) {
 
       // 사이드바 - 항상 화면 세로에 딱 맞게
       .home-two-sidebar-col {
-        flex: 0 0 var(--sidebar-width, 520px) !important;
-        max-width: var(--sidebar-width, 520px) !important;
-        width: var(--sidebar-width, 520px) !important;
-        min-width: var(--sidebar-width, 520px) !important;
+        flex: 0 0 var(--sidebar-width, 482px) !important;
+        max-width: var(--sidebar-width, 482px) !important;
+        width: var(--sidebar-width, 482px) !important;
+        min-width: var(--sidebar-width, 482px) !important;
         height: auto !important;
         min-height: 100% !important;
         position: relative !important;
@@ -144,7 +144,7 @@ body:has(.nftg-content-home) {
         overflow-y: visible !important;
         padding: 0 !important;
         margin: 0 !important;
-        margin-left: 16px !important; // 사이드 패널과 16px 여백
+        margin-left: 8px !important; // 사이드 패널과 8px 여백
 
         // 스크롤바 숨기기
         &::-webkit-scrollbar {
