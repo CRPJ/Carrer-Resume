@@ -70,7 +70,7 @@
     position: relative;        // sticky → relative로 복원
     // top: 0; 삭제
     z-index: 0;
-    margin-top: 51px;
+    margin-top: 0;
     margin-bottom: -630px;
     will-change: transform;
     transform: translateZ(0);
@@ -187,8 +187,8 @@
       position: relative;
       z-index: 1;
       text-align: center;
-      padding-top: 48px;
-      margin-bottom: 20px;
+      padding-top: 60px;
+      margin-bottom: 24px;
       height: 140px;          // 추가
       overflow: hidden;      // 추가
       pointer-events: none;     
@@ -225,7 +225,7 @@
       max-width: min(62ch, 1100px);
       margin: 0 auto;
       padding: 30px 40px 0;
-      line-height: 22px;
+      line-height: 1.8;
       position: relative;
       z-index: 1;
       text-align: left;
@@ -242,7 +242,7 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.375rem;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
@@ -253,14 +253,14 @@
 
         &.small-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 1.4375rem;
+          font-size: 1.375rem;
           color: #FFF;
           margin-top: 0;
         }
 
         &.quote-text {
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 1.4375rem;
+          font-size: 1.375rem;
           line-height: 1.4;
           color: #FFF;
           margin-top: 24px;
@@ -274,13 +274,13 @@
         }
 
         &:nth-child(2) {
-          margin-bottom: 22px;
+          margin-bottom: 28px;
         }
       }
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.6875rem;
+        font-size: 1.8125rem;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -293,7 +293,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.4375rem;
+        font-size: 1.375rem;
         line-height: 1.4;
         color: #FFF;
         margin: 0;

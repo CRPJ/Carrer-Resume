@@ -124,7 +124,7 @@
     position: relative;
     text-align: center;
     margin: 0 0 -200px 0;
-    padding: 78px 0 290px;
+    padding: 60px 0 290px;
     z-index: 0;
     width: 100%;
     max-width: 1325px;
@@ -175,27 +175,27 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.25rem;
-        line-height: 22px;
+        font-size: 1.375rem;
+        line-height: 1.6;
         margin-bottom: 0;
         color: #FFF;
         text-wrap: pretty;
 
         &:nth-child(2) {
-          margin-bottom: 22px;
+          margin-bottom: 28px;
         }
       }
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.375rem;
         color: #FFF;
         margin-top: 0;
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.375rem;
         line-height: 1.4;
         color: #FFF;
         margin-top: 24px;
@@ -211,7 +211,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.6875rem;
+        font-size: 1.8125rem;
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -224,7 +224,7 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.375rem;
         line-height: 1.4;
         color: #FFF;
         margin: 0;
@@ -273,7 +273,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 60px;
+    margin-top: 200px;
     margin-bottom: 0;
     padding: 30px 40px;
     background-image: url('/images/0/cluster 2/section 01.png');

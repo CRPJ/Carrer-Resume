@@ -84,30 +84,26 @@ const Cluster2Content = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEdu, setSelectedEdu] = useState<EduData | null>(null);
 
-  // 승인 상태 관련
-  const [isApproved, setIsApproved] = useState(false);
-
-  // 승인 상태 확인 함수
-  const checkApprovalStatus = async () => {
-    if (!session) return false;
-
-    try {
-      const response = await fetch('/api/auth/check-status');
-      const result = await response.json();
-
-      if (result.success && result.status === 'approved') {
-        setIsApproved(true);
-        return true;
-      } else {
-        setIsApproved(false);
-        return false;
-      }
-    } catch (error) {
-      console.error('승인 상태 확인 오류:', error);
-      setIsApproved(false);
-      return false;
-    }
-  };
+  // 승인 상태 관련 (TODO: 프로덕션 배포 전 복원)
+  // const [isApproved, setIsApproved] = useState(false);
+  // const checkApprovalStatus = async () => {
+  //   if (!session) return false;
+  //   try {
+  //     const response = await fetch('/api/auth/check-status');
+  //     const result = await response.json();
+  //     if (result.success && result.status === 'approved') {
+  //       setIsApproved(true);
+  //       return true;
+  //     } else {
+  //       setIsApproved(false);
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     console.error('승인 상태 확인 오류:', error);
+  //     setIsApproved(false);
+  //     return false;
+  //   }
+  // };
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
@@ -320,7 +316,7 @@ const Cluster2Content = () => {
   // 서브 사진 삭제 핸들러 - 삭제 후 순서 재정렬
   const handleSubPhotoDelete = (index: number) => {
     setSubPhotos(prev => {
-      const newPhotos = prev.filter((_, i) => i !== index || !prev[index]);
+      prev.filter((_, i) => i !== index || !prev[index]);
       // 삭제된 사진이 있으면 앞으로 당기고 뒤에 null 추가
       const filledPhotos = prev.filter((photo, i) => i !== index && photo);
       while (filledPhotos.length < 4) {
@@ -785,14 +781,6 @@ const Cluster2Content = () => {
       const result = await response.json();
 
       if (result.success && result.data) {
-        const fieldMapping: { [key: string]: string } = {
-          growthStory: '성장 과정',
-          socialExperience: '사회 경험',
-          careerDirection: '커리어 방향',
-          workStyle: '실무 스타일',
-          personalStory: '퍼스널 스토리',
-        };
-
         const dbFieldOrder = ['growthStory', 'socialExperience', 'careerDirection', 'workStyle', 'personalStory'];
 
         setIntroCards(prev => {
@@ -1079,8 +1067,8 @@ const Cluster2Content = () => {
           <p>우리가 어떻게 바라봤던, 나의 모습, 나의 능력, 나의 경험.. 우리는 그때 그 목표에 얼마나 가까이 살고 있나요?</p>
           <p className="small-text">우수하고, 뛰어나고, 멋진 건 아무 짝에도 소용 없습니다. 남들의 시선도 무시하세요! 😊</p>
           <p className="small-text">중요한건, 내가 나답게 세상에 보여질 수 있는지, 그리고 그 모습을 얼마나 후회없이 그려나가고 있는지 입니다.</p>
-          <p className="quote-text">"Know thyself"</p>
-          <p className="quote-highlight">"너 자신을 알라"</p>
+          <p className="quote-text">&quot;Know thyself&quot;</p>
+          <p className="quote-highlight">&quot;너 자신을 알라&quot;</p>
           <p className="quote-author">- 소크라테스 (Socrates) -</p>
         </div>  {/* section1-description 닫힘 */}
       </div>    {/* cluster2-title-wrapper 닫힘 */}
@@ -1216,7 +1204,7 @@ const Cluster2Content = () => {
         </div>
 
         <div className="videos-grid">
-          {videoData.map((video, index) => (
+          {videoData.map((video) => (
             <div key={video.id} className={`video-card ${!video.videoUrl ? 'empty-placeholder' : 'has-video'}`}>
               {video.isBookmarked && (
                 <div className="bookmark-flag">
@@ -1548,7 +1536,7 @@ const Cluster2Content = () => {
                 </div>
                 <span>- 인디언 속담 -</span>
               </div>
-              <p className="quote-text">"누구나 덮어놓고 '시작' 할 수 있지만, 목표한 바 대로 '마무리' 하는 것은 누구나 할 수 있는 것이 아니다."</p>
+              <p className="quote-text">&quot;누구나 덮어놓고 &apos;시작&apos; 할 수 있지만, 목표한 바 대로 &apos;마무리&apos; 하는 것은 누구나 할 수 있는 것이 아니다.&quot;</p>
             </div>
           </div>
           <div
@@ -1569,7 +1557,7 @@ const Cluster2Content = () => {
                 </div>
                 <span>- 노자 -</span>
               </div>
-              <p className="quote-text">"끝을 맺기를 처음과 같이 하면 실패가 없다"</p>
+              <p className="quote-text">&quot;끝을 맺기를 처음과 같이 하면 실패가 없다&quot;</p>
             </div>
           </div>
           <div
@@ -1590,7 +1578,7 @@ const Cluster2Content = () => {
                 </div>
                 <span>- 로빈 샤르마 -</span>
               </div>
-              <p className="quote-text">"강하게 시작하는 건 좋지만, 강하게 마무리하는 건 정말 대단해요"</p>
+              <p className="quote-text">&quot;강하게 시작하는 건 좋지만, 강하게 마무리하는 건 정말 대단해요&quot;</p>
             </div>
           </div>
         </div>
@@ -2667,7 +2655,7 @@ const Cluster2Content = () => {
                           placeholder="기타 전공"
                         />
                       </div>
-                      <p className="major-hint">* 전공이 없을 시 "-"로 입력해주세요.</p>
+                      <p className="major-hint">* 전공이 없을 시 &quot;-&quot;로 입력해주세요.</p>
                     </div>
 
                     {/* 행 5: 입학 / 졸업 */}
