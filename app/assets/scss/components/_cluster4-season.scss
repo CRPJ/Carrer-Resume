@@ -452,20 +452,20 @@
 
         .collection-card {
           display: inline-flex;
-          padding: 20px 38px;
-          align-items: center;
-          gap: 30px;
+          padding: 20px 36px;
+          align-items: flex-start;
+          gap: 28px;
           background: #232323;
-          border: 2px dashed #3A3A3A;
+          border: 2px solid #3A3A3A;
           border-radius: 30px;
           margin-bottom: 24px;
-          box-shadow: 0 10px 30px rgba(255, 255, 255, 0.25);
+          box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
 
           .collection-icon {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             flex-shrink: 0;
-            border-radius: 50%;
+            border-radius: 64px;
             overflow: hidden;
 
             img {
@@ -477,42 +477,44 @@
 
           .collection-content {
             flex: 1;
-            display: flex;
+            display: inline-flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
           }
 
           .collection-header {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
 
             .add-icon {
-              width: 16px;
-              height: 16px;
+              width: 24px;
+              height: 24px;
               object-fit: contain;
             }
 
             .collection-label {
-              font-family: 'Pretendard', sans-serif;
+              font-family: 'Manrope', 'Pretendard', sans-serif;
               font-size: 1.125rem;
               font-weight: 800;
               color: #DDF247;
+              line-height: 24px;
             }
           }
 
           .collection-text {
+            font-family: 'Khula', sans-serif;
             font-size: 1.125rem;
             font-weight: 400;
             color: #fff;
             margin: 0;
-            line-height: 1.5;
-            white-space: nowrap;
+            line-height: 32px;
+            white-space: normal;
 
             strong {
               font-size: 1.25rem;
               color: #FF9C9C;
-              font-weight: 700;
+              font-weight: 800;
               animation: blink 1.5s ease-in-out infinite;
             }
           }
@@ -626,7 +628,7 @@
 
       .card-right {
         position: absolute;
-        right: 80px;
+        right: 20px;
         bottom: 10px;
         width: 702px;
         height: 732px;
