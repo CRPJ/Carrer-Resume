@@ -15,7 +15,7 @@ const Cluster4Page = () => {
   useEffect(() => {
     // 화면 크기 체크
     const checkMobile = () => {
-      setIsMobile(screen.width < 1400);
+      setIsMobile(window.innerWidth < 1200);
     };
 
     // 초기 실행

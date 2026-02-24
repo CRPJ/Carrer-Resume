@@ -6,7 +6,7 @@ const ResponsiveScale = () => {
   useEffect(() => {
     const BASE_WIDTH = 1977;
     const MAX_ZOOM = 2.0; // ★ 최대 150% - 4K에서 적당히 확대
-    const MOBILE_BREAKPOINT = 1400; // 모바일 레이아웃 전환 기준
+    const MOBILE_BREAKPOINT = 1200; // 모바일 레이아웃 전환 기준 (CSS 1200px과 일치)
 
     const updateHeaderDividerY = (scale: number) => {
       const header = document.querySelector('.header') as HTMLElement | null;
@@ -29,6 +29,7 @@ const ResponsiveScale = () => {
       if (windowWidth < MOBILE_BREAKPOINT) {
         document.documentElement.style.zoom = '1';
         document.documentElement.style.setProperty('--app-zoom', '1');
+        document.documentElement.classList.remove('tight-desktop');
         // 모바일은 scale=1 이므로 그대로 저장
         requestAnimationFrame(() => updateHeaderDividerY(1));
         document.documentElement.style.overflowX = 'hidden';
@@ -45,6 +46,15 @@ const ResponsiveScale = () => {
       
       document.documentElement.style.zoom = String(scale);
       document.documentElement.style.setProperty('--app-zoom', String(scale));
+
+      // ★ 1200~1400px 중간폭: CSS zoom이 media query를 무력화하므로
+      // JS에서 직접 클래스를 토글하여 타이트한 레이아웃 적용
+      if (windowWidth >= 1200 && windowWidth < 1400) {
+        document.documentElement.classList.add('tight-desktop');
+      } else {
+        document.documentElement.classList.remove('tight-desktop');
+      }
+
       // zoom 적용 후 다음 프레임에서 측정 → 언줌(px)로 저장
       requestAnimationFrame(() => updateHeaderDividerY(scale));
       document.documentElement.style.overflowX = 'hidden';
@@ -61,6 +71,7 @@ const ResponsiveScale = () => {
       document.documentElement.style.removeProperty('--header-divider-y');
       document.documentElement.style.overflowX = '';
       document.body.style.overflowX = '';
+      document.documentElement.classList.remove('tight-desktop');
     };
   }, []);
 

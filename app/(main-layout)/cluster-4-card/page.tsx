@@ -19,6 +19,12 @@ const Cluster4CardPage = () => {
   });
   const mainRef = useRef<HTMLElement>(null);
 
+  // tight-desktop 감지를 위한 헬퍼
+  const getSidebarLeft = () => {
+    const isTight = document.documentElement.classList.contains('tight-desktop');
+    return isTight ? '80px' : '110px';
+  };
+
   // 현재 주차로 리다이렉트
   useEffect(() => {
     const fetchCurrentWeekAndRedirect = async () => {
@@ -71,37 +77,33 @@ const Cluster4CardPage = () => {
   }, [router]);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const updateSidebar = () => {
+      const left = getSidebarLeft();
       const footer = document.querySelector('footer');
-      if (!footer) return;
+      if (!footer) {
+        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        return;
+      }
 
       const footerRect = footer.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
       if (footerRect.top < windowHeight) {
         const moveUp = windowHeight - footerRect.top;
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: `${124 - moveUp}px`,
-          overflow: 'visible',
-          zIndex: 100,
-        });
+        setSidebarStyle({ position: 'fixed', left, top: `${124 - moveUp}px`, overflow: 'visible', zIndex: 100 });
       } else {
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: '124px',
-          overflow: 'visible',
-          zIndex: 100,
-        });
+        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    window.addEventListener('scroll', updateSidebar);
+    window.addEventListener('resize', updateSidebar);
+    updateSidebar();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', updateSidebar);
+      window.removeEventListener('resize', updateSidebar);
+    };
   }, []);
 
   return (

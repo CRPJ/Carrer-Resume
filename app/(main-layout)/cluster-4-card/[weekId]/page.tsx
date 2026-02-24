@@ -21,10 +21,20 @@ const Cluster4CardDynamicPage = () => {
   });
   const mainRef = useRef<HTMLElement>(null);
 
+  // tight-desktop 감지를 위한 헬퍼
+  const getSidebarLeft = () => {
+    const isTight = document.documentElement.classList.contains('tight-desktop');
+    return isTight ? '80px' : '110px';
+  };
+
   useEffect(() => {
-    const handleScroll = () => {
+    const updateSidebar = () => {
+      const left = getSidebarLeft();
       const footer = document.querySelector('footer');
-      if (!footer) return;
+      if (!footer) {
+        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        return;
+      }
 
       const footerRect = footer.getBoundingClientRect();
       const sidebarHeight = 810;
@@ -32,29 +42,20 @@ const Cluster4CardDynamicPage = () => {
       const sidebarBottom = sidebarTop + sidebarHeight;
 
       if (footerRect.top < sidebarBottom) {
-        // footer와 겹칠 때: 사이드바를 딱 footer 위까지만
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: `${footerRect.top - sidebarHeight}px`,
-          overflow: 'visible',
-          zIndex: 100,
-        });
+        setSidebarStyle({ position: 'fixed', left, top: `${footerRect.top - sidebarHeight}px`, overflow: 'visible', zIndex: 100 });
       } else {
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: '124px',
-          overflow: 'visible',
-          zIndex: 100,
-        });
+        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    window.addEventListener('scroll', updateSidebar);
+    window.addEventListener('resize', updateSidebar);
+    updateSidebar();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', updateSidebar);
+      window.removeEventListener('resize', updateSidebar);
+    };
   }, []);
 
   return (

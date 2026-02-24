@@ -47,6 +47,45 @@
   }
 }
 
+// ===== 1200~1400px (노트북/중간폭) - 타이트 데스크톱 =====
+// CSS zoom이 media query를 무력화하므로, JS가 html.tight-desktop 클래스를 토글
+// → gap/padding을 줄이고, 사이드바 카드를 확대하여 공간 효율 극대화
+html.tight-desktop {
+  // 콘텐츠 좌우 패딩 제거 (.nftg-app 유무 모두 커버)
+  .nftg-content.nftg-content-home,
+  .nftg-app .nftg-content.nftg-content-home {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  // desktop-layout flex gap 제거
+  .nftg-content-home .desktop-layout,
+  .desktop-layout {
+    gap: 0 !important;
+  }
+
+  // 왼쪽 네비게이션 사이드바도 축소
+  .nftg-app .nftg-sidebar,
+  .nftg-sidebar {
+    width: 80px;
+
+    .sidebar__wrapper {
+      padding: 8px 0;
+    }
+
+    .sidebar__logo img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .nftg-app .nftg-layout,
+  .nftg-layout {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+  }
+}
+
 
 // ===== 공통 레이아웃 스타일 =====
 

@@ -15,63 +15,50 @@ import Secure from "@/components/home/Secure";
 import Animations from "@/components/shared/Animations";
 
 const HomePageTwo = () => {
-  // 사이드바 고정 너비
-  const sidebarWidth = '474px';
-
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
     position: 'fixed',
     left: '110px',
     top: '125px',
-    overflowY: 'hidden',
+    overflow: 'visible',
     zIndex: 100,
-    width: sidebarWidth,
-    height: '810px',
-    transform: 'scale(1)',
-    transformOrigin: 'top left',
   });
 
   const mainRef = useRef<HTMLElement>(null);
 
+  // tight-desktop 감지를 위한 헬퍼
+  const getSidebarLeft = () => {
+    const isTight = document.documentElement.classList.contains('tight-desktop');
+    return isTight ? '80px' : '110px';
+  };
+
   useEffect(() => {
-    const handleScroll = () => {
+    const updateSidebar = () => {
+      const left = getSidebarLeft();
       const footer = document.querySelector('footer');
-      if (!footer) return;
+      if (!footer) {
+        setSidebarStyle({ position: 'fixed', left, top: '125px', overflow: 'visible', zIndex: 100 });
+        return;
+      }
 
       const footerRect = footer.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
       if (footerRect.top < windowHeight) {
         const moveUp = windowHeight - footerRect.top;
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: `${125 - moveUp}px`,
-          overflowY: 'hidden',
-          zIndex: 100,
-          width: sidebarWidth,
-          height: '810px',
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-        });
+        setSidebarStyle({ position: 'fixed', left, top: `${125 - moveUp}px`, overflow: 'visible', zIndex: 100 });
       } else {
-        setSidebarStyle({
-          position: 'fixed',
-          left: '110px',
-          top: '125px',
-          overflowY: 'hidden',
-          zIndex: 100,
-          width: sidebarWidth,
-          height: '810px',
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-        });
+        setSidebarStyle({ position: 'fixed', left, top: '125px', overflow: 'visible', zIndex: 100 });
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    window.addEventListener('scroll', updateSidebar);
+    window.addEventListener('resize', updateSidebar);
+    updateSidebar();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', updateSidebar);
+      window.removeEventListener('resize', updateSidebar);
+    };
   }, []);
 
   return (
@@ -85,7 +72,7 @@ const HomePageTwo = () => {
       <div className="container-fluid">
         <div className="row">
           {/* 사이드바 공간 확보용 빈 영역 */}
-          <div style={{ width: sidebarWidth, flexShrink: 0 }}></div>
+          <div style={{ width: 'var(--sidebar-width, 482px)', flexShrink: 0 }}></div>
           <div className="home-two-content-col">
             <ClusterTabs />
 

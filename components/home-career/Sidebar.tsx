@@ -323,7 +323,7 @@ const Sidebar = () => {
   useEffect(() => {
     const calculateScale = () => {
       const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
-      const mobile = screen.width < 1400;
+      const mobile = window.innerWidth < 1200;
       setIsMobileView(mobile);
 
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
@@ -361,12 +361,20 @@ const Sidebar = () => {
       // 기본 정책: 큰 화면에서 임의 확대 금지(비율 깨짐 방지)
       scale = Math.min(1, scale);
 
-      // 1366x768급 노트북(세로가 낮은 환경)에서는 카드가 지나치게 작게 보일 수 있어
-      // "오른쪽 콘텐츠를 침범하지 않는" 범위에서만 추가 확대를 허용한다.
-      // (Cluster2에서도 동일 UX가 필요함)
+      // 중간폭 데스크톱 및 노트북 카드 확대 보정
       const isClusterPages =
         (pathname || '').includes('/cluster-') ||
         (pathname || '').includes('/career');
+
+      // ★ 1200~1400px 물리 뷰포트: window.innerWidth는 CSS zoom의 영향을 받지 않으므로
+      //   물리적 뷰포트 폭을 직접 사용하여 안정적으로 감지
+      const physicalWidth = window.innerWidth;
+      const isTightDesktop =
+        !mobile &&
+        physicalWidth >= 1200 &&
+        physicalWidth < 1400;
+
+      // 1366x768급 노트북(세로가 낮은 환경)
       const isLaptop1366 =
         !mobile &&
         viewportWidth >= 1280 &&
@@ -374,18 +382,23 @@ const Sidebar = () => {
         viewportHeight >= 700 &&
         viewportHeight <= 820;
 
-      if (isClusterPages && isLaptop1366) {
-        // 레이아웃 상수(페이지에서 desktop-layout gap=20px)
+      if (isClusterPages && isTightDesktop) {
+        // 뷰포트가 좁을수록 카드를 더 확대 (1200px → 1.15, 1400px → 1.0)
+        // CSS zoom으로 인한 카드 시각적 축소를 보정
+        const boost = 1 + (1400 - physicalWidth) / (1400 - 1200) * 0.15;
+        const tightScale = Math.min(1.15, Math.max(1.0, boost));
+        scale = Math.max(scale, tightScale);
+      } else if (isClusterPages && isLaptop1366) {
         const GAP_PX = 20;
+        const NAV_WIDTH = 97;
+        const PADDING_PX = 24;
         const BASE_SIDEBAR_WIDTH = 482;
-        // 오른쪽 콘텐츠가 너무 좁아지지 않게 "최소 확보 폭" (침범 방지 가드레일)
         const MIN_RIGHT_CONTENT = 760;
 
-        // 뷰포트에서 오른쪽 최소 폭을 남기고, 남는 만큼만 사이드바를 키울 수 있다.
-        const maxSidebarWidth = Math.max(BASE_SIDEBAR_WIDTH, viewportWidth - GAP_PX - MIN_RIGHT_CONTENT);
+        const availableForSidebar = viewportWidth - NAV_WIDTH - PADDING_PX - GAP_PX - MIN_RIGHT_CONTENT;
+        const maxSidebarWidth = Math.max(BASE_SIDEBAR_WIDTH, availableForSidebar);
         const maxScaleByWidth = maxSidebarWidth / BASE_SIDEBAR_WIDTH;
 
-        // "가능한 만큼" 확대(최대 상한은 과도 확대 방지)
         const desiredScale = Math.min(1.5, maxScaleByWidth);
         scale = Math.max(scale, desiredScale);
       }
