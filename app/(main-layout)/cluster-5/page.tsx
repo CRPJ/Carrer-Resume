@@ -49,8 +49,7 @@ const sparkleStyles = `
 `;
 
 const Cluster5Page = () => {
-  // 사이드바 고정 너비
-  const sidebarWidth = '474px';
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const sidebarShellRef = useRef<HTMLDivElement>(null);
   const sidebarInnerRef = useRef<HTMLDivElement>(null);
@@ -75,51 +74,58 @@ const Cluster5Page = () => {
     setTimeout(() => sparkle.remove(), 600);
   };
 
-  const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
-    position: 'fixed',
-    left: '110px',
-    top: '125px',
-    overflowY: 'hidden',
-    zIndex: 100,
-    width: sidebarWidth,
-    height: '810px',
-    transform: 'scale(1)',
-    transformOrigin: 'top left',
-  });
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!sidebarShellRef.current || !sidebarInnerRef.current) return;
+    // 화면 크기 체크
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1200);
+    };
+
+    // 초기 실행
+    checkMobile();
+
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
+  useEffect(() => {
+    if (isMobile || !sidebarShellRef.current || !sidebarInnerRef.current) return;
 
     const shell = sidebarShellRef.current;
     const inner = sidebarInnerRef.current;
-
     const getHeaderBottom = () => {
-      const header = document.querySelector('header');
-      if (header) return header.getBoundingClientRect().bottom;
-      return 71;
-    };
+    const header = document.querySelector('header');
+    if (header) return header.getBoundingClientRect().bottom;
+    return 71;
+};
 
     let rafId: number | null = null;
     let isFixed = false;
 
-    const computeTop = (zoom: number, height: number) => {
+    // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
+        const computeTop = (zoom: number, height: number) => {
       const defaultTop = getHeaderBottom() / zoom;
       let top = defaultTop;
-  
+
       const footer = document.querySelector("footer");
       if (footer) {
           const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 2 / zoom;
+          const margin = 4 / zoom;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
       }
-  
+
       return top;
   };
 
     const apply = () => {
       rafId = null;
+
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
@@ -133,15 +139,18 @@ const Cluster5Page = () => {
 
         shell.style.width = `${width}px`;
         shell.style.height = `${inner.offsetHeight}px`;
-        inner.style.position = 'fixed';
+
+        inner.style.position = "fixed";
         inner.style.top = `${top}px`;
         inner.style.left = `${left}px`;
         inner.style.width = `${width}px`;
-        inner.style.zIndex = '9999';
+        inner.style.zIndex = "9999";
+
         isFixed = true;
         return;
       }
 
+      // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
       if (isFixed && shouldFix) {
         const height = inner.getBoundingClientRect().height / zoom;
         const top = computeTop(zoom, height);
@@ -150,13 +159,15 @@ const Cluster5Page = () => {
       }
 
       if (isFixed && !shouldFix) {
-        shell.style.width = '';
-        shell.style.height = '';
-        inner.style.position = 'relative';
-        inner.style.top = '0';
-        inner.style.left = '0';
-        inner.style.width = '';
-        inner.style.zIndex = '100';
+        shell.style.width = "";
+        shell.style.height = "";
+
+        inner.style.position = "relative";
+        inner.style.top = "0";
+        inner.style.left = "0";
+        inner.style.width = "";
+        inner.style.zIndex = "100";
+
         isFixed = false;
       }
     };
@@ -168,100 +179,143 @@ const Cluster5Page = () => {
 
     const handleResize = () => {
       isFixed = false;
-      shell.style.width = '';
-      shell.style.height = '';
-      inner.style.position = 'relative';
-      inner.style.top = '0';
-      inner.style.left = '0';
-      inner.style.width = '';
+      shell.style.width = "";
+      shell.style.height = "";
+      inner.style.position = "relative";
+      inner.style.top = "0";
+      inner.style.left = "0";
+      inner.style.width = "";
+
       if (rafId != null) window.cancelAnimationFrame(rafId);
       rafId = window.requestAnimationFrame(apply);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize);
     rafId = window.requestAnimationFrame(apply);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
       if (rafId != null) window.cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [isMobile]);
 
+  // 공사중 콘텐츠 (모바일/데스크톱 공용)
+  const constructionContent = (
+    <>
+      <style>{sparkleStyles}</style>
+      <div
+        ref={containerRef}
+        onMouseMove={handleMouseMove}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '810px',
+          width: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {/* 배경 이미지 (50% 투명도) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url(/images/0/공사중.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.5,
+            zIndex: 0,
+          }}
+        />
+        {/* 텍스트 (100% 선명) */}
+        <p
+          className="shimmer-text"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1,
+            fontSize: '48px',
+            fontWeight: 700,
+            textAlign: 'center',
+            fontFamily: 'Cafe24Ohsquare, sans-serif',
+            filter: 'drop-shadow(0 0 10px rgba(0, 0, 0, 0.8)) drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.9))',
+            lineHeight: '1.5',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          페이지 공사중 !
+        </p>
+      </div>
+    </>
+  );
+
+  // 모바일 레이아웃
+  if (isMobile) {
+    return (
+      <main ref={mainRef} className="nftg-content nftg-content-home mobile-layout">
+        <Animations />
+
+        {/* 모바일: 세로 배치 */}
+        <div className="mobile-container">
+          {/* 1. 프로필 카드 (상단) */}
+          <div className="mobile-sidebar-section">
+            <Sidebar />
+          </div>
+
+          {/* 2. 클러스터 탭 */}
+          <div className="mobile-tabs-section">
+            <ClusterTabs />
+          </div>
+
+          {/* 3. 메인 콘텐츠 */}
+          <div className="mobile-content-section">
+            {constructionContent}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // 데스크탑 레이아웃 - JavaScript로 sticky 동작 구현
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
 
-      {/* 고정 사이드바 */}
       <div className="desktop-layout" style={{
-          display: 'flex',
-          gap: '20px',
-          alignItems: 'flex-start',
-          position: 'relative',
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'flex-start',
+        position: 'relative',
       }}>
-          <div ref={sidebarShellRef} className="sidebar-sticky-wrapper" style={{ flexShrink: 0, zIndex: 100 }}>
-            <div ref={sidebarInnerRef} style={{ position: 'relative', zIndex: 100 }}>
-              <Sidebar />
-            </div>
-          </div>
-          <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
-            <ClusterTabs />
-            {/* 공사중 콘텐츠 */}
-            <style>{sparkleStyles}</style>
-            <div
-              ref={containerRef}
-              onMouseMove={handleMouseMove}
-              style={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '810px',
-                width: '100%',
-                overflow: 'hidden',
-              }}
-            >
-              {/* 배경 이미지 (50% 투명도) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundImage: 'url(/images/0/공사중.png)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  opacity: 0.5,
-                  zIndex: 0,
-                }}
-              />
-              {/* 텍스트 (100% 선명) */}
-              <p
-                className="shimmer-text"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 1,
-                  fontSize: '48px',
-                  fontWeight: 700,
-                  textAlign: 'center',
-                  fontFamily: 'Cafe24Ohsquare, sans-serif',
-                  filter: 'drop-shadow(0 0 10px rgba(0, 0, 0, 0.8)) drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.9))',
-                  lineHeight: '1.5',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                페이지 공사중 !
-              </p>
-            </div>
+        {/* 사이드바 - JS로 스크롤 따라오기 */}
+        <div
+          ref={sidebarShellRef}
+          className="sidebar-sticky-wrapper"
+          style={{ flexShrink: 0, zIndex: 100 }}
+        >
+          <div ref={sidebarInnerRef} style={{ position: 'relative', zIndex: 100 }}>
+            <Sidebar />
           </div>
         </div>
+
+        {/* 메인 콘텐츠 */}
+        <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
+          <ClusterTabs />
+          <div className="home-two-content">
+            {constructionContent}
+          </div>
+        </div>
+      </div>
     </main>
   );
 };
