@@ -188,11 +188,8 @@
       z-index: 1;
       text-align: center;
       padding-top: 60px;
-      margin-bottom: 24px;
-      height: 140px;          // 추가
-      overflow: hidden;      // 추가
-      pointer-events: none;     
-      padding-bottom: 8px;
+      margin-bottom: 30px;
+      padding-bottom: 0;
 
       .title-inner {
         position: relative;
@@ -224,7 +221,7 @@
       // Cluster2/3와 동일한 여백/줄바꿈 전략으로 통일
       max-width: min(62ch, 1100px);
       margin: 0 auto;
-      padding: 30px 40px 0;
+      padding: 30px 40px 0 70px;
       line-height: 1.8;
       position: relative;
       z-index: 1;

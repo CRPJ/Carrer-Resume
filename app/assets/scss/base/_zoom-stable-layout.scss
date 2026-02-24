@@ -456,21 +456,7 @@ body {
     height: var(--tab-height, 48px);
     font-size: var(--tab-font-size, 14px);
     flex-shrink: 0;
-    
-    @media (max-width: 1599px) {
-      width: 220px;
-      min-width: 220px;
-      height: 44px;
-      font-size: 13px;
-    }
-    
-    @media (max-width: 1399px) {
-      width: 200px;
-      min-width: 200px;
-      height: 42px;
-      font-size: 12px;
-    }
-    
+
     @media (max-width: 1199px) {
       width: 180px;
       min-width: 180px;

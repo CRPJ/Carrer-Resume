@@ -1012,7 +1012,8 @@
 
         // ★ 문제 1: "이 페이지는~" 텍스트 크기 — 모든 클러스터 통일
         .section1-description {
-          padding: 8px 0 0 0 !important; // 16 → 8 (제목과 간격 축소)
+          padding-top: 8px !important;
+          padding-bottom: 0 !important;
           max-width: 100% !important;
 
           p, .quote-text, .small-text {
