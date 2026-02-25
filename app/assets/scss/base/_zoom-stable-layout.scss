@@ -349,9 +349,10 @@ body {
     }
     
     .intro-card {
-      max-width: 100%;
-      width: 100% !important;
-      min-width: unset !important;
+      width: 317px !important;
+      min-width: 317px !important;
+      max-width: 317px !important;
+      justify-self: center;
     }
   }
 }
