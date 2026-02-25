@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     // user_introductions에서 슬로건 조회
     const { data: introduction } = await supabaseAdmin
       .from("user_introductions")
-      .select("slogan_1, slogan_2, slogan_3, slogan_1_tag, slogan_2_tag, slogan_3_tag")
+      .select("slogan_1, slogan_2, slogan_3, slogan_1_tag, slogan_2_tag, slogan_3_tag, slogan_1_rating, slogan_2_rating, slogan_3_rating")
       .eq("user_id", profile.id)
       .maybeSingle();
 
@@ -72,14 +72,17 @@ export async function GET(request: Request) {
         slogan1: {
           content: introduction?.slogan_1 || null,
           option: introduction?.slogan_1_tag || null,
+          rating: introduction?.slogan_1_rating ?? 0,
         },
         slogan2: {
           content: introduction?.slogan_2 || null,
           option: introduction?.slogan_2_tag || null,
+          rating: introduction?.slogan_2_rating ?? 0,
         },
         slogan3: {
           content: introduction?.slogan_3 || null,
           option: introduction?.slogan_3_tag || null,
+          rating: introduction?.slogan_3_rating ?? 0,
         },
         engName: profile.eng_name || null,
       },
@@ -154,13 +157,22 @@ export async function PUT(request: Request) {
       .eq("user_id", profile.id)
       .maybeSingle();
 
+    // rating 범위 검증 (0~10 자연수)
+    const clampRating = (val: unknown): number => {
+      const n = typeof val === 'number' ? val : 0;
+      return Math.max(0, Math.min(10, Math.round(n)));
+    };
+
     const sloganData = {
       slogan_1: slogan1?.content || null,
       slogan_1_tag: slogan1?.option || null,
+      slogan_1_rating: clampRating(slogan1?.rating),
       slogan_2: slogan2?.content || null,
       slogan_2_tag: slogan2?.option || null,
+      slogan_2_rating: clampRating(slogan2?.rating),
       slogan_3: slogan3?.content || null,
       slogan_3_tag: slogan3?.option || null,
+      slogan_3_rating: clampRating(slogan3?.rating),
       updated_at: new Date().toISOString(),
     };
 

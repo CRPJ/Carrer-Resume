@@ -5,9 +5,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import schoolDataJson from "@/data/korea-schools.json";
-
-const schoolData: { [key: string]: string[] } = schoolDataJson;
 
 // 학력 데이터 타입
 interface EduData {
@@ -380,9 +377,9 @@ const Cluster2Content = () => {
   // 섹션 2 모달 (슬로건 편집)
   const [section2ModalOpen, setSection2ModalOpen] = useState(false);
   const [sloganData, setSloganData] = useState({
-    slogan1: { option: "", content: "" },
-    slogan2: { option: "", content: "" },
-    slogan3: { option: "", content: "" }
+    slogan1: { option: "", content: "", rating: 0 },
+    slogan2: { option: "", content: "", rating: 0 },
+    slogan3: { option: "", content: "", rating: 0 }
   });
   const [editingSloganData, setEditingSloganData] = useState(sloganData);
   const [dropdown1Open, setDropdown1Open] = useState(false);
@@ -404,15 +401,18 @@ const Cluster2Content = () => {
         const newSloganData = {
           slogan1: {
             option: result.data.slogan1?.option || "",
-            content: result.data.slogan1?.content || ""
+            content: result.data.slogan1?.content || "",
+            rating: result.data.slogan1?.rating ?? 0
           },
           slogan2: {
             option: result.data.slogan2?.option || "",
-            content: result.data.slogan2?.content || ""
+            content: result.data.slogan2?.content || "",
+            rating: result.data.slogan2?.rating ?? 0
           },
           slogan3: {
             option: result.data.slogan3?.option || "",
-            content: result.data.slogan3?.content || ""
+            content: result.data.slogan3?.content || "",
+            rating: result.data.slogan3?.rating ?? 0
           }
         };
         setSloganData(newSloganData);
@@ -879,6 +879,14 @@ const Cluster2Content = () => {
   const [eduDropdowns, setEduDropdowns] = useState<{ [key: string]: boolean }>({});
   // 학교 검색어 상태
   const [schoolSearchQuery, setSchoolSearchQuery] = useState<{ [key: string]: string }>({});
+  // 학교 검색 결과 상태
+  const [schoolSearchResults, setSchoolSearchResults] = useState<{ [key: string]: string[] }>({});
+  // 학교 검색 로딩 상태
+  const [schoolSearchLoading, setSchoolSearchLoading] = useState<{ [key: string]: boolean }>({});
+  // 학교 직접 입력 모드
+  const [schoolCustomInput, setSchoolCustomInput] = useState<{ [key: string]: boolean }>({});
+  // debounce 타이머 ref
+  const schoolSearchTimerRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
   // 모달 바디 ref (자동 스크롤용)
   const modalBodyRef = useRef<HTMLDivElement>(null);
 
@@ -907,9 +915,11 @@ const Cluster2Content = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       // 클릭한 요소가 드롭다운 내부가 아니면 모든 드롭다운 닫기
-      if (!target.closest('.edu-custom-dropdown')) {
+      if (!target.closest('.edu-custom-dropdown') && !target.closest('.school-autocomplete')) {
         setEduDropdowns({});
         setSchoolSearchQuery({});
+        setSchoolSearchResults({});
+        setSchoolCustomInput({});
       }
     };
 
@@ -920,6 +930,39 @@ const Cluster2Content = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  // 학교 검색 API 호출 (debounce)
+  const handleSchoolSearch = useCallback((key: string, query: string, eduLevel: string) => {
+    setSchoolSearchQuery(prev => ({ ...prev, [key]: query }));
+
+    // 기존 타이머 클리어
+    if (schoolSearchTimerRef.current[key]) {
+      clearTimeout(schoolSearchTimerRef.current[key]);
+    }
+
+    if (query.length < 2) {
+      setSchoolSearchResults(prev => ({ ...prev, [key]: [] }));
+      setSchoolSearchLoading(prev => ({ ...prev, [key]: false }));
+      return;
+    }
+
+    setSchoolSearchLoading(prev => ({ ...prev, [key]: true }));
+
+    schoolSearchTimerRef.current[key] = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/schools/search?query=${encodeURIComponent(query)}&eduLevel=${encodeURIComponent(eduLevel)}`);
+        const data = await res.json();
+        if (data.success) {
+          setSchoolSearchResults(prev => ({ ...prev, [key]: data.schools }));
+        }
+      } catch (error) {
+        console.error('학교 검색 오류:', error);
+        setSchoolSearchResults(prev => ({ ...prev, [key]: [] }));
+      } finally {
+        setSchoolSearchLoading(prev => ({ ...prev, [key]: false }));
+      }
+    }, 300);
   }, []);
 
   // 스크롤 애니메이션 - Intersection Observer
@@ -1331,14 +1374,42 @@ const Cluster2Content = () => {
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
                   <div className="score-row">
-                    <span className="score-stars animated-stars">
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                    </span>
-                    <span className="score-count">n/10</span>
+                    <div className="score-star-rating">
+                      {[1, 2, 3, 4, 5].map((starIndex) => {
+                        const fullValue = starIndex * 2;
+                        const halfValue = starIndex * 2 - 1;
+                        const currentRating = sloganData.slogan2.rating;
+                        const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                        const isFull = currentRating >= fullValue;
+                        return (
+                          <div key={starIndex} className="star-wrapper">
+                            <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#DFF314" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            {isHalf && (
+                              <svg className="star-half-fill" viewBox="0 0 24 24">
+                                <defs>
+                                  <clipPath id={`scoreHalfClip-2-${starIndex}`}>
+                                    <rect x="0" y="0" width="12" height="24" />
+                                  </clipPath>
+                                </defs>
+                                <polygon
+                                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                  fill="#DFF314"
+                                  clipPath={`url(#scoreHalfClip-2-${starIndex})`}
+                                />
+                              </svg>
+                            )}
+                            {isFull && (
+                              <svg className="star-full-fill" viewBox="0 0 24 24" fill="#DFF314">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <span className="score-count">{sloganData.slogan2.rating} / 10</span>
                   </div>
                 </div>
               </div>
@@ -1374,14 +1445,42 @@ const Cluster2Content = () => {
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
                   <div className="score-row">
-                    <span className="score-stars animated-stars">
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                    </span>
-                    <span className="score-count">n/10</span>
+                    <div className="score-star-rating">
+                      {[1, 2, 3, 4, 5].map((starIndex) => {
+                        const fullValue = starIndex * 2;
+                        const halfValue = starIndex * 2 - 1;
+                        const currentRating = sloganData.slogan3.rating;
+                        const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                        const isFull = currentRating >= fullValue;
+                        return (
+                          <div key={starIndex} className="star-wrapper">
+                            <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#DFF314" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            {isHalf && (
+                              <svg className="star-half-fill" viewBox="0 0 24 24">
+                                <defs>
+                                  <clipPath id={`scoreHalfClip-3-${starIndex}`}>
+                                    <rect x="0" y="0" width="12" height="24" />
+                                  </clipPath>
+                                </defs>
+                                <polygon
+                                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                  fill="#DFF314"
+                                  clipPath={`url(#scoreHalfClip-3-${starIndex})`}
+                                />
+                              </svg>
+                            )}
+                            {isFull && (
+                              <svg className="star-full-fill" viewBox="0 0 24 24" fill="#DFF314">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <span className="score-count">{sloganData.slogan3.rating} / 10</span>
                   </div>
                 </div>
               </div>
@@ -1430,8 +1529,13 @@ const Cluster2Content = () => {
             cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
-          {/* 최종학력을 맨 앞에 배치하고, 나머지는 그 뒤에 배치 */}
-          {[...educationData].sort((a, b) => (b.isFinal ? 1 : 0) - (a.isFinal ? 1 : 0)).map((edu, index) => (
+          {/* 대표학력을 맨 앞에 배치하고, 나머지는 입학년도 최신순 정렬 */}
+          {[...educationData].sort((a, b) => {
+            if (a.isFinal !== b.isFinal) return a.isFinal ? -1 : 1;
+            const aDate = parseInt(a.startYear || '0') * 100 + parseInt(a.startMonth || '0');
+            const bDate = parseInt(b.startYear || '0') * 100 + parseInt(b.startMonth || '0');
+            return bDate - aDate;
+          }).map((edu, index) => (
             <div className={`edu-card ${edu.isFinal ? 'first' : ''}`} key={index}>
               <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
               <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
@@ -1971,6 +2075,61 @@ const Cluster2Content = () => {
                   />
                   <span className="char-count">{editingSloganData.slogan1.content.length}/86</span>
                 </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan1.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-1-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-1-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan1: { ...prev.slogan1, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan1: { ...prev.slogan1, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan1.rating} / 10</span>
+                </div>
               </div>
 
               {/* 슬로건 2 */}
@@ -2020,6 +2179,61 @@ const Cluster2Content = () => {
                   />
                   <span className="char-count">{editingSloganData.slogan2.content.length}/86</span>
                 </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan2.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-2-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-2-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan2: { ...prev.slogan2, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan2: { ...prev.slogan2, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan2.rating} / 10</span>
+                </div>
               </div>
 
               {/* 슬로건 3 */}
@@ -2068,6 +2282,61 @@ const Cluster2Content = () => {
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
                   <span className="char-count">{editingSloganData.slogan3.content.length}/86</span>
+                </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan3.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-3-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-3-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan3: { ...prev.slogan3, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan3: { ...prev.slogan3, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan3.rating} / 10</span>
                 </div>
               </div>
             </div>
@@ -2347,7 +2616,12 @@ const Cluster2Content = () => {
               <div className="header-actions">
                 <button
                   className="add-edu-btn"
+                  disabled={editingEduData.length >= 10}
                   onClick={() => {
+                    if (editingEduData.length >= 10) {
+                      alert('학력은 최대 10개까지 추가할 수 있습니다.');
+                      return;
+                    }
                     const newEdu: EduData = {
                       eduLevel: "",
                       school: "",
@@ -2392,7 +2666,7 @@ const Cluster2Content = () => {
             <div className="section3-modal-body" ref={modalBodyRef}>
               {editingEduData.map((edu, index) => (
                 <div key={index} className={`edu-edit-card ${edu.isFinal ? 'is-final' : ''}`}>
-                  {/* 헤더: 번호 + 학력 선택 + 최종학력 버튼 */}
+                  {/* 헤더: 번호 + 학력 선택 + 대표학력 버튼 */}
                   <div className="edu-edit-header">
                     <span className="edu-edit-number">{index + 1}</span>
                     <div className={`edu-custom-dropdown edu-level-dropdown ${eduDropdowns[`${index}_eduLevel`] ? 'open' : ''}`}>
@@ -2424,7 +2698,7 @@ const Cluster2Content = () => {
                       )}
                     </div>
                     <div className="header-buttons">
-                      {/* 최종학력 선택 버튼 */}
+                      {/* 대표학력 선택 버튼 */}
                       <button
                         className={`final-edu-btn ${edu.isFinal ? 'active' : ''}`}
                         onClick={() => {
@@ -2432,7 +2706,7 @@ const Cluster2Content = () => {
                             ...item,
                             isFinal: i === index
                           }));
-                          // 최종학력을 첫 번째로 이동
+                          // 대표학력을 첫 번째로 이동
                           const finalItem = newData[index];
                           newData.splice(index, 1);
                           newData.unshift(finalItem);
@@ -2442,10 +2716,10 @@ const Cluster2Content = () => {
                             modalBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                           }, 100);
                         }}
-                        title="최종학력으로 설정"
+                        title="대표학력으로 설정"
                       >
                         <i className="ti ti-star-filled"></i>
-                        <span>{edu.isFinal ? '최종학력' : '최종학력 지정'}</span>
+                        <span>{edu.isFinal ? '대표학력' : '대표학력 지정'}</span>
                       </button>
                       {/* 삭제 버튼 */}
                       <button
@@ -2476,74 +2750,135 @@ const Cluster2Content = () => {
 
                   {/* 본문 그리드 - 행별로 그룹화 */}
                   <div className="edu-edit-grid">
-                    {/* 행 1: 학교 선택 (전체 너비) */}
+                    {/* 행 1: 학교 선택 - 자동완성 검색 (전체 너비) */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
                         <label>학교<span className="required">*</span></label>
-                        <div className={`edu-custom-dropdown edu-school-dropdown ${eduDropdowns[`${index}_school`] ? 'open' : ''}`}>
-                          <div
-                            className="dropdown-selected"
-                            onClick={() => edu.eduLevel && setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: !prev[`${index}_school`] }))}
-                            style={{ opacity: edu.eduLevel ? 1 : 0.5, cursor: edu.eduLevel ? 'pointer' : 'not-allowed' }}
-                          >
-                            <span>{edu.school || (edu.eduLevel ? '학교 선택' : '학력을 먼저 선택하세요')}</span>
-                            <i className="ti ti-chevron-down"></i>
-                          </div>
-                          {eduDropdowns[`${index}_school`] && edu.eduLevel && (
-                            <div className="dropdown-options scrollable">
-                              {/* 검색 필드 */}
-                              <div className="dropdown-search-wrapper" onClick={(e) => e.stopPropagation()}>
+                        <div className="school-autocomplete">
+                          {schoolCustomInput[`${index}_school`] ? (
+                            /* 직접 입력 모드 */
+                            <div className="school-custom-input-wrapper">
+                              <input
+                                type="text"
+                                className="school-search-input"
+                                placeholder="학교명을 직접 입력하세요"
+                                value={edu.school || ''}
+                                onChange={(e) => {
+                                  const newData = [...editingEduData];
+                                  newData[index].school = e.target.value;
+                                  setEditingEduData(newData);
+                                }}
+                                autoFocus
+                              />
+                              <button
+                                className="school-back-btn"
+                                onClick={() => {
+                                  setSchoolCustomInput(prev => ({ ...prev, [`${index}_school`]: false }));
+                                  const newData = [...editingEduData];
+                                  newData[index].school = '';
+                                  setEditingEduData(newData);
+                                }}
+                                title="검색으로 돌아가기"
+                              >
+                                <i className="ti ti-arrow-left"></i>
+                              </button>
+                            </div>
+                          ) : (
+                            /* 검색 모드 */
+                            <>
+                              <div className="school-search-wrapper">
+                                <i className="ti ti-search school-search-icon"></i>
                                 <input
                                   type="text"
-                                  className="dropdown-search-input"
-                                  placeholder="학교 검색..."
-                                  value={schoolSearchQuery[`${index}_school`] || ''}
-                                  onChange={(e) => setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: e.target.value }))}
-                                  autoFocus
+                                  className="school-search-input"
+                                  placeholder={edu.eduLevel ? '학교명을 검색하세요 (2글자 이상)' : '학력을 먼저 선택하세요'}
+                                  value={edu.school && !eduDropdowns[`${index}_school`] ? edu.school : (schoolSearchQuery[`${index}_school`] || '')}
+                                  onChange={(e) => {
+                                    if (!edu.eduLevel) return;
+                                    const newData = [...editingEduData];
+                                    newData[index].school = '';
+                                    setEditingEduData(newData);
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: true }));
+                                    handleSchoolSearch(`${index}_school`, e.target.value, edu.eduLevel);
+                                  }}
+                                  onFocus={() => {
+                                    if (!edu.eduLevel) return;
+                                    if (edu.school) {
+                                      handleSchoolSearch(`${index}_school`, edu.school, edu.eduLevel);
+                                    }
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: true }));
+                                  }}
+                                  disabled={!edu.eduLevel}
+                                  style={{ opacity: edu.eduLevel ? 1 : 0.5 }}
                                 />
-                              </div>
-                              {/* 필터링된 학교 목록 */}
-                              {(schoolData[edu.eduLevel] || [])
-                                .filter(school =>
-                                  !schoolSearchQuery[`${index}_school`] ||
-                                  school.toLowerCase().includes(schoolSearchQuery[`${index}_school`].toLowerCase())
-                                )
-                                .map((school) => (
-                                  <div
-                                    key={school}
-                                    className={`dropdown-option ${edu.school === school ? 'selected' : ''}`}
+                                {edu.school && eduDropdowns[`${index}_school`] !== true && (
+                                  <button
+                                    className="school-clear-btn"
                                     onClick={() => {
                                       const newData = [...editingEduData];
-                                      newData[index].school = school;
+                                      newData[index].school = '';
                                       setEditingEduData(newData);
+                                      setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                      setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
+                                    }}
+                                    title="선택 해제"
+                                  >
+                                    <i className="ti ti-x"></i>
+                                  </button>
+                                )}
+                              </div>
+                              {/* 검색 결과 드롭다운 */}
+                              {eduDropdowns[`${index}_school`] && edu.eduLevel && (
+                                <div className="school-results-dropdown">
+                                  {schoolSearchLoading[`${index}_school`] ? (
+                                    <div className="school-result-message">
+                                      <i className="ti ti-loader school-spinner"></i>
+                                      검색 중...
+                                    </div>
+                                  ) : (schoolSearchQuery[`${index}_school`] || '').length < 2 ? (
+                                    <div className="school-result-message">
+                                      2글자 이상 입력하세요
+                                    </div>
+                                  ) : (schoolSearchResults[`${index}_school`] || []).length === 0 ? (
+                                    <div className="school-result-message">
+                                      검색 결과가 없습니다
+                                    </div>
+                                  ) : (
+                                    <div className="school-results-list">
+                                      {(schoolSearchResults[`${index}_school`] || []).map((school) => (
+                                        <div
+                                          key={school}
+                                          className={`school-result-item ${edu.school === school ? 'selected' : ''}`}
+                                          onClick={() => {
+                                            const newData = [...editingEduData];
+                                            newData[index].school = school;
+                                            setEditingEduData(newData);
+                                            setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
+                                            setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                            setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
+                                          }}
+                                        >
+                                          {school}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {/* 기타 (직접 입력) - 하단 고정 */}
+                                  <div
+                                    className="school-custom-option"
+                                    onClick={() => {
+                                      setSchoolCustomInput(prev => ({ ...prev, [`${index}_school`]: true }));
                                       setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
                                       setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                      setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
                                     }}
                                   >
-                                    {school}
+                                    <i className="ti ti-pencil"></i>
+                                    기타 (직접 입력)
                                   </div>
-                                ))}
-                              <div
-                                className="dropdown-option custom-input-option"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <input
-                                  type="text"
-                                  placeholder="직접 입력..."
-                                  value={edu.school && !schoolData[edu.eduLevel]?.includes(edu.school) ? edu.school : ''}
-                                  onChange={(e) => {
-                                    const newData = [...editingEduData];
-                                    newData[index].school = e.target.value;
-                                    setEditingEduData(newData);
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
-                                    }
-                                  }}
-                                />
-                              </div>
-                            </div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -2615,6 +2950,7 @@ const Cluster2Content = () => {
                           )}
                         </div>
                       </div>
+                      <p className="major-hint">* 계열이 없을 시 &quot;-&quot;를 선택해주세요.</p>
                     </div>
 
                     {/* 행 4: 전공 1 / 전공 2 / 전공 3 */}
@@ -2658,7 +2994,7 @@ const Cluster2Content = () => {
                           placeholder="기타 전공"
                         />
                       </div>
-                      <p className="major-hint">* 전공이 없을 시 &quot;-&quot;로 입력해주세요.</p>
+                      <p className="major-hint">* 전공이 없을 시 &quot;-&quot;를 기입해주세요.</p>
                     </div>
 
                     {/* 행 5: 입학 / 졸업 */}
@@ -3010,8 +3346,8 @@ const Cluster2Content = () => {
                                     onClick={() => {
                                       const newData = [...editingEduData];
                                       newData[index].gradeMax = opt;
-                                      // 최대치 변경 시 달성치 초기화
-                                      newData[index].gradeValue = '';
+                                      // 최대치 변경 시 달성치 초기화 ('-' 선택 시 달성치도 '-')
+                                      newData[index].gradeValue = opt === '-' ? '-' : '';
                                       setEditingEduData(newData);
                                       setEduDropdowns(prev => ({ ...prev, [`${index}_gradeMax`]: false }));
                                     }}
@@ -3024,6 +3360,7 @@ const Cluster2Content = () => {
                           </div>
                         )}
                       </div>
+                      <p className="major-hint">* 성적이 없을 시 &quot;-&quot;를 선택해주세요.</p>
                     </div>
 
                     {/* 행 6: 비고 (전체 너비) */}
@@ -3062,9 +3399,12 @@ const Cluster2Content = () => {
                     const missing: string[] = [];
                     if (!edu.school || edu.school === '-') missing.push('학교');
                     if (!edu.status || edu.status === '-') missing.push('상태');
-                    if (!edu.category || edu.category === '-') missing.push('계열');
-                    if (!edu.major1 || edu.major1 === '-') missing.push('전공 1');
+                    if (!edu.category) missing.push('계열');
+                    if (!edu.major1) missing.push('전공 1');
                     if (!edu.startYear) missing.push('입학년도');
+                    if (edu.startYear && !edu.startMonth) missing.push('입학월');
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) missing.push('종료년도');
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) missing.push('종료월');
                     if (!edu.gradeValue) missing.push('성적');
                     return { index: index + 1, missing };
                   }).filter(item => item.missing.length > 0);

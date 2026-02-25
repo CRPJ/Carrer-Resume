@@ -970,6 +970,35 @@
             top: 2px;
           }
 
+          .score-star-rating {
+            display: flex;
+            gap: 2px;
+            position: relative;
+            top: 2px;
+
+            .star-wrapper {
+              width: 14px;
+              height: 14px;
+              position: relative;
+              animation: svgStarPulse 3s ease-in-out infinite;
+
+              &:nth-child(1) { animation-delay: 0s; }
+              &:nth-child(2) { animation-delay: 0.3s; }
+              &:nth-child(3) { animation-delay: 0.6s; }
+              &:nth-child(4) { animation-delay: 0.9s; }
+              &:nth-child(5) { animation-delay: 1.2s; }
+
+              svg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+              }
+            }
+          }
+
           .score-count {
             font-family: 'Pretendard', sans-serif;
             font-size: 0.75rem;
@@ -1565,7 +1594,7 @@
       margin-top: 120px;
       margin-left: 30px;
 
-      // 첫 번째 카드 (최종학력) - 상단 고정
+      // 첫 번째 카드 (대표학력) - 상단 고정
       &:first-child {
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 20px;
@@ -3565,6 +3594,22 @@
   }
 }
 
+// SVG 별 순차 펄스 애니메이션
+@keyframes svgStarPulse {
+  0%, 10% {
+    transform: scale(1);
+    filter: brightness(0.5);
+  }
+  15% {
+    transform: scale(1.3);
+    filter: brightness(1.5);
+  }
+  25%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
 // 별점 순차 채우기 애니메이션
 @keyframes starFillSequence {
   0%, 10% {
@@ -4674,6 +4719,71 @@
           letter-spacing: 0.5px;
         }
       }
+
+      .slogan-rating-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+
+        .slogan-rating-label {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .slogan-star-rating {
+          display: flex;
+          gap: 4px;
+
+          .star-wrapper {
+            width: 20px;
+            height: 20px;
+            position: relative;
+            cursor: pointer;
+
+            svg {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              pointer-events: none;
+            }
+
+            .star-click-area {
+              position: absolute;
+              top: 0;
+              width: 50%;
+              height: 100%;
+              background: transparent;
+              border: none;
+              cursor: pointer;
+              padding: 0;
+
+              &.star-click-left {
+                left: 0;
+              }
+
+              &.star-click-right {
+                right: 0;
+              }
+            }
+
+            &:hover {
+              transform: scale(1.15);
+            }
+          }
+        }
+
+        .slogan-rating-value {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #FFA500;
+          font-family: 'Pretendard', sans-serif;
+        }
+      }
     }
   }
 
@@ -4933,7 +5043,7 @@
         margin-bottom: 0;
       }
 
-      // 최종학력 카드 스타일
+      // 대표학력 카드 스타일
       &.is-final {
         background: rgba(255, 165, 0, 0.05);
         border: 1px solid rgba(255, 165, 0, 0.3);
@@ -5035,7 +5145,7 @@
           margin-left: auto;
         }
 
-        // 최종학력 선택 버튼
+        // 대표학력 선택 버튼
         .final-edu-btn {
           display: flex;
           align-items: center;
@@ -5338,72 +5448,209 @@
             margin: -8px 0 0 0;
           }
 
-          // 학교 선택 드롭다운 (본문 내)
-          .edu-school-dropdown {
-            .dropdown-selected {
-              font-family: 'Cafe24Ohsquare', sans-serif;
-              font-size: 1rem;
-              font-weight: 700;
-            }
+          // 학교 자동완성 검색
+          .school-autocomplete {
+            position: relative;
 
-            .dropdown-options {
-              .dropdown-search-wrapper {
-                padding: 8px 12px;
-                background: rgba(255, 165, 0, 0.05);
-                border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            .school-search-wrapper {
+              position: relative;
+              display: flex;
+              align-items: center;
 
-                .dropdown-search-input {
-                  width: 100%;
-                  background: #151515;
-                  border: 1px solid rgba(255, 165, 0, 0.3);
-                  color: #fff;
-                  padding: 8px 12px;
+              .school-search-icon {
+                position: absolute;
+                left: 12px;
+                color: #888;
+                font-size: 0.875rem;
+                pointer-events: none;
+              }
+
+              .school-search-input {
+                width: 100%;
+                background: #151515;
+                border: 1px solid rgba(255, 165, 0, 0.3);
+                color: #fff;
+                padding: 10px 36px 10px 36px;
+                font-family: 'Cafe24Ohsquare', sans-serif;
+                font-size: 1rem;
+                font-weight: 700;
+                box-sizing: border-box;
+                border-radius: 4px;
+                transition: border-color 0.2s;
+
+                &:focus {
+                  outline: none;
+                  border-color: #FFA500;
+                  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.1);
+                }
+
+                &::placeholder {
+                  color: #666;
                   font-family: 'Pretendard', sans-serif;
                   font-size: 0.875rem;
-                  box-sizing: border-box;
-                  border-radius: 4px;
+                  font-weight: 400;
+                }
 
-                  &:focus {
-                    outline: none;
-                    border-color: #FFA500;
-                    box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.1);
-                  }
-
-                  &::placeholder {
-                    color: #666;
-                  }
+                &:disabled {
+                  cursor: not-allowed;
                 }
               }
 
-              .custom-input-option {
-                padding: 8px 12px;
-                background: rgba(255, 255, 255, 0.03);
-                border-top: 1px solid rgba(255, 165, 0, 0.2);
-
-                input {
-                  width: 100%;
-                  background: #151515;
-                  border: 1px solid rgba(255, 255, 255, 0.1);
-                  color: #fff;
-                  padding: 10px 12px;
-                  font-family: 'Pretendard', sans-serif;
-                  font-size: 0.875rem;
-                  box-sizing: border-box;
-
-                  &:focus {
-                    outline: none;
-                    border-color: rgba(255, 165, 0, 0.5);
-                  }
-
-                  &::placeholder {
-                    color: #666;
-                  }
-                }
+              .school-clear-btn {
+                position: absolute;
+                right: 8px;
+                background: none;
+                border: none;
+                color: #888;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 &:hover {
-                  background: rgba(255, 255, 255, 0.03);
+                  color: #FFA500;
                 }
               }
+            }
+
+            .school-custom-input-wrapper {
+              position: relative;
+              display: flex;
+              align-items: center;
+
+              .school-search-input {
+                width: 100%;
+                background: #151515;
+                border: 1px solid rgba(255, 165, 0, 0.3);
+                color: #fff;
+                padding: 10px 36px 10px 12px;
+                font-family: 'Cafe24Ohsquare', sans-serif;
+                font-size: 1rem;
+                font-weight: 700;
+                box-sizing: border-box;
+                border-radius: 4px;
+                transition: border-color 0.2s;
+
+                &:focus {
+                  outline: none;
+                  border-color: #FFA500;
+                  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.1);
+                }
+
+                &::placeholder {
+                  color: #666;
+                  font-family: 'Pretendard', sans-serif;
+                  font-size: 0.875rem;
+                  font-weight: 400;
+                }
+              }
+
+              .school-back-btn {
+                position: absolute;
+                right: 8px;
+                background: none;
+                border: none;
+                color: #888;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                  color: #FFA500;
+                }
+              }
+            }
+
+            .school-results-dropdown {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: #1a1a1a;
+              border: 1px solid rgba(255, 165, 0, 0.3);
+              border-top: none;
+              border-radius: 0 0 4px 4px;
+              z-index: 100;
+              display: flex;
+              flex-direction: column;
+
+              .school-results-list {
+                max-height: 200px;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                  width: 4px;
+                }
+
+                &::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                  background: rgba(255, 165, 0, 0.3);
+                  border-radius: 2px;
+                }
+              }
+
+              .school-result-item {
+                padding: 10px 14px;
+                cursor: pointer;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.875rem;
+                color: #ccc;
+                transition: background 0.15s;
+
+                &:hover {
+                  background: rgba(255, 165, 0, 0.1);
+                  color: #fff;
+                }
+
+                &.selected {
+                  background: rgba(255, 165, 0, 0.15);
+                  color: #FFA500;
+                }
+              }
+
+              .school-result-message {
+                padding: 14px;
+                text-align: center;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.8rem;
+                color: #888;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+              }
+
+              .school-spinner {
+                animation: spin 1s linear infinite;
+              }
+
+              .school-custom-option {
+                padding: 10px 14px;
+                cursor: pointer;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.875rem;
+                color: #FFA500;
+                border-top: 1px solid rgba(255, 165, 0, 0.2);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.15s;
+
+                &:hover {
+                  background: rgba(255, 165, 0, 0.1);
+                }
+              }
+            }
+
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
             }
           }
         }
