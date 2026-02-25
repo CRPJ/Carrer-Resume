@@ -274,7 +274,10 @@ const Sidebar = () => {
       const el = editBtnContainerRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      setEditBtnPos({ top: rect.bottom - 30, left: rect.right - 75 });
+      // CSS zoom 보정: getBoundingClientRect()는 visual 좌표를 반환하지만,
+      // position: fixed의 CSS 값은 zoom이 적용된 좌표 공간을 사용하므로 zoom으로 나눠야 한다
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      setEditBtnPos({ top: (rect.bottom - 50) / zoom, left: (rect.right - 75) / zoom });
     };
     updatePos();
     const resizeObserver = new ResizeObserver(updatePos);
