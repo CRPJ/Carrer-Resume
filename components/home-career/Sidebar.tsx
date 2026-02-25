@@ -1511,32 +1511,32 @@ const Sidebar = () => {
               </button>
             </div>
 
+            {/* 프로필 수정 버튼: resume-header(position:relative, 고정너비) 기준 absolute 배치 */}
+            {isOwner && (
+              <button
+                onClick={handleEditButtonClick}
+                style={{
+                  position: "absolute",
+                  bottom: "12px",
+                  right: "12px",
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  backgroundColor: debugPanelType === "EC" ? "#FF4B70" : debugPanelType === "PX" ? "#36DA60" : "#FFA500",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                  padding: 0,
+                }}
+              >
+                <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#fff" }}></i>
+              </button>
+            )}
             <div className="resume-info">
-              {/* 프로필 수정 버튼: resume-info(position:relative) 기준 absolute 배치 */}
-              {isOwner && (
-                <button
-                  onClick={handleEditButtonClick}
-                  style={{
-                    position: "absolute",
-                    top: "0px",
-                    right: "0px",
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    backgroundColor: debugPanelType === "EC" ? "#FF4B70" : debugPanelType === "PX" ? "#36DA60" : "#FFA500",
-                    border: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    zIndex: 10,
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                    padding: 0,
-                  }}
-                >
-                  <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#fff" }}></i>
-                </button>
-              )}
               {hasData ? (
                 <>
                   <h1 className="resume-name">
