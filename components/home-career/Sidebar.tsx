@@ -1420,7 +1420,7 @@ const Sidebar = () => {
               style={{
                 position: "absolute",
                 top: "248px",
-                right: "12px",
+                right: "50px",
                 width: "28px",
                 height: "28px",
                 borderRadius: "50%",
