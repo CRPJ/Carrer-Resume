@@ -380,9 +380,9 @@ const Cluster2Content = () => {
   // 섹션 2 모달 (슬로건 편집)
   const [section2ModalOpen, setSection2ModalOpen] = useState(false);
   const [sloganData, setSloganData] = useState({
-    slogan1: { option: "", content: "" },
-    slogan2: { option: "", content: "" },
-    slogan3: { option: "", content: "" }
+    slogan1: { option: "", content: "", rating: 0 },
+    slogan2: { option: "", content: "", rating: 0 },
+    slogan3: { option: "", content: "", rating: 0 }
   });
   const [editingSloganData, setEditingSloganData] = useState(sloganData);
   const [dropdown1Open, setDropdown1Open] = useState(false);
@@ -404,15 +404,18 @@ const Cluster2Content = () => {
         const newSloganData = {
           slogan1: {
             option: result.data.slogan1?.option || "",
-            content: result.data.slogan1?.content || ""
+            content: result.data.slogan1?.content || "",
+            rating: result.data.slogan1?.rating ?? 0
           },
           slogan2: {
             option: result.data.slogan2?.option || "",
-            content: result.data.slogan2?.content || ""
+            content: result.data.slogan2?.content || "",
+            rating: result.data.slogan2?.rating ?? 0
           },
           slogan3: {
             option: result.data.slogan3?.option || "",
-            content: result.data.slogan3?.content || ""
+            content: result.data.slogan3?.content || "",
+            rating: result.data.slogan3?.rating ?? 0
           }
         };
         setSloganData(newSloganData);
@@ -1331,14 +1334,42 @@ const Cluster2Content = () => {
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
                   <div className="score-row">
-                    <span className="score-stars animated-stars">
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                    </span>
-                    <span className="score-count">n/10</span>
+                    <div className="score-star-rating">
+                      {[1, 2, 3, 4, 5].map((starIndex) => {
+                        const fullValue = starIndex * 2;
+                        const halfValue = starIndex * 2 - 1;
+                        const currentRating = sloganData.slogan2.rating;
+                        const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                        const isFull = currentRating >= fullValue;
+                        return (
+                          <div key={starIndex} className="star-wrapper">
+                            <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#DFF314" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            {isHalf && (
+                              <svg className="star-half-fill" viewBox="0 0 24 24">
+                                <defs>
+                                  <clipPath id={`scoreHalfClip-2-${starIndex}`}>
+                                    <rect x="0" y="0" width="12" height="24" />
+                                  </clipPath>
+                                </defs>
+                                <polygon
+                                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                  fill="#DFF314"
+                                  clipPath={`url(#scoreHalfClip-2-${starIndex})`}
+                                />
+                              </svg>
+                            )}
+                            {isFull && (
+                              <svg className="star-full-fill" viewBox="0 0 24 24" fill="#DFF314">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <span className="score-count">{sloganData.slogan2.rating} / 10</span>
                   </div>
                 </div>
               </div>
@@ -1374,14 +1405,42 @@ const Cluster2Content = () => {
                 <div className="quote-score">
                   <span className="score-label">CLOUD SCORE</span>
                   <div className="score-row">
-                    <span className="score-stars animated-stars">
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                      <span className="star">✦</span>
-                    </span>
-                    <span className="score-count">n/10</span>
+                    <div className="score-star-rating">
+                      {[1, 2, 3, 4, 5].map((starIndex) => {
+                        const fullValue = starIndex * 2;
+                        const halfValue = starIndex * 2 - 1;
+                        const currentRating = sloganData.slogan3.rating;
+                        const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                        const isFull = currentRating >= fullValue;
+                        return (
+                          <div key={starIndex} className="star-wrapper">
+                            <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#DFF314" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            {isHalf && (
+                              <svg className="star-half-fill" viewBox="0 0 24 24">
+                                <defs>
+                                  <clipPath id={`scoreHalfClip-3-${starIndex}`}>
+                                    <rect x="0" y="0" width="12" height="24" />
+                                  </clipPath>
+                                </defs>
+                                <polygon
+                                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                  fill="#DFF314"
+                                  clipPath={`url(#scoreHalfClip-3-${starIndex})`}
+                                />
+                              </svg>
+                            )}
+                            {isFull && (
+                              <svg className="star-full-fill" viewBox="0 0 24 24" fill="#DFF314">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <span className="score-count">{sloganData.slogan3.rating} / 10</span>
                   </div>
                 </div>
               </div>
@@ -1968,6 +2027,61 @@ const Cluster2Content = () => {
                   />
                   <span className="char-count">{editingSloganData.slogan1.content.length}/86</span>
                 </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan1.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-1-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-1-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan1: { ...prev.slogan1, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan1: { ...prev.slogan1, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan1.rating} / 10</span>
+                </div>
               </div>
 
               {/* 슬로건 2 */}
@@ -2017,6 +2131,61 @@ const Cluster2Content = () => {
                   />
                   <span className="char-count">{editingSloganData.slogan2.content.length}/86</span>
                 </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan2.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-2-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-2-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan2: { ...prev.slogan2, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan2: { ...prev.slogan2, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan2.rating} / 10</span>
+                </div>
               </div>
 
               {/* 슬로건 3 */}
@@ -2065,6 +2234,61 @@ const Cluster2Content = () => {
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
                   <span className="char-count">{editingSloganData.slogan3.content.length}/86</span>
+                </div>
+                <div className="slogan-rating-row">
+                  <label className="slogan-rating-label">평점</label>
+                  <div className="slogan-star-rating">
+                    {[1, 2, 3, 4, 5].map((starIndex) => {
+                      const fullValue = starIndex * 2;
+                      const halfValue = starIndex * 2 - 1;
+                      const currentRating = editingSloganData.slogan3.rating;
+                      const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                      const isFull = currentRating >= fullValue;
+                      return (
+                        <div key={starIndex} className="star-wrapper">
+                          <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          {isHalf && (
+                            <svg className="star-half-fill" viewBox="0 0 24 24">
+                              <defs>
+                                <clipPath id={`sloganHalfClip-3-${starIndex}`}>
+                                  <rect x="0" y="0" width="12" height="24" />
+                                </clipPath>
+                              </defs>
+                              <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                fill="#FFA500"
+                                clipPath={`url(#sloganHalfClip-3-${starIndex})`}
+                              />
+                            </svg>
+                          )}
+                          {isFull && (
+                            <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          )}
+                          <button
+                            className="star-click-area star-click-left"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan3: { ...prev.slogan3, rating: halfValue }
+                            }))}
+                          />
+                          <button
+                            className="star-click-area star-click-right"
+                            type="button"
+                            onClick={() => setEditingSloganData(prev => ({
+                              ...prev,
+                              slogan3: { ...prev.slogan3, rating: fullValue }
+                            }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <span className="slogan-rating-value">{editingSloganData.slogan3.rating} / 10</span>
                 </div>
               </div>
             </div>
