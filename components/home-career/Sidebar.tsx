@@ -1419,8 +1419,8 @@ const Sidebar = () => {
               onClick={handleEditButtonClick}
               style={{
                 position: "absolute",
-                top: "10px",
-                right: "10px",
+                top: "248px",
+                right: "12px",
                 width: "28px",
                 height: "28px",
                 borderRadius: "50%",
