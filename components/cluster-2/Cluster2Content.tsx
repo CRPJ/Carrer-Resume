@@ -77,6 +77,8 @@ const Cluster2Content = () => {
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   const [currentPage, setCurrentPage] = useState(0);
+  // 학력 카드 총 페이지 수: 카드 2개까지 1페이지, 이후 카드당 1페이지 추가
+  const eduTotalPages = Math.max(1, educationData.length <= 2 ? 1 : educationData.length - 1);
   const [isWiggling, setIsWiggling] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEdu, setSelectedEdu] = useState<EduData | null>(null);
@@ -1031,7 +1033,7 @@ const Cluster2Content = () => {
     setIsDragging(false);
 
     // 드래그 거리에 따라 페이지 변경
-    if (dragOffset < -100 && currentPage < 1) {
+    if (dragOffset < -100 && currentPage < eduTotalPages - 1) {
       setCurrentPage(currentPage + 1);
     } else if (dragOffset > 100 && currentPage > 0) {
       setCurrentPage(currentPage - 1);
@@ -1581,10 +1583,28 @@ const Cluster2Content = () => {
             </div>
           ))}
         </div>
+        {/* 좌우 화살표 버튼 */}
+        {eduTotalPages > 1 && currentPage > 0 && (
+          <button
+            className="edu-arrow left"
+            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+            aria-label="이전 학력"
+          >
+            <i className="ti ti-chevron-left"></i>
+          </button>
+        )}
+        {eduTotalPages > 1 && currentPage < eduTotalPages - 1 && (
+          <button
+            className="edu-arrow right"
+            onClick={() => setCurrentPage(p => Math.min(eduTotalPages - 1, p + 1))}
+            aria-label="다음 학력"
+          >
+            <i className="ti ti-chevron-right"></i>
+          </button>
+        )}
         <div className="edu-pagination">
           <div className="pagination-dots">
-            {/* 카드 수에 따라 페이지네이션 동적 생성 (1~4개: 2페이지, 5개 이상: 3페이지) */}
-            {educationData.length > 2 && Array.from({ length: educationData.length <= 4 ? 2 : 3 }, (_, index) => (
+            {eduTotalPages > 1 && Array.from({ length: eduTotalPages }, (_, index) => (
               <button
                 key={index}
                 className={`pagination-dot ${currentPage === index ? 'active' : ''}`}
