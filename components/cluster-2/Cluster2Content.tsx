@@ -1529,8 +1529,13 @@ const Cluster2Content = () => {
             cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
-          {/* 최종학력을 맨 앞에 배치하고, 나머지는 그 뒤에 배치 */}
-          {[...educationData].sort((a, b) => (b.isFinal ? 1 : 0) - (a.isFinal ? 1 : 0)).map((edu, index) => (
+          {/* 대표학력을 맨 앞에 배치하고, 나머지는 입학년도 최신순 정렬 */}
+          {[...educationData].sort((a, b) => {
+            if (a.isFinal !== b.isFinal) return a.isFinal ? -1 : 1;
+            const aDate = parseInt(a.startYear || '0') * 100 + parseInt(a.startMonth || '0');
+            const bDate = parseInt(b.startYear || '0') * 100 + parseInt(b.startMonth || '0');
+            return bDate - aDate;
+          }).map((edu, index) => (
             <div className={`edu-card ${edu.isFinal ? 'first' : ''}`} key={index}>
               <img className="edu-border-tl" src="/images/0/cluster 2/border.png" alt="" />
               <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
@@ -2608,7 +2613,12 @@ const Cluster2Content = () => {
               <div className="header-actions">
                 <button
                   className="add-edu-btn"
+                  disabled={editingEduData.length >= 10}
                   onClick={() => {
+                    if (editingEduData.length >= 10) {
+                      alert('학력은 최대 10개까지 추가할 수 있습니다.');
+                      return;
+                    }
                     const newEdu: EduData = {
                       eduLevel: "",
                       school: "",
@@ -2653,7 +2663,7 @@ const Cluster2Content = () => {
             <div className="section3-modal-body" ref={modalBodyRef}>
               {editingEduData.map((edu, index) => (
                 <div key={index} className={`edu-edit-card ${edu.isFinal ? 'is-final' : ''}`}>
-                  {/* 헤더: 번호 + 학력 선택 + 최종학력 버튼 */}
+                  {/* 헤더: 번호 + 학력 선택 + 대표학력 버튼 */}
                   <div className="edu-edit-header">
                     <span className="edu-edit-number">{index + 1}</span>
                     <div className={`edu-custom-dropdown edu-level-dropdown ${eduDropdowns[`${index}_eduLevel`] ? 'open' : ''}`}>
@@ -2685,7 +2695,7 @@ const Cluster2Content = () => {
                       )}
                     </div>
                     <div className="header-buttons">
-                      {/* 최종학력 선택 버튼 */}
+                      {/* 대표학력 선택 버튼 */}
                       <button
                         className={`final-edu-btn ${edu.isFinal ? 'active' : ''}`}
                         onClick={() => {
@@ -2693,7 +2703,7 @@ const Cluster2Content = () => {
                             ...item,
                             isFinal: i === index
                           }));
-                          // 최종학력을 첫 번째로 이동
+                          // 대표학력을 첫 번째로 이동
                           const finalItem = newData[index];
                           newData.splice(index, 1);
                           newData.unshift(finalItem);
@@ -2703,10 +2713,10 @@ const Cluster2Content = () => {
                             modalBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                           }, 100);
                         }}
-                        title="최종학력으로 설정"
+                        title="대표학력으로 설정"
                       >
                         <i className="ti ti-star-filled"></i>
-                        <span>{edu.isFinal ? '최종학력' : '최종학력 지정'}</span>
+                        <span>{edu.isFinal ? '대표학력' : '대표학력 지정'}</span>
                       </button>
                       {/* 삭제 버튼 */}
                       <button

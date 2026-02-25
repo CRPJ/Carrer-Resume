@@ -1594,7 +1594,7 @@
       margin-top: 120px;
       margin-left: 30px;
 
-      // 첫 번째 카드 (최종학력) - 상단 고정
+      // 첫 번째 카드 (대표학력) - 상단 고정
       &:first-child {
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 20px;
@@ -5034,7 +5034,7 @@
         margin-bottom: 0;
       }
 
-      // 최종학력 카드 스타일
+      // 대표학력 카드 스타일
       &.is-final {
         background: rgba(255, 165, 0, 0.05);
         border: 1px solid rgba(255, 165, 0, 0.3);
@@ -5136,7 +5136,7 @@
           margin-left: auto;
         }
 
-        // 최종학력 선택 버튼
+        // 대표학력 선택 버튼
         .final-edu-btn {
           display: flex;
           align-items: center;
