@@ -5,9 +5,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import schoolDataJson from "@/data/korea-schools.json";
-
-const schoolData: { [key: string]: string[] } = schoolDataJson;
 
 // 학력 데이터 타입
 interface EduData {
@@ -882,6 +879,14 @@ const Cluster2Content = () => {
   const [eduDropdowns, setEduDropdowns] = useState<{ [key: string]: boolean }>({});
   // 학교 검색어 상태
   const [schoolSearchQuery, setSchoolSearchQuery] = useState<{ [key: string]: string }>({});
+  // 학교 검색 결과 상태
+  const [schoolSearchResults, setSchoolSearchResults] = useState<{ [key: string]: string[] }>({});
+  // 학교 검색 로딩 상태
+  const [schoolSearchLoading, setSchoolSearchLoading] = useState<{ [key: string]: boolean }>({});
+  // 학교 직접 입력 모드
+  const [schoolCustomInput, setSchoolCustomInput] = useState<{ [key: string]: boolean }>({});
+  // debounce 타이머 ref
+  const schoolSearchTimerRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
   // 모달 바디 ref (자동 스크롤용)
   const modalBodyRef = useRef<HTMLDivElement>(null);
 
@@ -910,9 +915,11 @@ const Cluster2Content = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       // 클릭한 요소가 드롭다운 내부가 아니면 모든 드롭다운 닫기
-      if (!target.closest('.edu-custom-dropdown')) {
+      if (!target.closest('.edu-custom-dropdown') && !target.closest('.school-autocomplete')) {
         setEduDropdowns({});
         setSchoolSearchQuery({});
+        setSchoolSearchResults({});
+        setSchoolCustomInput({});
       }
     };
 
@@ -923,6 +930,39 @@ const Cluster2Content = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, []);
+
+  // 학교 검색 API 호출 (debounce)
+  const handleSchoolSearch = useCallback((key: string, query: string, eduLevel: string) => {
+    setSchoolSearchQuery(prev => ({ ...prev, [key]: query }));
+
+    // 기존 타이머 클리어
+    if (schoolSearchTimerRef.current[key]) {
+      clearTimeout(schoolSearchTimerRef.current[key]);
+    }
+
+    if (query.length < 2) {
+      setSchoolSearchResults(prev => ({ ...prev, [key]: [] }));
+      setSchoolSearchLoading(prev => ({ ...prev, [key]: false }));
+      return;
+    }
+
+    setSchoolSearchLoading(prev => ({ ...prev, [key]: true }));
+
+    schoolSearchTimerRef.current[key] = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/schools/search?query=${encodeURIComponent(query)}&eduLevel=${encodeURIComponent(eduLevel)}`);
+        const data = await res.json();
+        if (data.success) {
+          setSchoolSearchResults(prev => ({ ...prev, [key]: data.schools }));
+        }
+      } catch (error) {
+        console.error('학교 검색 오류:', error);
+        setSchoolSearchResults(prev => ({ ...prev, [key]: [] }));
+      } finally {
+        setSchoolSearchLoading(prev => ({ ...prev, [key]: false }));
+      }
+    }, 300);
   }, []);
 
   // 스크롤 애니메이션 - Intersection Observer
@@ -2697,74 +2737,135 @@ const Cluster2Content = () => {
 
                   {/* 본문 그리드 - 행별로 그룹화 */}
                   <div className="edu-edit-grid">
-                    {/* 행 1: 학교 선택 (전체 너비) */}
+                    {/* 행 1: 학교 선택 - 자동완성 검색 (전체 너비) */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
                         <label>학교<span className="required">*</span></label>
-                        <div className={`edu-custom-dropdown edu-school-dropdown ${eduDropdowns[`${index}_school`] ? 'open' : ''}`}>
-                          <div
-                            className="dropdown-selected"
-                            onClick={() => edu.eduLevel && setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: !prev[`${index}_school`] }))}
-                            style={{ opacity: edu.eduLevel ? 1 : 0.5, cursor: edu.eduLevel ? 'pointer' : 'not-allowed' }}
-                          >
-                            <span>{edu.school || (edu.eduLevel ? '학교 선택' : '학력을 먼저 선택하세요')}</span>
-                            <i className="ti ti-chevron-down"></i>
-                          </div>
-                          {eduDropdowns[`${index}_school`] && edu.eduLevel && (
-                            <div className="dropdown-options scrollable">
-                              {/* 검색 필드 */}
-                              <div className="dropdown-search-wrapper" onClick={(e) => e.stopPropagation()}>
+                        <div className="school-autocomplete">
+                          {schoolCustomInput[`${index}_school`] ? (
+                            /* 직접 입력 모드 */
+                            <div className="school-custom-input-wrapper">
+                              <input
+                                type="text"
+                                className="school-search-input"
+                                placeholder="학교명을 직접 입력하세요"
+                                value={edu.school || ''}
+                                onChange={(e) => {
+                                  const newData = [...editingEduData];
+                                  newData[index].school = e.target.value;
+                                  setEditingEduData(newData);
+                                }}
+                                autoFocus
+                              />
+                              <button
+                                className="school-back-btn"
+                                onClick={() => {
+                                  setSchoolCustomInput(prev => ({ ...prev, [`${index}_school`]: false }));
+                                  const newData = [...editingEduData];
+                                  newData[index].school = '';
+                                  setEditingEduData(newData);
+                                }}
+                                title="검색으로 돌아가기"
+                              >
+                                <i className="ti ti-arrow-left"></i>
+                              </button>
+                            </div>
+                          ) : (
+                            /* 검색 모드 */
+                            <>
+                              <div className="school-search-wrapper">
+                                <i className="ti ti-search school-search-icon"></i>
                                 <input
                                   type="text"
-                                  className="dropdown-search-input"
-                                  placeholder="학교 검색..."
-                                  value={schoolSearchQuery[`${index}_school`] || ''}
-                                  onChange={(e) => setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: e.target.value }))}
-                                  autoFocus
+                                  className="school-search-input"
+                                  placeholder={edu.eduLevel ? '학교명을 검색하세요 (2글자 이상)' : '학력을 먼저 선택하세요'}
+                                  value={edu.school && !eduDropdowns[`${index}_school`] ? edu.school : (schoolSearchQuery[`${index}_school`] || '')}
+                                  onChange={(e) => {
+                                    if (!edu.eduLevel) return;
+                                    const newData = [...editingEduData];
+                                    newData[index].school = '';
+                                    setEditingEduData(newData);
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: true }));
+                                    handleSchoolSearch(`${index}_school`, e.target.value, edu.eduLevel);
+                                  }}
+                                  onFocus={() => {
+                                    if (!edu.eduLevel) return;
+                                    if (edu.school) {
+                                      handleSchoolSearch(`${index}_school`, edu.school, edu.eduLevel);
+                                    }
+                                    setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: true }));
+                                  }}
+                                  disabled={!edu.eduLevel}
+                                  style={{ opacity: edu.eduLevel ? 1 : 0.5 }}
                                 />
-                              </div>
-                              {/* 필터링된 학교 목록 */}
-                              {(schoolData[edu.eduLevel] || [])
-                                .filter(school =>
-                                  !schoolSearchQuery[`${index}_school`] ||
-                                  school.toLowerCase().includes(schoolSearchQuery[`${index}_school`].toLowerCase())
-                                )
-                                .map((school) => (
-                                  <div
-                                    key={school}
-                                    className={`dropdown-option ${edu.school === school ? 'selected' : ''}`}
+                                {edu.school && eduDropdowns[`${index}_school`] !== true && (
+                                  <button
+                                    className="school-clear-btn"
                                     onClick={() => {
                                       const newData = [...editingEduData];
-                                      newData[index].school = school;
+                                      newData[index].school = '';
                                       setEditingEduData(newData);
+                                      setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                      setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
+                                    }}
+                                    title="선택 해제"
+                                  >
+                                    <i className="ti ti-x"></i>
+                                  </button>
+                                )}
+                              </div>
+                              {/* 검색 결과 드롭다운 */}
+                              {eduDropdowns[`${index}_school`] && edu.eduLevel && (
+                                <div className="school-results-dropdown">
+                                  {schoolSearchLoading[`${index}_school`] ? (
+                                    <div className="school-result-message">
+                                      <i className="ti ti-loader school-spinner"></i>
+                                      검색 중...
+                                    </div>
+                                  ) : (schoolSearchQuery[`${index}_school`] || '').length < 2 ? (
+                                    <div className="school-result-message">
+                                      2글자 이상 입력하세요
+                                    </div>
+                                  ) : (schoolSearchResults[`${index}_school`] || []).length === 0 ? (
+                                    <div className="school-result-message">
+                                      검색 결과가 없습니다
+                                    </div>
+                                  ) : (
+                                    <div className="school-results-list">
+                                      {(schoolSearchResults[`${index}_school`] || []).map((school) => (
+                                        <div
+                                          key={school}
+                                          className={`school-result-item ${edu.school === school ? 'selected' : ''}`}
+                                          onClick={() => {
+                                            const newData = [...editingEduData];
+                                            newData[index].school = school;
+                                            setEditingEduData(newData);
+                                            setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
+                                            setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                            setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
+                                          }}
+                                        >
+                                          {school}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {/* 기타 (직접 입력) - 하단 고정 */}
+                                  <div
+                                    className="school-custom-option"
+                                    onClick={() => {
+                                      setSchoolCustomInput(prev => ({ ...prev, [`${index}_school`]: true }));
                                       setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
                                       setSchoolSearchQuery(prev => ({ ...prev, [`${index}_school`]: '' }));
+                                      setSchoolSearchResults(prev => ({ ...prev, [`${index}_school`]: [] }));
                                     }}
                                   >
-                                    {school}
+                                    <i className="ti ti-pencil"></i>
+                                    기타 (직접 입력)
                                   </div>
-                                ))}
-                              <div
-                                className="dropdown-option custom-input-option"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <input
-                                  type="text"
-                                  placeholder="직접 입력..."
-                                  value={edu.school && !schoolData[edu.eduLevel]?.includes(edu.school) ? edu.school : ''}
-                                  onChange={(e) => {
-                                    const newData = [...editingEduData];
-                                    newData[index].school = e.target.value;
-                                    setEditingEduData(newData);
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      setEduDropdowns(prev => ({ ...prev, [`${index}_school`]: false }));
-                                    }
-                                  }}
-                                />
-                              </div>
-                            </div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
