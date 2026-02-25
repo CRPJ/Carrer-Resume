@@ -1572,6 +1572,8 @@
       gap: 20px;
       padding: 40px;
       padding-top: 30px;
+      // ★ 마지막 카드가 컨테이너 우측 경계에서 잘리지 않도록 여유 확보
+      padding-right: 320px;
       height: 100%;
       align-items: flex-start;
     }
