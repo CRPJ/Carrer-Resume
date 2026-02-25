@@ -2173,7 +2173,7 @@
     // ✅ 수정 (1fr로 변경 + 좌우 패딩 추가)
       .detail-grid {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);    // 고정값 → 유동비율
+        grid-template-columns: repeat(5, minmax(0, 1fr));    // 고정값 → 유동비율
         gap: 20px 12px;
         justify-content: center;
         padding: 0 8px;                            // 좌우 여백 추가

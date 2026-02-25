@@ -674,7 +674,7 @@
     // 실무 정보/경험/경력 카드
     .work-cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 20px;
 
       .work-card {
@@ -817,7 +817,7 @@
     // 실무 역할 카드
     .role-cards {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 20px;
 
       .role-card {
@@ -1697,7 +1697,7 @@
   // 주차 평판 카드 그리드 (2열)
   .reputation-cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
 
     .reputation-card {

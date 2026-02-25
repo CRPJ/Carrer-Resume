@@ -796,7 +796,7 @@
         // 3단 영역 - 그리드로 균등 배치 (모든 기기에서 일관)
         .resume-three-column {
           display: grid !important;
-          grid-template-columns: repeat(3, 1fr) !important;
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
           gap: 10px !important;
           width: 100% !important;
           max-width: 100% !important;
@@ -847,7 +847,7 @@
           // 실무 역량 - 균등 배치 (기기 상관없이 동일)
           .resume-skills {
             display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
             gap: 8px !important;
             padding: 12px 8px !important;
             width: 100% !important;
@@ -2154,7 +2154,7 @@
           // 10개 카드: 모바일에서는 2열 그리드로(가독성 우선)
           .section2-cards {
             display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 10px !important;
             align-items: stretch !important;
 
@@ -2303,14 +2303,14 @@
         // 태블릿에서는 정보 밀도를 살짝 올리되, 과밀은 방지
         .cluster2-intro {
           .intro-cards {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 14px !important;
           }
         }
 
         .cluster2-section4 {
           .review-grid-9 {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 12px !important;
           }
         }
@@ -2320,7 +2320,7 @@
       .cluster3-content {
         .cluster3-section2 {
           .section2-cards {
-            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
             gap: 12px !important;
 
             .rank-card {

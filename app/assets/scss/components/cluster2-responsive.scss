@@ -287,7 +287,7 @@ $c2-bp-desktop: 1200px;
       }
 
       .videos-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 16px;
         margin-left: 0;
         margin-right: 0;
@@ -524,7 +524,7 @@ $c2-bp-desktop: 1200px;
         }
 
         .review-grid-9 {
-          grid-template-columns: repeat(2, 1fr) !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           gap: 12px;
           width: 100%;
 
@@ -577,7 +577,7 @@ $c2-bp-desktop: 1200px;
         }
 
         .review-grid-9 {
-          grid-template-columns: repeat(3, 1fr) !important;
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
           gap: 12px;
           width: 100%;
 
@@ -732,7 +732,7 @@ $c2-bp-desktop: 1200px;
     @include c2-tablet-only {
       .section21-modal {
         .section21-modal-body {
-          grid-template-columns: repeat(2, 1fr) !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         }
       }
     }
