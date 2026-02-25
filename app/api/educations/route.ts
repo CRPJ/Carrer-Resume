@@ -171,17 +171,17 @@ export async function GET(request: Request) {
         eduLevel: eduLevelFromDb[edu.education_level] || edu.education_level || "",
         school: edu.school_name || "",
         status: statusFromDb[edu.status] || edu.status || "",
-        category: categoryFromDb[edu.major_category] || edu.major_category || "",
-        major1: edu.major_name_1 || "",
-        major2: edu.major_name_2 || "",
-        major3: edu.major_name_3 || "",
+        category: edu.major_category ? (categoryFromDb[edu.major_category] || edu.major_category) : "-",
+        major1: edu.major_name_1 || "-",
+        major2: edu.major_name_2 || "-",
+        major3: edu.major_name_3 || "-",
         period: period,
         startYear: admissionParts[0] || "",
         startMonth: admissionParts[1] || "",
         endYear: graduationParts[0] || "",
         endMonth: graduationParts[1] || "",
-        gradeMax: gradeMaxFromDb[edu.grade_max_type] || edu.grade_max_type || "",
-        gradeValue: edu.grade_value || "",
+        gradeMax: edu.grade_max_type ? (gradeMaxFromDb[edu.grade_max_type] || edu.grade_max_type) : "-",
+        gradeValue: edu.grade_value || "-",
         description: edu.note || "",
         isFinal: edu.sort_order === 0,
       };
@@ -229,7 +229,7 @@ export async function PUT(request: Request) {
       // 졸업 또는 중퇴/자퇴 상태일 때 졸업년도 필수
       if ((status === '졸업' || status === '중퇴' || status === '자퇴') && !edu.endYear) {
         return NextResponse.json(
-          { error: `${i + 1}번째 학력: '${status}' 상태에서는 졸업년도를 입력해야 합니다.` },
+          { error: `${i + 1}번째 학력: '${status}' 상태에서는 종료년도를 입력해야 합니다.` },
           { status: 400 }
         );
       }
@@ -316,8 +316,8 @@ export async function PUT(request: Request) {
           major_name_3: edu.major3 || null,
           admission_year: admissionYear,
           graduation_year: graduationYear,
-          grade_max_type: gradeMaxToDb[edu.gradeMax || ''] || edu.gradeMax || null,
-          grade_value: edu.gradeValue || null,
+          grade_max_type: edu.gradeMax === '-' ? null : (gradeMaxToDb[edu.gradeMax || ''] || edu.gradeMax || null),
+          grade_value: edu.gradeValue === '-' ? null : (edu.gradeValue || null),
           note: edu.description || null,
           sort_order: edu.isFinal ? 0 : index + 1,
         };

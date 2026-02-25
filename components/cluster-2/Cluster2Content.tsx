@@ -2937,6 +2937,7 @@ const Cluster2Content = () => {
                           )}
                         </div>
                       </div>
+                      <p className="major-hint">* 계열이 없을 시 &quot;-&quot;를 선택해주세요.</p>
                     </div>
 
                     {/* 행 4: 전공 1 / 전공 2 / 전공 3 */}
@@ -2980,7 +2981,7 @@ const Cluster2Content = () => {
                           placeholder="기타 전공"
                         />
                       </div>
-                      <p className="major-hint">* 전공이 없을 시 &quot;-&quot;로 입력해주세요.</p>
+                      <p className="major-hint">* 전공이 없을 시 &quot;-&quot;를 기입해주세요.</p>
                     </div>
 
                     {/* 행 5: 입학 / 졸업 */}
@@ -3332,8 +3333,8 @@ const Cluster2Content = () => {
                                     onClick={() => {
                                       const newData = [...editingEduData];
                                       newData[index].gradeMax = opt;
-                                      // 최대치 변경 시 달성치 초기화
-                                      newData[index].gradeValue = '';
+                                      // 최대치 변경 시 달성치 초기화 ('-' 선택 시 달성치도 '-')
+                                      newData[index].gradeValue = opt === '-' ? '-' : '';
                                       setEditingEduData(newData);
                                       setEduDropdowns(prev => ({ ...prev, [`${index}_gradeMax`]: false }));
                                     }}
@@ -3346,6 +3347,7 @@ const Cluster2Content = () => {
                           </div>
                         )}
                       </div>
+                      <p className="major-hint">* 성적이 없을 시 &quot;-&quot;를 선택해주세요.</p>
                     </div>
 
                     {/* 행 6: 비고 (전체 너비) */}
@@ -3384,9 +3386,12 @@ const Cluster2Content = () => {
                     const missing: string[] = [];
                     if (!edu.school || edu.school === '-') missing.push('학교');
                     if (!edu.status || edu.status === '-') missing.push('상태');
-                    if (!edu.category || edu.category === '-') missing.push('계열');
-                    if (!edu.major1 || edu.major1 === '-') missing.push('전공 1');
+                    if (!edu.category) missing.push('계열');
+                    if (!edu.major1) missing.push('전공 1');
                     if (!edu.startYear) missing.push('입학년도');
+                    if (edu.startYear && !edu.startMonth) missing.push('입학월');
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) missing.push('종료년도');
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) missing.push('종료월');
                     if (!edu.gradeValue) missing.push('성적');
                     return { index: index + 1, missing };
                   }).filter(item => item.missing.length > 0);
