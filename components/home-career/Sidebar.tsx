@@ -1273,26 +1273,14 @@ const Sidebar = () => {
     setScrollThumbTop(thumbTop);
   }, []);
 
-  // 스크롤 이벤트 핸들러
+  // 테마 변경 시 스크롤 위치 리셋 + 스크롤바 업데이트
   useEffect(() => {
     const container = activitiesRef.current;
     if (!container) return;
 
-    // 테마 변경 시 스크롤 위치 리셋
     container.scrollTop = 0;
-
-    // 약간의 지연 후 스크롤바 업데이트 (DOM 업데이트 대기)
-    const timer = setTimeout(() => {
-      updateScrollbar();
-    }, 50);
-
-    container.addEventListener("scroll", updateScrollbar);
-
-    return () => {
-      clearTimeout(timer);
-      container.removeEventListener("scroll", updateScrollbar);
-    };
-  }, [updateScrollbar, debugPanelType]);
+    setScrollThumbTop(0);
+  }, [debugPanelType]);
 
   // 드래그 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -1783,6 +1771,7 @@ const Sidebar = () => {
                 <div
                   ref={activitiesRef}
                   className="resume-activities"
+                  onScroll={updateScrollbar}
                   style={
                     {
                       width: "100%",
