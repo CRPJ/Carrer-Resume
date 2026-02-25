@@ -261,35 +261,9 @@ const Sidebar = () => {
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
   const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
-  const editBtnContainerRef = useRef<HTMLDivElement>(null);
-  const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // 수정 버튼 위치 추적 (Portal용 - resume-info 우측 하단 기준)
-  useEffect(() => {
-    if (!editBtnContainerRef.current || !isOwner) return;
-    const updatePos = () => {
-      const el = editBtnContainerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // CSS zoom 보정: getBoundingClientRect()는 visual 좌표를 반환하지만,
-      // position: fixed의 CSS 값은 zoom이 적용된 좌표 공간을 사용하므로 zoom으로 나눠야 한다
-      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
-      setEditBtnPos({ top: (rect.bottom - 50) / zoom, left: (rect.right - 75) / zoom });
-    };
-    updatePos();
-    const resizeObserver = new ResizeObserver(updatePos);
-    resizeObserver.observe(editBtnContainerRef.current);
-    window.addEventListener("scroll", updatePos, true);
-    window.addEventListener("resize", updatePos);
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("scroll", updatePos, true);
-      window.removeEventListener("resize", updatePos);
-    };
-  }, [isMounted, isOwner, hasData]);
 
   // 아이콘 링크 state
   const [iconLink1, setIconLink1] = useState("https://www.google.com/");
@@ -1551,36 +1525,32 @@ const Sidebar = () => {
               </button>
             </div>
 
-            <div className="resume-info" ref={editBtnContainerRef}>
-              {/* 프로필 수정 버튼: Portal로 body에 렌더링하여 overflow:hidden 우회 */}
-              {typeof document !== "undefined" &&
-                isOwner &&
-                editBtnPos &&
-                createPortal(
-                  <button
-                    onClick={handleEditButtonClick}
-                    style={{
-                      position: "fixed",
-                      top: `${editBtnPos.top}px`,
-                      left: `${editBtnPos.left}px`,
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "50%",
-                      backgroundColor: debugPanelType === "EC" ? "#FF4B70" : debugPanelType === "PX" ? "#36DA60" : "#FFA500",
-                      border: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      zIndex: 999999,
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                      padding: 0,
-                    }}
-                  >
-                    <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#fff" }}></i>
-                  </button>,
-                  document.body,
-                )}
+            <div className="resume-info">
+              {/* 프로필 수정 버튼: resume-info(position:relative) 기준 absolute 배치 */}
+              {isOwner && (
+                <button
+                  onClick={handleEditButtonClick}
+                  style={{
+                    position: "absolute",
+                    bottom: "12px",
+                    right: "12px",
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "50%",
+                    backgroundColor: debugPanelType === "EC" ? "#FF4B70" : debugPanelType === "PX" ? "#36DA60" : "#FFA500",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    zIndex: 10,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                    padding: 0,
+                  }}
+                >
+                  <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#fff" }}></i>
+                </button>
+              )}
               {hasData ? (
                 <>
                   <h1 className="resume-name">
