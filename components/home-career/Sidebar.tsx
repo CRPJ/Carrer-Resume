@@ -1261,8 +1261,7 @@ const Sidebar = () => {
   // 커스텀 스크롤바 업데이트
   const updateScrollbar = useCallback(() => {
     const container = activitiesRef.current;
-    const thumb = scrollThumbRef.current;
-    if (!container || !thumb) return;
+    if (!container) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
     const trackHeight = clientHeight;
@@ -1271,8 +1270,7 @@ const Sidebar = () => {
     const maxThumbTop = trackHeight - thumbHeight;
     const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * maxThumbTop : 0;
 
-    thumb.style.top = `${thumbTop}px`;
-    thumb.style.height = `${thumbHeight}px`;
+    setScrollThumbTop(thumbTop);
   }, []);
 
   // 스크롤 이벤트 핸들러
@@ -1857,7 +1855,7 @@ const Sidebar = () => {
                     onMouseDown={handleMouseDown}
                     style={{
                       position: "absolute",
-                      top: 0,
+                      top: `${scrollThumbTop}px`,
                       width: "100%",
                       height: 44,
                       background: debugPanelType === "PX" ? "#36DA60" : debugPanelType === "EC" ? "#FF4B70" : "#FFA500",
