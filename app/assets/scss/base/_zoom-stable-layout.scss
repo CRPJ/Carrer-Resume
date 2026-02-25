@@ -352,6 +352,9 @@ body {
       width: 317px !important;
       min-width: 317px !important;
       max-width: 317px !important;
+      height: 244px !important;
+      overflow: hidden !important;
+      flex-shrink: 0 !important;
       justify-self: center;
     }
   }

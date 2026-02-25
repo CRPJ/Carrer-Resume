@@ -180,24 +180,18 @@ const menu = [
 const Header = () => {
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
-  const [search, setSearch] = useState(false);
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [submenu1, setSubmenu1] = useState("");
   const [submenu2, setSubmenu2] = useState("");
   const [activeParent, setActiveParent] = useState("");
   useEffect(() => {
-    if (search) {
-      document.body.classList.add("search-active");
-    } else {
-      document.body.classList.remove("search-active");
-    }
     if (cartIsOpen) {
       document.body.classList.add("body-active");
     } else {
       document.body.classList.remove("body-active");
     }
-  }, [search, cartIsOpen]);
+  }, [cartIsOpen]);
   const pathName = usePathname();
 
   // 현재 경로와 메뉴 URL 비교 함수
@@ -271,25 +265,6 @@ const Header = () => {
                 </div>
                 <div className="navbar__items-wrapper">
                   <div className="navbar__items">
-                    <div className="search-popup">
-                      <button onClick={() => setSearch(false)} className="close-search" aria-label="close search box" title="close search box">
-                        <i className="ti ti-x"></i>
-                      </button>
-                      <form action="#" method="post" autoComplete="off">
-                        <div className="navbar__items-search search-popup__group">
-                          <input type="search" name="search-field" id="searchField" placeholder="Search" required />
-                          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
-                            <path d="M0 0  L100 0  L100 75 L92 100 L0 100 Z" vectorEffect="non-scaling-stroke" />
-                          </svg>
-                          <button type="submit" aria-label="search games" title="search games">
-                            <i className="ti ti-search"></i>
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                    <button onClick={() => setSearch(true)} aria-label="open search popup" title="open search popup" className="open-search">
-                      <i className="ti ti-search"></i>
-                    </button>
                     {!isLoading && (session ? (
                       <button onClick={() => signOut({ callbackUrl: "/" })} className="btn--primary">
                         Log Out
