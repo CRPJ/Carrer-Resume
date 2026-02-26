@@ -77,8 +77,6 @@ const Cluster2Content = () => {
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   const [currentPage, setCurrentPage] = useState(0);
-  // 학력 카드 총 페이지 수: 카드 2개까지 1페이지, 이후 카드당 1페이지 추가
-  const eduTotalPages = Math.max(1, educationData.length <= 2 ? 1 : educationData.length - 1);
   const [isWiggling, setIsWiggling] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEdu, setSelectedEdu] = useState<EduData | null>(null);
@@ -609,6 +607,8 @@ const Cluster2Content = () => {
   // 섹션 3 모달 (학력 편집)
   const [section3ModalOpen, setSection3ModalOpen] = useState(false);
   const [educationData, setEducationData] = useState<EduData[]>(initialEducationData);
+  // 학력 카드 총 페이지 수: 카드 2개까지 1페이지, 이후 카드당 1페이지 추가
+  const eduTotalPages = Math.max(1, educationData.length <= 2 ? 1 : educationData.length - 1);
   const [editingEduData, setEditingEduData] = useState<EduData[]>(initialEducationData);
   const [hasEduChanges, setHasEduChanges] = useState(false); // 학력 변경사항 추적
   const [eduSaving, setEduSaving] = useState(false);
@@ -897,6 +897,7 @@ const Cluster2Content = () => {
   const [dragStartX, setDragStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [maxScroll, setMaxScroll] = useState(0);
 
   // 섹션 5 물결 파동 상태
   const [ripples, setRipples] = useState<Ripple[]>([]);
@@ -992,6 +993,23 @@ const Cluster2Content = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  // 학력 카드 캐러셀 최대 스크롤 계산 (마지막 카드 잘림 방지)
+  useEffect(() => {
+    const updateMaxScroll = () => {
+      if (cardsRef.current) {
+        const container = cardsRef.current.closest('.cluster2-education') as HTMLElement;
+        if (container) {
+          const containerWidth = container.clientWidth;
+          const contentWidth = cardsRef.current.scrollWidth;
+          setMaxScroll(Math.max(0, contentWidth - containerWidth));
+        }
+      }
+    };
+    updateMaxScroll();
+    window.addEventListener('resize', updateMaxScroll);
+    return () => window.removeEventListener('resize', updateMaxScroll);
+  }, [educationData]);
 
   // 모달 열기
   const openModal = (edu: EduData, e: React.MouseEvent) => {
@@ -1493,7 +1511,7 @@ const Cluster2Content = () => {
 
       {/* 학력 섹션 */}
       <div
-        className="cluster2-education"
+        className={`cluster2-education${currentPage < eduTotalPages - 1 ? ' has-more-right' : ''}${currentPage > 0 ? ' has-more-left' : ''}`}
         style={{ position: 'relative' }}
       >
         {/* Floating Icons - 로그인한 본인만 표시 */}
@@ -1525,7 +1543,7 @@ const Cluster2Content = () => {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           style={{
-            transform: `translateX(calc(-${currentPage * 350}px + ${dragOffset}px))`,
+            transform: `translateX(calc(-${Math.min(currentPage * 350, maxScroll)}px + ${dragOffset}px))`,
             transition: isDragging ? 'none' : 'transform 0.4s ease',
             userSelect: 'none',
             cursor: isDragging ? 'grabbing' : 'grab'

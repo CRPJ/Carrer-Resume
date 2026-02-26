@@ -1379,6 +1379,49 @@
     height: 685px;
     overflow: hidden;
 
+    // ★ 우측 더보기 그라데이션 힌트 (더 많은 카드가 있을 때)
+    &.has-more-right::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 100%;
+      background: linear-gradient(to left, #0C0F14 0%, transparent 100%);
+      z-index: 5;
+      pointer-events: none;
+      animation: fade-hint-pulse 2s ease-in-out 1;
+    }
+
+    // ★ 좌측 더보기 그라데이션 힌트 (이전 카드가 있을 때)
+    &.has-more-left::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 60px;
+      height: 100%;
+      background: linear-gradient(to right, #0C0F14 0%, transparent 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    @keyframes fade-hint-pulse {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+
+    // ★ 우측 화살표 초기 주목 유도 애니메이션
+    &.has-more-right .edu-arrow.right {
+      animation: arrow-hint 1.5s ease-in-out 0.5s 2;
+    }
+
+    @keyframes arrow-hint {
+      0%, 100% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.2); box-shadow: 0 4px 20px rgba(250, 171, 7, 0.7); }
+    }
+
     &:hover .floating-icons {
       display: flex;
     }
@@ -2926,6 +2969,9 @@
           color: #fff;
           line-height: 1.7;
           margin: 0;
+          min-width: 0;
+          word-break: break-word;
+          white-space: pre-wrap;
         }
       }
     }
@@ -2954,6 +3000,9 @@
           p {
             font-size: 0.9375rem;
             line-height: 1.8;
+            min-width: 0;
+            word-break: break-word;
+            white-space: pre-wrap;
           }
         }
       }
