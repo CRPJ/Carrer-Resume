@@ -1063,7 +1063,7 @@
     align-items: flex-end;
     position: relative;
     z-index: 3;
-    gap: 0;
+    gap: 6px;
 
     .notice-box {
       display: flex;
@@ -1129,6 +1129,25 @@
         position: relative;
         z-index: 10;
         margin-left: -5px;
+      }
+
+      .notice-stamp-wrapper {
+        flex-shrink: 0;
+        order: 3;
+        position: relative;
+        z-index: 10;
+        margin-left: 8px;
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.60);
+
+        // 도장이 찍히면 배경 제거
+        &.stamped {
+          background: transparent;
+        }
       }
 
       &.yellow {

@@ -1953,15 +1953,15 @@ const Sidebar = () => {
               <div className="notice-box yellow">
                 <Image src="/images/0/cluster 1/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
                 <span className="notice-text notice-text-top">{debugPanelType === "EC" ? "전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레" : debugPanelType === "PX" ? "전국청춘연합 기획/컨설팅 클럽, 팔랑크스" : "전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐"}</span>
-                <div className="notice-stamp-wrapper" style={{ position: "relative", width: "46px", height: "46px", display: "flex", alignItems: "center", justifyContent: "center", order: 3, flexShrink: 0, marginLeft: "8px" }}>
-                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} style={{ position: "relative", zIndex: 2 }} />}
+                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>
+                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} />}
                 </div>
               </div>
               <div className="notice-box green">
                 <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
                 <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
-                <div className="notice-stamp-wrapper" style={{ position: "relative", width: "46px", height: "46px", display: "flex", alignItems: "center", justifyContent: "center", order: 3, flexShrink: 0, marginLeft: "8px" }}>
-                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} style={{ position: "relative", zIndex: 2 }} />}
+                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>
+                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} />}
                 </div>
               </div>
             </div>
