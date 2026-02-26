@@ -2086,7 +2086,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan1.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan1.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2190,7 +2190,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan2.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan2.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2294,7 +2294,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan3.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan3.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2539,7 +2539,7 @@ const Cluster2Content = () => {
                       placeholder="내용을 입력하세요 (최대 1,000자)"
                       maxLength={1000}
                     />
-                    <span className="char-count">{editingIntroData.content.length} / 1,000</span>
+                    <span className="char-count">{editingIntroData.content.length.toLocaleString()} / 1,000</span>
                   </div>
                 ) : (
                   <p className="content-text">{introCards[selectedIntroCard].content}</p>
@@ -3394,7 +3394,7 @@ const Cluster2Content = () => {
                             rows={3}
                             maxLength={100}
                           />
-                          <span className="char-count">{edu.description.length}/100</span>
+                          <span className="char-count">{edu.description.length.toLocaleString()}/100</span>
                         </div>
                       </div>
                     </div>
