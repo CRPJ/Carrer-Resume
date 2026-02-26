@@ -635,7 +635,7 @@ const Cluster3Content = () => {
     '/images/0/cluster 3/icon/etc 2.png',
     '/images/0/cluster 3/icon/etc 2.png',
     // 11-16번 카드용 (페이지 2)
-    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 3.png',
     '/images/0/cluster 3/icon/etc 2.png',
     '/images/0/cluster 3/icon/etc 3.png',
     '/images/0/cluster 3/icon/etc 1.png',
@@ -1350,6 +1350,18 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingOutputs}
                 onClick={async () => {
+                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
+                  const incomplete = editingSection4Links
+                    .map((link, i) => ({ link, channel: editingOutputChannels[i], index: i }))
+                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
+                  if (incomplete.length > 0) {
+                    const names = incomplete.map(item => {
+                      const missing = item.link ? '채널' : '링크';
+                      return `Work ${item.index + 1}: ${missing}`;
+                    }).join('\n');
+                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
+                    return;
+                  }
                   const success = await savePortfolioOutputs(editingSection4Links, editingOutputChannels);
                   if (success) {
                     setSection4Links([...editingSection4Links]);
@@ -1419,6 +1431,18 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingDetails}
                 onClick={async () => {
+                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
+                  const incomplete = editingSection5Links
+                    .map((link, i) => ({ link, channel: editingDetailChannels[i], index: i }))
+                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
+                  if (incomplete.length > 0) {
+                    const names = incomplete.map(item => {
+                      const missing = item.link ? '채널' : '링크';
+                      return `Detail ${item.index + 1}: ${missing}`;
+                    }).join('\n');
+                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
+                    return;
+                  }
                   const success = await savePortfolioDetails(editingSection5Links, editingDetailChannels);
                   if (success) {
                     setSection5Links([...editingSection5Links]);
