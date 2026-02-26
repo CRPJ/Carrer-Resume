@@ -1693,28 +1693,13 @@
       color: #000;
       font-size: 0.875rem;
       font-weight: 700;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: arrow-hint 1.5s ease-in-out infinite;
-    }
-
-    @keyframes arrow-hint {
-      0%, 100% {
-        transform: translateX(0);
-      }
-      50% {
-        transform: translateX(3px);
-      }
+      line-height: 1;
     }
 
     &:hover {
       transform: translateY(-50%) scale(1.1);
       box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
       animation: none;
-
-      i {
-        animation: none;
-        transform: translateX(3px);
-      }
     }
 
     &:active {

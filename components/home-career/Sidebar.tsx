@@ -1001,8 +1001,8 @@ const Sidebar = () => {
 
       // formData → user_profiles 필드 변환
       const profileData = {
-        display_name: `${formData.lastName} ${formData.firstName}`.trim(),
-        eng_name: `${formData.lastNameEng} ${formData.firstNameEng}`.trim(),
+        display_name: `${formData.lastName}${formData.firstName}`.trim(),
+        eng_name: `${formData.lastNameEng}${formData.firstNameEng}`.trim(),
         gender: formData.gender === "male" ? "남" : formData.gender === "female" ? "여" : null,
         birth_date: formData.birthDate || null,
         address: `${formData.addressCity} ${formData.addressDistrict}`.trim(),
