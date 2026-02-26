@@ -1525,9 +1525,9 @@ const Cluster4Content = () => {
 
         {/* 타이틀 */}
         <div className="section1-title-wrapper">
-        <div className="title-inner">
-          <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
-        </div>
+          <div className="title-inner">
+            <h2 className="section1-title">CLUB CHALLENGE GROWTH</h2>
+          </div>
         </div>
 
         {/* 설명 텍스트 */}

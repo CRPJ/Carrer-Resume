@@ -183,6 +183,8 @@
       }
     }
 
+    // overflow: visible로 강제 — _zoom-stable-layout의 [class*="section"]이
+    // overflow-x:hidden을 적용하면 overflow-y가 auto로 바뀌어 세로 스크롤 발생
     .section1-title-wrapper {
       position: relative;
       z-index: 1;
@@ -190,12 +192,14 @@
       padding-top: 60px;
       margin-bottom: 30px;
       padding-bottom: 0;
+      overflow: visible !important;
 
       .title-inner {
         position: relative;
-        display: block;        // inline-block → block
-        width: 100%;           // 추가
-        text-align: center;    // 추가
+        display: block;
+        width: 100%;
+        text-align: center;
+        overflow: visible !important;
       }
     }
 
@@ -204,7 +208,7 @@
       font-family: 'Khula', sans-serif;
       font-size: 4.5rem;
       font-weight: 800;
-      line-height: 82px !important;
+      line-height: 82px;
       text-transform: uppercase;
       color: #FFF;
       text-align: center;
@@ -214,6 +218,7 @@
       z-index: 1;
       white-space: nowrap;
       text-shadow: 3px 3px 0 #111, 4px 4px 0 rgba(33, 231, 134, 0.7);
+      overflow: visible !important;
       @include stacked-title-layer(1.05, true);
     }
 
