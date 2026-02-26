@@ -67,6 +67,18 @@ const sloganOptions = [
   "Architect"
 ];
 
+// 바이트 기반 텍스트 truncate (한글=2, 영문/기호=1, maxBytes 기준)
+const truncateByBytes = (text: string, maxBytes: number): string => {
+  let bytes = 0;
+  for (let i = 0; i < text.length; i++) {
+    bytes += text.charCodeAt(i) > 127 ? 2 : 1;
+    if (bytes > maxBytes) {
+      return text.slice(0, i) + '...';
+    }
+  }
+  return text;
+};
+
 const Cluster2Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -1811,7 +1823,7 @@ const Cluster2Content = () => {
                   </div>
                   <span className="card-subtitle">{card.subtitle}</span>
                 </div>
-                <p>{card.content.length > 40 ? card.content.slice(0, 40) + '...' : card.content}</p>
+                <p className="intro-card-content">{truncateByBytes(card.content, 80)}</p>
               </div>
             ))}
           </div>
@@ -1841,7 +1853,7 @@ const Cluster2Content = () => {
                   </div>
                   <span className="card-subtitle">{card.subtitle}</span>
                 </div>
-                <p>{card.content.length > 40 ? card.content.slice(0, 40) + '...' : card.content}</p>
+                <p className="intro-card-content">{truncateByBytes(card.content, 80)}</p>
               </div>
             ))}
             <div className="intro-card empty waiting">
