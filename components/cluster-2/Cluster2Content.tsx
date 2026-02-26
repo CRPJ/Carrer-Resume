@@ -1763,9 +1763,9 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {session && isOwner && (
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => handleEditClick(() => { setSelectedIntroCard(0); setIsEditingIntro(true); setEditingIntroData({ content: introCards[0].content }); setIntroModalOpen(true); })}>
-                <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" style={{ pointerEvents: 'none' }} />
-            </div>
+            {/*<div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => handleEditClick(() => { setSelectedIntroCard(0); setIsEditingIntro(true); setEditingIntroData({ content: introCards[0].content }); setIntroModalOpen(true); })}>*/}
+            {/*    <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" style={{ pointerEvents: 'none' }} />*/}
+            {/*</div>*/}
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
