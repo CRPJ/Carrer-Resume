@@ -867,9 +867,10 @@ const Cluster3Content = () => {
                 <span className="info-label"><span className="dot">·</span> 휴식(개인) 주차</span>
                 <span className="info-value week">{growthPeriodStats?.restWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.restSeasons ?? 0})</span><span className="unit">주</span></span>
               </div>
-              <div className="info-row">
+              <div className="info-row club-break-row">
                 <span className="info-label"><span className="dot">·</span> 휴식(공식) 주차</span>
                 <span className="info-value week">{growthPeriodStats?.clubBreakWeeks ?? 0}<span className="unit">주</span></span>
+                <div className="club-break-tooltip">공식 휴식 주차(구정 설 연휴, 추석, 중간/기말고사 등)에 사전 승인된 &apos;활동&apos;을 진행하여 적격요건을 달성한 경우, 해당 주차는 &apos;휴식(공식) 주차&apos;가 아닌, &apos;성장(성공) 주차&apos;에 반영됩니다.</div>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 가능 주차</span>
