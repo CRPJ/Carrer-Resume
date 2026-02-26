@@ -1056,7 +1056,7 @@
 
   // Notices
   .resume-notices {
-    padding: 25px 20px 12px 0;
+    padding: 25px 20px 32px 0;
     margin-top: -8px;
     display: flex;
     flex-direction: column;
@@ -1085,7 +1085,7 @@
       }
 
       &:last-child {
-        margin-bottom: 0;
+        margin-bottom: 10px;
         margin-right: 10px;
         transform: translateX(25px);
       }
@@ -1136,7 +1136,7 @@
         order: 3;
         position: relative;
         z-index: 10;
-        margin-left: 8px;
+        margin-left: 14px;
         width: 46px;
         height: 46px;
         display: inline-flex;
