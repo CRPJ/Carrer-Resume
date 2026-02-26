@@ -1583,16 +1583,6 @@ const Cluster2Content = () => {
             </div>
           ))}
         </div>
-        {/* 좌우 화살표 버튼 */}
-        {eduTotalPages > 1 && currentPage > 0 && (
-          <button
-            className="edu-arrow left"
-            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-            aria-label="이전 학력"
-          >
-            <i className="ti ti-chevron-left"></i>
-          </button>
-        )}
         <div className="edu-pagination">
           <div className="pagination-dots">
             {eduTotalPages > 1 && Array.from({ length: eduTotalPages }, (_, index) => (
