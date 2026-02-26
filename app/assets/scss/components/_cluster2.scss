@@ -5054,8 +5054,8 @@
       cursor: pointer;
       transition: all 0.3s ease;
 
-      i {
-        font-size: 1rem;
+      svg {
+        flex-shrink: 0;
       }
 
       &:hover {
