@@ -897,7 +897,6 @@ const Cluster2Content = () => {
   const [dragStartX, setDragStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const [maxScroll, setMaxScroll] = useState(0);
 
   // 섹션 5 물결 파동 상태
   const [ripples, setRipples] = useState<Ripple[]>([]);
@@ -993,23 +992,6 @@ const Cluster2Content = () => {
 
     return () => observer.disconnect();
   }, []);
-
-  // 학력 카드 캐러셀 최대 스크롤 계산 (마지막 카드 잘림 방지)
-  useEffect(() => {
-    const updateMaxScroll = () => {
-      if (cardsRef.current) {
-        const container = cardsRef.current.closest('.cluster2-education') as HTMLElement;
-        if (container) {
-          const containerWidth = container.clientWidth;
-          const contentWidth = cardsRef.current.scrollWidth;
-          setMaxScroll(Math.max(0, contentWidth - containerWidth));
-        }
-      }
-    };
-    updateMaxScroll();
-    window.addEventListener('resize', updateMaxScroll);
-    return () => window.removeEventListener('resize', updateMaxScroll);
-  }, [educationData]);
 
   // 모달 열기
   const openModal = (edu: EduData, e: React.MouseEvent) => {
@@ -1543,7 +1525,7 @@ const Cluster2Content = () => {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           style={{
-            transform: `translateX(calc(-${Math.min(currentPage * 350, maxScroll)}px + ${dragOffset}px))`,
+            transform: `translateX(calc(-${currentPage * 350}px + ${dragOffset}px))`,
             transition: isDragging ? 'none' : 'transform 0.4s ease',
             userSelect: 'none',
             cursor: isDragging ? 'grabbing' : 'grab'
@@ -1609,15 +1591,6 @@ const Cluster2Content = () => {
             aria-label="이전 학력"
           >
             <i className="ti ti-chevron-left"></i>
-          </button>
-        )}
-        {eduTotalPages > 1 && currentPage < eduTotalPages - 1 && (
-          <button
-            className="edu-arrow right"
-            onClick={() => setCurrentPage(p => Math.min(eduTotalPages - 1, p + 1))}
-            aria-label="다음 학력"
-          >
-            <i className="ti ti-chevron-right"></i>
           </button>
         )}
         <div className="edu-pagination">
