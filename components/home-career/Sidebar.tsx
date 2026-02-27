@@ -319,8 +319,8 @@ const Sidebar = () => {
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
       const availableHeight = viewportHeight - 130 / browserZoom;
 
-      // 기준 카드 크기: 474 x 810
-      const baseCardHeight = 810;
+      // 기준 카드 크기: 474 x 870
+      const baseCardHeight = 870;
 
       // 모바일에서는 CSS 반응형(1199px 이하: width 100% / height auto)을 그대로 사용
       if (mobile) {
@@ -1330,7 +1330,7 @@ const Sidebar = () => {
         <div
           style={{
             width: "474px",
-            height: "810px",
+            height: "870px",
             backgroundColor: "#1a1a2e",
             borderRadius: "12px",
           }}
@@ -1400,7 +1400,7 @@ const Sidebar = () => {
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
           width: isMobileView ? "100%" : cardScale > 1 ? `${482 * cardScale}px` : "var(--sidebar-width, 482px)",
-          height: isMobileView ? "auto" : `${810 * cardScale}px`,
+          height: isMobileView ? "auto" : `${870 * cardScale}px`,
           overflow: isMobileView || cardScale > 1 ? "visible" : "hidden",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",
