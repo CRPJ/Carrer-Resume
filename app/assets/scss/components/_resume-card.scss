@@ -505,6 +505,12 @@
           color: #FFFFFF;
           align-items: center;
 
+          .detail-icon {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: brightness(1.3) contrast(1.4) saturate(1.2);
+          }
+
           .icon {
             flex-shrink: 0;
             font-size: 1rem;
