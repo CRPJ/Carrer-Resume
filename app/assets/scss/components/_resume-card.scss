@@ -196,14 +196,16 @@
       word-break: keep-all !important;
     }
 
-    // 실무 역량 skill-label 의미 단위 줄바꿈
-    .resume-skills .skill-card .skill-label {
-      white-space: normal !important;
-      word-break: keep-all !important;
-      overflow: visible !important;
-      text-overflow: unset !important;
-      font-size: 0.625rem !important;
-      line-height: 1.3 !important;
+    // 모바일 skill 축소
+    .resume-skills {
+      gap: 6px !important;
+
+      .skill-card {
+        .skill-icon { width: 20px !important; height: 20px !important; top: -5px !important; left: -5px !important; }
+        .skill-num { font-size: 1rem !important; }
+        .skill-unit { font-size: 0.5rem !important; }
+        .skill-label { font-size: 0.5625rem !important; }
+      }
     }
 
     // ★ 인라인 width:474px override
@@ -295,20 +297,13 @@
 
     // skill-card 축소
     .resume-skills {
-      gap: 2px !important;
-      
+      gap: 8px !important;
+
       .skill-card {
-        .skill-num {
-          font-size: 1.375rem !important;
-        }
-        .skill-icon {
-          width: 22px !important;
-          height: 22px !important;
-        }
-        .skill-label {
-          white-space: nowrap !important;
-          font-size: 0.5625rem !important;
-        }
+        .skill-icon { width: 22px !important; height: 22px !important; top: -6px !important; left: -6px !important; }
+        .skill-num { font-size: 1.25rem !important; }
+        .skill-unit { font-size: 0.5625rem !important; }
+        .skill-label { font-size: 0.5625rem !important; }
       }
     }
 
@@ -366,11 +361,12 @@
       }
 
       .resume-skills {
-        gap: 4px !important;
+        gap: 16px !important;
 
         .skill-card {
-          .skill-num { font-size: 1.625rem !important; }
           .skill-icon { width: 26px !important; height: 26px !important; }
+          .skill-num { font-size: 1.5rem !important; }
+          .skill-unit { font-size: 0.625rem !important; }
           .skill-label { font-size: 0.6875rem !important; }
         }
       }
@@ -389,8 +385,9 @@
       }
 
       .resume-skills .skill-card {
+        .skill-icon { width: 30px !important; height: 30px !important; }
         .skill-num { font-size: 1.75rem !important; }
-        .skill-icon { width: 27px !important; height: 27px !important; }
+        .skill-unit { font-size: 0.6875rem !important; }
         .skill-label { font-size: 0.75rem !important; }
       }
     }
@@ -765,7 +762,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(0deg, rgba(17, 17, 17, 0.30) 0%, rgba(17, 17, 17, 0.30) 100%);
+        background: linear-gradient(0deg, rgba(17, 17, 17, 0.15) 0%, rgba(17, 17, 17, 0.15) 100%);
         border-radius: 512px;
         z-index: 1;
         pointer-events: none;
@@ -833,6 +830,7 @@
 
   // Activities
   .resume-activities {
+    border-top: 1px solid #313131;
     width: 472px;
     // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
     // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
@@ -900,8 +898,8 @@
 
           .activity-season {
             color: #fff;
-            font-weight: 400;
-            width: 84px;
+            font-weight: 600;
+            width: 82px;
             flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
@@ -909,8 +907,8 @@
 
           .activity-period {
             color: #fff;
-            font-weight: 400;
-            width: 78px;
+            font-weight: 600;
+            width: 72px;
             flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
@@ -918,16 +916,18 @@
 
           .activity-role {
             color: #fff;
-            font-weight: 400;
-            width: 62px;
+            font-weight: 500;
+            width: 70px;
             flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .activity-badge {
             font-size: 0.875rem;
-            font-weight: 400;
+            font-weight: 500;
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
@@ -943,7 +943,7 @@
           }
 
           .activity-check {
-            font-weight: 400;
+            font-weight: 500;
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
@@ -970,7 +970,7 @@
     &::before {
       content: '';
       position: absolute;
-      top: 3px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: -18px;
@@ -984,7 +984,7 @@
     &::after {
       content: '';
       position: absolute;
-      top: 3px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: -18px;
@@ -994,91 +994,86 @@
   }
 
   // Skills
+  // Skills — 피그마: 4열 가로 배치, 각 카드는 세로(아이콘→숫자+단위→라벨)
   .resume-skills {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    padding: 0;
-    padding-top: 30px;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    width: 420px;
-    margin-left: auto;
-    margin-right: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 30px;
+    padding: 30px 0 0;
+    margin: 0;
+    width: 100%;
     position: relative;
     z-index: 3;
 
     .skill-card {
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      padding: 0;
-      padding-top: 10px;
-      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       position: relative;
-      width: 100%;
-      height: 50px;
-      overflow: visible;
-
-      .skill-num-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-        position: relative;
-        z-index: 2;
-      }
+      background: transparent;
+      border: none;
+      padding: 0;
 
       .skill-icon {
         width: 34px;
         height: 34px;
-        flex-shrink: 0;
         object-fit: contain;
-        margin-right: -6px;
+        position: absolute;
+        top: -8px;
+        left: -4px;
+        z-index: 1;
+      }
+
+      .skill-num-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 2px;
         position: relative;
-        top: -3px;
+        z-index: 2;
+        width: 100%;
+        padding-left: 16px;
       }
 
       .skill-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 1.875rem;
+        font-size: 30px;
         font-weight: 400;
         color: #FFEC8F;
-        line-height: 1;
-        margin-bottom: 0;
-        position: relative;
-        z-index: 2;
+        line-height: 25px;
+      }
+
+      .skill-unit {
+        font-size: 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-weight: 400;
+        color: #FFF;
+        line-height: 18px;
       }
 
       .skill-label {
-        font-size: 0.8125rem;
+        font-size: 13px;
+        font-family: 'Pretendard', sans-serif;
+        font-weight: 500;
         color: #FFF;
-        line-height: 1.2;
-        position: relative;
-        z-index: 2;
-      }
-
-      & > div {
-        position: relative;
-        z-index: 2;
+        line-height: 18px;
+        white-space: nowrap;
+        margin-top: 2px;
       }
     }
   }
 
   // Notices
   .resume-notices {
-    padding: 25px 20px 42px 0;
+    padding: 18px 20px 42px 0;
     margin-top: -8px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     position: relative;
     z-index: 3;
-    gap: 14px;
+    gap: 4px;
 
     .notice-box {
       display: flex;

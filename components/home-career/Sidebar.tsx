@@ -1839,52 +1839,36 @@ const Sidebar = () => {
             {/* Skill Cards */}
             <div className="resume-skills">
               <div className="skill-card">
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", width: "100%" }}>
-                  <div className="skill-num-wrapper">
-                    <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                    <span className="skill-num" style={{ color: "#FFEB99" }}>
-                      {hasActivityData ? practicalCompetency : "-"}
-                    </span>
-                    <span style={{ fontSize: "12px", fontFamily: "Pretendard, sans-serif", color: "#FFF", alignSelf: "flex-end", marginBottom: "4px", marginLeft: "2px" }}>unit</span>
-                  </div>
-                  <div className="skill-label">실무 역량 성장</div>
+                <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={34} height={34} className="skill-icon" />
+                <div className="skill-num-row">
+                  <span className="skill-num">{hasActivityData ? practicalCompetency : "-"}</span>
+                  <span className="skill-unit">unit</span>
                 </div>
+                <span className="skill-label">실무 역량 성장</span>
               </div>
               <div className="skill-card">
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", width: "100%" }}>
-                  <div className="skill-num-wrapper">
-                    <Image src="/images/0/cluster 1/Sheriff Badge1.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                    <span className="skill-num" style={{ color: "#FFEB99" }}>
-                      {hasActivityData ? practicalExperience : "-"}
-                    </span>
-                    <span style={{ fontSize: "12px", fontFamily: "Pretendard, sans-serif", color: "#FFF", alignSelf: "flex-end", marginBottom: "4px", marginLeft: "2px" }}>건</span>
-                  </div>
-                  <div className="skill-label">실무 경험 축적</div>
+                <Image src="/images/0/cluster 1/Sheriff Badge1.png" alt="" width={34} height={34} className="skill-icon" />
+                <div className="skill-num-row">
+                  <span className="skill-num">{hasActivityData ? practicalExperience : "-"}</span>
+                  <span className="skill-unit">건</span>
                 </div>
+                <span className="skill-label">실무 경험 축적</span>
               </div>
               <div className="skill-card">
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", width: "100%" }}>
-                  <div className="skill-num-wrapper">
-                    <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                    <span className="skill-num" style={{ color: "#FFEB99" }}>
-                      {hasActivityData ? practicalInfo : "-"}
-                    </span>
-                    <span style={{ fontSize: "12px", fontFamily: "Pretendard, sans-serif", color: "#FFF", alignSelf: "flex-end", marginBottom: "4px", marginLeft: "2px" }}>회</span>
-                  </div>
-                  <div className="skill-label">실무 정보 습득</div>
+                <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={34} height={34} className="skill-icon" />
+                <div className="skill-num-row">
+                  <span className="skill-num">{hasActivityData ? practicalInfo : "-"}</span>
+                  <span className="skill-unit">회</span>
                 </div>
+                <span className="skill-label">실무 정보 습득</span>
               </div>
               <div className="skill-card">
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", width: "100%" }}>
-                  <div className="skill-num-wrapper">
-                    <Image src="/images/0/cluster 1/Sheriff Badge1 4.png" alt="" width={27} height={27} className="skill-icon" style={{ opacity: 0.8 }} />
-                    <span className="skill-num" style={{ color: "#FFEB99" }}>
-                      {hasActivityData ? practicalCareer : "-"}
-                    </span>
-                    <span style={{ fontSize: "12px", fontFamily: "Pretendard, sans-serif", color: "#FFF", alignSelf: "flex-end", marginBottom: "4px", marginLeft: "2px" }}>proj</span>
-                  </div>
-                  <div className="skill-label">실무 경력 누적</div>
+                <Image src="/images/0/cluster 1/Sheriff Badge1 4.png" alt="" width={34} height={34} className="skill-icon" />
+                <div className="skill-num-row">
+                  <span className="skill-num">{hasActivityData ? practicalCareer : "-"}</span>
+                  <span className="skill-unit">proj</span>
                 </div>
+                <span className="skill-label">실무 경력 누적</span>
               </div>
             </div>
 
