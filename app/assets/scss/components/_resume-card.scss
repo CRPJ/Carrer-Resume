@@ -542,7 +542,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border-left: 2px solid #FFC300;
+    border-left: none;
     font-family: 'HakgyoansimTuho', sans-serif;
     font-size: 1.375rem;
     font-style: normal;
@@ -558,6 +558,19 @@
     word-break: keep-all;
     overflow-wrap: break-word;
     position: relative;
+
+    // 왼쪽 금색 바 - 시안 Vector 9.svg (75px, round cap)
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 75px;
+      background: #FFC300;
+      border-radius: 1px;
+    }
 
     .intro-icon {
       position: absolute;
@@ -1175,7 +1188,8 @@
 .resume-card.ec-theme {
   // Resume intro border
   .resume-intro {
-    border-left: 2px solid #FF4B70 !important;
+    border-left: none !important;
+    &::before { background: #FF4B70 !important; }
   }
 
   // Badges - 영역 5 아이콘
@@ -1319,7 +1333,8 @@
 .resume-card.px-theme {
   // Section 3 - intro border
   .resume-intro {
-    border-left: 2px solid #36DA60 !important;
+    border-left: none !important;
+    &::before { background: #36DA60 !important; }
   }
 
   // Section 4 - stats
