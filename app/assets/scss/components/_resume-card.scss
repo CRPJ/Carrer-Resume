@@ -655,12 +655,13 @@
     .badge-group {
       display: flex;
       align-items: center;
-      gap: 10px;
-      justify-content: center;
+      gap: 8px;
+      width: 100%;
 
       .badge-icon {
-        width: 18px;
-        height: 18px;
+        width: 27px;
+        height: 27px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -670,9 +671,6 @@
 
         &.icon-graphic10 {
           background-image: url('/images/0/cluster 1/Ok01.png');
-          width: 19px;
-          height: 19px;
-          filter: sepia(100%) saturate(300%) hue-rotate(-10deg) brightness(1.1);
         }
 
         &.icon-shield {
@@ -689,7 +687,7 @@
         font-size: 1.0625rem;
         font-weight: 400;
         color: #FFEC8F;
-        min-width: 55px;
+        flex: 1;
         text-align: right;
 
         &.red {
