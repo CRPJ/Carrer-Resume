@@ -305,24 +305,40 @@ const Sidebar = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
-  // ★ 브라우저 줌 보정용 초기 DPR (컴포넌트 마운트 시 1회 캡처)
-  const [initialDPR] = useState(() => typeof window !== 'undefined' ? window.devicePixelRatio : 1);
+  // ★ 브라우저 줌 감지용: DPR과 outerWidth를 추적
+  const lastDPRRef = useRef(typeof window !== 'undefined' ? window.devicePixelRatio : 1);
+  const lastOuterWidthRef = useRef(typeof window !== 'undefined' ? window.outerWidth : 1920);
 
   useEffect(() => {
     const calculateScale = () => {
+      const currentDPR = window.devicePixelRatio;
+      const currentOuterWidth = window.outerWidth;
+
+      // ★ 브라우저 줌 감지: DPR이 변했는데 outerWidth는 안 변한 경우
+      //   → 사용자가 Ctrl+/- 로 줌한 것 → 카드 스케일 재계산 스킵 (레이아웃 안정)
+      //   DevTools/리사이즈: DPR 안 변하거나, outerWidth도 변함 → 정상 재계산
+      const isBrowserZoom = Math.abs(currentDPR - lastDPRRef.current) > 0.001
+        && Math.abs(currentOuterWidth - lastOuterWidthRef.current) < 5;
+
+      lastDPRRef.current = currentDPR;
+
+      if (isBrowserZoom) {
+        // 브라우저 줌 변경 — 카드 스케일을 유지하여 레이아웃 안정
+        return;
+      }
+
+      lastOuterWidthRef.current = currentOuterWidth;
+
       const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const windowWidth = window.innerWidth;
 
-      // ★ 브라우저 줌 보정: innerWidth/Height가 줌에 의해 줄어드는 것을 복원
-      const browserZoomFactor = window.devicePixelRatio / initialDPR;
-      const compensatedWidth = window.innerWidth * browserZoomFactor;
-
-      const mobile = compensatedWidth < 1200;
+      const mobile = windowWidth < 1200;
       setIsMobileView(mobile);
 
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
       const browserZoom = window.visualViewport?.scale || 1;
-      const viewportWidth = (window.visualViewport?.width || window.innerWidth) * browserZoomFactor;
-      const viewportHeight = (window.visualViewport?.height || window.innerHeight) * browserZoomFactor;
+      const viewportWidth = window.visualViewport?.width || window.innerWidth;
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
 
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
       const availableHeight = viewportHeight - 130 / browserZoom;
@@ -357,9 +373,8 @@ const Sidebar = () => {
       // 중간폭 데스크톱 및 노트북 카드 확대 보정
       const isClusterPages = (pathname || "").includes("/cluster-") || (pathname || "").includes("/career");
 
-      // ★ 1200~1400px 물리 뷰포트: 브라우저 줌 보정 적용
-      const physicalWidth = compensatedWidth;
-      const isTightDesktop = !mobile && physicalWidth >= 1200 && physicalWidth < 1400;
+      // ★ 1200~1400px 뷰포트
+      const isTightDesktop = !mobile && windowWidth >= 1200 && windowWidth < 1400;
 
       // 1366x768급 노트북(세로가 낮은 환경)
       const isLaptop1366 = !mobile && viewportWidth >= 1280 && viewportWidth <= 1440 && viewportHeight >= 700 && viewportHeight <= 820;
@@ -367,7 +382,7 @@ const Sidebar = () => {
       if (isClusterPages && isTightDesktop) {
         // 뷰포트가 좁을수록 카드를 더 확대 (1200px → 1.15, 1400px → 1.0)
         // CSS zoom으로 인한 카드 시각적 축소를 보정
-        const boost = 1 + ((1400 - physicalWidth) / (1400 - 1200)) * 0.15;
+        const boost = 1 + ((1400 - windowWidth) / (1400 - 1200)) * 0.15;
         const tightScale = Math.min(1.15, Math.max(1.0, boost));
         scale = Math.max(scale, tightScale);
       } else if (isClusterPages && isLaptop1366) {
