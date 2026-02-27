@@ -44,7 +44,7 @@ export default function RootLayout({
       <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
         <SessionProvider>
           <ProfileProvider>
-            <ZoomPrevention />
+            {/* <ZoomPrevention /> */}
             <ResponsiveScale />
             <Progress />
             <Bootstrap>{children}</Bootstrap>

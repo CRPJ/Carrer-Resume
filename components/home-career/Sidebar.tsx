@@ -305,16 +305,24 @@ const Sidebar = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
+  // ★ 브라우저 줌 보정용 초기 DPR (컴포넌트 마운트 시 1회 캡처)
+  const [initialDPR] = useState(() => typeof window !== 'undefined' ? window.devicePixelRatio : 1);
+
   useEffect(() => {
     const calculateScale = () => {
       const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
-      const mobile = window.innerWidth < 1200;
+
+      // ★ 브라우저 줌 보정: innerWidth/Height가 줌에 의해 줄어드는 것을 복원
+      const browserZoomFactor = window.devicePixelRatio / initialDPR;
+      const compensatedWidth = window.innerWidth * browserZoomFactor;
+
+      const mobile = compensatedWidth < 1200;
       setIsMobileView(mobile);
 
       // 브라우저 줌 레벨 감지 (visualViewport 사용)
       const browserZoom = window.visualViewport?.scale || 1;
-      const viewportWidth = window.visualViewport?.width || window.innerWidth;
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const viewportWidth = (window.visualViewport?.width || window.innerWidth) * browserZoomFactor;
+      const viewportHeight = (window.visualViewport?.height || window.innerHeight) * browserZoomFactor;
 
       // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
       const availableHeight = viewportHeight - 130 / browserZoom;
@@ -349,9 +357,8 @@ const Sidebar = () => {
       // 중간폭 데스크톱 및 노트북 카드 확대 보정
       const isClusterPages = (pathname || "").includes("/cluster-") || (pathname || "").includes("/career");
 
-      // ★ 1200~1400px 물리 뷰포트: window.innerWidth는 CSS zoom의 영향을 받지 않으므로
-      //   물리적 뷰포트 폭을 직접 사용하여 안정적으로 감지
-      const physicalWidth = window.innerWidth;
+      // ★ 1200~1400px 물리 뷰포트: 브라우저 줌 보정 적용
+      const physicalWidth = compensatedWidth;
       const isTightDesktop = !mobile && physicalWidth >= 1200 && physicalWidth < 1400;
 
       // 1366x768급 노트북(세로가 낮은 환경)
