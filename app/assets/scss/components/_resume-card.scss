@@ -580,7 +580,7 @@
   .resume-three-column {
     display: flex;
     gap: 39px; // 피그마: stats→badges, badges→medal 모두 39px 간격
-    padding: 28px 20px; // 피그마 시안: 상하 여백 넉넉하게 확보
+    padding: 22px 20px; // 상하 여백 살짝 축소 → 하단 notices 공간 확보
     align-items: flex-start;
   }
 
@@ -1066,7 +1066,7 @@
 
   // Notices
   .resume-notices {
-    padding: 18px 20px 42px 0;
+    padding: 18px 20px 50px 0;
     margin-top: -8px;
     display: flex;
     flex-direction: column;
