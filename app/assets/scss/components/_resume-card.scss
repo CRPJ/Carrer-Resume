@@ -74,15 +74,15 @@
   width: 474px !important;
   min-width: 474px !important;
   max-width: 474px !important;
-  height: 870px !important;
-  min-height: 870px !important;
-  max-height: 870px !important;
+  height: 810px !important;
+  min-height: 810px !important;
+  max-height: 810px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
-  border: 1px solid #999 !important;
-  border-bottom: 2px solid #999 !important;
-  box-shadow: none;      
+  background: #0C0F14;
+  border: 1px solid #313F11 !important;
+  box-shadow: none;
   border-radius: 0 !important;
   overflow: hidden !important;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -486,8 +486,8 @@
 
         .name-eng {
           font-family: 'Cafe24AnemoneAir', sans-serif;
-          font-size: 0.8125rem;
-          font-weight: 400;
+          font-size: 12px;
+          font-weight: 300;
           color: #999;
         }
       }
@@ -501,7 +501,7 @@
           display: flex;
           gap: 10px;
           font-size: 0.875rem;
-          line-height: 1.6;
+          line-height: 24px;
           color: #FFFFFF;
           align-items: center;
 
@@ -578,7 +578,7 @@
   // Stats - 영역 4
   .resume-stats {
     flex-shrink: 0;
-    width: 170px;
+    width: 138px;
 
     .stat-item {
       margin-bottom: 22px;
@@ -599,7 +599,7 @@
       width: 138px;
 
       .stat-label {
-        font-size: 0.9375rem;
+        font-size: 16px;
         color: #999;
         white-space: nowrap;
 
@@ -617,7 +617,7 @@
 
         .stat-unit {
           font-family: 'Pretendard', sans-serif;
-          font-size: 0.75rem;
+          font-size: 10px;
           font-weight: 400;
           color: #FFEC8F;
         }
@@ -627,7 +627,7 @@
     .progress-bar {
       width: 138px;
       height: 3px;
-      background: #555555;
+      background: #FFFFFF;
       border: none;
       border-radius: 2px;
       overflow: hidden;
@@ -646,7 +646,7 @@
   // Badges - 영역 5
   .resume-badges {
     flex-shrink: 0;
-    width: 120px;
+    width: 86px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -659,8 +659,8 @@
       width: 100%;
 
       .badge-icon {
-        width: 27px;
-        height: 27px;
+        width: 15px;
+        height: 16px;
         flex-shrink: 0;
         display: flex;
         align-items: center;
@@ -684,7 +684,7 @@
 
       .badge-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 1.0625rem;
+        font-size: 16px;
         font-weight: 400;
         color: #FFEC8F;
         flex: 1;
@@ -700,7 +700,7 @@
   // Medal - 영역 6
   .resume-medal {
     flex-shrink: 0;
-    width: 120px;
+    width: 88px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -724,8 +724,8 @@
 
     .medal-image-wrapper {
       position: relative;
-      width: 98px;
-      height: 98px;
+      width: 88px;
+      height: 88px;
       margin-left: -35px;
       border-radius: 512px;
       overflow: hidden;
@@ -745,8 +745,8 @@
       }
 
       img {
-        width: 98px;
-        height: 98px;
+        width: 88px;
+        height: 88px;
         display: block;
         object-fit: contain;
         box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
@@ -841,7 +841,7 @@
       align-items: center;
       gap: 4px;
       padding: 0;
-      border-bottom: 0;
+      border-bottom: 1px solid #313131;
       width: 470px;
       height: 36px;
       background-color: #1C242F;
@@ -990,7 +990,7 @@
     padding: 0;
     padding-top: 30px;
     padding-bottom: 0;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     width: 420px;
     margin-left: auto;
     margin-right: auto;
@@ -1023,8 +1023,8 @@
       }
 
       .skill-icon {
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         flex-shrink: 0;
         object-fit: contain;
         margin-right: -6px;
@@ -1109,10 +1109,10 @@
         line-height: 1.4;
         order: 2;
         text-align: left;
-        font-size: 1rem;
+        font-size: 13px;
         position: relative;
         z-index: 10;
-        color: #FFF;
+        color: #DDDDDD;
 
         &.notice-text-top {
           font-family: 'Eutman', sans-serif;
@@ -1124,7 +1124,7 @@
         font-family: 'GanaChocolate', sans-serif;
         margin-right: -15px;
         white-space: nowrap;
-        font-size: 0.84rem;
+        font-size: 13px;
       }
 
       .notice-stamp {
