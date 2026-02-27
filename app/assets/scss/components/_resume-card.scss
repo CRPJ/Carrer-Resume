@@ -59,7 +59,7 @@
 
 // Main content width adjustment
 .col-xxl-9 {
-  max-width: calc(100% - 482px) !important;
+  max-width: calc(100% - var(--sidebar-width, 482px)) !important;
   padding-left: 70px !important;
   padding-right: 0 !important;
 }
@@ -582,19 +582,19 @@
   // Three Column Container - 영역 4, 5, 6
   .resume-three-column {
     display: flex;
-    gap: 15px;
-    padding: 16px 20px;
+    gap: 39px; // 피그마: stats→badges, badges→medal 모두 39px 간격
+    padding: 28px 20px; // 피그마 시안: 상하 여백 넉넉하게 확보
     align-items: flex-start;
-    justify-content: space-between;
   }
 
   // Stats - 영역 4
   .resume-stats {
     flex-shrink: 0;
     width: 138px;
+    margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
 
     .stat-item {
-      margin-bottom: 25px;
+      margin-bottom: 36px; // badge-group 전체 높이(~92px)와 stats 높이 일치
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -734,7 +734,7 @@
     justify-content: center;
     position: relative;
     font-size: 0.875rem;
-    margin-top: 6px;
+    overflow: visible;
 
     // Complete일 때 오버레이 제거 + 금장 glow 효과
     &.no-overlay {
@@ -751,31 +751,31 @@
 
     .medal-image-wrapper {
       position: relative;
-      width: 88px;
-      height: 88px;
-      margin-left: -35px;
+      width: 100px;
+      height: 100px;
+      margin-left: -6px; // 88px 슬롯 안에서 100px를 중앙 정렬: (100-88)/2
       border-radius: 512px;
       overflow: hidden;
 
+      // 피그마 시안 기반 오버레이 (0.60 → 0.30 밝기 조정)
       &::before {
         content: '';
         position: absolute;
-        top: calc(50% - 7px);
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 87%;
-        height: 87%;
-        background-color: rgba(0, 0, 0, 0.6);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, rgba(17, 17, 17, 0.30) 0%, rgba(17, 17, 17, 0.30) 100%);
         border-radius: 512px;
         z-index: 1;
         pointer-events: none;
       }
 
       img {
-        width: 88px;
-        height: 88px;
+        width: 100px;
+        height: 100px;
         display: block;
-        object-fit: contain;
+        object-fit: cover;
         box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
         border-radius: 512px;
         position: relative;
@@ -786,51 +786,44 @@
     .medal-text {
       position: absolute;
       bottom: 17px;
-      right: 7px;
+      right: -31px; // 피그마: 카드 우측 16.67px 여백 확보
       z-index: 2;
-      width: 80px;
-      height: 28px;
+      width: 76.73px;
+      height: 24px;
       padding: 0 8px;
-      font-family: 'Cafe24Anemone', sans-serif;
-      font-size: 0.875rem;
+      font-family: 'Cafe24Ohsquare', 'Cafe24Anemone', sans-serif;
+      font-size: 14px;
       color: #FFEC8F;
       font-weight: 400;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: rotate(-13deg);
+      transform: rotate(-15deg);
+      // 피그마 시안: 리본 모양 + 녹색 글로우
       background-image: url('/images/0/cluster 1/ribon box.png');
       background-size: 100% 100%;
       background-repeat: no-repeat;
       background-position: center;
+      filter: drop-shadow(0 0 10px rgba(190, 255, 37, 0.50));
+      backdrop-filter: blur(2.5px);
       transition: width 0.3s ease;
-
-      // Running 상태: Figma처럼 미세하게 반짝이며 눈에 띄도록
-      // (다른 상태에는 영향 없음)
-      &:not(.short-medium):not(.medium):not(.long) {
-        // 애니메이션 없이 "고정 글로우"만 유지
-        filter: drop-shadow(0 0 10px rgba(255, 236, 143, 0.6));
-      }
 
       // 짧은-중간 길이 (Complete)
       &.short-medium {
         width: 90px;
-        right: 2px;
         font-size: 0.8125rem;
       }
 
       // 중간 길이 (Recharging)
       &.medium {
         width: 105px;
-        right: -5px;
         font-size: 0.8125rem;
       }
 
       // 긴 길이 (Next Challenge)
       &.long {
         width: 125px;
-        right: -8px;
         font-size: 0.75rem;
       }
     }
@@ -900,7 +893,7 @@
         .activity-line {
           display: flex;
           flex-wrap: nowrap;
-          gap: 2px;
+          gap: 17px;
           align-items: center;
           justify-content: flex-start;
           font-size: 0.875rem;
@@ -908,10 +901,8 @@
           .activity-season {
             color: #fff;
             font-weight: 400;
-            min-width: 90px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            width: 84px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
           }
@@ -919,10 +910,8 @@
           .activity-period {
             color: #fff;
             font-weight: 400;
-            min-width: 75px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            width: 78px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
           }
@@ -930,10 +919,8 @@
           .activity-role {
             color: #fff;
             font-weight: 400;
-            min-width: 110px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            width: 62px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
           }
@@ -941,11 +928,9 @@
           .activity-badge {
             font-size: 0.875rem;
             font-weight: 400;
-            min-width: 55px;
-            flex-shrink: 1;
-            overflow: hidden;
+            width: 60px;
+            flex-shrink: 0;
             white-space: nowrap;
-            text-overflow: ellipsis;
             text-align: center;
 
             &.active {
@@ -959,11 +944,10 @@
 
           .activity-check {
             font-weight: 400;
-            flex-shrink: 1;
-            overflow: visible;
+            width: 60px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
-            margin-left: 8px;
 
             &.pending {
               color: #999;

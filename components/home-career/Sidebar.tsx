@@ -305,132 +305,50 @@ const Sidebar = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
-  // ★ 브라우저 줌 감지용: DPR과 outerWidth를 추적
-  const lastDPRRef = useRef(typeof window !== 'undefined' ? window.devicePixelRatio : 1);
-  const lastOuterWidthRef = useRef(typeof window !== 'undefined' ? window.outerWidth : 1920);
-
   useEffect(() => {
     const calculateScale = () => {
-      const currentDPR = window.devicePixelRatio;
-      const currentOuterWidth = window.outerWidth;
-
-      // ★ 브라우저 줌 감지: DPR이 변했는데 outerWidth는 안 변한 경우
-      //   → 사용자가 Ctrl+/- 로 줌한 것 → 카드 스케일 재계산 스킵 (레이아웃 안정)
-      //   DevTools/리사이즈: DPR 안 변하거나, outerWidth도 변함 → 정상 재계산
-      const isBrowserZoom = Math.abs(currentDPR - lastDPRRef.current) > 0.001
-        && Math.abs(currentOuterWidth - lastOuterWidthRef.current) < 5;
-
-      lastDPRRef.current = currentDPR;
-
-      if (isBrowserZoom) {
-        // 브라우저 줌 변경 — 카드 스케일을 유지하여 레이아웃 안정
-        return;
-      }
-
-      lastOuterWidthRef.current = currentOuterWidth;
-
-      const cssZoom = parseFloat(document.documentElement.style.zoom) || 1;
       const windowWidth = window.innerWidth;
-
       const mobile = windowWidth < 1200;
       setIsMobileView(mobile);
 
-      // 브라우저 줌 레벨 감지 (visualViewport 사용)
-      const browserZoom = window.visualViewport?.scale || 1;
-      const viewportWidth = window.visualViewport?.width || window.innerWidth;
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const BASE_CARD_HEIGHT = 810;
+      const BASE_SIDEBAR_WIDTH = 482;
 
-      // 헤더 높이 제외한 사용 가능한 높이 (줌 고려) - 130px로 여유 확보
-      const availableHeight = viewportHeight - 130 / browserZoom;
-
-      // 기준 카드 크기: 474 x 810
-      const baseCardHeight = 810;
-
-      // 모바일에서는 CSS 반응형(1199px 이하: width 100% / height auto)을 그대로 사용
+      // 모바일: CSS 반응형 그대로 사용
       if (mobile) {
         setCardScale(1);
-
-        // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
-        document.documentElement.style.removeProperty("--card-width");
-        document.documentElement.style.removeProperty("--card-height");
-        document.documentElement.style.removeProperty("--card-scale");
         document.documentElement.style.removeProperty("--sidebar-width");
-        document.documentElement.style.removeProperty("--container-height");
         return;
       }
 
-      // 높이 기준으로 스케일 계산 (화면 높이에 딱 맞도록)
-      let scale = availableHeight / baseCardHeight;
+      // ★ 카드만 축소, 헤더·nav는 그대로 (네이버 방식)
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const viewportWidth = window.visualViewport?.width || window.innerWidth;
 
-      // ★ CSS zoom 역보정: zoom이 1보다 크면 카드를 작게 만들어서 상쇄
-      if (cssZoom > 1) {
-        scale = scale / cssZoom;
-      }
+      // 1) 높이 기반 스케일: 카드(810px)가 뷰포트 높이에 맞게
+      const availableHeight = viewportHeight - 130; // 헤더 높이 제외
+      const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
-      // 기본 정책: 큰 화면에서 임의 확대 금지(비율 깨짐 방지)
-      scale = Math.min(1, scale);
+      // 2) 폭 기반 스케일: 우측 콘텐츠 최소 600px 확보
+      //    레이아웃: [sidebar(482*s)] [gap 20px] [content ≥ 600px]
+      const MIN_CONTENT_WIDTH = 600;
+      const GAP = 20;
+      const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
+      const scaleByWidth = maxSidebarByWidth / BASE_SIDEBAR_WIDTH;
 
-      // 중간폭 데스크톱 및 노트북 카드 확대 보정
-      const isClusterPages = (pathname || "").includes("/cluster-") || (pathname || "").includes("/career");
-
-      // ★ 1200~1400px 뷰포트
-      const isTightDesktop = !mobile && windowWidth >= 1200 && windowWidth < 1400;
-
-      // 1366x768급 노트북(세로가 낮은 환경)
-      const isLaptop1366 = !mobile && viewportWidth >= 1280 && viewportWidth <= 1440 && viewportHeight >= 700 && viewportHeight <= 820;
-
-      if (isClusterPages && isTightDesktop) {
-        // 뷰포트가 좁을수록 카드를 더 확대 (1200px → 1.15, 1400px → 1.0)
-        // CSS zoom으로 인한 카드 시각적 축소를 보정
-        const boost = 1 + ((1400 - windowWidth) / (1400 - 1200)) * 0.15;
-        const tightScale = Math.min(1.15, Math.max(1.0, boost));
-        scale = Math.max(scale, tightScale);
-      } else if (isClusterPages && isLaptop1366) {
-        const GAP_PX = 20;
-        const NAV_WIDTH = 97;
-        const PADDING_PX = 24;
-        const BASE_SIDEBAR_WIDTH = 482;
-        const MIN_RIGHT_CONTENT = 760;
-
-        const availableForSidebar = viewportWidth - NAV_WIDTH - PADDING_PX - GAP_PX - MIN_RIGHT_CONTENT;
-        const maxSidebarWidth = Math.max(BASE_SIDEBAR_WIDTH, availableForSidebar);
-        const maxScaleByWidth = maxSidebarWidth / BASE_SIDEBAR_WIDTH;
-
-        const desiredScale = Math.min(1.5, maxScaleByWidth);
-        scale = Math.max(scale, desiredScale);
-      }
+      // 높이·폭 중 더 제한적인 쪽 적용, 최대 1(확대 금지), 최소 0.55
+      let scale = Math.min(1, scaleByHeight, scaleByWidth);
+      scale = Math.max(0.55, scale);
 
       setCardScale(scale);
 
-      // ★ Mac 보정: 오버레이 스크롤바로 뷰포트가 넓어 여백이 커 보이므로
-      // 카드를 살짝 확대하여 사이드바를 꽉 채움 (Windows는 영향 없음)
-      const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-      if (isMac) {
-        const macScale = Math.max(scale, 482 / 474); // ≈ 1.017배
-        setCardScale(macScale);
-        scale = macScale;
-      }
-
-      // ★ 레이아웃 가드레일: 실제 사이드바 점유 폭을 CSS 변수로 동기화
-      // - fixed+spacer 방식(예: cluster-4-card)에서도 콘텐츠 침범이 발생하지 않게 함
-      // - scale < 1인 경우에도 "컬럼 폭"은 기본 482px을 유지
-      const BASE_SIDEBAR_WIDTH = 482;
-      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * Math.max(1, scale));
+      // 사이드바 폭을 스케일에 맞게 조정 → 우측 콘텐츠 영역이 자동 확장
+      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
       document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
-
-      // 과거 로직에서 주입된 CSS 변수 제거(레이아웃 폭 변동 방지)
-      document.documentElement.style.removeProperty("--card-width");
-      document.documentElement.style.removeProperty("--card-height");
-      document.documentElement.style.removeProperty("--card-scale");
-      document.documentElement.style.removeProperty("--container-height");
-
-      // 부모 컨테이너 높이 제한 제거 - 스크롤 시 프로필 잘림 방지
-      // (기존 코드 삭제됨)
     };
 
     calculateScale();
 
-    // 리사이즈 및 줌 이벤트 감지
     window.addEventListener("resize", calculateScale);
     window.visualViewport?.addEventListener("resize", calculateScale);
 
@@ -1421,9 +1339,9 @@ const Sidebar = () => {
         style={{
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
-          width: isMobileView ? "100%" : cardScale > 1 ? `${482 * cardScale}px` : "var(--sidebar-width, 482px)",
-          height: isMobileView ? "auto" : `${810 * cardScale}px`,
-          overflow: isMobileView || cardScale > 1 ? "visible" : "hidden",
+          width: isMobileView ? "100%" : `${Math.round(482 * cardScale)}px`,
+          height: isMobileView ? "auto" : `${Math.round(810 * cardScale)}px`,
+          overflow: "visible",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",
         }}
@@ -1780,7 +1698,7 @@ const Sidebar = () => {
             {/* Medal Badge - 영역 6 */}
             <div className={`resume-medal ${crewStatus === "Complete" ? "no-overlay" : ""}`}>
               <div className="medal-image-wrapper">
-                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={98} height={98} />
+                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={512} height={512} />
               </div>
               <div className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""}`}>{crewStatus}</div>
             </div>
