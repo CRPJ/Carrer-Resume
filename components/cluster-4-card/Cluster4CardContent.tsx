@@ -333,6 +333,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'part_leader': '심화(파트장)',
     'crew_partleader': '심화(파트장)',

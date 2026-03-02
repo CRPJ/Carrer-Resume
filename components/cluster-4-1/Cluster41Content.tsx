@@ -309,6 +309,7 @@ const Cluster41Content = () => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'crew_normal': '일반',
     'part_leader': '심화(파트장)',
