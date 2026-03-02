@@ -142,7 +142,7 @@ const Cluster4RankingContent = () => {
 
   // 시즌 옵션 추출
   const seasonOptions = React.useMemo(() => {
-    const seasonOrder: { [key: string]: number } = { '봄': 1, '여름': 2, '가을': 3, '겨울': 4 };
+    const seasonOrder: { [key: string]: number } = { '겨울': 1, '봄': 2, '여름': 3, '가을': 4 };
     const uniqueSeasons = new Map<string, { year: number; season: string }>();
     weeks.forEach(week => {
       const key = `${week.seasonYear}-${week.seasonName}`;

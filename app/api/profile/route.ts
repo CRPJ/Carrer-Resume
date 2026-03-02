@@ -278,7 +278,7 @@ export async function GET(request: NextRequest) {
       // 모든 시즌 (성장 가능 시즌 계산용)
       supabaseAdmin.from("seasons").select("id, name, year, start_date, end_date").order("start_date", { ascending: true }),
 
-      // 해당 유저의 성공 주차 (주차별) - user_weekly_growth 사용
+      // 해당 유저의 성공 주차 (주차별) - user_weekly_growth 사용 (pms1.5와 동일)
       supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
 
       // 해당 유저의 역할 이력
@@ -392,11 +392,11 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const activityByWeek = new Map(userActivities.map((a: any) => [a.week_id, a]));
 
-    // 시즌 휴식 상태인 시즌의 ID들 추출 (progress_status='full_rest', 완료된 시즌만 - 현재 진행 중인 시즌 제외)
+    // 시즌 휴식 상태인 시즌의 ID들 추출 (progress_status='full_rest', 현재 진행 중인 시즌 포함 - pms1.5와 동일)
     const restingSeasonIds = new Set<string>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (seasonHistories || []).forEach((sh: any) => {
-      if (sh.progress_status === 'full_rest' && sh.seasons?.id && sh.seasons?.end_date < today) {
+      if (sh.progress_status === 'full_rest' && sh.seasons?.id) {
         restingSeasonIds.add(sh.seasons.id);
       }
     });
@@ -424,6 +424,12 @@ export async function GET(request: NextRequest) {
       return true;
     });
 
+    // break 시즌 ID 목록 (전환 시즌) - 주차별 통계 계산 전에 미리 생성
+    const breakSeasonIds = new Set(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      allSeasons.filter((s: any) => s.name?.toLowerCase().includes('break')).map((s: any) => s.id)
+    );
+
     // 주차별 통계 계산
     let approvedWeeksCount = 0;      // a: 활동 인정 주차
     let unapprovedWeeksCount = 0;    // b: 활동 미인정 주차
@@ -440,7 +446,8 @@ export async function GET(request: NextRequest) {
       const hasActivity = activityByWeek.has(week.id);
       // 개인 휴식만 카운트 (시즌 휴식은 위에서 제외됨)
       const hasPersonalRest = userRestWeekIds.has(week.id);
-      const isClubBreak = week.is_club_break;
+      // break 시즌 소속 주차도 공식 휴식으로 처리 (is_club_break가 false여도)
+      const isClubBreak = week.is_club_break || breakSeasonIds.has(week.season_id);
       const isOnboardingWeek = week.id === profile.onboarding_week_id;
 
       // 온보딩 주차는 무조건 성공 처리
@@ -480,11 +487,7 @@ export async function GET(request: NextRequest) {
     // e: 활동 가능 주차 = a + b + c
     const availableWeeksCount = approvedWeeksCount + unapprovedWeeksCount + restWeeksCount;
 
-    // break 시즌 ID 목록 (전환 시즌)
-    const breakSeasonIds = new Set(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      allSeasons.filter((s: any) => s.name?.toLowerCase().includes('break')).map((s: any) => s.id)
-    );
+    // break 시즌 ID 목록 (전환 시즌) - 위에서 이미 생성됨
 
     // 성장 가능 시즌 수 계산 (가입 이후 클럽 정상 운영 시즌, break 시즌 제외)
     let availableSeasonsCount = 0;
@@ -614,12 +617,12 @@ export async function GET(request: NextRequest) {
       console.log('[Profile API] completionRate 계산 스킵 - 조건 불충족 (null 반환)');
     }
 
-    // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
+    // 시즌 이름에서 순서 매핑 (겨울 시작: winter=1, spring=2, summer=3, fall=4)
     const seasonOrderMap: { [key: string]: number } = {
-      'spring': 1,
-      'summer': 2,
-      'fall': 3,
-      'winter': 4
+      'winter': 1,
+      'spring': 2,
+      'summer': 3,
+      'fall': 4
     };
 
     // seasons 데이터가 있는 항목만 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)

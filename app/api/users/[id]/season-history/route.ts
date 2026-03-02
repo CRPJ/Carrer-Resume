@@ -47,12 +47,12 @@ export async function GET(
       })
     }
 
-    // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
+    // 시즌 이름에서 순서 매핑 (겨울 시작: winter=1, spring=2, summer=3, fall=4)
     const seasonOrderMap: { [key: string]: number } = {
-      'spring': 1,
-      'summer': 2,
-      'fall': 3,
-      'winter': 4
+      'winter': 1,
+      'spring': 2,
+      'summer': 3,
+      'fall': 4
     }
 
     // seasons 데이터가 없는 항목 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)

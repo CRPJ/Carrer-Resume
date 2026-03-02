@@ -582,12 +582,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const onboardingWeekId = profileResult.onboardingWeekId;
         const isCurrentWeekOnboarding = weekId === onboardingWeekId;
 
+        // break 시즌 소속 여부 (전환주차는 공식 휴식)
+        const isBreakSeason = rawSeasonName?.toLowerCase().includes('break');
+
         let growthStatus = '실패';
         // 온보딩 주차(무적 주차)는 무조건 성공
         if (isCurrentWeekOnboarding) {
           growthStatus = '성공';
         } else if (weeklyGrowth) {
-          if (weeklyGrowth.is_club_break) {
+          if (weeklyGrowth.is_club_break || isBreakSeason) {
             growthStatus = '휴식(공식)';
           } else if (weeklyGrowth.is_resting) {
             growthStatus = '휴식(개인)';
@@ -597,7 +600,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             growthStatus = '실패';
           }
         } else {
-          if (currentWeek.is_club_break) {
+          if (currentWeek.is_club_break || isBreakSeason) {
             growthStatus = '휴식(공식)';
           } else if (apiRestWeekIds.includes(currentWeek.id)) {
             growthStatus = '휴식(개인)';
@@ -2257,15 +2260,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="header-info-row2">
               <div className="info-group left">
                 <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{
-                  teamName === '운영진' && generation
-                    ? `운영진(${generation}기)`
-                    : (teamName || '-')
+                  isOnboardingWeek
+                    ? '클럽 온보딩'
+                    : teamName === '운영진' && generation
+                      ? `운영진(${generation}기)`
+                      : (teamName || '-')
                 }</span></span>
                 <span className="info-divider">|</span>
                 <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
-                  teamName === '운영진' && partName === '팀장' && managedTeamName
-                    ? `팀장(${managedTeamName})`
-                    : (partName || '-')
+                  isOnboardingWeek
+                    ? '신입OT'
+                    : teamName === '운영진' && partName === '팀장' && managedTeamName
+                      ? `팀장(${managedTeamName})`
+                      : (partName || '-')
                 }</span></span>
               </div>
               <div className="info-group right">

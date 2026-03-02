@@ -1028,12 +1028,12 @@ const Cluster41Content = () => {
 
   // 드롭다운 옵션 - dbWeeklyData에서 유니크한 시즌 추출
   const seasonOptions = React.useMemo(() => {
-    // 시즌 순서 매핑 (정렬용)
+    // 시즌 순서 매핑 (정렬용 - 겨울 시작)
     const seasonOrder: { [key: string]: number } = {
-      '봄': 1,
-      '여름': 2,
-      '가을': 3,
-      '겨울': 4
+      '겨울': 1,
+      '봄': 2,
+      '여름': 3,
+      '가을': 4
     };
 
     // 유니크한 (년도, 시즌) 조합 추출
@@ -1245,100 +1245,6 @@ const Cluster41Content = () => {
         }
       `}</style>
 
-      {/* 역대 시즌 드롭다운 메뉴 (최상단 렌더링) */}
-      {seasonDropdownOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: seasonBtnPos.top,
-            left: seasonBtnPos.left,
-            width: '200px',
-            background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '12px',
-            zIndex: 999999,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-            animation: 'dropdownSlide 0.2s ease-out'
-          }}
-        >
-          {seasonOptions.map((option, index) => (
-            <div
-              key={index}
-              style={{
-                padding: '12px 16px',
-                color: selectedSeason === option ? '#FFA500' : '#fff',
-                background: selectedSeason === option ? 'rgba(255,165,0,0.2)' : 'transparent',
-                cursor: 'pointer',
-                borderBottom: index < seasonOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
-              }}
-              onClick={() => {
-                setSelectedSeason(option);
-                setSeasonDropdownOpen(false);
-              }}
-              onMouseEnter={(e) => {
-                if (selectedSeason !== option) {
-                  e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedSeason !== option) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 주차 결과 드롭다운 메뉴 (최상단 렌더링) */}
-      {resultDropdownOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: resultBtnPos.top,
-            left: resultBtnPos.left,
-            width: '200px',
-            background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '12px',
-            zIndex: 999999,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-            animation: 'dropdownSlide 0.2s ease-out'
-          }}
-        >
-          {resultOptions.map((option, index) => (
-            <div
-              key={index}
-              style={{
-                padding: '12px 16px',
-                color: selectedResult === option ? '#FFA500' : '#fff',
-                background: selectedResult === option ? 'rgba(255,165,0,0.2)' : 'transparent',
-                cursor: 'pointer',
-                borderBottom: index < resultOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
-              }}
-              onClick={() => {
-                setSelectedResult(option);
-                setResultDropdownOpen(false);
-              }}
-              onMouseEnter={(e) => {
-                if (selectedResult !== option) {
-                  e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedResult !== option) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-
     <div className="cluster4-content cluster4-content--week">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1" ref={headerRef}>
@@ -1449,7 +1355,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 성공 주차</span>
                   <span className="detail-value">
-                    <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span><span className="orange-highlight">(1)</span> <span className="white-text">개 주차</span>
+                    <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span>{growthPeriodStats?.approvedSeasons ? <span className="orange-highlight">({growthPeriodStats.approvedSeasons})</span> : null} <span className="white-text">개 주차</span>
                   </span>
                 </div>
                 <div className="detail-row">
@@ -1622,10 +1528,10 @@ const Cluster41Content = () => {
               className="filter-card filter-dropdown"
               style={{
                 borderColor: selectedSeason !== "역대 시즌" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                position: 'relative'
               }}
               onClick={() => {
-                updateSeasonPos();
                 setSeasonDropdownOpen(!seasonDropdownOpen);
                 setResultDropdownOpen(false);
               }}
@@ -1635,6 +1541,53 @@ const Cluster41Content = () => {
                 <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
               </div>
               <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
+              {seasonDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    marginTop: 8,
+                    width: '200px',
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '12px',
+                    zIndex: 999999,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    animation: 'dropdownSlide 0.2s ease-out'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {seasonOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '12px 16px',
+                        color: selectedSeason === option ? '#FFA500' : '#fff',
+                        background: selectedSeason === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        cursor: 'pointer',
+                        borderBottom: index < seasonOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                      }}
+                      onClick={() => {
+                        setSelectedSeason(option);
+                        setSeasonDropdownOpen(false);
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedSeason !== option) {
+                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedSeason !== option) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             {/* 주차 결과 버튼 */}
             <div
@@ -1642,10 +1595,10 @@ const Cluster41Content = () => {
               className="filter-card filter-dropdown"
               style={{
                 borderColor: selectedResult !== "주차 결과" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                position: 'relative'
               }}
               onClick={() => {
-                updateResultPos();
                 setResultDropdownOpen(!resultDropdownOpen);
                 setSeasonDropdownOpen(false);
               }}
@@ -1655,6 +1608,53 @@ const Cluster41Content = () => {
                 <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>{selectedResult}</span>
               </div>
               <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>▼</span>
+              {resultDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    marginTop: 8,
+                    width: '200px',
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '12px',
+                    zIndex: 999999,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    animation: 'dropdownSlide 0.2s ease-out'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {resultOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '12px 16px',
+                        color: selectedResult === option ? '#FFA500' : '#fff',
+                        background: selectedResult === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        cursor: 'pointer',
+                        borderBottom: index < resultOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                      }}
+                      onClick={() => {
+                        setSelectedResult(option);
+                        setResultDropdownOpen(false);
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedResult !== option) {
+                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedResult !== option) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="filter-card">
               <div className="card-left">
