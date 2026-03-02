@@ -482,7 +482,7 @@
       top: auto;
       // 프레임(컨테이너) 바닥에서 살짝 띄워서 "프레임 자체"를 위로 올림
       // (요청: 약 37px)
-      bottom: calc(var(--c2-frame-center-bottom, 43px) / var(--app-zoom, 1));
+      bottom: var(--c2-frame-center-bottom, 43px);
       // 하단 프레임 오버레이(::after, z-index:12) 아래로 들어가게
       z-index: 11;
       clip-path: none;
@@ -1929,43 +1929,7 @@
       }
     }
 
-    // ★ 학력 카드 좌우 화살표 버튼
-    .edu-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #FFD000 0%, #FAAB07 100%);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(250, 171, 7, 0.4);
-      transition: all 0.2s ease;
 
-      i {
-        color: #000;
-        font-size: 18px;
-        font-weight: bold;
-      }
-
-      &:hover {
-        transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
-      }
-
-      &.left {
-        left: 16px;
-      }
-
-      &.right {
-        right: 16px;
-      }
-    }
 
     .edu-pagination {
       position: absolute;
@@ -2622,24 +2586,23 @@
 
         .border-tl {
           position: absolute;
-          top: -2px;
-          left: 0;
-          width: auto;
-          height: auto;
-          transform: scale(0.8);
-          transform-origin: top left;
+          top: -1px;
+          left: -1px;
+          width: 120px;
+          height: 127px;
           z-index: 1;
+          pointer-events: none;
         }
 
         .border-br {
           position: absolute;
-          bottom: -135px;
-          right: -121px;
-          width: auto;
-          height: auto;
-          transform: rotate(180deg) scale(0.8);
-          transform-origin: top left;
+          bottom: -1px;
+          right: -1px;
+          width: 121px;
+          height: 104px;
           z-index: 1;
+          pointer-events: none;
+          opacity: 0.65;
         }
 
         .card-header {

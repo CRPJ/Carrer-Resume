@@ -59,7 +59,7 @@
 
 // Main content width adjustment
 .col-xxl-9 {
-  max-width: calc(100% - 482px) !important;
+  max-width: calc(100% - var(--sidebar-width, 482px)) !important;
   padding-left: 70px !important;
   padding-right: 0 !important;
 }
@@ -80,9 +80,9 @@
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
-  border: 1px solid #999 !important;
-  border-bottom: 2px solid #999 !important;
-  box-shadow: none;      
+  background: #0C0F14;
+  border: 1px solid #313F11 !important;
+  box-shadow: none;
   border-radius: 0 !important;
   overflow: hidden !important;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -196,14 +196,16 @@
       word-break: keep-all !important;
     }
 
-    // 실무 역량 skill-label 의미 단위 줄바꿈
-    .resume-skills .skill-card .skill-label {
-      white-space: normal !important;
-      word-break: keep-all !important;
-      overflow: visible !important;
-      text-overflow: unset !important;
-      font-size: 0.625rem !important;
-      line-height: 1.3 !important;
+    // 모바일 skill 축소
+    .resume-skills {
+      gap: 6px !important;
+
+      .skill-card {
+        .skill-icon { width: 20px !important; height: 20px !important; top: -5px !important; left: -5px !important; }
+        .skill-num { font-size: 1rem !important; }
+        .skill-unit { font-size: 0.5rem !important; }
+        .skill-label { font-size: 0.5625rem !important; }
+      }
     }
 
     // ★ 인라인 width:474px override
@@ -295,20 +297,13 @@
 
     // skill-card 축소
     .resume-skills {
-      gap: 2px !important;
-      
+      gap: 8px !important;
+
       .skill-card {
-        .skill-num {
-          font-size: 1.375rem !important;
-        }
-        .skill-icon {
-          width: 22px !important;
-          height: 22px !important;
-        }
-        .skill-label {
-          white-space: nowrap !important;
-          font-size: 0.5625rem !important;
-        }
+        .skill-icon { width: 22px !important; height: 22px !important; top: -6px !important; left: -6px !important; }
+        .skill-num { font-size: 1.25rem !important; }
+        .skill-unit { font-size: 0.5625rem !important; }
+        .skill-label { font-size: 0.5625rem !important; }
       }
     }
 
@@ -366,11 +361,12 @@
       }
 
       .resume-skills {
-        gap: 4px !important;
+        gap: 16px !important;
 
         .skill-card {
-          .skill-num { font-size: 1.625rem !important; }
           .skill-icon { width: 26px !important; height: 26px !important; }
+          .skill-num { font-size: 1.5rem !important; }
+          .skill-unit { font-size: 0.625rem !important; }
           .skill-label { font-size: 0.6875rem !important; }
         }
       }
@@ -389,8 +385,9 @@
       }
 
       .resume-skills .skill-card {
+        .skill-icon { width: 30px !important; height: 30px !important; }
         .skill-num { font-size: 1.75rem !important; }
-        .skill-icon { width: 27px !important; height: 27px !important; }
+        .skill-unit { font-size: 0.6875rem !important; }
         .skill-label { font-size: 0.75rem !important; }
       }
     }
@@ -486,8 +483,8 @@
 
         .name-eng {
           font-family: 'Cafe24AnemoneAir', sans-serif;
-          font-size: 0.8125rem;
-          font-weight: 400;
+          font-size: 12px;
+          font-weight: 300;
           color: #999;
         }
       }
@@ -501,9 +498,15 @@
           display: flex;
           gap: 10px;
           font-size: 0.875rem;
-          line-height: 1.6;
+          line-height: 24px;
           color: #FFFFFF;
           align-items: center;
+
+          .detail-icon {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: brightness(0) invert(0.77) sepia(1) saturate(1.79);
+          }
 
           .icon {
             flex-shrink: 0;
@@ -536,7 +539,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border-left: 2px solid #FFC300;
+    border-left: none;
     font-family: 'HakgyoansimTuho', sans-serif;
     font-size: 1.375rem;
     font-style: normal;
@@ -553,6 +556,19 @@
     overflow-wrap: break-word;
     position: relative;
 
+    // 왼쪽 금색 바 - 시안 Vector 9.svg (75px, round cap)
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 75px;
+      background: #FFC300;
+      border-radius: 1px;
+    }
+
     .intro-icon {
       position: absolute;
       top: -8px;
@@ -563,23 +579,23 @@
   // Three Column Container - 영역 4, 5, 6
   .resume-three-column {
     display: flex;
-    gap: 15px;
-    padding: 16px 20px;
+    gap: 39px; // 피그마: stats→badges, badges→medal 모두 39px 간격
+    padding: 22px 20px; // 상하 여백 살짝 축소 → 하단 notices 공간 확보
     align-items: flex-start;
-    justify-content: space-between;
   }
 
   // Stats - 영역 4
   .resume-stats {
     flex-shrink: 0;
-    width: 170px;
+    width: 138px;
+    margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
 
     .stat-item {
-      margin-bottom: 22px;
+      margin-bottom: 36px; // badge-group 전체 높이(~92px)와 stats 높이 일치
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 6px;
+      align-items: flex-start;
+      gap: 3px;
 
       &:last-child {
         margin-bottom: 0;
@@ -589,31 +605,45 @@
     .stat-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 4px;
       width: 138px;
 
       .stat-label {
-        font-size: 0.9375rem;
-        color: #999;
+        font-size: 16px;
+        color: #999999;
         white-space: nowrap;
+        line-height: 15px;
 
         .stat-dot {
-          color: #FFEC8F;
+          display: inline-block;
+          width: 2px;
+          height: 2px;
+          background: #FFEC8F;
+          border-radius: 9999px;
+          vertical-align: middle;
+          font-size: 0;
+          line-height: 0;
+          color: transparent;
+          overflow: hidden;
         }
       }
 
       .stat-value {
         font-family: var(--black-ops-one), cursive;
-        font-size: 1.375rem;
+        font-size: 22px;
         font-weight: 400;
         color: #FFEC8F;
         white-space: nowrap;
+        line-height: 22px;
+        margin-left: auto;
 
         .stat-unit {
           font-family: 'Pretendard', sans-serif;
-          font-size: 0.75rem;
+          font-size: 10px;
           font-weight: 400;
           color: #FFEC8F;
+          line-height: 12px;
         }
       }
     }
@@ -623,14 +653,14 @@
       height: 3px;
       background: #555555;
       border: none;
-      border-radius: 2px;
+      border-radius: 5px;
       overflow: hidden;
       position: relative;
 
       .progress-fill {
         height: 100%;
         background: #FFEC8F;
-        border-radius: 2px;
+        border-radius: 5px;
         transition: width 0.3s ease;
         display: block;
       }
@@ -640,7 +670,7 @@
   // Badges - 영역 5
   .resume-badges {
     flex-shrink: 0;
-    width: 120px;
+    width: 86px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -649,12 +679,13 @@
     .badge-group {
       display: flex;
       align-items: center;
-      gap: 10px;
-      justify-content: center;
+      gap: 8px;
+      width: 100%;
 
       .badge-icon {
-        width: 18px;
-        height: 18px;
+        width: 15px;
+        height: 16px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -664,9 +695,6 @@
 
         &.icon-graphic10 {
           background-image: url('/images/0/cluster 1/Ok01.png');
-          width: 19px;
-          height: 19px;
-          filter: sepia(100%) saturate(300%) hue-rotate(-10deg) brightness(1.1);
         }
 
         &.icon-shield {
@@ -680,10 +708,10 @@
 
       .badge-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 1.0625rem;
+        font-size: 16px;
         font-weight: 400;
         color: #FFEC8F;
-        min-width: 55px;
+        flex: 1;
         text-align: right;
 
         &.red {
@@ -696,14 +724,14 @@
   // Medal - 영역 6
   .resume-medal {
     flex-shrink: 0;
-    width: 120px;
+    width: 88px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
     font-size: 0.875rem;
-    margin-top: 6px;
+    overflow: visible;
 
     // Complete일 때 오버레이 제거 + 금장 glow 효과
     &.no-overlay {
@@ -720,31 +748,31 @@
 
     .medal-image-wrapper {
       position: relative;
-      width: 98px;
-      height: 98px;
-      margin-left: -35px;
+      width: 100px;
+      height: 100px;
+      margin-left: -6px; // 88px 슬롯 안에서 100px를 중앙 정렬: (100-88)/2
       border-radius: 512px;
       overflow: hidden;
 
+      // 피그마 시안 기반 오버레이 (0.60 → 0.30 밝기 조정)
       &::before {
         content: '';
         position: absolute;
-        top: calc(50% - 7px);
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 87%;
-        height: 87%;
-        background-color: rgba(0, 0, 0, 0.6);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, rgba(17, 17, 17, 0.15) 0%, rgba(17, 17, 17, 0.15) 100%);
         border-radius: 512px;
         z-index: 1;
         pointer-events: none;
       }
 
       img {
-        width: 98px;
-        height: 98px;
+        width: 100px;
+        height: 100px;
         display: block;
-        object-fit: contain;
+        object-fit: cover;
         box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
         border-radius: 512px;
         position: relative;
@@ -755,51 +783,44 @@
     .medal-text {
       position: absolute;
       bottom: 17px;
-      right: 7px;
+      right: -31px; // 피그마: 카드 우측 16.67px 여백 확보
       z-index: 2;
-      width: 80px;
-      height: 28px;
+      width: 76.73px;
+      height: 24px;
       padding: 0 8px;
-      font-family: 'Cafe24Anemone', sans-serif;
-      font-size: 0.875rem;
+      font-family: 'Cafe24Ohsquare', 'Cafe24Anemone', sans-serif;
+      font-size: 14px;
       color: #FFEC8F;
       font-weight: 400;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: rotate(-13deg);
+      transform: rotate(-15deg);
+      // 피그마 시안: 리본 모양 + 녹색 글로우
       background-image: url('/images/0/cluster 1/ribon box.png');
       background-size: 100% 100%;
       background-repeat: no-repeat;
       background-position: center;
+      filter: drop-shadow(0 0 10px rgba(190, 255, 37, 0.50));
+      backdrop-filter: blur(2.5px);
       transition: width 0.3s ease;
-
-      // Running 상태: Figma처럼 미세하게 반짝이며 눈에 띄도록
-      // (다른 상태에는 영향 없음)
-      &:not(.short-medium):not(.medium):not(.long) {
-        // 애니메이션 없이 "고정 글로우"만 유지
-        filter: drop-shadow(0 0 10px rgba(255, 236, 143, 0.6));
-      }
 
       // 짧은-중간 길이 (Complete)
       &.short-medium {
         width: 90px;
-        right: 2px;
         font-size: 0.8125rem;
       }
 
       // 중간 길이 (Recharging)
       &.medium {
         width: 105px;
-        right: -5px;
         font-size: 0.8125rem;
       }
 
       // 긴 길이 (Next Challenge)
       &.long {
         width: 125px;
-        right: -8px;
         font-size: 0.75rem;
       }
     }
@@ -809,6 +830,7 @@
 
   // Activities
   .resume-activities {
+    border-top: 1px solid #313131;
     width: 472px;
     // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
     // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
@@ -837,7 +859,7 @@
       align-items: center;
       gap: 4px;
       padding: 0;
-      border-bottom: 0;
+      border-bottom: 1px solid #313131;
       width: 470px;
       height: 36px;
       background-color: #1C242F;
@@ -869,52 +891,46 @@
         .activity-line {
           display: flex;
           flex-wrap: nowrap;
-          gap: 2px;
+          gap: 17px;
           align-items: center;
           justify-content: flex-start;
           font-size: 0.875rem;
 
           .activity-season {
             color: #fff;
-            font-weight: 400;
-            min-width: 90px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600;
+            width: 82px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
           }
 
           .activity-period {
             color: #fff;
-            font-weight: 400;
-            min-width: 75px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600;
+            width: 72px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
           }
 
           .activity-role {
             color: #fff;
-            font-weight: 400;
-            min-width: 110px;
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 500;
+            width: 70px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .activity-badge {
             font-size: 0.875rem;
-            font-weight: 400;
-            min-width: 55px;
-            flex-shrink: 1;
-            overflow: hidden;
+            font-weight: 500;
+            width: 60px;
+            flex-shrink: 0;
             white-space: nowrap;
-            text-overflow: ellipsis;
             text-align: center;
 
             &.active {
@@ -927,12 +943,11 @@
           }
 
           .activity-check {
-            font-weight: 400;
-            flex-shrink: 1;
-            overflow: visible;
+            font-weight: 500;
+            width: 60px;
+            flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
-            margin-left: 8px;
 
             &.pending {
               color: #999;
@@ -955,7 +970,7 @@
     &::before {
       content: '';
       position: absolute;
-      top: 3px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: -18px;
@@ -969,7 +984,7 @@
     &::after {
       content: '';
       position: absolute;
-      top: 3px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: -18px;
@@ -979,91 +994,86 @@
   }
 
   // Skills
+  // Skills — 피그마: 4열 가로 배치, 각 카드는 세로(아이콘→숫자+단위→라벨)
   .resume-skills {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;
-    padding: 0;
-    padding-top: 30px;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    width: 420px;
-    margin-left: auto;
-    margin-right: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 30px;
+    padding: 30px 0 0;
+    margin: 0;
+    width: 100%;
     position: relative;
     z-index: 3;
 
     .skill-card {
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      padding: 0;
-      padding-top: 10px;
-      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       position: relative;
-      width: 100%;
-      height: 50px;
-      overflow: visible;
-
-      .skill-num-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-        position: relative;
-        z-index: 2;
-      }
+      background: transparent;
+      border: none;
+      padding: 0;
 
       .skill-icon {
-        width: 32px;
-        height: 32px;
-        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
         object-fit: contain;
-        margin-right: -6px;
+        position: absolute;
+        top: -8px;
+        left: -4px;
+        z-index: 1;
+      }
+
+      .skill-num-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 2px;
         position: relative;
-        top: -3px;
+        z-index: 2;
+        width: 100%;
+        padding-left: 16px;
       }
 
       .skill-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 1.875rem;
+        font-size: 30px;
         font-weight: 400;
         color: #FFEC8F;
-        line-height: 1;
-        margin-bottom: 0;
-        position: relative;
-        z-index: 2;
+        line-height: 25px;
+      }
+
+      .skill-unit {
+        font-size: 12px;
+        font-family: 'Pretendard', sans-serif;
+        font-weight: 400;
+        color: #FFF;
+        line-height: 18px;
       }
 
       .skill-label {
-        font-size: 0.8125rem;
+        font-size: 13px;
+        font-family: 'Pretendard', sans-serif;
+        font-weight: 500;
         color: #FFF;
-        line-height: 1.2;
-        position: relative;
-        z-index: 2;
-      }
-
-      & > div {
-        position: relative;
-        z-index: 2;
+        line-height: 18px;
+        white-space: nowrap;
+        margin-top: 2px;
       }
     }
   }
 
   // Notices
   .resume-notices {
-    padding: 25px 20px 12px 0;
+    padding: 18px 20px 50px 0;
     margin-top: -8px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     position: relative;
     z-index: 3;
-    gap: 6px;
+    gap: 4px;
 
     .notice-box {
       display: flex;
@@ -1085,7 +1095,7 @@
       }
 
       &:last-child {
-        margin-bottom: 0;
+        margin-bottom: 20px;
         margin-right: 10px;
         transform: translateX(25px);
       }
@@ -1105,10 +1115,10 @@
         line-height: 1.4;
         order: 2;
         text-align: left;
-        font-size: 0.875rem;
+        font-size: 13px;
         position: relative;
         z-index: 10;
-        color: #FFF;
+        color: #DDDDDD;
 
         &.notice-text-top {
           font-family: 'Eutman', sans-serif;
@@ -1119,6 +1129,8 @@
       &.green .notice-text {
         font-family: 'GanaChocolate', sans-serif;
         margin-right: -15px;
+        white-space: nowrap;
+        font-size: 13px;
       }
 
       .notice-stamp {
@@ -1136,7 +1148,7 @@
         order: 3;
         position: relative;
         z-index: 10;
-        margin-left: 8px;
+        margin-left: 24px;
         width: 46px;
         height: 46px;
         display: inline-flex;
@@ -1169,7 +1181,8 @@
 .resume-card.ec-theme {
   // Resume intro border
   .resume-intro {
-    border-left: 2px solid #FF4B70 !important;
+    border-left: none !important;
+    &::before { background: #FF4B70 !important; }
   }
 
   // Badges - 영역 5 아이콘
@@ -1313,7 +1326,8 @@
 .resume-card.px-theme {
   // Section 3 - intro border
   .resume-intro {
-    border-left: 2px solid #36DA60 !important;
+    border-left: none !important;
+    &::before { background: #36DA60 !important; }
   }
 
   // Section 4 - stats

@@ -67,6 +67,18 @@ const sloganOptions = [
   "Architect"
 ];
 
+// 바이트 기반 텍스트 truncate (한글=2, 영문/기호=1, maxBytes 기준)
+const truncateByBytes = (text: string, maxBytes: number): string => {
+  let bytes = 0;
+  for (let i = 0; i < text.length; i++) {
+    bytes += text.charCodeAt(i) > 127 ? 2 : 1;
+    if (bytes > maxBytes) {
+      return text.slice(0, i) + '...';
+    }
+  }
+  return text;
+};
+
 const Cluster2Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -1583,16 +1595,6 @@ const Cluster2Content = () => {
             </div>
           ))}
         </div>
-        {/* 좌우 화살표 버튼 */}
-        {eduTotalPages > 1 && currentPage > 0 && (
-          <button
-            className="edu-arrow left"
-            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-            aria-label="이전 학력"
-          >
-            <i className="ti ti-chevron-left"></i>
-          </button>
-        )}
         <div className="edu-pagination">
           <div className="pagination-dots">
             {eduTotalPages > 1 && Array.from({ length: eduTotalPages }, (_, index) => (
@@ -1807,8 +1809,8 @@ const Cluster2Content = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <img className="border-tl" src="/images/0/cluster 2/border02.png" alt="" />
-                <img className="border-br" src="/images/0/cluster 2/border02.png" alt="" />
+                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
                 <div className="card-header">
                   <img src={card.icon} alt="" className="card-icon" />
                   <div className="title-row">
@@ -1821,7 +1823,7 @@ const Cluster2Content = () => {
                   </div>
                   <span className="card-subtitle">{card.subtitle}</span>
                 </div>
-                <p>{card.content.length > 40 ? card.content.slice(0, 40) + '...' : card.content}</p>
+                <p className="intro-card-content">{truncateByBytes(card.content, 80)}</p>
               </div>
             ))}
           </div>
@@ -1837,8 +1839,8 @@ const Cluster2Content = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <img className="border-tl" src="/images/0/cluster 2/border02.png" alt="" />
-                <img className="border-br" src="/images/0/cluster 2/border02.png" alt="" />
+                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
                 <div className="card-header">
                   <img src={card.icon} alt="" className="card-icon" />
                   <div className="title-row">
@@ -1851,12 +1853,12 @@ const Cluster2Content = () => {
                   </div>
                   <span className="card-subtitle">{card.subtitle}</span>
                 </div>
-                <p>{card.content.length > 40 ? card.content.slice(0, 40) + '...' : card.content}</p>
+                <p className="intro-card-content">{truncateByBytes(card.content, 80)}</p>
               </div>
             ))}
             <div className="intro-card empty waiting">
-              <img className="border-tl" src="/images/0/cluster 2/border02.png" alt="" />
-              <img className="border-br" src="/images/0/cluster 2/border02.png" alt="" />
+              <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+              <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
               <div className="waiting-content">
                 <img src="/images/0/cluster 2/icon/waiting icon.png" alt="" className="waiting-icon" />
                 <span className="waiting-text">WAITING FOR YOU</span>
@@ -2084,7 +2086,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan1.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan1.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2188,7 +2190,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan2.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan2.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2292,7 +2294,7 @@ const Cluster2Content = () => {
                     maxLength={86}
                     placeholder="슬로건 내용을 입력하세요 (최대 86자)"
                   />
-                  <span className="char-count">{editingSloganData.slogan3.content.length}/86</span>
+                  <span className="char-count">{editingSloganData.slogan3.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
                   <label className="slogan-rating-label">평점</label>
@@ -2537,7 +2539,7 @@ const Cluster2Content = () => {
                       placeholder="내용을 입력하세요 (최대 1,000자)"
                       maxLength={1000}
                     />
-                    <span className="char-count">{editingIntroData.content.length} / 1,000</span>
+                    <span className="char-count">{editingIntroData.content.length.toLocaleString()} / 1,000</span>
                   </div>
                 ) : (
                   <p className="content-text">{introCards[selectedIntroCard].content}</p>
@@ -3392,7 +3394,7 @@ const Cluster2Content = () => {
                             rows={3}
                             maxLength={100}
                           />
-                          <span className="char-count">{edu.description.length}/100</span>
+                          <span className="char-count">{edu.description.length.toLocaleString()}/100</span>
                         </div>
                       </div>
                     </div>
