@@ -465,7 +465,7 @@
       .resume-name {
         color: #FFF;
         font-family: 'Cafe24Anemone', sans-serif;
-        font-size: 1.5625rem;
+        font-size: 1.625rem;
         font-style: normal;
         font-weight: 400;
         line-height: 34px;
@@ -485,7 +485,7 @@
 
         .name-eng {
           font-family: 'Cafe24AnemoneAir', sans-serif;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 300;
           color: #999;
         }
@@ -499,7 +499,7 @@
         .detail-row {
           display: flex;
           gap: 10px;
-          font-size: 0.875rem;
+          font-size: 0.9375rem;
           line-height: 24px;
           color: #FFFFFF;
           align-items: center;
@@ -524,7 +524,7 @@
             line-height: 1.5;
 
             .sub-text {
-              font-size: 0.75rem;
+              font-size: 0.8125rem;
               color: #999;
             }
           }
@@ -543,7 +543,7 @@
     background-repeat: no-repeat;
     border-left: none;
     font-family: 'HakgyoansimTuho', sans-serif;
-    font-size: 1.375rem;
+    font-size: 1.4375rem;
     font-style: normal;
     font-weight: 400;
     line-height: 28px;
@@ -582,7 +582,7 @@
   .resume-three-column {
     display: flex;
     gap: 39px; // 피그마: stats→badges, badges→medal 모두 39px 간격
-    padding: 22px 20px; // 상하 여백 살짝 축소 → 하단 notices 공간 확보
+    padding: 31px 20px; // 피그마 시안: 상하 31.03px
     align-items: flex-start;
   }
 
@@ -591,9 +591,10 @@
     flex-shrink: 0;
     width: 138px;
     margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
+    align-self: center; // 세로 중앙 정렬 → 위아래 간격 동일
 
     .stat-item {
-      margin-bottom: 36px; // badge-group 전체 높이(~92px)와 stats 높이 일치
+      margin-bottom: 25px; // 피그마 시안 gap: 25px
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -612,7 +613,7 @@
       width: 138px;
 
       .stat-label {
-        font-size: 16px;
+        font-size: 17px;
         color: #999999;
         white-space: nowrap;
         line-height: 15px;
@@ -633,7 +634,7 @@
 
       .stat-value {
         font-family: var(--black-ops-one), cursive;
-        font-size: 22px;
+        font-size: 23px;
         font-weight: 400;
         color: #FFEC8F;
         white-space: nowrap;
@@ -642,7 +643,7 @@
 
         .stat-unit {
           font-family: 'Pretendard', sans-serif;
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 400;
           color: #FFEC8F;
           line-height: 12px;
@@ -710,7 +711,7 @@
 
       .badge-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 400;
         color: #FFEC8F;
         flex: 1;
@@ -791,7 +792,7 @@
       height: 24px;
       padding: 0 8px;
       font-family: 'Cafe24Ohsquare', 'Cafe24Anemone', sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       color: #FFEC8F;
       font-weight: 400;
       text-align: center;
@@ -896,7 +897,7 @@
           gap: 17px;
           align-items: center;
           justify-content: flex-start;
-          font-size: 0.875rem;
+          font-size: 0.9375rem;
 
           .activity-season {
             color: #fff;
@@ -928,7 +929,7 @@
           }
 
           .activity-badge {
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
             font-weight: 500;
             width: 60px;
             flex-shrink: 0;
@@ -1040,14 +1041,14 @@
 
       .skill-num {
         font-family: var(--black-ops-one), cursive;
-        font-size: 30px;
+        font-size: 32px;
         font-weight: 400;
         color: #FFEC8F;
         line-height: 25px;
       }
 
       .skill-unit {
-        font-size: 12px;
+        font-size: 13px;
         font-family: 'Pretendard', sans-serif;
         font-weight: 400;
         color: #FFF;
@@ -1055,7 +1056,7 @@
       }
 
       .skill-label {
-        font-size: 13px;
+        font-size: 14px;
         font-family: 'Pretendard', sans-serif;
         font-weight: 500;
         color: #FFF;
