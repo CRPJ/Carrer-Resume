@@ -582,8 +582,8 @@
   .resume-three-column {
     display: flex;
     gap: 39px; // 피그마: stats→badges, badges→medal 모두 39px 간격
-    padding: 31px 20px; // 피그마 시안: 상하 31.03px
-    align-items: flex-start;
+    padding: 20px 20px; // 상하 축소 → 하단 잘림 방지
+    align-items: center; // stats↔badges↔medal 세로 중앙 정렬
   }
 
   // Stats - 영역 4
@@ -591,7 +591,6 @@
     flex-shrink: 0;
     width: 138px;
     margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
-    align-self: center; // 세로 중앙 정렬 → 위아래 간격 동일
 
     .stat-item {
       margin-bottom: 25px; // 피그마 시안 gap: 25px
