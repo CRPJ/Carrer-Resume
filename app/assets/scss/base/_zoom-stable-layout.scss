@@ -51,11 +51,11 @@
 // CSS zoom이 media query를 무력화하므로, JS가 html.tight-desktop 클래스를 토글
 // → gap/padding을 줄이고, 사이드바 카드를 확대하여 공간 효율 극대화
 html.tight-desktop {
-  // 콘텐츠 좌우 패딩: zoom 보정으로 시각적 12px 유지
+  // 콘텐츠 좌우 패딩: zoom 보정으로 시각적 8px 유지
   .nftg-content.nftg-content-home,
   .nftg-app .nftg-content.nftg-content-home {
-    padding-left: calc(12px / var(--app-zoom, 1)) !important;
-    padding-right: calc(12px / var(--app-zoom, 1)) !important;
+    padding-left: calc(8px / var(--app-zoom, 1)) !important;
+    padding-right: calc(8px / var(--app-zoom, 1)) !important;
   }
 
   // desktop-layout flex gap: zoom 보정으로 시각적 8px 유지
@@ -102,12 +102,12 @@ html.tight-desktop {
 }
 
 // ===== 1400~1700px (중간폭 데스크톱) - 미드 데스크톱 =====
-// CSS zoom이 padding을 축소하므로, zoom에 반비례하는 동적 padding으로 시각적 20px 유지
+// CSS zoom이 padding을 축소하므로, zoom에 반비례하는 동적 padding으로 시각적 8px 유지
 html.mid-desktop {
   .nftg-content.nftg-content-home,
   .nftg-app .nftg-content.nftg-content-home {
-    padding-left: calc(20px / var(--app-zoom, 1)) !important;
-    padding-right: calc(20px / var(--app-zoom, 1)) !important;
+    padding-left: calc(8px / var(--app-zoom, 1)) !important;
+    padding-right: calc(8px / var(--app-zoom, 1)) !important;
   }
 
   // 왼쪽 네비게이션 사이드바 축소
