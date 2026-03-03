@@ -59,7 +59,7 @@
 
 // Main content width adjustment
 .col-xxl-9 {
-  max-width: calc(100% - var(--sidebar-width, 482px)) !important;
+  max-width: calc(100% - var(--sidebar-width, 497px)) !important;
   padding-left: 70px !important;
   padding-right: 0 !important;
 }
@@ -69,14 +69,14 @@
 }
 
 // Resume Card - Exact Design Match
-// 474px x 810px 고정 (데스크탑용, 모바일에서는 유연하게)
+// 489px x 818px 고정 (데스크탑용, 모바일에서는 유연하게)
 .resume-card {
-  width: 474px !important;
-  min-width: 474px !important;
-  max-width: 474px !important;
-  height: 810px !important;
-  min-height: 810px !important;
-  max-height: 810px !important;
+  width: 489px !important;
+  min-width: 489px !important;
+  max-width: 489px !important;
+  height: 818px !important;
+  min-height: 818px !important;
+  max-height: 818px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -88,6 +88,7 @@
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
+  padding-top: 48px !important;
   position: relative;
   box-sizing: border-box !important;
   
@@ -312,9 +313,9 @@
       max-width: 100% !important;
     }
 
-    // 인라인 width:474px 강제 해제 (활동 영역 등)
-    div[style*="width: 474px"],
-    div[style*="width:474px"] {
+    // 인라인 width:489px 강제 해제 (활동 영역 등)
+    div[style*="width: 489px"],
+    div[style*="width:489px"] {
       width: 100% !important;
       max-width: 100% !important;
     }

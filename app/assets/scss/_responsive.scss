@@ -32,7 +32,7 @@ body:has(.nftg-content-home) {
 // Home two layout - 사이드바와 메인콘텐츠 고정 레이아웃
 .nftg-content-home {
   height: auto !important;
-  min-height: calc(100vh - 124px) !important;
+  min-height: calc(100vh - 98px) !important;
   overflow: visible !important;
   // sticky는 유지하면서 "가로 오버플로우"만 차단 (Cluster3/4 가로 스크롤바 방지)
   overflow-x: clip !important;
@@ -63,7 +63,7 @@ body:has(.nftg-content-home) {
   // 데스크탑 레이아웃 - sticky 사이드바
   .desktop-layout {
     display: flex !important;
-    gap: 20px !important;
+    gap: 8px !important;
     align-items: flex-start !important;
     overflow: visible !important; // sticky 작동을 위해 필수 (y)
     overflow-x: clip !important;
@@ -106,10 +106,10 @@ body:has(.nftg-content-home) {
 
       // 사이드바 - 항상 화면 세로에 딱 맞게
       .home-two-sidebar-col {
-        flex: 0 0 var(--sidebar-width, 482px) !important;
-        max-width: var(--sidebar-width, 482px) !important;
-        width: var(--sidebar-width, 482px) !important;
-        min-width: var(--sidebar-width, 482px) !important;
+        flex: 0 0 var(--sidebar-width, 497px) !important;
+        max-width: var(--sidebar-width, 497px) !important;
+        width: var(--sidebar-width, 497px) !important;
+        min-width: var(--sidebar-width, 497px) !important;
         height: auto !important;
         min-height: 100% !important;
         position: relative !important;

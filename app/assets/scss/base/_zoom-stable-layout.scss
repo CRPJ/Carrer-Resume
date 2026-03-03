@@ -9,7 +9,7 @@
   // 레이아웃 크기 (고정)
   --content-max-width: 1977px;
   // 사이드바(프로필) 영역은 고정 폭으로 안정화 (해상도/높이/zoom에 의해 변동되지 않게)
-  --sidebar-width: 482px;
+  --sidebar-width: 497px;
   --sidebar-left-offset: 110px;
   --header-height: 82px;
   // zoom 상한(예: 4K)에서 남는 영역까지 포용하는 "외곽" 최대 폭
@@ -58,10 +58,10 @@ html.tight-desktop {
     padding-right: calc(12px / var(--app-zoom, 1)) !important;
   }
 
-  // desktop-layout flex gap: zoom 보정으로 시각적 10px 유지
+  // desktop-layout flex gap: zoom 보정으로 시각적 8px 유지
   .nftg-content-home .desktop-layout,
   .desktop-layout {
-    gap: calc(10px / var(--app-zoom, 1)) !important;
+    gap: calc(8px / var(--app-zoom, 1)) !important;
   }
 
   // 왼쪽 네비게이션 사이드바도 축소

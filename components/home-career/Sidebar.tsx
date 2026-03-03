@@ -299,7 +299,7 @@ const Sidebar = () => {
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
-  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(482px)으로 유지하고
+  // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(497px)으로 유지하고
   // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -311,8 +311,8 @@ const Sidebar = () => {
       const mobile = windowWidth < 1200;
       setIsMobileView(mobile);
 
-      const BASE_CARD_HEIGHT = 810;
-      const BASE_SIDEBAR_WIDTH = 482;
+      const BASE_CARD_HEIGHT = 818;
+      const BASE_SIDEBAR_WIDTH = 497;
 
       // 모바일: CSS 반응형 그대로 사용
       if (mobile) {
@@ -330,7 +330,7 @@ const Sidebar = () => {
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
       // 2) 폭 기반 스케일: 우측 콘텐츠 최소 600px 확보
-      //    레이아웃: [sidebar(482*s)] [gap 20px] [content ≥ 600px]
+      //    레이아웃: [sidebar(497*s)] [gap 20px] [content ≥ 600px]
       const MIN_CONTENT_WIDTH = 600;
       const GAP = 20;
       const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
@@ -1269,8 +1269,8 @@ const Sidebar = () => {
       <div className="home-two-sidebar-col">
         <div
           style={{
-            width: "474px",
-            height: "810px",
+            width: "489px",
+            height: "818px",
             backgroundColor: "#1a1a2e",
             borderRadius: "12px",
           }}
@@ -1339,8 +1339,8 @@ const Sidebar = () => {
         style={{
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
-          width: isMobileView ? "100%" : `${Math.round(482 * cardScale)}px`,
-          height: isMobileView ? "auto" : `${Math.round(810 * cardScale)}px`,
+          width: isMobileView ? "100%" : `${Math.round(497 * cardScale)}px`,
+          height: isMobileView ? "auto" : `${Math.round(818 * cardScale)}px`,
           overflow: "visible",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",
@@ -1705,7 +1705,7 @@ const Sidebar = () => {
           </div>
 
           {/* Activities */}
-          <div style={{ position: "relative", width: "474px", height: "95px" }}>
+          <div style={{ position: "relative", width: "489px", height: "95px" }}>
             {hasData ? (
               <>
                 <div

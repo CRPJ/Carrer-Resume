@@ -70,7 +70,7 @@ const Cluster4CardDynamicPage = () => {
       <div className="container-fluid">
         <div className="row">
           {/* 사이드바 공간 확보용 빈 영역 */}
-          <div style={{ width: 'var(--sidebar-width, 482px)', flexShrink: 0 }}></div>
+          <div style={{ width: 'var(--sidebar-width, 497px)', flexShrink: 0 }}></div>
           <div className="home-two-content-col" style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
             <ClusterTabs />
             <div className="home-two-content">
