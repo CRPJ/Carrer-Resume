@@ -321,7 +321,7 @@
     // 모바일에서는 화면을 너무 많이 가리므로 비활성화
     @media (min-width: 1200px) {
       position: sticky;
-      top: 98px; // header 높이(82px) + 간격(16px)
+      top: calc(var(--header-divider-y, var(--header-height, 82px)) + 16px);
       z-index: 50;
       align-self: flex-start;
       // sticky가 동작하려면 상위/자기 자신이 overflow로 잘리지 않아야 함

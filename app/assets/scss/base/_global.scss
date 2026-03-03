@@ -935,11 +935,12 @@ svg {
   }
 
   .nftg-content-home {
-    margin-top: 98px;
+    // ★ 헤더 실제 높이(--header-divider-y)에 동기화 → 줌 레벨 변경 시에도 틈 없음
+    margin-top: calc(var(--header-divider-y, var(--header-height, 82px)) + 16px);
 
     .home-two-sidebar {
       position: sticky;
-      top: 98px;
+      top: calc(var(--header-divider-y, var(--header-height, 82px)) + 16px);
     }
   }
 }

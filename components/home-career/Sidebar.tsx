@@ -306,12 +306,28 @@ const Sidebar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
   useEffect(() => {
+    // ★ outerWidth 기반 실제 리사이즈 감지
+    // 브라우저 줌(Ctrl+/-)은 outerWidth를 바꾸지 않으므로 자연스럽게 스킵됨
+    let lastOuterWidth = window.outerWidth;
+    let initialized = false;
+
     const calculateScale = () => {
+      const currentOuterWidth = window.outerWidth;
+
+      // 초기화 이후: outerWidth가 변하지 않았으면 브라우저 줌 → 스킵
+      // (브라우저 줌은 전체를 동일하게 스케일하므로 cardScale 유지)
+      if (initialized && Math.abs(currentOuterWidth - lastOuterWidth) < 5) {
+        return;
+      }
+
+      initialized = true;
+      lastOuterWidth = currentOuterWidth;
+
       const windowWidth = window.innerWidth;
       const mobile = windowWidth < 1200;
       setIsMobileView(mobile);
 
-      const BASE_CARD_HEIGHT = 866;
+      const BASE_CARD_HEIGHT = 848;
       const BASE_SIDEBAR_WIDTH = 497;
 
       // 모바일: CSS 반응형 그대로 사용
@@ -325,12 +341,11 @@ const Sidebar = () => {
       const viewportHeight = window.visualViewport?.height || window.innerHeight;
       const viewportWidth = window.visualViewport?.width || window.innerWidth;
 
-      // 1) 높이 기반 스케일: 카드(810px)가 뷰포트 높이에 맞게
+      // 1) 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
       const availableHeight = viewportHeight - 130; // 헤더 높이 제외
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
       // 2) 폭 기반 스케일: 우측 콘텐츠 최소 600px 확보
-      //    레이아웃: [sidebar(497*s)] [gap 20px] [content ≥ 600px]
       const MIN_CONTENT_WIDTH = 600;
       const GAP = 20;
       const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
@@ -349,12 +364,11 @@ const Sidebar = () => {
 
     calculateScale();
 
+    // ★ window.resize만 사용 (visualViewport는 브라우저 줌에도 발동하므로 제외)
     window.addEventListener("resize", calculateScale);
-    window.visualViewport?.addEventListener("resize", calculateScale);
 
     return () => {
       window.removeEventListener("resize", calculateScale);
-      window.visualViewport?.removeEventListener("resize", calculateScale);
     };
   }, [pathname]);
 
@@ -1270,7 +1284,7 @@ const Sidebar = () => {
         <div
           style={{
             width: "489px",
-            height: "866px",
+            height: "848px",
             backgroundColor: "#1a1a2e",
             borderRadius: "12px",
           }}
@@ -1340,7 +1354,7 @@ const Sidebar = () => {
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
           width: isMobileView ? "100%" : `${Math.round(497 * cardScale)}px`,
-          height: isMobileView ? "auto" : `${Math.round(866 * cardScale)}px`,
+          height: isMobileView ? "auto" : `${Math.round(848 * cardScale)}px`,
           overflow: "visible",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",
@@ -1590,7 +1604,35 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school} <span style={{ color: currentProfile.lightColor }}>{currentProfile.major}</span>
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school}
+                      </span>
+                    </div>
+
+                    {/* 학과명 — 별도 줄 (피그마 시안: #FFEC8F, 14px, Pretendard 400, lineHeight 24) */}
+                    <div className="detail-row">
+                      <span style={{ width: "16px" }}></span>
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTooltipVisible(tooltipVisible === "major" ? null : "major");
+                          setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
+                        }}
+                        style={{
+                          color: "#FFEC8F",
+                          fontSize: "14px",
+                          fontFamily: "Pretendard, sans-serif",
+                          fontWeight: 400,
+                          lineHeight: "24px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                        }}
+                      >
+                        <span style={{ color: currentProfile.lightColor }}>·</span>{currentProfile.major}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+                          <path d="M8.33 6.67L11.67 10L8.33 13.33" stroke="#FFEC8F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </span>
                     </div>
 

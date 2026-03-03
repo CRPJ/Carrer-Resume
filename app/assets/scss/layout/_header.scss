@@ -32,15 +32,22 @@
     align-items: center;
     justify-content: space-between;
     gap: 30px;
+    flex-wrap: nowrap; // 확대 시 줄바꿈 방지
   }
 
   .navbar__list {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: nowrap; // 확대 시 메뉴 항목 줄바꿈 방지
+    flex-shrink: 1; // 공간 부족 시 축소 허용
+    min-width: 0; // flex 축소 가능하도록
   }
 
   .navbar__item {
+    flex-shrink: 0; // 개별 메뉴 항목은 축소하지 않음
+    white-space: nowrap;
+
     button,
     a {
       padding: 30px 12px 30px;
@@ -51,6 +58,7 @@
       letter-spacing: 0.3px;
       font-size: 15px;
       gap: 4px;
+      white-space: nowrap;
       &:hover {
         color: var(--quaternary-color);
       }
@@ -230,7 +238,8 @@
     flex-grow: 1;
     justify-content: flex-end;
     gap: 24px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: hidden; // 확대 시 메뉴가 nav 뒤로 밀리지 않도록
 
     .btn--primary {
       background-color: var(--quaternary-color);

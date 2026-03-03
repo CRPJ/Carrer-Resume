@@ -18,7 +18,7 @@ const ResponsiveScale = () => {
         document.documentElement.style.removeProperty('--header-divider-y');
         return;
       }
-      // offsetHeight는 CSS 픽셀 기준이므로 zoom에 영향받지 않아 정확
+      // offsetHeight: CSS 픽셀 기준(정수) → CSS 속성(margin-top 등)과 동일 좌표계
       const headerHeight = header.offsetHeight;
       document.documentElement.style.setProperty('--header-divider-y', `${headerHeight}px`);
     };
@@ -36,7 +36,8 @@ const ResponsiveScale = () => {
       lastDPR = currentDPR;
 
       if (isBrowserZoom) {
-        // 브라우저 줌 변경 — CSS zoom을 유지하여 레이아웃 안정
+        // 브라우저 줌 변경 — CSS zoom은 유지하되 헤더 높이는 재계산
+        requestAnimationFrame(() => updateHeaderDividerY());
         return;
       }
 
