@@ -1375,8 +1375,8 @@ const Cluster41Content = () => {
           <p className="quote-text">
             There is no magic to achievement. It's really about hard work, choices and persistence.
           </p>
-          <p className="quote-highlight">무언가를 성취하기 위해 부릴 수 있는 마법은 없다. 필요한 것은 오직 노력, 선택 그리고 꾸준함일 뿐이다.</p>
-          <p className="quote-author">-Michelle Obama-</p>
+          <p className="quote-highlight">"무언가를 성취하기 위해 부릴 수 있는 마법은 없다. 필요한 것은 오직 노력, 선택 그리고 꾸준함일 뿐이다."</p>
+          <p className="quote-author">-미셸 오바마(Michelle Obama)-</p>
         </div>
       </section>
 
