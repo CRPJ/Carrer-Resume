@@ -73,7 +73,7 @@ body:has(.nftg-content-home) {
     
     .sidebar-sticky-wrapper {
       position: sticky !important;
-      top: 100px !important;
+      top: var(--header-height, 82px) !important;
       flex-shrink: 0 !important;
       z-index: 100 !important;
       align-self: flex-start !important;

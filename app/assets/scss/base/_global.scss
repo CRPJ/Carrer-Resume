@@ -897,7 +897,7 @@ svg {
 .nftg-app {
   display: flex;
   .nftg-sidebar {
-    width: 97px;
+    width: 75px;
 
     // Windows에서 사이드바가 scrollable일 때 스크롤바가 튀어나와 보이지 않게
     scrollbar-width: none;
@@ -909,16 +909,16 @@ svg {
   }
 
   .nftg-layout {
-    width: calc(100% - 97px);
+    width: calc(100% - 75px);
     flex-grow: 1;
-    margin-left: 97px;
+    margin-left: 75px;
     height: auto; // sticky 작동을 위해 100% -> auto로 변경
     min-height: 100vh;
   }
 
   .nftg-content {
     padding: 0px 12px;
-    margin-top: 100px;
+    margin-top: var(--header-height, 82px);
     overflow-x: clip;
     
     // nftg-content-home은 sticky 작동을 위해 overflow: visible 필요

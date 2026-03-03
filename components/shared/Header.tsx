@@ -221,7 +221,7 @@ const Header = () => {
           <div className="row">
             <div className="col-12">
               <nav className="navbar p-0">
-                <div className="navbar__logo d-xxl-none">
+                <div className="navbar__logo d-xl-none">
                   <Link href="/" aria-label="home page" title="logo" className="not-cursor">
                     <Image src={logo} alt="Image" width={77} height={77} />
                   </Link>

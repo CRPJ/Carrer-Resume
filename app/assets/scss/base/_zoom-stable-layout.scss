@@ -11,7 +11,7 @@
   // 사이드바(프로필) 영역은 고정 폭으로 안정화 (해상도/높이/zoom에 의해 변동되지 않게)
   --sidebar-width: 482px;
   --sidebar-left-offset: 110px;
-  --header-height: 100px;
+  --header-height: 82px;
   // zoom 상한(예: 4K)에서 남는 영역까지 포용하는 "외곽" 최대 폭
   // (3840px / 1.5 = 2560px 정도를 커버)
   --outer-max-width: 2600px;
@@ -67,22 +67,37 @@ html.tight-desktop {
   // 왼쪽 네비게이션 사이드바도 축소
   .nftg-app .nftg-sidebar,
   .nftg-sidebar {
-    width: 80px;
+    width: 65px;
 
     .sidebar__wrapper {
       padding: 8px 0;
     }
 
     .sidebar__logo img {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
+    }
+
+    .sidebar--links a {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+    }
+
+    .sidebar--images a {
+      width: 40px;
+      height: 40px;
     }
   }
 
   .nftg-app .nftg-layout,
   .nftg-layout {
-    margin-left: 80px;
-    width: calc(100% - 80px);
+    margin-left: 65px;
+    width: calc(100% - 65px);
+  }
+
+  .header {
+    padding-left: 65px !important;
   }
 }
 
@@ -93,6 +108,38 @@ html.mid-desktop {
   .nftg-app .nftg-content.nftg-content-home {
     padding-left: calc(20px / var(--app-zoom, 1)) !important;
     padding-right: calc(20px / var(--app-zoom, 1)) !important;
+  }
+
+  // 왼쪽 네비게이션 사이드바 축소
+  .nftg-app .nftg-sidebar,
+  .nftg-sidebar {
+    width: 70px;
+
+    .sidebar__logo img {
+      width: 52px;
+      height: 52px;
+    }
+
+    .sidebar--links a {
+      width: 42px;
+      height: 42px;
+      font-size: 20px;
+    }
+
+    .sidebar--images a {
+      width: 42px;
+      height: 42px;
+    }
+  }
+
+  .nftg-app .nftg-layout,
+  .nftg-layout {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+  }
+
+  .header {
+    padding-left: 70px !important;
   }
 }
 

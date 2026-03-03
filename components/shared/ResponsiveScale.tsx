@@ -12,16 +12,15 @@ const ResponsiveScale = () => {
     let lastDPR = window.devicePixelRatio;
     let lastOuterWidth = window.outerWidth;
 
-    const updateHeaderDividerY = (scale: number) => {
+    const updateHeaderDividerY = () => {
       const header = document.querySelector('.header') as HTMLElement | null;
       if (!header) {
         document.documentElement.style.removeProperty('--header-divider-y');
         return;
       }
-      const rect = header.getBoundingClientRect();
-      const borderBottom = parseFloat(getComputedStyle(header).borderBottomWidth || '0') || 0;
-      const dividerYUnzoomed = (rect.bottom - borderBottom) / (scale || 1);
-      document.documentElement.style.setProperty('--header-divider-y', `${dividerYUnzoomed}px`);
+      // offsetHeight는 CSS 픽셀 기준이므로 zoom에 영향받지 않아 정확
+      const headerHeight = header.offsetHeight;
+      document.documentElement.style.setProperty('--header-divider-y', `${headerHeight}px`);
     };
 
     const applyScale = () => {
@@ -50,7 +49,7 @@ const ResponsiveScale = () => {
         document.documentElement.style.setProperty('--app-zoom', '1');
         document.documentElement.classList.remove('tight-desktop');
         document.documentElement.classList.remove('mid-desktop');
-        requestAnimationFrame(() => updateHeaderDividerY(1));
+        requestAnimationFrame(() => updateHeaderDividerY());
         document.documentElement.style.overflowX = 'hidden';
         document.body.style.overflowX = 'hidden';
         return;
@@ -76,15 +75,18 @@ const ResponsiveScale = () => {
         document.documentElement.classList.remove('mid-desktop');
       }
 
-      requestAnimationFrame(() => updateHeaderDividerY(scale));
+      requestAnimationFrame(() => updateHeaderDividerY());
       document.documentElement.style.overflowX = 'hidden';
       document.body.style.overflowX = 'hidden';
     };
 
     applyScale();
+    // 폰트/이미지 로드 후 헤더 높이가 확정되면 divider 재계산
+    window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 
     return () => {
+      window.removeEventListener('load', applyScale);
       window.removeEventListener('resize', applyScale);
       document.documentElement.style.zoom = '';
       document.documentElement.style.removeProperty('--app-zoom');

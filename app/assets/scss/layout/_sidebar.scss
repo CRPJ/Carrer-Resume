@@ -29,8 +29,8 @@
       position: fixed;
       left: 0;
       // 헤더 "divider(=border-bottom)" 위치와 동기화 (서브픽셀/1px 어긋남 방지)
-      top: var(--header-divider-y, var(--header-height, 100px));
-      width: 97px; // `.nftg-app .nftg-sidebar` 기본 폭과 동일
+      top: var(--header-divider-y, var(--header-height, 82px));
+      width: inherit; // 사이드바 폭에 자동 맞춤
       height: 1px;
       background-color: #39424c;
       pointer-events: none;
@@ -55,8 +55,8 @@
     justify-content: center;
 
     img {
-      width: 77px;
-      height: 77px;
+      width: 55px;
+      height: 55px;
       max-width: none;
     }
   }
@@ -64,7 +64,7 @@
   .sidebar__widget:nth-of-type(1) {
     // 로고가 "정중앙"에 오도록, 헤더 divider까지의 높이를 고정
     // (모니터 높이/미디어쿼리로 padding이 바뀌어도 위치가 흔들리지 않게)
-    height: var(--header-divider-y, var(--header-height, 100px));
+    height: var(--header-divider-y, var(--header-height, 82px));
     padding: 0;
     display: flex;
     align-items: center;
@@ -106,9 +106,9 @@
 
   .sidebar--links {
     a {
-      @include box(48px);
+      @include box(44px);
       color: var(--tertiary-color);
-      font-size: 24px;
+      font-size: 22px;
       position: relative;
 
       i {
@@ -144,8 +144,8 @@
 
   .sidebar--images {
     a {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       gap: 0px;
       position: relative;
       display: inline-block;
@@ -230,16 +230,16 @@
 
     .sidebar--links {
       a {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
       }
     }
 
     .sidebar--images {
       a {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
       }
 
       .sidebar-game-slider {
