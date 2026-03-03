@@ -750,9 +750,8 @@
 
     .medal-image-wrapper {
       position: relative;
-      width: 100px;
-      height: 100px;
-      margin-left: -6px; // 88px 슬롯 안에서 100px를 중앙 정렬: (100-88)/2
+      width: 108px;
+      height: 108px;
       border-radius: 512px;
       overflow: hidden;
 
@@ -771,10 +770,10 @@
       }
 
       img {
-        width: 100px;
-        height: 100px;
+        width: 108px;
+        height: 108px;
         display: block;
-        object-fit: cover;
+        object-fit: contain;
         box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
         border-radius: 512px;
         position: relative;
