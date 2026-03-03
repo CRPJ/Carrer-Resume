@@ -69,14 +69,15 @@
 }
 
 // Resume Card - Exact Design Match
-// 489px x 818px 고정 (데스크탑용, 모바일에서는 유연하게)
+// 489px x 866px 고정 (데스크탑용, 모바일에서는 유연하게)
+// 866 = 818 + 48 (padding-top 48px 추가분)
 .resume-card {
   width: 489px !important;
   min-width: 489px !important;
   max-width: 489px !important;
-  height: 818px !important;
-  min-height: 818px !important;
-  max-height: 818px !important;
+  height: 866px !important;
+  min-height: 866px !important;
+  max-height: 866px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
