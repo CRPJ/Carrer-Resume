@@ -2541,9 +2541,11 @@
             line-height: 1.5;
             font-family: 'Pretendard', sans-serif;
             font-weight: 400;
-            display: inline-flex;
-            align-items: center;
+            display: inline;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
+            max-width: 100%;
 
             .card-arrow {
               width: 16px;
@@ -2551,6 +2553,8 @@
               object-fit: contain;
               flex-shrink: 0;
               margin-left: 4px;
+              display: inline;
+              vertical-align: middle;
             }
           }
         }

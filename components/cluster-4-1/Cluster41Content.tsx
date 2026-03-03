@@ -199,6 +199,7 @@ const Cluster41Content = () => {
     fromSeason: string | null; // 전환 주차: 이전 시즌 한글명
     toSeason: string | null;   // 전환 주차: 다음 시즌 한글명
     holidayName: string | null;
+    termNumber: number | null; // 운영진 기수
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
 
@@ -226,6 +227,8 @@ const Cluster41Content = () => {
     left_at: string | null;
     is_current: boolean;
     season_id: string;
+    generation: number | null;
+    managed_team_id: string | null;
   }
   interface UserRoleHistoryData {
     id: string;
@@ -385,6 +388,41 @@ const Cluster41Content = () => {
     }
 
     return null;
+  };
+
+  // 운영진 역할 확인
+  const isAdminRole = (role: string | undefined): boolean => {
+    if (!role) return false;
+    return ['admin_team_leader', 'crew_team_leader', 'operations_teamleader',
+            'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
+  };
+
+  // 운영진일 때 팀/파트 포맷 변환
+  const getFormattedTeamPart = (date: string, week: DBWeekData) => {
+    if (week.isBreakSeason) return { teamName: '-', partName: '-' };
+    const teamPart = getTeamPartForDate(date);
+    const roleInfo = getRoleForDate(date);
+
+    if (roleInfo && isAdminRole(roleInfo.role) && teamPart.teamName === '운영진') {
+      const dateObj = new Date(date);
+      const activeTeamPart = userTeamParts.find(utp => {
+        const startDate = new Date(utp.joined_at);
+        const endDate = utp.left_at ? new Date(utp.left_at) : null;
+        return startDate <= dateObj && (!endDate || endDate > dateObj);
+      });
+      const gen = activeTeamPart?.generation;
+      const isTeamLeader = roleInfo.role?.includes('team_leader');
+      const managedTeam = activeTeamPart?.managed_team_id
+        ? teams.find(t => t.id === activeTeamPart.managed_team_id)
+        : null;
+
+      return {
+        teamName: gen ? `운영진(${gen}기)` : '운영진',
+        partName: isTeamLeader && managedTeam ? `팀장(${managedTeam.name})` : (teamPart.partName || '-')
+      };
+    }
+
+    return teamPart;
   };
 
   // 특정 주차의 포인트 정보 계산
@@ -804,7 +842,7 @@ const Cluster41Content = () => {
         // 현재 진행 중인 주차는 제외 (end_date < today)
         let weeksQuery = supabase
           .from('weeks')
-          .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
+          .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name, term_number)')
           .lt('end_date', today)
           .order('start_date', { ascending: false });
 
@@ -983,6 +1021,7 @@ const Cluster41Content = () => {
             fromSeason: breakFromSeason,
             toSeason: breakToSeason,
             holidayName: week.holiday_name,
+            termNumber: seasonData?.term_number ? Number(seasonData.term_number) : null,
             growthStatus: status
           };
         }) as DBWeekData[];
@@ -1822,8 +1861,8 @@ const Cluster41Content = () => {
                           const experienceRate = getWeeklyExperienceRate(week.id);
                           const careerRate = getWeeklyCareerRate(week.id);
                           const weekPoints = getPointsForWeek(week.id);
-                          const injeolmi = getCumulativeInjeolmi(week.endDate);
-                          const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                          const injeolmi = weekPoints.shield - weekPoints.lightning;
+                          const teamPart = getFormattedTeamPart(week.startDate, week);
                           const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
 
                           return (
@@ -1910,7 +1949,7 @@ const Cluster41Content = () => {
                       {/* 그룹 1: 팀, 파트 */}
                       {(() => {
                         // 전환 주차는 팀/파트/역할을 '-'로 표시
-                        const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                        const teamPart = getFormattedTeamPart(week.startDate, week);
                         const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
                         return (
                           <>
@@ -1938,7 +1977,7 @@ const Cluster41Content = () => {
                       {/* 그룹 3: 아이템들 */}
                       {(() => {
                         const weekPoints = getPointsForWeek(week.id);
-                        const injeolmi = getCumulativeInjeolmi(week.endDate);
+                        const injeolmi = weekPoints.shield - weekPoints.lightning;
                         return (
                           <div className="info-group items">
                             <span className="info-divider">·</span>

@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
         supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
         supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
-        supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+        supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
         getCachedParts(),
       ]);
@@ -300,7 +300,7 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id),
 
       // 해당 유저의 팀/파트 이력 (시즌 상태 표시용)
-      supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+      supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
 
       // 팀 목록 - 캐시 사용
       getCachedTeams(),
@@ -757,6 +757,55 @@ export async function GET(request: NextRequest) {
 
         finalSeasonHistories = newSeasonHistories || [];
         console.log('[Profile API] Auto-generated season histories:', finalSeasonHistories.length);
+      }
+    }
+
+    // 기존 유저: 현재 진행 중인 시즌의 레코드가 없으면 자동 생성
+    if (finalSeasonHistories.length > 0 && supabaseAdmin) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const existingSeasonIds = new Set(finalSeasonHistories.map((sh: any) => sh.seasons?.id).filter(Boolean));
+      // 오늘 날짜 기준 진행 중인 시즌 (break 시즌 제외)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const currentSeasons = allSeasons.filter((s: any) =>
+        s.start_date <= today && s.end_date >= today && !s.name?.toLowerCase().includes('break')
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const missingSeasons = currentSeasons.filter((s: any) => !existingSeasonIds.has(s.id));
+
+      if (missingSeasons.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const insertPromises = missingSeasons.map(async (season: any) => {
+          const { data: seasonWeeks } = await supabaseAdmin
+            .from('weeks')
+            .select('id')
+            .eq('season_id', season.id);
+
+          await supabaseAdmin
+            .from('user_season_histories')
+            .insert({
+              user_id: profile.id,
+              season_id: season.id,
+              role_in_season: profile.role || 'crew_regular',
+              approved_weeks: 0,
+              total_weeks: seasonWeeks?.length || 16,
+              progress_status: 'in_progress',
+              review_status: 'reviewing'
+            });
+        });
+
+        await Promise.all(insertPromises);
+
+        // 다시 조회
+        const { data: refreshed } = await supabaseAdmin
+          .from('user_season_histories')
+          .select(`
+            id, role_in_season, approved_weeks, total_weeks, progress_status,
+            review_status, is_qualified, rating, review, review_link,
+            seasons (id, year, name, start_date, end_date)
+          `)
+          .eq('user_id', profile.id);
+
+        finalSeasonHistories = refreshed || finalSeasonHistories;
       }
     }
 

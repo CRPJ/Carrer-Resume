@@ -80,7 +80,6 @@ const Cluster4RankingContent = () => {
   const [selectedWeek, setSelectedWeek] = useState<WeekOption | null>(null);
   const [rankings, setRankings] = useState<RankingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [teamStatsOverride, setTeamStatsOverride] = useState<{ teamName: string; successCount: number; failCount: number }[] | null>(null);
 
   // 초기 로드: 주차 목록 + 기본 주차 랭킹을 한 번에 가져오기
   useEffect(() => {
@@ -97,7 +96,6 @@ const Cluster4RankingContent = () => {
             setSelectedWeek(result.selectedWeek);
           }
           setRankings(result.rankings || []);
-          setTeamStatsOverride(result.teamStatsOverride || null);
         }
       } catch (error) {
         console.error("초기 데이터 로드 오류:", error);
@@ -128,7 +126,6 @@ const Cluster4RankingContent = () => {
         if (result.success) {
           setSelectedWeek(result.selectedWeek);
           setRankings(result.rankings || []);
-          setTeamStatsOverride(result.teamStatsOverride || null);
         }
       } catch (error) {
         console.error("랭킹 데이터 로드 오류:", error);
@@ -278,23 +275,9 @@ const Cluster4RankingContent = () => {
       });
     });
 
-    // [임시] 오버라이드 적용: 팀별 승패 값 덮어쓰기 + 5개 팀만 표시 (TODO: 복원 시 이 블록 삭제)
-    if (teamStatsOverride) {
-      const overrideTeamNames = teamStatsOverride.map(o => o.teamName);
-      const filtered = stats.filter(s => overrideTeamNames.includes(s.teamName));
-      for (const override of teamStatsOverride) {
-        const stat = filtered.find(s => s.teamName === override.teamName);
-        if (stat) {
-          stat.successCount = override.successCount;
-          stat.failCount = override.failCount;
-        }
-      }
-      return filtered.sort((a, b) => b.totalStar - a.totalStar);
-    }
-
     // 단감 총합 기준으로 정렬
     return stats.sort((a, b) => b.totalStar - a.totalStar);
-  }, [rankings, teamStatsOverride]);
+  }, [rankings]);
 
   return (
     <>
