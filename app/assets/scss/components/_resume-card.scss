@@ -534,7 +534,7 @@
 
   // Introduction
   .resume-intro {
-    width: 472px;
+    width: 487px;
     height: 114px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/cluster 1/bg image/17.png');
     background-size: cover;
@@ -832,7 +832,7 @@
   // Activities
   .resume-activities {
     border-top: 1px solid #313131;
-    width: 472px;
+    width: 487px;
     // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
     // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
     // → 스크롤은 유지하되 스크롤바만 숨겨 OS/모니터별 표시 편차를 제거.
@@ -861,7 +861,7 @@
       gap: 4px;
       padding: 0;
       border-bottom: 1px solid #313131;
-      width: 470px;
+      width: 485px;
       height: 36px;
       background-color: #1C242F;
       margin-bottom: 0;
@@ -966,7 +966,7 @@
   // Bottom section wrapper with background
   .resume-bottom-section {
     position: relative;
-    width: 472px;
+    width: 487px;
 
     &::before {
       content: '';
