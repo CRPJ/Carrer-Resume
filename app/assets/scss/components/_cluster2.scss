@@ -3000,8 +3000,6 @@
     }
   }
 
-  } // .cluster2-section4 닫기
-
   // 섹션 4 모달 - 바로가기 링크 편집 (모달은 cluster2-content 직접 하위에 렌더)
   .section4-modal-overlay {
     position: fixed;
@@ -3189,6 +3187,7 @@
     .section4-modal-footer {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       gap: 12px;
       padding: 20px 28px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -3230,6 +3229,7 @@
         }
       }
     }
+  }
 
   // 섹션 5 모달 - 자기소개서 카드 상세/편집
   .intro-modal-overlay {
@@ -6201,4 +6201,5 @@
     stroke-dashoffset: 0;
     stroke: var(--quaternary-color);
   }
-}}
+}
+} // end .cluster2-content
