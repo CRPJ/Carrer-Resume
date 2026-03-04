@@ -336,8 +336,17 @@ const Sidebar = () => {
       }
 
       // ★ 카드만 축소, 헤더·nav는 그대로 (네이버 방식)
-      const viewportHeight = window.visualViewport?.height || window.innerHeight;
-      const viewportWidth = window.visualViewport?.width || window.innerWidth;
+      // CSS zoom 적용 전/후 innerHeight가 달라지는 문제 방지:
+      // innerHeight(CSS px) × currentZoom = 물리 픽셀 → ÷ expectedZoom = 안정된 CSS px
+      const BASE_WIDTH = 1977;
+      const MAX_ZOOM = 2.0;
+      const w = window.outerWidth;
+      const expectedZoom = w >= 1200 ? Math.min(w / BASE_WIDTH, MAX_ZOOM) : 1;
+      const currentZoom = parseFloat(document.documentElement.style.zoom || '1');
+      const rawHeight = window.visualViewport?.height || window.innerHeight;
+      const rawWidth = window.visualViewport?.width || window.innerWidth;
+      const viewportHeight = (rawHeight * currentZoom) / expectedZoom;
+      const viewportWidth = (rawWidth * currentZoom) / expectedZoom;
 
       // 1) 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
       const availableHeight = viewportHeight - 130; // 헤더 높이 제외
