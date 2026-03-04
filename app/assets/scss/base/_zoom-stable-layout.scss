@@ -47,6 +47,37 @@
   }
 }
 
+// ===== 고줌 데스크탑 (175%+ 줌) - 세로 배치 =====
+// JS(ResponsiveScale)가 html.high-zoom 클래스를 토글
+// React 상태 변경 없이 CSS만으로 레이아웃 전환 → 줌 복원 시 즉시 원래대로
+html.high-zoom {
+  .desktop-layout {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .sidebar-sticky-wrapper {
+    position: relative !important;
+    top: auto !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+
+    & > div {
+      position: relative !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: auto !important;
+    }
+  }
+
+  .home-two-content-col {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
 // ===== 1200~1400px (노트북/중간폭) - 타이트 데스크톱 =====
 // CSS zoom이 media query를 무력화하므로, JS가 html.tight-desktop 클래스를 토글
 // → gap/padding을 줄이고, 사이드바 카드를 확대하여 공간 효율 극대화

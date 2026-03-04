@@ -57,6 +57,11 @@ const ResponsiveScale = () => {
       requestAnimationFrame(() => updateHeaderDividerY());
       document.documentElement.style.overflowX = 'hidden';
       document.body.style.overflowX = 'hidden';
+
+      // ★ 고줌 감지: 실제 데스크탑이지만 브라우저 줌으로 뷰포트가 좁아진 경우
+      // CSS 클래스만 토글 → React 상태 변경 없이 CSS로 세로 배치
+      const isHighZoom = w >= MOBILE_BREAKPOINT && window.innerWidth < MOBILE_BREAKPOINT;
+      document.documentElement.classList.toggle('high-zoom', isHighZoom);
     };
 
     applyScale();
@@ -73,6 +78,7 @@ const ResponsiveScale = () => {
       document.body.style.overflowX = '';
       document.documentElement.classList.remove('tight-desktop');
       document.documentElement.classList.remove('mid-desktop');
+      document.documentElement.classList.remove('high-zoom');
     };
   }, []);
 

@@ -125,6 +125,21 @@ const Cluster9Page = () => {
 
     const apply = () => {
       rafId = null;
+      // 고줌 모드: sticky 비활성화 (CSS가 레이아웃 제어)
+      if (document.documentElement.classList.contains('high-zoom')) {
+        if (isFixed) {
+          shell.style.width = '';
+          shell.style.height = '';
+          inner.style.position = 'relative';
+          inner.style.top = '0';
+          inner.style.left = '0';
+          inner.style.width = '';
+          inner.style.zIndex = '100';
+          isFixed = false;
+        }
+        return;
+      }
+
 
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const shellRect = shell.getBoundingClientRect();

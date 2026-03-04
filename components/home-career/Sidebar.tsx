@@ -315,7 +315,6 @@ const Sidebar = () => {
       const currentOuterWidth = window.outerWidth;
 
       // 초기화 이후: outerWidth가 변하지 않았으면 브라우저 줌 → 스킵
-      // (브라우저 줌은 전체를 동일하게 스케일하므로 cardScale 유지)
       if (initialized && Math.abs(currentOuterWidth - lastOuterWidth) < 5) {
         return;
       }
