@@ -1526,24 +1526,19 @@
     align-items: center;
     gap: 6px;
     padding: 8px 0;
+    padding-right: 50px; // 화살표 버튼 공간 확보
     margin-left: 0;
-    overflow-x: visible;
-    flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
     justify-content: flex-start;
-    row-gap: 8px;
-    // 기본: 5개씩 한 줄에 배치 (250px * 5 + gap 6px * 4 = 1274px)
-    max-width: min(1274px, 100%);
+    max-width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
-    // 4K(3840px) 등 초광폭 화면에서는 더 많은 탭이 한 줄에 노출되도록 확장
-    @media (min-width: 2000px) {
-      max-width: min(2400px, 100%);
+    &::-webkit-scrollbar {
+      display: none;
     }
-  }
-
-  // 두 줄 모드에서 그라데이션과 화살표 숨김
-  .cluster-tabs-gradient,
-  .cluster-tabs-arrow {
-    display: none;
   }
 
   .cluster-tab {
