@@ -28,15 +28,21 @@ const ResponsiveScale = () => {
       const currentOuterWidth = window.outerWidth;
 
       // ★ 브라우저 줌 감지: DPR이 변했는데 outerWidth는 안 변한 경우
-      //   → 사용자가 Ctrl+/- 로 줌한 것 → CSS zoom 재계산 스킵 (레이아웃 안정)
-      //   DevTools/리사이즈: DPR 안 변하거나, outerWidth도 변함 → 정상 재계산
+      //   → 사용자가 Ctrl+/- 로 줌한 것
+      //   DevTools/리사이즈: DPR 안 변하거나, outerWidth도 변함
       const isBrowserZoom = Math.abs(currentDPR - lastDPR) > 0.001
         && Math.abs(currentOuterWidth - lastOuterWidth) < 5;
 
       lastDPR = currentDPR;
 
       if (isBrowserZoom) {
-        // 브라우저 줌 변경 — CSS zoom은 유지하되 헤더 높이는 재계산
+        // 브라우저 줌 변경 — outerWidth 기준으로 CSS zoom 재계산 (복원 정상 작동)
+        const physicalWidth = currentOuterWidth;
+        if (physicalWidth >= MOBILE_BREAKPOINT) {
+          const scale = Math.min(physicalWidth / BASE_WIDTH, MAX_ZOOM);
+          document.documentElement.style.zoom = String(scale);
+          document.documentElement.style.setProperty('--app-zoom', String(scale));
+        }
         requestAnimationFrame(() => updateHeaderDividerY());
         return;
       }
