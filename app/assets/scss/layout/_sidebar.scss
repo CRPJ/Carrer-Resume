@@ -28,8 +28,8 @@
       content: "";
       position: fixed;
       left: 0;
-      // 헤더 "divider(=border-bottom)" 위치와 동기화 (서브픽셀/1px 어긋남 방지)
-      top: var(--header-divider-y, var(--header-height, 82px));
+      // JS 측정값(offsetHeight)에서 border-bottom 1px를 빼야 헤더 border-bottom과 정확히 겹침
+      top: calc(var(--header-divider-y, var(--header-height, 82px)) - 1px);
       width: inherit; // 사이드바 폭에 자동 맞춤
       height: 1px;
       background-color: #39424c;

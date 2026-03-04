@@ -820,8 +820,10 @@
 
       // 중간 길이 (Recharging)
       &.medium {
-        width: 105px;
-        font-size: 0.8125rem;
+        width: 110px;
+        font-size: 0.6875rem;
+        font-weight: 300;
+        letter-spacing: -0.02em;
       }
 
       // 긴 길이 (Next Challenge)
