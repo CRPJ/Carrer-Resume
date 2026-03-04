@@ -138,7 +138,7 @@
       transform: translateX(-50%);
       width: 100vw;
       height: 100%;
-      background: url('/images/0/cluster 2/bg02.png') center 30%/cover no-repeat;
+      background: url('/images/0/cluster 2/bg02.png') center 15%/cover no-repeat; // 30% → 15% 위쪽 부분 노출
       opacity: 0.6;
       z-index: -1;
     }
@@ -175,29 +175,30 @@
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.375rem;
-        margin-bottom: 0;
+        font-size: 1.5rem; // 22px → 24px
+        margin-bottom: 6px; // 0 → 6px (문단 간 기본 간격)
         color: #FFF;
         text-wrap: pretty;
 
         &:nth-child(2) {
-          margin-bottom: 28px;
+          margin-bottom: 34px; // 28px → 34px
         }
       }
 
       .small-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.375rem;
+        font-size: 1.5rem; // 22px → 24px
         color: #FFF;
         margin-top: 0;
+        margin-bottom: 6px; // 문단 간 간격 추가
       }
 
       .quote-text {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.375rem;
+        font-size: 1.5rem; // 22px → 24px
         line-height: 1.4;
         color: #FFF;
-        margin-top: 24px;
+        margin-top: 30px; // 24px → 30px
         margin-bottom: 0;
         font-style: italic;
         // 인용문은 단어 단위 우선 + 긴 토큰만 예외적으로 줄바꿈
@@ -210,7 +211,7 @@
 
       .quote-highlight {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.8125rem;
+        font-size: 2rem; // 29px → 32px
         line-height: 1.4;
         background: linear-gradient(90deg, #FED402, #FFF1AA);
         -webkit-background-clip: text;
@@ -223,10 +224,10 @@
 
       .quote-author {
         font-family: 'HakgyoansimTuho', sans-serif;
-        font-size: 1.375rem;
+        font-size: 1.5rem; // 22px → 24px
         line-height: 1.4;
         color: #FFF;
-        margin: 0;
+        margin-top: 4px; // 0 → 4px
         font-style: italic;
       }
     }
