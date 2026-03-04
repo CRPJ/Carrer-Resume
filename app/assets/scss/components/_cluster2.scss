@@ -2508,9 +2508,10 @@
     }
 
     .intro-title-shadow {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 900;
+      font-family: 'Khula', 'Pretendard', sans-serif;
+      font-size: 3.75rem; // 56px → 60px 피그마 일치
+      font-weight: 800;
+      line-height: 82px;
       color: #111;
       -webkit-text-stroke: 1px #FFA500;
       text-stroke: 1px #FFA500;
@@ -2526,9 +2527,10 @@
     }
 
     .intro-title {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 900;
+      font-family: 'Khula', 'Pretendard', sans-serif;
+      font-size: 3.75rem; // 56px → 60px 피그마 일치
+      font-weight: 800;
+      line-height: 82px;
       color: #FFF;
       text-align: center;
       letter-spacing: 0;
@@ -2541,6 +2543,8 @@
     .intro-sub {
       font-family: var(--black-ops-one), 'Black Ops One', cursive, Arial, sans-serif;
       font-size: 1.5625rem;
+      font-weight: 400;
+      line-height: 40px; // 피그마 일치
       color: #fff;
       letter-spacing: 0;
       // 타이틀 높이가 조금 달라도 겹치지 않게 위쪽 여유 확보
@@ -2565,7 +2569,7 @@
     .intro-cards {
       display: flex;
       flex-direction: column;
-      gap: 55px;
+      gap: 70px; // 55px → 70px 피그마 일치
       align-items: center;
       position: relative;
       z-index: 1;
@@ -2600,6 +2604,7 @@
           height: 127px;
           z-index: 1;
           pointer-events: none;
+          opacity: 1;
         }
 
         .border-br {
@@ -2610,7 +2615,7 @@
           height: 104px;
           z-index: 1;
           pointer-events: none;
-          opacity: 0.65;
+          opacity: 1; // 0.65 → 1 선명하게
         }
 
         .card-header {

@@ -1821,8 +1821,8 @@ const Cluster2Content = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
-                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
+                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
                 <div className="card-header">
                   <img src={card.icon} alt="" className="card-icon" />
                   <div className="title-row">
@@ -1851,8 +1851,8 @@ const Cluster2Content = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
-                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+                <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
+                <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
                 <div className="card-header">
                   <img src={card.icon} alt="" className="card-icon" />
                   <div className="title-row">
@@ -1869,8 +1869,8 @@ const Cluster2Content = () => {
               </div>
             ))}
             <div className="intro-card empty waiting">
-              <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
-              <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round"/></svg>
+              <svg className="border-tl" xmlns="http://www.w3.org/2000/svg" width="120" height="127" viewBox="0 0 120 127" fill="none"><path d="M1 125.624V18C1 8.61116 8.61116 1 18 1H118.778" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
+              <svg className="border-br" xmlns="http://www.w3.org/2000/svg" width="121" height="104" viewBox="0 0 121 104" fill="none"><path d="M119.18 0.999918V90.345C119.18 96.972 113.807 102.345 107.18 102.345H1.00013" stroke="#FAAB07" strokeWidth="3" strokeLinecap="round"/></svg>
               <div className="waiting-content">
                 <img src="/images/0/cluster 2/icon/waiting icon.png" alt="" className="waiting-icon" />
                 <span className="waiting-text">WAITING FOR YOU</span>

@@ -390,7 +390,7 @@ body {
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     grid-template-rows: repeat(2, auto) !important;
-    gap: 30px !important;
+    gap: 70px !important; // 30px → 70px 피그마 일치
     
     .intro-row {
       display: contents !important; // 부모 그리드에 직접 참여
