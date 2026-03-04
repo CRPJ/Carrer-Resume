@@ -3595,11 +3595,7 @@
   .section-modal {
     width: 500px;
     max-width: 90vw;
-    max-height: 700px !important;
-
-    @media (max-height: 900px) {
-      max-height: 80vh !important;
-    }
+    max-height: 85vh !important;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #FFA500;
     overflow: hidden;

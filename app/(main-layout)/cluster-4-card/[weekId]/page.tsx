@@ -14,8 +14,8 @@ const Cluster4CardDynamicPage = () => {
 
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
     position: 'fixed',
-    left: '110px',
-    top: '124px',
+    left: '83px',
+    top: '98px',
     overflow: 'visible',
     zIndex: 100,
   });
@@ -24,7 +24,7 @@ const Cluster4CardDynamicPage = () => {
   // tight-desktop 감지를 위한 헬퍼
   const getSidebarLeft = () => {
     const isTight = document.documentElement.classList.contains('tight-desktop');
-    return isTight ? '80px' : '110px';
+    return isTight ? '73px' : '83px';
   };
 
   useEffect(() => {
@@ -32,19 +32,19 @@ const Cluster4CardDynamicPage = () => {
       const left = getSidebarLeft();
       const footer = document.querySelector('footer');
       if (!footer) {
-        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        setSidebarStyle({ position: 'fixed', left, top: '98px', overflow: 'visible', zIndex: 100 });
         return;
       }
 
       const footerRect = footer.getBoundingClientRect();
-      const sidebarHeight = 810;
-      const sidebarTop = 124;
+      const sidebarHeight = 848;
+      const sidebarTop = 98;
       const sidebarBottom = sidebarTop + sidebarHeight;
 
       if (footerRect.top < sidebarBottom) {
         setSidebarStyle({ position: 'fixed', left, top: `${footerRect.top - sidebarHeight}px`, overflow: 'visible', zIndex: 100 });
       } else {
-        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        setSidebarStyle({ position: 'fixed', left, top: '98px', overflow: 'visible', zIndex: 100 });
       }
     };
 

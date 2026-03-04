@@ -12,8 +12,8 @@ const Cluster4CardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarStyle, setSidebarStyle] = useState<React.CSSProperties>({
     position: 'fixed',
-    left: '110px',
-    top: '124px',
+    left: '83px',
+    top: '98px',
     overflow: 'visible',
     zIndex: 100,
   });
@@ -22,7 +22,7 @@ const Cluster4CardPage = () => {
   // tight-desktop 감지를 위한 헬퍼
   const getSidebarLeft = () => {
     const isTight = document.documentElement.classList.contains('tight-desktop');
-    return isTight ? '80px' : '110px';
+    return isTight ? '73px' : '83px';
   };
 
   // 현재 주차로 리다이렉트
@@ -81,7 +81,7 @@ const Cluster4CardPage = () => {
       const left = getSidebarLeft();
       const footer = document.querySelector('footer');
       if (!footer) {
-        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        setSidebarStyle({ position: 'fixed', left, top: '98px', overflow: 'visible', zIndex: 100 });
         return;
       }
 
@@ -90,9 +90,9 @@ const Cluster4CardPage = () => {
 
       if (footerRect.top < windowHeight) {
         const moveUp = windowHeight - footerRect.top;
-        setSidebarStyle({ position: 'fixed', left, top: `${124 - moveUp}px`, overflow: 'visible', zIndex: 100 });
+        setSidebarStyle({ position: 'fixed', left, top: `${98 - moveUp}px`, overflow: 'visible', zIndex: 100 });
       } else {
-        setSidebarStyle({ position: 'fixed', left, top: '124px', overflow: 'visible', zIndex: 100 });
+        setSidebarStyle({ position: 'fixed', left, top: '98px', overflow: 'visible', zIndex: 100 });
       }
     };
 
