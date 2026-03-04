@@ -1373,12 +1373,12 @@ const Sidebar = () => {
               onClick={handleEditButtonClick}
               style={{
                 position: "absolute",
-                top: "10px",
+                top: "5px",
                 right: "20px",
                 width: "28px",
                 height: "28px",
                 borderRadius: "50%",
-                backgroundColor: debugPanelType === "EC" ? "#FF4B70" : debugPanelType === "PX" ? "#36DA60" : "#FFA500",
+                backgroundColor: "#fff",
                 border: "none",
                 display: "flex",
                 alignItems: "center",
@@ -1389,7 +1389,7 @@ const Sidebar = () => {
                 padding: 0,
               }}
             >
-              <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#fff" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#000" }}></i>
             </button>
           )}
           {/* Header Section */}

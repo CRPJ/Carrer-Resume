@@ -75,9 +75,9 @@
   width: 489px !important;
   min-width: 489px !important;
   max-width: 489px !important;
-  height: 848px !important;
-  min-height: 848px !important;
-  max-height: 848px !important;
+  height: 856px !important;
+  min-height: 856px !important;
+  max-height: 856px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -89,9 +89,21 @@
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  padding-top: 30px !important;
+  padding-top: 38px !important;
   position: relative;
   box-sizing: border-box !important;
+
+  // 상단 프로필 영역 배경색
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    background: rgba(250, 171, 7, 1);
+    z-index: 1;
+  }
   
   // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
   @media only screen and (max-width: 1199px) {
