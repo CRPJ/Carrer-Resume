@@ -1673,7 +1673,7 @@ const Sidebar = () => {
                   <div className="detail-row">
                     <span style={{ width: "16px" }}></span>
                     <span className="sub-text">
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gpa} <span style={{ color: "#999999" }}>/{currentProfile.gpaMax}</span>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gpa} <span style={{ color: currentProfile.lightColor }}>/{currentProfile.gpaMax}</span>
                     </span>
                   </div>
                 </div>
