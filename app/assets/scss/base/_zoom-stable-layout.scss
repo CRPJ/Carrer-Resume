@@ -76,6 +76,11 @@ html.high-zoom {
     max-width: 100% !important;
     width: 100% !important;
   }
+
+  // 고줌 시 resume-card(사이드바 카드) 숨김
+  .home-two-sidebar-col {
+    display: none !important;
+  }
 }
 
 // ===== 1200~1400px (노트북/중간폭) - 타이트 데스크톱 =====
