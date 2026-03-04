@@ -1135,7 +1135,7 @@ const Cluster2Content = () => {
       {/* 상단 섹션: 연결된 프레임 */}
       <div className="cluster2-top-frame" style={{ position: 'relative' }}>
         {/* Floating Icons - PROFILE 영역 우측 하단 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{
             display: 'flex',
             position: 'absolute',
@@ -1144,7 +1144,7 @@ const Cluster2Content = () => {
             zIndex: 100,
             gap: '5px'
           }}>
-            <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => handleEditClick(() => setSection1ModalOpen(true))}>
+            <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
                 <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" style={{ pointerEvents: 'none' }} />
             </div>
             <div className="edit-icon search-icon">
@@ -1242,9 +1242,9 @@ const Cluster2Content = () => {
       {/* 섹션 2-1: 비디오 섹션 */}
       <div ref={videosRef} className="cluster2-videos" style={{ position: 'relative' }}>
         {/* Floating Icons - 로그인한 본인만 표시 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); })}>
+            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
               <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1353,9 +1353,9 @@ const Cluster2Content = () => {
       {/* 인용문 섹션 */}
       <div className="cluster2-quotes" style={{ position: 'relative' }}>
         {/* Floating Icons - 로그인한 본인만 표시 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); })}>
+            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
               <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1521,9 +1521,9 @@ const Cluster2Content = () => {
         style={{ position: 'relative' }}
       >
         {/* Floating Icons - 로그인한 본인만 표시 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); })}>
+            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
               <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">
@@ -1623,9 +1623,9 @@ const Cluster2Content = () => {
       {/* CLUB REVIEW 배너 */}
       <div className="cluster2-review-banner" style={{ position: 'relative' }}>
         {/* Floating Icons - 로그인한 본인만 표시 */}
-        {session && isOwner && (
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); })}>
+            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
               <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
             </div>
             <div className="edit-icon search-icon">

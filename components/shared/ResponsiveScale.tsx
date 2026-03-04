@@ -8,50 +8,35 @@ const ResponsiveScale = () => {
     const MAX_ZOOM = 2.0;
     const MOBILE_BREAKPOINT = 1200;
 
-    // ★ 브라우저 줌 감지용: DPR과 outerWidth를 추적
-    let lastDPR = window.devicePixelRatio;
-    let lastOuterWidth = window.outerWidth;
-
     const updateHeaderDividerY = () => {
       const header = document.querySelector('.header') as HTMLElement | null;
       if (!header) {
         document.documentElement.style.removeProperty('--header-divider-y');
         return;
       }
-      // offsetHeight: CSS 픽셀 기준(정수) → CSS 속성(margin-top 등)과 동일 좌표계
       const headerHeight = header.offsetHeight;
       document.documentElement.style.setProperty('--header-divider-y', `${headerHeight}px`);
     };
 
-    const applyScale = () => {
-      const currentDPR = window.devicePixelRatio;
-      const currentOuterWidth = window.outerWidth;
-
-      // ★ 브라우저 줌 감지: DPR이 변했는데 outerWidth는 안 변한 경우
-      //   → 사용자가 Ctrl+/- 로 줌한 것
-      //   DevTools/리사이즈: DPR 안 변하거나, outerWidth도 변함
-      const isBrowserZoom = Math.abs(currentDPR - lastDPR) > 0.001
-        && Math.abs(currentOuterWidth - lastOuterWidth) < 5;
-
-      lastDPR = currentDPR;
-
-      if (isBrowserZoom) {
-        // 브라우저 줌 변경 — outerWidth 기준으로 CSS zoom 재계산 (복원 정상 작동)
-        const physicalWidth = currentOuterWidth;
-        if (physicalWidth >= MOBILE_BREAKPOINT) {
-          const scale = Math.min(physicalWidth / BASE_WIDTH, MAX_ZOOM);
-          document.documentElement.style.zoom = String(scale);
-          document.documentElement.style.setProperty('--app-zoom', String(scale));
-        }
-        requestAnimationFrame(() => updateHeaderDividerY());
-        return;
+    const updateDesktopClasses = (width: number) => {
+      if (width >= 1200 && width < 1400) {
+        document.documentElement.classList.add('tight-desktop');
+        document.documentElement.classList.remove('mid-desktop');
+      } else if (width >= 1400 && width < 1700) {
+        document.documentElement.classList.remove('tight-desktop');
+        document.documentElement.classList.add('mid-desktop');
+      } else {
+        document.documentElement.classList.remove('tight-desktop');
+        document.documentElement.classList.remove('mid-desktop');
       }
+    };
 
-      lastOuterWidth = currentOuterWidth;
+    const applyScale = () => {
+      // outerWidth: 실제 창 크기만 반영, 브라우저 줌(Ctrl+/-)에 불변
+      // → CSS zoom이 항상 안정적이고, 브라우저 줌 UX를 방해하지 않음
+      const w = window.outerWidth;
 
-      const windowWidth = window.innerWidth;
-
-      if (windowWidth < MOBILE_BREAKPOINT) {
+      if (w < MOBILE_BREAKPOINT) {
         document.documentElement.style.zoom = '1';
         document.documentElement.style.setProperty('--app-zoom', '1');
         document.documentElement.classList.remove('tight-desktop');
@@ -62,25 +47,12 @@ const ResponsiveScale = () => {
         return;
       }
 
-      let scale = windowWidth / BASE_WIDTH;
-
-      if (scale > MAX_ZOOM) {
-        scale = MAX_ZOOM;
-      }
+      const scale = Math.min(w / BASE_WIDTH, MAX_ZOOM);
 
       document.documentElement.style.zoom = String(scale);
       document.documentElement.style.setProperty('--app-zoom', String(scale));
 
-      if (windowWidth >= 1200 && windowWidth < 1400) {
-        document.documentElement.classList.add('tight-desktop');
-        document.documentElement.classList.remove('mid-desktop');
-      } else if (windowWidth >= 1400 && windowWidth < 1700) {
-        document.documentElement.classList.remove('tight-desktop');
-        document.documentElement.classList.add('mid-desktop');
-      } else {
-        document.documentElement.classList.remove('tight-desktop');
-        document.documentElement.classList.remove('mid-desktop');
-      }
+      updateDesktopClasses(w);
 
       requestAnimationFrame(() => updateHeaderDividerY());
       document.documentElement.style.overflowX = 'hidden';
@@ -88,7 +60,6 @@ const ResponsiveScale = () => {
     };
 
     applyScale();
-    // 폰트/이미지 로드 후 헤더 높이가 확정되면 divider 재계산
     window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 

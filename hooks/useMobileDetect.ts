@@ -9,7 +9,7 @@ export function useMobileDetect() {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      setIsMobile(window.outerWidth < MOBILE_BREAKPOINT);
     };
 
     checkMobile();

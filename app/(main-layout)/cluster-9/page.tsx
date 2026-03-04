@@ -79,7 +79,7 @@ const Cluster9Page = () => {
   useEffect(() => {
     // 화면 크기 체크
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1200);
+      setIsMobile(window.outerWidth < 1200);
     };
 
     // 초기 실행

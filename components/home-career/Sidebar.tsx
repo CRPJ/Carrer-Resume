@@ -323,8 +323,7 @@ const Sidebar = () => {
       initialized = true;
       lastOuterWidth = currentOuterWidth;
 
-      const windowWidth = window.innerWidth;
-      const mobile = windowWidth < 1200;
+      const mobile = window.outerWidth < 1200;
       setIsMobileView(mobile);
 
       const BASE_CARD_HEIGHT = 848;
@@ -1368,9 +1367,9 @@ const Sidebar = () => {
           }}
         >
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
-          {isOwner && (
+          {(
             <button
-              onClick={handleEditButtonClick}
+              onClick={isOwner ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
                 top: "5px",
@@ -1383,10 +1382,11 @@ const Sidebar = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                cursor: "pointer",
+                cursor: isOwner ? "pointer" : "not-allowed",
                 zIndex: 20,
                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                 padding: 0,
+                opacity: isOwner ? 1 : 0.4,
               }}
             >
               <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#000" }}></i>

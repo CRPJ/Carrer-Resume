@@ -14,7 +14,7 @@ const Cluster41Page = () => {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1200);
+      setIsMobile(window.outerWidth < 1200);
     };
 
     checkMobile();

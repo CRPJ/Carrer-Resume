@@ -1817,9 +1817,9 @@ const Cluster4Content = () => {
                   <p className="review-comment">"{currentSeason.review || '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나'}"</p>
                 </div>
                 {/* 편집 아이콘 (본인만 표시) */}
-                {isOwner && (
+                {(
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleEditClick(openSeasonReviewModal); }}
+                    onClick={isOwner ? (e) => { e.stopPropagation(); handleEditClick(openSeasonReviewModal); } : (e) => { e.stopPropagation(); }}
                     style={{
                       position: 'absolute',
                       bottom: '8px',
@@ -1832,11 +1832,12 @@ const Cluster4Content = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      cursor: 'pointer',
+                      cursor: isOwner ? 'pointer' : 'not-allowed',
                       transition: 'all 0.2s ease',
+                      opacity: isOwner ? 1 : 0.4,
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; }}
+                    onMouseEnter={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; } : undefined}
+                    onMouseLeave={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; } : undefined}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
