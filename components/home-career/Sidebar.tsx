@@ -325,7 +325,7 @@ const Sidebar = () => {
       const mobile = window.outerWidth < 1200;
       setIsMobileView(mobile);
 
-      const BASE_CARD_HEIGHT = 848;
+      const BASE_CARD_HEIGHT = 982;
       const BASE_SIDEBAR_WIDTH = 497;
 
       // 모바일: CSS 반응형 그대로 사용
@@ -1282,7 +1282,7 @@ const Sidebar = () => {
         <div
           style={{
             width: "489px",
-            height: "848px",
+            height: "982px",
             backgroundColor: "#1a1a2e",
             borderRadius: "12px",
           }}
@@ -1352,7 +1352,7 @@ const Sidebar = () => {
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
           width: isMobileView ? "100%" : `${Math.round(497 * cardScale)}px`,
-          height: isMobileView ? "auto" : `${Math.round(848 * cardScale)}px`,
+          height: isMobileView ? "auto" : `${Math.round(982 * cardScale)}px`,
           overflow: "visible",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",

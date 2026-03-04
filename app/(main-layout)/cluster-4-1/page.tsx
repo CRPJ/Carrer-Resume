@@ -32,7 +32,7 @@ const Cluster41Page = () => {
     const getHeaderBottom = () => {
     const header = document.querySelector('header');
     if (header) return header.getBoundingClientRect().bottom;
-    return 71;
+    return 57;
 };
     const computeTop = (zoom: number, height: number) => {
     const defaultTop = getHeaderBottom() / zoom;

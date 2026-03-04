@@ -11,7 +11,7 @@
   // 사이드바(프로필) 영역은 고정 폭으로 안정화 (해상도/높이/zoom에 의해 변동되지 않게)
   --sidebar-width: 497px;
   --sidebar-left-offset: 110px;
-  --header-height: 82px;
+  --header-height: 66px;
   // zoom 상한(예: 4K)에서 남는 영역까지 포용하는 "외곽" 최대 폭
   // (3840px / 1.5 = 2560px 정도를 커버)
   --outer-max-width: 2600px;

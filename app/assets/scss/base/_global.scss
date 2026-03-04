@@ -918,7 +918,7 @@ svg {
 
   .nftg-content {
     padding: 0px 8px;
-    margin-top: var(--header-height, 82px);
+    margin-top: var(--header-height, 66px);
     overflow-x: clip;
     
     // nftg-content-home은 sticky 작동을 위해 overflow: visible 필요
@@ -936,11 +936,11 @@ svg {
 
   .nftg-content-home {
     // ★ 헤더 실제 높이(--header-divider-y)에 동기화 → 줌 레벨 변경 시에도 틈 없음
-    margin-top: calc(var(--header-divider-y, var(--header-height, 82px)) + 16px);
+    margin-top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
 
     .home-two-sidebar {
       position: sticky;
-      top: calc(var(--header-divider-y, var(--header-height, 82px)) + 16px);
+      top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
     }
   }
 }

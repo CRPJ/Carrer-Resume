@@ -3,7 +3,7 @@
  ==== */
 
 .header {
-  padding: 0px 12px 0px 75px;
+  padding: 0px 10px 0px 75px;
   position: fixed;
   top: 0px;
   left: 0px;
@@ -22,7 +22,7 @@
 
   .navbar__logo {
     img {
-      max-width: 40px;
+      max-width: 32px;
       height: auto;
     }
   }
@@ -49,7 +49,7 @@
 
     button,
     a {
-      padding: 30px clamp(4px, 0.625vw, 12px) 30px; // 좌우 패딩만 vw 축소, 수직 30px 유지
+      padding: 24px clamp(4px, 0.625vw, 12px) 24px; // 좌우 패딩만 vw 축소, 수직 24px 유지
       font-weight: 600;
       width: 100%;
       color: var(--white);
@@ -244,7 +244,7 @@
       background-color: var(--quaternary-color);
       color: var(--secondary-color);
       font-weight: 700;
-      padding: 16px 24px 14px;
+      padding: 13px 20px 11px;
       &::before {
         border-bottom-color: var(--primary-color);
       }
@@ -274,7 +274,7 @@
     position: relative;
 
     input {
-      padding: 14px 60px 16px 24px;
+      padding: 11px 48px 13px 20px;
       min-width: 100%;
       &::placeholder {
         color: #ffffff80;
@@ -295,7 +295,7 @@
 
   .open-search {
     display: none;
-    font-size: 30px;
+    font-size: 24px;
     color: var(--quaternary-color);
   }
 
@@ -876,7 +876,7 @@
 
 // header two styles
 .header-two {
-  padding: 30px 12px 29px;
+  padding: 24px 12px 23px;
   border-bottom: 1px solid var(--tertiary-color);
   position: sticky;
   top: 0px;

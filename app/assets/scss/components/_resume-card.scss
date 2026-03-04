@@ -75,9 +75,9 @@
   width: 489px !important;
   min-width: 489px !important;
   max-width: 489px !important;
-  height: 856px !important;
-  min-height: 856px !important;
-  max-height: 856px !important;
+  height: 990px !important;
+  min-height: 990px !important;
+  max-height: 990px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -103,6 +103,24 @@
     height: 38px;
     background: rgba(250, 171, 7, 1);
     z-index: 1;
+  }
+
+  // 상단 주황 탭 "Identity - Core" 라벨
+  &::after {
+    content: 'Identity - Core';
+    position: absolute;
+    top: 0;
+    left: 16px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 24px;
+    font-family: 'HakgyoansimTuho', sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    z-index: 2;
+    pointer-events: none;
   }
   
   // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
@@ -555,18 +573,19 @@
 
   // Introduction
   .resume-intro {
+    margin-top: 40px;
     width: 487px;
-    height: 114px;
+    height: 154px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/cluster 1/bg image/17.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     border-left: none;
     font-family: 'HakgyoansimTuho', sans-serif;
-    font-size: 1.4375rem;
+    font-size: 1.625rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 28px;
+    line-height: 36px;
     color: #FFF;
     margin: 0;
     padding: 16px 30px;
@@ -1020,7 +1039,7 @@
     align-items: flex-start;
     justify-content: center;
     gap: 30px;
-    padding: 30px 0 0;
+    padding: 54px 0 0;
     margin: 0;
     width: 100%;
     position: relative;
@@ -1087,13 +1106,13 @@
   // Notices
   .resume-notices {
     padding: 18px 20px 50px 0;
-    margin-top: -8px;
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     position: relative;
     z-index: 3;
-    gap: 4px;
+    gap: 16px;
 
     .notice-box {
       display: flex;

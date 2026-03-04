@@ -37,7 +37,7 @@ const Cluster4Page = () => {
     const getHeaderBottom = () => {
     const header = document.querySelector('header');
     if (header) return header.getBoundingClientRect().bottom;
-    return 71;
+    return 57;
 };
 
     let rafId: number | null = null;
