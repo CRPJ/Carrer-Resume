@@ -539,6 +539,8 @@ const Cluster2Content = () => {
   ]);
   const [editingVideoData, setEditingVideoData] = useState(videoData);
   const [videoSaving, setVideoSaving] = useState(false);
+  const [videoPage, setVideoPage] = useState(0);
+  const VIDEOS_PER_PAGE = 3;
 
   // DB에서 영상 URL 로드
   const fetchVideos = async () => {
@@ -1257,11 +1259,13 @@ const Cluster2Content = () => {
 
         <div className="videos-header">
           <h2 className="videos-title">Let Me Speak My Own Vision</h2>
-          <button className="view-all-btn">View All</button>
+          <div className="btn-wrapper">
+            <button className="view-all-btn">View All</button>
+          </div>
         </div>
 
         <div className="videos-grid">
-          {videoData.map((video) => (
+          {videoData.slice(videoPage * VIDEOS_PER_PAGE, (videoPage + 1) * VIDEOS_PER_PAGE).map((video) => (
             <div key={video.id} className={`video-card ${!video.videoUrl ? 'empty-placeholder' : 'has-video'}`}>
               {video.isBookmarked && (
                 <div className="bookmark-flag">
@@ -1322,18 +1326,26 @@ const Cluster2Content = () => {
         </div>
 
         <div className="videos-navigation">
-          <button className="nav-btn nav-prev">
+          <button
+            className="nav-btn nav-prev"
+            disabled={videoPage === 0}
+            onClick={() => setVideoPage(p => Math.max(0, p - 1))}
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <button className="nav-btn nav-next">
+          <button
+            className="nav-btn nav-next"
+            disabled={videoPage >= Math.ceil(videoData.length / VIDEOS_PER_PAGE) - 1}
+            onClick={() => setVideoPage(p => Math.min(Math.ceil(videoData.length / VIDEOS_PER_PAGE) - 1, p + 1))}
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
           <div className="progress-bar">
-            <div className="progress-fill" style={{ width: '60%' }}></div>
+            <div className="progress-fill" style={{ width: `${Math.ceil(videoData.length / VIDEOS_PER_PAGE) > 1 ? ((videoPage + 1) / Math.ceil(videoData.length / VIDEOS_PER_PAGE)) * 100 : 100}%` }}></div>
           </div>
         </div>
       </div>
