@@ -1380,7 +1380,7 @@ const Sidebar = () => {
               onClick={isOwner ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
-                top: "5px",
+                top: "15px",
                 right: "20px",
                 width: "28px",
                 height: "28px",
