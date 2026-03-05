@@ -832,7 +832,7 @@
     .quote-card {
       display: flex;
       position: relative;
-      background: url('/images/0/cluster 2/section 02.png') center/cover no-repeat;
+      background: url('/images/0/cluster 2/section 02.png') center bottom/cover no-repeat;
       border: none;
       border-radius: 12px;
       overflow: hidden;
@@ -878,8 +878,9 @@
           background: transparent;
           color: #FFF;
           font-family: 'Pretendard', sans-serif;
-          font-size: 0.875rem;
+          font-size: 0.9375rem; // 14px → 15px 피그마 시안 맞춤
           font-weight: 500;
+          text-transform: capitalize; // 피그마 시안 맞춤
           padding: 0;
           margin-top: 46px;
           margin-bottom: 7px;
