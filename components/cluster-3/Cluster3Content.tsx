@@ -635,7 +635,7 @@ const Cluster3Content = () => {
     '/images/0/cluster 3/icon/etc 2.png',
     '/images/0/cluster 3/icon/etc 2.png',
     // 11-16번 카드용 (페이지 2)
-    '/images/0/cluster 3/icon/etc 2.png',
+    '/images/0/cluster 3/icon/etc 3.png',
     '/images/0/cluster 3/icon/etc 2.png',
     '/images/0/cluster 3/icon/etc 3.png',
     '/images/0/cluster 3/icon/etc 1.png',
@@ -867,9 +867,10 @@ const Cluster3Content = () => {
                 <span className="info-label"><span className="dot">·</span> 휴식(개인) 주차</span>
                 <span className="info-value week">{growthPeriodStats?.restWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.restSeasons ?? 0})</span><span className="unit">주</span></span>
               </div>
-              <div className="info-row">
+              <div className="info-row club-break-row">
                 <span className="info-label"><span className="dot">·</span> 휴식(공식) 주차</span>
                 <span className="info-value week">{growthPeriodStats?.clubBreakWeeks ?? 0}<span className="unit">주</span></span>
+                <div className="club-break-tooltip">공식 휴식 주차(구정 설 연휴, 추석, 중간/기말고사 등)에 사전 승인된 &apos;활동&apos;을 진행하여 적격요건을 달성한 경우, 해당 주차는 &apos;휴식(공식) 주차&apos;가 아닌, &apos;성장(성공) 주차&apos;에 반영됩니다.</div>
               </div>
               <div className="info-row">
                 <span className="info-label"><span className="dot">·</span> 성장 가능 주차</span>
@@ -1344,6 +1345,18 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingOutputs}
                 onClick={async () => {
+                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
+                  const incomplete = editingSection4Links
+                    .map((link, i) => ({ link, channel: editingOutputChannels[i], index: i }))
+                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
+                  if (incomplete.length > 0) {
+                    const names = incomplete.map(item => {
+                      const missing = item.link ? '채널' : '링크';
+                      return `Work ${item.index + 1}: ${missing}`;
+                    }).join('\n');
+                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
+                    return;
+                  }
                   const success = await savePortfolioOutputs(editingSection4Links, editingOutputChannels);
                   if (success) {
                     setSection4Links([...editingSection4Links]);
@@ -1413,6 +1426,18 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingDetails}
                 onClick={async () => {
+                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
+                  const incomplete = editingSection5Links
+                    .map((link, i) => ({ link, channel: editingDetailChannels[i], index: i }))
+                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
+                  if (incomplete.length > 0) {
+                    const names = incomplete.map(item => {
+                      const missing = item.link ? '채널' : '링크';
+                      return `Detail ${item.index + 1}: ${missing}`;
+                    }).join('\n');
+                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
+                    return;
+                  }
                   const success = await savePortfolioDetails(editingSection5Links, editingDetailChannels);
                   if (success) {
                     setSection5Links([...editingSection5Links]);

@@ -876,6 +876,7 @@ const Cluster4Content = () => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'crew_normal': '일반',
     'crew_advanced_agent': '심화(에이전트)',
@@ -1099,6 +1100,7 @@ const Cluster4Content = () => {
 
       // 역할 라벨 매핑 (함수 내부용)
       const roleLabelMap: { [key: string]: string } = {
+        'crew': '일반',
         'crew_regular': '일반',
         'crew_normal': '일반',
         'crew_advanced_agent': '심화(에이전트)',

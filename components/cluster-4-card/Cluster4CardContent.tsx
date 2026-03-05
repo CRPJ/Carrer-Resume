@@ -17,6 +17,8 @@ interface DBWeekData {
   weekNumber: number;
   seasonYear: number;
   seasonName: string;
+  isBreakSeason: boolean;
+  toSeasonName: string | null;
   startDate: string;
   endDate: string;
   isClubBreak: boolean;
@@ -101,17 +103,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // DB에서 가져온 주차 데이터 상태
-  const [weekData, setWeekData] = useState<DBWeekData | null>({
-    id: 'dummy-1',
-    weekNumber: 3,
-    seasonYear: 2025,
-    seasonName: '여름',
-    startDate: '2025-03-23',
-    endDate: '2025-03-30',
-    isClubBreak: false,
-    holidayName: null,
-    growthStatus: '성공',
-  });
+  const [weekData, setWeekData] = useState<DBWeekData | null>(null);
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
@@ -333,6 +325,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'part_leader': '심화(파트장)',
     'crew_partleader': '심화(파트장)',
@@ -522,7 +515,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const seasonData = currentWeek.seasons as any;
         const rawSeasonName = seasonData?.name || '';
-        const seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
+        const isBreakSeason = rawSeasonName.toLowerCase().includes('break');
+        let seasonName = seasonNameMap[rawSeasonName] || rawSeasonName;
+        let toSeasonName: string | null = null;
+
+        if (isBreakSeason) {
+          const parts = rawSeasonName.replace('_break', '').split('_');
+          if (parts.length >= 2) {
+            toSeasonName = seasonNameMap[parts[1]] || parts[1];
+          }
+          seasonName = '시즌 전환';
+        }
 
         // 프로필 정보 처리
         const profileResult = await profileResponse.json();
@@ -587,7 +590,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         if (isCurrentWeekOnboarding) {
           growthStatus = '성공';
         } else if (weeklyGrowth) {
-          if (weeklyGrowth.is_club_break) {
+          if (weeklyGrowth.is_club_break || isBreakSeason) {
             growthStatus = '휴식(공식)';
           } else if (weeklyGrowth.is_resting) {
             growthStatus = '휴식(개인)';
@@ -597,7 +600,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             growthStatus = '실패';
           }
         } else {
-          if (currentWeek.is_club_break) {
+          if (currentWeek.is_club_break || isBreakSeason) {
             growthStatus = '휴식(공식)';
           } else if (apiRestWeekIds.includes(currentWeek.id)) {
             growthStatus = '휴식(개인)';
@@ -611,6 +614,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           weekNumber: currentWeek.week_number,
           seasonYear: seasonData?.year || 0,
           seasonName,
+          isBreakSeason,
+          toSeasonName,
           startDate: currentWeek.start_date,
           endDate: currentWeek.end_date,
           isClubBreak: currentWeek.is_club_break || false,
@@ -1359,7 +1364,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
   const currentImage = "/images/0/cluster4/4-1-card/image.png";
   const currentTitle = weekData
-    ? `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
+    ? weekData.isBreakSeason
+      ? `${weekData.seasonYear}년, ${weekData.toSeasonName} 시즌, 전환 주차`
+      : `${weekData.seasonYear}년, ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
 
   // 날짜 포맷팅 함수 (2025 - 01 - 06 (월) 형식)
@@ -2257,15 +2264,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="header-info-row2">
               <div className="info-group left">
                 <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{
-                  teamName === '운영진' && generation
-                    ? `운영진(${generation}기)`
-                    : (teamName || '-')
+                  isOnboardingWeek
+                    ? '클럽 온보딩'
+                    : teamName === '운영진' && generation
+                      ? `운영진(${generation}기)`
+                      : (teamName || '-')
                 }</span></span>
                 <span className="info-divider">|</span>
                 <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
-                  teamName === '운영진' && partName === '팀장' && managedTeamName
-                    ? `팀장(${managedTeamName})`
-                    : (partName || '-')
+                  isOnboardingWeek
+                    ? '신입OT'
+                    : teamName === '운영진' && partName === '팀장' && managedTeamName
+                      ? `팀장(${managedTeamName})`
+                      : (partName || '-')
                 }</span></span>
               </div>
               <div className="info-group right">
@@ -2279,7 +2290,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">{weekPoints.shield}</strong>
+                  <strong className="number-value">{weekPoints.shield - weekPoints.lightning}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>
@@ -2417,11 +2428,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
             <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
+              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
             </div>
           </div>
           <div className="growth-center">
-            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.round(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}</span><span className="percent">%</span></span>
+            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}</span><span className="percent">%</span></span>
           </div>
           <div className="growth-right">
             <span className="growth-label">라인별 강화 결과</span>
@@ -2462,7 +2473,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.round((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-info-cards">
@@ -2548,7 +2559,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.round((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           {(() => {
@@ -2662,7 +2673,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.round((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-exp-cards">
@@ -2774,7 +2785,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.round((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
             </div>
           </div>
           <div className="work-career-cards">

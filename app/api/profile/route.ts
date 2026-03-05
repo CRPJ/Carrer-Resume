@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
         supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
         supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
-        supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+        supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
         getCachedParts(),
       ]);
@@ -278,7 +278,7 @@ export async function GET(request: NextRequest) {
       // 모든 시즌 (성장 가능 시즌 계산용)
       supabaseAdmin.from("seasons").select("id, name, year, start_date, end_date").order("start_date", { ascending: true }),
 
-      // 해당 유저의 성공 주차 (주차별) - user_weekly_growth 사용
+      // 해당 유저의 성공 주차 (주차별) - user_weekly_growth 사용 (pms1.5와 동일)
       supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
 
       // 해당 유저의 역할 이력
@@ -300,7 +300,7 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id),
 
       // 해당 유저의 팀/파트 이력 (시즌 상태 표시용)
-      supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at").eq("user_id", profile.id),
+      supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
 
       // 팀 목록 - 캐시 사용
       getCachedTeams(),
@@ -392,11 +392,11 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const activityByWeek = new Map(userActivities.map((a: any) => [a.week_id, a]));
 
-    // 시즌 휴식 상태인 시즌의 ID들 추출 (progress_status='full_rest', 완료된 시즌만 - 현재 진행 중인 시즌 제외)
+    // 시즌 휴식 상태인 시즌의 ID들 추출 (progress_status='full_rest', 현재 진행 중인 시즌 포함 - pms1.5와 동일)
     const restingSeasonIds = new Set<string>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (seasonHistories || []).forEach((sh: any) => {
-      if (sh.progress_status === 'full_rest' && sh.seasons?.id && sh.seasons?.end_date < today) {
+      if (sh.progress_status === 'full_rest' && sh.seasons?.id) {
         restingSeasonIds.add(sh.seasons.id);
       }
     });
@@ -424,6 +424,12 @@ export async function GET(request: NextRequest) {
       return true;
     });
 
+    // break 시즌 ID 목록 (전환 시즌) - 주차별 통계 계산 전에 미리 생성
+    const breakSeasonIds = new Set(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      allSeasons.filter((s: any) => s.name?.toLowerCase().includes('break')).map((s: any) => s.id)
+    );
+
     // 주차별 통계 계산
     let approvedWeeksCount = 0;      // a: 활동 인정 주차
     let unapprovedWeeksCount = 0;    // b: 활동 미인정 주차
@@ -440,7 +446,8 @@ export async function GET(request: NextRequest) {
       const hasActivity = activityByWeek.has(week.id);
       // 개인 휴식만 카운트 (시즌 휴식은 위에서 제외됨)
       const hasPersonalRest = userRestWeekIds.has(week.id);
-      const isClubBreak = week.is_club_break;
+      // break 시즌 소속 주차도 공식 휴식으로 처리 (is_club_break가 false여도)
+      const isClubBreak = week.is_club_break || breakSeasonIds.has(week.season_id);
       const isOnboardingWeek = week.id === profile.onboarding_week_id;
 
       // 온보딩 주차는 무조건 성공 처리
@@ -480,11 +487,7 @@ export async function GET(request: NextRequest) {
     // e: 활동 가능 주차 = a + b + c
     const availableWeeksCount = approvedWeeksCount + unapprovedWeeksCount + restWeeksCount;
 
-    // break 시즌 ID 목록 (전환 시즌)
-    const breakSeasonIds = new Set(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      allSeasons.filter((s: any) => s.name?.toLowerCase().includes('break')).map((s: any) => s.id)
-    );
+    // break 시즌 ID 목록 (전환 시즌) - 위에서 이미 생성됨
 
     // 성장 가능 시즌 수 계산 (가입 이후 클럽 정상 운영 시즌, break 시즌 제외)
     let availableSeasonsCount = 0;
@@ -614,12 +617,12 @@ export async function GET(request: NextRequest) {
       console.log('[Profile API] completionRate 계산 스킵 - 조건 불충족 (null 반환)');
     }
 
-    // 시즌 이름에서 순서 매핑 (spring=1, summer=2, fall=3, winter=4)
+    // 시즌 이름에서 순서 매핑 (겨울 시작: winter=1, spring=2, summer=3, fall=4)
     const seasonOrderMap: { [key: string]: number } = {
-      'spring': 1,
-      'summer': 2,
-      'fall': 3,
-      'winter': 4
+      'winter': 1,
+      'spring': 2,
+      'summer': 3,
+      'fall': 4
     };
 
     // seasons 데이터가 있는 항목만 필터링 후 정렬 (년도 내림차순, 시즌 순서 내림차순)
@@ -754,6 +757,55 @@ export async function GET(request: NextRequest) {
 
         finalSeasonHistories = newSeasonHistories || [];
         console.log('[Profile API] Auto-generated season histories:', finalSeasonHistories.length);
+      }
+    }
+
+    // 기존 유저: 현재 진행 중인 시즌의 레코드가 없으면 자동 생성
+    if (finalSeasonHistories.length > 0 && supabaseAdmin) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const existingSeasonIds = new Set(finalSeasonHistories.map((sh: any) => sh.seasons?.id).filter(Boolean));
+      // 오늘 날짜 기준 진행 중인 시즌 (break 시즌 제외)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const currentSeasons = allSeasons.filter((s: any) =>
+        s.start_date <= today && s.end_date >= today && !s.name?.toLowerCase().includes('break')
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const missingSeasons = currentSeasons.filter((s: any) => !existingSeasonIds.has(s.id));
+
+      if (missingSeasons.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const insertPromises = missingSeasons.map(async (season: any) => {
+          const { data: seasonWeeks } = await supabaseAdmin
+            .from('weeks')
+            .select('id')
+            .eq('season_id', season.id);
+
+          await supabaseAdmin
+            .from('user_season_histories')
+            .insert({
+              user_id: profile.id,
+              season_id: season.id,
+              role_in_season: profile.role || 'crew_regular',
+              approved_weeks: 0,
+              total_weeks: seasonWeeks?.length || 16,
+              progress_status: 'in_progress',
+              review_status: 'reviewing'
+            });
+        });
+
+        await Promise.all(insertPromises);
+
+        // 다시 조회
+        const { data: refreshed } = await supabaseAdmin
+          .from('user_season_histories')
+          .select(`
+            id, role_in_season, approved_weeks, total_weeks, progress_status,
+            review_status, is_qualified, rating, review, review_link,
+            seasons (id, year, name, start_date, end_date)
+          `)
+          .eq('user_id', profile.id);
+
+        finalSeasonHistories = refreshed || finalSeasonHistories;
       }
     }
 
