@@ -533,12 +533,13 @@
         display: flex;
         flex-direction: column;
         gap: 5.5px;
+        margin-top: 3px;
 
         .detail-row {
           display: flex;
           gap: 10px;
-          font-size: 0.9375rem;
-          line-height: 22px;
+          font-size: 0.875rem;
+          line-height: 20px;
           color: #FFFFFF;
           align-items: center;
 
