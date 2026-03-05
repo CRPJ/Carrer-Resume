@@ -1774,18 +1774,16 @@ const Cluster2Content = () => {
         ref={introRef}
         onMouseMove={handleIntroMouseMove}
       >
-        {/* Floating Icons - search-icon만 표시 */}
-        {session && isOwner && (
-          <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
-            </div>
+        {/* Floating Icons - search-icon은 항상 표시 */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
-        )}
+        </div>
         {/* 물결 파동 효과 */}
         {ripples.map(ripple => (
           <div
