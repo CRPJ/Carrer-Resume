@@ -93,7 +93,7 @@
   position: relative;
   box-sizing: border-box !important;
 
-  // 상단 프로필 영역 배경색
+  // 상단 프로필 영역 배경 (도시 야경 이미지 + 그라데이션 오버레이)
   &::before {
     content: '';
     position: absolute;
@@ -101,7 +101,9 @@
     left: 0;
     right: 0;
     height: 35px;
-    background: rgba(250, 171, 7, 1);
+    background:
+      linear-gradient(to right, rgba(0, 0, 0, 0.45), rgba(250, 171, 7, 0.75)),
+      url('/images/0/cluster 1/identity-tab-bg.png') center 42% / cover no-repeat;
     z-index: 1;
   }
 
