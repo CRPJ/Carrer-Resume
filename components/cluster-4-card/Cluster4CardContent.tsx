@@ -1055,24 +1055,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
 
   // 연계 동료 선택 상태 (1st, 2nd, 3rd 각각 별도 저장)
-  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([
-    {
-      id: 1, name: '김미현', gender: '여', age: 24,
-      profileImg: '/images/0/cluster4/4-1-card/avatar-small-04.jpg',
-      university: '서울대학교', major: '미디어커뮤니케이션',
-      team: '엔터테인먼트', part: '내돈내산',
-      nickname: '엔비디아구글테슬라쿵', rank: 1, message: '',
-      createdAt: '2025-12-22',
-    },
-    {
-      id: 2, name: '김미현', gender: '여', age: 24,
-      profileImg: '/images/0/cluster4/4-1-card/avatar-small-05.jpg',
-      university: '서울대학교', major: '미디어커뮤니케이션',
-      team: '엔터테인먼트', part: '내돈내산',
-      nickname: '엔비디아구글테슬라쿵', rank: 2, message: '',
-      createdAt: '2025-12-22',
-    },
-  ]);
+  const [selectedColleagues, setSelectedColleagues] = useState<SelectedColleague[]>([]);
 
   // 크루 검색어 상태
   const [crewSearchQuery, setCrewSearchQuery] = useState("");
@@ -1099,44 +1082,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
 
   // 주차 평판 데이터 (API에서 가져옴)
-  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([
-    {
-      id: 'dummy-1',
-      rating: 6,
-      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
-      keyword: '추진력추진력력',
-      reviewer: {
-        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션',
-        teamName: '엔터테인먼트', partName: '내돈내산',
-        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-01.jpg',
-      },
-    },
-    {
-      id: 'dummy-2',
-      rating: 6,
-      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
-      keyword: '추진력추진력력',
-      reviewer: {
-        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션',
-        teamName: '엔터테인먼트', partName: '내돈내산',
-        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-02.jpg',
-      },
-    },
-    {
-      id: 'dummy-3',
-      rating: 6,
-      content: '20자까지 쓴 내용을 확인할 수 있습니다~..',
-      keyword: '추진력추진력력',
-      reviewer: {
-        display_name: '김미현', gender: '여', birth_date: '2001-01-01',
-        university: '서울대학교', major_first: '미디어커뮤니케이션',
-        teamName: '엔터테인먼트', partName: '내돈내산',
-        vision: '엔비디아구글테슬라쿵', profile_photo_url: '/images/0/cluster4/4-1-card/avatar-small-03.jpg',
-      },
-    },
-  ]);
+  const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
 
   // 크루 목록 (API에서 가져옴)
   const [allCrewList, setAllCrewList] = useState<any[]>([]);
@@ -1914,7 +1860,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const updatedDetails = [...prev];
       activityTypes.forEach(activityType => {
         const detail = editingDetails[activityType];
-        const validLinks = detail?.outputLinks.filter(link => link.url.trim() !== '') || [];
+        // 운영진 링크 제외, 사용자 링크만 로컬 상태에 저장 (DB 저장과 동일하게)
+        const adminCount = getAdminOutputLinksCount(activityType);
+        const validLinks = detail?.outputLinks.slice(adminCount).filter(link => link.url.trim() !== '') || [];
         const newDetail = {
           week_id: weekId,
           activity_type_id: activityType,
@@ -2202,7 +2150,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); })} style={{ cursor: 'pointer' }}>
+            <div className="edit-icon" onClick={() => {
+              if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
+              handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
+            }} style={{ cursor: 'pointer' }}>
               <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
             </div>
             <div className="edit-icon search-icon">
@@ -2214,10 +2165,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
         )}
-        {/* 타인 카드일 때 - 주차 평판 남기기 버튼 */}
-        {session && !isOwner && (
+        {/* 주차 평판 남기기 버튼 */}
+        {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={() => handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); })} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
+            <div className="edit-icon" onClick={() => {
+              if (isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
+              handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); });
+            }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
             </div>
           </div>
@@ -2375,7 +2329,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
-                const isEmpty = user.isEmpty || isRestMode;
+                const isEmpty = user.isEmpty;
                 return (
                 <div
                   key={user.id}
@@ -2616,7 +2570,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     )}
                   </div>
                   <p className="main-desc">{(isRestMode || !hasActivity) ? '-' : (displayActivity?.title || '-')}</p>
-                  <div className="sub-title-row">
+                  <div className="sub-title-rcow">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
