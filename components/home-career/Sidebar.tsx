@@ -1380,10 +1380,10 @@ const Sidebar = () => {
               onClick={isOwner ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
-                top: "10px",
+                top: "6px",
                 right: "18px",
-                width: "24px",
-                height: "24px",
+                width: "22px",
+                height: "22px",
                 borderRadius: "50%",
                 backgroundColor: "#fff",
                 border: "none",
@@ -1397,7 +1397,7 @@ const Sidebar = () => {
                 opacity: isOwner ? 1 : 0.4,
               }}
             >
-              <i className="ti ti-pencil" style={{ fontSize: "12px", color: "#000" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#000" }}></i>
             </button>
           )}
           {/* Header Section */}
@@ -1526,7 +1526,7 @@ const Sidebar = () => {
                           width={13}
                           height={13}
                           className="detail-icon"
-                          style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px" }}
+                          style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px 0 45px" }}
                         />{" "}
                         <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}
                       </span>
