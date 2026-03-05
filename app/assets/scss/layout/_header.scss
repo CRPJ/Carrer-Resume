@@ -244,7 +244,8 @@
       background-color: var(--quaternary-color);
       color: var(--secondary-color);
       font-weight: 700;
-      padding: 13px 20px 11px;
+      padding: 8px 16px 7px;
+      font-size: 13px;
       &::before {
         border-bottom-color: var(--primary-color);
       }
@@ -304,8 +305,8 @@
   }
 
   .icon-drop {
-    @include box(46px);
-    font-size: 24px;
+    @include box(36px);
+    font-size: 20px;
     border: 1px solid var(--tertiary-color);
     color: var(--tertiary-color);
     position: relative;
@@ -316,10 +317,10 @@
     &::before {
       content: "";
       position: absolute;
-      top: 0px;
-      right: 0px;
-      width: 12px;
-      height: 12px;
+      top: -1px;
+      right: -1px;
+      width: 10px;
+      height: 10px;
       background-color: var(--quaternary-color);
       border-radius: 50%;
     }
@@ -374,14 +375,14 @@
     }
     span {
       position: absolute;
-      top: -8px;
-      right: -8px;
-      @include box(26px);
+      top: -6px;
+      right: -6px;
+      @include box(20px);
       background-color: var(--quaternary-color);
       color: var(--secondary-color);
-      font-size: 14px;
+      font-size: 11px;
       font-weight: 700;
-      padding-top: 4px;
+      padding-top: 3px;
     }
   }
 
@@ -585,10 +586,10 @@
     margin-right: -4px;
 
     .hexagon-wrapper {
-      @include box(64px);
+      @include box(48px);
       display: inline-block !important;
       position: relative;
-      padding: 3px 1px;
+      padding: 2px 1px;
 
       img {
         width: 100%;
@@ -622,8 +623,8 @@
     }
 
     .profile-dropdown-btn {
-      font-size: 24px;
-      margin-top: 2px;
+      font-size: 18px;
+      margin-top: 1px;
       i {
         font-weight: 600;
         margin-top: 0px !important;

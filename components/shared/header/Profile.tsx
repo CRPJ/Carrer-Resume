@@ -30,9 +30,9 @@ const Profile = () => {
           </span>
           <span style={{
             fontFamily: "'Khula', sans-serif",
-            fontSize: '20px',
+            fontSize: '15px',
             fontWeight: 600,
-            lineHeight: '30px',
+            lineHeight: '22px',
             color: '#FFF'
           }}>{userName}</span>
           <span className="profile-dropdown-btn rotate">
