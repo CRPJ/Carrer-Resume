@@ -3562,16 +3562,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                         </div>
                         <div className="colleague-message-section">
-                          <label>Thank you message <span className="char-limit">(최대 50자)</span></label>
+                          <label>Thank you message <span className="char-limit">(최대 100자)</span></label>
                           <div className="message-input-wrapper">
                             <textarea
                               placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={50}
+                              maxLength={100}
                               rows={1}
                               value={colleague.message}
                               onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}
                             ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 50</span>
+                            <span className="char-counter">{colleague.message.length} / 100</span>
                           </div>
                         </div>
                       </div>
