@@ -872,7 +872,7 @@
 
   // Activities
   .resume-activities {
-    border-top: 1px solid #313131;
+    border-top: 1px solid #555555;
     width: 487px;
     // 내부 스크롤을 없애면, 카드(부모)의 고정 레이아웃 특성상 아래 내용이
     // "날아간 것처럼" 보일 수 있음(실제로는 클리핑).
@@ -945,6 +945,7 @@
             flex-shrink: 0;
             white-space: nowrap;
             text-align: center;
+            padding-left: 8px;
           }
 
           .activity-period {
@@ -1116,7 +1117,7 @@
     align-items: flex-end;
     position: relative;
     z-index: 3;
-    gap: 16px;
+    gap: 10px;
 
     .notice-box {
       display: flex;
