@@ -325,7 +325,7 @@ const Sidebar = () => {
       const mobile = window.outerWidth < 1200;
       setIsMobileView(mobile);
 
-      const BASE_CARD_HEIGHT = 1001;
+      const BASE_CARD_HEIGHT = 810; // 높이 기준값 완화 → 카드가 헤더 SHOP 위치까지 확장
       const BASE_SIDEBAR_WIDTH = 497;
 
       // 모바일: CSS 반응형 그대로 사용
@@ -358,8 +358,8 @@ const Sidebar = () => {
       const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
       const scaleByWidth = maxSidebarByWidth / BASE_SIDEBAR_WIDTH;
 
-      // 높이·폭 중 더 제한적인 쪽 적용, 최대 1(확대 금지), 최소 0.55
-      let scale = Math.min(1, scaleByHeight, scaleByWidth);
+      // 높이·폭 중 더 제한적인 쪽 적용, 최대 1.25(SHOP 위치까지 확대 허용), 최소 0.55
+      let scale = Math.min(1.25, scaleByHeight, scaleByWidth);
       scale = Math.max(0.55, scale);
 
       setCardScale(scale);
@@ -1361,7 +1361,7 @@ const Sidebar = () => {
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
           width: isMobileView ? "100%" : `${Math.round(497 * cardScale)}px`,
-          height: isMobileView ? "auto" : `${Math.round(1001 * cardScale)}px`,
+          height: isMobileView ? "auto" : `${Math.round(875 * cardScale)}px`,
           overflow: "visible",
           display: isMobileView ? "block" : "flex",
           justifyContent: isMobileView ? undefined : "center",
@@ -1380,10 +1380,10 @@ const Sidebar = () => {
               onClick={isOwner ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
-                top: "15px",
-                right: "20px",
-                width: "28px",
-                height: "28px",
+                top: "10px",
+                right: "18px",
+                width: "24px",
+                height: "24px",
                 borderRadius: "50%",
                 backgroundColor: "#fff",
                 border: "none",
@@ -1397,7 +1397,7 @@ const Sidebar = () => {
                 opacity: isOwner ? 1 : 0.4,
               }}
             >
-              <i className="ti ti-pencil" style={{ fontSize: "14px", color: "#000" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "12px", color: "#000" }}></i>
             </button>
           )}
           {/* Header Section */}
