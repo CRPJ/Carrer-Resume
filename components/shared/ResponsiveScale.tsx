@@ -31,19 +31,12 @@ const ResponsiveScale = () => {
       }
     };
 
-    // 마운트 시점의 물리적 화면 폭을 캐시 (DevTools 에뮬레이션이 덮어쓰기 전)
-    // DevTools는 screen.availWidth까지 에뮬레이션 값으로 바꿀 수 있으므로
-    // 마운트 시점에 고정해두고 상한선으로 사용
     const mountScreenWidth = window.screen.availWidth;
 
     const getReliableWidth = () => {
-      // outerWidth와 마운트 시점 화면 폭 중 작은 값 사용
-      // → DevTools가 outerWidth를 부풀려도 물리적 화면을 초과하지 않음
-      // → 사용자가 창을 줄이면 outerWidth가 작아지므로 정상 반영
       return Math.min(window.outerWidth, mountScreenWidth);
     };
 
-    // 100% 줌 시점의 레이아웃 폭 (브라우저 확대 감지용)
     let naturalBodyWidth = 0;
 
     const applyScale = () => {
@@ -59,25 +52,26 @@ const ResponsiveScale = () => {
         return;
       }
 
-      const scale = Math.min(w / BASE_WIDTH, MAX_ZOOM);
+      const baseScale = Math.min(w / BASE_WIDTH, MAX_ZOOM);
+      const browserZoom = w / window.innerWidth;
+
+      // ★ 150% 초과 확대 차단: CSS zoom을 줄여서 브라우저 확대를 상쇄
+      const MAX_BROWSER_ZOOM = 1.5;
+      let scale = baseScale;
+      if (browserZoom > MAX_BROWSER_ZOOM) {
+        scale = (baseScale * MAX_BROWSER_ZOOM) / browserZoom;
+      }
 
       document.documentElement.style.zoom = String(scale);
       document.documentElement.style.setProperty('--app-zoom', String(scale));
 
-      // ★ 브라우저 확대(Ctrl+) 감지:
-      // outerWidth는 브라우저 확대와 무관하게 고정, innerWidth는 확대 시 줄어듦
-      // → 비율이 1.0 이상이면 확대 중
-      // ★ 브라우저 확대(Ctrl+) 감지:
-      // outerWidth는 확대와 무관, innerWidth는 확대 시 줄어듦
-      const zoomRatio = w / window.innerWidth;
-
-      if (zoomRatio < 1.05) {
-        // 100% 줌 → 폭 캡처, overflow 숨김 (기존 동작 유지)
-        naturalBodyWidth = Math.round(window.innerWidth / scale);
+      if (browserZoom < 1.05) {
+        // 100% 줌 → 정상 상태
+        naturalBodyWidth = Math.round(window.innerWidth / baseScale);
         document.body.style.minWidth = '';
         document.documentElement.style.overflowX = 'hidden';
       } else {
-        // 확대 중 → 폭 고정 + overflow auto → 스크롤바 표시
+        // 확대 중 (최대 150%까지) → 레이아웃 고정 + 스크롤바
         if (naturalBodyWidth > 0) {
           document.body.style.minWidth = `${naturalBodyWidth}px`;
         }
@@ -85,7 +79,6 @@ const ResponsiveScale = () => {
       }
 
       updateDesktopClasses(w);
-
       requestAnimationFrame(() => updateHeaderDividerY());
     };
 
@@ -93,15 +86,12 @@ const ResponsiveScale = () => {
     window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 
-    // DevTools 닫기 시 resize 이벤트 누락 대응: 주기적 zoom 보정
     const pollInterval = window.setInterval(applyScale, 500);
 
-    // DPR(devicePixelRatio) 변경 감지 — DevTools 에뮬레이션 시작/종료 시 발생
     const dprMedia = window.matchMedia(
       `(resolution: ${window.devicePixelRatio}dppx)`
     );
     const onDPRChange = () => {
-      // DPR 변경 후 브라우저가 안정화될 시간을 주고 재계산
       setTimeout(applyScale, 150);
     };
     dprMedia.addEventListener('change', onDPRChange);
@@ -114,6 +104,7 @@ const ResponsiveScale = () => {
       document.documentElement.style.zoom = '';
       document.documentElement.style.removeProperty('--app-zoom');
       document.documentElement.style.removeProperty('--header-divider-y');
+      document.documentElement.style.overflowX = '';
       document.body.style.minWidth = '';
       document.documentElement.classList.remove('tight-desktop');
       document.documentElement.classList.remove('mid-desktop');

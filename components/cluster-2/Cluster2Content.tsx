@@ -1409,6 +1409,11 @@ const Cluster2Content = () => {
             data-card-id="quote-1"
             style={{ transitionDelay: '0ms' }}
           >
+            <div className="dotted-navigation">
+              <span className="dot active" />
+              <span className="dot" />
+              <span className="dot" />
+            </div>
             <img className="diamond-icon" src="/images/0/cluster 2/icon/diamond.png" alt="" />
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
@@ -1480,6 +1485,11 @@ const Cluster2Content = () => {
             data-card-id="quote-2"
             style={{ transitionDelay: '150ms' }}
           >
+            <div className="dotted-navigation">
+              <span className="dot" />
+              <span className="dot active" />
+              <span className="dot" />
+            </div>
             <img className="diamond-icon" src="/images/0/cluster 2/icon/diamond.png" alt="" />
             <span className="quote-mark">&quot;</span>
             <div className="quote-body">
