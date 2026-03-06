@@ -10,7 +10,15 @@ import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 
+const IDENTITY_TAB_IMAGES = [
+  { src: "/images/0/cluster 1/identity-tab-bg-1.png", overlay: 0.45 },
+  { src: "/images/0/cluster 1/identity-tab-bg-2.png", overlay: 0.45 },
+  { src: "/images/0/cluster 1/identity-tab-bg-3.png", overlay: 0.65 },
+  { src: "/images/0/cluster 1/identity-tab-bg-4.png", overlay: 0.45 },
+];
+
 const Sidebar = () => {
+  const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -1371,8 +1379,10 @@ const Sidebar = () => {
           className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
           style={{
             position: "relative",
+            "--identity-tab-bg": `url('${tabBg.src}')`,
+            "--identity-tab-overlay": String(tabBg.overlay),
             ...(isMobileView ? {} : { transform: `scale(${cardScale})`, transformOrigin: "top center" }),
-          }}
+          } as React.CSSProperties}
         >
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
           {(
