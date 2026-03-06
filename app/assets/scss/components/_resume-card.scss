@@ -794,6 +794,7 @@
         width: 29px;
         height: 30px;
         flex-shrink: 0;
+        margin-left: -6px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -820,7 +821,7 @@
         font-weight: 400;
         color: #ffec8f;
         flex: none;
-        margin-left: 0;
+        margin-left: 8px;
         text-align: left;
 
         &.red {
