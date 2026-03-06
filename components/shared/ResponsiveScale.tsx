@@ -31,10 +31,20 @@ const ResponsiveScale = () => {
       }
     };
 
+    // 마운트 시점의 물리적 화면 폭을 캐시 (DevTools 에뮬레이션이 덮어쓰기 전)
+    // DevTools는 screen.availWidth까지 에뮬레이션 값으로 바꿀 수 있으므로
+    // 마운트 시점에 고정해두고 상한선으로 사용
+    const mountScreenWidth = window.screen.availWidth;
+
+    const getReliableWidth = () => {
+      // outerWidth와 마운트 시점 화면 폭 중 작은 값 사용
+      // → DevTools가 outerWidth를 부풀려도 물리적 화면을 초과하지 않음
+      // → 사용자가 창을 줄이면 outerWidth가 작아지므로 정상 반영
+      return Math.min(window.outerWidth, mountScreenWidth);
+    };
+
     const applyScale = () => {
-      // outerWidth: 실제 창 크기만 반영, 브라우저 줌(Ctrl+/-)에 불변
-      // → CSS zoom이 항상 안정적이고, 브라우저 줌 UX를 방해하지 않음
-      const w = window.outerWidth;
+      const w = getReliableWidth();
 
       if (w < MOBILE_BREAKPOINT) {
         document.documentElement.style.zoom = '1';
@@ -58,8 +68,6 @@ const ResponsiveScale = () => {
       document.documentElement.style.overflowX = 'hidden';
       document.body.style.overflowX = 'hidden';
 
-      // ★ 고줌 감지: 실제 데스크탑이지만 브라우저 줌으로 뷰포트가 좁아진 경우
-      // CSS 클래스만 토글 → React 상태 변경 없이 CSS로 세로 배치
       const isHighZoom = w >= MOBILE_BREAKPOINT && window.innerWidth < MOBILE_BREAKPOINT;
       document.documentElement.classList.toggle('high-zoom', isHighZoom);
     };
@@ -68,13 +76,24 @@ const ResponsiveScale = () => {
     window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 
-    // DevTools 열기/닫기 시 resize 이벤트 누락 대응: 주기적 zoom 보정
+    // DevTools 닫기 시 resize 이벤트 누락 대응: 주기적 zoom 보정
     const pollInterval = window.setInterval(applyScale, 500);
+
+    // DPR(devicePixelRatio) 변경 감지 — DevTools 에뮬레이션 시작/종료 시 발생
+    const dprMedia = window.matchMedia(
+      `(resolution: ${window.devicePixelRatio}dppx)`
+    );
+    const onDPRChange = () => {
+      // DPR 변경 후 브라우저가 안정화될 시간을 주고 재계산
+      setTimeout(applyScale, 150);
+    };
+    dprMedia.addEventListener('change', onDPRChange);
 
     return () => {
       clearInterval(pollInterval);
       window.removeEventListener('load', applyScale);
       window.removeEventListener('resize', applyScale);
+      dprMedia.removeEventListener('change', onDPRChange);
       document.documentElement.style.zoom = '';
       document.documentElement.style.removeProperty('--app-zoom');
       document.documentElement.style.removeProperty('--header-divider-y');

@@ -888,11 +888,10 @@
 
         // 'Per Aspera Ad Astra' 아래 추가 문구
         .quote-subtext {
-          // 피그마 시안처럼 메인 인용문과 동일한 폰트/톤으로 처리
           font-family: 'HakgyoansimTuho', sans-serif;
-          font-size: 1.625rem;
+          font-size: 28px;
           color: #FFF;
-          line-height: 1.4;
+          line-height: 39.2px;
           font-weight: 400;
           margin: 0 0 10px 0;
           word-break: keep-all;
@@ -937,16 +936,19 @@
             gap: 0px;
 
             .author-name {
-              font-family: 'Pretendard', sans-serif;
-              font-size: 0.9375rem;
+              font-family: 'DM Sans', sans-serif;
+              font-size: 18px;
               color: #fff;
               font-weight: 500;
+              line-height: 26.1px;
             }
 
             .author-role {
-              font-family: 'Pretendard', sans-serif;
-              font-size: 0.75rem;
-              color: #888;
+              font-family: 'DM Sans', sans-serif;
+              font-size: 14px;
+              font-weight: 400;
+              color: #999;
+              line-height: 22.4px;
             }
           }
         }
@@ -958,16 +960,24 @@
           gap: 0px;
 
           .score-label {
-            font-family: 'Pretendard', sans-serif;
-            font-size: 0.6875rem;
-            color: #888;
-            letter-spacing: 1px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.36px;
           }
 
           .score-row {
             display: flex;
             align-items: center;
             gap: 5px;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.36px;
           }
 
           .score-stars {
@@ -1445,6 +1455,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: 40% center;
         opacity: 0.3;
       }
 
@@ -2043,6 +2054,8 @@
       font-size: 3.75rem;
       font-weight: 800;
       color: #FFF;
+      text-transform: uppercase;
+      line-height: 82px;
       text-align: center;
       letter-spacing: 0;
       margin: 0;
@@ -2178,15 +2191,17 @@
 
             span {
               font-family: 'Pretendard', sans-serif;
-              font-size: 0.875rem;
+              font-size: 16px;
+              font-weight: 400;
               color: #fff;
-              margin-left: 10px; // 오른쪽으로 이동
+              margin-left: 10px;
             }
           }
 
           .quote-text {
-            font-family: 'Cafe24Anemone', sans-serif;
-            font-size: 1.5rem;
+            font-family: 'Cafe24Ohsquare', sans-serif;
+            font-size: 24px;
+            font-weight: 400;
             color: #fff;
             line-height: 1.5;
             margin-top: 10px;
@@ -2281,29 +2296,35 @@
 
           .complete-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 1.5rem;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 30px;
             color: #fff;
             margin-bottom: 5px;
           }
 
           h2 {
             font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 2.5rem;
+            font-size: 40px;
+            font-weight: 400;
+            line-height: 30px;
             color: #fff;
             margin: 0 0 15px 0;
             word-break: break-word;
 
             .highlight {
-              color: #FFA500;
+              color: #FAAB07;
             }
           }
 
           .goto-btn {
             background: transparent;
             border: none;
-            color: #888;
+            color: #999;
             font-family: 'Pretendard', sans-serif;
-            font-size: 1.125rem;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 18px;
             cursor: pointer;
             padding: 0;
             transition: color 0.2s ease;
@@ -2392,24 +2413,30 @@
 
           .review-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 0.875rem;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 30px;
             color: #fff;
             margin-bottom: 2.5px;
           }
 
           .review-weeks {
             font-family: var(--black-ops-one), 'Black Ops One', cursive;
-            font-size: 1.25rem;
-            color: #FFA500;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 30px;
+            color: #FAAB07;
             margin-bottom: 5px;
           }
 
           .review-btn {
             background: transparent;
             border: none;
-            color: #888;
+            color: #999;
             font-family: 'Pretendard', sans-serif;
-            font-size: 0.75rem;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 18px;
             cursor: pointer;
             padding: 0;
             transition: color 0.2s ease;
@@ -2645,16 +2672,17 @@
 
           h4 {
             font-family: 'Cafe24Ohsquare', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #FFA500;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 34px;
+            color: #FAAB07;
             margin: 0;
             flex: 1;
           }
 
           .card-arrow {
             background: transparent;
-            border: 2px solid #FFA500;
+            border: 2px solid #FAAB07;
             border-radius: 50%;
             width: 28px;
             height: 28px;
@@ -2669,7 +2697,7 @@
               width: 14px;
               height: 14px;
               fill: none;
-              stroke: #FFA500;
+              stroke: #FAAB07;
               stroke-width: 2;
               stroke-linecap: round;
               stroke-linejoin: round;
@@ -2690,16 +2718,16 @@
               visibility: hidden;
               transition: opacity 0.15s ease, visibility 0.15s ease;
               pointer-events: none;
-              border: 1px solid #FFA500;
+              border: 1px solid #FAAB07;
               z-index: 99999;
               transform: translateX(-50%) translateY(-100%);
               margin-top: -10px;
             }
 
             &:hover {
-              background: #FFA500;
+              background: #FAAB07;
               transform: scale(1.15);
-              box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+              box-shadow: 0 0 12px rgba(250, 171, 7, 0.6);
 
               svg {
                 stroke: #000;
@@ -2715,9 +2743,10 @@
 
         p {
           font-family: 'Pretendard', sans-serif;
-          font-size: 1.125rem;
+          font-size: 18px;
+          font-weight: 400;
           color: #fff;
-          line-height: 1.6;
+          line-height: 30px;
           margin: 0;
           margin-top: 5px;
           display: -webkit-box;
@@ -2731,15 +2760,22 @@
           display: flex;
           align-items: center;
           gap: 6px;
-          font-family: 'Cafe24Anemone', sans-serif;
-          font-size: 1rem;
+          font-family: 'Cafe24Ohsquare', sans-serif;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
           color: #FFF;
           margin-top: 5px;
 
           &::before {
-            content: '▸';
-            font-size: 0.875rem;
-            color: #FFA500;
+            content: '';
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 7px solid #FAAB07;
+            flex-shrink: 0;
           }
         }
       }
@@ -3617,12 +3653,11 @@
 
         .waiting-text {
           font-family: 'Black Ops One', sans-serif;
-          font-size: 1.375rem;
+          font-size: 22px;
           font-weight: 400;
-          background: linear-gradient(135deg, #8061FF 0%, #7321B9 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          color: #8061FF;
+          text-transform: uppercase;
+          line-height: 26px;
           letter-spacing: 0;
         }
       }

@@ -621,11 +621,43 @@ const Cluster2Content = () => {
   // 섹션 3 모달 (학력 편집)
   const [section3ModalOpen, setSection3ModalOpen] = useState(false);
   const [educationData, setEducationData] = useState<EduData[]>(initialEducationData);
-  // 학력 카드 총 페이지 수: 카드 2개까지 1페이지, 이후 카드당 1페이지 추가
-  const eduTotalPages = Math.max(1, educationData.length <= 2 ? 1 : educationData.length - 1);
+  // 학력 카드 페이지네이션: 컨테이너 대비 카드 오버플로 시에만 동적 생성
+  const [eduTotalPages, setEduTotalPages] = useState(1);
+  const [eduSlideWidth, setEduSlideWidth] = useState(350);
+  const eduContainerRef = useRef<HTMLDivElement>(null);
   const [editingEduData, setEditingEduData] = useState<EduData[]>(initialEducationData);
   const [hasEduChanges, setHasEduChanges] = useState(false); // 학력 변경사항 추적
   const [eduSaving, setEduSaving] = useState(false);
+
+  // 학력 페이지네이션: 컨테이너 vs 카드 전체 폭 비교하여 동적 계산
+  useEffect(() => {
+    const calculate = () => {
+      const container = eduContainerRef.current;
+      const wrapper = cardsRef.current;
+      if (!container || !wrapper) return;
+
+      const containerW = container.clientWidth;
+      const totalW = wrapper.scrollWidth;
+
+      if (totalW <= containerW) {
+        setEduTotalPages(1);
+        setCurrentPage(0);
+      } else {
+        // 카드 1장(274px) + gap(20px) + margin(30px) ≈ 324px 단위로 슬라이드
+        const cardStep = 324;
+        const overflow = totalW - containerW;
+        const pages = Math.max(1, Math.ceil(overflow / cardStep) + 1);
+        setEduTotalPages(pages);
+        setEduSlideWidth(cardStep);
+        setCurrentPage((prev) => Math.min(prev, pages - 1));
+      }
+    };
+
+    calculate();
+    const ro = new ResizeObserver(calculate);
+    if (eduContainerRef.current) ro.observe(eduContainerRef.current);
+    return () => ro.disconnect();
+  }, [educationData]);
 
   // 학력 데이터 로드
   const fetchEducations = async () => {
@@ -1517,6 +1549,7 @@ const Cluster2Content = () => {
 
       {/* 학력 섹션 */}
       <div
+        ref={eduContainerRef}
         className={`cluster2-education${currentPage < eduTotalPages - 1 ? ' has-more-right' : ''}${currentPage > 0 ? ' has-more-left' : ''}`}
         style={{ position: 'relative' }}
       >
@@ -1549,7 +1582,7 @@ const Cluster2Content = () => {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           style={{
-            transform: `translateX(calc(-${currentPage * 350}px + ${dragOffset}px))`,
+            transform: `translateX(calc(-${currentPage * eduSlideWidth}px + ${dragOffset}px))`,
             transition: isDragging ? 'none' : 'transform 0.4s ease',
             userSelect: 'none',
             cursor: isDragging ? 'grabbing' : 'grab'
