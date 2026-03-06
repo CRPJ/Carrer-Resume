@@ -43,6 +43,9 @@ const ResponsiveScale = () => {
       return Math.min(window.outerWidth, mountScreenWidth);
     };
 
+    // 100% 줌 시점의 레이아웃 폭 (브라우저 확대 감지용)
+    let naturalBodyWidth = 0;
+
     const applyScale = () => {
       const w = getReliableWidth();
 
@@ -51,9 +54,8 @@ const ResponsiveScale = () => {
         document.documentElement.style.setProperty('--app-zoom', '1');
         document.documentElement.classList.remove('tight-desktop');
         document.documentElement.classList.remove('mid-desktop');
+        document.body.style.minWidth = '';
         requestAnimationFrame(() => updateHeaderDividerY());
-        document.documentElement.style.overflowX = 'hidden';
-        document.body.style.overflowX = 'hidden';
         return;
       }
 
@@ -62,14 +64,29 @@ const ResponsiveScale = () => {
       document.documentElement.style.zoom = String(scale);
       document.documentElement.style.setProperty('--app-zoom', String(scale));
 
+      // ★ 브라우저 확대(Ctrl+) 감지:
+      // outerWidth는 브라우저 확대와 무관하게 고정, innerWidth는 확대 시 줄어듦
+      // → 비율이 1.0 이상이면 확대 중
+      // ★ 브라우저 확대(Ctrl+) 감지:
+      // outerWidth는 확대와 무관, innerWidth는 확대 시 줄어듦
+      const zoomRatio = w / window.innerWidth;
+
+      if (zoomRatio < 1.05) {
+        // 100% 줌 → 폭 캡처, overflow 숨김 (기존 동작 유지)
+        naturalBodyWidth = Math.round(window.innerWidth / scale);
+        document.body.style.minWidth = '';
+        document.documentElement.style.overflowX = 'hidden';
+      } else {
+        // 확대 중 → 폭 고정 + overflow auto → 스크롤바 표시
+        if (naturalBodyWidth > 0) {
+          document.body.style.minWidth = `${naturalBodyWidth}px`;
+        }
+        document.documentElement.style.overflowX = 'auto';
+      }
+
       updateDesktopClasses(w);
 
       requestAnimationFrame(() => updateHeaderDividerY());
-      document.documentElement.style.overflowX = 'hidden';
-      document.body.style.overflowX = 'hidden';
-
-      const isHighZoom = w >= MOBILE_BREAKPOINT && window.innerWidth < MOBILE_BREAKPOINT;
-      document.documentElement.classList.toggle('high-zoom', isHighZoom);
     };
 
     applyScale();
@@ -97,11 +114,9 @@ const ResponsiveScale = () => {
       document.documentElement.style.zoom = '';
       document.documentElement.style.removeProperty('--app-zoom');
       document.documentElement.style.removeProperty('--header-divider-y');
-      document.documentElement.style.overflowX = '';
-      document.body.style.overflowX = '';
+      document.body.style.minWidth = '';
       document.documentElement.classList.remove('tight-desktop');
       document.documentElement.classList.remove('mid-desktop');
-      document.documentElement.classList.remove('high-zoom');
     };
   }, []);
 
