@@ -521,6 +521,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
+    // 온보딩 주차는 강화율 계산에서 제외 (이력으로만 존재)
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
@@ -538,6 +540,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 실무 역량은 매주 분모가 항상 1
     const total = 1;
     // 강화 성공한 competency 타입 활동 개수 (count) - 최대 1
@@ -554,6 +558,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
@@ -618,6 +624,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
 
     // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
     const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);

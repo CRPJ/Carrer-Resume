@@ -788,10 +788,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 값 사용
           const currentCumulativeApproved = currentApprovedCount;
 
-          // 실무 정보: 온보딩 주차면 0, 아니면 해당 주차의 활성화된 활동 수
+          // 실무 정보: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 해당 주차의 활성화된 활동 수
           const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
 
-          // 실무 역량: 온보딩 주차면 0, 아니면 1 (매주 최대 1개 선택 가능)
+          // 실무 역량: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 1 (매주 최대 1개 선택 가능)
           const competencyTotal = isOnboardingWeekLocal ? 0 : 1;
 
           // 실무 경험: eligible 조건 체크 (cluster-4-1과 동일한 로직)
@@ -865,7 +865,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           };
 
           const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
-          // 실무 역량 success: 온보딩 아니고 강화 성공한 활동이 있으면 1 (최대 1)
+          // 실무 역량 success: 온보딩 주차면 0 (강화율 계산에서 제외)
           const competencySuccess = isOnboardingWeekLocal ? 0 : (competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0);
           const experienceSuccess = isOnboardingWeekLocal ? 0 : experienceTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
@@ -1469,7 +1469,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const result = [...apiData];
     while (result.length < 3) {
       result.push({
-        id: Number(`empty-${result.length}`),
+        id: `empty-colleague-${result.length}` as any,
         name: "-",
         gender: "-",
         age: "-",
@@ -1557,19 +1557,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = 'success' | 'waiting' | 'failed' | 'not_applicable';
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
-    // 온보딩 주차(무적 주차)는 모든 강화가 해당 없음
-    if (isOnboardingWeek) {
-      return 'not_applicable';
-    }
-
     // 해당 활동 정보 가져오기
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
 
-    // 1. 해당 없음: 활동이 개설되지 않음
-    if (!activity?.is_active) return 'not_applicable';
-
-    // 2. activity_records에서 해당 activity_type의 이행 여부 확인
+    // activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find(ar => ar.activity_type_id === activityType);
+
+    // 1. 해당 없음: 활동이 개설되지 않음 AND 크루가 참여하지도 않음
+    if (!activity?.is_active && (!record || !record.is_completed)) return 'not_applicable';
 
     if (!record || !record.is_completed) {
       // 레코드 없거나 is_completed = false → 강화 실패
@@ -1589,7 +1584,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     // 4. 2차 정보 미기입 시, 48시간 경과 여부 확인
-    const openedAt = activity.opened_at;
+    const openedAt = activity?.opened_at;
     if (!openedAt) {
       // 개설 시각이 없으면 대기 상태로 처리
       console.log(`[getEnhancementStatus] ${activityType}: no opened_at -> waiting`);
@@ -1839,7 +1834,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
-    // 온보딩 주차면 모든 파트 total=0, 아니면 정상 계산
+    // 온보딩 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
     if (isOnboardingWeek) {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
@@ -2432,7 +2427,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           </div>
           <div className="work-info-cards">
             {workInfoCards.map((card) => {
-              const isEmpty = card.isEmpty || isRestMode;
+              const isEmpty = card.isEmpty;
               return (
               <div
                 key={card.id}
@@ -2528,23 +2523,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
             return (
               <div
-                className={`work-ability-card ${isRestMode || !hasActivity ? 'empty' : ''}`}
+                className={`work-ability-card ${!hasActivity ? 'empty' : ''}`}
                 onClick={() => {
-                  if (!isRestMode && hasActivity) {
+                  if (hasActivity) {
                     setWorkAbilityViewModalOpen(true);
                   }
                 }}
-                style={{ cursor: (isRestMode || !hasActivity) ? 'default' : 'pointer' }}
+                style={{ cursor: !hasActivity ? 'default' : 'pointer' }}
               >
                 <div className={`card-icon-area ${enhancementStatus === 'failed' ? 'failed' : ''}`}>
-                  {!isRestMode && hasActivity && displayActivity && (
+                  {hasActivity && displayActivity && (
                     <img
                       src={getCompetencyIconPath(displayActivity.activity_type_id)}
                       alt="실무 역량"
                       style={{ opacity: enhancementStatus === 'failed' ? 0.3 : 1 }}
                     />
                   )}
-                  {(isRestMode || !hasActivity) && <div className="icon-placeholder"></div>}
+                  {!hasActivity && <div className="icon-placeholder"></div>}
                   {enhancementStatus === 'failed' && (
                     <div className="failed-overlay">
                       <span className="failed-text">강화 실패</span>
@@ -2562,21 +2557,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <span className="verified-text">Verified</span>
                       </>
                     )}
-                    {!isRestMode && hasActivity && activityTypeInfo && (
+                    {hasActivity && activityTypeInfo && (
                       <>
                         <span className="code-tag">{activityTypeInfo.line_code}</span>
                         <span className="info-tag">{activityTypeInfo.name}</span>
                       </>
                     )}
                   </div>
-                  <p className="main-desc">{(isRestMode || !hasActivity) ? '-' : (displayActivity?.title || '-')}</p>
+                  <p className="main-desc">{!hasActivity ? '-' : (displayActivity?.title || '-')}</p>
                   <div className="sub-title-rcow">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{(isRestMode || !hasActivity) ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc">{!hasActivity ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                 </div>
-                {!isRestMode && hasActivity && (
+                {hasActivity && (
                   <div className="status-badge">
                     {enhancementStatus === 'success' && <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" />}
                     {enhancementStatus === 'waiting' && <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" />}
@@ -2632,7 +2627,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           </div>
           <div className="work-exp-cards">
             {workExpCards.map((card, cardIndex) => {
-              const isEmpty = card.isEmpty || isRestMode;
+              const isEmpty = card.isEmpty;
               const expActivityType = workExpActivityTypes[cardIndex];
               return (
               <div
@@ -2744,7 +2739,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           </div>
           <div className="work-career-cards">
             {displayWorkCareerCards.map((card, cardIndex) => {
-              const isEmpty = card.isEmpty || isRestMode;
+              const isEmpty = card.isEmpty;
               return (
               <div
                 key={card.id}
