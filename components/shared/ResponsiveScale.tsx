@@ -68,7 +68,11 @@ const ResponsiveScale = () => {
     window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 
+    // DevTools 열기/닫기 시 resize 이벤트 누락 대응: 주기적 zoom 보정
+    const pollInterval = window.setInterval(applyScale, 500);
+
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener('load', applyScale);
       window.removeEventListener('resize', applyScale);
       document.documentElement.style.zoom = '';

@@ -695,7 +695,7 @@
   .resume-stats {
     flex-shrink: 0;
     width: 138px;
-    margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
+    margin-left: 8px; // 컨테이너 padding 20px + 8px = 살짝 왼쪽으로 이동
 
     .stat-item {
       margin-bottom: 25px; // 피그마 시안 gap: 25px
@@ -778,6 +778,7 @@
   .resume-badges {
     flex-shrink: 0;
     width: 86px;
+    margin-left: -8px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -790,8 +791,8 @@
       width: 100%;
 
       .badge-icon {
-        width: 19px;
-        height: 20px;
+        width: 29px;
+        height: 30px;
         flex-shrink: 0;
         display: flex;
         align-items: center;
@@ -818,8 +819,9 @@
         font-size: 20px;
         font-weight: 400;
         color: #ffec8f;
-        flex: 1;
-        text-align: right;
+        flex: none;
+        margin-left: 0;
+        text-align: left;
 
         &.red {
           color: #ffec8f;
@@ -832,6 +834,7 @@
   .resume-medal {
     flex-shrink: 0;
     width: 88px;
+    transform: translateX(20px);
     height: 108px; // three-column 높이 유지 (메달 커져도 박스 불변)
     display: flex;
     flex-direction: column;
