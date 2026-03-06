@@ -3777,7 +3777,7 @@
     background: #0d0d0d;
     border: 1px solid #FFA500;
     width: 90%;
-    max-width: 960px;
+    max-width: 1140px !important;
     max-height: min(90vh, 800px);
     border-radius: 0;
     overflow: hidden;
@@ -4044,14 +4044,15 @@
   background: #0d0d0d;
   border: 1px solid #FFA500;
   border-radius: 0;
-  width: 560px;
-  max-height: 700px !important;       // none → 700px
+  width: 562px;
+  height: 826px;                       // 피그마 시안 562×826px 고정
+  max-height: 826px;
   @media (max-height: 900px) {
-    max-height: 80vh !important;
+    height: 80vh;
+    max-height: 80vh;
   }
-  height: auto;
   margin: 20px 0;
-  overflow: hidden;                    // visible → hidden
+  overflow: hidden;
   position: relative;
   animation: modalSlideIn 0.3s ease;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
@@ -4153,8 +4154,8 @@
   .section1-modal-body {
     padding: 28px;
     flex: 1;
-    overflow-y: visible;
-    max-height: none;
+    min-height: 0;
+    overflow-y: scroll;
     overscroll-behavior: contain;
 
     &::-webkit-scrollbar {
@@ -4545,8 +4546,9 @@
   background: #0d0d0d;
   border: 1px solid #FFA500;
   border-radius: 0;
-  width: 520px;
-  max-height: min(80vh, 700px);
+  width: 523px;
+  height: 926px;
+  max-height: min(90vh, 926px);
   overflow: hidden;
   position: relative;
   animation: modalSlideIn 0.3s ease;
