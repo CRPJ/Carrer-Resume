@@ -1243,28 +1243,28 @@
               gap: 2px;
 
               .video-title {
-                font-family: 'Pretendard', sans-serif;
-                font-size: 1.5rem;
-                font-weight: 600;
+                font-family: 'Khula', sans-serif;
+                font-size: 24px;
+                font-weight: 400;
                 color: #fff;
                 margin: 0;
                 padding: 0;
-                line-height: 1;
+                line-height: 34px;
                 transform: translateY(-7px);
 
                 .highlight-orange {
-                  color: #F5A623;
+                  color: #FAAB07;
                 }
               }
 
               .video-author {
-                font-family: 'Pretendard', sans-serif;
-                font-size: 1rem;
+                font-family: 'Khula', sans-serif;
+                font-size: 16px;
                 font-weight: 400;
-                color: #e2e8f0;
+                color: #fff;
                 margin: 0;
                 padding: 0;
-                line-height: 1;
+                line-height: 26px;
               }
             }
 
@@ -1272,17 +1272,18 @@
               display: flex;
               align-items: center;
               gap: 8px;
-              font-family: 'Pretendard', sans-serif;
+              font-family: 'Khula', sans-serif;
               font-weight: 400;
 
               .dot-separator {
                 font-size: 0.5rem;
-                color: #F5A623;
+                color: #FAAB07;
               }
 
               .viewers-count {
-                font-size: 1rem;
-                color: #e2e8f0;
+                font-size: 16px;
+                color: #fff;
+                line-height: 26px;
               }
             }
           }

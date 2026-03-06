@@ -66,7 +66,7 @@ const Sidebar = () => {
               <div className="sidebar__widget">
                 <Link href="/" className="sidebar__logo not-cursor" aria-label="home page" title="logo">
                   <Image src={logo} alt="Logo" 
-                    className="w-16 h-16 left-0 top-[4px] absolute"  
+                    className="w-16 h-16 left-0 top-[4px] absolute"
                     width={64} height={64} />
                 </Link>
               </div>
