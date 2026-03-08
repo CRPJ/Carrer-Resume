@@ -132,7 +132,6 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      profile = data;
     }
 
     const context = searchParams.get('context');
