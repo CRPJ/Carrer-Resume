@@ -1619,38 +1619,24 @@
   width: 0 !important;
 }
 
-// Cluster Tabs Navigation
+// Cluster Tabs Navigation — Figma(Group 2121454060) 2-row layout
 .cluster-tabs {
   width: 100%;
   padding: 0;
   margin-top: -8px;
-  margin-bottom: 3px;
+  margin-bottom: 15px;
   position: relative;
   z-index: 50;
   background: transparent;
   display: flex;
-  align-items: flex-start;
-  position: relative;
-  overflow: visible;
+  flex-direction: column;
+  gap: 15px;
 
-  .cluster-tabs-inner {
+  .cluster-tabs-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 0;
-    padding-right: 50px; // 화살표 버튼 공간 확보
-    margin-left: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
+    gap: 18px;
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    max-width: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   .cluster-tab {
@@ -1658,81 +1644,54 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    height: 48px;
-    width: 250px;
-    min-width: 250px;
-    padding: 0 20px;
+    height: 56px;
+    width: 259px;
+    min-width: 259px;
+    padding: 23px 20px;
     border-radius: 0;
-    // Figma(Group 2121454060) 탭 라벨 폰트: Chakra Petch Bold
-    // (요청대로 "폰트만" 시안과 동일하게 맞춤)
     font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
-    font-size: 0.875rem;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.3px;
+    letter-spacing: 0;
+    text-transform: uppercase;
     color: #fed402;
+    // Figma: #1c1f18 opacity 0.6
     background: rgba(28, 31, 24, 0.6);
+    // Figma: individualStrokeWeights top:1 right:0 bottom:1 left:0
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
     text-decoration: none;
     white-space: nowrap;
     transition: all 0.15s ease;
     cursor: pointer;
     flex-shrink: 0;
+    // Figma: BACKGROUND_BLUR radius 12
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-sizing: border-box;
 
     .tab-text {
-      // Bold가 얇게 보이는 이슈 방지: 텍스트 노드에 굵기/폰트 명시
       font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
       font-weight: 700;
-      line-height: 1.4;
-      background: linear-gradient(to right, #fed402, #fff1aa);
+      line-height: 26px;
+      // Figma: diagonal gradient #FED402 → #FFF1AA
+      background: linear-gradient(145deg, #fed402, #fff1aa);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      padding-bottom: 2px;
     }
 
     &:hover {
-      background: rgba(254, 212, 2, 0.2);
+      background: rgba(254, 212, 2, 0.15);
     }
 
     &.active {
-      color: #000 !important;
-      background: linear-gradient(to right, #fed402, #fff1aa) !important;
-      padding-left: 8px !important;
-      padding-right: 8px !important;
-      border-top: none !important;
-      border-bottom: none !important;
-      gap: 8px;
-
-      .tab-deco {
-        height: 36px;
-        width: auto;
-        flex-shrink: 0;
-        position: absolute;
-
-        &.left {
-          left: 10px;
-        }
-
-        &.right {
-          transform: scaleY(-1);
-          right: 10px;
-        }
-      }
-
-      // 긴 탭 이름용 (클러스터 9, 10)
-      &.wide-deco {
-        .tab-deco {
-          &.left {
-            left: 3px;
-          }
-
-          &.right {
-            right: 3px;
-          }
-        }
-      }
+      // Figma: diagonal gradient background
+      background: linear-gradient(145deg, #fed402, #fff1aa) !important;
+      // Figma: stroke #000 top:1 right:0 bottom:1 left:0
+      border-top: 1px solid #000000 !important;
+      border-bottom: 1px solid #000000 !important;
 
       .tab-text {
         font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
@@ -1742,117 +1701,67 @@
         -webkit-background-clip: unset !important;
         background-clip: unset !important;
       }
-
-      .tab-settings {
-        display: flex !important;
-        color: #000 !important;
-        border-color: #000 !important;
-      }
-    }
-
-    .tab-settings {
-      display: flex;
-      align-items: center;
-      margin-left: 12px;
-      padding-left: 12px;
-      font-size: 0.875rem;
-      color: #000;
-      border-left: 1px dashed #000;
-      height: 20px;
     }
 
     &.placeholder {
       cursor: default;
       pointer-events: none;
       opacity: 1;
-      background: rgba(28, 31, 24, 0.6);
     }
   }
 
-  .cluster-tabs-gradient {
+  // Diamond separator (Figma: Group 131423 / 131422)
+  // Positioned absolutely within the active .cluster-tab
+  .cluster-tabs-diamond {
     position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100px;
-    height: 56px;
-    background: linear-gradient(to right, transparent, #0a0a0a 70%);
-    pointer-events: none;
-    z-index: 11;
-
-    &.at-start {
-      right: auto;
-      left: 0;
-      background: linear-gradient(to left, transparent, #0a0a0a 70%);
-    }
-  }
-
-  .cluster-tabs-arrow {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffd000 0%, #faab07 100%);
-    border: none;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 12;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
-    animation: pulse-glow 2s ease-in-out infinite;
+    gap: 0;
+    width: 7px;
+    height: 44px;
+    z-index: 10;
 
-    @keyframes pulse-glow {
-      0%,
-      100% {
-        box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
-      }
-      50% {
-        box-shadow: 0 2px 16px rgba(250, 171, 7, 0.6);
-      }
+    // Figma: 5px from tab left edge, vertically centered
+    &.diamond-left {
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    i {
-      color: #000;
-      font-size: 0.875rem;
-      font-weight: 700;
-      line-height: 1;
+    // Figma: 5px from tab right edge (259 - 7 - 5 = 247), vertically centered
+    &.diamond-right {
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    &:hover {
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
-      animation: none;
+    .diamond-line {
+      width: 1px;
+      height: 25px;
+      background: #000;
+      flex-shrink: 0;
     }
 
-    &:active {
-      transform: translateY(-50%) scale(0.95);
-    }
+    .diamond-shapes {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
 
-    &.at-start {
-      right: auto;
-      left: 10px;
-
-      i {
-        animation-name: arrow-hint-left;
+      .diamond-filled {
+        width: 7px;
+        height: 7px;
+        background: #000;
+        flex-shrink: 0;
       }
 
-      @keyframes arrow-hint-left {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        50% {
-          transform: translateX(-3px);
-        }
-      }
-
-      &:hover i {
-        transform: translateX(-3px);
+      .diamond-outline {
+        width: 7px;
+        height: 7px;
+        border: 1px solid #000;
+        box-sizing: border-box;
+        flex-shrink: 0;
       }
     }
   }

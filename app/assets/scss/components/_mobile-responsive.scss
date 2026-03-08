@@ -940,30 +940,26 @@
         padding: 0 !important;
         margin: 0 !important;
 
-        .cluster-tabs-arrow {
-          &.left { left: 0 !important; }
-          &.right { right: 0 !important; }
-        }
-        
-        .cluster-tabs-inner {
+        .cluster-tabs-row {
           display: flex !important;
           flex-direction: row !important;
           flex-wrap: nowrap !important;
           overflow-x: auto !important;
           -webkit-overflow-scrolling: touch;
-          gap: 0 !important;
-          padding: 8px 12px;
+          gap: 6px !important;
+          padding: 4px 12px;
           max-width: none !important;
           width: 100% !important;
-          
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+
           &::-webkit-scrollbar {
-            height: 4px;
+            display: none;
           }
-          
-          &::-webkit-scrollbar-thumb {
-            background: #FFA500;
-            border-radius: 2px;
-          }
+        }
+
+        .cluster-tabs-diamond {
+          display: none !important;
         }
         
         .cluster-tab {
@@ -2631,7 +2627,7 @@
   }
   
   // 스크롤 스냅
-  .cluster-tabs-inner,
+  .cluster-tabs-row,
   .resume-three-column {
     scroll-snap-type: x mandatory;
     

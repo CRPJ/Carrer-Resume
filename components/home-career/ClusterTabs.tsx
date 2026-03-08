@@ -1,16 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useRef, useState, useEffect } from "react";
 
 const ClusterTabs = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId") || searchParams.get("userID");
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
 
   const tabs = [
     { name: "PERSONAL PROFILE", path: "/cluster-2", cluster: 2 },
@@ -25,6 +20,9 @@ const ClusterTabs = () => {
     { name: "-", path: "", cluster: 0, isPlaceholder: true },
   ];
 
+  const row1 = tabs.slice(0, 5);
+  const row2 = tabs.slice(5);
+
   const isActive = (tabPath: string) => {
     if (tabPath === "/cluster-2") {
       return pathname === "/cluster-2" || pathname === "/" || pathname === "/cluster-2/" || pathname === "/career" || pathname === "/career/";
@@ -38,109 +36,59 @@ const ClusterTabs = () => {
     return pathname === tabPath || pathname === tabPath + "/";
   };
 
-  // 스크롤 위치에 따라 화살표 표시 여부 결정
-  const checkScrollPosition = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeftArrow(scrollLeft > 10);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
-    }
-  };
+  const DiamondDecos = () => (
+    <>
+      {/* Figma: Group 131423 — 탭 좌측 가장자리 */}
+      <div className="cluster-tabs-diamond diamond-left">
+        <div className="diamond-shapes">
+          <div className="diamond-outline" />
+          <div className="diamond-filled" />
+        </div>
+        <div className="diamond-line" />
+      </div>
+      {/* Figma: Group 131422 — 탭 우측 가장자리 (미러) */}
+      <div className="cluster-tabs-diamond diamond-right">
+        <div className="diamond-line" />
+        <div className="diamond-shapes">
+          <div className="diamond-filled" />
+          <div className="diamond-outline" />
+        </div>
+      </div>
+    </>
+  );
 
-  useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", checkScrollPosition);
-      checkScrollPosition();
-      return () => scrollElement.removeEventListener("scroll", checkScrollPosition);
-    }
-  }, []);
+  const renderTab = (tab: typeof tabs[0], index: number) => {
+    const tabHref = tab.path && userId ? `${tab.path}?userId=${userId}` : tab.path;
+    const active = tab.path ? isActive(tab.path) : false;
 
-  const scrollToCenter = (index: number) => {
-    const tab = tabRefs.current[index];
-    const container = scrollRef.current;
-    if (tab && container) {
-      const tabLeft = tab.offsetLeft;
-      const tabWidth = tab.offsetWidth;
-      const containerWidth = container.clientWidth;
-      const scrollPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
-      container.scrollTo({ left: scrollPosition, behavior: "smooth" });
+    if (tab.path) {
+      return (
+        <Link
+          key={index}
+          href={tabHref}
+          className={`cluster-tab ${active ? "active" : ""}`}
+        >
+          <span className="tab-text">{tab.name}</span>
+          {active && <DiamondDecos />}
+        </Link>
+      );
     }
-  };
 
-  // 페이지 로드 시 활성화된 탭을 가운데로 스크롤
-  useEffect(() => {
-    const activeIndex = tabs.findIndex((tab) => isActive(tab.path));
-    if (activeIndex !== -1) {
-      setTimeout(() => {
-        scrollToCenter(activeIndex);
-      }, 50);
-    }
-  }, [pathname]);
-
-  // 화살표 클릭 시 스크롤
-  const handleScrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
-
-  const handleScrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
+    return (
+      <div key={index} className="cluster-tab placeholder">
+        <span className="tab-text">{tab.name}</span>
+      </div>
+    );
   };
 
   return (
     <div className="cluster-tabs">
-      {/* 왼쪽 화살표 */}
-      {showLeftArrow && (
-        <button 
-          className="cluster-tabs-arrow left"
-          onClick={handleScrollLeft}
-          aria-label="이전 탭 보기"
-        >
-          <i className="ti ti-chevron-left"></i>
-        </button>
-      )}
-      
-      <div className="cluster-tabs-inner" ref={scrollRef}>
-        {tabs.map((tab, index) => {
-          const isWideDeco = tab.cluster === 9 || tab.cluster === 10;
-          const tabHref = tab.path && userId ? `${tab.path}?userId=${userId}` : tab.path;
-          return tab.path ? (
-            <Link
-              key={index}
-              href={tabHref}
-              ref={(el) => { tabRefs.current[index] = el; }}
-              className={`cluster-tab ${isActive(tab.path) ? "active" : ""} ${isWideDeco ? "wide-deco" : ""}`}
-            >
-              {isActive(tab.path) && (
-                <img src="/images/0/cluster 1/tabbb.png" alt="" className="tab-deco left" />
-              )}
-              <span className="tab-text">{tab.name}</span>
-              {isActive(tab.path) && (
-                <img src="/images/0/cluster 1/tabbb.png" alt="" className="tab-deco right" />
-              )}
-            </Link>
-          ) : (
-            <div key={index} className="cluster-tab placeholder">
-              <span className="tab-text">{tab.name}</span>
-            </div>
-          );
-        })}
+      <div className="cluster-tabs-row">
+        {row1.map((tab, i) => renderTab(tab, i))}
       </div>
-      
-      {/* 오른쪽 화살표 */}
-      {showRightArrow && (
-        <button 
-          className="cluster-tabs-arrow right"
-          onClick={handleScrollRight}
-          aria-label="다음 탭 보기"
-        >
-          <i className="ti ti-chevron-right"></i>
-        </button>
-      )}
+      <div className="cluster-tabs-row">
+        {row2.map((tab, i) => renderTab(tab, i + 5))}
+      </div>
     </div>
   );
 };
