@@ -1631,12 +1631,9 @@ const Cluster4Content = () => {
 
           {/* 오른쪽 캐릭터 이미지 */}
           <div className="card-right">
-            <img 
-              src="/images/0/cluster4/bg cha.png" 
+            <img
+              src="/images/0/cluster4/bg cha.png"
               alt="Character"
-              ref={(el) => {
-                if (el) el.style.cssText = 'width:auto!important;height:650px!important;max-width:none!important;object-fit:contain!important;';
-              }}
             />
           </div>
         </div>
