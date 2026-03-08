@@ -58,9 +58,9 @@
   // Section 1: CLUB CHALLENGE GROWTH
   .cluster4-section1 {
     width: 100%;
-    max-width: 1330px;
+    max-width: 1336px;
     height: auto;
-    min-height: 1180px;
+    min-height: 1118px;
     padding: 0;
     text-align: left;
     background-image: url('/images/0/cluster4/img 01.png');
@@ -310,7 +310,7 @@
     width: 100%;
     max-width: 1330px;
     padding: 0;
-    margin-top: -50px;
+    margin-top: 40px;
     margin-bottom: clamp(36px, 3vw, 72px);
     display: flex;
     justify-content: center;
@@ -326,19 +326,15 @@
       z-index: 50;
       align-self: flex-start;
       // sticky가 동작하려면 상위/자기 자신이 overflow로 잘리지 않아야 함
-      overflow: visible;
+      overflow: visible !important;
     }
 
     .season-growth-card {
       position: relative;
       width: 100%;
-      max-width: 1320px;
+      max-width: 1316px;
       height: auto;
-      min-height: 600px;
-      background-image: url('/images/0/cluster4/4-1/bg image.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: calc(50% + 3px) -100px;
+      min-height: 715px;
       opacity: 0;
       transform: translateY(30px) translateZ(0);
       will-change: transform;
@@ -350,30 +346,62 @@
         transform: translateY(0) translateZ(0);
       }
 
-      // 보더 이미지 레이어
+      // 배경 이미지 레이어 — 보더 안쪽으로만 클리핑
+      &::before {
+        content: '';
+        position: absolute;
+        top: 108px;
+        left: -28px;
+        width: calc(100% + 56px);
+        height: 626px;
+        background-image: url('/images/0/cluster4/4-1/bg image.png');
+        background-size: 140% 140%;
+        background-repeat: no-repeat;
+        background-position: center;
+        clip-path: polygon(
+          0 0,
+          calc(100% - 70px) 0,
+          100% 140px,
+          100% 100%,
+          70px 100%,
+          0 calc(100% - 140px)
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      // 보더 이미지 레이어 — cluster2와 동일하게 좌우 확장
       &::after {
         content: '';
         position: absolute;
         top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        left: -28px;
+        top: 108px;
+        width: calc(100% + 56px);
+        height: 626px;
         background-image: url('/images/0/cluster4/bg border.png');
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-position: center;
         z-index: 5;
         pointer-events: none;
+        clip-path: inset(0);
       }
 
       .card-background {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 108px;
+        left: -28px;
+        width: calc(100% + 56px);
+        height: 626px;
+        overflow: hidden;
+        border-radius: 8px;
         z-index: 0;
         pointer-events: none;
+        background-image: url('/images/0/cluster4/4-1/bg image.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
 
         img {
           width: 100%;
@@ -385,7 +413,7 @@
       .card-left {
         position: relative;
         z-index: 2;
-        padding: 70px 40px 40px 60px;
+        padding: 180px 40px 40px 60px;
         width: 65%;
 
         .season-header-row {
@@ -455,18 +483,18 @@
 
         .collection-card {
           display: inline-flex;
-          padding: 20px 36px;
+          padding: 21px 40px;
           align-items: flex-start;
-          gap: 28px;
+          gap: 31px;
           background: #232323;
           border: 2px solid #3A3A3A;
-          border-radius: 30px;
-          margin-bottom: 24px;
+          border-radius: 31px;
+          margin-bottom: 25px;
           box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
 
           .collection-icon {
-            width: 56px;
-            height: 56px;
+            width: 61px;
+            height: 61px;
             flex-shrink: 0;
             border-radius: 64px;
             overflow: hidden;
@@ -534,8 +562,8 @@
 
         .details-card {
           display: flex;
-          width: 422px;
-          padding: 20px;
+          width: 440px;
+          padding: 21px;
           flex-direction: column;
           align-items: flex-start;
           margin-top: -10px;
@@ -562,10 +590,10 @@
             .toggle-text {
               flex: 1;
               text-align: left;
-              font-family: 'Pretendard', sans-serif;
+              font-family: 'Manrope', 'Pretendard', sans-serif;
               font-size: 0.875rem;
               color: #fff;
-              font-weight: 600;
+              font-weight: 800;
             }
 
             .arrow-icon {
@@ -585,38 +613,37 @@
             .detail-row {
               display: flex;
               justify-content: space-between;
-              padding: 4px 0;
-
-              &:first-child {
-                padding-top: 0;
-              }
+              align-items: center;
+              height: 19px;
+              margin-bottom: 15px;
 
               &:last-child {
-                padding-bottom: 0;
+                margin-bottom: 0;
               }
 
               .detail-label {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
-                color: #ccc;
+                color: #fff;
                 font-weight: 600;
               }
 
               .detail-value {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
-                color: #FFEC8F;
+                color: #fff;
                 text-align: right;
-                font-weight: 600;
+                font-weight: 700;
 
                 .number {
                   font-size: 1rem;
-                  color: #FFEC8F;
+                  color: #fff;
+                  font-weight: 700;
                 }
 
                 .orange-highlight {
-                  font-size: 1rem;
-                  color: #FAAB07;
+                  font-size: 0.875rem;
+                  color: #FFEC8F;
                   font-weight: 700;
                 }
 
@@ -632,9 +659,9 @@
       .card-right {
         position: absolute;
         right: 20px;
-        bottom: 10px;
-        width: 702px;
-        height: 732px;
+        top: -110px;
+        width: 732px;
+        height: 763px;
         z-index: 10;
         display: flex;
         align-items: flex-end;
