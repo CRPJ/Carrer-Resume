@@ -121,12 +121,12 @@ const Cluster3Content = () => {
     const koreanStatuses = [
       '클럽 온보딩 중',
       '활동 중',
-      '휴식(주차) 중',
+      '휴식(개인) 중',
       '휴식(공식) 중',
       '시즌 휴식 중',
       '성장 유보',
       '성장 중단',
-      '졸업 절차중',
+      '졸업 절차 중',
       '성장 완료(졸업)',
       '추가 성장 중'
     ];
@@ -140,12 +140,12 @@ const Cluster3Content = () => {
     // 영문 growthStatus 값 변환 (10개)
     if (growthStatus === 'pending') return '클럽 온보딩 중';
     if (growthStatus === 'active') return '성장 중';
-    if (growthStatus === 'resting') return '휴식(주차) 중';
+    if (growthStatus === 'resting') return '휴식(개인) 중';
     if (growthStatus === 'official_rest') return '휴식(공식) 중';
     if (growthStatus === 'season_rest') return '시즌 휴식 중';
     if (growthStatus === 'deferred') return '성장 유보';
     if (growthStatus === 'suspended') return '성장 중단';
-    if (growthStatus === 'graduating') return '졸업 절차중';
+    if (growthStatus === 'graduating') return '졸업 절차 중';
     if (growthStatus === 'graduated') return '성장 완료(졸업)';
     if (growthStatus === 'reinforcing') return '추가 성장 중';
 

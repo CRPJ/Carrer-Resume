@@ -1300,7 +1300,7 @@ const Cluster4Content = () => {
     if (
       status === 'graduated' ||
       growthStatus === '졸업 완료' ||
-      growthStatus === '졸업 절차중'
+      growthStatus === '졸업 절차 중'
     ) {
       return '성장 완료';
     }
