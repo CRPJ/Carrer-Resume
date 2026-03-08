@@ -737,7 +737,10 @@ const Cluster3Content = () => {
       <section className="cluster3-section1">
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
         </div>
         {/* 배경 이미지 영역 */}
         <div className="section1-bg">
@@ -923,7 +926,10 @@ const Cluster3Content = () => {
       <section className="cluster3-section2" ref={section2Ref}>
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
         </div>
         <div className="section2-bg">
           <img src="/images/0/cluster 3/bg2.png" alt="Background" />
@@ -996,7 +1002,10 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
           <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setSection3ModalOpen(true); } : undefined} />
-          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
         </div>
         {/* 배경 이미지 */}
         <div className="section3-bg">
@@ -1006,7 +1015,7 @@ const Cluster3Content = () => {
         <div className="section3-header">
           <div className="header-left">
           <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '-24px' }} />
+            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
             포트폴리오 아카이빙 Channel
           </h2>
             <div className="header-sub">
@@ -1080,7 +1089,10 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
           <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection4Links([...portfolioOutputs]); setEditingOutputChannels([...portfolioOutputChannels]); setSection4ModalOpen(true); } : undefined} />
-          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
         </div>
         {/* 배경 이미지 */}
         <div className="section4-bg">
@@ -1192,7 +1204,10 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
           <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection5Links([...portfolioDetails]); setEditingDetailChannels([...portfolioDetailChannels]); setSection5ModalOpen(true); } : undefined} />
-          <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
         </div>
         <div className="section5-header">
           <div className="header-left">

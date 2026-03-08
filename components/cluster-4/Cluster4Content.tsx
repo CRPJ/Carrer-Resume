@@ -1655,7 +1655,10 @@ const Cluster4Content = () => {
                 openSeasonReputationModal();
               }
             }} />
-            <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
           <div className="section3-title-wrapper">
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>
