@@ -1181,12 +1181,30 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 기존 프로필 확인
-    const { data: existingProfile } = await supabaseAdmin
+    // user_profiles에서 기존 프로필 확인 (1차: email, 2차: auth_email)
+    let existingProfile: { id: string } | null = null;
+
+    const { data: profileByEmail } = await supabaseAdmin
       .from("user_profiles")
       .select("id")
       .eq("email", email)
       .maybeSingle();
+
+    if (profileByEmail) {
+      existingProfile = profileByEmail;
+    }
+
+    if (!existingProfile) {
+      const { data: profileByAuth } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("auth_email", email)
+        .maybeSingle();
+
+      if (profileByAuth) {
+        existingProfile = profileByAuth;
+      }
+    }
 
     if (!existingProfile) {
       return NextResponse.json(
