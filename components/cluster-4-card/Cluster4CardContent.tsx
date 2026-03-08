@@ -254,6 +254,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     line_code: string | null;
     line_name: string | null;
     output_links: { desc: string; url: string }[] | null;
+    secondary_info_deadline: string | null;
     created_at: string;
     weeks?: {
       id: string;
@@ -283,27 +284,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
     {
-      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r1', user_id: 'u1', enhancement_status: 'enhanced', grade: 'S', grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '김민지', supervisor_position: '대리', supervisor_department: '서비스기획팀', supervisor_company: '우아한형제들', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
     },
     {
-      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
     },
     {
-      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자3.png',
     },
     {
-      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r4', user_id: 'u1', enhancement_status: 'enhanced', grade: 'D', grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '조지 워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자4.png',
     },
     {
-      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r5', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
     },
@@ -446,7 +447,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
         // urlUserId가 있으면 API fetch + DB 쿼리도 동시 시작
         const earlyApiPromise = earlyUserId ? Promise.all([
-          fetch(`/api/career-records?week_id=${weekId}&user_id=${earlyUserId}`).then(r => r.json()).catch(() => null),
+          fetch(`/api/career-records?week_id=${weekId}&user_id=${earlyUserId}`, { cache: 'no-store' }).then(r => r.json()).catch(() => null),
           fetch(`/api/weekly-reputations?targetUserId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
           fetch(`/api/weekly-colleagues?userId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
         ]) : Promise.resolve([null, null, null] as const);
@@ -925,7 +926,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setIsLoadingCareerRecords(true);
       try {
         const params = new URLSearchParams({ week_id: weekId, user_id: currentUserId });
-        const response = await fetch(`/api/career-records?${params.toString()}`);
+        const response = await fetch(`/api/career-records?${params.toString()}`, { cache: 'no-store' });
         const result = await response.json();
         if (result.success && result.data) {
           setCareerRecords(result.data);
@@ -940,17 +941,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     fetchCareerRecords();
   }, [currentUserId, weekId, urlUserId]);
 
-  // 실무 경력 통계 업데이트 (career records 기반)
+  // 실무 경력 통계 업데이트 (computed status 기반)
   // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
-  // success: 강화 성공한 프로젝트 수 (enhanced - 최대 total개)
+  // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
     // 전체 프로젝트 수 (최대 5개)
     const rawTotal = careerRecords.length;
     const total = Math.min(rawTotal, 5);
-    const enhancedCount = careerRecords.filter(r => r.enhancement_status === 'enhanced').length;
+    // computed status 기반: pending이어도 2차 정보 작성 or 마감 경과 시 성공으로 카운트
+    const enhancedCount = careerRecords.filter((r, index) => {
+      if (r.enhancement_status === 'enhanced') return true;
+      if (r.enhancement_status === 'pending') {
+        const activityType = (careerTypeIds.length > 0 ? careerTypeIds : ['practical_project'])[index];
+        const detail = activityType ? weekActivityDetails.find(d => d.activity_type_id === activityType) : null;
+        const hasSecondaryInfo = detail && (
+          (detail.sub_title && detail.sub_title.trim() !== '') ||
+          (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+        );
+        const deadlinePassed = r.secondary_info_deadline
+          ? new Date(r.secondary_info_deadline) <= new Date()
+          : false;
+        return hasSecondaryInfo || deadlinePassed;
+      }
+      return false;
+    }).length;
     const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
-  }, [careerRecords]);
+  }, [careerRecords, weekActivityDetails]);
 
   // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchKeywordsIfNeeded = async () => {
@@ -1709,12 +1726,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 운영진이 입력한 output links 개수 가져오기
   const getAdminOutputLinksCount = (activityType: string): number => {
+    // 실무 경력: career_projects의 output_links에서 가져옴
+    const careerIndex = (careerTypeIds.length > 0 ? careerTypeIds : ['practical_project']).indexOf(activityType);
+    if (careerIndex >= 0 && careerRecords[careerIndex]) {
+      return careerRecords[careerIndex].output_links?.filter((l: { url?: string }) => l.url?.trim())?.length || 0;
+    }
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
     return activity?.output_links?.filter(l => l.url?.trim())?.length || 0;
   };
 
   // 운영진이 입력한 output links 가져오기
   const getAdminOutputLinks = (activityType: string): OutputLink[] => {
+    // 실무 경력: career_projects의 output_links에서 가져옴
+    const careerIndex = (careerTypeIds.length > 0 ? careerTypeIds : ['practical_project']).indexOf(activityType);
+    if (careerIndex >= 0 && careerRecords[careerIndex]) {
+      return (careerRecords[careerIndex].output_links || []) as OutputLink[];
+    }
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
     return activity?.output_links || [];
   };
@@ -1981,6 +2008,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const workCareerCards = careerRecords.length > 0
     ? careerRecords
         .map((record, index) => {
+          // 강화 상태 계산: pending일 때 2차 정보 작성 또는 마감 기한 경과 시 강화 성공으로 표시
+          let computedStatus = record.enhancement_status;
+          if (record.enhancement_status === 'pending') {
+            const activityType = workCareerActivityTypes[index];
+            const detail = activityType ? weekActivityDetails.find(d => d.activity_type_id === activityType) : null;
+            const hasSecondaryInfo = detail && (
+              (detail.sub_title && detail.sub_title.trim() !== '') ||
+              (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''))
+            );
+            const deadlinePassed = record.secondary_info_deadline
+              ? new Date(record.secondary_info_deadline) <= new Date()
+              : false;
+            if (hasSecondaryInfo || deadlinePassed) {
+              computedStatus = 'enhanced';
+            }
+          }
+
           // 강화 상태에 따른 배지 결정
           const getStatusBadge = (enhStatus: string) => {
             if (enhStatus === 'enhanced') return '/images/0/cluster4/icon/5 강화 성공.png';
@@ -1991,12 +2035,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           return {
             id: index + 1,
-            code: record.career_code || record.line_code || '-',
-            badge: `${record.company_name}|${record.job_position}`,
+            code: record.line_code || record.career_code || '-',
+            badge: record.company_name,
             title: record.project_name || record.job_position,
-            verified: record.enhancement_status === 'enhanced',
-            date: formatDate(record.created_at),
-            likes: record.grade_points ? `${record.grade_points / 10}` : '0',
+            verified: computedStatus === 'enhanced',
+            date: weekData?.startDate ? formatDate(weekData.startDate) : formatDate(record.created_at),
+            likes: '0,99',
             hasWeb: (record.output_links?.length || 0) > 0,
             icon: record.company_logo_url || '/images/0/cluster4/icon/default-company.png',
             supervisorImg: record.supervisor_profile_img || '/images/0/crew profile/default.jpg',
@@ -2004,19 +2048,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             supervisorDept: record.supervisor_department || '',
             supervisorCompany: record.supervisor_company || '',
             supervisorPosition: record.supervisor_position || '',
-            statusBadge: getStatusBadge(record.enhancement_status),
+            statusBadge: getStatusBadge(computedStatus),
             grade: record.grade || '',
-            isNotApplicable: record.enhancement_status === 'not_applicable',
+            isNotApplicable: computedStatus === 'not_applicable',
             isEmpty: false,
-            isFailed: record.enhancement_status === 'failed',
+            isFailed: computedStatus === 'failed',
             // 추가 정보 (상세 보기용)
-            projectDescription: record.project_description,
+            projectDescription: (() => {
+              const activityType = workCareerActivityTypes[index];
+              const detail = activityType ? weekActivityDetails.find(d => d.activity_type_id === activityType) : null;
+              return (detail?.sub_title && detail.sub_title.trim() !== '') ? detail.sub_title : (record.project_description || null);
+            })(),
             gradePoints: record.grade_points,
             recordId: record.record_id,
             projectId: record.project_id,
             lineCode: record.line_code,
             lineName: record.line_name,
             outputLinks: record.output_links,
+            secondaryInfoDeadline: record.secondary_info_deadline || null,
           };
         })
     : [];
@@ -2033,14 +2082,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     recordId: null as string | null, projectId: null as string | null,
     lineCode: null as string | null, lineName: null as string | null,
     outputLinks: null as { desc: string; url: string }[] | null,
+    secondaryInfoDeadline: null as string | null,
   });
 
-  // 참여한 경력이 없으면 빈 카드 표시, 있으면 6의 배수로 패딩
+  // 참여한 경력이 없으면 빈 카드 표시, 있으면 5의 배수로 패딩
   const displayWorkCareerCards = workCareerCards.length > 0
     ? [
         ...workCareerCards,
         ...Array.from(
-          { length: (6 - (workCareerCards.length % 6)) % 6 },
+          { length: (5 - (workCareerCards.length % 5)) % 5 },
           (_, i) => emptyCareerCard(workCareerCards.length + i + 1)
         ),
       ]
@@ -2708,8 +2758,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
-                if (!isAnyActivityActive(workCareerActivityTypes)) {
-                  alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
+                // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단
+                const hasEditableCareer = displayWorkCareerCards.some(card =>
+                  !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date()
+                );
+                if (!hasEditableCareer) {
+                  alert('2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)');
                   return;
                 }
                 initializeEditingDetails();
@@ -2776,12 +2830,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <p className="category-text">{isEmpty ? '-' : card.badge.replace('|', ' - ')}</p>
                   <div className="card-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
-                    <span className="card-title">프로젝트</span>
+                    <span className="card-title">Main Title</span>
                   </div>
                   <p className="main-desc-white">{isEmpty ? '-' : card.title}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
-                    <span className="sub-label">설명</span>
+                    <span className="sub-label">Subtitle</span>
                   </div>
                   <span className="sub-desc">{isEmpty ? '-' : (card.projectDescription || '-')}{!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
                   <div className="supervisor-section">
@@ -3451,53 +3505,131 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     </div>
 
-                    {/* 강화실패 안내 */}
-                    {card.isFailed && (
-                      <div style={{
-                        padding: '16px',
-                        backgroundColor: '#fee2e2',
-                        border: '1px solid #ef4444',
-                        borderRadius: '8px',
-                        marginBottom: '16px'
-                      }}>
-                        <p style={{ margin: 0, color: '#dc2626', fontSize: '14px' }}>
-                          ❌ 강화에 실패하였습니다.
-                        </p>
-                      </div>
-                    )}
+                    {/* 강화실패 / 마감 안내 */}
+                    {(() => {
+                      const isDeadlineActive = card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
+                      const isDeadlineExpired = card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) <= new Date();
+                      const activityType = workCareerActivityTypes[card.id - 1];
+                      if (card.isFailed) return (
+                        <div style={{ padding: '16px', backgroundColor: '#fee2e2', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '16px' }}>
+                          <p style={{ margin: 0, color: '#dc2626', fontSize: '14px' }}>
+                            ❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.
+                          </p>
+                        </div>
+                      );
+                      if (isDeadlineExpired) return (
+                        <div style={{ padding: '16px', backgroundColor: '#fee2e2', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '16px' }}>
+                          <p style={{ margin: 0, color: '#dc2626', fontSize: '14px' }}>
+                            ⏰ 2차 정보 작성 기간이 마감되었습니다. (마감: {new Date(card.secondaryInfoDeadline!).toLocaleString('ko-KR')})
+                          </p>
+                        </div>
+                      );
+                      if (!card.secondaryInfoDeadline) return (
+                        <div style={{ padding: '16px', backgroundColor: '#fff3cd', border: '1px solid #ffc107', borderRadius: '8px', marginBottom: '16px' }}>
+                          <p style={{ margin: 0, color: '#856404', fontSize: '14px' }}>
+                            ⚠️ 2차 정보 작성 마감 기한이 설정되지 않았습니다.
+                          </p>
+                        </div>
+                      );
+                      return null;
+                    })()}
 
-                    {/* Output Links */}
-                    {card.outputLinks && card.outputLinks.length > 0 && (
-                      <div className="modal-input-group">
-                        <div className="section-label-row">
-                          <span className="section-label">Output Links</span>
+                    {/* Sub Title - 마감 기한 이내만 수정 가능 */}
+                    {(() => {
+                      const activityType = workCareerActivityTypes[card.id - 1];
+                      const isEditable = !card.isFailed && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
+                      return activityType ? (
+                        <div className="modal-input-group">
+                          <div className="section-label-row">
+                            <div className="section-label">Sub Title</div>
+                            <div className="char-counter"><span className={(editingDetails[activityType]?.subTitle || '').length > 0 ? 'active' : ''}>{(editingDetails[activityType]?.subTitle || '').length}</span> / 150</div>
+                          </div>
+                          <textarea
+                            value={editingDetails[activityType]?.subTitle || ''}
+                            onChange={(e) => setEditingDetails(prev => ({
+                              ...prev,
+                              [activityType]: {
+                                ...prev[activityType],
+                                subTitle: e.target.value,
+                              }
+                            }))}
+                            placeholder={isEditable ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
+                            rows={3}
+                            maxLength={150}
+                            disabled={!isEditable}
+                            style={!isEditable ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                          ></textarea>
                         </div>
-                        <div className="output-links-list">
-                          {card.outputLinks.map((link: { desc: string; url: string }, linkIndex: number) => (
-                            <a key={linkIndex} href={link.url} target="_blank" rel="noopener noreferrer" className="output-link-item">
-                              <span className="link-desc">{link.desc || `Link ${linkIndex + 1}`}</span>
-                              <span className="link-url">{link.url}</span>
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      ) : null;
+                    })()}
 
-                    {/* 감독자 정보 */}
-                    {card.supervisorName && card.supervisorName !== '-' && (
-                      <div className="modal-input-group">
-                        <div className="section-label-row">
-                          <span className="section-label">감독자</span>
-                        </div>
-                        <div className="supervisor-info-card">
-                          <img src={card.supervisorImg} alt={card.supervisorName} className="supervisor-img" />
-                          <div className="supervisor-details">
-                            <span className="supervisor-name">{card.supervisorName}</span>
-                            <span className="supervisor-meta">{[card.supervisorPosition, card.supervisorDept, card.supervisorCompany].filter(Boolean).join(' / ')}</span>
+                    {/* Output Link - 마감 기한 이내만 수정 가능 */}
+                    {(() => {
+                      const activityType = workCareerActivityTypes[card.id - 1];
+                      const isEditable = !card.isFailed && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
+                      const adminCount = activityType ? getAdminOutputLinksCount(activityType) : 0;
+                      return activityType ? (
+                        <div className="modal-input-group">
+                          <div className="section-label">Output Link</div>
+                          <div className="output-links-buttons">
+                            {[0, 1, 2, 3, 4].map((idx) => {
+                              const link = editingDetails[activityType]?.outputLinks?.[idx] || { desc: '', url: '' };
+                              const hasContent = link.url.trim() !== '';
+                              const isAdminLink = idx < adminCount;
+                              const isDisabled = !isEditable || isAdminLink;
+                              return (
+                                <div key={idx} className={`output-link-item ${hasContent ? 'active' : ''} ${isAdminLink ? 'admin-link' : ''}`}>
+                                  <div className="link-button">
+                                    <span className="link-num">{idx + 1}</span>
+                                    {isAdminLink && <span className="admin-badge" title="운영진 입력">A</span>}
+                                  </div>
+                                  <input
+                                    type="text"
+                                    className="link-desc"
+                                    placeholder={isDisabled ? '' : '링크 설명 (20자)'}
+                                    maxLength={20}
+                                    value={link.desc}
+                                    disabled={isDisabled}
+                                    style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                    onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                      const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
+                                      currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                      return {
+                                        ...prev,
+                                        [activityType]: {
+                                          ...prev[activityType],
+                                          outputLinks: currentLinks,
+                                        }
+                                      };
+                                    })}
+                                  />
+                                  <input
+                                    type="url"
+                                    className="link-url"
+                                    placeholder={isDisabled ? '' : 'URL'}
+                                    value={link.url}
+                                    disabled={isDisabled}
+                                    style={isDisabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                                    onChange={(e) => !isDisabled && setEditingDetails(prev => {
+                                      const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
+                                      currentLinks[idx] = { ...currentLinks[idx], url: e.target.value };
+                                      return {
+                                        ...prev,
+                                        [activityType]: {
+                                          ...prev[activityType],
+                                          outputLinks: currentLinks,
+                                        }
+                                      };
+                                    })}
+                                  />
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-                      </div>
-                    )}
+                      ) : null;
+                    })()}
+
 
                   </div>
                 </div>
@@ -3505,7 +3637,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               })}
             </div>
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>닫기</button>
+              <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>취소</button>
+              <button className="save-btn" onClick={async () => {
+                setIsSaving(true);
+                try {
+                  for (const activityType of workCareerActivityTypes) {
+                    await saveActivityDetail(activityType);
+                  }
+                  updateWeekActivityDetailsAfterSave(workCareerActivityTypes);
+                  alert('저장되었습니다.');
+                  setWorkCareerModalOpen(false);
+                } catch (error) {
+                  console.error('Error saving work career details:', error);
+                } finally {
+                  setIsSaving(false);
+                }
+              }} disabled={isSaving}>{isSaving ? '저장 중...' : '저장'}</button>
             </div>
           </div>
         </div>
@@ -4244,16 +4391,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="work-icon-box fruit">
                     {selectedWorkCareerCard.icon && <img src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge} />}
                   </div>
-                  <span className="category-title">마케팅(바이럴) 혹시 몰라</span>
+                  <span className="category-title">{selectedWorkCareerCard.badge}</span>
                   <span className="code-badge">{selectedWorkCareerCard.code}</span>
                 </div>
                 <div className="work-view-right">
-                  {selectedWorkCareerCard.statusBadge && (
-                    <div className="status-badge success">
+                  {selectedWorkCareerCard.statusBadge && (() => {
+                    const statusText = selectedWorkCareerCard.verified ? '강화성공' : selectedWorkCareerCard.isFailed ? '강화실패' : selectedWorkCareerCard.isNotApplicable ? '해당없음' : '강화대기';
+                    const statusClass = selectedWorkCareerCard.verified ? 'success' : selectedWorkCareerCard.isFailed ? 'failed' : selectedWorkCareerCard.isNotApplicable ? 'not-applicable' : 'pending';
+                    return (
+                    <div className={`status-badge ${statusClass}`}>
                       <img src={selectedWorkCareerCard.statusBadge} alt="상태" />
-                      <span>강화성공</span>
+                      <span>{statusText}</span>
                     </div>
-                  )}
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -4288,12 +4439,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="output-links-view">
                   {(() => {
                     const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+                    const careerRecord = careerRecords[selectedWorkCareerCard.id - 1];
                     const detail = weekActivityDetails.find(d => d.activity_type_id === activityType);
-                    const adminLinks = activity?.output_links || [];
+                    const adminLinks = (careerRecord?.output_links || []) as { desc: string; url: string }[];
                     const userLinks = detail?.output_links || [];
+                    const adminCount = adminLinks.filter(l => l.url?.trim()).length;
                     return [0, 1, 2, 3, 4].map((idx) => {
-                      const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
+                      const link = idx < adminCount ? adminLinks[idx] : userLinks[idx - adminCount];
                       const hasLink = link?.url && link.url.trim() !== '';
                       return (
                         <a

@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
           line_code: project.line_code,
           line_name: project.line_name,
           output_links: project.output_links,
+          secondary_info_deadline: project.secondary_info_deadline || null,
           weeks: null,
           created_at: project.created_at,
 
@@ -97,6 +98,10 @@ export async function GET(request: NextRequest) {
         success: true,
         data: combinedData,
         count: combinedData.length,
+      }, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
       })
     }
 
@@ -170,6 +175,10 @@ export async function GET(request: NextRequest) {
       success: true,
       data: filteredData,
       count: filteredData.length,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
     })
   } catch (error) {
     console.error('Career records GET error:', error)
