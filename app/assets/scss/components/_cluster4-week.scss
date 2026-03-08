@@ -3590,22 +3590,22 @@
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    backdrop-filter: blur(5px);
     overflow-y: auto;
     padding: 40px 0;
     padding-left: 73px;
   }
 
   .section-modal {
-    width: 500px;
-    max-width: 90vw;
-    max-height: 85vh !important;
-    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    width: 504px;
+    height: 606px;
+    max-width: none;
+    max-height: 606px;
+    background: #0d1117;
     border: 1px solid #FFA500;
+    border-radius: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    border-radius: 12px;
 
     &.section-modal-wide {
       width: 700px;
@@ -3617,10 +3617,11 @@
       align-items: flex-start;
       flex-wrap: wrap;
       position: relative;
-      padding: 20px 24px 40px;
+      padding: 24px 24px 16px;
       min-width: 0;
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
-      background: rgba(255, 165, 0, 0.05);
+      min-height: auto;
+      border-bottom: none;
+      background: transparent;
 
       h3 {
         margin: 0;
@@ -4384,18 +4385,18 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 16px 24px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.2);
+      padding: 24px 28px;
+      border-top: none;
+      background: transparent;
       flex-shrink: 0;
 
       button {
-        padding: 10px 24px;
+        padding: 12px 28px;
         font-size: 0.875rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        border-radius: 6px;
+        border-radius: 0;
         font-family: 'Pretendard', sans-serif;
 
         &.cancel-btn {
