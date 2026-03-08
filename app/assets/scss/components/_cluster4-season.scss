@@ -60,7 +60,7 @@
     width: 100%;
     max-width: 1336px;
     height: auto;
-    min-height: 1118px;
+    min-height: 1700px;
     padding: 0;
     text-align: left;
     background-image: url('/images/0/cluster4/img 01.png');
@@ -71,7 +71,8 @@
     // top: 0; 삭제
     z-index: 0;
     margin-top: 0;
-    margin-bottom: -630px;
+    margin-bottom: -1200px;
+
     will-change: transform;
     transform: translateZ(0);
 
@@ -87,17 +88,17 @@
       z-index: 0;
     }
 
-    // 하단 주황색 선
+    // 하단 노란색 테두리선
     &::after {
       content: '';
       position: absolute;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 1023px;
-      height: 1px;
-      background: #FFA500;
-      z-index: 1;
+      width: 80%;
+      height: 3px;
+      background: #D4C700;
+      z-index: 10;
     }
 
     // 좌측 상단 탭 (세로 정렬)
