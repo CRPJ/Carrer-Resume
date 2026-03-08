@@ -1515,24 +1515,13 @@
     width: 100%;
     max-width: 1330px;
     margin: 0 auto 0;
-    margin-top: var(--c3-section-gap);
-    padding: 60px 125px 60px;
+    margin-top: 0;
+    padding: 60px 125px 80px;
     position: relative;
-    overflow: hidden;
+    overflow: visible !important;
     border-radius: 0;
 
-    // 하단 노란색 선
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1023px;
-      height: 1px;
-      background: #ECBB02;
-      z-index: 10;
-    }
+    // 하단 노란색 선 (삭제됨)
 
     // 배경 이미지
     .section4-bg {
@@ -1542,6 +1531,7 @@
       width: 100%;
       height: 100%;
       z-index: 0;
+      overflow: hidden;
 
       img {
         width: 100%;
@@ -1558,16 +1548,19 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 30px;
-      width: 1080px;
-      margin-left: auto;
+      margin-bottom: 25px;
+      padding: 0 0 0 0;
+      width: auto;
+      margin-left: -14px;
       margin-right: auto;
+      overflow: visible !important;
 
       .header-left {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 0;
+        overflow: visible !important;
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
@@ -1579,6 +1572,7 @@
           gap: 10px;
           margin: 0 0 -8px 0;
           line-height: 44px;
+          overflow: visible !important;
           text-transform: capitalize;
 
           .title-text {
@@ -1604,7 +1598,7 @@
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-left: 0;
+          margin-left: 28px;
 
           .view-all {
             font-family: 'Manrope', 'Pretendard', sans-serif;
@@ -2088,8 +2082,8 @@
     width: 100%;
     max-width: 1080px;
     margin: 0 auto;
-    padding: 80px 20px 0;    // 좌우 20px 여백 추가
-    overflow: visible;   
+    padding: 50px 20px 0;    // 좌우 20px 여백 추가 (80→50: 30px 위로)
+    overflow: visible !important;
     position: relative;
     z-index: 1;
 
@@ -2100,17 +2094,24 @@
     }
 
     .section5-header {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      padding: 0;
+      width: auto;
+      margin-left: -35px;
+      margin-right: auto;
+      overflow: visible !important;
 
       .header-left {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 0;
-        overflow: visible;
+        overflow: visible !important;
 
         .subtitle {
           font-family: 'Cafe24Ohsquare', sans-serif;
@@ -2122,7 +2123,7 @@
           gap: 10px;
           margin: 0;
           line-height: 1;
-          overflow: visible;
+          overflow: visible !important;
           line-height: 44px;
           text-transform: capitalize;
 
@@ -2147,12 +2148,12 @@
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-left: 0;
+          margin-left: 28px;
 
           .view-all {
-            font-family: 'Manrope', 'Pretendard', sans-serif;  // Pretendard → Manrope
-            font-size: 0.875rem;      // 13px → 14px
-            font-weight: 800;     // 추가
+            font-family: 'Manrope', 'Pretendard', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 800;
             line-height: 19px;    // 추가
             text-transform: capitalize;  // 추가
             color: #FED402;
@@ -2216,19 +2217,19 @@
       }
     }
 
-    // ✅ 수정 (1fr로 변경 + 좌우 패딩 추가)
       .detail-grid {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));    // 고정값 → 유동비율
+        grid-template-columns: repeat(5, 205px);
         gap: 20px 12px;
         justify-content: center;
-        padding: 0 8px;                            // 좌우 여백 추가
+        width: 1073px;
+        margin: 0 auto;
       }
 
       .detail-item {
         width: 205px;
         height: 205px;
-        border-radius: 16px;
+        border-radius: 10px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.2);
         cursor: pointer;
@@ -2266,13 +2267,16 @@
             align-self: flex-end;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            border-radius: 999px;
-            padding: 2px 10px;
+            border-radius: 10px;
+            padding: 6px 10px;
             margin: 10px 10px 0 0;
+            min-width: 86px;
+            height: 26px;
+            box-sizing: border-box;
 
             span {
               font-family: 'Pretendard', sans-serif;
@@ -2294,9 +2298,9 @@
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
-            border-radius: 0 0 16px 16px;
-            padding: 15px 12px;
-            height: 33%;
+            border-radius: 0 0 10px 10px;
+            padding: 10px;
+            height: 64px;
 
             .sns-icon {
               width: 38px;
