@@ -199,6 +199,7 @@ const Cluster41Content = () => {
     fromSeason: string | null; // 전환 주차: 이전 시즌 한글명
     toSeason: string | null;   // 전환 주차: 다음 시즌 한글명
     holidayName: string | null;
+    termNumber: number | null; // 운영진 기수
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
 
@@ -226,6 +227,8 @@ const Cluster41Content = () => {
     left_at: string | null;
     is_current: boolean;
     season_id: string;
+    generation: number | null;
+    managed_team_id: string | null;
   }
   interface UserRoleHistoryData {
     id: string;
@@ -309,6 +312,7 @@ const Cluster41Content = () => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'crew_normal': '일반',
     'part_leader': '심화(파트장)',
@@ -384,6 +388,41 @@ const Cluster41Content = () => {
     }
 
     return null;
+  };
+
+  // 운영진 역할 확인
+  const isAdminRole = (role: string | undefined): boolean => {
+    if (!role) return false;
+    return ['admin_team_leader', 'crew_team_leader', 'operations_teamleader',
+            'admin_ambassador', 'crew_ambassador', 'operations_ambassador'].includes(role);
+  };
+
+  // 운영진일 때 팀/파트 포맷 변환
+  const getFormattedTeamPart = (date: string, week: DBWeekData) => {
+    if (week.isBreakSeason) return { teamName: '-', partName: '-' };
+    const teamPart = getTeamPartForDate(date);
+    const roleInfo = getRoleForDate(date);
+
+    if (roleInfo && isAdminRole(roleInfo.role) && teamPart.teamName === '운영진') {
+      const dateObj = new Date(date);
+      const activeTeamPart = userTeamParts.find(utp => {
+        const startDate = new Date(utp.joined_at);
+        const endDate = utp.left_at ? new Date(utp.left_at) : null;
+        return startDate <= dateObj && (!endDate || endDate > dateObj);
+      });
+      const gen = activeTeamPart?.generation;
+      const isTeamLeader = roleInfo.role?.includes('team_leader');
+      const managedTeam = activeTeamPart?.managed_team_id
+        ? teams.find(t => t.id === activeTeamPart.managed_team_id)
+        : null;
+
+      return {
+        teamName: gen ? `운영진(${gen}기)` : '운영진',
+        partName: isTeamLeader && managedTeam ? `팀장(${managedTeam.name})` : (teamPart.partName || '-')
+      };
+    }
+
+    return teamPart;
   };
 
   // 특정 주차의 포인트 정보 계산
@@ -482,6 +521,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
+    // 온보딩 주차는 강화율 계산에서 제외 (이력으로만 존재)
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
@@ -499,6 +540,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 실무 역량은 매주 분모가 항상 1
     const total = 1;
     // 강화 성공한 competency 타입 활동 개수 (count) - 최대 1
@@ -515,6 +558,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
@@ -579,6 +624,8 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
+    // 온보딩 주차는 강화율 계산에서 제외
+    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
 
     // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
     const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
@@ -803,7 +850,7 @@ const Cluster41Content = () => {
         // 현재 진행 중인 주차는 제외 (end_date < today)
         let weeksQuery = supabase
           .from('weeks')
-          .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
+          .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name, term_number)')
           .lt('end_date', today)
           .order('start_date', { ascending: false });
 
@@ -982,6 +1029,7 @@ const Cluster41Content = () => {
             fromSeason: breakFromSeason,
             toSeason: breakToSeason,
             holidayName: week.holiday_name,
+            termNumber: seasonData?.term_number ? Number(seasonData.term_number) : null,
             growthStatus: status
           };
         }) as DBWeekData[];
@@ -1028,12 +1076,12 @@ const Cluster41Content = () => {
 
   // 드롭다운 옵션 - dbWeeklyData에서 유니크한 시즌 추출
   const seasonOptions = React.useMemo(() => {
-    // 시즌 순서 매핑 (정렬용)
+    // 시즌 순서 매핑 (정렬용 - 겨울 시작)
     const seasonOrder: { [key: string]: number } = {
-      '봄': 1,
-      '여름': 2,
-      '가을': 3,
-      '겨울': 4
+      '겨울': 1,
+      '봄': 2,
+      '여름': 3,
+      '가을': 4
     };
 
     // 유니크한 (년도, 시즌) 조합 추출
@@ -1245,100 +1293,6 @@ const Cluster41Content = () => {
         }
       `}</style>
 
-      {/* 역대 시즌 드롭다운 메뉴 (최상단 렌더링) */}
-      {seasonDropdownOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: seasonBtnPos.top,
-            left: seasonBtnPos.left,
-            width: '200px',
-            background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '12px',
-            zIndex: 999999,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-            animation: 'dropdownSlide 0.2s ease-out'
-          }}
-        >
-          {seasonOptions.map((option, index) => (
-            <div
-              key={index}
-              style={{
-                padding: '12px 16px',
-                color: selectedSeason === option ? '#FFA500' : '#fff',
-                background: selectedSeason === option ? 'rgba(255,165,0,0.2)' : 'transparent',
-                cursor: 'pointer',
-                borderBottom: index < seasonOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
-              }}
-              onClick={() => {
-                setSelectedSeason(option);
-                setSeasonDropdownOpen(false);
-              }}
-              onMouseEnter={(e) => {
-                if (selectedSeason !== option) {
-                  e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedSeason !== option) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 주차 결과 드롭다운 메뉴 (최상단 렌더링) */}
-      {resultDropdownOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: resultBtnPos.top,
-            left: resultBtnPos.left,
-            width: '200px',
-            background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: '12px',
-            zIndex: 999999,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-            animation: 'dropdownSlide 0.2s ease-out'
-          }}
-        >
-          {resultOptions.map((option, index) => (
-            <div
-              key={index}
-              style={{
-                padding: '12px 16px',
-                color: selectedResult === option ? '#FFA500' : '#fff',
-                background: selectedResult === option ? 'rgba(255,165,0,0.2)' : 'transparent',
-                cursor: 'pointer',
-                borderBottom: index < resultOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
-              }}
-              onClick={() => {
-                setSelectedResult(option);
-                setResultDropdownOpen(false);
-              }}
-              onMouseEnter={(e) => {
-                if (selectedResult !== option) {
-                  e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedResult !== option) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-
     <div className="cluster4-content cluster4-content--week">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1" ref={headerRef}>
@@ -1449,7 +1403,7 @@ const Cluster41Content = () => {
                 <div className="detail-row">
                   <span className="detail-label">성장 성공 주차</span>
                   <span className="detail-value">
-                    <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span><span className="orange-highlight">(1)</span> <span className="white-text">개 주차</span>
+                    <span className="number">{growthPeriodStats?.approvedWeeks ?? '-'}</span>{growthPeriodStats?.approvedSeasons ? <span className="orange-highlight">({growthPeriodStats.approvedSeasons})</span> : null} <span className="white-text">개 주차</span>
                   </span>
                 </div>
                 <div className="detail-row">
@@ -1622,10 +1576,10 @@ const Cluster41Content = () => {
               className="filter-card filter-dropdown"
               style={{
                 borderColor: selectedSeason !== "역대 시즌" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                position: 'relative'
               }}
               onClick={() => {
-                updateSeasonPos();
                 setSeasonDropdownOpen(!seasonDropdownOpen);
                 setResultDropdownOpen(false);
               }}
@@ -1635,6 +1589,53 @@ const Cluster41Content = () => {
                 <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
               </div>
               <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
+              {seasonDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    marginTop: 8,
+                    width: '200px',
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '12px',
+                    zIndex: 999999,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    animation: 'dropdownSlide 0.2s ease-out'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {seasonOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '12px 16px',
+                        color: selectedSeason === option ? '#FFA500' : '#fff',
+                        background: selectedSeason === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        cursor: 'pointer',
+                        borderBottom: index < seasonOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                      }}
+                      onClick={() => {
+                        setSelectedSeason(option);
+                        setSeasonDropdownOpen(false);
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedSeason !== option) {
+                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedSeason !== option) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             {/* 주차 결과 버튼 */}
             <div
@@ -1642,10 +1643,10 @@ const Cluster41Content = () => {
               className="filter-card filter-dropdown"
               style={{
                 borderColor: selectedResult !== "주차 결과" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent'
+                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                position: 'relative'
               }}
               onClick={() => {
-                updateResultPos();
                 setResultDropdownOpen(!resultDropdownOpen);
                 setSeasonDropdownOpen(false);
               }}
@@ -1655,6 +1656,53 @@ const Cluster41Content = () => {
                 <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>{selectedResult}</span>
               </div>
               <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>▼</span>
+              {resultDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    marginTop: 8,
+                    width: '200px',
+                    background: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '12px',
+                    zIndex: 999999,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    animation: 'dropdownSlide 0.2s ease-out'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {resultOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '12px 16px',
+                        color: selectedResult === option ? '#FFA500' : '#fff',
+                        background: selectedResult === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        cursor: 'pointer',
+                        borderBottom: index < resultOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                      }}
+                      onClick={() => {
+                        setSelectedResult(option);
+                        setResultDropdownOpen(false);
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedResult !== option) {
+                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedResult !== option) {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="filter-card">
               <div className="card-left">
@@ -1821,8 +1869,8 @@ const Cluster41Content = () => {
                           const experienceRate = getWeeklyExperienceRate(week.id);
                           const careerRate = getWeeklyCareerRate(week.id);
                           const weekPoints = getPointsForWeek(week.id);
-                          const injeolmi = getCumulativeInjeolmi(week.endDate);
-                          const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                          const injeolmi = weekPoints.shield - weekPoints.lightning;
+                          const teamPart = getFormattedTeamPart(week.startDate, week);
                           const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
 
                           return (
@@ -1909,7 +1957,7 @@ const Cluster41Content = () => {
                       {/* 그룹 1: 팀, 파트 */}
                       {(() => {
                         // 전환 주차는 팀/파트/역할을 '-'로 표시
-                        const teamPart = week.isBreakSeason ? { teamName: '-', partName: '-' } : getTeamPartForDate(week.startDate);
+                        const teamPart = getFormattedTeamPart(week.startDate, week);
                         const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
                         return (
                           <>
@@ -1937,7 +1985,7 @@ const Cluster41Content = () => {
                       {/* 그룹 3: 아이템들 */}
                       {(() => {
                         const weekPoints = getPointsForWeek(week.id);
-                        const injeolmi = getCumulativeInjeolmi(week.endDate);
+                        const injeolmi = weekPoints.shield - weekPoints.lightning;
                         return (
                           <div className="info-group items">
                             <span className="info-divider">·</span>

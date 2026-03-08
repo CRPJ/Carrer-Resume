@@ -876,6 +876,7 @@ const Cluster4Content = () => {
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
+    'crew': '일반',
     'crew_regular': '일반',
     'crew_normal': '일반',
     'crew_advanced_agent': '심화(에이전트)',
@@ -1099,6 +1100,7 @@ const Cluster4Content = () => {
 
       // 역할 라벨 매핑 (함수 내부용)
       const roleLabelMap: { [key: string]: string } = {
+        'crew': '일반',
         'crew_regular': '일반',
         'crew_normal': '일반',
         'crew_advanced_agent': '심화(에이전트)',
@@ -1646,7 +1648,13 @@ const Cluster4Content = () => {
         <div className="section3-banner">
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => openSeasonReputationModal()} />
+            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => {
+              if (isOwner) {
+                alert('시즌 평판은 타 크루끼리 작성합니다.');
+              } else {
+                openSeasonReputationModal();
+              }
+            }} />
             <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
           </div>
           <div className="section3-title-wrapper">
@@ -2197,64 +2205,84 @@ const Cluster4Content = () => {
               {/* 키워드 */}
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
-                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 2개, 각 7자)</span>
+                  키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
                 </label>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: '8px',
-                    padding: '0 12px',
-                    height: '44px',
-                  }}>
-                    <span style={{ color: '#FFA500', fontWeight: 700, fontSize: '14px', marginRight: '6px', flexShrink: 0 }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드 1"
-                      maxLength={7}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <select
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword1: e.target.value }))}
                       style={{
+                        display: 'block',
                         width: '100%',
-                        background: 'transparent',
-                        border: 'none',
+                        height: '44px',
+                        padding: '0 10px',
+                        background: '#1a1f2e',
+                        border: '2px solid #FFA500',
+                        borderRadius: '8px',
                         color: '#fff',
-                        fontSize: '14px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
                         outline: 'none',
-                        padding: 0,
                       }}
-                    />
+                    >
+                      <option value="">키워드 1 선택</option>
+                      {reputationKeywords.length === 0 ? (
+                        <option value="" disabled>키워드 로딩 중...</option>
+                      ) : (
+                        [1, 2, 3, 4, 5].map(clusterNum => {
+                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
+                          if (clusterKeywords.length === 0) return null;
+                          const clusterInfo = clusterKeywords[0];
+                          return (
+                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
+                              {clusterKeywords.map(k => (
+                                <option key={k.id} value={k.keyword} disabled={k.keyword === seasonReputationEditData.keyword2}>{k.keyword}</option>
+                              ))}
+                            </optgroup>
+                          );
+                        })
+                      )}
+                    </select>
                   </div>
-                  <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: '8px',
-                    padding: '0 12px',
-                    height: '44px',
-                  }}>
-                    <span style={{ color: '#FFA500', fontWeight: 700, fontSize: '14px', marginRight: '6px', flexShrink: 0 }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드 2"
-                      maxLength={7}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <select
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword2: e.target.value }))}
                       style={{
+                        display: 'block',
                         width: '100%',
-                        background: 'transparent',
-                        border: 'none',
+                        height: '44px',
+                        padding: '0 10px',
+                        background: '#1a1f2e',
+                        border: '2px solid #FFA500',
+                        borderRadius: '8px',
                         color: '#fff',
-                        fontSize: '14px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
                         outline: 'none',
-                        padding: 0,
                       }}
-                    />
+                    >
+                      <option value="">키워드 2 선택</option>
+                      {reputationKeywords.length === 0 ? (
+                        <option value="" disabled>키워드 로딩 중...</option>
+                      ) : (
+                        [1, 2, 3, 4, 5].map(clusterNum => {
+                          const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
+                          if (clusterKeywords.length === 0) return null;
+                          const clusterInfo = clusterKeywords[0];
+                          return (
+                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
+                              {clusterKeywords.map(k => (
+                                <option key={k.id} value={k.keyword} disabled={k.keyword === seasonReputationEditData.keyword1}>{k.keyword}</option>
+                              ))}
+                            </optgroup>
+                          );
+                        })
+                      )}
+                    </select>
                   </div>
                 </div>
               </div>

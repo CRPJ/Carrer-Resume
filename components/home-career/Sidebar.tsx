@@ -184,6 +184,7 @@ const Sidebar = () => {
 
   // 역할 한글 변환
   const roleKorean: { [key: string]: string } = {
+    crew: "일반(정규)",
     crew_regular: "일반(정규)",
     crew_normal: "일반(정규)",
     crew_advanced: "심화(파트장)",
