@@ -512,7 +512,7 @@ const Cluster2Content = () => {
     {
       id: 1,
       title: "Eclipse Journey",
-      author: "Hwang Yeongyeong",
+      author: "Eng Name",
       viewers: "9.9k Viewers",
       thumbnail: "/images/0/cluster 2/영상 01.jpeg",
       isBookmarked: true,
@@ -521,7 +521,7 @@ const Cluster2Content = () => {
     {
       id: 2,
       title: "Eclipse Journey",
-      author: "Hwang Yeongyeong",
+      author: "Eng Name",
       viewers: "9.9k Viewers",
       thumbnail: "999",
       isBookmarked: true,
@@ -530,7 +530,7 @@ const Cluster2Content = () => {
     {
       id: 3,
       title: "Eclipse Journey",
-      author: "Hwang Yeongyeong",
+      author: "Eng Name",
       viewers: "9.9k Viewers",
       thumbnail: "999",
       isBookmarked: true,

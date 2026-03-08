@@ -19,6 +19,7 @@ export async function GET(request: Request) {
     let query = supabase
       .from("user_profiles")
       .select("id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first")
+      .in("growth_status", ["active", "suspended", "seasonal_rest", "graduated", "club_onboarding"])
       .not("display_name", "is", null)
       .order("display_name", { ascending: true });
 

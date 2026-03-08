@@ -73,7 +73,7 @@ const Cluster3Content = () => {
   });
 
   // 영어 이름
-  const [engName, setEngName] = useState<string>('Hwang Yeongyeong');
+  const [engName, setEngName] = useState<string>('Eng Name');
 
   // 성장 점수 기록 데이터 (단감, 인절미, 어흥)
   interface PointsData {

@@ -94,7 +94,7 @@ const page = () => {
         const result = await res.json();
         if (result.success) {
           setCrews(result.data);
-          const active = result.data.filter((c: Crew) => c.status !== "graduated" && c.status !== "suspended");
+          const active = result.data.filter((c: Crew) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
           active.sort((a: Crew, b: Crew) => b.approvedWeeks - a.approvedWeeks);
           setFilteredCrews(active);
         }
@@ -122,13 +122,13 @@ const page = () => {
     if (status) {
       switch (status) {
         case "활동 중":
-          result = result.filter((c) => c.status !== "graduated" && c.status !== "suspended");
+          result = result.filter((c) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
           break;
         case "활동 졸업":
-          result = result.filter((c) => c.status === "graduated");
+          result = result.filter((c) => c.growthStatus === "graduated");
           break;
         case "활동 중단":
-          result = result.filter((c) => c.status === "suspended");
+          result = result.filter((c) => c.growthStatus === "suspended");
           break;
       }
     }
