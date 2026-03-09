@@ -1556,7 +1556,10 @@ const Cluster4Content = () => {
                 <h3 className="season-title-shadow">SEASON GROWTH</h3>
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
-              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster4/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+              <div className="season-badge">
+                <svg className="badge-border" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" fill="#FAAB07" stroke="#FAAB07" strokeWidth="1.69311"/>
+                </svg>
                 <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>
@@ -1690,7 +1693,7 @@ const Cluster4Content = () => {
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
             <div className={`area-1-title ${isTextFading ? 'fading' : ''}`}>
               <div className="season-main-title">
-                <span className="year-orange">{currentSeason.year}</span>년도_{currentSeason.season} 시즌
+                <span className="year-orange">{currentSeason.year}</span>년도_<span className="season-highlight">{currentSeason.season}</span> 시즌
               </div>
               <div className="date-status">
                 <span className="date-range">{currentSeason.dateRange}</span>

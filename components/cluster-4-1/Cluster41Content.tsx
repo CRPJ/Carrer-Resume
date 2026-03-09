@@ -1350,7 +1350,10 @@ const Cluster41Content = () => {
                 <h3 className="season-title-shadow">WEEKLY GROWTH</h3>
                 <h3 className="season-title">WEEKLY GROWTH</h3>
               </div>
-              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster4/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+              <div className="season-badge">
+                <svg className="badge-border" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" fill="#FAAB07" stroke="#FAAB07" strokeWidth="1.69311"/>
+                </svg>
                 <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>

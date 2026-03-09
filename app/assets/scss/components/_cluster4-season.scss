@@ -458,18 +458,27 @@
           justify-content: center;
           width: 127px;
           min-width: 127px;
-          height: 56px;
-          min-height: 56px;
+          height: 52px;
+          min-height: 52px;
           flex-shrink: 0;
           overflow: visible;
           margin-left: 20px;
 
+          .badge-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+
           .badge-text {
+            position: relative;
+            z-index: 1;
             font-size: 1.125rem;
             font-weight: 700;
             color: #000;
             white-space: nowrap;
-            margin-left: -2px;
           }
         }
 
@@ -1979,14 +1988,15 @@
   // SEASON CHALLENGE 배너
   .section3-banner {
     width: 100%;
-    padding: 79px 40px 50px 40px;
-    margin-bottom: 30px;
+    padding: 79px 40px 60px 40px;
+    margin-bottom: 50px;
     background-image: url('/images/0/cluster4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     text-align: center;
     position: relative;
+    overflow: visible;
 
     &::before {
       content: '';
@@ -2096,10 +2106,10 @@
 
     .section3-banner-description {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.875rem;
+      font-size: 1.875rem !important;
       color: #FFF;
       font-weight: 400;
-      line-height: 38px;
+      line-height: 2.5rem !important;
       margin-bottom: 0;
       position: relative;
       z-index: 1;
@@ -2109,22 +2119,25 @@
         border-left: none !important;
         padding-left: 0 !important;
         font-family: 'HakgyoansimTuho', sans-serif !important;
+        font-size: 1.875rem !important;
+        line-height: 2.5rem !important;
       }
     }
 
     .section3-banner-notice {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.875rem;
+      font-size: 1rem !important;
       color: #FFF;
       position: relative;
       z-index: 1;
-      margin-top: 30px;
+      margin-top: 20px;
 
       p {
         margin: 0;
         border-left: none !important;
         padding-left: 0 !important;
         font-family: 'HakgyoansimTuho', sans-serif !important;
+        font-size: 1rem !important;
       }
     }
   }
@@ -2414,6 +2427,10 @@
             font-size: 2.25rem;
             font-weight: 700;
             color: #FFA500;
+          }
+
+          .season-highlight {
+            color: #FAAB07;
           }
 
           &::after {
