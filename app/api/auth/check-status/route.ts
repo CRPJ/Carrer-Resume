@@ -67,6 +67,22 @@ export async function GET() {
       }
     }
 
+    // 1-4: JWT에서 매칭된 profile UUID로 직접 조회
+    if (!profile && session.user.id) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(session.user.id)) {
+        const { data: profileById } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id, display_name, email, growth_status")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (profileById) {
+          profile = profileById;
+        }
+      }
+    }
+
     if (profile) {
       return NextResponse.json({
         success: true,

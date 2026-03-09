@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      // 1차: email
       const { data, error } = await supabaseAdmin
         .from("user_profiles")
         .select("*")
@@ -64,13 +65,46 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         );
       }
-      if (!data) {
+
+      if (data) {
+        profile = data;
+      }
+
+      // 2차: auth_email
+      if (!profile) {
+        const { data: profileByAuth } = await supabaseAdmin
+          .from("user_profiles")
+          .select("*")
+          .eq("auth_email", session.user.email)
+          .maybeSingle();
+
+        if (profileByAuth) {
+          profile = profileByAuth;
+        }
+      }
+
+      // 3차: JWT에서 매칭된 profile UUID
+      if (!profile && session.user?.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            profile = profileById;
+          }
+        }
+      }
+
+      if (!profile) {
         return NextResponse.json(
           { error: "승인된 프로필이 없습니다. 어드민 승인을 기다려주세요." },
           { status: 404 }
         );
       }
-      profile = data;
     }
 
     const today = new Date().toISOString().split('T')[0];

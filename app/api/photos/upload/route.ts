@@ -24,12 +24,45 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 사용자 ID 조회
-    const { data: profile } = await supabaseAdmin
+    // user_profiles에서 사용자 ID 조회 (1차: email, 2차: auth_email, 3차: session UUID)
+    let profile: { id: string } | null = null;
+
+    const { data: profileByEmail } = await supabaseAdmin
       .from("user_profiles")
       .select("id")
       .eq("email", session.user.email)
       .maybeSingle();
+
+    if (profileByEmail) {
+      profile = profileByEmail;
+    }
+
+    if (!profile) {
+      const { data: profileByAuth } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("auth_email", session.user.email)
+        .maybeSingle();
+
+      if (profileByAuth) {
+        profile = profileByAuth;
+      }
+    }
+
+    if (!profile && session.user?.id) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(session.user.id)) {
+        const { data: profileById } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (profileById) {
+          profile = profileById;
+        }
+      }
+    }
 
     if (!profile) {
       return NextResponse.json(

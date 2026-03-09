@@ -104,6 +104,22 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
+      if (!profile && session.user.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            profile = profileById;
+          }
+        }
+      }
+
       // 매칭 성공 시 auth_email 자동 저장 (다음부터 빠르게 조회)
       if (profile && !profile.auth_email) {
         await supabaseAdmin
@@ -1203,6 +1219,45 @@ export async function PUT(request: Request) {
 
       if (profileByAuth) {
         existingProfile = profileByAuth;
+      }
+    }
+
+    // 3차: 카카오 이름으로 display_name 매칭
+    if (!existingProfile && session.user?.name) {
+      const cleanName = session.user.name.replace(/\s+/g, "");
+      const { data: profileByName } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("display_name", cleanName)
+        .maybeSingle();
+
+      if (profileByName) {
+        existingProfile = profileByName;
+        await supabaseAdmin
+          .from("user_profiles")
+          .update({ auth_email: email })
+          .eq("id", profileByName.id);
+      }
+    }
+
+    // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
+    if (!existingProfile && session.user?.id) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(session.user.id)) {
+        const { data: profileById } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (profileById) {
+          existingProfile = profileById;
+          await supabaseAdmin
+            .from("user_profiles")
+            .update({ auth_email: email })
+            .eq("id", profileById.id)
+            .is("auth_email", null);
+        }
       }
     }
 
