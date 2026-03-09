@@ -464,17 +464,27 @@
           overflow: visible;
           margin-left: 20px;
 
+          .badge-outline {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+          }
+
           .badge-border {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 1;
           }
 
           .badge-text {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             font-size: 1.125rem;
             font-weight: 700;
             color: #000;
@@ -564,15 +574,14 @@
         .details-card {
           display: flex;
           width: 440px;
-          padding: 21px;
+          padding: 20px;
           flex-direction: column;
           align-items: flex-start;
           margin-top: -10px;
-          gap: 16px;
+          gap: 20px;
           background: #232323;
           border: 1px solid rgba(100, 100, 110, 0.6);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(255, 255, 255, 0.25);
+          border-radius: 12px;
 
           .details-header {
             display: flex;
@@ -615,8 +624,8 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              height: 19px;
-              margin-bottom: 15px;
+              height: 20px;
+              margin-bottom: 16px;
 
               &:last-child {
                 margin-bottom: 0;
@@ -625,14 +634,14 @@
               .detail-label {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
-                color: #fff;
+                color: #B8B8B8;
                 font-weight: 600;
               }
 
               .detail-value {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
-                color: #fff;
+                color: #FFEC8F;
                 text-align: right;
                 font-weight: 700;
 

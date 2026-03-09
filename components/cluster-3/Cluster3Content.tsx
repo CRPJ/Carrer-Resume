@@ -1102,7 +1102,7 @@ const Cluster3Content = () => {
         <div className="section4-top-header">
           <div className="header-left">
           <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '-24px', marginLeft: '-4px', verticalAlign: 'middle' }} />
+            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
             포트폴리오 아카이빙 output
           </h2>
             <div className="header-sub">
@@ -1212,7 +1212,7 @@ const Cluster3Content = () => {
         <div className="section5-header">
           <div className="header-left">
           <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '32px', height: '32px', objectFit: 'contain', marginRight: '-24px', marginLeft: '-4px', verticalAlign: 'middle' }} />
+            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
             The Detail 10
           </h2>
             <div className="header-sub">
