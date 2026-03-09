@@ -96,8 +96,8 @@
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      height: 3px;
-      background: #D4C700;
+      height: 1px;
+      background: #ECBB02;
       z-index: 10;
     }
 
@@ -1956,6 +1956,22 @@
   max-width: 1330px;
   padding: 30px 0 10px 0;
   margin-top: 20px;
+  position: relative;
+  z-index: 2;
+  background: #000;
+
+  // Vector 38: 섹션1 하단 노란색 구분선 (피그마 시안)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: #ECBB02;
+    z-index: 10;
+  }
 
   // SEASON CHALLENGE 배너
   .section3-banner {
@@ -3583,6 +3599,22 @@
   padding: 80px 0 40px 0;
   margin-top: 40px;
   overflow: visible;
+  position: relative;
+  z-index: 2;
+  background: #000;
+
+  // Vector 38: 섹션1 하단 노란색 구분선 (피그마 시안)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: #ECBB02;
+    z-index: 10;
+  }
 
   // 필터 바
   .weekly-filter-bar {
