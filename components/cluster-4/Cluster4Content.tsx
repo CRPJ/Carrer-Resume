@@ -1631,12 +1631,9 @@ const Cluster4Content = () => {
 
           {/* 오른쪽 캐릭터 이미지 */}
           <div className="card-right">
-            <img 
-              src="/images/0/cluster4/bg cha.png" 
+            <img
+              src="/images/0/cluster4/bg cha.png"
               alt="Character"
-              ref={(el) => {
-                if (el) el.style.cssText = 'width:auto!important;height:650px!important;max-width:none!important;object-fit:contain!important;';
-              }}
             />
           </div>
         </div>
@@ -1655,7 +1652,10 @@ const Cluster4Content = () => {
                 openSeasonReputationModal();
               }
             }} />
-            <img src="/images/0/cluster 3/icon - help.png" alt="Help" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} />
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
+            </div>
           </div>
           <div className="section3-title-wrapper">
             <h2 className="section3-banner-text">SEASON CHALLENGE</h2>

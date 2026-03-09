@@ -241,16 +241,19 @@
     overflow: hidden; // 확대 시 메뉴가 nav 뒤로 밀리지 않도록
 
     .btn--primary {
-      background-color: var(--quaternary-color);
-      color: var(--secondary-color);
-      font-weight: 700;
-      padding: 8px 16px 7px;
-      font-size: 13px;
-      &::before {
-        border-bottom-color: var(--primary-color);
-      }
+      background-color: var(--quaternary-color) !important;
+      color: #1C242F !important;
+      font-family: 'Khula', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      line-height: 18px;
+      letter-spacing: 1px;
+      padding: 6px 16px !important;
+      clip-path: none !important;
+      border-radius: 0;
+      &::before,
       &::after {
-        border-top-color: var(--primary-color);
+        display: none !important;
       }
     }
   }

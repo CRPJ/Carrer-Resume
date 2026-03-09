@@ -47,41 +47,9 @@
   }
 }
 
-// ===== 고줌 데스크탑 (175%+ 줌) - 세로 배치 =====
-// JS(ResponsiveScale)가 html.high-zoom 클래스를 토글
-// React 상태 변경 없이 CSS만으로 레이아웃 전환 → 줌 복원 시 즉시 원래대로
-html.high-zoom {
-  .desktop-layout {
-    flex-direction: column !important;
-    align-items: center !important;
-  }
-
-  .sidebar-sticky-wrapper {
-    position: relative !important;
-    top: auto !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    visibility: hidden !important;
-
-    & > div {
-      position: relative !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: auto !important;
-    }
-  }
-
-  .home-two-content-col {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  // 고줌 시 resume-card(사이드바 카드) 숨김
-  .home-two-sidebar-col {
-    display: none !important;
-  }
-}
+// ===== 데스크탑 확대 시 모바일 미디어쿼리 방지 =====
+// JS(ResponsiveScale)가 @media (max-width:1199px) 규칙들을 직접 비활성화
+// → 별도 CSS 오버라이드 불필요
 
 // ===== 1200~1400px (노트북/중간폭) - 타이트 데스크톱 =====
 // CSS zoom이 media query를 무력화하므로, JS가 html.tight-desktop 클래스를 토글
@@ -185,16 +153,15 @@ html.mid-desktop {
 // ★ zoom으로 모든 모니터 대응 (position: fixed도 영향 받음)
 html {
   background-color: #0a0a0a;
-  overflow-x: hidden;
   // zoom은 JS에서 적용
 }
 
 body {
   width: 100%;
+  min-width: var(--content-max-width); // ★ 브라우저 확대 시 축소 방지 → 스크롤바 생성
   max-width: var(--outer-max-width); // ★ 넓은 모니터에서도 레이아웃 일관성
   margin: 0 auto !important;
   position: relative;
-  overflow-x: hidden;
 }
 
 .nftg-content,
@@ -444,111 +411,29 @@ body {
   }
 }
 
-// 탭 메뉴 반응형
+// 탭 메뉴 반응형 — Figma 2-row layout
 .cluster-tabs {
   position: relative;
-  
-  .cluster-tabs-inner {
-    // 기본은 콘텐츠 폭(가독성)을 따르되, 4K급 와이드 화면에서는 탭을 더 많이 노출
-    max-width: min(100%, var(--content-max-width));
-    margin-left: auto;
-    margin-right: auto;
-    
-    // ★ 1줄 가로 스크롤
-    display: flex;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding: 0 50px; // 화살표 공간 확보
+  max-width: min(100%, var(--content-max-width));
 
-    // 4K(3840px) 등 초광폭 화면: 탭 영역은 더 넓게 사용해서 한 번에 더 많이 보이도록
-    @media (min-width: 2000px) {
-      // 양쪽 화살표/그라데이션 여백을 고려해 살짝 더 넓게
-      max-width: min(2400px, calc(100vw - 160px));
-    }
-    
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-  
-  // ★ 스크롤 화살표 버튼
-  .cluster-tabs-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #FFD000 0%, #FAAB07 100%);
-    border: none;
+  .cluster-tabs-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 20;
-    box-shadow: 0 2px 10px rgba(250, 171, 7, 0.4);
-    transition: all 0.2s ease;
-    
-    i {
-      color: #000;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    
-    &:hover {
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
-    }
-    
-    &.left {
-      left: 10px;
-    }
-    
-    &.right {
-      right: 10px;
-    }
+    gap: 18px;
+    flex-wrap: nowrap;
   }
-  
-  // ★ 그라데이션 힌트 (화살표 배경)
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 80px;
-    background: linear-gradient(to right, transparent, rgba(10, 10, 10, 0.9));
-    pointer-events: none;
-    z-index: 10;
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 80px;
-    background: linear-gradient(to left, transparent, rgba(10, 10, 10, 0.9));
-    pointer-events: none;
-    z-index: 10;
-  }
-  
+
   .cluster-tab {
-    width: var(--tab-width, 250px);
-    min-width: var(--tab-width, 250px);
-    height: var(--tab-height, 48px);
-    font-size: var(--tab-font-size, 14px);
+    width: 259px;
+    min-width: 259px;
+    height: 56px;
+    font-size: 14px;
     flex-shrink: 0;
 
     @media (max-width: 1199px) {
       width: 180px;
       min-width: 180px;
-      height: 40px;
+      height: 44px;
       font-size: 11px;
     }
   }

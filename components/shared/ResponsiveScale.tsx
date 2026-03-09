@@ -31,54 +31,83 @@ const ResponsiveScale = () => {
       }
     };
 
+    const mountScreenWidth = window.screen.availWidth;
+
+    const getReliableWidth = () => {
+      return Math.min(window.outerWidth, mountScreenWidth);
+    };
+
+    let naturalBodyWidth = 0;
+
     const applyScale = () => {
-      // outerWidth: 실제 창 크기만 반영, 브라우저 줌(Ctrl+/-)에 불변
-      // → CSS zoom이 항상 안정적이고, 브라우저 줌 UX를 방해하지 않음
-      const w = window.outerWidth;
+      const w = getReliableWidth();
 
       if (w < MOBILE_BREAKPOINT) {
         document.documentElement.style.zoom = '1';
         document.documentElement.style.setProperty('--app-zoom', '1');
         document.documentElement.classList.remove('tight-desktop');
         document.documentElement.classList.remove('mid-desktop');
+        document.body.style.minWidth = '';
         requestAnimationFrame(() => updateHeaderDividerY());
-        document.documentElement.style.overflowX = 'hidden';
-        document.body.style.overflowX = 'hidden';
         return;
       }
 
-      const scale = Math.min(w / BASE_WIDTH, MAX_ZOOM);
+      const baseScale = Math.min(w / BASE_WIDTH, MAX_ZOOM);
+      const browserZoom = w / window.innerWidth;
+
+      // ★ 150% 초과 확대 차단: CSS zoom을 줄여서 브라우저 확대를 상쇄
+      const MAX_BROWSER_ZOOM = 1.5;
+      let scale = baseScale;
+      if (browserZoom > MAX_BROWSER_ZOOM) {
+        scale = (baseScale * MAX_BROWSER_ZOOM) / browserZoom;
+      }
 
       document.documentElement.style.zoom = String(scale);
       document.documentElement.style.setProperty('--app-zoom', String(scale));
 
+      if (browserZoom < 1.05) {
+        // 100% 줌 → 정상 상태
+        naturalBodyWidth = Math.round(window.innerWidth / baseScale);
+        document.body.style.minWidth = '';
+        document.documentElement.style.overflowX = 'hidden';
+      } else {
+        // 확대 중 (최대 150%까지) → 레이아웃 고정 + 스크롤바
+        if (naturalBodyWidth > 0) {
+          document.body.style.minWidth = `${naturalBodyWidth}px`;
+        }
+        document.documentElement.style.overflowX = 'auto';
+      }
+
       updateDesktopClasses(w);
-
       requestAnimationFrame(() => updateHeaderDividerY());
-      document.documentElement.style.overflowX = 'hidden';
-      document.body.style.overflowX = 'hidden';
-
-      // ★ 고줌 감지: 실제 데스크탑이지만 브라우저 줌으로 뷰포트가 좁아진 경우
-      // CSS 클래스만 토글 → React 상태 변경 없이 CSS로 세로 배치
-      const isHighZoom = w >= MOBILE_BREAKPOINT && window.innerWidth < MOBILE_BREAKPOINT;
-      document.documentElement.classList.toggle('high-zoom', isHighZoom);
     };
 
     applyScale();
     window.addEventListener('load', applyScale);
     window.addEventListener('resize', applyScale);
 
+    const pollInterval = window.setInterval(applyScale, 500);
+
+    const dprMedia = window.matchMedia(
+      `(resolution: ${window.devicePixelRatio}dppx)`
+    );
+    const onDPRChange = () => {
+      setTimeout(applyScale, 150);
+    };
+    dprMedia.addEventListener('change', onDPRChange);
+
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener('load', applyScale);
       window.removeEventListener('resize', applyScale);
+      dprMedia.removeEventListener('change', onDPRChange);
       document.documentElement.style.zoom = '';
       document.documentElement.style.removeProperty('--app-zoom');
       document.documentElement.style.removeProperty('--header-divider-y');
       document.documentElement.style.overflowX = '';
-      document.body.style.overflowX = '';
+      document.body.style.minWidth = '';
       document.documentElement.classList.remove('tight-desktop');
       document.documentElement.classList.remove('mid-desktop');
-      document.documentElement.classList.remove('high-zoom');
     };
   }, []);
 

@@ -1,57 +1,57 @@
 // Font imports
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 @font-face {
-  font-family: 'Cafe24Anemone';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+  font-family: "Cafe24Anemone";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Cafe24AnemoneAir';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff') format('woff');
+  font-family: "Cafe24AnemoneAir";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2202@1.0/Cafe24Ohsquareair.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'HakgyoansimTuho';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimTuhoR.woff2') format('woff2');
+  font-family: "HakgyoansimTuho";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimTuhoR.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Tenada';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/Tenada.woff2') format('woff2');
+  font-family: "Tenada";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/Tenada.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Eutman';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKCHAN.woff2') format('woff2');
+  font-family: "Eutman";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKCHAN.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'GanaChocolate';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff') format('woff');
+  font-family: "GanaChocolate";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ghanachoco.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Jeongmeokbawi';
-  src: url('https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/SangSangRockOTF.woff') format('woff');
+  font-family: "Jeongmeokbawi";
+  src: url("https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/SangSangRockOTF.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -81,48 +81,55 @@
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
-  background: #0C0F14;
-  border: 1px solid #313F11 !important;
+  background: #0c0f14;
+  border: 1px solid #313f11 !important;
   box-shadow: none;
   border-radius: 0 !important;
   overflow: hidden !important;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   margin: 0;
   padding: 0;
-  padding-top: 45px !important;
+  padding-top: 35px !important;
   position: relative;
   box-sizing: border-box !important;
 
-  // 상단 프로필 영역 배경색
+  // 상단 프로필 영역 배경 (도시 야경 이미지 + 그라데이션 오버레이)
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 45px;
-    background: rgba(250, 171, 7, 1);
+    height: 35px;
+    background:
+      linear-gradient(to right, rgba(0, 0, 0, var(--identity-tab-overlay, 0.45)), rgba(250, 171, 7, 0.75)),
+      var(--identity-tab-bg) center 42% / cover no-repeat;
     z-index: 1;
   }
 
   // 상단 주황 탭 "Identity - Core" 라벨
   &::after {
-    content: 'Identity - Core';
+    content: "Identity - Core";
     position: absolute;
     top: 0;
     left: 14px;
-    height: 45px;
+    height: 35px;
     display: flex;
     align-items: center;
     color: #fff;
-    font-size: 19px;
-    font-family: 'HakgyoansimTuho', sans-serif;
+    font-size: 17px;
+    font-family: "HakgyoansimTuho", sans-serif;
     font-weight: 400;
-    line-height: 22px;
+    line-height: 17px;
     z-index: 2;
     pointer-events: none;
   }
-  
+
   // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
   @media only screen and (max-width: 1199px) {
     width: 100% !important;
@@ -133,7 +140,7 @@
     max-height: none !important;
     padding: 12px !important;
     overflow: hidden !important;
-    
+
     // 내부 고정 너비 요소들 모두 100%로 변경
     .resume-header,
     .resume-intro,
@@ -158,7 +165,7 @@
       margin: 0 0 10px 0 !important;
       overflow: visible !important;
     }
-    
+
     // ★ 사진 축소 + mask 해제
     .resume-photo {
       width: 90px !important;
@@ -213,7 +220,10 @@
         font-size: 0.6875rem !important;
         gap: 4px !important;
 
-        .detail-icon { width: 12px !important; height: 12px !important; }
+        .detail-icon {
+          width: 12px !important;
+          height: 12px !important;
+        }
       }
     }
 
@@ -233,10 +243,21 @@
       gap: 6px !important;
 
       .skill-card {
-        .skill-icon { width: 20px !important; height: 20px !important; top: -5px !important; left: -5px !important; }
-        .skill-num { font-size: 1rem !important; }
-        .skill-unit { font-size: 0.5rem !important; }
-        .skill-label { font-size: 0.5625rem !important; }
+        .skill-icon {
+          width: 20px !important;
+          height: 20px !important;
+          top: -5px !important;
+          left: -5px !important;
+        }
+        .skill-num {
+          font-size: 1rem !important;
+        }
+        .skill-unit {
+          font-size: 0.5rem !important;
+        }
+        .skill-label {
+          font-size: 0.5625rem !important;
+        }
       }
     }
 
@@ -332,10 +353,21 @@
       gap: 8px !important;
 
       .skill-card {
-        .skill-icon { width: 22px !important; height: 22px !important; top: -6px !important; left: -6px !important; }
-        .skill-num { font-size: 1.25rem !important; }
-        .skill-unit { font-size: 0.5625rem !important; }
-        .skill-label { font-size: 0.5625rem !important; }
+        .skill-icon {
+          width: 22px !important;
+          height: 22px !important;
+          top: -6px !important;
+          left: -6px !important;
+        }
+        .skill-num {
+          font-size: 1.25rem !important;
+        }
+        .skill-unit {
+          font-size: 0.5625rem !important;
+        }
+        .skill-label {
+          font-size: 0.5625rem !important;
+        }
       }
     }
 
@@ -396,10 +428,19 @@
         gap: 16px !important;
 
         .skill-card {
-          .skill-icon { width: 26px !important; height: 26px !important; }
-          .skill-num { font-size: 1.5rem !important; }
-          .skill-unit { font-size: 0.625rem !important; }
-          .skill-label { font-size: 0.6875rem !important; }
+          .skill-icon {
+            width: 26px !important;
+            height: 26px !important;
+          }
+          .skill-num {
+            font-size: 1.5rem !important;
+          }
+          .skill-unit {
+            font-size: 0.625rem !important;
+          }
+          .skill-label {
+            font-size: 0.6875rem !important;
+          }
         }
       }
     }
@@ -417,10 +458,19 @@
       }
 
       .resume-skills .skill-card {
-        .skill-icon { width: 30px !important; height: 30px !important; }
-        .skill-num { font-size: 1.75rem !important; }
-        .skill-unit { font-size: 0.6875rem !important; }
-        .skill-label { font-size: 0.75rem !important; }
+        .skill-icon {
+          width: 30px !important;
+          height: 30px !important;
+        }
+        .skill-num {
+          font-size: 1.75rem !important;
+        }
+        .skill-unit {
+          font-size: 0.6875rem !important;
+        }
+        .skill-label {
+          font-size: 0.75rem !important;
+        }
       }
     }
 
@@ -444,8 +494,8 @@
 
     .resume-photo {
       flex-shrink: 0;
-      width: 242px;   // +2px: 서브픽셀 렌더링 틈 방지
-      height: 275px;  // +2px: 서브픽셀 렌더링 틈 방지
+      width: 242px; // +2px: 서브픽셀 렌더링 틈 방지
+      height: 275px; // +2px: 서브픽셀 렌더링 틈 방지
       border-radius: 0;
       overflow: visible;
       background: transparent;
@@ -455,10 +505,10 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
-      -webkit-mask-image: url('/images/0/cluster 1/shape.png');
+      -webkit-mask-image: url("/images/0/cluster 1/shape.png");
       -webkit-mask-size: cover;
       -webkit-mask-position: center;
-      mask-image: url('/images/0/cluster 1/shape.png');
+      mask-image: url("/images/0/cluster 1/shape.png");
       mask-size: cover;
       mask-position: center;
 
@@ -501,13 +551,13 @@
       }
 
       .resume-name {
-        color: #FFF;
-        font-family: 'Cafe24Anemone', sans-serif;
+        color: #fff;
+        font-family: "Cafe24Anemone", sans-serif;
         font-size: 1.625rem;
         font-style: normal;
         font-weight: 400;
         line-height: 34px;
-        margin-top: -8px;
+        margin-top: -6px;
         margin-bottom: 2px;
         margin-left: -5px;
         padding-right: 35px;
@@ -522,7 +572,7 @@
         }
 
         .name-eng {
-          font-family: 'Cafe24AnemoneAir', sans-serif;
+          font-family: "Cafe24AnemoneAir", sans-serif;
           font-size: 13px;
           font-weight: 300;
           color: #999;
@@ -540,7 +590,7 @@
           gap: 10px;
           font-size: 0.875rem;
           line-height: 20px;
-          color: #FFFFFF;
+          color: #ffffff;
           align-items: center;
 
           .detail-icon {
@@ -577,19 +627,19 @@
     margin-top: 40px;
     width: 487px;
     height: 118px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/0/cluster 1/bg image/17.png');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/images/0/cluster 1/bg image/17.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     border: none;
     outline: none;
     box-shadow: none;
-    font-family: 'HakgyoansimTuho', sans-serif;
+    font-family: "HakgyoansimTuho", sans-serif;
     font-size: 1.4rem;
     font-style: normal;
     font-weight: 400;
     line-height: 32px;
-    color: #FFF;
+    color: #fff;
     margin: 0;
     margin-bottom: -1px;
     padding: 0 30px;
@@ -603,14 +653,14 @@
 
     // 왼쪽 금색 바 - 시안 Vector 9.svg (75px, round cap)
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       left: 4px;
       top: 50%;
       transform: translateY(-50%);
       width: 2px;
       height: 75px;
-      background: #FFC300;
+      background: #ffc300;
       border-radius: 1px;
     }
 
@@ -621,13 +671,13 @@
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: -2px;
       left: 0;
       width: 100%;
       height: 4px;
-      background: #0C0F14;
+      background: #0c0f14;
       z-index: 1;
     }
   }
@@ -645,7 +695,7 @@
   .resume-stats {
     flex-shrink: 0;
     width: 138px;
-    margin-left: 13px; // 컨테이너 padding 20px + 13px = 피그마 33px 여백
+    margin-left: 8px; // 컨테이너 padding 20px + 8px = 살짝 왼쪽으로 이동
 
     .stat-item {
       margin-bottom: 25px; // 피그마 시안 gap: 25px
@@ -676,7 +726,7 @@
           display: inline-block;
           width: 2px;
           height: 2px;
-          background: #FFEC8F;
+          background: #ffec8f;
           border-radius: 9999px;
           vertical-align: middle;
           font-size: 0;
@@ -690,16 +740,16 @@
         font-family: var(--black-ops-one), cursive;
         font-size: 23px;
         font-weight: 400;
-        color: #FFEC8F;
+        color: #ffec8f;
         white-space: nowrap;
         line-height: 22px;
         margin-left: auto;
 
         .stat-unit {
-          font-family: 'Pretendard', sans-serif;
+          font-family: "Pretendard", sans-serif;
           font-size: 11px;
           font-weight: 400;
-          color: #FFEC8F;
+          color: #ffec8f;
           line-height: 12px;
         }
       }
@@ -716,7 +766,7 @@
 
       .progress-fill {
         height: 100%;
-        background: #FFEC8F;
+        background: #ffec8f;
         border-radius: 5px;
         transition: width 0.3s ease;
         display: block;
@@ -728,6 +778,7 @@
   .resume-badges {
     flex-shrink: 0;
     width: 86px;
+    margin-left: -8px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -740,9 +791,10 @@
       width: 100%;
 
       .badge-icon {
-        width: 19px;
-        height: 20px;
+        width: 29px;
+        height: 30px;
         flex-shrink: 0;
+        margin-left: -6px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -751,15 +803,15 @@
         background-position: center;
 
         &.icon-graphic10 {
-          background-image: url('/images/0/cluster 1/Ok01.png');
+          background-image: url("/images/0/cluster 1/Ok01.png");
         }
 
         &.icon-shield {
-          background-image: url('/images/0/cluster 1/OK02.png');
+          background-image: url("/images/0/cluster 1/OK02.png");
         }
 
         &.icon-graphic13 {
-          background-image: url('/images/0/cluster 1/Ok03.png');
+          background-image: url("/images/0/cluster 1/Ok03.png");
         }
       }
 
@@ -767,12 +819,13 @@
         font-family: var(--black-ops-one), cursive;
         font-size: 20px;
         font-weight: 400;
-        color: #FFEC8F;
-        flex: 1;
-        text-align: right;
+        color: #ffec8f;
+        flex: none;
+        margin-left: 8px;
+        text-align: left;
 
         &.red {
-          color: #FFEC8F;
+          color: #ffec8f;
         }
       }
     }
@@ -782,6 +835,7 @@
   .resume-medal {
     flex-shrink: 0;
     width: 88px;
+    transform: translateX(20px);
     height: 108px; // three-column 높이 유지 (메달 커져도 박스 불변)
     display: flex;
     flex-direction: column;
@@ -800,7 +854,10 @@
         }
 
         img {
-          box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 165, 0, 0.7), 0 0 90px rgba(255, 200, 0, 0.5);
+          box-shadow:
+            0 0 30px rgba(255, 215, 0, 0.9),
+            0 0 60px rgba(255, 165, 0, 0.7),
+            0 0 90px rgba(255, 200, 0, 0.5);
         }
       }
     }
@@ -837,9 +894,9 @@
       width: 101px;
       height: 64px;
       padding: 0;
-      font-family: 'Cafe24Ohsquare', sans-serif;
+      font-family: "Cafe24Ohsquare", sans-serif;
       font-size: 14px;
-      color: #FFEC8F;
+      color: #ffec8f;
       font-weight: 400;
       word-wrap: break-word;
       text-align: center;
@@ -847,7 +904,7 @@
       align-items: center;
       justify-content: center;
       // PNG가 이미 회전된 리본 형태이므로 CSS rotate 불필요
-      background-image: url('/images/0/cluster 1/ribon box.png');
+      background-image: url("/images/0/cluster 1/ribon box.png");
       background-size: 100% 100%;
       background-repeat: no-repeat;
       background-position: center;
@@ -917,7 +974,7 @@
       border-bottom: 1px solid #313131;
       width: 485px;
       height: 36px;
-      background-color: #1C242F;
+      background-color: #1c242f;
       margin-bottom: 0;
 
       &:last-child {
@@ -990,11 +1047,11 @@
             text-align: center;
 
             &.active {
-              color: #FFEC8F;
+              color: #ffec8f;
             }
 
             &.complete {
-              color: #FFEC8F;
+              color: #ffec8f;
             }
           }
 
@@ -1025,13 +1082,13 @@
     padding-bottom: 8px;
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: -18px;
-      background-image: url('/images/0/cluster 1/bg image/OK 섹션89.png');
+      background-image: url("/images/0/cluster 1/bg image/OK 섹션89.png");
       background-size: cover;
       background-position: center -80px;
       background-repeat: no-repeat;
@@ -1039,7 +1096,7 @@
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -1097,23 +1154,23 @@
         font-family: var(--black-ops-one), cursive;
         font-size: 32px;
         font-weight: 400;
-        color: #FFEC8F;
+        color: #ffec8f;
         line-height: 25px;
       }
 
       .skill-unit {
         font-size: 13px;
-        font-family: 'Pretendard', sans-serif;
+        font-family: "Pretendard", sans-serif;
         font-weight: 400;
-        color: #FFF;
+        color: #fff;
         line-height: 18px;
       }
 
       .skill-label {
         font-size: 14px;
-        font-family: 'Pretendard', sans-serif;
+        font-family: "Pretendard", sans-serif;
         font-weight: 500;
-        color: #FFF;
+        color: #fff;
         line-height: 18px;
         white-space: nowrap;
         margin-top: 2px;
@@ -1124,7 +1181,7 @@
   // Notices
   .resume-notices {
     padding: 10px 20px 8px 0;
-    margin-top: 10px;
+    margin-top: 18px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1175,16 +1232,16 @@
         font-size: 16px;
         position: relative;
         z-index: 10;
-        color: #DDDDDD;
+        color: #dddddd;
 
         &.notice-text-top {
-          font-family: 'Eutman', sans-serif;
+          font-family: "Eutman", sans-serif;
           margin-right: -15px;
         }
       }
 
       &.green .notice-text {
-        font-family: 'GanaChocolate', sans-serif;
+        font-family: "GanaChocolate", sans-serif;
         margin-right: -15px;
         white-space: nowrap;
         font-size: 16px;
@@ -1212,7 +1269,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.60);
+        background: rgba(0, 0, 0, 0.6);
 
         // 도장이 찍히면 배경 제거
         &.stamped {
@@ -1223,13 +1280,13 @@
       &.yellow {
         background: transparent;
         border: none;
-        color: #FFD700;
+        color: #ffd700;
       }
 
       &.green {
         background: transparent;
         border: none;
-        color: #21E786;
+        color: #21e786;
       }
     }
   }
@@ -1240,7 +1297,9 @@
   // Resume intro border
   .resume-intro {
     border-left: none !important;
-    &::before { background: #FF4B70 !important; }
+    &::before {
+      background: #ff4b70 !important;
+    }
   }
 
   // Badges - 영역 5 아이콘
@@ -1248,13 +1307,13 @@
     .badge-group {
       .badge-icon {
         &.icon-graphic10 {
-          background-image: url('/images/0/cluster 1/Graphic10.png') !important;
+          background-image: url("/images/0/cluster 1/Graphic10.png") !important;
         }
         &.icon-shield {
-          background-image: url('/images/0/cluster 1/pX02.png') !important;
+          background-image: url("/images/0/cluster 1/pX02.png") !important;
         }
         &.icon-graphic13 {
-          background-image: url('/images/0/cluster 1/Graphic13.png') !important;
+          background-image: url("/images/0/cluster 1/Graphic13.png") !important;
         }
       }
     }
@@ -1265,17 +1324,17 @@
     .stat-item {
       .stat-row {
         .stat-value {
-          color: #FF98A6 !important;
+          color: #ff98a6 !important;
 
           .stat-unit {
-            color: #FF98A6 !important;
+            color: #ff98a6 !important;
           }
         }
       }
 
       .progress-bar {
         .progress-fill {
-          background: #FF98A6 !important;
+          background: #ff98a6 !important;
         }
       }
     }
@@ -1285,10 +1344,10 @@
   .resume-badges {
     .badge-group {
       .badge-num {
-        color: #FF98A6 !important;
+        color: #ff98a6 !important;
 
         &.red {
-          color: #FF98A6 !important;
+          color: #ff98a6 !important;
         }
       }
     }
@@ -1297,13 +1356,13 @@
   // Medal text - 진행중 텍스트
   .resume-medal {
     .medal-text {
-      color: #FF98A6 !important;
+      color: #ff98a6 !important;
     }
   }
 
   // Activity badge colors
   .resume-activities {
-    scrollbar-color: #FF98A6 #2a2a2a !important;
+    scrollbar-color: #ff98a6 #2a2a2a !important;
 
     .activity-row {
       .activity-content {
@@ -1322,11 +1381,11 @@
 
           .activity-badge {
             &.active {
-              color: #FF98A6 !important;
+              color: #ff98a6 !important;
             }
 
             &.complete {
-              color: #FF98A6 !important;
+              color: #ff98a6 !important;
             }
           }
 
@@ -1348,7 +1407,7 @@
   .resume-skills {
     .skill-card {
       .skill-num {
-        color: #FF98A6 !important;
+        color: #ff98a6 !important;
       }
     }
   }
@@ -1357,11 +1416,11 @@
   .resume-notices {
     .notice-box {
       &.yellow {
-        color: #FF98A6 !important;
+        color: #ff98a6 !important;
 
         .notice-text {
           &.notice-text-top {
-            font-family: 'Tenada', sans-serif !important;
+            font-family: "Tenada", sans-serif !important;
             font-size: 0.9375rem !important;
             position: relative;
             top: 2px;
@@ -1374,7 +1433,7 @@
   // Bottom section background - Section 8, 9
   .resume-bottom-section {
     &::before {
-      background-image: url('/images/0/cluster 1/bg image/EC02 (2).png') !important;
+      background-image: url("/images/0/cluster 1/bg image/EC02 (2).png") !important;
       background-position: center -80px !important;
     }
   }
@@ -1385,7 +1444,9 @@
   // Section 3 - intro border
   .resume-intro {
     border-left: none !important;
-    &::before { background: #36DA60 !important; }
+    &::before {
+      background: #36da60 !important;
+    }
   }
 
   // Section 4 - stats
@@ -1393,10 +1454,10 @@
     .stat-item {
       .stat-row {
         .stat-value {
-          color: #B2FF8F !important;
+          color: #b2ff8f !important;
 
           .stat-unit {
-            color: #B2FF8F !important;
+            color: #b2ff8f !important;
           }
         }
       }
@@ -1404,7 +1465,7 @@
 
     .progress-bar {
       .progress-fill {
-        background: #B2FF8F !important;
+        background: #b2ff8f !important;
       }
     }
   }
@@ -1414,21 +1475,21 @@
     .badge-group {
       .badge-icon {
         &.icon-graphic10 {
-          background-image: url('/images/0/cluster 1/PX01.png') !important;
+          background-image: url("/images/0/cluster 1/PX01.png") !important;
         }
         &.icon-shield {
-          background-image: url('/images/0/cluster 1/pX02.png') !important;
+          background-image: url("/images/0/cluster 1/pX02.png") !important;
         }
         &.icon-graphic13 {
-          background-image: url('/images/0/cluster 1/PX03.png') !important;
+          background-image: url("/images/0/cluster 1/PX03.png") !important;
         }
       }
 
       .badge-num {
-        color: #B2FF8F !important;
+        color: #b2ff8f !important;
 
         &.red {
-          color: #B2FF8F !important;
+          color: #b2ff8f !important;
         }
       }
     }
@@ -1446,7 +1507,7 @@
       .activity-badge {
         &.active,
         &.complete {
-          color: #B2FF8F !important;
+          color: #b2ff8f !important;
         }
       }
 
@@ -1465,7 +1526,7 @@
   .resume-skills {
     .skill-card {
       .skill-num {
-        color: #B2FF8F !important;
+        color: #b2ff8f !important;
       }
     }
   }
@@ -1473,7 +1534,7 @@
   // Section 6 - medal
   .resume-medal {
     .medal-text {
-      color: #B2FF8F !important;
+      color: #b2ff8f !important;
     }
   }
 
@@ -1481,10 +1542,10 @@
   .resume-notices {
     .notice-box {
       &.yellow {
-        color: #B2FF8F !important;
+        color: #b2ff8f !important;
 
         .notice-text.notice-text-top {
-          font-family: 'Jeongmeokbawi', sans-serif !important;
+          font-family: "Jeongmeokbawi", sans-serif !important;
           font-size: 1rem !important;
           position: relative;
           top: 1px;
@@ -1495,20 +1556,20 @@
 
   // Section 7 - activities scroll
   .resume-activities {
-    scrollbar-color: #B2FF8F #2a2a2a !important;
+    scrollbar-color: #b2ff8f #2a2a2a !important;
 
     &::-webkit-scrollbar-thumb {
-      background: #B2FF8F !important;
+      background: #b2ff8f !important;
     }
     &::-webkit-scrollbar-thumb:hover {
-      background: #90EE90 !important;
+      background: #90ee90 !important;
     }
   }
 
   // Bottom section background - Section 8, 9
   .resume-bottom-section {
     &::before {
-      background-image: url('/images/0/cluster 1/bg image/PX05.jpg') !important;
+      background-image: url("/images/0/cluster 1/bg image/PX05.jpg") !important;
       background-position: center -80px !important;
     }
   }
@@ -1529,11 +1590,11 @@
   width: 2px !important;
 }
 .resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb {
-  background: #B2FF8F !important;
+  background: #b2ff8f !important;
   border-radius: 2px !important;
 }
 .resume-card.px-theme .resume-activities::-webkit-scrollbar-thumb:hover {
-  background: #90EE90 !important;
+  background: #90ee90 !important;
 }
 .resume-card.px-theme .resume-activities::-webkit-scrollbar-button {
   display: none !important;
@@ -1546,11 +1607,11 @@
   width: 2px !important;
 }
 .resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb {
-  background: #FF98A6 !important;
+  background: #ff98a6 !important;
   border-radius: 2px !important;
 }
 .resume-card.ec-theme .resume-activities::-webkit-scrollbar-thumb:hover {
-  background: #FF6B8A !important;
+  background: #ff6b8a !important;
 }
 .resume-card.ec-theme .resume-activities::-webkit-scrollbar-button {
   display: none !important;
@@ -1558,38 +1619,24 @@
   width: 0 !important;
 }
 
-// Cluster Tabs Navigation
+// Cluster Tabs Navigation — Figma(Group 2121454060) 2-row layout
 .cluster-tabs {
   width: 100%;
   padding: 0;
-  margin-top: -8px;
-  margin-bottom: 3px;
+  margin-top: 0;
+  margin-bottom: 15px;
   position: relative;
   z-index: 50;
   background: transparent;
   display: flex;
-  align-items: flex-start;
-  position: relative;
-  overflow: visible;
+  flex-direction: column;
+  gap: 15px;
 
-  .cluster-tabs-inner {
+  .cluster-tabs-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 0;
-    padding-right: 50px; // 화살표 버튼 공간 확보
-    margin-left: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
+    gap: 18px;
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    max-width: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   .cluster-tab {
@@ -1597,201 +1644,124 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    height: 48px;
-    width: 250px;
-    min-width: 250px;
-    padding: 0 20px;
+    height: 56px;
+    width: 259px;
+    min-width: 259px;
+    padding: 23px 20px;
     border-radius: 0;
-    // Figma(Group 2121454060) 탭 라벨 폰트: Chakra Petch Bold
-    // (요청대로 "폰트만" 시안과 동일하게 맞춤)
-    font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
-    font-size: 0.875rem;
+    font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    color: #FED402;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: #fed402;
+    // Figma: #1c1f18 opacity 0.6
     background: rgba(28, 31, 24, 0.6);
+    // Figma: individualStrokeWeights top:1 right:0 bottom:1 left:0
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
     text-decoration: none;
     white-space: nowrap;
     transition: all 0.15s ease;
     cursor: pointer;
     flex-shrink: 0;
+    // Figma: BACKGROUND_BLUR radius 12
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-sizing: border-box;
 
     .tab-text {
-      // Bold가 얇게 보이는 이슈 방지: 텍스트 노드에 굵기/폰트 명시
-      font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+      font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
       font-weight: 700;
-      line-height: 1.4;
-      background: linear-gradient(to right, #FED402, #FFF1AA);
+      line-height: 26px;
+      // Figma: diagonal gradient #FED402 → #FFF1AA
+      background: linear-gradient(145deg, #fed402, #fff1aa);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      padding-bottom: 2px;
     }
 
-
     &:hover {
-      background: rgba(254, 212, 2, 0.2);
+      background: rgba(254, 212, 2, 0.15);
     }
 
     &.active {
-      color: #000 !important;
-      background: linear-gradient(to right, #FED402, #FFF1AA) !important;
-      padding-left: 8px !important;
-      padding-right: 8px !important;
-      border-top: none !important;
-      border-bottom: none !important;
-      gap: 8px;
-
-      .tab-deco {
-        height: 36px;
-        width: auto;
-        flex-shrink: 0;
-        position: absolute;
-
-        &.left {
-          left: 10px;
-        }
-
-        &.right {
-          transform: scaleY(-1);
-          right: 10px;
-        }
-      }
-
-      // 긴 탭 이름용 (클러스터 9, 10)
-      &.wide-deco {
-        .tab-deco {
-          &.left {
-            left: 3px;
-          }
-
-          &.right {
-            right: 3px;
-          }
-        }
-      }
+      // Figma: diagonal gradient background
+      background: linear-gradient(145deg, #fed402, #fff1aa) !important;
+      // Figma: stroke #000 top:1 right:0 bottom:1 left:0
+      border-top: 1px solid #000000 !important;
+      border-bottom: 1px solid #000000 !important;
 
       .tab-text {
-        font-family: var(--chakra-petch), 'Chakra Petch', sans-serif;
+        font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
         font-weight: 700;
         background: none !important;
         -webkit-text-fill-color: #000 !important;
         -webkit-background-clip: unset !important;
         background-clip: unset !important;
       }
-
-      .tab-settings {
-        display: flex !important;
-        color: #000 !important;
-        border-color: #000 !important;
-      }
-    }
-
-
-    .tab-settings {
-      display: flex;
-      align-items: center;
-      margin-left: 12px;
-      padding-left: 12px;
-      font-size: 0.875rem;
-      color: #000;
-      border-left: 1px dashed #000;
-      height: 20px;
     }
 
     &.placeholder {
       cursor: default;
       pointer-events: none;
       opacity: 1;
-      background: rgba(28, 31, 24, 0.6);
     }
   }
 
-  .cluster-tabs-gradient {
+  // Diamond separator (Figma: Group 131423 / 131422)
+  // Positioned absolutely within the active .cluster-tab
+  .cluster-tabs-diamond {
     position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100px;
-    height: 56px;
-    background: linear-gradient(to right, transparent, #0a0a0a 70%);
-    pointer-events: none;
-    z-index: 11;
-
-    &.at-start {
-      right: auto;
-      left: 0;
-      background: linear-gradient(to left, transparent, #0a0a0a 70%);
-    }
-  }
-
-  .cluster-tabs-arrow {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #FFD000 0%, #FAAB07 100%);
-    border: none;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 12;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
-    animation: pulse-glow 2s ease-in-out infinite;
+    gap: 0;
+    width: 7px;
+    height: 44px;
+    z-index: 10;
 
-    @keyframes pulse-glow {
-      0%, 100% {
-        box-shadow: 0 2px 8px rgba(250, 171, 7, 0.4);
-      }
-      50% {
-        box-shadow: 0 2px 16px rgba(250, 171, 7, 0.6);
-      }
+    // Figma: 5px from tab left edge, vertically centered
+    &.diamond-left {
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    i {
-      color: #000;
-      font-size: 0.875rem;
-      font-weight: 700;
-      line-height: 1;
+    // Figma: 5px from tab right edge (259 - 7 - 5 = 247), vertically centered
+    &.diamond-right {
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    &:hover {
-      transform: translateY(-50%) scale(1.1);
-      box-shadow: 0 4px 16px rgba(250, 171, 7, 0.6);
-      animation: none;
+    .diamond-line {
+      width: 1px;
+      height: 25px;
+      background: #000;
+      flex-shrink: 0;
     }
 
-    &:active {
-      transform: translateY(-50%) scale(0.95);
-    }
+    .diamond-shapes {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
 
-    &.at-start {
-      right: auto;
-      left: 10px;
-
-      i {
-        animation-name: arrow-hint-left;
+      .diamond-filled {
+        width: 7px;
+        height: 7px;
+        background: #000;
+        flex-shrink: 0;
       }
 
-      @keyframes arrow-hint-left {
-        0%, 100% {
-          transform: translateX(0);
-        }
-        50% {
-          transform: translateX(-3px);
-        }
-      }
-
-      &:hover i {
-        transform: translateX(-3px);
+      .diamond-outline {
+        width: 7px;
+        height: 7px;
+        border: 1px solid #000;
+        box-sizing: border-box;
+        flex-shrink: 0;
       }
     }
   }

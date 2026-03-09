@@ -6,23 +6,14 @@
 // NOTE: html + body 모두에 overflow-y를 주면(특히 Windows) "이중 스크롤바"가 보일 수 있음
 // → 스크롤 컨테이너를 html로 통일하고, body는 overflow-y를 풀어준다.
 html:has(.nftg-content-home) {
-  overflow-x: hidden !important;
+  // overflow-x는 JS(ResponsiveScale)에서 동적 제어: 100%→hidden, 확대→auto
   overflow-y: auto !important;
   height: auto !important;
   min-height: 100vh !important;
-
-  // Windows/Chromium에서 메인 스크롤바(흰 바) 숨기기: 스크롤은 유지
-  scrollbar-width: none; // Firefox
-  -ms-overflow-style: none; // legacy Edge/IE
-  &::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
-  }
 }
 
 body:has(.nftg-content-home) {
-  overflow-x: hidden !important;
+  overflow-x: visible !important;
   overflow-y: visible !important;
   height: auto !important;
   min-height: 100vh !important;

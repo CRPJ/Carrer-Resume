@@ -10,7 +10,15 @@ import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 
+const IDENTITY_TAB_IMAGES = [
+  { src: "/images/0/cluster 1/identity-tab-bg-1.png", overlay: 0.45 },
+  { src: "/images/0/cluster 1/identity-tab-bg-2.png", overlay: 0.45 },
+  { src: "/images/0/cluster 1/identity-tab-bg-3.png", overlay: 0.65 },
+  { src: "/images/0/cluster 1/identity-tab-bg-4.png", overlay: 0.45 },
+];
+
 const Sidebar = () => {
+  const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -1372,8 +1380,10 @@ const Sidebar = () => {
           className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
           style={{
             position: "relative",
+            "--identity-tab-bg": `url('${tabBg.src}')`,
+            "--identity-tab-overlay": String(tabBg.overlay),
             ...(isMobileView ? {} : { transform: `scale(${cardScale})`, transformOrigin: "top center" }),
-          }}
+          } as React.CSSProperties}
         >
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
           {(
@@ -1381,10 +1391,10 @@ const Sidebar = () => {
               onClick={isOwner ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
-                top: "10px",
+                top: "6px",
                 right: "18px",
-                width: "24px",
-                height: "24px",
+                width: "22px",
+                height: "22px",
                 borderRadius: "50%",
                 backgroundColor: "#fff",
                 border: "none",
@@ -1398,7 +1408,7 @@ const Sidebar = () => {
                 opacity: isOwner ? 1 : 0.4,
               }}
             >
-              <i className="ti ti-pencil" style={{ fontSize: "12px", color: "#000" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#000" }}></i>
             </button>
           )}
           {/* Header Section */}
@@ -1527,7 +1537,7 @@ const Sidebar = () => {
                           width={13}
                           height={13}
                           className="detail-icon"
-                          style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px" }}
+                          style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px 0 45px" }}
                         />{" "}
                         <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}
                       </span>
