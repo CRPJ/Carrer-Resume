@@ -1,6 +1,6 @@
 // Cluster 4 - Club Challenge Growth Styles
-@import url('https://fonts.googleapis.com/css2?family=Khula:wght@800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&family=Poppins:wght@700&family=Press+Start+2P&family=Chakra+Petch:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Khula:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&family=Poppins:wght@700&family=Press+Start+2P&family=Chakra+Petch:wght@700&family=Rajdhani:wght@400;500&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
@@ -1288,8 +1288,9 @@
         border: 1px solid rgba(80, 80, 90, 0.4);
 
         .season-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 1.75rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
+          font-weight: 700;
           color: #FFF;
           margin: 0 0 12px 0;
 
@@ -1372,8 +1373,8 @@
         align-items: flex-start;
 
         .season-image-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 2rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
           color: #FFF;
           margin: 0;
           font-weight: 700;
@@ -1492,8 +1493,9 @@
         border-bottom: 1px solid #333;
 
         .season-main-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 1.75rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
+          font-weight: 700;
           color: #FFF;
           margin: 0;
 
@@ -1955,8 +1957,8 @@
 .cluster4-section3 {
   width: 100%;
   max-width: 1330px;
-  padding: 30px 0 10px 0;
-  margin-top: 20px;
+  padding: 0 0 10px 0;
+  margin-top: 0;
   position: relative;
   z-index: 2;
   background: #000;
@@ -1977,8 +1979,8 @@
   // SEASON CHALLENGE 배너
   .section3-banner {
     width: 100%;
-    padding: 79px 40px 40px 40px; 
-    margin-bottom: 20px;
+    padding: 79px 40px 50px 40px;
+    margin-bottom: 30px;
     background-image: url('/images/0/cluster4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
@@ -2094,10 +2096,10 @@
 
     .section3-banner-description {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.25rem;
+      font-size: 1.875rem;
       color: #FFF;
       font-weight: 400;
-      line-height: 22px;
+      line-height: 38px;
       margin-bottom: 0;
       position: relative;
       z-index: 1;
@@ -2112,7 +2114,7 @@
 
     .section3-banner-notice {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.25rem;
+      font-size: 1.875rem;
       color: #FFF;
       position: relative;
       z-index: 1;
@@ -2894,6 +2896,8 @@
                 }
 
                 .rating-text {
+                  font-family: 'Rajdhani', sans-serif;
+                  font-weight: 500;
                   font-size: 0.875rem;
                   color: #FFF;
                   margin-left: 8px;
@@ -2902,10 +2906,10 @@
               }
 
               .review-label {
-                font-family: 'Pretendard', sans-serif;
+                font-family: 'Manrope', sans-serif;
                 font-size: 0.875rem;
                 color: #000;
-                font-weight: 600;
+                font-weight: 800;
                 background: #FFA500;
                 padding: 1px 14px;
                 border-radius: 999px;
@@ -2913,6 +2917,8 @@
             }
 
             .review-comment {
+              font-family: 'Khula', sans-serif;
+              font-weight: 400;
               font-size: 1rem;
               color: rgba(255, 255, 255, 0.7);
               margin: 0;
@@ -3127,9 +3133,10 @@
 
         // 영역 8: 시즌 상태
         .area-8-season-status {
-          width: 100%;   
+          width: 100%;
 
           .section-title {
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
@@ -3264,9 +3271,10 @@
 
         // 영역 9: 시즌 평판
         .area-9-season-reputation {
-          width: 100%;   // 370px → 100%  
+          width: 100%;   // 370px → 100%
 
           .section-title {
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
@@ -3451,9 +3459,9 @@
                   background: rgba(0, 255, 190, 0.1);
                   color: #00FFBE;
                   border-radius: 4px;
-                  font-family: 'Pretendard', sans-serif;
-                  font-size: 0.625rem;
-                  font-weight: 600;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-size: 0.6rem;
+                  font-weight: 500;
                   white-space: nowrap;
                   padding: 4px 8px;
                   line-height: 1;
@@ -3467,9 +3475,9 @@
                   background: rgba(235, 247, 72, 0.1);
                   color: #EBF748;
                   border-radius: 4px;
-                  font-family: 'Pretendard', sans-serif;
-                  font-size: 0.625rem;
-                  font-weight: 600;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-size: 0.6rem;
+                  font-weight: 500;
                   white-space: nowrap;
                   padding: 4px 8px;
                   line-height: 1;
@@ -3519,6 +3527,8 @@
                   display: flex;
                   align-items: center;
                   gap: 10px;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-weight: 400;
                   font-size: 0.9375rem;
                   color: #888;
                   margin-top: 3px;
@@ -3575,6 +3585,8 @@
                   }
 
                   .rating-score {
+                    font-family: 'Rajdhani', sans-serif;
+                    font-weight: 400;
                     font-size: 0.9375rem;
                     color: #888;
                     margin-left: 12px;
