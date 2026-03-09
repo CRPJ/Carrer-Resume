@@ -44,19 +44,52 @@ export async function GET(request: Request) {
         );
       }
 
-      const { data, error } = await supabaseAdmin
+      // 1차: email
+      const { data } = await supabaseAdmin
         .from("user_profiles")
         .select("id, eng_name")
         .eq("email", session.user.email)
         .maybeSingle();
 
-      if (error || !data) {
+      if (data) {
+        profile = data;
+      }
+
+      // 2차: auth_email
+      if (!profile) {
+        const { data: profileByAuth } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id, eng_name")
+          .eq("auth_email", session.user.email)
+          .maybeSingle();
+
+        if (profileByAuth) {
+          profile = profileByAuth;
+        }
+      }
+
+      // 3차: session UUID
+      if (!profile && session.user?.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("id, eng_name")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            profile = profileById;
+          }
+        }
+      }
+
+      if (!profile) {
         return NextResponse.json(
           { error: "프로필을 찾을 수 없습니다." },
           { status: 404 }
         );
       }
-      profile = data;
     }
 
     // user_introductions에서 슬로건 조회
@@ -136,14 +169,47 @@ export async function PUT(request: Request) {
       );
     }
 
-    // user_profiles에서 사용자 ID 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
+    // user_profiles에서 사용자 ID 조회 (1차: email, 2차: auth_email, 3차: session UUID)
+    let profile: { id: string } | null = null;
+
+    const { data: profileByEmail } = await supabaseAdmin
       .from("user_profiles")
       .select("id")
       .eq("email", session.user.email)
       .maybeSingle();
 
-    if (profileError || !profile) {
+    if (profileByEmail) {
+      profile = profileByEmail;
+    }
+
+    if (!profile) {
+      const { data: profileByAuth } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("auth_email", session.user.email)
+        .maybeSingle();
+
+      if (profileByAuth) {
+        profile = profileByAuth;
+      }
+    }
+
+    if (!profile && session.user?.id) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(session.user.id)) {
+        const { data: profileById } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (profileById) {
+          profile = profileById;
+        }
+      }
+    }
+
+    if (!profile) {
       return NextResponse.json(
         { error: "프로필을 찾을 수 없습니다." },
         { status: 404 }

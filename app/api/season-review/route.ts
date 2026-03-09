@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getUserProfile } from "@/lib/get-user-profile";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -48,10 +47,10 @@ export async function GET(request: Request) {
 // PUT: 시즌 리뷰 저장
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { profile, error } = await getUserProfile();
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
     if (!supabaseAdmin) {
@@ -61,7 +60,6 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { seasonHistoryId, rating, review, link } = body;
 
-    // 유효성 검사
     if (!seasonHistoryId) {
       return NextResponse.json({ error: "시즌 기록 ID가 필요합니다." }, { status: 400 });
     }
@@ -80,17 +78,6 @@ export async function PUT(request: Request) {
 
     if (!link || link.trim().length === 0) {
       return NextResponse.json({ error: "링크를 입력해주세요." }, { status: 400 });
-    }
-
-    // 작성자 프로필 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
-
-    if (profileError || !profile) {
-      return NextResponse.json({ error: "프로필을 찾을 수 없습니다." }, { status: 404 });
     }
 
     // 해당 season_history가 본인의 것인지 확인

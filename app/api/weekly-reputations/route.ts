@@ -1,8 +1,7 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase-server";
 import { getCachedTeams, getCachedParts } from "@/lib/cached-data";
+import { getUserProfile } from "@/lib/get-user-profile";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -155,13 +154,10 @@ export async function GET(request: Request) {
 // POST: 주차 평판 작성 (다른 사람에게 평판 남기기)
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { profile: reviewerProfile, error } = await getUserProfile();
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
     const supabase = createAdminClient();
@@ -169,7 +165,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { targetUserId, weekCardId, rating, content, keyword } = body;
 
-    // 유효성 검사
     if (!targetUserId || !weekCardId) {
       return NextResponse.json(
         { error: "대상 사용자와 주차 정보가 필요합니다." },
@@ -202,20 +197,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "키워드를 선택해주세요." },
         { status: 400 }
-      );
-    }
-
-    // 작성자 프로필 조회
-    const { data: reviewerProfile, error: profileError } = await supabase
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
-
-    if (profileError || !reviewerProfile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
       );
     }
 
@@ -299,13 +280,10 @@ export async function POST(request: Request) {
 // DELETE: 주차 평판 삭제 (본인이 작성한 것만)
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { profile, error } = await getUserProfile();
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
     const supabase = createAdminClient();
@@ -317,20 +295,6 @@ export async function DELETE(request: Request) {
       return NextResponse.json(
         { error: "삭제할 평판 ID가 필요합니다." },
         { status: 400 }
-      );
-    }
-
-    // 작성자 프로필 조회
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
-
-    if (!profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
       );
     }
 

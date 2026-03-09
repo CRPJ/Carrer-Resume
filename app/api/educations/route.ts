@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getUserProfile } from "@/lib/get-user-profile";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -86,7 +85,6 @@ const gradeMaxFromDb: { [key: string]: string } = {
 // GET: 학력 조회
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
     const { searchParams } = new URL(request.url);
     const targetUserId = searchParams.get('userId');
 
@@ -100,30 +98,14 @@ export async function GET(request: Request) {
     let userId: string;
 
     if (targetUserId) {
-      // targetUserId가 있으면 해당 유저의 학력 조회 (로그인 불필요)
       userId = targetUserId;
     } else {
-      // 본인 학력 조회 시에는 로그인 필요
-      if (!session?.user?.email) {
-        return NextResponse.json(
-          { error: "로그인이 필요합니다." },
-          { status: 401 }
-        );
+      const { profile, error } = await getUserProfile();
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: error.status });
       }
 
-      // user_profiles에서 사용자 ID 조회
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from("user_profiles")
-        .select("id")
-        .eq("email", session.user.email)
-        .maybeSingle();
-
-      if (profileError || !profile) {
-        return NextResponse.json(
-          { error: "프로필을 찾을 수 없습니다." },
-          { status: 404 }
-        );
-      }
       userId = profile.id;
     }
 
@@ -203,13 +185,10 @@ export async function GET(request: Request) {
 // PUT: 학력 저장
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { profile, error } = await getUserProfile();
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
     const body = await request.json();
@@ -226,7 +205,6 @@ export async function PUT(request: Request) {
     for (let i = 0; i < educations.length; i++) {
       const edu = educations[i];
       const status = edu.status;
-      // 졸업 또는 중퇴/자퇴 상태일 때 졸업년도 필수
       if ((status === '졸업' || status === '중퇴' || status === '자퇴') && !edu.endYear) {
         return NextResponse.json(
           { error: `${i + 1}번째 학력: '${status}' 상태에서는 종료년도를 입력해야 합니다.` },
@@ -239,20 +217,6 @@ export async function PUT(request: Request) {
       return NextResponse.json(
         { error: "서버 설정 오류" },
         { status: 500 }
-      );
-    }
-
-    // user_profiles에서 사용자 ID 조회
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "프로필을 찾을 수 없습니다." },
-        { status: 404 }
       );
     }
 
