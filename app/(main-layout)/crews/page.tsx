@@ -183,7 +183,7 @@ const page = () => {
         <div className="container-fluid" style={{ paddingLeft: 15, paddingRight: 15, maxWidth: '100%' }}>
 
           {/* 필터 바 — cluster4-weekly-list 래퍼로 기존 CSS 활용 */}
-          <div className="cluster4-weekly-list" style={{ padding: 0, margin: 0, maxWidth: '100%' }}>
+          <div className="cluster4-weekly-list crews-filter-only" style={{ padding: 0, margin: 0, maxWidth: '100%', background: 'transparent' }}>
           {isMobile ? (
             <div className="weekly-filter-bar weekly-filter-bar--mobile" onKeyDown={handleKeyDown}>
               <button

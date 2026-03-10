@@ -3648,6 +3648,16 @@
   z-index: 2;
   background: #000;
 
+  // crews 페이지에서는 구분선/배경 제거
+  &.crews-filter-only {
+    background: transparent;
+    margin-top: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+
   // Vector 38: 섹션1 하단 노란색 구분선 (피그마 시안)
   &::before {
     content: '';
