@@ -1839,7 +1839,7 @@ const Cluster4Content = () => {
                       bottom: '8px',
                       right: '8px',
                       background: 'rgba(255, 165, 0, 0.2)',
-                      border: '1px solid #FFA500',
+                      border: '1px solid #FAAB07',
                       borderRadius: '50%',
                       width: '28px',
                       height: '28px',
@@ -1853,7 +1853,7 @@ const Cluster4Content = () => {
                     onMouseEnter={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; } : undefined}
                     onMouseLeave={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; } : undefined}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
@@ -2116,31 +2116,33 @@ const Cluster4Content = () => {
           onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReputationModalOpen(false); }}
         >
           <div style={{
-            width: '460px',
+            width: '500px',
             maxWidth: '90vw',
-            maxHeight: '80vh',
-            background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
-            border: '1px solid #FFA500',
-            borderRadius: '12px',
+            height: '620px',
+            maxHeight: 'calc(100vh - 80px)',
+            background: '#0d1117',
+            border: '1px solid #FAAB07',
+            borderRadius: '0px',
             display: 'flex',
             flexDirection: 'column',
+            overflow: 'hidden',
           }}>
             {/* Header */}
             <div style={{
               padding: '20px 24px',
-              borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
-              background: 'rgba(255, 165, 0, 0.05)',
+              flexShrink: 0,
+              background: 'rgba(0,0,0,0.2)',
             }}>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FFA500' }}>✦ 시즌 평판</h3>
-              <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FAAB07', fontFamily: "'Cafe24Ohsquare', sans-serif" }}>✦ 시즌 평판</h3>
+              <span style={{ color: '#999', fontSize: '14px', display: 'block', marginTop: '8px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
             </div>
 
             {/* Body */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.3)' }}>
               
               {/* 평점 */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {[1, 2, 3, 4, 5].map((starIndex) => {
@@ -2157,20 +2159,20 @@ const Cluster4Content = () => {
                             setSeasonReputationEditData(prev => ({ ...prev, rating: Math.max(0, newRating) }));
                           }}
                         >
-                          <svg viewBox="0 0 24 24" fill={isFull ? '#FFA500' : 'none'} stroke="#FFA500" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
+                          <svg viewBox="0 0 24 24" fill={isFull ? '#FAAB07' : 'none'} stroke="#FAAB07" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                           {isHalf && (
                             <svg viewBox="0 0 24 24" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                               <defs><clipPath id={`sr-half-${starIndex}`}><rect x="0" y="0" width="12" height="24" /></clipPath></defs>
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#sr-half-${starIndex})`} />
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FAAB07" clipPath={`url(#sr-half-${starIndex})`} />
                             </svg>
                           )}
                         </div>
                       );
                     })}
                   </div>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FFA500' }}>
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FAAB07' }}>
                     {seasonReputationEditData.rating} / 10
                   </span>
                 </div>
@@ -2178,7 +2180,7 @@ const Cluster4Content = () => {
 
               {/* 내용 */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   내용 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 100자)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -2210,12 +2212,12 @@ const Cluster4Content = () => {
 
               {/* 키워드 */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
                 </label>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FAAB07', minWidth: '20px' }}>#</span>
                     <select
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword1: e.target.value }))}
@@ -2225,7 +2227,7 @@ const Cluster4Content = () => {
                         height: '44px',
                         padding: '0 10px',
                         background: '#1a1f2e',
-                        border: '2px solid #FFA500',
+                        border: '2px solid #FAAB07',
                         borderRadius: '8px',
                         color: '#fff',
                         fontSize: '13px',
@@ -2253,7 +2255,7 @@ const Cluster4Content = () => {
                     </select>
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FAAB07', minWidth: '20px' }}>#</span>
                     <select
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword2: e.target.value }))}
@@ -2263,7 +2265,7 @@ const Cluster4Content = () => {
                         height: '44px',
                         padding: '0 10px',
                         background: '#1a1f2e',
-                        border: '2px solid #FFA500',
+                        border: '2px solid #FAAB07',
                         borderRadius: '8px',
                         color: '#fff',
                         fontSize: '13px',
@@ -2312,7 +2314,7 @@ const Cluster4Content = () => {
               justifyContent: 'flex-end',
               gap: '12px',
               padding: '16px 24px',
-              borderTop: '1px solid rgba(255, 165, 0, 0.2)',
+              borderTop: '1px solid rgba(250, 171, 7, 0.2)',
               background: 'rgba(0,0,0,0.2)',
             }}>
               <button
@@ -2340,7 +2342,7 @@ const Cluster4Content = () => {
                 style={{
                   padding: '10px 24px',
                   border: 'none',
-                  background: '#FFA500',
+                  background: '#FAAB07',
                   color: '#000',
                   fontSize: '14px',
                   fontWeight: 600,
@@ -2417,7 +2419,7 @@ const Cluster4Content = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <h3 style={{ margin: 0, color: '#FFA500', fontSize: '18px', fontWeight: 600 }}>시즌 평판 상세</h3>
+                <h3 style={{ margin: 0, color: '#FAAB07', fontSize: '18px', fontWeight: 600 }}>시즌 평판 상세</h3>
                 <button
                   onClick={() => setReputationDetailModalOpen(false)}
                   style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '24px', cursor: 'pointer', padding: '4px' }}
@@ -2449,7 +2451,7 @@ const Cluster4Content = () => {
                 {/* Keywords */}
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                   {selectedReputation.keyword_1 && (
-                    <span style={{ padding: '6px 12px', background: 'rgba(255, 165, 0, 0.2)', borderRadius: '20px', color: '#FFA500', fontSize: '13px' }}>
+                    <span style={{ padding: '6px 12px', background: 'rgba(250, 171, 7, 0.2)', borderRadius: '20px', color: '#FAAB07', fontSize: '13px' }}>
                       #{selectedReputation.keyword_1}
                     </span>
                   )}
@@ -2489,7 +2491,7 @@ const Cluster4Content = () => {
                           <img key={`empty-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.2 }} />
                         ))}
                       </div>
-                      <span style={{ color: '#FFA500', fontSize: '14px', fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
+                      <span style={{ color: '#FAAB07', fontSize: '14px', fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
                     </div>
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>|</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2529,7 +2531,7 @@ const Cluster4Content = () => {
             width: '450px',
             maxWidth: '90vw',
             background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
-            border: '1px solid #FFA500',
+            border: '1px solid #FAAB07',
             borderRadius: '12px',
             overflow: 'hidden',
           }}>
@@ -2539,7 +2541,7 @@ const Cluster4Content = () => {
               borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
               background: 'rgba(255, 165, 0, 0.05)',
             }}>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FFA500' }}>✦ 시즌 리뷰</h3>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FAAB07' }}>✦ 시즌 리뷰</h3>
               <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 나의 평가를 남겨주세요</span>
             </div>
 
@@ -2547,7 +2549,7 @@ const Cluster4Content = () => {
             <div style={{ padding: '20px 24px' }}>
               {/* 평점 선택 */}
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <select
                     value={seasonReviewEditData.rating.toString()}
@@ -2558,9 +2560,9 @@ const Cluster4Content = () => {
                       height: '48px',
                       padding: '12px 14px',
                       background: '#1a1f2e',
-                      border: '2px solid #FFA500',
+                      border: '2px solid #FAAB07',
                       borderRadius: '8px',
-                      color: '#FFA500',
+                      color: '#FAAB07',
                       fontSize: '16px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -2591,7 +2593,7 @@ const Cluster4Content = () => {
                       );
                     })}
                   </div>
-                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FFA500' }}>
+                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FAAB07' }}>
                     {seasonReviewEditData.rating.toFixed(1)} / 5.0
                   </span>
                 </div>
@@ -2599,7 +2601,7 @@ const Cluster4Content = () => {
 
               {/* 리뷰 입력 */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   한줄평 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 30자)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -2636,7 +2638,7 @@ const Cluster4Content = () => {
 
               {/* 링크 입력 */}
               <div style={{ marginTop: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   링크
                 </label>
                 <input
@@ -2672,7 +2674,7 @@ const Cluster4Content = () => {
             )}
 
             {/* Footer */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(255, 165, 0, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
               <button
                 onClick={() => setSeasonReviewModalOpen(false)}
                 disabled={seasonReviewSaving}
@@ -2684,7 +2686,7 @@ const Cluster4Content = () => {
                 style={{
                   padding: '10px 24px',
                   border: 'none',
-                  background: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? '#444' : 'linear-gradient(135deg, #FFA500 0%, #FF8C00 100%)',
+                  background: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? '#444' : 'linear-gradient(135deg, #FAAB07 0%, #E09A06 100%)',
                   color: '#fff',
                   fontSize: '14px',
                   fontWeight: 600,
