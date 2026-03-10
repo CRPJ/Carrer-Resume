@@ -50,7 +50,7 @@
         position: absolute;
         right: 15px;
         top: auto !important;
-        bottom: -80px;
+        bottom: -70px;
         width: 759px;
         height: 957px;
         z-index: 10;
@@ -79,14 +79,14 @@
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {
-    width: 100%;
-    max-width: 1330px;
+    width: calc(100% + 27px);
+    max-width: none;
     height: 105px;
     position: relative;
     margin-bottom: 20px;
     background-image: url('/images/0/cluster4/4-1-card/bg img 1.png');
     background-size: cover;
-    background-position: center;
+    background-position: right center;
     background-repeat: no-repeat;
 
     // 70% 검정 오버레이
@@ -101,7 +101,7 @@
       z-index: 1;
     }
 
-    // 하단 주황색 divider (1023px)
+    // 하단 divider (1023px)
     &::after {
       content: '';
       position: absolute;
@@ -110,13 +110,13 @@
       transform: translateX(-50%);
       width: 1023px;
       height: 1px;
-      background: #FFA500;
+      background: #DDF247;
     }
 
     // 네비게이션 버튼들
     .nav-buttons {
       position: absolute;
-      right: 20px;
+      right: 47px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -134,11 +134,12 @@
         background: #fff;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 600;
+        text-transform: capitalize;
+        line-height: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -170,11 +171,12 @@
         background: #FAAB07;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 600;
+        text-transform: capitalize;
+        line-height: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -206,11 +208,12 @@
         background: #FFE3AA;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 600;
+        text-transform: capitalize;
+        line-height: 16px;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -904,7 +907,7 @@
   width: 100%;
   padding: 0;
   background: transparent;
-  border-radius: 16px;
+  border-radius: 0;
   border: none;
 
   .detail-header {
@@ -1024,17 +1027,16 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-    gap: 24px;
+    gap: 50px;
     width: 100%;
-    padding: 0;
-    padding-top: 0;
-    margin-top: 0;
-    padding-right: 0;
-    overflow: hidden;
+    margin-top: 60px;
+    padding: 0 40px;
+    box-sizing: border-box;
+    overflow: visible;
 
     .floating-icons {
-      top: 0;
-      right: 160px;
+      top: -40px;
+      right: 20px;
     }
 
     // 왼쪽: 큰 주차 이미지
@@ -1106,9 +1108,9 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 5px;
       padding-top: 0;
-      margin-top: -18px;
+      margin-top: 0;
 
       // 헤더
       .section1-header {
@@ -1126,6 +1128,7 @@
             font-size: 2rem;
             font-weight: 800;
             color: #fff;
+            line-height: 44px;
             margin: 0;
           }
 
@@ -1137,8 +1140,9 @@
 
             &.success {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #9DFA07;
                 text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
               }
@@ -1146,8 +1150,9 @@
 
             &.fail {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #FF6B6B;
                 text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
               }
@@ -1155,8 +1160,9 @@
 
             &.rest-personal {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #65E3FF;
                 text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
               }
@@ -1164,8 +1170,9 @@
 
             &.rest-official {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #FFEA48;
                 text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
               }
@@ -1183,23 +1190,22 @@
         .header-info-row {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
           margin-bottom: 0;
           flex-wrap: wrap;
 
           .info-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 16px;
-            height: 40px;
+            gap: 6px;
+            padding: 9px 12px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             font-family: 'Pretendard', sans-serif;
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 800;
             color: #fff;
-            margin-top: -8px;
+            line-height: 19px;
 
             img {
               width: 16px;
@@ -1252,7 +1258,10 @@
               align-items: center;
               gap: 4px;
               color: #fff;
+              font-family: 'Poppins', sans-serif;
               font-size: 0.875rem;
+              font-weight: 700;
+              line-height: 35px;
 
               .item-icon {
                 width: 16px;
@@ -1264,7 +1273,8 @@
                 font-family: 'Black Ops One', cursive;
                 color: #fff;
                 font-weight: 400;
-                font-size: 1.125rem;
+                font-size: 0.875rem;
+                line-height: 35px;
               }
             }
           }
