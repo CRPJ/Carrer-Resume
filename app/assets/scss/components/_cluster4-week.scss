@@ -4595,7 +4595,9 @@
 
     // 주차 평판 상세보기 모달
     &.reputation-view-modal {
-      max-width: 480px;
+      width: 480px;
+      height: 454px;
+      max-height: calc(100vh - 80px);
 
       .section-modal-header {
         display: flex;
@@ -4842,7 +4844,9 @@
     // 연계 동료 상세보기 모달
     &.colleague-view-modal {
       width: 660px;
+      height: 364px;
       max-width: 90vw;
+      max-height: calc(100vh - 80px);
 
       .section-modal-header {
         display: flex;
@@ -5038,8 +5042,18 @@
 
     // 실무 정보/역량/경험/경력 상세보기 모달
     &.work-view-modal {
-      width: 650px;
+      width: 540px;
+      height: 85vh;
       max-width: 90vw;
+      max-height: calc(100vh - 40px);
+
+      .work-view-fixed {
+        flex-shrink: 0;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
       .section-modal-header {
         display: flex;

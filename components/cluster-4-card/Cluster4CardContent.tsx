@@ -4106,7 +4106,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>실무 정보</h3>
               <button className="modal-close-btn" onClick={() => setWorkInfoViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4155,7 +4155,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Sub Title</div>
                 <div className="section-content">{selectedWorkInfoCard.subTitle || '-'}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4212,7 +4214,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <h3>실무 역량</h3>
                 <button className="modal-close-btn" onClick={() => setWorkAbilityViewModalOpen(false)}>×</button>
               </div>
-              <div className="section-modal-body">
+              <div className="work-view-fixed">
                 {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
                 <div className="work-view-header-row">
                   <div className="work-view-left">
@@ -4242,7 +4244,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="section-label">Sub Title</div>
                   <div className="section-content">{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}</div>
                 </div>
+              </div>
 
+              <div className="section-modal-body">
                 {/* Output Link */}
                 <div className="work-view-section">
                   <div className="section-label">Output Link</div>
@@ -4287,7 +4291,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>실무 경험</h3>
               <button className="modal-close-btn" onClick={() => setWorkExpViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4340,7 +4344,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Sub Title</div>
                 <div className="section-content">{weekActivityDetails.find(d => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || '-'}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4384,7 +4390,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>실무 경력</h3>
               <button className="modal-close-btn" onClick={() => setWorkCareerViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4432,7 +4438,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   return weekActivityDetails.find(d => d.activity_type_id === activityType)?.sub_title || '-';
                 })()}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
