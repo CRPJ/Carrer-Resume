@@ -2431,29 +2431,33 @@
         }
 
         .season-main-title {
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Poppins', 'Pretendard', sans-serif;
           font-size: 2.25rem;
           font-weight: 700;
+          letter-spacing: -1.08px;
           color: #FFF;
           margin: 0;
 
           .year-orange {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Poppins', 'Pretendard', sans-serif;
             font-size: 2.25rem;
             font-weight: 700;
-            color: #FFA500;
+            color: #FAAB07;
           }
 
           .season-highlight {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
             color: #FAAB07;
           }
 
           &::after {
             content: '';
             display: inline-block;
-            width: 4px;
-            height: 4px;
-            background: #FFA500;
+            width: 2px;
+            height: 2px;
+            background: #FAAB07;
             border-radius: 50%;
             margin-left: 16px;
             vertical-align: middle;
@@ -2474,9 +2478,9 @@
             &::after {
               content: '';
               display: inline-block;
-              width: 4px;
-              height: 4px;
-              background: #FFA500;
+              width: 2px;
+              height: 2px;
+              background: #FAAB07;
               border-radius: 50%;
               margin-left: 12px;
               vertical-align: middle;
@@ -2484,14 +2488,14 @@
           }
 
           .status-badge {
-            background: #FFA500;
+            background: #FAAB07;
             border: none;
             width: 87px;
             height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 17.5px;
+            border-radius: 20px;
             font-size: 0.875rem;
             color: #FFF;
             font-weight: 700;
@@ -2528,7 +2532,7 @@
 
         .qualified-items {
           display: flex;
-          gap: 16px;
+          gap: 15px;
           overflow: visible;
           position: relative;
           z-index: 101;
@@ -2536,7 +2540,7 @@
           .item-group {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
             position: relative;
             cursor: pointer;
             z-index: 102;
@@ -2561,18 +2565,18 @@
             }
 
             .qualified-icon {
-              width: 24px;
-              height: 24px;
+              width: 28px;
+              height: 28px;
               object-fit: contain;
             }
 
             .item {
               font-family: var(--rajdhani), sans-serif;
               font-size: 0.75rem;
-              font-weight: 600;
+              font-weight: 500;
               color: #FAAB07;
-              border-bottom: 1px solid rgba(250, 171, 7, 0.5);
-              padding: 0 8px 2px 8px;
+              border-bottom: 1px solid #FAAB07;
+              padding: 5px 9px;
             }
 
             .trophy {
@@ -2648,8 +2652,9 @@
         display: flex;
         align-items: flex-start;
         justify-content: center;
+        padding-left: 40px;
         overflow: visible;
-        padding-top: 30px;    
+        padding-top: 60px;
 
         .season-image-stack {
           width: 315px;
@@ -2819,7 +2824,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-left: 70px;
+        margin-left: 110px;
         align-items: flex-start;
         opacity: 1;
         transform: translateY(0);
@@ -2838,38 +2843,40 @@
           padding: 12px 0;
 
           .stat {
-            font-size: 0.875rem;
-            color: #CCC;
+            font-family: 'Poppins', 'Pretendard', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #FFF;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
 
             &::before {
               content: '';
               display: inline-block;
               width: 2px;
               height: 2px;
-              background: #FFA500;
+              background: #FAAB07;
               border-radius: 50%;
             }
 
             .stat-icon {
-              width: 18px;
-              height: 18px;
+              width: 20px;
+              height: 21px;
               object-fit: contain;
             }
 
             .number {
               font-family: var(--black-ops-one), cursive;
-              font-size: 1.375rem;
+              font-size: 0.875rem;
               color: #FFF;
               font-weight: 400;
             }
 
             .unit {
               font-family: 'Pretendard', sans-serif;
-              font-size: 1rem;
-              color: #CCC;
+              font-size: 0.875rem;
+              color: #FFF;
               font-weight: 400;
             }
           }
@@ -2879,18 +2886,18 @@
         .area-5-rating {
           display: flex;
           align-items: center;
-          gap: 16px;
-          width: 490px;
+          gap: 20px;
+          width: 466px;
           height: 80px;
-          padding: 16px;
-          background: #222;
+          padding: 10px;
+          background: #1b1b1b;
           border-radius: 30px;
 
           .rating-avatar {
             flex-shrink: 0;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
             overflow: hidden;
 
             img {
@@ -2932,19 +2939,20 @@
                   font-weight: 500;
                   font-size: 0.875rem;
                   color: #FFF;
-                  margin-left: 8px;
-                  line-height: 1;
+                  margin-left: 10px;
+                  letter-spacing: 0.7px;
+                  line-height: 22.5px;
                 }
               }
 
               .review-label {
                 font-family: 'Manrope', sans-serif;
                 font-size: 0.875rem;
-                color: #000;
-                font-weight: 800;
-                background: #FFA500;
-                padding: 1px 14px;
-                border-radius: 999px;
+                color: #161616;
+                font-weight: 700;
+                background: #FAAB07;
+                padding: 4px 10px;
+                border-radius: 14px;
               }
             }
 
@@ -2961,7 +2969,7 @@
         // 영역 6: 원형 차트 3개
         .area-6-circles {
           display: flex;
-          gap: 25px;
+          gap: 40px;
           justify-content: space-around;
           padding: 30px 0;
 
@@ -3023,8 +3031,8 @@
                 top: -5px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 28px;
-                height: 28px;
+                width: 30px;
+                height: 34px;
                 object-fit: contain;
                 z-index: 10;
               }
@@ -3049,15 +3057,18 @@
               z-index: 20;
 
               .label-main {
-                font-size: 1.25rem;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 700;
                 color: #FFF;
                 margin-bottom: 4px;
                 line-height: 1;
               }
 
               .label-sub {
-                font-size: 0.875rem;
-                font-weight: 300;
+                font-family: 'Inter', sans-serif;
+                font-size: 0.75rem;
+                font-weight: 400;
                 color: #FFF;
                 margin-top: -2px;
                 line-height: 1;
@@ -3077,7 +3088,7 @@
         .area-7-progress {
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 10px;
           padding: 16px 0;
 
           .progress-item {
@@ -3089,38 +3100,41 @@
               width: 465.572px;
 
               .name {
+                font-family: 'Pretendard', sans-serif;
                 font-size: 1rem;
+                font-weight: 700;
                 color: #FFF;
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 5px;
 
                 .progress-icon {
                   width: 20px;
-                  height: 20px;
+                  height: 30px;
                   object-fit: contain;
                 }
               }
 
               .value {
+                font-family: 'Chakra Petch', sans-serif;
                 font-size: 0.875rem;
                 color: #FFF;
-                font-weight: 600;
+                font-weight: 700;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 5px;
                 white-space: nowrap;
 
                 .stars-icon {
                   width: 18px;
-                  height: 18px;
+                  height: 13px;
                   flex-shrink: 0;
                   object-fit: contain;
                 }
 
                 .highlight {
                   font-size: 1rem;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-weight: 700;
                 }
               }
@@ -3128,7 +3142,7 @@
 
             .bar {
               border: 1px solid rgba(255, 255, 255, 0.15);
-              background: #333532;
+              background: #323532;
               border-radius: 0;
               width: 465.572px;
               height: 12px;
@@ -3172,14 +3186,15 @@
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            letter-spacing: 0.7px;
+            margin: 0 0 10px 0;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
 
             .section-icon {
-              width: 20px;
-              height: 20px;
+              width: 21px;
+              height: 21px;
               object-fit: contain;
               margin-top: -4px;
             }
@@ -3189,6 +3204,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            background: #0b0b0b;
             max-height: 96px;          // 배지 2개만 보이는 높이
             overflow-y: auto;          // visible → auto
             overflow-x: hidden;
@@ -3253,6 +3269,7 @@
               .badge-info {
                 display: flex;
                 align-items: center;
+                gap: 8px;
 
                 .badge-text {
                   font-family: 'Pretendard', sans-serif;
@@ -3289,7 +3306,7 @@
               
                 &.yellow {
                   background: #FAAB07;
-                  color: #171717;
+                  color: #111111;
                 }
 
                 &.orange {
@@ -3310,14 +3327,15 @@
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            letter-spacing: 0.7px;
+            margin: 0 0 10px 0;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
 
             .section-icon {
-              width: 20px;
-              height: 20px;
+              width: 21px;
+              height: 21px;
               object-fit: contain;
               margin-top: -4px;
             }
@@ -3327,8 +3345,9 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            max-height: 340px;         // 카드 2개 + 세번째 살짝 보이는 높이
+            gap: 20px;
+            background: #1b1b1b;
+            max-height: 490px;         // 피그마 높이 맞춤
             overflow-y: auto;          // visible → auto
             overflow-x: hidden;
             padding: 3px 3px 3px 0;  
@@ -3427,8 +3446,8 @@
                 align-items: flex-start;
 
                 .avatar {
-                  width: 48px;
-                  height: 48px;
+                  width: 42px;
+                  height: 42px;
                   border-radius: 50%;
                   overflow: hidden;
                   flex-shrink: 0;
@@ -3523,16 +3542,18 @@
               .comment {
                 display: flex;
                 align-items: flex-start;
-                gap: 3px;
-                font-size: 0.75rem;
+                gap: 4px;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.8125rem;
+                font-weight: 500;
                 color: #FFF;
                 margin-top: 16px;
-                line-height: 1.4;
+                line-height: 20px;
 
                 .speech-icon {
                   flex-shrink: 0;
-                  width: 16px;
-                  height: 16px;
+                  width: 20px;
+                  height: 20px;
                   margin-top: -2px;
                 }
 
@@ -3562,7 +3583,8 @@
                   font-family: 'Rajdhani', sans-serif;
                   font-weight: 400;
                   font-size: 0.9375rem;
-                  color: #888;
+                  color: #FFF;
+                  letter-spacing: 0.7px;
                   margin-top: 3px;
 
                   .wifi-icon {

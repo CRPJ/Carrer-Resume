@@ -2406,7 +2406,7 @@ const Cluster4Content = () => {
               width: '500px',
               maxHeight: '80vh',
               background: 'linear-gradient(145deg, #1a1d2e 0%, #0d0f1a 100%)',
-              borderRadius: '16px',
+              borderRadius: '0px',
               border: '1px solid rgba(255, 165, 0, 0.3)',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.1)',
               overflow: 'hidden',
@@ -2532,7 +2532,7 @@ const Cluster4Content = () => {
             maxWidth: '90vw',
             background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
             border: '1px solid #FAAB07',
-            borderRadius: '12px',
+            borderRadius: '0px',
             overflow: 'hidden',
           }}>
             {/* Header */}
