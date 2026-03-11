@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useDataMasking } from "@/hooks/useDataMasking";
 
 
 interface Cluster4CardContentProps {
@@ -61,6 +62,7 @@ const formatMajor = (value: string) => {
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
@@ -2340,7 +2342,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </>
                         ) : (
                           <>
-                            <div className="detail-line"><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
                             <div className="detail-line"><span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                           </>
@@ -2404,7 +2406,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isEmpty ? (
                           <span className="text">-</span>
                         ) : (
-                          <><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
                         )}
                       </div>
                     </div>
@@ -4007,7 +4009,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(selectedReputationCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedReputationCard.major)}</span><span className="label">학과</span>
+                      <span className="text">{formatSchool(mask.school(selectedReputationCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedReputationCard.major))}</span><span className="label">학과</span>
                     </div>
                     <div className="detail-line">
                       <span className="text">{selectedReputationCard.team}</span><span className="label">팀</span> | <span className="text">{selectedReputationCard.part}</span><span className="label">파트</span>
@@ -4082,7 +4084,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(selectedColleagueCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedColleagueCard.major)}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
                     </div>
                   </div>
                 </div>

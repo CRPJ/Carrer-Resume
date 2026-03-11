@@ -5,6 +5,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useDataMasking } from "@/hooks/useDataMasking";
 
 // 학력 데이터 타입
 interface EduData {
@@ -82,6 +83,7 @@ const truncateByBytes = (text: string, maxBytes: number): string => {
 const Cluster2Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
 
@@ -1610,16 +1612,16 @@ const Cluster2Content = () => {
               <img className="edu-border-br" src="/images/0/cluster 2/border.png" alt="" />
               <img className="edu-bg-icon" src="/images/0/cluster 2/icon/Success Plan.png" alt="" />
               <div className="edu-header">
-                <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">{edu.school}</span></h3>
+                <h3 className="edu-school"><span className="school-circle"></span><span className="school-name">{mask.school(edu.school)}</span></h3>
               </div>
               <ul className="edu-details">
                 <li><span className="dot">·</span><span className="label">상태</span><span className="value">{edu.status}</span></li>
                 <li><span className="dot">·</span><span className="label">계열</span><span className="value">{edu.category}</span></li>
-                <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">{edu.major1}</span></li>
-                <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{edu.major2}</span></li>
-                <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{edu.major3}</span></li>
-                <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{edu.period.includes('~ing') ? (<>{edu.period.replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : edu.period}</span></li>
-                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${edu.gradeValue}등급` : edu.gradeMax === '100%' ? `${edu.gradeValue}%` : edu.gradeValue}{edu.gradeMax !== '기타' && <span className="grade-sub"> / {edu.gradeMax}</span>}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 1</span><span className="value">{mask.major(edu.major1)}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 2</span><span className="value">{mask.major(edu.major2)}</span></li>
+                <li><span className="dot">·</span><span className="label">전공 3</span><span className="value">{mask.major(edu.major3)}</span></li>
+                <li><span className="dot">·</span><span className="label">기간</span><span className="value highlight">{mask.period(edu.period).includes('~ing') ? (<>{mask.period(edu.period).replace('~ing', '')}<span className="ing-highlight">~ing</span></>) : mask.period(edu.period)}</span></li>
+                <li><span className="dot">·</span><span className="label">성적</span><span className="value highlight">{edu.gradeMax === '9등급' ? `${mask.gpa(edu.gradeValue)}등급` : edu.gradeMax === '100%' ? `${mask.gpa(edu.gradeValue)}%` : mask.gpa(edu.gradeValue)}{edu.gradeMax !== '기타' && <span className="grade-sub"> / {edu.gradeMax}</span>}</span></li>
               </ul>
               <div
                 className="edu-footer"
@@ -1929,7 +1931,7 @@ const Cluster2Content = () => {
             </button>
             <div className="modal-header">
               <div className="modal-school-info">
-                <h2>{selectedEdu.school}</h2>
+                <h2>{mask.school(selectedEdu.school)}</h2>
                 {selectedEdu.isFinal && <span className="final-tag">FINAL</span>}
               </div>
             </div>

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
+import { useDataMasking } from "@/hooks/useDataMasking";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -20,6 +21,7 @@ const IDENTITY_TAB_IMAGES = [
 const Sidebar = () => {
   const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
@@ -1539,13 +1541,13 @@ const Sidebar = () => {
                           className="detail-icon"
                           style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px 0 45px" }}
                         />{" "}
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.birthDate(currentProfile.birthDate)}
                       </span>
                     </div>
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
                       <span>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.city} {currentProfile.district}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || '') + ' ' + (currentProfile.district || ''))}
                       </span>
                     </div>
                     <div className="detail-row">
@@ -1603,7 +1605,7 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.email}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.email(currentProfile.email)}
                       </span>
                     </div>
                     <div className="detail-row">
@@ -1623,7 +1625,7 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.school(currentProfile.school)}
                       </span>
                     </div>
 
@@ -1648,7 +1650,7 @@ const Sidebar = () => {
                           gap: "5px",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span>{currentProfile.major}
+                        <span style={{ color: currentProfile.lightColor }}>·</span>{mask.major(currentProfile.major)}
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
                           <path d="M8.33 6.67L11.67 10L8.33 13.33" stroke="#FFEC8F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -1658,7 +1660,7 @@ const Sidebar = () => {
                     <div className="detail-row">
                       <span style={{ width: "16px" }}></span>
                       <span className="sub-text" style={{ color: currentProfile.lightColor }}>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.period(currentProfile.enrollPeriod)}
                       </span>
                     </div>
                   </div>
@@ -1692,7 +1694,7 @@ const Sidebar = () => {
                   <div className="detail-row">
                     <span style={{ width: "16px" }}></span>
                     <span className="sub-text">
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gpa} <span style={{ color: currentProfile.lightColor }}>/{currentProfile.gpaMax}</span>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {mask.gpa(currentProfile.gpa)} <span style={{ color: currentProfile.lightColor }}>/{currentProfile.gpaMax}</span>
                     </span>
                   </div>
                 </div>

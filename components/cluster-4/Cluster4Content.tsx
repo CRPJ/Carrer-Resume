@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useDataMasking } from "@/hooks/useDataMasking";
 
 // 기본 시즌 데이터 (데이터가 없을 때 사용)
 const defaultSeasonData = {
@@ -49,6 +50,7 @@ const defaultSeasonData = {
 const Cluster4Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
@@ -2020,7 +2022,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="info">
                               <div className="row1">
-                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {age || '-'} <span className="separator">|</span> {reviewer?.university || '-'} <span className="separator">|</span> {reviewer?.major_first || '-'}
+                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {age || '-'} <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
                               </div>
                               <div className="row2">
                                 {reviewer?.teamName || '-'} <span className="separator">|</span> {reviewer?.partName || '-'}{reviewer?.vision && <> <span className="separator">|</span> {reviewer.vision}</>}
@@ -2440,7 +2442,7 @@ const Cluster4Content = () => {
                       {reviewer?.display_name || '익명'}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>
-                      {genderLabel} | {age || '-'}세 | {reviewer?.university || '-'} | {reviewer?.major_first || '-'}
+                      {genderLabel} | {age || '-'}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: '2px' }}>
                       {reviewer?.teamName || '-'} | {reviewer?.partName || '-'}{reviewer?.vision && ` | ${reviewer.vision}`}
