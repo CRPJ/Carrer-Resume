@@ -932,11 +932,11 @@ svg {
 
   .nftg-content-home {
     // sticky 헤더이므로 margin-top 불필요 (헤더가 flow에 있음)
-    margin-top: 16px;
+    margin-top: 4px;
 
     .home-two-sidebar {
       position: sticky;
-      top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
+      top: calc(var(--header-divider-y, var(--header-height, 66px)) + 4px);
     }
   }
 }
