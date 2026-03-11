@@ -127,19 +127,22 @@ export async function GET(request: Request) {
       const teamPart = userTeamPartMap[user.id];
       const education = educationMap[user.id];
 
+      const schoolName = education?.school_name || user.university || '-';
+      const majorName = education?.major_name_1 || user.major_first || '-';
+
       return {
         id: user.id,
         name: user.display_name || '-',
         gender: user.gender || '-',
         age: age || '-',
         profileImg: user.profile_photo_url || '',
-        university: education?.school_name || '-',
-        major: education?.major_name_1 || '-',
+        university: schoolName,
+        major: majorName,
         team: teamPart?.teamName || '-',
         part: teamPart?.partName || '-',
         nickname: user.vision || '-',
         club: user.club || '-',
-        universityMajor: [user.university, user.major_first].filter(Boolean).join(' ') || '-',
+        universityMajor: [schoolName, majorName].filter(v => v && v !== '-').join(' ') || '-',
         status: user.status || '-',
         growthStatus: user.growth_status || '-',
         totalStars: starsMap[user.id] || 0,
