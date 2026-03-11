@@ -48,9 +48,24 @@ body {
   font-weight: 400;
   color: var(--template-color);
   background-color: var(--template-bg);
-  overflow-x: visible;
+  overflow-x: auto;
   width: 100%;
   min-height: 100vh;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(250, 171, 7, 0.85);
+    border-radius: 5px;
+    &:hover {
+      background: rgba(250, 171, 7, 1);
+    }
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
 }
 
 .body-active {
