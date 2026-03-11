@@ -84,7 +84,12 @@
       "Bash(ls:*)",
       "Bash(dir \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\template1\\\\public\\\\images\\\\0\")",
       "Bash(git commit -m \"$\\(cat <<''EOF''\n푸터 UI 개선 - 로고/이미지 교체, SNS 아이콘 업데이트\n\n- 푸터 가운데 로고 이미지 교체 \\(footer-logo.png\\)\n- 우측 하단 컨트롤러 이미지 추가 \\(footer-img.png, 230x184\\)\n- SNS 아이콘 순서 변경: 인스타그램, 유튜브, 네이버카페, 빈 원\n- SNS 링크 업데이트 \\(oranke_marketing.club, oranke 채널\\)\n- 인스타그램 아이콘 호버 시 회색 유지\n- 4번째 아이콘 호버 시 다른 아이콘 리셋 처리\n- 네이버 카페 아이콘 밝기 개선\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(vercel --version:*)"
+      "Bash(vercel --version:*)",
+      "Bash(npx next:*)",
+      "Bash(grep:*)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_evaluate"
     ],
     "deny": [],
     "ask": []

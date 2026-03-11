@@ -103,6 +103,12 @@ export function maskYear(value: string | number | null | undefined): string {
   return str[0] + '*'.repeat(str.length - 1);
 }
 
+/** 나이 마스킹: "27" → "**", 27 → "**" */
+export function maskAge(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '' || value === '-') return '-';
+  return '**';
+}
+
 /** 기간 마스킹: "2019.03 ~ 2023.02" → "2***.** ~ 2***.** " */
 export function maskPeriod(value: string | null | undefined): string {
   if (!value || value === '-') return '-';

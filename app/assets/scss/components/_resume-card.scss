@@ -130,7 +130,7 @@
     pointer-events: none;
   }
 
-  // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
+  /* ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
   @media only screen and (max-width: 1199px) {
     width: 100% !important;
     min-width: 0 !important;
@@ -266,7 +266,7 @@
       width: 100% !important;
       max-width: 100% !important;
     }
-  }
+  } */
 
   // ===== mobile-layout 클래스 기반 반응형 (미디어쿼리와 독립) =====
   body:has(.mobile-layout) & {
@@ -407,7 +407,7 @@
       }
     }
 
-    // 768px 이상: 여유 있으므로 폰트 키움
+    /* 768px 이상: 여유 있으므로 폰트 키움
     @media (min-width: 768px) {
       .activity-line {
         font-size: 0.6875rem !important;
@@ -443,9 +443,9 @@
           }
         }
       }
-    }
+    } */
 
-    // 1024px 이상: 더 여유
+    /* 1024px 이상: 더 여유
     @media (min-width: 1024px) {
       .activity-line {
         font-size: 0.75rem !important;
@@ -472,7 +472,7 @@
           font-size: 0.75rem !important;
         }
       }
-    }
+    } */
 
     // hexagon 버튼 숨기기
     button[aria-label*="hexagon"] {
@@ -1633,10 +1633,10 @@
   gap: 15px;
 
   .cluster-tabs-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     align-items: center;
     gap: 18px;
-    flex-wrap: nowrap;
   }
 
   .cluster-tab {
@@ -1645,8 +1645,7 @@
     justify-content: center;
     position: relative;
     height: 56px;
-    width: 259px;
-    min-width: 259px;
+    min-width: 0;
     padding: 23px 20px;
     border-radius: 0;
     font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
@@ -1665,7 +1664,6 @@
     white-space: nowrap;
     transition: all 0.15s ease;
     cursor: pointer;
-    flex-shrink: 0;
     // Figma: BACKGROUND_BLUR radius 12
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);

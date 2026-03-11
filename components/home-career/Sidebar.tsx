@@ -317,72 +317,30 @@ const Sidebar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
 
   useEffect(() => {
-    // ★ outerWidth 기반 실제 리사이즈 감지
-    // 브라우저 줌(Ctrl+/-)은 outerWidth를 바꾸지 않으므로 자연스럽게 스킵됨
-    let lastOuterWidth = window.outerWidth;
-    let initialized = false;
+    // 고정 너비 레이아웃: 항상 데스크탑
+    setIsMobileView(false);
 
     const calculateScale = () => {
-      const currentOuterWidth = window.outerWidth;
-
-      // 초기화 이후: outerWidth가 변하지 않았으면 브라우저 줌 → 스킵
-      if (initialized && Math.abs(currentOuterWidth - lastOuterWidth) < 5) {
-        return;
-      }
-
-      initialized = true;
-      lastOuterWidth = currentOuterWidth;
-
-      const mobile = window.outerWidth < 1200;
-      setIsMobileView(mobile);
-
-      const BASE_CARD_HEIGHT = 810; // 높이 기준값 완화 → 카드가 헤더 SHOP 위치까지 확장
+      const BASE_CARD_HEIGHT = 810;
       const BASE_SIDEBAR_WIDTH = 497;
 
-      // 모바일: CSS 반응형 그대로 사용
-      if (mobile) {
-        setCardScale(1);
-        document.documentElement.style.removeProperty("--sidebar-width");
-        return;
-      }
-
-      // ★ 카드만 축소, 헤더·nav는 그대로 (네이버 방식)
-      // CSS zoom 적용 전/후 innerHeight가 달라지는 문제 방지:
-      // innerHeight(CSS px) × currentZoom = 물리 픽셀 → ÷ expectedZoom = 안정된 CSS px
-      const BASE_WIDTH = 1977;
-      const MAX_ZOOM = 2.0;
-      const w = window.outerWidth;
-      const expectedZoom = w >= 1200 ? Math.min(w / BASE_WIDTH, MAX_ZOOM) : 1;
-      const currentZoom = parseFloat(document.documentElement.style.zoom || '1');
-      const rawHeight = window.visualViewport?.height || window.innerHeight;
-      const rawWidth = window.visualViewport?.width || window.innerWidth;
-      const viewportHeight = (rawHeight * currentZoom) / expectedZoom;
-      const viewportWidth = (rawWidth * currentZoom) / expectedZoom;
-
-      // 1) 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
-      const availableHeight = viewportHeight - 130; // 헤더 높이 제외
+      // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
+      const viewportHeight = window.innerHeight;
+      const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
-      // 2) 폭 기반 스케일: 우측 콘텐츠 최소 600px 확보
-      const MIN_CONTENT_WIDTH = 600;
-      const GAP = 20;
-      const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
-      const scaleByWidth = maxSidebarByWidth / BASE_SIDEBAR_WIDTH;
-
-      // 높이·폭 중 더 제한적인 쪽 적용, 최대 1.25(SHOP 위치까지 확대 허용), 최소 0.55
-      let scale = Math.min(1.25, scaleByHeight, scaleByWidth);
+      // 높이 기반으로 적용, 최대 1.25, 최소 0.55
+      let scale = Math.min(1.25, scaleByHeight);
       scale = Math.max(0.55, scale);
 
       setCardScale(scale);
 
-      // 사이드바 폭을 스케일에 맞게 조정 → 우측 콘텐츠 영역이 자동 확장
+      // 사이드바 폭을 스케일에 맞게 조정
       const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
       document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
     };
 
     calculateScale();
-
-    // ★ window.resize만 사용 (visualViewport는 브라우저 줌에도 발동하므로 제외)
     window.addEventListener("resize", calculateScale);
 
     return () => {

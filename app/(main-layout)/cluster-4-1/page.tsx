@@ -13,14 +13,7 @@ const Cluster41Page = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
+    setIsMobile(false);
   }, []);
 
   // JavaScript 기반 sticky 구현 (cluster-4와 동일 정책 + footer 충돌 방지)
@@ -35,17 +28,17 @@ const Cluster41Page = () => {
     return 57;
 };
     const computeTop = (zoom: number, height: number) => {
-    const defaultTop = getHeaderBottom() / zoom;
+    const defaultTop = getHeaderBottom();
     let top = defaultTop;
     const footer = document.querySelector("footer");
     if (footer) {
-        const footerTop = footer.getBoundingClientRect().top / zoom;
-        const margin = 2 / zoom;
+        const footerTop = footer.getBoundingClientRect().top;
+        const margin = 2;
         const maxTop = footerTop - height - margin;
         top = Math.min(defaultTop, maxTop);
     }
-    const viewportHeight = window.innerHeight / zoom;
-    const minTop = viewportHeight - height - (2 / zoom);
+    const viewportHeight = window.innerHeight;
+    const minTop = viewportHeight - height - 2;
     top = Math.max(top, minTop);
     return top;
 };
@@ -71,23 +64,23 @@ const Cluster41Page = () => {
       }
 
 
-      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const zoom = 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
       const shouldFix = shellRect.top <= headerBottom;
 
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
-        const height = inner.getBoundingClientRect().height / zoom;
-        const left = shellRect.left / zoom;
-        const defaultTop = getHeaderBottom() / zoom;
+        const height = inner.getBoundingClientRect().height;
+        const left = shellRect.left;
+        const defaultTop = getHeaderBottom();
 
         // footer가 올라오면 사이드바가 footer를 덮지 않게 위로 밀어올림
         let top = defaultTop;
         const footer = document.querySelector("footer");
         if (footer) {
-          const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 2 / zoom;
+          const footerTop = footer.getBoundingClientRect().top;
+          const margin = 2;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
         }
@@ -106,15 +99,14 @@ const Cluster41Page = () => {
       }
 
       if (isFixed && shouldFix) {
-        const zoomNow = parseFloat(document.documentElement.style.zoom) || 1;
-        const height = inner.getBoundingClientRect().height / zoomNow;
-        const defaultTop = getHeaderBottom() / zoomNow;
+        const height = inner.getBoundingClientRect().height;
+        const defaultTop = getHeaderBottom();
 
         let top = defaultTop;
         const footer = document.querySelector("footer");
         if (footer) {
-          const footerTop = footer.getBoundingClientRect().top / zoomNow;
-          const margin = 44 / zoomNow;
+          const footerTop = footer.getBoundingClientRect().top;
+          const margin = 44;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
         }

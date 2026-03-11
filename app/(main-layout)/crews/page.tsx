@@ -68,12 +68,7 @@ const page = () => {
   const statusRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    setIsMobile(false);
   }, []);
 
   useEffect(() => {

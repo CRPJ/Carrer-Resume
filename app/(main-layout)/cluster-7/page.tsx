@@ -77,19 +77,7 @@ const Cluster7Page = () => {
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // 화면 크기 체크
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-
-    // 초기 실행
-    checkMobile();
-
-    window.addEventListener('resize', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
+    setIsMobile(false);
   }, []);
 
   // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
@@ -109,13 +97,13 @@ const Cluster7Page = () => {
 
     // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
         const computeTop = (zoom: number, height: number) => {
-      const defaultTop = getHeaderBottom() / zoom;
+      const defaultTop = getHeaderBottom();
       let top = defaultTop;
 
       const footer = document.querySelector("footer");
       if (footer) {
-          const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 4 / zoom;
+          const footerTop = footer.getBoundingClientRect().top;
+          const margin = 4;
           const maxTop = footerTop - height - margin;
           top = Math.min(defaultTop, maxTop);
       }
@@ -141,15 +129,15 @@ const Cluster7Page = () => {
       }
 
 
-      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const zoom = 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
       const shouldFix = shellRect.top <= headerBottom;
 
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
-        const height = inner.getBoundingClientRect().height / zoom;
-        const left = shellRect.left / zoom;
+        const height = inner.getBoundingClientRect().height;
+        const left = shellRect.left;
         const top = computeTop(zoom, height);
 
         shell.style.width = `${width}px`;
@@ -167,7 +155,7 @@ const Cluster7Page = () => {
 
       // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
       if (isFixed && shouldFix) {
-        const height = inner.getBoundingClientRect().height / zoom;
+        const height = inner.getBoundingClientRect().height;
         const top = computeTop(zoom, height);
         inner.style.top = `${top}px`;
         return;

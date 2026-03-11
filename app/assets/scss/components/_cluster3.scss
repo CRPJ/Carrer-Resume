@@ -260,7 +260,7 @@
       // Cluster2와 동일한 여백/줄바꿈 전략으로 통일
       max-width: min(62ch, 1100px);
       margin: 0 auto;
-      padding: 30px 40px 0 70px;
+      padding: 30px 40px 0;
       line-height: 1.8;
       position: relative;
       z-index: 1;
@@ -272,9 +272,8 @@
       text-wrap: pretty;
 
       // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
-      @media (min-width: 1200px) {
-        transform: translateX(clamp(0px, 2.2vw, 72px));
-      }
+      // @media (min-width: 1200px) unwrapped:
+      transform: translateX(clamp(0px, 2.2vw, 72px));
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;

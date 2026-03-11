@@ -131,7 +131,7 @@ body:has(.nftg-content-home) {
         min-width: 0 !important;
         height: auto !important;
         min-height: 100% !important;
-        overflow-x: hidden !important;
+        overflow-x: visible !important;
         overflow-y: visible !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -152,12 +152,7 @@ body:has(.nftg-content-home) {
         }
 
         .home-two-content {
-          // 세로는 보이되, 가로만 차단해서 "이중/불필요 스크롤바" 방지
           overflow: visible !important;
-          overflow-x: clip !important;
-          @supports not (overflow-x: clip) {
-            overflow-x: hidden !important;
-          }
           max-width: 100% !important;
         }
 
@@ -172,47 +167,44 @@ body:has(.nftg-content-home) {
   }
 }
 
-@media only screen and (min-width: 1400px) {
-  .tournaments,
-  .tournament-details,
-  .badges {
-    .container {
-      max-width: 1496px;
+.tournaments,
+.tournament-details,
+.badges {
+  .container {
+    max-width: 1496px;
+  }
+}
+
+// header
+.header {
+  .navbar__item {
+    .dot-menu {
+      padding: 34px 12px 30px;
+      font-size: 24px;
+      span {
+        display: none;
+      }
+      &::after {
+        content: none;
+      }
+    }
+
+    .dot-menu.nftg-open-modal-active {
+      color: var(--primary-color);
+    }
+
+    .nftg-modal-body-active {
+      transform: translateY(-26px);
+      .navbar__sub-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+      }
     }
   }
 }
 
-@media only screen and (min-width: 1200px) {
-  // header
-  .header {
-    .navbar__item {
-      .dot-menu {
-        padding: 34px 12px 30px;
-        font-size: 24px;
-        span {
-          display: none;
-        }
-        &::after {
-          content: none;
-        }
-      }
-
-      .dot-menu.nftg-open-modal-active {
-        color: var(--primary-color);
-      }
-
-      .nftg-modal-body-active {
-        transform: translateY(-26px);
-        .navbar__sub-menu {
-          opacity: 1;
-          visibility: visible;
-          pointer-events: all;
-        }
-      }
-    }
-  }
-}
-
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1859.98px) {
   .trending {
     .trending__wrapper {
@@ -220,7 +212,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1979.98px) {
   // header
   .header {
@@ -341,7 +335,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1719.98px) {
   // header
   .header {
@@ -464,7 +460,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1599.98px) {
   .footer {
     .footer__widget--alt {
@@ -478,7 +476,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1399.98px) {
   // typography
   .title-xxl {
@@ -633,7 +633,9 @@ body:has(.nftg-content-home) {
     padding: 0px;
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 1199.98px) {
   // layout (tablet/mobile)
   .nftg-app {
@@ -1209,7 +1211,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 991.98px) {
   // typography
   h1 {
@@ -1662,7 +1666,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 767.98px) {
   // offcanvas cart
   .sidebar-cart {
@@ -1982,7 +1988,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 575.98px) {
   // typography
   h1 {
@@ -2461,7 +2469,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 475.98px) {
   // streamer
   .streamer {
@@ -2480,7 +2490,9 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
+/* 고정 너비 레이아웃: 비활성화
 @media only screen and (max-width: 424.98px) {
   // trending nft
   .trending-nft {
@@ -2515,19 +2527,18 @@ body:has(.nftg-content-home) {
     }
   }
 }
+*/
 
-@media only screen and (min-width: 992px) {
-  .tournament-details {
-    .tournament-match {
-      .tournament-match__left,
-      .tournament-match__right {
-        min-width: 250px;
-      }
+.tournament-details {
+  .tournament-match {
+    .tournament-match__left,
+    .tournament-match__right {
+      min-width: 250px;
+    }
 
-      .tournament-match__left {
-        .admin__header-profile {
-          justify-content: flex-end;
-        }
+    .tournament-match__left {
+      .admin__header-profile {
+        justify-content: flex-end;
       }
     }
   }

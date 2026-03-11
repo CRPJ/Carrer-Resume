@@ -909,23 +909,19 @@ svg {
   }
 
   .nftg-layout {
-    width: calc(100% - 75px);
-    flex-grow: 1;
-    margin-left: 75px;
-    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    flex: 1;
+    min-width: 0;
+    height: auto;
     min-height: 100vh;
   }
 
   .nftg-content {
     padding: 0px 8px;
-    margin-top: var(--header-height, 66px);
     overflow-x: clip;
-    
+
     // nftg-content-home은 sticky 작동을 위해 overflow: visible 필요
     &.nftg-content-home {
       overflow: visible;
-      // 가로 오버플로우(원치 않는 스크롤바)만 차단하고,
-      // 세로/스티키 동작은 유지
       overflow-x: clip;
 
       @supports not (overflow-x: clip) {
@@ -935,8 +931,8 @@ svg {
   }
 
   .nftg-content-home {
-    // ★ 헤더 실제 높이(--header-divider-y)에 동기화 → 줌 레벨 변경 시에도 틈 없음
-    margin-top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
+    // sticky 헤더이므로 margin-top 불필요 (헤더가 flow에 있음)
+    margin-top: 16px;
 
     .home-two-sidebar {
       position: sticky;
@@ -949,17 +945,11 @@ svg {
   display: flex;
   .nftg-sidebar {
     width: 0px;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-    }
+    display: none;
   }
 
   .nftg-layout {
-    width: 100%;
-    flex-grow: 1;
-    margin-left: 0px;
-    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    flex: 1;
     min-height: 100vh;
   }
 

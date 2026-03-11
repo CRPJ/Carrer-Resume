@@ -28,12 +28,8 @@ const Cluster41Content = () => {
   const resultBtnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    // 고정 너비 레이아웃: 항상 데스크탑 모드
+    setIsMobile(false);
   }, []);
 
   // 현재 시즌 정보 상태

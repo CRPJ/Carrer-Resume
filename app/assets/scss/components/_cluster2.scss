@@ -169,9 +169,8 @@
 
       // Figma(Image 프레임) 대비: 텍스트 블록이 조금 더 "오른쪽"에 위치
       // - 작은 화면에서는 밀림이 과해질 수 있어 데스크톱에서만 적용
-      @media (min-width: 1200px) {
-        transform: translateX(clamp(0px, 2.2vw, 72px));
-      }
+      // @media (min-width: 1200px) unwrapped:
+      transform: translateX(clamp(0px, 2.2vw, 72px));
 
       p {
         font-family: "HakgyoansimTuho", sans-serif;
@@ -4128,10 +4127,10 @@
     width: 562px;
     height: 826px; // 피그마 시안 562×826px 고정
     max-height: 826px;
-    @media (max-height: 900px) {
+    /* @media (max-height: 900px) {
       height: 80vh;
       max-height: 80vh;
-    }
+    } */
     margin: 20px 0;
     overflow: hidden;
     position: relative;

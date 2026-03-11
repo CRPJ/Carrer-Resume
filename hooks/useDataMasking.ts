@@ -10,6 +10,7 @@ import {
   maskGPA,
   maskYear,
   maskPeriod,
+  maskAge,
 } from '@/lib/dataMasking';
 
 /**
@@ -31,6 +32,7 @@ export function useDataMasking() {
     gpa: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskGPA(v),
     year: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskYear(v),
     period: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskPeriod(v),
+    age: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskAge(v),
   };
 
   return { isLoggedIn, mask: m };

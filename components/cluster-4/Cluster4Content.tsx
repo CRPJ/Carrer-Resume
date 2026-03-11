@@ -2022,7 +2022,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="info">
                               <div className="row1">
-                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {age || '-'} <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
+                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {mask.age(age)}세 <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
                               </div>
                               <div className="row2">
                                 {reviewer?.teamName || '-'} <span className="separator">|</span> {reviewer?.partName || '-'}{reviewer?.vision && <> <span className="separator">|</span> {reviewer.vision}</>}
@@ -2442,7 +2442,7 @@ const Cluster4Content = () => {
                       {reviewer?.display_name || '익명'}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>
-                      {genderLabel} | {age || '-'}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
+                      {genderLabel} | {mask.age(age)}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: '2px' }}>
                       {reviewer?.teamName || '-'} | {reviewer?.partName || '-'}{reviewer?.vision && ` | ${reviewer.vision}`}

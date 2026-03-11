@@ -2332,7 +2332,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                      <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                       <div className="profile-details">
                         {isEmpty ? (
                           <>
@@ -2396,7 +2396,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="profile-info">
                       <div className="profile-name-row">
-                        <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                        <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                         <div className="date-view">
                           <span className="date">{isEmpty ? '0000 - 00 - 00 (일)' : user.date}</span>
                           <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
@@ -3701,7 +3701,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             {colleague.profileImg ? <img src={colleague.profileImg} alt={colleague.name} /> : <div className="profile-placeholder"></div>}
                           </div>
                           <div className="colleague-info">
-                            <div className="colleague-name">{colleague.name} | {colleague.gender} | {colleague.age}</div>
+                            <div className="colleague-name">{colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세</div>
                             <div className="colleague-details">{colleague.team} 팀 | {colleague.part} 파트 | {colleague.nickname}</div>
                           </div>
                         </div>
@@ -3780,7 +3780,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               {user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                             </div>
                             <div className="crew-info">
-                              <div className="crew-name">{user.name} | {user.gender} | {user.age}</div>
+                              <div className="crew-name">{user.name} | {user.gender} | {mask.age(user.age)}세</div>
                               <div className="crew-details">{user.team} 팀 | {user.part} 파트 | {user.nickname}</div>
                             </div>
                           </div>
@@ -4005,7 +4005,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
-                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{selectedReputationCard.age}</span>
+                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{mask.age(selectedReputationCard.age)}세</span>
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
@@ -4080,7 +4080,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
-                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{selectedColleagueCard.age}</span>
+                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{mask.age(selectedColleagueCard.age)}세</span>
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
