@@ -216,6 +216,10 @@ const Cluster3Content = () => {
 
   // 포트폴리오 아카이빙 데이터 (DB 저장용)
   const [portfolioArchives, setPortfolioArchives] = useState<string[]>(Array(10).fill(""));
+  const [portfolioArchiveChannels, setPortfolioArchiveChannels] = useState<string[]>([
+    'instagram', 'youtube', 'blog', 'tistory', 'twitter', 'threads', 'tiktok', 'behance', 'etc', 'etc'
+  ]);
+  const [editingArchiveChannels, setEditingArchiveChannels] = useState<string[]>([]);
   const [isSavingArchives, setIsSavingArchives] = useState(false);
 
   // 포트폴리오 Output 데이터 (DB 저장용)
@@ -242,13 +246,15 @@ const Cluster3Content = () => {
   // 채널 옵션 목록
   const channelOptions = [
     { value: '', label: '채널 선택', icon: '' },
-    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/instagram.png' },
-    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/youtube.png' },
-    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/blog.png' },
-    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/tistory.png' },
-    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/x.png' },
-    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/thread.png' },
-    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/tiktok.png' },
+    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/icon/Instagram.png' },
+    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/icon/Youtube.png' },
+    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/icon/Naver Blog.png' },
+    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/icon/Tstory.png' },
+    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/icon/X.png' },
+    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/icon/Threads.png' },
+    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/icon/TikTok.png' },
+    { value: 'behance', label: '비핸스', icon: '/images/0/cluster 3/icon/Behance.png' },
+    { value: 'etc', label: '기타', icon: '/images/0/cluster 3/icon/etc 2.png' },
   ];
 
   // 포트폴리오 아카이빙 데이터 가져오기
@@ -262,6 +268,9 @@ const Cluster3Content = () => {
 
         if (response.ok && result.data) {
           setPortfolioArchives(result.data);
+          if (result.channels) {
+            setPortfolioArchiveChannels(result.channels);
+          }
           // channelCards의 처음 10개 링크도 업데이트
           const updatedCards = channelCards.map((card, index) => {
             if (index < 10 && result.data[index]) {
@@ -280,18 +289,19 @@ const Cluster3Content = () => {
   }, [session?.user?.email]);
 
   // 포트폴리오 아카이빙 저장 함수
-  const savePortfolioArchives = async (links: string[]) => {
+  const savePortfolioArchives = async (links: string[], channels: string[]) => {
     setIsSavingArchives(true);
     try {
       const response = await fetch('/api/portfolio-archives', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ portfolioArchives: links }),
+        body: JSON.stringify({ portfolioArchives: links, portfolioArchiveChannels: channels }),
       });
 
       const result = await response.json();
       if (response.ok) {
         setPortfolioArchives(links);
+        setPortfolioArchiveChannels(channels);
         // channelCards의 처음 10개 링크도 업데이트
         const updatedCards = channelCards.map((card, index) => {
           if (index < 10) {
@@ -938,8 +948,10 @@ const Cluster3Content = () => {
           <div className="section2-text">
             <span className="handwriting">클럽 강화 품계</span>
           </div>
+        </div>
 
-          {/* 오른쪽 상단: 상위 퍼센트 */}
+        {/* 상위 퍼센트 + 서브 멘트 - 같은 y좌표 배치 */}
+        <div className="section2-sub-row">
           <div className="section2-progress">
             <div className="progress-info">
               <span className="progress-label">상위</span>
@@ -947,6 +959,10 @@ const Cluster3Content = () => {
               <span className="progress-unit">%</span>
             </div>
           </div>
+          <p className="section-comment section2-comment">
+            클럽 활동 중 함께 활동하는 수백명의 크루들 간의 경쟁을 기준으로,<br />
+            매 주 단위 &apos;강화&apos; / &apos;성장&apos; 순위를 집계하여 누적된, 나의 최종 클럽 활동 성적입니다.
+          </p>
         </div>
 
         {/* 10개의 품계 카드 (정승 + 정 1~9품) */}
@@ -961,14 +977,14 @@ const Cluster3Content = () => {
                 style={{
                   transform: !animationComplete && highlightedRank !== -1 && highlightedRank >= rank
                     ? `scale(${1 + 0.08 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}) translateY(${-5 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}px)`
-                    : 'scale(1) translateY(0)',
+                    : undefined,
                   boxShadow: !animationComplete && highlightedRank === rank
                     ? '0 8px 25px rgba(250, 171, 7, 0.6)'
                     : !animationComplete && highlightedRank !== -1 && Math.abs(highlightedRank - rank) === 1
                       ? '0 4px 15px rgba(250, 171, 7, 0.3)'
-                      : 'none',
-                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  zIndex: !animationComplete && highlightedRank === rank ? 10 : 1
+                      : undefined,
+                  transition: !animationComplete ? 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)' : undefined,
+                  zIndex: !animationComplete && highlightedRank === rank ? 10 : undefined
                 }}
               >
                 <div className="rank-medal">
@@ -1001,7 +1017,7 @@ const Cluster3Content = () => {
       <section className="cluster3-section3">
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setSection3ModalOpen(true); } : undefined} />
+          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setEditingArchiveChannels([...portfolioArchiveChannels]); setSection3ModalOpen(true); } : undefined} />
           <div className="edit-icon search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
@@ -1023,17 +1039,28 @@ const Cluster3Content = () => {
                 View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
               </span>
             </div>
+            <p className="section-comment section3-comment">
+              클럽 활동 중 쌓아 올린 커리어 결과물이 누적된 포트폴리오 아카이빙 채널 리스트 입니다.
+            </p>
           </div>
         </div>
 
         <div className="channel-cards">
           {channelCards.slice(section3Page * 8, section3Page * 8 + 8).map((card, index) => {
             const actualIndex = section3Page * 8 + index;
-            // 순서대로 아이콘 표시 (인스타, 유튜브, 블로그, 티스토리, X, 쓰레드, 틱톡, 비핸스, 기타1, 기타2)
-            const snsImage = snsIconOrder[card.id - 1] || snsIconOrder[snsIconOrder.length - 1];
+            // DB 연동 카드(1~10)는 드롭다운 선택 채널 아이콘 사용, 나머지는 기존 고정 아이콘
+            const cardIndex = card.id - 1;
+            let snsImage: string;
+            if (cardIndex < 10) {
+              const selectedChannel = portfolioArchiveChannels[cardIndex];
+              const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
+              snsImage = channelOption?.icon || snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
+            } else {
+              snsImage = snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
+            }
             const isEtcIcon = snsImage.includes('etc');
             return (
-              <div key={card.id} className="channel-card" onClick={() => card.link && window.open(ensureProtocol(card.link), '_blank')}>
+              <div key={card.id} className={`channel-card${card.link ? ' has-link' : ''}`} onClick={() => card.link && window.open(ensureProtocol(card.link), '_blank')}>
                 <div className="card-image">
                   <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.tag}</div>
@@ -1115,8 +1142,7 @@ const Cluster3Content = () => {
         <div className="section4-header">
           <h2 className="section4-title">World Of Top Works</h2>
           <p className="section4-desc">
-            *본 아카이빙 Output은 클럽에서 쌓은 '실무 경험' 중 최고 결과물에 해당하는 것들 중 &lt;일부분&gt;만을 다루고 있습니다.<br />
-            전체적인 실무 경험, 실무 경력, 역량, 정보 등은 다른 탭에서 확인해주세요.
+            *본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다. 전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.
           </p>
         </div>
 
@@ -1153,7 +1179,7 @@ const Cluster3Content = () => {
             return (
               <div
                 key={slide.id}
-                className={`slider-item position-${position}`}
+                className={`slider-item position-${position}${slide.link ? ' has-link' : ''}`}
                 data-position={position}
                 onClick={() => slide.link && window.open(ensureProtocol(slide.link), '_blank')}
                 style={{ cursor: 'pointer' }}
@@ -1221,6 +1247,9 @@ const Cluster3Content = () => {
               </span>
             </div>
           </div>
+          <p className="section-comment section5-comment">
+            클럽에서 쌓아올린 모든 활동 중 더 자세하게 핵심으로 어필하고픈 second 10 개의 최고 결과물을 선별하여 기재하였습니다.
+          </p>
         </div>
 
         <div className="detail-grid">
@@ -1231,7 +1260,7 @@ const Cluster3Content = () => {
             const channelIcon = channelOption?.icon || '';
 
             return (
-              <div key={thumb.id} className="detail-item" onClick={() => thumb.link && window.open(ensureProtocol(thumb.link), '_blank')} style={{ cursor: thumb.link ? 'pointer' : 'default' }}>
+              <div key={thumb.id} className={`detail-item${thumb.link ? ' has-link' : ''}`} onClick={() => thumb.link && window.open(ensureProtocol(thumb.link), '_blank')} style={{ cursor: thumb.link ? 'pointer' : 'default' }}>
                 <img src={`/images/0/cluster 3/image/3-${thumb.id}.png`} alt={`Detail ${thumb.id}`} />
                 <div className="item-overlay">
                   <div className="like-badge">
@@ -1272,15 +1301,29 @@ const Cluster3Content = () => {
             </div>
             <div className="section-modal-body">
               {editingSection3Links.map((link, index) => {
-                const snsNames = ['인스타그램', '유튜브', '블로그', '티스토리', 'X(트위터)', '쓰레드', '틱톡', '비핸스', '기타1', '기타2'];
                 return (
                   <div key={index} className="link-edit-item">
                     <div className="link-item-header">
-                      <span className="link-label">Channel {index + 1} - {snsNames[index]}</span>
+                      <span className="link-label">Channel {index + 1}</span>
                     </div>
+                    <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
+                    <select
+                      className="channel-select"
+                      style={{ display: 'block', marginBottom: '8px' }}
+                      value={editingArchiveChannels[index] || ''}
+                      onChange={(e) => {
+                        const newChannels = [...editingArchiveChannels];
+                        newChannels[index] = e.target.value;
+                        setEditingArchiveChannels(newChannels);
+                      }}
+                    >
+                      {channelOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
                     <input
                       type="url"
-                      placeholder={`${snsNames[index]} 링크를 입력하세요 (https://...)`}
+                      placeholder="링크를 입력하세요 (https://...)"
                       value={link}
                       onChange={(e) => {
                         const newLinks = [...editingSection3Links];
@@ -1298,7 +1341,7 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingArchives}
                 onClick={async () => {
-                  const success = await savePortfolioArchives(editingSection3Links);
+                  const success = await savePortfolioArchives(editingSection3Links, editingArchiveChannels);
                   if (success) {
                     setSection3ModalOpen(false);
                   }
@@ -1360,18 +1403,6 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingOutputs}
                 onClick={async () => {
-                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
-                  const incomplete = editingSection4Links
-                    .map((link, i) => ({ link, channel: editingOutputChannels[i], index: i }))
-                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
-                  if (incomplete.length > 0) {
-                    const names = incomplete.map(item => {
-                      const missing = item.link ? '채널' : '링크';
-                      return `Work ${item.index + 1}: ${missing}`;
-                    }).join('\n');
-                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
-                    return;
-                  }
                   const success = await savePortfolioOutputs(editingSection4Links, editingOutputChannels);
                   if (success) {
                     setSection4Links([...editingSection4Links]);
