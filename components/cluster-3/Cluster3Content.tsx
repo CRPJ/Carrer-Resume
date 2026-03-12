@@ -4,6 +4,49 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
+// 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
+const CustomSelect = ({ value, onChange, options, className, style }: {
+  value: string;
+  onChange: (val: string) => void;
+  options: { value: string; label: string }[];
+  className?: string;
+  style?: React.CSSProperties;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selectedLabel = options.find(o => o.value === value)?.label || '선택하세요';
+
+  return (
+    <div ref={ref} className={`${className || ''} custom-select-wrapper`} style={style}>
+      <div className="custom-select-trigger" onClick={() => setIsOpen(!isOpen)}>
+        {selectedLabel}
+      </div>
+      {isOpen && (
+        <div className="custom-select-options">
+          {options.map(opt => (
+            <div
+              key={opt.value}
+              className={`custom-select-option${opt.value === value ? ' selected' : ''}`}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -675,11 +718,11 @@ const Cluster3Content = () => {
 
   // Top Works 슬라이드 데이터 (5개)
   const [topWorksSlides, setTopWorksSlides] = useState([
-    { id: 1, active: false, link: "https://www.example.com" },
-    { id: 2, active: false, link: "https://www.example.com" },
-    { id: 3, active: true, link: "https://www.example.com" },
-    { id: 4, active: false, link: "https://www.example.com" },
-    { id: 5, active: false, link: "https://www.example.com" },
+    { id: 1, active: false, link: "" },
+    { id: 2, active: false, link: "" },
+    { id: 3, active: true, link: "" },
+    { id: 4, active: false, link: "" },
+    { id: 5, active: false, link: "" },
   ]);
 
   // Detail 10 썸네일 데이터 (10개, 2줄 5개)
@@ -1307,20 +1350,17 @@ const Cluster3Content = () => {
                       <span className="link-label">Channel {index + 1}</span>
                     </div>
                     <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
-                    <select
+                    <CustomSelect
                       className="channel-select"
                       style={{ display: 'block', marginBottom: '8px' }}
                       value={editingArchiveChannels[index] || ''}
-                      onChange={(e) => {
+                      onChange={(val) => {
                         const newChannels = [...editingArchiveChannels];
-                        newChannels[index] = e.target.value;
+                        newChannels[index] = val;
                         setEditingArchiveChannels(newChannels);
                       }}
-                    >
-                      {channelOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
+                      options={channelOptions}
+                    />
                     <input
                       type="url"
                       placeholder="링크를 입력하세요 (https://...)"
@@ -1370,20 +1410,17 @@ const Cluster3Content = () => {
                     <span className="link-label">Work {index + 1}</span>
                   </div>
                   <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
-                  <select
+                  <CustomSelect
                     className="channel-select"
                     style={{ display: 'block', marginBottom: '8px' }}
                     value={editingOutputChannels[index] || ''}
-                    onChange={(e) => {
+                    onChange={(val) => {
                       const newChannels = [...editingOutputChannels];
-                      newChannels[index] = e.target.value;
+                      newChannels[index] = val;
                       setEditingOutputChannels(newChannels);
                     }}
-                  >
-                    {channelOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
+                    options={channelOptions}
+                  />
                   <input
                     type="url"
                     placeholder="링크를 입력하세요 (https://...)"
@@ -1439,20 +1476,17 @@ const Cluster3Content = () => {
                     <span className="link-label">Detail {index + 1}</span>
                   </div>
                   <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
-                  <select
+                  <CustomSelect
                     className="channel-select"
                     style={{ display: 'block', marginBottom: '8px' }}
                     value={editingDetailChannels[index] || ''}
-                    onChange={(e) => {
+                    onChange={(val) => {
                       const newChannels = [...editingDetailChannels];
-                      newChannels[index] = e.target.value;
+                      newChannels[index] = val;
                       setEditingDetailChannels(newChannels);
                     }}
-                  >
-                    {channelOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
+                    options={channelOptions}
+                  />
                   <input
                     type="url"
                     placeholder="링크를 입력하세요 (https://...)"
@@ -1472,18 +1506,6 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingDetails}
                 onClick={async () => {
-                  // 채널만 선택하고 링크 미입력, 또는 링크만 입력하고 채널 미선택 검증
-                  const incomplete = editingSection5Links
-                    .map((link, i) => ({ link, channel: editingDetailChannels[i], index: i }))
-                    .filter(item => (item.link && !item.channel) || (!item.link && item.channel));
-                  if (incomplete.length > 0) {
-                    const names = incomplete.map(item => {
-                      const missing = item.link ? '채널' : '링크';
-                      return `Detail ${item.index + 1}: ${missing}`;
-                    }).join('\n');
-                    alert(`다음 항목의 입력을 완성해주세요:\n\n${names}`);
-                    return;
-                  }
                   const success = await savePortfolioDetails(editingSection5Links, editingDetailChannels);
                   if (success) {
                     setSection5Links([...editingSection5Links]);
