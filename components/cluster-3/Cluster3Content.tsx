@@ -1261,7 +1261,7 @@ const Cluster3Content = () => {
 
       {/* 섹션 3 모달 - 채널 링크 편집 */}
       {section3ModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSection3ModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>포트폴리오 아카이빙 channel 링크 편집</h3>
@@ -1311,7 +1311,7 @@ const Cluster3Content = () => {
 
       {/* 섹션 4 모달 - Top Works 링크 편집 */}
       {section4ModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSection4ModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>포트폴리오 아카이빙 Output 링크 편집</h3>
@@ -1392,7 +1392,7 @@ const Cluster3Content = () => {
 
       {/* 섹션 5 모달 - Detail 10 링크 편집 */}
       {section5ModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSection5ModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>The Detail 10 링크 편집</h3>

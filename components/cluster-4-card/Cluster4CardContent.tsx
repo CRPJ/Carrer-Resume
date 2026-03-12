@@ -2882,7 +2882,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 정보 모달 ========== */}
       {workInfoModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 정보 편집</h3>
@@ -3063,7 +3063,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 역량 모달 ========== */}
       {workAbilityModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 역량 편집</h3>
@@ -3255,7 +3255,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경험 모달 ========== */}
       {workExpModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 경험 편집</h3>
@@ -3452,7 +3452,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경력 모달 ========== */}
       {workCareerModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 경력 편집</h3>
@@ -3663,7 +3663,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
       {headerModalOpen && headerModalType === '본인' && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-colleague-edit">
             <div className="section-modal-header">
               <h3>연계 동료 편집</h3>
@@ -3836,7 +3836,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 상단 섹션 타크루 모달 (타크루가 나에 대해 평판을 남김) ========== */}
       {headerModalOpen && headerModalType === '타크루' && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal section-modal-reputation-form">
             <div className="section-modal-header">
               <h3>주차 평판</h3>
@@ -3991,7 +3991,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 주차 평판 카드 상세보기 모달 ========== */}
       {reputationViewModalOpen && selectedReputationCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setReputationViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal reputation-view-modal">
             <div className="section-modal-header">
               <h3>주차 평판</h3>
@@ -4055,7 +4055,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 연계 동료 카드 상세보기 모달 ========== */}
       {colleagueViewModalOpen && selectedColleagueCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setColleagueViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal colleague-view-modal">
             <div className="section-modal-header">
               <h3>연계 동료</h3>
@@ -4102,7 +4102,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 정보 카드 상세보기 모달 ========== */}
       {workInfoViewModalOpen && selectedWorkInfoCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 정보</h3>
@@ -4210,7 +4210,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         };
 
         return (
-          <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityViewModalOpen(false); }}>
+          <div className="section-modal-overlay">
             <div className="section-modal work-view-modal">
               <div className="section-modal-header">
                 <h3>실무 역량</h3>
@@ -4287,7 +4287,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경험 카드 상세보기 모달 ========== */}
       {workExpViewModalOpen && selectedWorkExpCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경험</h3>
@@ -4386,7 +4386,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경력 카드 상세보기 모달 ========== */}
       {workCareerViewModalOpen && selectedWorkCareerCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경력</h3>

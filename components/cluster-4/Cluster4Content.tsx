@@ -2115,7 +2115,6 @@ const Cluster4Content = () => {
             zIndex: 99999,
             backdropFilter: 'blur(5px)',
           }}
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReputationModalOpen(false); }}
         >
           <div style={{
             width: '500px',
@@ -2402,7 +2401,6 @@ const Cluster4Content = () => {
               zIndex: 99999,
               backdropFilter: 'blur(5px)',
             }}
-            onMouseDown={(e) => { if (e.target === e.currentTarget) setReputationDetailModalOpen(false); }}
           >
             <div style={{
               width: '500px',
@@ -2527,7 +2525,6 @@ const Cluster4Content = () => {
             zIndex: 99999,
             backdropFilter: 'blur(5px)',
           }}
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReviewModalOpen(false); }}
         >
           <div style={{
             width: '450px',

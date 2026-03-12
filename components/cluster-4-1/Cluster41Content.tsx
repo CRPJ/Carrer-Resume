@@ -1727,9 +1727,6 @@ const Cluster41Content = () => {
         {isMobile && filterSheetOpen && (
           <div
             className="filter-sheet-overlay"
-            onMouseDown={(e) => {
-              if (e.target === e.currentTarget) setFilterSheetOpen(false);
-            }}
           >
             <div className="filter-sheet" onMouseDown={(e) => e.stopPropagation()}>
               <div className="filter-sheet-header">

@@ -468,6 +468,8 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         setSloganData(editingSloganData);
+        // 슬로건 변경을 Sidebar(.resume-card)에 알려 즉시 반영
+        window.dispatchEvent(new CustomEvent('sloganUpdated', { detail: editingSloganData }));
         alert('슬로건이 저장되었습니다.');
         setSection2ModalOpen(false);
       } else {
@@ -630,6 +632,26 @@ const Cluster2Content = () => {
   const [editingEduData, setEditingEduData] = useState<EduData[]>(initialEducationData);
   const [hasEduChanges, setHasEduChanges] = useState(false); // 학력 변경사항 추적
   const [eduSaving, setEduSaving] = useState(false);
+  const [eduValidationErrors, setEduValidationErrors] = useState<{ [key: string]: boolean }>({});
+
+  // 학력 데이터 변경 시 해당 필드의 에러 상태 자동 해제
+  useEffect(() => {
+    if (Object.keys(eduValidationErrors).length === 0) return;
+    const updatedErrors = { ...eduValidationErrors };
+    let changed = false;
+    editingEduData.forEach((edu, index) => {
+      if (updatedErrors[`${index}_school`] && edu.school && edu.school !== '-') { delete updatedErrors[`${index}_school`]; changed = true; }
+      if (updatedErrors[`${index}_status`] && edu.status && edu.status !== '-') { delete updatedErrors[`${index}_status`]; changed = true; }
+      if (updatedErrors[`${index}_category`] && edu.category) { delete updatedErrors[`${index}_category`]; changed = true; }
+      if (updatedErrors[`${index}_major1`] && edu.major1) { delete updatedErrors[`${index}_major1`]; changed = true; }
+      if (updatedErrors[`${index}_startYear`] && edu.startYear) { delete updatedErrors[`${index}_startYear`]; changed = true; }
+      if (updatedErrors[`${index}_startMonth`] && edu.startMonth) { delete updatedErrors[`${index}_startMonth`]; changed = true; }
+      if (updatedErrors[`${index}_endYear`] && edu.endYear) { delete updatedErrors[`${index}_endYear`]; changed = true; }
+      if (updatedErrors[`${index}_endMonth`] && edu.endMonth) { delete updatedErrors[`${index}_endMonth`]; changed = true; }
+      if (updatedErrors[`${index}_gradeValue`] && edu.gradeValue) { delete updatedErrors[`${index}_gradeValue`]; changed = true; }
+    });
+    if (changed) setEduValidationErrors(updatedErrors);
+  }, [editingEduData]);
 
   // 학력 페이지네이션: 컨테이너 vs 카드 전체 폭 비교하여 동적 계산
   useEffect(() => {
@@ -704,7 +726,10 @@ const Cluster2Content = () => {
         setEducationData(processedData);
         setEditingEduData(processedData);
         setHasEduChanges(false);
+        setEduValidationErrors({});
         setSection3ModalOpen(false);
+        // 학력 변경을 Sidebar(.resume-card)에 알려 즉시 반영
+        window.dispatchEvent(new Event('educationUpdated'));
         alert('학력이 저장되었습니다.');
       } else {
         alert(result.error || '학력 저장에 실패했습니다.');
@@ -970,6 +995,12 @@ const Cluster2Content = () => {
         setSchoolSearchQuery({});
         setSchoolSearchResults({});
         setSchoolCustomInput({});
+      }
+      // 슬로건 드롭다운 외부 클릭 시 닫기
+      if (!target.closest('.slogan-dropdown-wrapper')) {
+        setDropdown1Open(false);
+        setDropdown2Open(false);
+        setDropdown3Open(false);
       }
     };
 
@@ -1760,7 +1791,14 @@ const Cluster2Content = () => {
         {/* 오른쪽 */}
         <div className="section4-right">
           {/* Total Complete 큰 박스 */}
-          <div className="total-complete-box">
+          <div className="total-complete-box" style={{ position: 'relative' }}>
+            {reviewLinks[0] && (
+              <div style={{
+                position: 'absolute', top: 8, right: 8, width: 20, height: 20,
+                borderRadius: '50%', backgroundColor: 'rgba(250, 171, 7, 1)', zIndex: 2,
+                boxShadow: '0 0 6px 2px rgba(250, 171, 7, 0.6)'
+              }} />
+            )}
             <img className="border-tl" src="/images/0/cluster 2/border.png" alt="" />
             <img className="border-br" src="/images/0/cluster 2/border.png" alt="" />
             <img className="victory-badge" src="/images/0/cluster 2/icon/medal 30.png" alt="" />
@@ -1769,15 +1807,13 @@ const Cluster2Content = () => {
               <h2><span className="highlight">T</span>otal <span className="highlight">C</span>omplete</h2>
               <button
                 className="goto-btn"
-                onClick={(e) => {
+                onClick={() => {
                   if (reviewLinks[0]) {
                     window.open(reviewLinks[0], '_blank');
                   } else {
-                    setNoLinkTooltip({ visible: true, x: e.clientX, y: e.clientY });
-                    setTimeout(() => setNoLinkTooltip({ visible: false, x: 0, y: 0 }), 2000);
+                    alert('입력된 링크가 없습니다.');
                   }
                 }}
-                style={{ opacity: reviewLinks[0] ? 1 : 0.5 }}
               >바로가기 &gt;</button>
             </div>
           </div>
@@ -1785,7 +1821,14 @@ const Cluster2Content = () => {
           {/* 9개의 작은 박스 그리드 */}
           <div className="review-grid-9">
             {[3, 6, 9, 12, 15, 18, 21, 24, 27].map((weeks, index) => (
-              <div key={weeks} className="review-week-item">
+              <div key={weeks} className="review-week-item" style={{ position: 'relative' }}>
+                {reviewLinks[index + 1] && (
+                  <div style={{
+                    position: 'absolute', top: 4, right: 4, width: 10, height: 10,
+                    borderRadius: '50%', backgroundColor: 'rgba(250, 171, 7, 1)', zIndex: 2,
+                    boxShadow: '0 0 6px 2px rgba(250, 171, 7, 0.6)'
+                  }} />
+                )}
                 <img className="border-br" src="/images/0/cluster 2/border.png" alt="" />
                 <img
                   src={`/images/0/cluster 2/icon/medal ${weeks}.png`}
@@ -1796,15 +1839,13 @@ const Cluster2Content = () => {
                 <span className="review-weeks">{weeks} weeks</span>
                 <button
                   className="review-btn"
-                  onClick={(e) => {
+                  onClick={() => {
                     if (reviewLinks[index + 1]) {
                       window.open(reviewLinks[index + 1], '_blank');
                     } else {
-                      setNoLinkTooltip({ visible: true, x: e.clientX, y: e.clientY });
-                      setTimeout(() => setNoLinkTooltip({ visible: false, x: 0, y: 0 }), 2000);
+                      alert('입력된 링크가 없습니다.');
                     }
                   }}
-                  style={{ opacity: reviewLinks[index + 1] ? 1 : 0.5 }}
                 >바로가기 &gt;</button>
               </div>
             ))}
@@ -1947,7 +1988,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 1 모달 - 프로필 사진 수정 */}
       {section1ModalOpen && (
-        <div className="section1-modal-overlay" onClick={() => setSection1ModalOpen(false)}>
+        <div className="section1-modal-overlay">
           <div className="section1-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section1-modal-header">
               <h3>프로필 사진 수정</h3>
@@ -2083,7 +2124,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 2 모달 - 슬로건 편집 */}
       {section2ModalOpen && (
-        <div className="section2-modal-overlay" onClick={() => setSection2ModalOpen(false)}>
+        <div className="section2-modal-overlay">
           <div className="section2-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section2-modal-header">
               <h3>슬로건 편집</h3>
@@ -2096,6 +2137,9 @@ const Cluster2Content = () => {
               {/* 슬로건 1 */}
               <div className="slogan-edit-item">
                 <span className="slogan-label">슬로건 1</span>
+                <span style={{ fontSize: '11px', color: '#888', marginLeft: '8px', fontWeight: 400 }}>
+                  슬로건 1에 작성되는 내용은, 좌측에 있는 &apos;Identity - Core&apos; 칸의 슬로건에 명시됩니다.
+                </span>
                 <div className="slogan-dropdown-wrapper">
                   <button
                     className="slogan-dropdown-btn"
@@ -2421,7 +2465,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 2-1 모달 - 영상 편집 */}
       {section21ModalOpen && (
-        <div className="section21-modal-overlay" onClick={() => setSection21ModalOpen(false)}>
+        <div className="section21-modal-overlay">
           <div className="section21-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section21-modal-header">
               <h3>영상 편집</h3>
@@ -2500,15 +2544,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 5 모달 - 자기소개서 카드 상세/편집 */}
       {introModalOpen && selectedIntroCard !== null && (
-        <div className="intro-modal-overlay" onClick={() => {
-          if (isEditingIntro && editingIntroData.content !== introCards[selectedIntroCard].content) {
-            if (!confirm('변경사항이 저장되지 않았습니다. 정말 닫으시겠습니까?')) {
-              return;
-            }
-            setIsEditingIntro(false);
-          }
-          setIntroModalOpen(false);
-        }}>
+        <div className="intro-modal-overlay">
           <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
             <div className="intro-modal-header">
               <div className="header-left">
@@ -2604,7 +2640,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 4 모달 - 바로가기 링크 편집 */}
       {section4ModalOpen && (
-        <div className="section4-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSection4ModalOpen(false); }}>
+        <div className="section4-modal-overlay">
           <div className="section4-modal">
             <div className="section4-modal-header">
               <h3>클럽 리뷰 링크 편집</h3>
@@ -2667,13 +2703,7 @@ const Cluster2Content = () => {
 
       {/* 섹션 3 모달 - 학력 편집 */}
       {section3ModalOpen && (
-        <div className="section3-modal-overlay" onClick={() => {
-          if (hasEduChanges) {
-            alert('변경사항이 있습니다. 저장 버튼을 눌러 저장해주세요.');
-            return;
-          }
-          setSection3ModalOpen(false);
-        }}>
+        <div className="section3-modal-overlay">
           <div className="section3-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section3-modal-header">
               <h3>학력 편집</h3>
@@ -2706,10 +2736,13 @@ const Cluster2Content = () => {
                       isFinal: false
                     };
                     setEditingEduData([...editingEduData, newEdu]);
-                    // 새로 추가된 카드로 스크롤
+                    // 새로 추가된 카드의 상단으로 스크롤 (모달 내부 스크롤 컨테이너 사용)
                     setTimeout(() => {
-                      if (modalBodyRef.current) {
-                        modalBodyRef.current.scrollTop = modalBodyRef.current.scrollHeight;
+                      const container = modalBodyRef.current;
+                      const cards = container?.querySelectorAll('.edu-edit-card');
+                      if (container && cards && cards.length > 0) {
+                        const lastCard = cards[cards.length - 1] as HTMLElement;
+                        container.scrollTo({ top: lastCard.offsetTop - container.offsetTop, behavior: 'smooth' });
                       }
                     }, 100);
                   }}
@@ -2818,7 +2851,7 @@ const Cluster2Content = () => {
                     {/* 행 1: 학교 선택 - 자동완성 검색 (전체 너비) */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label>학교<span className="required">*</span></label>
+                        <label style={eduValidationErrors[`${index}_school`] ? { color: '#ff4444' } : {}}>학교<span className="required">*</span></label>
                         <div className="school-autocomplete">
                           {schoolCustomInput[`${index}_school`] ? (
                             /* 직접 입력 모드 */
@@ -2952,7 +2985,7 @@ const Cluster2Content = () => {
                     {/* 행 2: 상태 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label>상태<span className="required">*</span></label>
+                        <label style={eduValidationErrors[`${index}_status`] ? { color: '#ff4444' } : {}}>상태<span className="required">*</span></label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_status`] ? 'open' : ''}`}>
                           <div
                             className="dropdown-selected"
@@ -2986,7 +3019,7 @@ const Cluster2Content = () => {
                     {/* 행 3: 계열 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label>계열</label>
+                        <label style={eduValidationErrors[`${index}_category`] ? { color: '#ff4444' } : {}}>계열</label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_category`] ? 'open' : ''}`}>
                           <div
                             className="dropdown-selected"
@@ -2997,7 +3030,7 @@ const Cluster2Content = () => {
                           </div>
                           {eduDropdowns[`${index}_category`] && (
                             <div className="dropdown-options">
-                              {['-', '상경', '인문', '자연', '공학', '예체능', '사회', '기타'].map((opt) => (
+                              {['-', '상경', '어문', '인문', '자연', '공학', '예체능', '사회', '기타'].map((opt) => (
                                 <div
                                   key={opt}
                                   className={`dropdown-option ${edu.category === opt ? 'selected' : ''}`}
@@ -3021,13 +3054,18 @@ const Cluster2Content = () => {
                     {/* 행 4: 전공 1 / 전공 2 / 전공 3 */}
                     <div className="edu-edit-row three-cols">
                       <div className="edu-edit-field">
-                        <label>전공 1<span className="required">*</span></label>
+                        <label style={eduValidationErrors[`${index}_major1`] ? { color: '#ff4444' } : {}}>전공 1<span className="required">*</span></label>
                         <input
                           type="text"
                           value={edu.major1}
                           onChange={(e) => {
                             const newData = [...editingEduData];
                             newData[index].major1 = e.target.value;
+                            // 전공1 지우면 전공2, 전공3 초기화
+                            if (!e.target.value.trim() || e.target.value.trim() === '-') {
+                              newData[index].major2 = '';
+                              newData[index].major3 = '';
+                            }
                             setEditingEduData(newData);
                           }}
                           placeholder="주전공"
@@ -3041,9 +3079,15 @@ const Cluster2Content = () => {
                           onChange={(e) => {
                             const newData = [...editingEduData];
                             newData[index].major2 = e.target.value;
+                            // 전공2 지우면 전공3 초기화
+                            if (!e.target.value.trim() || e.target.value.trim() === '-') {
+                              newData[index].major3 = '';
+                            }
                             setEditingEduData(newData);
                           }}
                           placeholder="복수전공/부전공"
+                          disabled={!edu.major1 || !edu.major1.trim() || edu.major1.trim() === '-'}
+                          style={!edu.major1 || !edu.major1.trim() || edu.major1.trim() === '-' ? { opacity: 0.4, cursor: 'not-allowed', background: '#0d0d0d' } : {}}
                         />
                       </div>
                       <div className="edu-edit-field">
@@ -3057,6 +3101,8 @@ const Cluster2Content = () => {
                             setEditingEduData(newData);
                           }}
                           placeholder="기타 전공"
+                          disabled={!edu.major2 || !edu.major2.trim() || edu.major2.trim() === '-'}
+                          style={!edu.major2 || !edu.major2.trim() || edu.major2.trim() === '-' ? { opacity: 0.4, cursor: 'not-allowed', background: '#0d0d0d' } : {}}
                         />
                       </div>
                       <p className="major-hint">* 전공이 없을 시 &quot;-&quot;를 기입해주세요.</p>
@@ -3065,7 +3111,7 @@ const Cluster2Content = () => {
                     {/* 행 5: 입학 / 졸업 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field">
-                        <label>입학년도<span className="required">*</span></label>
+                        <label style={eduValidationErrors[`${index}_startYear`] || eduValidationErrors[`${index}_startMonth`] ? { color: '#ff4444' } : {}}>입학시기<span className="required">*</span></label>
                         <div className="date-picker-row">
                           <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_startYear`] ? 'open' : ''}`}>
                             <div
@@ -3104,7 +3150,7 @@ const Cluster2Content = () => {
                             </div>
                             {eduDropdowns[`${index}_startMonth`] && (
                               <div className="dropdown-options scrollable">
-                                {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map((month) => (
+                                {['03', '09'].map((month) => (
                                   <div
                                     key={month}
                                     className={`dropdown-option ${edu.startMonth === month ? 'selected' : ''}`}
@@ -3124,7 +3170,7 @@ const Cluster2Content = () => {
                         </div>
                       </div>
                       <div className="edu-edit-field">
-                        <label>졸업년도</label>
+                        <label style={eduValidationErrors[`${index}_endYear`] || eduValidationErrors[`${index}_endMonth`] ? { color: '#ff4444' } : {}}>졸업시기</label>
                         {/* 재학/졸예/휴학일 때는 ~ing 표시, 졸업/중퇴일 때만 선택 가능 */}
                         {['재학', '졸예', '휴학'].includes(edu.status) ? (
                           <div className="date-picker-row">
@@ -3173,7 +3219,7 @@ const Cluster2Content = () => {
                               </div>
                               {eduDropdowns[`${index}_endMonth`] && (
                                 <div className="dropdown-options scrollable">
-                                  {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map((month) => (
+                                  {['02', '08'].map((month) => (
                                     <div
                                       key={month}
                                       className={`dropdown-option ${edu.endMonth === month ? 'selected' : ''}`}
@@ -3198,7 +3244,7 @@ const Cluster2Content = () => {
                     {/* 행 6: 성적 (달성치 / 최대치) */}
                     <div className="edu-edit-row grade-row">
                       <div className="edu-edit-field">
-                        <label>성적<span className="required">*</span></label>
+                        <label style={eduValidationErrors[`${index}_gradeValue`] ? { color: '#ff4444' } : {}}>성적<span className="required">*</span></label>
                         {/* 최대치에 따라 달성치 입력 방식 변경 */}
                         {edu.gradeMax === '-' ? (
                           // '-' 선택 시: 비활성화된 입력창에 '-' 표시
@@ -3459,26 +3505,39 @@ const Cluster2Content = () => {
                 className="save-btn"
                 disabled={eduSaving}
                 onClick={() => {
-                  // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학년도, 성적
+                  // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학시기, 성적
+                  const newErrors: { [key: string]: boolean } = {};
                   const invalidCards = editingEduData.map((edu, index) => {
                     const missing: string[] = [];
-                    if (!edu.school || edu.school === '-') missing.push('학교');
-                    if (!edu.status || edu.status === '-') missing.push('상태');
-                    if (!edu.category) missing.push('계열');
-                    if (!edu.major1) missing.push('전공 1');
-                    if (!edu.startYear) missing.push('입학년도');
-                    if (edu.startYear && !edu.startMonth) missing.push('입학월');
-                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) missing.push('종료년도');
-                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) missing.push('종료월');
-                    if (!edu.gradeValue) missing.push('성적');
+                    if (!edu.school || edu.school === '-') { missing.push('학교'); newErrors[`${index}_school`] = true; }
+                    if (!edu.status || edu.status === '-') { missing.push('상태'); newErrors[`${index}_status`] = true; }
+                    if (!edu.category) { missing.push('계열'); newErrors[`${index}_category`] = true; }
+                    if (!edu.major1) { missing.push('전공 1'); newErrors[`${index}_major1`] = true; }
+                    if (!edu.startYear) { missing.push('입학시기'); newErrors[`${index}_startYear`] = true; }
+                    if (edu.startYear && !edu.startMonth) { missing.push('입학월'); newErrors[`${index}_startMonth`] = true; }
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) { missing.push('졸업시기'); newErrors[`${index}_endYear`] = true; }
+                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) { missing.push('졸업월'); newErrors[`${index}_endMonth`] = true; }
+                    if (!edu.gradeValue) { missing.push('성적'); newErrors[`${index}_gradeValue`] = true; }
                     return { index: index + 1, missing };
                   }).filter(item => item.missing.length > 0);
+
+                  setEduValidationErrors(newErrors);
 
                   if (invalidCards.length > 0) {
                     const errorMessages = invalidCards.map(item =>
                       `${item.index}번 학력: ${item.missing.join(', ')}`
                     ).join('\n');
                     alert(`다음 필수 항목을 입력해주세요:\n\n${errorMessages}`);
+                    // 첫 번째 에러 카드로 스크롤 (모달 내부 스크롤 컨테이너 사용)
+                    const firstErrorIndex = invalidCards[0].index - 1;
+                    setTimeout(() => {
+                      const container = modalBodyRef.current;
+                      const cards = container?.querySelectorAll('.edu-edit-card');
+                      if (container && cards && cards[firstErrorIndex]) {
+                        const card = cards[firstErrorIndex] as HTMLElement;
+                        container.scrollTo({ top: card.offsetTop - container.offsetTop, behavior: 'smooth' });
+                      }
+                    }, 100);
                     return;
                   }
 

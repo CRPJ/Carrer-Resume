@@ -7,6 +7,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -243,6 +244,7 @@ const Sidebar = () => {
   const [skill3, setSkill3] = useState(0);
   const [skill4, setSkill4] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -309,12 +311,32 @@ const Sidebar = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleDropdownOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.custom-dropdown-list') && !target.closest('.chamfer-box')) {
+        setOpenDropdown(null);
+      }
+    };
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleDropdownOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleDropdownOutsideClick);
+    };
+  }, [openDropdown]);
+
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
   // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(497px)으로 유지하고
   // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // .resume-card 높이를 뷰포트에 맞게 실시간 재계산
+  useResumeCardHeight(cardRef, isMobileView);
 
   useEffect(() => {
     // 고정 너비 레이아웃: 항상 데스크탑
@@ -723,6 +745,30 @@ const Sidebar = () => {
     }
   }, [session, targetUserId]);
 
+  // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
+  useEffect(() => {
+    const handleSloganUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.slogan1?.content !== undefined) {
+        setUserProfile((prev) => {
+          if (!prev) return prev;
+          return { ...prev, quote: detail.slogan1.content || "" };
+        });
+      }
+    };
+    window.addEventListener('sloganUpdated', handleSloganUpdated);
+    return () => window.removeEventListener('sloganUpdated', handleSloganUpdated);
+  }, []);
+
+  // 학력 변경 이벤트 수신 → .resume-card 즉시 반영
+  useEffect(() => {
+    const handleEducationUpdated = () => {
+      fetchEducations();
+    };
+    window.addEventListener('educationUpdated', handleEducationUpdated);
+    return () => window.removeEventListener('educationUpdated', handleEducationUpdated);
+  }, []);
+
   // Error state for validation
   const [errors, setErrors] = useState({
     lastName: "",
@@ -914,6 +960,39 @@ const Sidebar = () => {
     // 승인된 경우 프로필 로드 후 모달 열기
     await loadProfile();
     setIsEditModalOpen(true);
+  };
+
+  // 모달 필드 네비게이션: Enter로 다음 필드 이동
+  const navigateToNextField = (currentNavIndex: number) => {
+    const allNav = Array.from(document.querySelectorAll('[data-nav-index]')) as HTMLElement[];
+    const sorted = allNav.sort((a, b) => Number(a.getAttribute('data-nav-index')) - Number(b.getAttribute('data-nav-index')));
+    const currentPos = sorted.findIndex((el) => Number(el.getAttribute('data-nav-index')) === currentNavIndex);
+    if (currentPos < 0 || currentPos >= sorted.length - 1) {
+      const submitBtn = document.querySelector('.edit-modal-content button[type="submit"]') as HTMLButtonElement;
+      if (submitBtn) submitBtn.click();
+      return;
+    }
+    const next = sorted[currentPos + 1];
+    const dropdownName = next.getAttribute('data-nav-dropdown');
+    if (dropdownName) {
+      setOpenDropdown(dropdownName);
+      next.focus();
+    } else {
+      next.focus();
+    }
+  };
+
+  const handleEnterKeyNavigation = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const el = e.currentTarget as HTMLElement;
+    const navIndex = Number(el.getAttribute('data-nav-index'));
+    const dropdownName = el.getAttribute('data-nav-dropdown');
+    if (dropdownName) {
+      setOpenDropdown(dropdownName);
+    } else {
+      navigateToNextField(navIndex);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1337,6 +1416,7 @@ const Sidebar = () => {
         }}
       >
         <div
+          ref={cardRef}
           className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
           style={{
             position: "relative",
@@ -1930,7 +2010,6 @@ const Sidebar = () => {
             zIndex: 99999,
             paddingTop: "20px",
           }}
-          onClick={() => setIsEditModalOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
             <Image src="/images/0/cluster 1/card01.png" alt="Contact Info" width={540} height={150} style={{ display: "block" }} />
@@ -1976,9 +2055,8 @@ const Sidebar = () => {
               overflowY: "auto", // ← 여기 추가
               padding: "40px 0", // ← 여기 추가
             }}
-            onClick={() => setIsEditModalOpen(false)}
           >
-            {/* modal (자식 div) - maxHeight 제거 */}
+            {/* modal (자식 div) */}
             <div
               className="edit-modal-content"
               style={{
@@ -1986,16 +2064,145 @@ const Sidebar = () => {
                 borderRadius: "8px",
                 border: "1px solid #FFA500",
                 boxShadow: "0 0 10px rgba(255, 165, 0, 0.15)",
-                padding: "40px 32px 40px 40px", // ← 원래대로 40px
                 width: "580px",
-                maxHeight: "700px", // ← 제한 제거
-                overflowY: "auto", // ← visible로 변경
+                maxHeight: "700px",
+                overflowY: "auto",
                 fontFamily: "'Pretendard', sans-serif",
                 marginTop: "0px",
               }}
-              onClick={(e) => e.stopPropagation()}
             >
-              <h6 style={{ color: "#fff", fontSize: "20px", fontWeight: 600, margin: "0 0 30px 0" }}>프로필 수정</h6>
+              {/* Cafe24Ohsquare 폰트 선언 */}
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: `
+                @font-face {
+                  font-family: 'Cafe24Ohsquare';
+                  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+                  font-weight: normal;
+                  font-style: normal;
+                  font-display: swap;
+                }
+              `,
+                }}
+              />
+              {/* 상단 헤더 바 */}
+              <div
+                style={{
+                  padding: "20px 28px",
+                  borderBottom: "1px solid #FFA500",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  position: "relative",
+                }}
+              >
+                <div>
+                  <h3 style={{ color: "#FFA500", fontFamily: "'Cafe24Ohsquare', sans-serif", fontSize: "1.25rem", margin: 0 }}>프로필 수정</h3>
+                  <p style={{ color: "#8a8d98", fontSize: "13px", marginTop: "6px", marginBottom: 0 }}>프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowExitConfirm(true)}
+                  style={{
+                    position: "absolute",
+                    top: "18px",
+                    right: "20px",
+                    background: "none",
+                    border: "none",
+                    outline: "none",
+                    padding: 0,
+                    margin: 0,
+                    cursor: "pointer",
+                    color: "#aaa",
+                    fontSize: "22px",
+                    fontWeight: 300,
+                    lineHeight: 1,
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#FFA500";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#aaa";
+                  }}
+                >
+                  &#x2715;
+                </button>
+              </div>
+
+              {/* X 버튼 확인 팝업 */}
+              {showExitConfirm && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(0,0,0,0.6)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 100001,
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "#1a1d29",
+                      border: "1px solid #FFA500",
+                      borderRadius: "8px",
+                      padding: "32px",
+                      width: "380px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <p style={{ color: "#fff", fontSize: "16px", fontWeight: 600, margin: "0 0 8px 0" }}>변경사항이 저장되지 않았습니다.</p>
+                    <p style={{ color: "#8a8d98", fontSize: "14px", margin: "0 0 24px 0", lineHeight: 1.6 }}>
+                      하단에 [작성 완료]를 눌러야 저장이 완료됩니다.<br />
+                      지금 나가시겠습니까?
+                    </p>
+                    <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowExitConfirm(false);
+                          setIsEditModalOpen(false);
+                        }}
+                        style={{
+                          padding: "12px 32px",
+                          backgroundColor: "#252836",
+                          border: "1px solid #555",
+                          borderRadius: "4px",
+                          color: "#fff",
+                          fontSize: "14px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        나가기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowExitConfirm(false)}
+                        style={{
+                          padding: "12px 32px",
+                          backgroundColor: "#FFA500",
+                          border: "none",
+                          borderRadius: "4px",
+                          color: "#1a1d29",
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        계속 작성
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 모달 본문 */}
+              <div style={{ padding: "30px 32px 40px 40px" }}>
 
               <form onSubmit={handleSubmit}>
                 {/* 성 & 이름 - 일렬 배치 */}
@@ -2007,8 +2214,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="lastName"
+                      data-nav-index={1}
                       value={formData.lastName}
                       onChange={(e) => handleNameChange(e, "lastName", 2)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={2}
                       placeholder="홍"
                       style={{
@@ -2033,8 +2242,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="firstName"
+                      data-nav-index={2}
                       value={formData.firstName}
                       onChange={(e) => handleNameChange(e, "firstName", 5)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={5}
                       placeholder="길동"
                       style={{
@@ -2062,8 +2273,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="lastNameEng"
+                      data-nav-index={3}
                       value={formData.lastNameEng}
                       onChange={(e) => handleEngNameChange(e, "lastNameEng", 20)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={20}
                       placeholder="Hong"
                       style={{
@@ -2088,8 +2301,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="firstNameEng"
+                      data-nav-index={4}
                       value={formData.firstNameEng}
                       onChange={(e) => handleEngNameChange(e, "firstNameEng", 30)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={30}
                       placeholder="Gildong"
                       style={{
@@ -2115,7 +2330,11 @@ const Sidebar = () => {
                     <button
                       type="button"
                       className="chamfer-box"
+                      data-nav-index={5}
                       onClick={() => setFormData((prev) => ({ ...prev, gender: "male" }))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); setFormData((prev) => ({ ...prev, gender: "male" })); navigateToNextField(5); }
+                      }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2138,6 +2357,9 @@ const Sidebar = () => {
                       type="button"
                       className="chamfer-box"
                       onClick={() => setFormData((prev) => ({ ...prev, gender: "female" }))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); setFormData((prev) => ({ ...prev, gender: "female" })); navigateToNextField(5); }
+                      }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2204,7 +2426,11 @@ const Sidebar = () => {
                     <div style={{ flex: 1.2, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={6}
+                        data-nav-dropdown="year"
                         onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}
+                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2249,14 +2475,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year) => (
+                          {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year, idx) => (
                             <div
                               key={year}
                               onClick={() => {
                                 const month = formData.birthDate.split("-")[1] || "";
                                 const day = formData.birthDate.split("-")[2] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${day}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("month");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2286,7 +2512,11 @@ const Sidebar = () => {
                     <div style={{ flex: 1, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={7}
+                        data-nav-dropdown="month"
                         onClick={() => setOpenDropdown(openDropdown === "month" ? null : "month")}
+                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2331,14 +2561,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month, idx) => (
                             <div
                               key={month}
                               onClick={() => {
                                 const year = formData.birthDate.split("-")[0] || "";
                                 const day = formData.birthDate.split("-")[2] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${String(month).padStart(2, "0")}-${day}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("day");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2368,7 +2598,11 @@ const Sidebar = () => {
                     <div style={{ flex: 1, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={8}
+                        data-nav-dropdown="day"
                         onClick={() => setOpenDropdown(openDropdown === "day" ? null : "day")}
+                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2413,14 +2647,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                          {Array.from({ length: 31 }, (_, i) => i + 1).map((day, idx) => (
                             <div
                               key={day}
                               onClick={() => {
                                 const year = formData.birthDate.split("-")[0] || "";
                                 const month = formData.birthDate.split("-")[1] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${String(day).padStart(2, "0")}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("city");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2457,7 +2691,11 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={9}
+                          data-nav-dropdown="city"
                           onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
+                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -2502,12 +2740,12 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {Object.keys(koreaRegions).map((city) => (
+                            {Object.keys(koreaRegions).map((city, idx) => (
                               <div
                                 key={city}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, addressCity: city, addressDistrict: "" }));
-                                  setOpenDropdown(null);
+                                  setOpenDropdown("district");
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2562,11 +2800,15 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={10}
+                          data-nav-dropdown="district"
                           onClick={() => {
                             if (formData.addressCity) {
                               setOpenDropdown(openDropdown === "district" ? null : "district");
                             }
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -2612,12 +2854,13 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {koreaRegions[formData.addressCity]?.map((district) => (
+                            {koreaRegions[formData.addressCity]?.map((district, idx) => (
                               <div
                                 key={district}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, addressDistrict: district }));
                                   setOpenDropdown(null);
+                                  setTimeout(() => navigateToNextField(10), 0);
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2651,8 +2894,10 @@ const Sidebar = () => {
                           className="modal-input chamfer-box"
                           type="text"
                           name="customAddress"
+                          data-nav-index={9}
                           value={formData.customAddress}
                           onChange={handleInputChange}
+                          onKeyDown={handleEnterKeyNavigation}
                           placeholder="해외 또는 기타 주소를 입력해주세요 (예: 미국 캘리포니아, 독도)"
                           style={{
                             flex: 1,
@@ -2742,11 +2987,13 @@ const Sidebar = () => {
                           type="text"
                           name="phoneMid"
                           className="phone-input modal-input chamfer-box"
+                          data-nav-index={11}
                           value={phoneMid}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
                             setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           maxLength={4}
                           placeholder="0000"
                           style={{
@@ -2768,11 +3015,13 @@ const Sidebar = () => {
                           type="text"
                           name="phoneLast"
                           className="phone-input modal-input chamfer-box"
+                          data-nav-index={12}
                           value={phoneLast}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
                             setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           maxLength={4}
                           placeholder="0000"
                           style={{
@@ -2802,6 +3051,7 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="emailId"
+                      data-nav-index={13}
                       value={formData.emailId}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -2817,6 +3067,7 @@ const Sidebar = () => {
                           setErrors((prev) => ({ ...prev, email: "" }));
                         }
                       }}
+                      onKeyDown={handleEnterKeyNavigation}
                       placeholder="example"
                       style={{
                         flex: 1,
@@ -2837,7 +3088,11 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={14}
+                          data-nav-dropdown="emailDomain"
                           onClick={() => setOpenDropdown(openDropdown === "emailDomain" ? null : "emailDomain")}
+                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -2882,12 +3137,13 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain) => (
+                            {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain, idx) => (
                               <div
                                 key={domain}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, emailDomain: domain }));
                                   setOpenDropdown(null);
+                                  setTimeout(() => navigateToNextField(14), 0);
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2943,11 +3199,13 @@ const Sidebar = () => {
                           className="modal-input chamfer-box"
                           type="text"
                           name="customEmailDomain"
+                          data-nav-index={14}
                           value={formData.customEmailDomain}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^a-zA-Z0-9.-]/g, "");
                             setFormData((prev) => ({ ...prev, customEmailDomain: value }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           placeholder="domain.com"
                           style={{
                             flex: 1,
@@ -3003,12 +3261,14 @@ const Sidebar = () => {
                     className="modal-input chamfer-box"
                     type="text"
                     name="vision"
+                    data-nav-index={15}
                     value={formData.vision}
                     onChange={(e) => {
                       if (e.target.value.length <= 10) {
                         setFormData((prev) => ({ ...prev, vision: e.target.value }));
                       }
                     }}
+                    onKeyDown={handleEnterKeyNavigation}
                     placeholder="가고 싶은 기업/브랜드를 기재합니다. (ex.구글)"
                     maxLength={10}
                     style={{
@@ -3038,8 +3298,10 @@ const Sidebar = () => {
                       <input
                         className="modal-input chamfer-box"
                         type="url"
+                        data-nav-index={16}
                         value={iconLink3}
                         onChange={(e) => handleIconLinkChange(e.target.value, 3)}
+                        onKeyDown={handleEnterKeyNavigation}
                         placeholder="https://example.com"
                         style={{
                           width: "100%",
@@ -3106,6 +3368,7 @@ const Sidebar = () => {
                   작성완료
                 </button>
               </form>
+              </div>
             </div>
           </div>,
           document.body,
@@ -3125,7 +3388,6 @@ const Sidebar = () => {
             alignItems: "center",
             zIndex: 2000,
           }}
-          onClick={() => setIsPhoneCommentModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -3216,7 +3478,6 @@ const Sidebar = () => {
             alignItems: "center",
             zIndex: 2000,
           }}
-          onClick={() => setIsPhoneCommentModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}

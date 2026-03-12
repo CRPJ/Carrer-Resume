@@ -164,6 +164,21 @@ const Cluster4RankingContent = () => {
     return weeks.filter(w => w.seasonYear === year && w.seasonName === season);
   }, [weeks, selectedSeason]);
 
+  // 드롭다운 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.filter-dropdown')) {
+        setSeasonDropdownOpen(false);
+        setWeekDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // 버튼 위치 업데이트
   const updateSeasonPos = () => {
     if (seasonBtnRef.current) {
