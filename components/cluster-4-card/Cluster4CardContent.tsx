@@ -1069,6 +1069,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workExpModalOpen, setWorkExpModalOpen] = useState(false);
   const [workCareerModalOpen, setWorkCareerModalOpen] = useState(false);
 
+  // 탭 팝오버 상태
+  const [showWeeklyGrowthBadge, setShowWeeklyGrowthBadge] = useState(false);
+
+  // 탭 팝오버 외부 클릭 시 닫기
+  useEffect(() => {
+    if (!showWeeklyGrowthBadge) return;
+    const handleClickOutside = () => setShowWeeklyGrowthBadge(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showWeeklyGrowthBadge]);
+
   // 상단 섹션 모달 상태
   const [headerModalOpen, setHeaderModalOpen] = useState(false);
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
@@ -1322,8 +1333,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const currentImage = "/images/0/cluster4/4-1-card/image.png";
   const currentTitle = weekData
     ? weekData.isBreakSeason
-      ? `${weekData.seasonYear}년, ${weekData.toSeasonName} 시즌, 전환 주차`
-      : `${weekData.seasonYear}년, ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
+      ? `${weekData.seasonYear} ${weekData.toSeasonName} 시즌, 전환 주차`
+      : `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
 
   // 날짜 포맷팅 함수 (2025 - 01 - 06 (월) 형식)
@@ -1384,43 +1395,52 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
 
   // 주차 평판 데이터 (API 데이터 기반)
+  // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
+  const dummyReputations = [
+    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
+    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
+    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+  ];
+
   const reputationData = useMemo(() => {
     // 태그 색상 배열
     const colors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint'];
 
     // API에서 가져온 데이터를 UI 형식으로 변환
-    const apiData = weeklyReputations.map((rep, index) => {
-      const reviewer = rep.reviewer;
-      // 나이 계산
-      let age: string | number = '-';
-      if (reviewer?.birth_date) {
-        const birthYear = new Date(reviewer.birth_date).getFullYear();
-        const currentYear = new Date().getFullYear();
-        age = currentYear - birthYear;
-      }
+    const apiData = weeklyReputations.length > 0
+      ? weeklyReputations.map((rep, index) => {
+          const reviewer = rep.reviewer;
+          // 나이 계산
+          let age: string | number = '-';
+          if (reviewer?.birth_date) {
+            const birthYear = new Date(reviewer.birth_date).getFullYear();
+            const currentYear = new Date().getFullYear();
+            age = currentYear - birthYear;
+          }
 
-      return {
-        id: rep.id,
-        name: reviewer?.display_name || '-',
-        gender: reviewer?.gender || '-',
-        age: age,
-        profileImg: reviewer?.profile_photo_url || '',
-        university: reviewer?.university || '-',
-        major: reviewer?.major_first || '-',
-        team: reviewer?.teamName || '-',
-        part: reviewer?.partName || '-',
-        nickname: reviewer?.vision || '-',
-        rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
-        ratingCount: `${rep.rating} / 10`,
-        description: rep.content || '-',
-        fm: 1, // FM은 항상 1
-        tagColor: colors[index % colors.length],
-        tagText: `#${rep.keyword || '-'}`,
-        isEmpty: false,
-      };
-    });
+          return {
+            id: rep.id,
+            name: reviewer?.display_name || '-',
+            gender: reviewer?.gender || '-',
+            age: age,
+            profileImg: reviewer?.profile_photo_url || '',
+            university: reviewer?.university || '-',
+            major: reviewer?.major_first || '-',
+            team: reviewer?.teamName || '-',
+            part: reviewer?.partName || '-',
+            nickname: reviewer?.vision || '-',
+            rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
+            ratingCount: `${rep.rating} / 10`,
+            description: rep.content || '-',
+            fm: 1, // FM은 항상 1
+            tagColor: colors[index % colors.length],
+            tagText: `#${rep.keyword || '-'}`,
+            isEmpty: false,
+          };
+        })
+      : dummyReputations; // 데이터 없으면 더미 데이터 폴백
 
-    // 최대 3개까지, 빈 슬롯 채우기
+    // 최대 4개까지, 빈 슬롯 채우기
     const result = [...apiData];
     while (result.length < 4) {
       result.push({
@@ -1444,7 +1464,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
     }
 
-    return result.slice(0, 4); // 최대 3개만 반환
+    return result.slice(0, 4); // 최대 4개만 반환
   }, [weeklyReputations]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
@@ -1457,24 +1477,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   }).filter(user => !selectedColleagues.find(c => c.id === user.id));
 
+  // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
+  const dummyColleagues = [
+    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
+    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
+    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
+  ];
+
   // 연계 동료 데이터 (API 데이터 기반)
   const colleagueData = useMemo(() => {
     // API에서 가져온 selectedColleagues를 UI 형식으로 변환
-    const apiData = selectedColleagues.map((c) => ({
-      id: c.id,
-      name: c.name || '-',
-      gender: c.gender || '-',
-      age: c.age || '-',
-      profileImg: c.profileImg || '',
-      university: c.university || '-',
-      major: c.major || '-',
-      team: c.team || '-',
-      part: c.part || '-',
-      nickname: c.nickname || '-',
-      date: c.createdAt ? formatDate(c.createdAt) : '-',
-      message: c.message || '',
-      isEmpty: false,
-    }));
+    const apiData = selectedColleagues.length > 0
+      ? selectedColleagues.map((c) => ({
+          id: c.id,
+          name: c.name || '-',
+          gender: c.gender || '-',
+          age: c.age || '-',
+          profileImg: c.profileImg || '',
+          university: c.university || '-',
+          major: c.major || '-',
+          team: c.team || '-',
+          part: c.part || '-',
+          nickname: c.nickname || '-',
+          date: c.createdAt ? formatDate(c.createdAt) : '-',
+          message: c.message || '',
+          isEmpty: false,
+        }))
+      : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
@@ -1993,7 +2022,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       ratingCount: hasActivity ? `${ratingScore} / 10` : '- / 10',
       hasWeb: (detail?.output_links?.length || 0) > 0,
       icon: getExperienceIconPath(activityTypeId),
-      isEmpty: !hasActivity,
+      isEmpty: false,
       enhancementStatus: enhStatus,
     };
   });
@@ -2135,13 +2164,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab active">
+          <div
+            className={`tab active${showWeeklyGrowthBadge ? ' badge-visible' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowWeeklyGrowthBadge(!showWeeklyGrowthBadge);
+            }}
+            style={{ cursor: 'pointer' }}
+          >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <Link
+              href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`}
+              className="tab-badge"
+              onClick={(e) => e.stopPropagation()}
+            >
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
-            </div>
-          </Link>
+            </Link>
+          </div>
           <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
@@ -2177,7 +2217,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-filled">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}#weekly-filter-bar`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -2188,19 +2228,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       <div className="section1-layout">
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {(
-          <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="floating-icons" style={{ display: 'flex', top: '700px', right: '40px' }}>
             <div className="edit-icon" onClick={() => {
               if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
             }} style={{ cursor: 'pointer' }}>
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
-            </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
             </div>
           </div>
         )}
@@ -2324,12 +2357,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
+                      <div className="profile-name">{isEmpty ? <><span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span></> : <><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                       <div className="profile-details">
                         {isEmpty ? (
                           <>
-                            <div className="detail-line"><span className="text">-</span></div>
-                            <div className="detail-line"><span className="text">&nbsp;</span></div>
+                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="text">&nbsp;</span></div>
                           </>
                         ) : (
@@ -2388,7 +2421,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="profile-info">
                       <div className="profile-name-row">
-                        <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
+                        <div className="profile-name">{isEmpty ? <><span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span></> : <><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                         <div className="date-view">
                           <span className="date">{isEmpty ? '0000 - 00 - 00 (일)' : user.date}</span>
                           <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
@@ -2396,9 +2429,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                       <div className="profile-details">
                         {isEmpty ? (
-                          <span className="text">-</span>
+                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>-</span><span className="label">파트</span></>
                         ) : (
-                          <><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>{user.team}</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
                         )}
                       </div>
                     </div>

@@ -32,6 +32,20 @@ const Cluster41Content = () => {
     setIsMobile(false);
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash === '#weekly-filter-bar') {
+      const tryScroll = () => {
+        const el = document.getElementById('weekly-filter-bar');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 150;
+          window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' });
+        }
+      };
+      setTimeout(tryScroll, 500);
+      setTimeout(tryScroll, 1000);
+    }
+  }, []);
+
   // 현재 시즌 정보 상태
   const [currentSeasonInfo, setCurrentSeasonInfo] = useState<{
     year: number;
@@ -1556,7 +1570,7 @@ const Cluster41Content = () => {
             </button>
           </div>
         ) : (
-          <div className="weekly-filter-bar">
+          <div className="weekly-filter-bar" id="weekly-filter-bar">
             {/* 254x40 Reset 카드 */}
             <div
               className="filter-card filter-card-large"
