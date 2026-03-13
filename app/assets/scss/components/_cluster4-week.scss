@@ -230,6 +230,10 @@
           object-fit: contain;
         }
 
+        span {
+          margin-left: -4px;
+        }
+
         &:hover {
           opacity: 0.9;
         }
@@ -1039,7 +1043,7 @@
     align-items: flex-start;
     gap: 38px;
     width: 100%;
-    margin-top: 60px;
+    margin-top: 41px;
     padding: 0 40px;
     box-sizing: border-box;
     overflow: visible;
@@ -1052,7 +1056,7 @@
 
     // 2번째 floating-icons: 주차 평판 남기기
     > .floating-icons:nth-child(2) {
-      top: 180px;
+      top: 167px;
       right: 40px;
     }
 
@@ -1154,7 +1158,7 @@
           .status-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             background: transparent;
 
             &.success {
@@ -1163,7 +1167,7 @@
                 font-size: 1.375rem;
                 font-weight: 800;
                 color: #9DFA07;
-                text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
@@ -1173,7 +1177,7 @@
                 font-size: 1.375rem;
                 font-weight: 800;
                 color: #FF6B6B;
-                text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
@@ -1183,7 +1187,7 @@
                 font-size: 1.375rem;
                 font-weight: 800;
                 color: #65E3FF;
-                text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
@@ -1193,13 +1197,13 @@
                 font-size: 1.375rem;
                 font-weight: 800;
                 color: #FFEA48;
-                text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
             img {
-              width: 50px;
-              height: 50px;
+              width: 49px;
+              height: 54px;
               position: relative;
               top: -5px;
             }
@@ -1210,8 +1214,8 @@
           display: flex;
           align-items: center;
           gap: 8px;
-          margin-top: 26px !important;
-          margin-bottom: 26px !important;
+          margin-top: 13px !important;
+          margin-bottom: 13px !important;
           flex-wrap: wrap;
 
           .info-badge {
@@ -1777,8 +1781,9 @@
           .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; font-size: 18px; line-height: 25px; }
           .label { color: #999999; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 400; line-height: 25px; }
           .profile-name {
-            font-size: 18px !important;
+            font-size: 14px !important;
             color: rgba(255, 255, 255, 0.50);
+            font-weight: 400;
             margin-bottom: 2px;
             line-height: 25px;
             .text { font-size: 18px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; line-height: 25px; }
@@ -1801,7 +1806,7 @@
       }
 
       .card-rating {
-        display: flex; align-items: center; gap: 8px; margin-bottom: 0;
+        display: flex; align-items: center; gap: 10px; margin-bottom: 0;
         .stars { display: flex; align-items: center; gap: 4px;
           img.star { width: 12.7px; height: 18px; object-fit: contain; display: block; }
           .star.half {
@@ -1826,13 +1831,13 @@
             }
           }
         }
-        .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.7px; line-height: 18px; }
+        .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.7px; line-height: 18px; padding-left: 4px; }
       }
 
       .card-description { font-size: 13px; color: #fff; margin-bottom: 0; font-family: 'Pretendard', sans-serif; font-weight: 600; line-height: 22px; display: flex; align-items: center; gap: 5px; .more-icon { width: 15px; height: 15px; object-fit: contain; } }
 
       .card-footer {
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; gap: 8px; padding: 3.5px 0 2.8px 0;
         .fm-badge { font-size: 15px; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 400; line-height: 19.5px; letter-spacing: 0.7px; background: none; padding: 0; display: flex; align-items: center; gap: 8px; .wifi-icon { width: 13.7px; height: 13px; object-fit: contain; } }
         .footer-divider { width: 1px; height: 15.2px; background: rgba(255, 255, 255, 0.1); color: transparent; }
         .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.7px; line-height: 9.6px; }
