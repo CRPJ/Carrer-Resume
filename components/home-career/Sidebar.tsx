@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -277,6 +277,74 @@ const Sidebar = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
+  const cacheInitRef = useRef(false);
+  useLayoutEffect(() => {
+    if (cacheInitRef.current || !cachedProfile?.data) return;
+    cacheInitRef.current = true;
+
+    const profile = cachedProfile.data;
+    setHasData(true);
+
+    const addressParts = (profile.address || "").split(" ");
+    setUserProfile({
+      name: profile.display_name || "",
+      nameEng: profile.eng_name || "",
+      gender: profile.gender || "",
+      birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
+      city: addressParts[0] || "",
+      district: addressParts.slice(1).join(" ") || "",
+      phone: profile.phone ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****") : "",
+      email: profile.email || "",
+      school: "",
+      major: "",
+      major2: "",
+      major3: "",
+      enrollPeriod: "",
+      graduationStatus: "",
+      gpa: "",
+      gpaMax: "",
+      quote: profile.bio || "",
+      photo: profile.profile_photo_url || "",
+    });
+
+    const statusMap: Record<string, "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge"> = {
+      active: "Running",
+      weekly_rest: "On Rest",
+      seasonal_rest: "Recharging",
+      graduated: "Complete",
+      suspended: "Next Challenge",
+    };
+    if (profile.status && statusMap[profile.status]) {
+      setCrewStatus(statusMap[profile.status]);
+    }
+
+    if (cachedProfile.completionRate !== undefined && cachedProfile.completionRate !== null) {
+      setHasCompletionData(true);
+      setCompletionRate(cachedProfile.completionRate);
+    }
+    if (cachedProfile.reliabilityRate !== undefined && cachedProfile.reliabilityRate !== null) {
+      setHasReliabilityData(true);
+      setReliabilityRate(cachedProfile.reliabilityRate);
+    }
+    if (cachedProfile.practicalCounts) {
+      const { competency, experience, info, career } = cachedProfile.practicalCounts;
+      setPracticalCompetency(competency);
+      setPracticalExperience(experience);
+      setPracticalInfo(info);
+      setPracticalCareer(career);
+      setHasActivityData(competency > 0 || experience > 0 || info > 0 || career > 0);
+    }
+    if (cachedProfile.badges) {
+      setBadgeData(cachedProfile.badges);
+      setHasBadgeData(true);
+    }
+    if (cachedProfile.seasonHistories && cachedProfile.seasonHistories.length > 0) {
+      setSeasonHistories(cachedProfile.seasonHistories);
+      setHasSeasonData(true);
+    }
+  }, [cachedProfile]);
 
   // 아이콘 링크 state
   const [iconLink1, setIconLink1] = useState("https://www.google.com/");

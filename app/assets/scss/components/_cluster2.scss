@@ -48,7 +48,7 @@
   .floating-icons {
     display: none;
     position: absolute;
-    top: 20px;
+    top: 10px;
     right: 20px;
     z-index: 100;
     gap: 5px;
@@ -302,7 +302,7 @@
     }
 
     .floating-icons {
-      top: -50px;
+      top: 5px;
     }
 
     // 왼쪽 영역
@@ -1075,10 +1075,21 @@
     position: relative;
     width: 100%;
     max-width: 1325px;
-    margin: 50px 0;
+    margin: 100px 0 50px 0;
     padding: 25px 0;
     background: transparent;
     overflow: visible;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1023px;
+      height: 2px;
+      background-color: rgba(236, 187, 2, 1);
+    }
 
     &:hover .floating-icons {
       display: flex;
@@ -1128,14 +1139,14 @@
         position: relative;
         width: 135px;
         height: 50px;
-        padding: 0 10px 8px 0; // 대각선 컷 보정: 우측·하단 여백으로 시각적 중앙
+        padding: 0 6px 4px 0; // 대각선 컷 보정: 시각적 중앙 정렬
         display: flex;
         align-items: center;
         justify-content: center;
         background: #faab07;
         color: #000;
         border: none;
-        font-size: 1rem;
+        font-size: 1.25rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -4852,7 +4863,7 @@
               border-left: 2px solid transparent;
 
               &:hover {
-                background: rgba(255, 165, 0, 0.08);
+                background: rgba(255, 165, 0, 0.1);
                 color: #fff;
                 border-left-color: #ffa500;
               }

@@ -1205,7 +1205,7 @@ const Cluster2Content = () => {
             display: 'flex',
             position: 'absolute',
             bottom: '220px',
-            right: '40px',
+            right: '20px',
             zIndex: 100,
             gap: '5px'
           }}>
