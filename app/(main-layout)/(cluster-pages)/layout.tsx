@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
-import Cluster41Content from "@/components/cluster-4-1/Cluster41Content";
 import Animations from "@/components/shared/Animations";
 
-const Cluster4Page = () => {
+export default function ClusterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isMobile, setIsMobile] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const sidebarShellRef = useRef<HTMLDivElement>(null);
@@ -23,10 +26,10 @@ const Cluster4Page = () => {
     const shell = sidebarShellRef.current;
     const inner = sidebarInnerRef.current;
     const getHeaderBottom = () => {
-    const header = document.querySelector('header');
-    if (header) return header.getBoundingClientRect().bottom;
-    return 57;
-};
+      const header = document.querySelector('header');
+      if (header) return header.getBoundingClientRect().bottom;
+      return 57;
+    };
 
     let rafId: number | null = null;
     let isFixed = false;
@@ -38,14 +41,14 @@ const Cluster4Page = () => {
 
       const footer = document.querySelector("footer");
       if (footer) {
-          const footerTop = footer.getBoundingClientRect().top;
-          const margin = 4;
-          const maxTop = footerTop - height - margin;
-          top = Math.min(defaultTop, maxTop);
+        const footerTop = footer.getBoundingClientRect().top;
+        const margin = 4;
+        const maxTop = footerTop - height - margin;
+        top = Math.min(defaultTop, maxTop);
       }
 
       return top;
-  };
+    };
 
     const apply = () => {
       rafId = null;
@@ -64,12 +67,12 @@ const Cluster4Page = () => {
         return;
       }
 
-
       const zoom = 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
       const shouldFix = shellRect.top <= headerBottom;
 
+      // 고정 진입
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
         const height = inner.getBoundingClientRect().height;
@@ -79,11 +82,11 @@ const Cluster4Page = () => {
         shell.style.width = `${width}px`;
         shell.style.height = `${inner.offsetHeight}px`;
 
-        inner.style.position = "fixed";
+        inner.style.position = 'fixed';
         inner.style.top = `${top}px`;
         inner.style.left = `${left}px`;
         inner.style.width = `${width}px`;
-        inner.style.zIndex = "9999";
+        inner.style.zIndex = '9999';
 
         isFixed = true;
         return;
@@ -97,15 +100,16 @@ const Cluster4Page = () => {
         return;
       }
 
+      // 고정 해제
       if (isFixed && !shouldFix) {
-        shell.style.width = "";
-        shell.style.height = "";
+        shell.style.width = '';
+        shell.style.height = '';
 
-        inner.style.position = "relative";
-        inner.style.top = "0";
-        inner.style.left = "0";
-        inner.style.width = "";
-        inner.style.zIndex = "100";
+        inner.style.position = 'relative';
+        inner.style.top = '0';
+        inner.style.left = '0';
+        inner.style.width = '';
+        inner.style.zIndex = '100';
 
         isFixed = false;
       }
@@ -118,24 +122,27 @@ const Cluster4Page = () => {
 
     const handleResize = () => {
       isFixed = false;
-      shell.style.width = "";
-      shell.style.height = "";
-      inner.style.position = "relative";
-      inner.style.top = "0";
-      inner.style.left = "0";
-      inner.style.width = "";
+
+      shell.style.width = '';
+      shell.style.height = '';
+      inner.style.position = 'relative';
+      inner.style.top = '0';
+      inner.style.left = '0';
+      inner.style.width = '';
 
       if (rafId != null) window.cancelAnimationFrame(rafId);
       rafId = window.requestAnimationFrame(apply);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    // 초기 실행
     rafId = window.requestAnimationFrame(apply);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
       if (rafId != null) window.cancelAnimationFrame(rafId);
     };
   }, [isMobile]);
@@ -145,42 +152,36 @@ const Cluster4Page = () => {
     return (
       <main ref={mainRef} className="nftg-content nftg-content-home mobile-layout">
         <Animations />
-        
-        {/* 모바일: 세로 배치 */}
+
         <div className="mobile-container">
-          {/* 1. 프로필 카드 (상단) */}
           <div className="mobile-sidebar-section">
             <Sidebar />
           </div>
-          
-          {/* 2. 클러스터 탭 */}
+
           <div className="mobile-tabs-section">
             <ClusterTabs />
           </div>
-          
-          {/* 3. 메인 콘텐츠 */}
+
           <div className="mobile-content-section">
-            <Suspense fallback={<div>Loading...</div>}>
-              <Cluster41Content />
-            </Suspense>
+            {children}
           </div>
         </div>
       </main>
     );
   }
 
-  // 데스크탑 레이아웃 - JavaScript로 sticky 동작 구현
+  // 데스크탑 레이아웃
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      
+
       <div className="desktop-layout" style={{
         display: 'flex',
         gap: '20px',
         alignItems: 'flex-start',
         position: 'relative',
       }}>
-        {/* 사이드바 - JS로 스크롤 따라오기 */}
+        {/* 사이드바 */}
         <div
           ref={sidebarShellRef}
           className="sidebar-sticky-wrapper"
@@ -190,19 +191,21 @@ const Cluster4Page = () => {
             <Sidebar />
           </div>
         </div>
-        
+
         {/* 메인 콘텐츠 */}
-        <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
+        <div
+          className="home-two-content-col"
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
           <ClusterTabs />
           <div className="home-two-content">
-            <Suspense fallback={<div>Loading...</div>}>
-              <Cluster41Content />
-            </Suspense>
+            {children}
           </div>
         </div>
       </div>
     </main>
   );
-};
-
-export default Cluster4Page;
+}
