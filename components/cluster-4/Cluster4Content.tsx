@@ -1653,13 +1653,13 @@ const Cluster4Content = () => {
         <div className="section3-banner">
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => {
+            <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => {
               if (isOwner) {
                 alert('시즌 평판은 타 크루끼리 작성합니다.');
               } else {
                 openSeasonReputationModal();
               }
-            }} />
+            }}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
               <div className="tooltip">등록된 도움말이 없습니다</div>

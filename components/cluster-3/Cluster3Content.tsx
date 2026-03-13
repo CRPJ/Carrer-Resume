@@ -1060,7 +1060,7 @@ const Cluster3Content = () => {
       <section className="cluster3-section3">
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setEditingArchiveChannels([...portfolioArchiveChannels]); setSection3ModalOpen(true); } : undefined} />
+          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setEditingArchiveChannels([...portfolioArchiveChannels]); setSection3ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
           <div className="edit-icon search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
@@ -1158,7 +1158,7 @@ const Cluster3Content = () => {
       <section className="cluster3-section4">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection4Links([...portfolioOutputs]); setEditingOutputChannels([...portfolioOutputChannels]); setSection4ModalOpen(true); } : undefined} />
+          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection4Links([...portfolioOutputs]); setEditingOutputChannels([...portfolioOutputChannels]); setSection4ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
           <div className="edit-icon search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
@@ -1272,7 +1272,7 @@ const Cluster3Content = () => {
         <div className="cluster3-section5">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
-          <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection5Links([...portfolioDetails]); setEditingDetailChannels([...portfolioDetailChannels]); setSection5ModalOpen(true); } : undefined} />
+          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection5Links([...portfolioDetails]); setEditingDetailChannels([...portfolioDetailChannels]); setSection5ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
           <div className="edit-icon search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>

@@ -2201,7 +2201,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
             }} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2455,7 +2455,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2541,7 +2541,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkAbilityModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2655,7 +2655,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkExpModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2771,7 +2771,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkCareerModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">

@@ -1204,13 +1204,13 @@ const Cluster2Content = () => {
           <div className="floating-icons" style={{
             display: 'flex',
             position: 'absolute',
-            bottom: '220px',
+            top: '-78px',
             right: '20px',
             zIndex: 100,
             gap: '5px'
           }}>
             <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
-                <img src="/images/0/cluster 2/icon -  modify.png" alt="Modify" style={{ pointerEvents: 'none' }} />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF', pointerEvents: 'none' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1310,7 +1310,7 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
-              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1421,7 +1421,7 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
-              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1600,7 +1600,7 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
-              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -1702,7 +1702,7 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
-              <img src="/images/0/cluster 2/icon -  modify.png" alt="Edit" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
