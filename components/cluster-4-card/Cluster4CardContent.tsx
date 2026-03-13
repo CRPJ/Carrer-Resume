@@ -1185,7 +1185,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 연계 동료 저장 함수
   const saveWeeklyColleagues = async () => {
     if (!weekId) {
-      setColleagueSaveError("주차 정보를 찾을 수 없습니다.");
+      alert("주차 정보를 찾을 수 없습니다.");
       return;
     }
 
@@ -1212,21 +1212,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const json = await res.json();
 
       if (!res.ok) {
-        setColleagueSaveError(json.error || "저장에 실패했습니다.");
+        alert(json.error || "저장에 실패했습니다.");
         return;
       }
 
-      setColleagueSaveSuccess(true);
       // 연계 동료 데이터 새로고침
       fetchWeeklyColleagues();
-      // 2초 후 모달 닫기 및 상태 초기화
-      setTimeout(() => {
-        setHeaderModalOpen(false);
-        setColleagueSaveSuccess(false);
-      }, 2000);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
     } catch (error) {
       console.error("연계 동료 저장 오류:", error);
-      setColleagueSaveError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setColleagueSaving(false);
     }
@@ -1235,22 +1231,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 저장 함수
   const saveWeeklyReputation = async () => {
     if (!urlUserId || !weekId) {
-      setReputationSaveError("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+      alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return;
     }
 
     if (reputationEditData.rating === 0) {
-      setReputationSaveError("평점을 입력해주세요.");
+      alert("평점을 입력해주세요.");
       return;
     }
 
     if (!reputationEditData.content.trim()) {
-      setReputationSaveError("내용을 입력해주세요.");
+      alert("내용을 입력해주세요.");
       return;
     }
 
     if (!reputationEditData.keyword) {
-      setReputationSaveError("키워드를 선택해주세요.");
+      alert("키워드를 선택해주세요.");
       return;
     }
 
@@ -1274,22 +1270,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const json = await res.json();
 
       if (!res.ok) {
-        setReputationSaveError(json.error || "저장에 실패했습니다.");
+        alert(json.error || "저장에 실패했습니다.");
         return;
       }
 
-      setReputationSaveSuccess(true);
       // 주차 평판 데이터 새로고침
       fetchWeeklyReputations();
-      // 2초 후 모달 닫기 및 상태 초기화
-      setTimeout(() => {
-        setHeaderModalOpen(false);
-        setReputationEditData({ rating: 0, content: "", keyword: "" });
-        setReputationSaveSuccess(false);
-      }, 2000);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
-      setReputationSaveError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setReputationSaving(false);
     }
@@ -3811,17 +3803,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
-            {/* 저장 상태 메시지 */}
-            {colleagueSaveError && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{colleagueSaveError}</p>
-              </div>
-            )}
-            {colleagueSaveSuccess && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>연계 동료가 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setColleagueSaveError(null); setColleagueSaveSuccess(false); }}>취소</button>
               <button
@@ -3966,17 +3947,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
-            {/* 저장 상태 메시지 */}
-            {reputationSaveError && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{reputationSaveError}</p>
-              </div>
-            )}
-            {reputationSaveSuccess && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>주차 평판이 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setReputationSaveError(null); setReputationSaveSuccess(false); }}>취소</button>
               <button

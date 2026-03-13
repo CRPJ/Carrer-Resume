@@ -244,7 +244,6 @@ const Sidebar = () => {
   const [skill3, setSkill3] = useState(0);
   const [skill4, setSkill4] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -1101,7 +1100,7 @@ const Sidebar = () => {
       const result = await response.json();
 
       if (result.success) {
-        alert("프로필이 성공적으로 저장되었습니다.");
+        alert("저장되었습니다.");
         setIsEditModalOpen(false);
         // 캐시 무효화 후 프로필 데이터 새로고침
         clearProfileCache();
@@ -2120,7 +2119,7 @@ const Sidebar = () => {
               alignItems: "center",
               justifyContent: "center",
               zIndex: 99999,
-              overflowY: "auto", // ← 여기 추가
+              overflow: "hidden",
               padding: "40px 0", // ← 여기 추가
             }}
           >
@@ -2129,14 +2128,10 @@ const Sidebar = () => {
               className="edit-modal-content"
               style={{
                 backgroundColor: "#1a1d29",
-                borderRadius: "8px",
                 border: "1px solid #FFA500",
                 boxShadow: "0 0 10px rgba(255, 165, 0, 0.15)",
                 width: "580px",
                 maxHeight: "700px",
-                overflowY: "auto",
-                fontFamily: "'Pretendard', sans-serif",
-                marginTop: "0px",
               }}
             >
               {/* Cafe24Ohsquare 폰트 선언 */}
@@ -2155,9 +2150,9 @@ const Sidebar = () => {
               />
               {/* 상단 헤더 바 */}
               <div
+                className="edit-modal-header"
                 style={{
                   padding: "20px 28px",
-                  borderBottom: "1px solid #FFA500",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "flex-start",
@@ -2165,114 +2160,31 @@ const Sidebar = () => {
                 }}
               >
                 <div>
-                  <h3 style={{ color: "#FFA500", fontFamily: "'Cafe24Ohsquare', sans-serif", fontSize: "1.25rem", margin: 0 }}>프로필 수정</h3>
-                  <p style={{ color: "#8a8d98", fontSize: "13px", marginTop: "6px", marginBottom: 0 }}>프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.</p>
+                  <h3 style={{ margin: 0 }}>프로필 수정</h3>
+                  <p className="modal-subtitle" style={{ marginTop: "6px", marginBottom: 0 }}>프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.</p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowExitConfirm(true)}
+                  className="modal-close-btn"
+                  onClick={() => {
+                    if (confirm('변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?')) {
+                      setIsEditModalOpen(false);
+                    }
+                  }}
                   style={{
                     position: "absolute",
                     top: "18px",
                     right: "20px",
-                    background: "none",
-                    border: "none",
-                    outline: "none",
-                    padding: 0,
-                    margin: 0,
-                    cursor: "pointer",
-                    color: "#aaa",
-                    fontSize: "22px",
-                    fontWeight: 300,
-                    lineHeight: 1,
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#FFA500";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "#aaa";
                   }}
                 >
                   &#x2715;
                 </button>
               </div>
 
-              {/* X 버튼 확인 팝업 */}
-              {showExitConfirm && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(0,0,0,0.6)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 100001,
-                  }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: "#1a1d29",
-                      border: "1px solid #FFA500",
-                      borderRadius: "8px",
-                      padding: "32px",
-                      width: "380px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <p style={{ color: "#fff", fontSize: "16px", fontWeight: 600, margin: "0 0 8px 0" }}>변경사항이 저장되지 않았습니다.</p>
-                    <p style={{ color: "#8a8d98", fontSize: "14px", margin: "0 0 24px 0", lineHeight: 1.6 }}>
-                      하단에 [작성 완료]를 눌러야 저장이 완료됩니다.<br />
-                      지금 나가시겠습니까?
-                    </p>
-                    <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowExitConfirm(false);
-                          setIsEditModalOpen(false);
-                        }}
-                        style={{
-                          padding: "12px 32px",
-                          backgroundColor: "#252836",
-                          border: "1px solid #555",
-                          borderRadius: "4px",
-                          color: "#fff",
-                          fontSize: "14px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        나가기
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowExitConfirm(false)}
-                        style={{
-                          padding: "12px 32px",
-                          backgroundColor: "#FFA500",
-                          border: "none",
-                          borderRadius: "4px",
-                          color: "#1a1d29",
-                          fontSize: "14px",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        계속 작성
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* 모달 본문 */}
-              <div style={{ padding: "30px 32px 40px 40px" }}>
 
               <form onSubmit={handleSubmit}>
+              {/* 모달 본문 */}
+              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px" }}>
                 {/* 성 & 이름 - 일렬 배치 */}
                 <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                   {/* 성 */}
@@ -2399,10 +2311,7 @@ const Sidebar = () => {
                       type="button"
                       className="chamfer-box"
                       data-nav-index={5}
-                      onClick={() => setFormData((prev) => ({ ...prev, gender: "male" }))}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') { e.preventDefault(); setFormData((prev) => ({ ...prev, gender: "male" })); navigateToNextField(5); }
-                      }}
+                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "male" })); setTimeout(() => navigateToNextField(5), 0); }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2424,10 +2333,7 @@ const Sidebar = () => {
                     <button
                       type="button"
                       className="chamfer-box"
-                      onClick={() => setFormData((prev) => ({ ...prev, gender: "female" }))}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') { e.preventDefault(); setFormData((prev) => ({ ...prev, gender: "female" })); navigateToNextField(5); }
-                      }}
+                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "female" })); setTimeout(() => navigateToNextField(5), 0); }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2461,18 +2367,18 @@ const Sidebar = () => {
                   .edit-modal-content * {
                     font-family: 'Pretendard', sans-serif !important;
                   }
-                  .edit-modal-content::-webkit-scrollbar {
+                  .edit-modal-body::-webkit-scrollbar {
                     width: 8px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-track {
+                  .edit-modal-body::-webkit-scrollbar-track {
                     background: #252836;
                     border-radius: 4px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-thumb {
+                  .edit-modal-body::-webkit-scrollbar-thumb {
                     background: #FFA500;
                     border-radius: 4px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-thumb:hover {
+                  .edit-modal-body::-webkit-scrollbar-thumb:hover {
                     background: #22c55e;
                   }
                   .custom-dropdown-list::-webkit-scrollbar {
@@ -2498,7 +2404,6 @@ const Sidebar = () => {
                         data-nav-index={6}
                         data-nav-dropdown="year"
                         onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}
-                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2584,7 +2489,6 @@ const Sidebar = () => {
                         data-nav-index={7}
                         data-nav-dropdown="month"
                         onClick={() => setOpenDropdown(openDropdown === "month" ? null : "month")}
-                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2670,7 +2574,6 @@ const Sidebar = () => {
                         data-nav-index={8}
                         data-nav-dropdown="day"
                         onClick={() => setOpenDropdown(openDropdown === "day" ? null : "day")}
-                        onKeyDown={handleEnterKeyNavigation}
                         style={{
                           padding: "14px 12px",
                           backgroundColor: "#252836",
@@ -2763,7 +2666,6 @@ const Sidebar = () => {
                           data-nav-index={9}
                           data-nav-dropdown="city"
                           onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
-                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -2876,7 +2778,6 @@ const Sidebar = () => {
                               setOpenDropdown(openDropdown === "district" ? null : "district");
                             }
                           }}
-                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -3160,7 +3061,6 @@ const Sidebar = () => {
                           data-nav-index={14}
                           data-nav-dropdown="emailDomain"
                           onClick={() => setOpenDropdown(openDropdown === "emailDomain" ? null : "emailDomain")}
-                          onKeyDown={handleEnterKeyNavigation}
                           style={{
                             padding: "14px 12px",
                             backgroundColor: "#252836",
@@ -3388,17 +3288,9 @@ const Sidebar = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
-                <div
-                  style={{
-                    width: "100%",
-                    height: "1px",
-                    backgroundColor: "#3a3d4a",
-                    margin: "16px 0 32px 0",
-                  }}
-                />
-
-                {/* Submit Button */}
+              </div>
+              {/* 모달 푸터 */}
+              <div className="edit-modal-footer">
                 <style
                   dangerouslySetInnerHTML={{
                     __html: `
@@ -3435,8 +3327,8 @@ const Sidebar = () => {
                 >
                   작성완료
                 </button>
-              </form>
               </div>
+              </form>
             </div>
           </div>,
           document.body,
@@ -3461,15 +3353,16 @@ const Sidebar = () => {
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "16px",
+              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid #FFA500",
             }}
           >
             {/* 헤더 */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>
+            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px", padding: 0 }}>
               {/* 전화 아이콘 */}
               <div
                 style={{
@@ -3486,27 +3379,17 @@ const Sidebar = () => {
               <div style={{ flex: 1 }}>
                 <h3
                   style={{
-                    color: "#fff",
-                    fontSize: "18px",
-                    fontWeight: 600,
                     margin: 0,
                     lineHeight: 1.4,
-                    fontFamily: "Pretendard, sans-serif",
                   }}
                 >
                   연락이 필요하시면, 하단 내용을 참고해주세요 :)
                 </h3>
               </div>
               <button
+                className="modal-close-btn"
                 onClick={() => setIsPhoneCommentModalOpen(false)}
                 style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "#8a8d98",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  padding: 0,
-                  lineHeight: 1,
                   flexShrink: 0,
                 }}
               >
@@ -3551,15 +3434,16 @@ const Sidebar = () => {
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "16px",
+              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid #FFA500",
             }}
           >
             {/* 헤더 */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>
+            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px", padding: 0 }}>
               {/* 전화 아이콘 */}
               <div
                 style={{
@@ -3576,9 +3460,6 @@ const Sidebar = () => {
               <div>
                 <h3
                   style={{
-                    color: "#fff",
-                    fontSize: "18px",
-                    fontWeight: 600,
                     margin: 0,
                     lineHeight: 1.4,
                   }}
@@ -3586,9 +3467,8 @@ const Sidebar = () => {
                   연락이 가능한 시간대와 코멘트를 작성해 주세요 :)
                 </h3>
                 <p
+                  className="modal-subtitle"
                   style={{
-                    color: "#8a8d98",
-                    fontSize: "14px",
                     margin: "2px 0 0 0",
                   }}
                 >

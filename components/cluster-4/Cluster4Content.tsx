@@ -1364,12 +1364,12 @@ const Cluster4Content = () => {
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
     if (!urlUserId) {
-      setSeasonReputationError("평판을 남길 대상을 찾을 수 없습니다.");
+      alert("평판을 남길 대상을 찾을 수 없습니다.");
       return;
     }
 
     if (!selectedSeasonId) {
-      setSeasonReputationError("시즌을 선택해주세요.");
+      alert("시즌을 선택해주세요.");
       return;
     }
 
@@ -1395,26 +1395,21 @@ const Cluster4Content = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        setSeasonReputationError(result.error || "저장에 실패했습니다.");
+        alert(result.error || "저장에 실패했습니다.");
         return;
       }
-
-      setSeasonReputationSuccess(true);
 
       // 평판 목록 새로고침 (현재 보고 있는 시즌의 평판)
       if (urlUserId && currentSeason?.id) {
         fetchSeasonReputations(urlUserId, currentSeason.id);
       }
 
-      // 1.5초 후 모달 닫기
-      setTimeout(() => {
-        setSeasonReputationModalOpen(false);
-        setSeasonReputationSuccess(false);
-        setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
-      }, 1500);
+      alert("저장되었습니다.");
+      setSeasonReputationModalOpen(false);
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
     } catch (error) {
       console.error("시즌 평판 저장 오류:", error);
-      setSeasonReputationError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReputationSaving(false);
     }
@@ -1436,28 +1431,28 @@ const Cluster4Content = () => {
   // 시즌 리뷰 저장
   const handleSaveSeasonReview = async () => {
     if (!currentSeason?.id) {
-      setSeasonReviewError("시즌 정보를 찾을 수 없습니다.");
+      alert("시즌 정보를 찾을 수 없습니다.");
       return;
     }
 
     // 0.0~5.0 범위, 0.5 단위 검증
     if (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 5 || (seasonReviewEditData.rating * 2) % 1 !== 0) {
-      setSeasonReviewError("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
+      alert("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
       return;
     }
 
     if (!seasonReviewEditData.review.trim()) {
-      setSeasonReviewError("리뷰를 입력해주세요.");
+      alert("리뷰를 입력해주세요.");
       return;
     }
 
     if (seasonReviewEditData.review.length > 30) {
-      setSeasonReviewError("리뷰는 30자 이내로 작성해주세요.");
+      alert("리뷰는 30자 이내로 작성해주세요.");
       return;
     }
 
     if (!seasonReviewEditData.link.trim()) {
-      setSeasonReviewError("링크를 입력해주세요.");
+      alert("링크를 입력해주세요.");
       return;
     }
 
@@ -1479,11 +1474,9 @@ const Cluster4Content = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setSeasonReviewError(data.error || "저장에 실패했습니다.");
+        alert(data.error || "저장에 실패했습니다.");
         return;
       }
-
-      setSeasonReviewSuccess(true);
 
       // 현재 시즌 데이터 업데이트
       setSeasonHistories(prev => prev.map((season) =>
@@ -1492,14 +1485,11 @@ const Cluster4Content = () => {
           : season
       ));
 
-      // 1.5초 후 모달 닫기
-      setTimeout(() => {
-        setSeasonReviewModalOpen(false);
-        setSeasonReviewSuccess(false);
-      }, 1500);
+      alert("저장되었습니다.");
+      setSeasonReviewModalOpen(false);
     } catch (error) {
       console.error("시즌 리뷰 저장 오류:", error);
-      setSeasonReviewError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReviewSaving(false);
     }
@@ -2297,18 +2287,6 @@ const Cluster4Content = () => {
               </div>
             </div>
 
-            {/* 에러/성공 메시지 */}
-            {seasonReputationError && (
-              <div style={{ padding: '12px 24px', background: 'rgba(255, 59, 48, 0.1)', borderTop: '1px solid rgba(255, 59, 48, 0.3)' }}>
-                <p style={{ margin: 0, color: '#FF3B30', fontSize: '14px' }}>{seasonReputationError}</p>
-              </div>
-            )}
-            {seasonReputationSuccess && (
-              <div style={{ padding: '12px 24px', background: 'rgba(52, 199, 89, 0.1)', borderTop: '1px solid rgba(52, 199, 89, 0.3)' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>시즌 평판이 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
-
             {/* Footer */}
             <div style={{
               display: 'flex',
@@ -2659,18 +2637,6 @@ const Cluster4Content = () => {
                 />
               </div>
             </div>
-
-            {/* 에러/성공 메시지 */}
-            {seasonReviewError && (
-              <div style={{ padding: '12px 24px', background: 'rgba(255, 59, 48, 0.1)', borderTop: '1px solid rgba(255, 59, 48, 0.3)' }}>
-                <p style={{ margin: 0, color: '#FF3B30', fontSize: '14px' }}>{seasonReviewError}</p>
-              </div>
-            )}
-            {seasonReviewSuccess && (
-              <div style={{ padding: '12px 24px', background: 'rgba(52, 199, 89, 0.1)', borderTop: '1px solid rgba(52, 199, 89, 0.3)' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>시즌 리뷰가 저장되었습니다!</p>
-              </div>
-            )}
 
             {/* Footer */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.2)', background: 'rgba(0,0,0,0.2)' }}>

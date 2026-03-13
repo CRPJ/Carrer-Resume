@@ -269,7 +269,7 @@ const Cluster2Content = () => {
 
       const result = await response.json();
       if (result.success) {
-        alert('사진이 저장되었습니다.');
+        alert('저장되었습니다.');
         setSection1ModalOpen(false);
       } else {
         alert(result.error || '사진 저장에 실패했습니다.');
@@ -470,7 +470,7 @@ const Cluster2Content = () => {
         setSloganData(editingSloganData);
         // 슬로건 변경을 Sidebar(.resume-card)에 알려 즉시 반영
         window.dispatchEvent(new CustomEvent('sloganUpdated', { detail: editingSloganData }));
-        alert('슬로건이 저장되었습니다.');
+        alert('저장되었습니다.');
         setSection2ModalOpen(false);
       } else {
         alert(result.error || '슬로건 저장에 실패했습니다.');
@@ -609,7 +609,7 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         setVideoData([...editingVideoData]);
-        alert('영상이 저장되었습니다.');
+        alert('저장되었습니다.');
         setSection21ModalOpen(false);
       } else {
         alert(result.error || '영상 저장에 실패했습니다.');
@@ -730,7 +730,7 @@ const Cluster2Content = () => {
         setSection3ModalOpen(false);
         // 학력 변경을 Sidebar(.resume-card)에 알려 즉시 반영
         window.dispatchEvent(new Event('educationUpdated'));
-        alert('학력이 저장되었습니다.');
+        alert('저장되었습니다.');
       } else {
         alert(result.error || '학력 저장에 실패했습니다.');
       }
@@ -742,13 +742,6 @@ const Cluster2Content = () => {
     }
   };
 
-  // 삭제 확인 모달
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
-    isOpen: boolean;
-    index: number | null;
-    schoolName: string;
-    type: 'edu' | 'minimum';
-  }>({ isOpen: false, index: null, schoolName: '', type: 'edu' });
 
   // 섹션 4 모달 (바로가기 링크 편집)
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
@@ -911,7 +904,7 @@ const Cluster2Content = () => {
         };
         setIntroCards(newCards);
         setIsEditingIntro(false);
-        alert('자기소개서가 저장되었습니다.');
+        alert('저장되었습니다.');
       } else {
         alert(result.error || '자기소개서 저장에 실패했습니다.');
       }
@@ -938,7 +931,7 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         setReviewLinks([...editingReviewLinks]);
-        alert('리뷰 링크가 저장되었습니다.');
+        alert('저장되었습니다.');
         setSection4ModalOpen(false);
       } else {
         alert(result.error || '리뷰 링크 저장에 실패했습니다.');
@@ -2824,20 +2817,18 @@ const Cluster2Content = () => {
                         className="delete-edu-btn"
                         onClick={() => {
                           if (editingEduData.length <= 1) {
-                            setDeleteConfirmModal({
-                              isOpen: true,
-                              index: null,
-                              schoolName: '',
-                              type: 'minimum'
-                            });
+                            alert('최소 1개의 학력은 유지해야 합니다.');
                             return;
                           }
-                          setDeleteConfirmModal({
-                            isOpen: true,
-                            index: index,
-                            schoolName: edu.school || `${index + 1}번 학력`,
-                            type: 'edu'
-                          });
+                          const schoolName = edu.school || `${index + 1}번 학력`;
+                          if (confirm(`${schoolName} 정보를 삭제하시겠습니까?`)) {
+                            const newData = editingEduData.filter((_, i) => i !== index);
+                            if (edu.isFinal && newData.length > 0) {
+                              newData[0].isFinal = true;
+                            }
+                            setEditingEduData(newData);
+                            setHasEduChanges(true);
+                          }
                         }}
                         title="학력 삭제"
                       >
@@ -3524,18 +3515,30 @@ const Cluster2Content = () => {
                   setEduValidationErrors(newErrors);
 
                   if (invalidCards.length > 0) {
-                    const errorMessages = invalidCards.map(item =>
-                      `${item.index}번 학력: ${item.missing.join(', ')}`
-                    ).join('\n');
-                    alert(`다음 필수 항목을 입력해주세요:\n\n${errorMessages}`);
-                    // 첫 번째 에러 카드로 스크롤 (모달 내부 스크롤 컨테이너 사용)
-                    const firstErrorIndex = invalidCards[0].index - 1;
+                    alert('입력되지 않은 필수 항목이 있습니다.');
+                    // 첫 번째 에러 필드로 스크롤
                     setTimeout(() => {
                       const container = modalBodyRef.current;
-                      const cards = container?.querySelectorAll('.edu-edit-card');
-                      if (container && cards && cards[firstErrorIndex]) {
-                        const card = cards[firstErrorIndex] as HTMLElement;
-                        container.scrollTo({ top: card.offsetTop - container.offsetTop, behavior: 'smooth' });
+                      if (!container) return;
+                      const firstErrorKey = Object.keys(newErrors)[0];
+                      if (!firstErrorKey) return;
+                      const cardIndex = parseInt(firstErrorKey.split('_')[0]);
+                      const cards = container.querySelectorAll('.edu-edit-card');
+                      if (!cards || !cards[cardIndex]) return;
+                      const card = cards[cardIndex] as HTMLElement;
+                      // 카드 내 첫 번째 에러 라벨의 부모 필드로 스크롤
+                      const labels = card.querySelectorAll('.edu-edit-field label');
+                      let targetField: HTMLElement | null = null;
+                      for (let i = 0; i < labels.length; i++) {
+                        if ((labels[i] as HTMLElement).style.color) {
+                          targetField = (labels[i] as HTMLElement).closest('.edu-edit-field') as HTMLElement;
+                          break;
+                        }
+                      }
+                      if (targetField) {
+                        container.scrollTop = targetField.offsetTop - container.offsetTop;
+                      } else {
+                        container.scrollTop = card.offsetTop - container.offsetTop;
                       }
                     }, 100);
                     return;
@@ -3581,63 +3584,6 @@ const Cluster2Content = () => {
         </div>
       )}
 
-      {/* 삭제 확인 모달 */}
-      {deleteConfirmModal.isOpen && (
-        <div className="delete-confirm-overlay" onClick={() => setDeleteConfirmModal({ isOpen: false, index: null, schoolName: '', type: 'edu' })}>
-          <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
-            {deleteConfirmModal.type === 'minimum' ? (
-              <>
-                <div className="delete-confirm-icon warning">
-                  <i className="ti ti-alert-triangle"></i>
-                </div>
-                <h3>삭제 불가</h3>
-                <p>최소 1개의 학력은 유지해야 합니다.</p>
-                <div className="delete-confirm-buttons">
-                  <button
-                    className="confirm-btn"
-                    onClick={() => setDeleteConfirmModal({ isOpen: false, index: null, schoolName: '', type: 'edu' })}
-                  >
-                    확인
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="delete-confirm-icon">
-                  <i className="ti ti-trash"></i>
-                </div>
-                <h3>학력 삭제</h3>
-                <p><strong>{deleteConfirmModal.schoolName}</strong> 정보를 삭제하시겠습니까?</p>
-                <div className="delete-confirm-buttons">
-                  <button
-                    className="cancel-btn"
-                    onClick={() => setDeleteConfirmModal({ isOpen: false, index: null, schoolName: '', type: 'edu' })}
-                  >
-                    취소
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => {
-                      if (deleteConfirmModal.index !== null) {
-                        const edu = editingEduData[deleteConfirmModal.index];
-                        const newData = editingEduData.filter((_, i) => i !== deleteConfirmModal.index);
-                        if (edu.isFinal && newData.length > 0) {
-                          newData[0].isFinal = true;
-                        }
-                        setEditingEduData(newData);
-                        setHasEduChanges(true); // 변경사항 표시
-                      }
-                      setDeleteConfirmModal({ isOpen: false, index: null, schoolName: '', type: 'edu' });
-                    }}
-                  >
-                    삭제
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* 링크 없음 툴팁 */}
       {noLinkTooltip.visible && (

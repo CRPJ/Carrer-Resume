@@ -353,6 +353,7 @@ const Cluster3Content = () => {
           return card;
         });
         setChannelCards(updatedCards);
+        alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);
@@ -420,6 +421,7 @@ const Cluster3Content = () => {
           link: links[index] || ""
         }));
         setTopWorksSlides(updatedSlides);
+        alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);
@@ -487,6 +489,7 @@ const Cluster3Content = () => {
           link: links[index] || ""
         }));
         setDetailThumbnails(updatedThumbnails);
+        alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);

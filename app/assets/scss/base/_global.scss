@@ -1442,7 +1442,8 @@ svg {
 .section2-modal,
 .section3-modal,
 .delete-confirm-modal,
-.modal-content {
+.modal-content,
+.edit-modal-content {
   border-radius: 0 !important;
 }
 
@@ -1498,6 +1499,53 @@ svg {
   .cancel-btn,
   .save-btn {
     font-family: 'Pretendard', sans-serif !important;
+  }
+}
+
+// 5. Edit Modal (.resume-card) — 헤더/푸터 고정 + 본문 스크롤 레이아웃
+.edit-modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  font-family: 'Pretendard', sans-serif;
+
+  .edit-modal-header {
+    flex-shrink: 0;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .edit-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 165, 0, 0.5);
+      border-radius: 3px;
+
+      &:hover {
+        background: #FFA500;
+      }
+    }
+  }
+
+  .edit-modal-footer {
+    flex-shrink: 0;
   }
 }
 
