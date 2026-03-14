@@ -1198,7 +1198,7 @@ const Cluster2Content = () => {
             display: 'flex',
             position: 'absolute',
             top: '-78px',
-            right: '20px',
+            right: '47px',
             zIndex: 100,
             gap: '5px'
           }}>
@@ -1784,7 +1784,7 @@ const Cluster2Content = () => {
         {/* 오른쪽 */}
         <div className="section4-right">
           {/* Total Complete 큰 박스 */}
-          <div className="total-complete-box" style={{ position: 'relative' }}>
+          <div className={`total-complete-box${reviewLinks[0] ? ' has-link' : ''}`} style={{ position: 'relative' }}>
             {reviewLinks[0] && (
               <div style={{
                 position: 'absolute', top: 8, right: 8, width: 20, height: 20,
@@ -1814,7 +1814,7 @@ const Cluster2Content = () => {
           {/* 9개의 작은 박스 그리드 */}
           <div className="review-grid-9">
             {[3, 6, 9, 12, 15, 18, 21, 24, 27].map((weeks, index) => (
-              <div key={weeks} className="review-week-item" style={{ position: 'relative' }}>
+              <div key={weeks} className={`review-week-item${reviewLinks[index + 1] ? ' has-link' : ''}`} style={{ position: 'relative' }}>
                 {reviewLinks[index + 1] && (
                   <div style={{
                     position: 'absolute', top: 4, right: 4, width: 10, height: 10,
