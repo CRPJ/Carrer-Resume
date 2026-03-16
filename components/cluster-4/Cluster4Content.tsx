@@ -2,10 +2,61 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
+
+// TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+const DUMMY_SEASON_ROLES = [
+  { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 1.jpg' },
+  { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 2.jpg' },
+  { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 3.jpg' },
+];
+
+// TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+const DUMMY_SEASON_REPUTATIONS = [
+  {
+    id: 'dummy-rep-1',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '안유현', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 4.webp',
+    },
+  },
+  {
+    id: 'dummy-rep-2',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '이지민', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 5.jpg',
+    },
+  },
+  {
+    id: 'dummy-rep-3',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '유성이', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 6.jpg',
+    },
+  },
+];
 
 // 기본 시즌 데이터 (데이터가 없을 때 사용)
 const defaultSeasonData = {
@@ -92,6 +143,7 @@ const Cluster4Content = () => {
     openModalFn();
 };
 
+  const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
@@ -1499,18 +1551,25 @@ const Cluster4Content = () => {
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1" ref={headerRef}>
+        {/* Floating Icons - search-icon */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`)}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
-          </Link>
-          <div className="tab active">
+          </div>
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`)}>
               <span className="badge-text">Season Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
@@ -1539,6 +1598,13 @@ const Cluster4Content = () => {
 
       {/* Section 2: SEASON GROWTH 카드 */}
       <section className="cluster4-section2">
+        {/* Floating Icons - search-icon */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         <div className="season-growth-card visible">
           {/* 왼쪽 콘텐츠 */}
           <div className="card-left">
@@ -1667,28 +1733,13 @@ const Cluster4Content = () => {
           </div>
         </div>
 
-        {/* 페이지네이션 */}
-        <div className="section3-pagination">
-          {seasonHistories.length > 0 ? seasonHistories.map((_: SeasonHistoryData, index: number) => (
-            <span
-              key={index}
-              className={`page-num ${section3Page === index ? 'active' : ''} ${index === seasonHistories.length - 1 ? 'last' : ''}`}
-              onClick={() => handlePageChange(index)}
-            >
-              {index + 1}
-            </span>
-          )) : (
-            <span className="page-num active last">1</span>
-          )}
-        </div>
-
         <div className="season-detail-container" style={{ backgroundImage: `url('${currentSeason.image}')` }}>
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
             <div className={`area-1-title ${isTextFading ? 'fading' : ''}`}>
               <div className="season-main-title">
-                <span className="year-orange">{currentSeason.year}</span>년도_<span className="season-highlight">{currentSeason.season}</span> 시즌
+                <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: 'inline-block', width: '0.6em' }}></span><span className="season-highlight">{currentSeason.season}</span> 시즌
               </div>
               <div className="date-status">
                 <span className="date-range">{currentSeason.dateRange}</span>
@@ -1946,20 +1997,27 @@ const Cluster4Content = () => {
               <div className="area-8-season-status">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
                 <div className="status-badges">
-                  {currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0 ? (
-                    currentSeason.seasonRoles.map((roleItem, index) => (
+                  {(() => {
+                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                    const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
+                      ? currentSeason.seasonRoles
+                      : [];
+                    const totalSlots = 3;
+                    // DB 데이터가 기준 미만이면 더미로 채움
+                    const roles = dbRoles.length >= totalSlots
+                      ? dbRoles.slice(0, totalSlots)
+                      : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
+                    return roles.map((roleItem, index) => (
                       <div className="badge-item" key={index}>
                         <div className="badge-icon">
-                        <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                          <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
                         </div>
                         <div className="badge-info">
                           {roleItem.isAdmin ? (
-                            // 운영진: 운영진(n기) | 클럽 단위 |
                             <span className="badge-text">
                               운영진({roleItem.adminGeneration}기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span>
                             </span>
                           ) : (
-                            // 일반/심화 크루: 팀 | 파트 |
                             <span className="badge-text">
                               {roleItem.teamName || '-'} <span className="separator">|</span> <span className="sub-text">{roleItem.partName || '-'}</span> <span className="separator">|</span>
                             </span>
@@ -1967,19 +2025,8 @@ const Cluster4Content = () => {
                         </div>
                         <span className="badge-status yellow">{roleItem.roleLabel}</span>
                       </div>
-                    ))
-                  ) : (
-                    // 역할 이력이 없을 때 기본 표시
-                    <div className="badge-item">
-                      <div className="badge-icon">
-                        <img src={profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
-                      </div>
-                      <div className="badge-info">
-                        <span className="badge-text">- <span className="separator">|</span> <span className="sub-text">-</span> <span className="separator">|</span></span>
-                      </div>
-                      <span className="badge-status yellow">{roleLabels[currentSeason.roleInSeason] || '일반'}</span>
-                    </div>
-                  )}
+                    ));
+                  })()}
                 </div>
               </div>
 
@@ -1987,14 +2034,20 @@ const Cluster4Content = () => {
               <div className="area-9-season-reputation">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
                 <div className="profile-cards">
-                  {seasonReputations.length > 0 ? (
-                    seasonReputations.slice(0, 3).map((reputation) => {
+                  {(() => {
+                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                    const totalSlots = 3;
+                    const dbReputations = seasonReputations.slice(0, totalSlots);
+                    // DB 데이터가 기준 미만이면 더미로 채움
+                    const allReputations = dbReputations.length >= totalSlots
+                      ? dbReputations
+                      : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
+
+                    return allReputations.map((reputation: any) => {
                       const reviewer = reputation.reviewer;
                       const currentYear = new Date().getFullYear();
-                      // birth_date에서 연도 추출해서 나이 계산
                       const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
                       const age = birthYear ? currentYear - birthYear : null;
-                      // gender는 이미 '남'/'여' 형태로 저장되어 있음
                       const genderLabel = reviewer?.gender || '-';
                       const fullStars = Math.floor(reputation.rating / 2);
                       const hasHalfStar = reputation.rating % 2 === 1;
@@ -2069,22 +2122,27 @@ const Cluster4Content = () => {
                           </div>
                         </div>
                       );
-                    })
-                  ) : (
-                    <div style={{
-                      width: '100%',
-                      padding: '40px 20px',
-                      textAlign: 'center',
-                      color: 'rgba(255,255,255,0.4)',
-                      fontSize: '14px'
-                    }}>
-                      아직 이 시즌에 대한 평판이 없습니다.
-                    </div>
-                  )}
+                    });
+                  })()}
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 페이지네이션 */}
+        <div className="section3-pagination">
+          {seasonHistories.length > 0 ? seasonHistories.map((_: SeasonHistoryData, index: number) => (
+            <span
+              key={index}
+              className={`page-num ${section3Page === index ? 'active' : ''} ${index === seasonHistories.length - 1 ? 'last' : ''}`}
+              onClick={() => handlePageChange(index)}
+            >
+              {index + 1}
+            </span>
+          )) : (
+            <span className="page-num active last">1</span>
+          )}
         </div>
       </section>
 
@@ -2106,30 +2164,31 @@ const Cluster4Content = () => {
             backdropFilter: 'blur(5px)',
           }}
         >
-          <div style={{
+          <div className="edit-modal-content" style={{
             width: '500px',
             maxWidth: '90vw',
             height: '620px',
             maxHeight: 'calc(100vh - 80px)',
             background: '#0d1117',
             border: '1px solid #FAAB07',
-            borderRadius: '0px',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
           }}>
             {/* Header */}
-            <div style={{
+            <div className="edit-modal-header" style={{
               padding: '20px 24px',
-              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
               background: 'rgba(0,0,0,0.2)',
             }}>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FAAB07', fontFamily: "'Cafe24Ohsquare', sans-serif" }}>✦ 시즌 평판</h3>
-              <span style={{ color: '#999', fontSize: '14px', display: 'block', marginTop: '8px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
+              <div>
+                <h3 style={{ margin: 0 }}>✦ 시즌 평판</h3>
+                <span className="modal-subtitle" style={{ display: 'block', marginTop: '8px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
+              </div>
+              <button className="modal-close" onClick={() => setSeasonReputationModalOpen(false)} style={{ marginLeft: '12px', flexShrink: 0 }}>&times;</button>
             </div>
 
             {/* Body */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.3)' }}>
+            <div className="edit-modal-body" style={{ padding: '20px 24px' }}>
               
               {/* 평점 */}
               <div style={{ marginBottom: '24px' }}>
@@ -2288,12 +2347,11 @@ const Cluster4Content = () => {
             </div>
 
             {/* Footer */}
-            <div style={{
+            <div className="edit-modal-footer" style={{
               display: 'flex',
               justifyContent: 'flex-end',
               gap: '12px',
               padding: '16px 24px',
-              borderTop: '1px solid rgba(250, 171, 7, 0.2)',
               background: 'rgba(0,0,0,0.2)',
             }}>
               <button

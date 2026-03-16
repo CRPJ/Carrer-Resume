@@ -1549,6 +1549,25 @@ svg {
   }
 }
 
+// 6. Modal Dropdown (select) — hover cursor + background
+.edit-modal-content select,
+.section-modal select {
+  cursor: pointer !important;
+
+  &:hover {
+    background: #2a2f3e !important;
+  }
+
+  option {
+    cursor: pointer;
+    background: #1a1f2e;
+
+    &:hover {
+      background: #2a2f3e;
+    }
+  }
+}
+
 /* ====
  --------- (2.04) global modal styles end ---------
  ==== */

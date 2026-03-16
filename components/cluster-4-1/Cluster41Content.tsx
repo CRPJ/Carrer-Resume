@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const Cluster41Content = () => {
@@ -10,6 +10,7 @@ const Cluster41Content = () => {
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
 
+  const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
@@ -1323,20 +1324,20 @@ const Cluster41Content = () => {
       <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <div className="tab active">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </div>
-          <Link href={`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`} className="tab">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
               <span className="badge-text">Season Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
-          </Link>
+          </div>
         </div>
 
         {/* 타이틀 */}

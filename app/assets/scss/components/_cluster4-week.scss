@@ -254,31 +254,38 @@
 
     .tab {
       position: relative;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: #000;
-      border: 1px solid #000;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
       text-decoration: none;
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.80), 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
+      width: 44px;
+      height: 44px;
 
-      &:hover {
-        background: #222;
+      // hover 브릿지: tab-badge까지 hover 영역 연결
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -8px;
+        width: 8px;
+        height: 100%;
       }
 
-      &.active {
+      // cluster4-1: 두번째 탭(book)이 active
+      &:first-child {
+        background: #161816;
+      }
+
+      &:last-child {
         background: #FAAB07;
-        border-color: #FAAB07;
-        box-shadow: 0 0 10px rgba(250, 171, 7, 0.8), 0 0 20px rgba(250, 171, 7, 0.5);
       }
 
       .tab-icon {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         object-fit: contain;
       }
 
@@ -286,23 +293,18 @@
         position: absolute;
         left: 100%;
         top: 50%;
-        transform: translateY(-50%) translateX(-10px);
-        margin-left: 8px;
-        display: flex;
+        transform: translateY(-50%);
+        display: none;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        text-decoration: none;
         background: #FFEC8F;
         padding: 8px 24px;
         border-radius: 8px;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.3s ease;
         white-space: nowrap;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         z-index: 100;
+        cursor: pointer;
 
         .badge-text {
           font-family: 'Pretendard', sans-serif;
@@ -318,11 +320,8 @@
         }
       }
 
-      &.badge-visible .tab-badge {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-        transform: translateY(-50%) translateX(0);
+      &:hover .tab-badge {
+        display: flex;
       }
     }
   }

@@ -2170,7 +2170,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               e.stopPropagation();
               setShowWeeklyGrowthBadge(!showWeeklyGrowthBadge);
             }}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', width: '44px', height: '44px' }}
           >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <Link
@@ -2182,7 +2182,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </Link>
           </div>
-          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
+          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
