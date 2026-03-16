@@ -2581,6 +2581,7 @@
             cursor: pointer;
             padding: 0 10px;
             line-height: 35px;
+            white-space: nowrap;
           }
         }
       }
@@ -2958,7 +2959,7 @@
             }
 
             .unit {
-              font-family: var(--black-ops-one), cursive;
+              font-family: 'Pretendard', sans-serif;
               font-size: 1rem;
               color: #FFF;
               font-weight: 400;
@@ -3061,7 +3062,7 @@
           display: flex;
           gap: 40px;
           justify-content: space-around;
-          padding: 30px 0;
+          padding: 27px 0 30px 0;
 
           .circle-item {
             display: flex;
@@ -3187,7 +3188,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              margin-bottom: 5px;
+              margin-bottom: 0;
               width: 465.572px;
 
               .name {
@@ -3210,7 +3211,7 @@
 
               .value {
                 font-family: 'Pretendard', sans-serif;
-                font-size: 0.875rem;
+                font-size: 1rem;
                 color: #FFF;
                 font-weight: 700;
                 display: flex;
@@ -3218,7 +3219,7 @@
                 gap: 5px;
                 white-space: nowrap;
                 text-transform: uppercase;
-                line-height: 31px;
+                line-height: 40px;
 
                 .stars-icon {
                   width: 18px;
@@ -3232,7 +3233,7 @@
                   color: #FAAB07;
                   font-weight: 700;
                   text-transform: uppercase;
-                  line-height: 31px;
+                  line-height: 40px;
                 }
               }
             }
@@ -3264,9 +3265,11 @@
       .right-column {
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        gap: 4px;
         padding: 0;
         overflow: hidden;
+        margin-left: 29px;
+        margin-top: -11px;
 
         &.fading {
           opacity: 0;
@@ -3284,7 +3287,7 @@
             color: #FFF;
             font-weight: 700;
             letter-spacing: 0.7px;
-            margin: 0 0 10px 0;
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 3px;
@@ -3303,39 +3306,38 @@
             gap: 2px;
             background: #0b0b0b;
             max-height: 101px;         // 피그마 높이
-            overflow-y: auto;          // visible → auto
+            overflow-y: auto;
             overflow-x: hidden;
             scrollbar-width: thin;
-            scrollbar-color: #FFE3AA #1B1B1B;
+            scrollbar-color: rgba(255, 227, 170, 1) transparent;
             padding: 0;
 
             &::-webkit-scrollbar {
-              width: 2px;
+              width: 2px !important;
             }
-
-            &::-webkit-scrollbar-track {
-              background: #1B1B1B;
-            }
-
             &::-webkit-scrollbar-thumb {
-              background: #FFE3AA;
-              border-radius: 2px;
+              background: rgba(255, 227, 170, 1) !important;
+              border-radius: 5px !important;
+              max-height: 61px;
             }
-
+            &::-webkit-scrollbar-thumb:hover {
+              background: rgba(255, 227, 170, 0.8) !important;
+            }
+            &::-webkit-scrollbar-track {
+              background: transparent !important;
+            }
             &::-webkit-scrollbar-button {
-              width: 0;
-              height: 0;
-              display: none;
-              background: transparent;
+              display: none !important;
+              height: 0 !important;
+              width: 0 !important;
             }
 
             .badge-item {
-              display: flex;
+              display: inline-flex;
               align-items: center;
-              gap: 8px;                    // 0 → 8px
-              width: 100%;
-              height: auto;                // 38px → auto
-              min-height: auto;            // 38px → auto
+              gap: 8px;
+              width: 338px;
+              height: 38px;
               flex-shrink: 0;
               padding: 5px;                // 5px 0 5px 2px → 5px
               background: #1B1B1B;
@@ -3392,7 +3394,7 @@
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.75rem;
                 font-weight: 600;
-                line-height: 16px;
+                line-height: 15px;
                 padding: 3px 10px;
                 margin: 0 5px 0 -7px;
                 border-radius: 20px;
@@ -3425,7 +3427,7 @@
             color: #FFF;
             font-weight: 700;
             letter-spacing: 0.7px;
-            margin: 0 0 10px 0;
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 3px;
@@ -3442,33 +3444,38 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             background: #1b1b1b;
             max-height: 490px;         // 피그마 높이 맞춤
-            overflow-y: auto;          // visible → auto
+            overflow-y: auto;
             overflow-x: hidden;
-            padding: 3px 3px 3px 0;  
-
-            // 커스텀 스크롤바 스타일
+            padding: 3px 3px 3px 0;
             scrollbar-width: thin;
-            scrollbar-color: #FFD6A5 transparent;
+            scrollbar-color: rgba(255, 227, 170, 1) transparent;
 
             &::-webkit-scrollbar {
-              width: 2px;
+              width: 2px !important;
             }
-
-            &::-webkit-scrollbar-track {
-              background: transparent;
-            }
-
             &::-webkit-scrollbar-thumb {
-              background: #FFD6A5;
-              border-radius: 5px;
+              background: rgba(255, 227, 170, 1) !important;
+              border-radius: 5px !important;
+              max-height: 61px;
+            }
+            &::-webkit-scrollbar-thumb:hover {
+              background: rgba(255, 227, 170, 0.8) !important;
+            }
+            &::-webkit-scrollbar-track {
+              background: transparent !important;
+            }
+            &::-webkit-scrollbar-button {
+              display: none !important;
+              height: 0 !important;
+              width: 0 !important;
             }
 
             .profile-card {
               position: relative;
-              width: 100%;
+              width: 337px;
               background: radial-gradient(
                 ellipse 51.26% 226.96% at 50% 50%,
                 rgba(15, 30, 26, 0.5) 0%,
@@ -3480,7 +3487,7 @@
               display: flex;
               flex-direction: column;
               flex-shrink: 0;
-              overflow: visible;
+              overflow: hidden;
               border-left: 1px solid rgba(255, 255, 255, 0.1);
               border-right: 1px solid rgba(255, 255, 255, 0.1);
               height: 150px;
@@ -3493,10 +3500,10 @@
                 left: 1px;
                 width: 20px;
                 height: 2px;
-                background: linear-gradient(to right, transparent, #2DD4BF);
+                background: linear-gradient(90deg, transparent 0%, #00FFBE 100%);
                 z-index: 2;
               }
-            
+
               // 상단 우측 teal 데코 라인
               &::after {
                 content: '';
@@ -3505,42 +3512,40 @@
                 right: 1px;
                 width: 20px;
                 height: 2px;
-                background: linear-gradient(to left, transparent, #2DD4BF);
+                background: linear-gradient(270deg, transparent 0%, #00FFBE 100%);
                 z-index: 2;
               }
             
-              // 코너 장식 숨김 (피그마에 없음)
+              // 코너 장식 (top은 ::before/::after, bottom은 .corner)
               .corner {
                 display: none;
-              }
 
-                &.top-left {
-                  top: 0;
-                  left: 0;
-                }
-
-                &.top-right {
-                  top: 0;
-                  right: 0;
-                  transform: scaleX(-1);
+                &.bottom-left,
+                &.bottom-right {
+                  display: block;
+                  position: absolute;
+                  width: 20px;
+                  height: 2px;
+                  z-index: 2;
                 }
 
                 &.bottom-left {
                   bottom: 0;
-                  left: 0;
-                  transform: scaleY(-1);
+                  left: 1px;
+                  background: linear-gradient(90deg, transparent 0%, #00FFBE 100%);
                 }
 
                 &.bottom-right {
                   bottom: 0;
-                  right: 0;
-                  transform: scale(-1, -1);
+                  right: 1px;
+                  background: linear-gradient(270deg, transparent 0%, #00FFBE 100%);
                 }
+              }
               }
 
               .card-top {
                 display: flex;
-                gap: 6px;
+                gap: 10px;
                 align-items: flex-start;
 
                 .avatar {
@@ -3612,7 +3617,7 @@
               .tags {
                 display: flex;
                 flex-direction: row;
-                gap: 3px;
+                gap: 8px;
                 margin-top: 4px;
 
                 .tag {
@@ -3659,6 +3664,10 @@
                 color: #FFF;
                 margin-top: 16px;
                 line-height: 20px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
 
                 .speech-icon {
                   flex-shrink: 0;
@@ -3695,6 +3704,7 @@
                   font-size: 0.9375rem;
                   color: #FFF;
                   letter-spacing: 0.7px;
+                  line-height: 19.5px;
                   margin-top: 3px;
 
                   .wifi-icon {

@@ -1739,7 +1739,7 @@ const Cluster4Content = () => {
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
             <div className={`area-1-title ${isTextFading ? 'fading' : ''}`}>
               <div className="season-main-title">
-                <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: 'inline-block', width: '0.6em' }}></span><span className="season-highlight">{currentSeason.season}</span> 시즌
+                <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: 'inline-block', width: '1.2em' }}></span><span className="season-highlight">{currentSeason.season}</span> 시즌
               </div>
               <div className="date-status">
                 <span className="date-range">{currentSeason.dateRange}</span>
@@ -2087,15 +2087,16 @@ const Cluster4Content = () => {
                               position: 'absolute',
                               right: '8px',
                               top: '50%',
-                              transform: 'none',
-                              width: '14px',
-                              height: '14px',
+                              transform: 'translateY(-50%)',
+                              width: '15px',
+                              height: '15px',
                               background: '#FAAB07',
-                              borderRadius: '3px',
+                              borderRadius: '5px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              padding: '2px'
+                              padding: '10px',
+                              boxSizing: 'content-box'
                             }}>
                               <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                                 <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
