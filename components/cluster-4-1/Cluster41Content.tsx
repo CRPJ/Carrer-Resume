@@ -32,6 +32,20 @@ const Cluster41Content = () => {
     setIsMobile(false);
   }, []);
 
+  // 필터 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (seasonBtnRef.current && !seasonBtnRef.current.contains(e.target as Node)) {
+        setSeasonDropdownOpen(false);
+      }
+      if (resultBtnRef.current && !resultBtnRef.current.contains(e.target as Node)) {
+        setResultDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   useEffect(() => {
     if (window.location.hash === '#weekly-filter-bar') {
       const tryScroll = () => {
@@ -1104,12 +1118,13 @@ const Cluster41Content = () => {
     });
 
     // 배열로 변환 후 정렬 (년도 내림차순, 시즌 순서)
-    return Array.from(uniqueSeasons.values())
+    const seasons = Array.from(uniqueSeasons.values())
       .sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year; // 년도 내림차순
         return (seasonOrder[b.season] || 0) - (seasonOrder[a.season] || 0); // 시즌 내림차순
       })
       .map(s => `${s.year}년, ${s.season} 시즌`);
+    return ["전체", ...seasons];
   }, [dbWeeklyData]);
 
   const resultOptions = [
@@ -1124,7 +1139,7 @@ const Cluster41Content = () => {
   const filteredDbData = dbWeeklyData.filter((week) => {
     // 시즌 필터
     let seasonMatch = true;
-    if (selectedSeason !== "역대 시즌") {
+    if (selectedSeason !== "역대 시즌" && selectedSeason !== "전체") {
       // "2025년, 여름 시즌" → year: 2025, season: 여름
       const seasonParts = selectedSeason.replace("년,", "").split(" ");
       const year = parseInt(seasonParts[0]); // 2025

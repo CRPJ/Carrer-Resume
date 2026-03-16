@@ -75,7 +75,7 @@
     display: none;
     position: absolute;
     top: 40px;
-    right: 20px;
+    right: 47px;
     z-index: 100;
     gap: 5px;
     align-items: center;
@@ -2139,10 +2139,10 @@
     z-index: 1;
 
     // 플로팅 아이콘 위치 조정 (section3/4와 동일한 화면 위치)
-    // section5(1080px)가 section4(1330px) 안에서 중앙 정렬 → 차이 125px 보정
+    // section5(1080px)가 section4(1330px) 안에서 중앙 정렬 → 차이 125px 보정 (47 - 125 = -78)
     .floating-icons {
       top: 40px;
-      right: -105px;
+      right: -78px;
     }
 
     .section5-header {
