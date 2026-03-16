@@ -10,28 +10,32 @@
  * - 입학년도: 첫 자리(2)만 공개, 나머지 마스킹
  */
 
-/** 생년월일 마스킹: "19990315" → "*******5", "1999-03-15" → "****-**-*5" */
+/** 생년월일 마스킹: "1999.03.15" → "****.**.** " (구분자 유지, 숫자만 마스킹) */
 export function maskBirthDate(value: string | null | undefined): string {
   if (!value) return '-';
-  const clean = value.replace(/[-./\s]/g, '');
-  if (clean.length < 2) return '*';
-  return '*'.repeat(clean.length - 1) + clean.slice(-1);
+  return value.replace(/[0-9]/g, '*');
 }
 
-/** 주소 마스킹: "서울시 강남구 역삼동" → "서**********" */
+/** 주소 마스킹: "서울시 송파구" → "*** ***" (공백 유지, 글자만 마스킹) */
 export function maskAddress(value: string | null | undefined): string {
   if (!value || value === '-') return '-';
   const trimmed = value.trim();
-  if (trimmed.length <= 1) return trimmed;
-  return trimmed[0] + '*'.repeat(trimmed.length - 1);
+  if (trimmed.length <= 1) return '*';
+  return trimmed.replace(/[^\s]/g, '*');
 }
 
-/** 이메일 마스킹: "example@gmail.com" → "e***************" */
+/** 이메일 마스킹: "encre.jjang@gmail.com" → "*****.****@gmail.com" (로컬파트 마스킹, @도메인 유지) */
 export function maskEmail(value: string | null | undefined): string {
   if (!value || value === '-') return '-';
   const trimmed = value.trim();
-  if (trimmed.length <= 1) return trimmed;
-  return trimmed[0] + '*'.repeat(trimmed.length - 1);
+  const atIndex = trimmed.indexOf('@');
+  if (atIndex < 0) {
+    return trimmed.replace(/[^\s]/g, '*');
+  }
+  const local = trimmed.slice(0, atIndex);
+  const domain = trimmed.slice(atIndex); // @gmail.com
+  const maskedLocal = local.replace(/[^.]/g, '*');
+  return maskedLocal + domain;
 }
 
 /** 학교 마스킹: "서울대학교" → "서*대학교", "한국외국어대학교" → "한****대학교" */
@@ -63,7 +67,7 @@ export function maskSchool(value: string | null | undefined): string {
   return body[0] + '*'.repeat(body.length - 1) + suffix;
 }
 
-/** 전공 마스킹: "경영학과" → "경*학과", "컴퓨터공학전공" → "컴****전공" */
+/** 전공 마스킹: "스페인어과" → "****과", "컴퓨터공학전공" → "*****전공" (전체 마스킹, suffix만 표시) */
 export function maskMajor(value: string | null | undefined): string {
   if (!value || value === '-') return '-';
   const trimmed = value.trim();
@@ -81,18 +85,16 @@ export function maskMajor(value: string | null | undefined): string {
   }
 
   if (!suffix) {
-    if (trimmed.length <= 1) return trimmed;
-    return trimmed[0] + '*'.repeat(trimmed.length - 1);
+    return '*'.repeat(trimmed.length);
   }
 
-  if (body.length <= 1) return body + suffix;
-  return body[0] + '*'.repeat(body.length - 1) + suffix;
+  return '*'.repeat(body.length) + suffix;
 }
 
-/** 학점 마스킹: 실제 학점 → "***", 만점 단위는 그대로 */
+/** 학점 마스킹: "4.3" → "*.*" (구분자 유지, 숫자만 마스킹) */
 export function maskGPA(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === '' || value === '-') return '-';
-  return '***';
+  return String(value).replace(/[0-9]/g, '*');
 }
 
 /** 입학년도 마스킹: "2019" → "2***" */
@@ -109,9 +111,8 @@ export function maskAge(value: string | number | null | undefined): string {
   return '**';
 }
 
-/** 기간 마스킹: "2019.03 ~ 2023.02" → "2***.** ~ 2***.** " */
+/** 기간 마스킹: "2016.02 - ~ing" → "****.** - ~ing" (구분자 유지, 숫자만 마스킹) */
 export function maskPeriod(value: string | null | undefined): string {
   if (!value || value === '-') return '-';
-  // 연도 부분만 마스킹 (첫 자리 유지)
-  return value.replace(/(\d)(\d{3})/g, '$1***');
+  return value.replace(/[0-9]/g, '*');
 }

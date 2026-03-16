@@ -22,16 +22,16 @@ export function useDataMasking() {
   const { data: session } = useSession();
   const isLoggedIn = !!session;
 
-  // 로그인 상태면 원본 그대로, 아니면 마스킹
+  // 개인정보(생년월일/주소/이메일/학교/전공)는 항상 마스킹, 나머지는 로그인 시 원본
   const m = {
-    birthDate: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskBirthDate(v),
-    address: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskAddress(v),
-    email: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskEmail(v),
-    school: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskSchool(v),
-    major: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskMajor(v),
-    gpa: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskGPA(v),
+    birthDate: (v: string | null | undefined) => maskBirthDate(v),
+    address: (v: string | null | undefined) => maskAddress(v),
+    email: (v: string | null | undefined) => maskEmail(v),
+    school: (v: string | null | undefined) => maskSchool(v),
+    major: (v: string | null | undefined) => maskMajor(v),
+    gpa: (v: string | number | null | undefined) => maskGPA(v),
     year: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskYear(v),
-    period: (v: string | null | undefined) => isLoggedIn ? (v || '-') : maskPeriod(v),
+    period: (v: string | null | undefined) => maskPeriod(v),
     age: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskAge(v),
   };
 
