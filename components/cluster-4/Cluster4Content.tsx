@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -172,6 +172,22 @@ const Cluster4Content = () => {
     keyword: string;
   }
   const [reputationKeywords, setReputationKeywords] = useState<ReputationKeyword[]>([]);
+
+  // 커스텀 스크롤바 상태 (area-8: status-badges)
+  const statusBadgesRef = useRef<HTMLDivElement>(null);
+  const scrollThumbRef8 = useRef<HTMLDivElement>(null);
+  const [scrollThumbTop8, setScrollThumbTop8] = useState(0);
+  const [isDragging8, setIsDragging8] = useState(false);
+  const dragStartY8 = useRef(0);
+  const dragStartScrollTop8 = useRef(0);
+
+  // 커스텀 스크롤바 상태 (area-9: profile-cards)
+  const profileCardsRef = useRef<HTMLDivElement>(null);
+  const scrollThumbRef9 = useRef<HTMLDivElement>(null);
+  const [scrollThumbTop9, setScrollThumbTop9] = useState(0);
+  const [isDragging9, setIsDragging9] = useState(false);
+  const dragStartY9 = useRef(0);
+  const dragStartScrollTop9 = useRef(0);
 
   // 시즌 평판 데이터 (DB에서 가져옴)
   interface SeasonReputationData {
@@ -1546,7 +1562,95 @@ const Cluster4Content = () => {
       setSeasonReviewSaving(false);
     }
   };
- 
+
+  // 커스텀 스크롤바: area-8 (status-badges)
+  const updateScrollbar8 = useCallback(() => {
+    const container = statusBadgesRef.current;
+    if (!container) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const trackHeight = clientHeight;
+    const thumbHeight = 61;
+    const maxScrollTop = scrollHeight - clientHeight;
+    const maxThumbTop = trackHeight - thumbHeight;
+    const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * maxThumbTop : 0;
+    setScrollThumbTop8(thumbTop);
+  }, []);
+
+  const handleMouseDown8 = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging8(true);
+    dragStartY8.current = e.clientY;
+    dragStartScrollTop8.current = statusBadgesRef.current?.scrollTop || 0;
+  }, []);
+
+  // 커스텀 스크롤바: area-9 (profile-cards)
+  const updateScrollbar9 = useCallback(() => {
+    const container = profileCardsRef.current;
+    if (!container) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const trackHeight = clientHeight;
+    const thumbHeight = 61;
+    const maxScrollTop = scrollHeight - clientHeight;
+    const maxThumbTop = trackHeight - thumbHeight;
+    const thumbTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * maxThumbTop : 0;
+    setScrollThumbTop9(thumbTop);
+  }, []);
+
+  const handleMouseDown9 = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging9(true);
+    dragStartY9.current = e.clientY;
+    dragStartScrollTop9.current = profileCardsRef.current?.scrollTop || 0;
+  }, []);
+
+  // 드래그 이벤트 핸들러 (area-8)
+  useEffect(() => {
+    if (!isDragging8) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = statusBadgesRef.current;
+      if (!container) return;
+      const deltaY = e.clientY - dragStartY8.current;
+      const { scrollHeight, clientHeight } = container;
+      const trackHeight = clientHeight;
+      const thumbHeight = 61;
+      const maxThumbTop = trackHeight - thumbHeight;
+      const maxScrollTop = scrollHeight - clientHeight;
+      const scrollDelta = maxThumbTop > 0 ? (deltaY / maxThumbTop) * maxScrollTop : 0;
+      container.scrollTop = dragStartScrollTop8.current + scrollDelta;
+    };
+    const handleMouseUp = () => setIsDragging8(false);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging8]);
+
+  // 드래그 이벤트 핸들러 (area-9)
+  useEffect(() => {
+    if (!isDragging9) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = profileCardsRef.current;
+      if (!container) return;
+      const deltaY = e.clientY - dragStartY9.current;
+      const { scrollHeight, clientHeight } = container;
+      const trackHeight = clientHeight;
+      const thumbHeight = 61;
+      const maxThumbTop = trackHeight - thumbHeight;
+      const maxScrollTop = scrollHeight - clientHeight;
+      const scrollDelta = maxThumbTop > 0 ? (deltaY / maxThumbTop) * maxScrollTop : 0;
+      container.scrollTop = dragStartScrollTop9.current + scrollDelta;
+    };
+    const handleMouseUp = () => setIsDragging9(false);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging9]);
+
   return (
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
@@ -1996,135 +2100,149 @@ const Cluster4Content = () => {
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
-                <div className="status-badges">
-                  {(() => {
-                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                    const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
-                      ? currentSeason.seasonRoles
-                      : [];
-                    const totalSlots = 3;
-                    // DB 데이터가 기준 미만이면 더미로 채움
-                    const roles = dbRoles.length >= totalSlots
-                      ? dbRoles.slice(0, totalSlots)
-                      : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
-                    return roles.map((roleItem, index) => (
-                      <div className="badge-item" key={index}>
-                        <div className="badge-icon">
-                          <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                <div style={{ position: 'relative' }}>
+                  <div ref={statusBadgesRef} className="status-badges" onScroll={updateScrollbar8}>
+                    {(() => {
+                      // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                      const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
+                        ? currentSeason.seasonRoles
+                        : [];
+                      const totalSlots = 3;
+                      // DB 데이터가 기준 미만이면 더미로 채움
+                      const roles = dbRoles.length >= totalSlots
+                        ? dbRoles.slice(0, totalSlots)
+                        : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
+                      return roles.map((roleItem, index) => (
+                        <div className="badge-item" key={index}>
+                          <div className="badge-icon">
+                            <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                          </div>
+                          <div className="badge-info">
+                            {roleItem.isAdmin ? (
+                              <span className="badge-text">
+                                운영진({roleItem.adminGeneration}기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span>
+                              </span>
+                            ) : (
+                              <span className="badge-text">
+                                {roleItem.teamName || '-'} <span className="separator">|</span> <span className="sub-text">{roleItem.partName || '-'}</span> <span className="separator">|</span>
+                              </span>
+                            )}
+                          </div>
+                          <span className="badge-status yellow">{roleItem.roleLabel}</span>
                         </div>
-                        <div className="badge-info">
-                          {roleItem.isAdmin ? (
-                            <span className="badge-text">
-                              운영진({roleItem.adminGeneration}기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span>
-                            </span>
-                          ) : (
-                            <span className="badge-text">
-                              {roleItem.teamName || '-'} <span className="separator">|</span> <span className="sub-text">{roleItem.partName || '-'}</span> <span className="separator">|</span>
-                            </span>
-                          )}
-                        </div>
-                        <span className="badge-status yellow">{roleItem.roleLabel}</span>
-                      </div>
-                    ));
-                  })()}
+                      ));
+                    })()}
+                  </div>
+                  {/* 커스텀 스크롤바 (area-8) */}
+                  <div style={{ position: 'absolute', right: 0, top: 0, width: '2px', height: '100%', background: 'rgba(255,227,170,0.15)', borderRadius: '2px' }}>
+                    <div ref={scrollThumbRef8} onMouseDown={handleMouseDown8}
+                      style={{ position: 'absolute', top: `${scrollThumbTop8}px`, width: '100%', height: 61, background: 'rgba(255,227,170,1)', borderRadius: '2px', cursor: 'pointer' }} />
+                  </div>
                 </div>
               </div>
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
-                <div className="profile-cards">
-                  {(() => {
-                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                    const totalSlots = 3;
-                    const dbReputations = seasonReputations.slice(0, totalSlots);
-                    // DB 데이터가 기준 미만이면 더미로 채움
-                    const allReputations = dbReputations.length >= totalSlots
-                      ? dbReputations
-                      : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
+                <div style={{ position: 'relative' }}>
+                  <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
+                    {(() => {
+                      // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                      const totalSlots = 3;
+                      const dbReputations = seasonReputations.slice(0, totalSlots);
+                      // DB 데이터가 기준 미만이면 더미로 채움
+                      const allReputations = dbReputations.length >= totalSlots
+                        ? dbReputations
+                        : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
 
-                    return allReputations.map((reputation: any) => {
-                      const reviewer = reputation.reviewer;
-                      const currentYear = new Date().getFullYear();
-                      const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
-                      const age = birthYear ? currentYear - birthYear : null;
-                      const genderLabel = reviewer?.gender || '-';
-                      const fullStars = Math.floor(reputation.rating / 2);
-                      const hasHalfStar = reputation.rating % 2 === 1;
-                      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                      return allReputations.map((reputation: any) => {
+                        const reviewer = reputation.reviewer;
+                        const currentYear = new Date().getFullYear();
+                        const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
+                        const age = birthYear ? currentYear - birthYear : null;
+                        const genderLabel = reviewer?.gender || '-';
+                        const fullStars = Math.floor(reputation.rating / 2);
+                        const hasHalfStar = reputation.rating % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-                      return (
-                        <div className="profile-card" key={reputation.id}>
-                          <div className="corner top-left"></div>
-                          <div className="corner top-right"></div>
-                          <div className="corner bottom-left"></div>
-                          <div className="corner bottom-right"></div>
-                          <div className="card-top">
-                            <div className="avatar">
-                              <img src={reviewer?.profile_photo_url || '/images/avatar/avatar.png'} alt="profile" />
-                            </div>
-                            <div className="info">
-                              <div className="row1">
-                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {mask.age(age)}세 <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
+                        return (
+                          <div className="profile-card" key={reputation.id}>
+                            <div className="corner top-left"></div>
+                            <div className="corner top-right"></div>
+                            <div className="corner bottom-left"></div>
+                            <div className="corner bottom-right"></div>
+                            <div className="card-top">
+                              <div className="avatar">
+                                <img src={reviewer?.profile_photo_url || '/images/avatar/avatar.png'} alt="profile" />
                               </div>
-                              <div className="row2">
-                                {reviewer?.teamName || '-'} <span className="separator">|</span> {reviewer?.partName || '-'}{reviewer?.vision && <> <span className="separator">|</span> {reviewer.vision}</>}
+                              <div className="info">
+                                <div className="row1">
+                                  {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {mask.age(age)}세 <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
+                                </div>
+                                <div className="row2">
+                                  {reviewer?.teamName || '-'} <span className="separator">|</span> {reviewer?.partName || '-'}{reviewer?.vision && <> <span className="separator">|</span> {reviewer.vision}</>}
+                                </div>
                               </div>
                             </div>
+                            <div className="tags">
+                              {reputation.keyword_1 && <span className="tag">#{reputation.keyword_1}</span>}
+                              {reputation.keyword_2 && <span className="tag-yellow">#{reputation.keyword_2}</span>}
+                            </div>
+                            <div
+                              className="comment"
+                              style={{ cursor: 'pointer', position: 'relative' }}
+                              onClick={() => { setSelectedReputation(reputation); setReputationDetailModalOpen(true); }}
+                            >
+                              <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
+                              {reputation.content.length > 30 ? `${reputation.content.substring(0, 30)}...` : reputation.content}
+                              <span className="arrow-icon" style={{
+                                position: 'absolute',
+                                right: '8px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                width: '10px',
+                                height: '10px',
+                                background: '#FAAB07',
+                                borderRadius: '3px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '2px',
+                                boxSizing: 'content-box'
+                              }}>
+                                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </span>
+                            </div>
+                            <div className="stats">
+                              <span className="pm"><img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :325</span>
+                              <span className="rating">
+                                {[...Array(fullStars)].map((_, i) => (
+                                  <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                ))}
+                                {hasHalfStar && (
+                                  <span className="star-half">
+                                    <img className="star-half-filled" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                    <img className="star-half-empty" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                  </span>
+                                )}
+                                {[...Array(emptyStars)].map((_, i) => (
+                                  <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                ))}
+                                <span className="rating-score">{reputation.rating} / 10</span>
+                              </span>
+                            </div>
                           </div>
-                          <div className="tags">
-                            {reputation.keyword_1 && <span className="tag">#{reputation.keyword_1}</span>}
-                            {reputation.keyword_2 && <span className="tag-yellow">#{reputation.keyword_2}</span>}
-                          </div>
-                          <div
-                            className="comment"
-                            style={{ cursor: 'pointer', position: 'relative' }}
-                            onClick={() => { setSelectedReputation(reputation); setReputationDetailModalOpen(true); }}
-                          >
-                            <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
-                            {reputation.content.length > 30 ? `${reputation.content.substring(0, 30)}...` : reputation.content}
-                            <span className="arrow-icon" style={{
-                              position: 'absolute',
-                              right: '8px',
-                              top: '50%',
-                              transform: 'translateY(-50%)',
-                              width: '15px',
-                              height: '15px',
-                              background: '#FAAB07',
-                              borderRadius: '5px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '10px',
-                              boxSizing: 'content-box'
-                            }}>
-                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            </span>
-                          </div>
-                          <div className="stats">
-                            <span className="pm"><img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :325</span>
-                            <span className="rating">
-                              {[...Array(fullStars)].map((_, i) => (
-                                <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />
-                              ))}
-                              {hasHalfStar && (
-                                <span className="star-half">
-                                  <img className="star-half-filled" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                  <img className="star-half-empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                </span>
-                              )}
-                              {[...Array(emptyStars)].map((_, i) => (
-                                <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                              ))}
-                              <span className="rating-score">{reputation.rating} / 10</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    });
-                  })()}
+                        );
+                      });
+                    })()}
+                  </div>
+                  {/* 커스텀 스크롤바 (area-9) */}
+                  <div style={{ position: 'absolute', right: 0, top: 0, width: '2px', height: '100%', background: 'rgba(255,227,170,0.15)', borderRadius: '2px' }}>
+                    <div ref={scrollThumbRef9} onMouseDown={handleMouseDown9}
+                      style={{ position: 'absolute', top: `${scrollThumbTop9}px`, width: '100%', height: 61, background: 'rgba(255,227,170,1)', borderRadius: '2px', cursor: 'pointer' }} />
+                  </div>
                 </div>
               </div>
             </div>
