@@ -2078,22 +2078,16 @@ const Sidebar = () => {
             paddingTop: "20px",
           }}
         >
-          <div onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
+          <div className="edit-modal-content" onClick={(e) => e.stopPropagation()} style={{ position: "relative", borderRadius: 0 }}>
             <Image src="/images/0/cluster 1/card01.png" alt="Contact Info" width={540} height={150} style={{ display: "block" }} />
             {/* X 닫기 버튼 */}
             <button
+              className="modal-close-btn"
               onClick={() => setIsEditModalOpen(false)}
               style={{
                 position: "absolute",
                 top: "15px",
                 right: "15px",
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                fontSize: "20px",
-                cursor: "pointer",
-                padding: 0,
-                lineHeight: 1,
               }}
             >
               ×
@@ -3350,10 +3344,10 @@ const Sidebar = () => {
           }}
         >
           <div
+            className="edit-modal-content"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
@@ -3431,10 +3425,10 @@ const Sidebar = () => {
           }}
         >
           <div
+            className="edit-modal-content"
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",

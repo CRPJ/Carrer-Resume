@@ -2539,17 +2539,16 @@ const Cluster4Content = () => {
               backdropFilter: 'blur(5px)',
             }}
           >
-            <div style={{
+            <div className="edit-modal-content" style={{
               width: '500px',
               maxHeight: '80vh',
               background: 'linear-gradient(145deg, #1a1d2e 0%, #0d0f1a 100%)',
-              borderRadius: '0px',
               border: '1px solid rgba(255, 165, 0, 0.3)',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.1)',
               overflow: 'hidden',
             }}>
               {/* Header */}
-              <div style={{
+              <div className="edit-modal-header" style={{
                 padding: '20px 24px',
                 borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
                 display: 'flex',
@@ -2558,13 +2557,14 @@ const Cluster4Content = () => {
               }}>
                 <h3 style={{ margin: 0, color: '#FAAB07', fontSize: '18px', fontWeight: 600 }}>시즌 평판 상세</h3>
                 <button
+                  className="modal-close-btn"
                   onClick={() => setReputationDetailModalOpen(false)}
                   style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '24px', cursor: 'pointer', padding: '4px' }}
                 >×</button>
               </div>
 
               {/* Body */}
-              <div style={{ padding: '24px', overflowY: 'auto', maxHeight: 'calc(80vh - 80px)' }}>
+              <div className="edit-modal-body" style={{ padding: '24px', overflowY: 'auto', maxHeight: 'calc(80vh - 80px)' }}>
                 {/* Reviewer Info */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
                   <img
@@ -2663,26 +2663,25 @@ const Cluster4Content = () => {
             backdropFilter: 'blur(5px)',
           }}
         >
-          <div style={{
+          <div className="edit-modal-content" style={{
             width: '450px',
             maxWidth: '90vw',
             background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
             border: '1px solid #FAAB07',
-            borderRadius: '0px',
             overflow: 'hidden',
           }}>
             {/* Header */}
-            <div style={{
+            <div className="edit-modal-header" style={{
               padding: '20px 24px',
               borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
               background: 'rgba(255, 165, 0, 0.05)',
             }}>
               <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FAAB07' }}>✦ 시즌 리뷰</h3>
-              <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 나의 평가를 남겨주세요</span>
+              <span className="modal-subtitle" style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 나의 평가를 남겨주세요</span>
             </div>
 
             {/* Body */}
-            <div style={{ padding: '20px 24px' }}>
+            <div className="edit-modal-body" style={{ padding: '20px 24px' }}>
               {/* 평점 선택 */}
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
@@ -2798,7 +2797,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Footer */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+            <div className="edit-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
               <button
                 onClick={() => setSeasonReviewModalOpen(false)}
                 disabled={seasonReviewSaving}
