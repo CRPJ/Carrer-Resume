@@ -3645,6 +3645,7 @@
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
+                  font-size: 0.8125rem;
                 }
               }
 
@@ -3660,7 +3661,7 @@
                   gap: 6px;
                   font-family: 'Rajdhani', sans-serif;
                   font-weight: 400;
-                  font-size: 0.9375rem;
+                  font-size: 0.8125rem;
                   color: #FFF;
                   letter-spacing: 0.7px;
                   line-height: 19.5px;
@@ -3677,6 +3678,7 @@
                   display: flex;
                   align-items: center;
                   gap: 2px;
+                  margin-right: 11px;
 
                   .star-icon {
                     width: 12px;

@@ -2190,7 +2190,8 @@ const Cluster4Content = () => {
                                 borderRadius: '5px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                marginRight: '11px'
                               }}>
                                 <svg width="11" height="10" viewBox="0 0 11 10" fill="none">
                                   <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
