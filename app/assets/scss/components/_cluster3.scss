@@ -854,7 +854,7 @@
         margin-bottom: 8px;
 
         .progress-label {
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Cafe24Ohsquare', sans-serif;
           font-size: 3.25rem;
           font-weight: 500;
           line-height: 33px;
@@ -1280,6 +1280,7 @@
       padding: 0;
 
       .channel-card {
+        position: relative;
         width: 255px;
         height: 408px;
         background: #1E1E1E;
@@ -2416,7 +2417,7 @@
   }
 
   // 링크 없는 카드에 반투명 오버레이 (섹션 3, 4, 5 공통)
-  .channel-card:not(.has-link) .card-image::after {
+  .channel-card:not(.has-link)::before {
     content: '';
     position: absolute;
     top: 0;
@@ -2424,8 +2425,8 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
-    border-radius: 15px;
-    z-index: 2;
+    border-radius: 20px;
+    z-index: 10;
     pointer-events: none;
   }
 
@@ -2438,7 +2439,7 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 24px;
-    z-index: 3;
+    z-index: 10;
     pointer-events: none;
   }
 
@@ -2451,7 +2452,7 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 10px;
-    z-index: 1;
+    z-index: 10;
     pointer-events: none;
   }
 
@@ -2585,6 +2586,11 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0;
         transition: all 0.3s ease;
+
+        &.disabled {
+          opacity: 0.4;
+          pointer-events: none;
+        }
 
         &:hover {
           border-color: rgba(255, 165, 0, 0.3);

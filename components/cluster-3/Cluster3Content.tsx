@@ -5,13 +5,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
-const CustomSelect = ({ value, onChange, options, className, style }: {
-  value: string;
-  onChange: (val: string) => void;
-  options: { value: string; label: string }[];
-  className?: string;
-  style?: React.CSSProperties;
-}) => {
+const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -19,24 +13,27 @@ const CustomSelect = ({ value, onChange, options, className, style }: {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selectedLabel = options.find(o => o.value === value)?.label || '선택하세요';
+  const selectedLabel = options.find((o) => o.value === value)?.label || "선택하세요";
 
   return (
-    <div ref={ref} className={`${className || ''} custom-select-wrapper`} style={style}>
+    <div ref={ref} className={`${className || ""} custom-select-wrapper`} style={style}>
       <div className="custom-select-trigger" onClick={() => setIsOpen(!isOpen)}>
         {selectedLabel}
       </div>
       {isOpen && (
         <div className="custom-select-options">
-          {options.map(opt => (
+          {options.map((opt) => (
             <div
               key={opt.value}
-              className={`custom-select-option${opt.value === value ? ' selected' : ''}`}
-              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+              className={`custom-select-option${opt.value === value ? " selected" : ""}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
             >
               {opt.label}
             </div>
@@ -51,24 +48,24 @@ const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const urlUserId = searchParams.get('userId') || searchParams.get('userID');
-  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+  const urlUserId = searchParams.get("userId") || searchParams.get("userID");
+  const isOwner = !urlUserId || session?.user?.id === urlUserId;
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
     if (!session) return false;
 
     try {
-      const response = await fetch('/api/auth/check-status');
+      const response = await fetch("/api/auth/check-status");
       const result = await response.json();
 
-      if (result.success && result.status === 'approved') {
+      if (result.success && result.status === "approved") {
         return true;
       } else {
         return false;
       }
     } catch (error) {
-      console.error('승인 상태 확인 오류:', error);
+      console.error("승인 상태 확인 오류:", error);
       return false;
     }
   };
@@ -76,14 +73,14 @@ const Cluster3Content = () => {
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
     if (!session) {
-      alert('로그인이 필요합니다.');
+      alert("로그인이 필요합니다.");
       return;
     }
 
     const approved = await checkApprovalStatus();
 
     if (!approved) {
-      alert('아직 회원 상태가 어드민 승인 대기 중입니다.');
+      alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
       return;
     }
 
@@ -109,44 +106,44 @@ const Cluster3Content = () => {
     endDate: string | null;
   }
   const [growthInfo, setGrowthInfo] = useState<GrowthInfo | null>({
-    status: 'active',
-    growthStatus: 'pending',
-    startDate: '2025-02-22',
-    endDate: null
+    status: "active",
+    growthStatus: "pending",
+    startDate: "2025-02-22",
+    endDate: null,
   });
 
   // 영어 이름
-  const [engName, setEngName] = useState<string>('Eng Name');
+  const [engName, setEngName] = useState<string>("Eng Name");
 
   // 성장 점수 기록 데이터 (단감, 인절미, 어흥)
   interface PointsData {
-    dangam: number;    // 단감 (star)
-    injeolmi: number;  // 인절미 (shield - lightning)
-    eoheung: number;   // 어흥 (lightning)
+    dangam: number; // 단감 (star)
+    injeolmi: number; // 인절미 (shield - lightning)
+    eoheung: number; // 어흥 (lightning)
   }
   const [pointsData, setPointsData] = useState<PointsData>({ dangam: 99999, injeolmi: 99999, eoheung: 99999 });
 
   // 품계 데이터 (user_grade_stats)
   interface GradeStats {
-    avgPercentile: number;  // 상위 퍼센트
-    grade: number;          // 품계 숫자 (1=정승, 2=정1품, ... 10=정9품)
-    gradeLabel: string;     // 품계 라벨 (정 7품 등)
+    avgPercentile: number; // 상위 퍼센트
+    grade: number; // 품계 숫자 (1=정승, 2=정1품, ... 10=정9품)
+    gradeLabel: string; // 품계 라벨 (정 7품 등)
   }
   const [gradeStats, setGradeStats] = useState<GradeStats | null>({
     avgPercentile: 30,
     grade: 3,
-    gradeLabel: '정 2품'
+    gradeLabel: "정 2품",
   });
 
   // 성장 기간 집계 데이터 (user_growth_stats)
   interface GrowthPeriodStats {
-    approvedWeeks: number;      // 성장(성공) 주차
-    unapprovedWeeks: number;    // 성장(실패) 주차
-    restWeeks: number;          // 휴식(개인) 주차
-    clubBreakWeeks: number;     // 휴식(공식) 주차
-    availableWeeks: number;     // 성장 가능 주차
-    restSeasons: number;        // 성장 휴식 시즌
-    approvedSeasons: number;    // 성장(성공) 시즌
+    approvedWeeks: number; // 성장(성공) 주차
+    unapprovedWeeks: number; // 성장(실패) 주차
+    restWeeks: number; // 휴식(개인) 주차
+    clubBreakWeeks: number; // 휴식(공식) 주차
+    availableWeeks: number; // 성장 가능 주차
+    restSeasons: number; // 성장 휴식 시즌
+    approvedSeasons: number; // 성장(성공) 시즌
   }
   const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>({
     approvedWeeks: 999,
@@ -155,54 +152,43 @@ const Cluster3Content = () => {
     clubBreakWeeks: 999,
     availableWeeks: 999,
     restSeasons: 999,
-    approvedSeasons: 999
+    approvedSeasons: 999,
   });
 
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
     // 이미 한글로 저장된 경우 그대로 반환
-    const koreanStatuses = [
-      '클럽 온보딩 중',
-      '활동 중',
-      '휴식(개인) 중',
-      '휴식(공식) 중',
-      '시즌 휴식 중',
-      '성장 유보',
-      '성장 중단',
-      '졸업 절차 중',
-      '성장 완료(졸업)',
-      '추가 성장 중'
-    ];
+    const koreanStatuses = ["클럽 온보딩 중", "활동 중", "휴식(개인) 중", "휴식(공식) 중", "시즌 휴식 중", "성장 유보", "성장 중단", "졸업 절차 중", "성장 완료(졸업)", "추가 성장 중"];
 
     if (koreanStatuses.includes(growthStatus)) {
       // '활동 중'은 '성장 중'으로 표시
-      if (growthStatus === '활동 중') return '성장 중';
+      if (growthStatus === "활동 중") return "성장 중";
       return growthStatus;
     }
 
     // 영문 growthStatus 값 변환 (10개)
-    if (growthStatus === 'pending') return '클럽 온보딩 중';
-    if (growthStatus === 'active') return '성장 중';
-    if (growthStatus === 'resting') return '휴식(개인) 중';
-    if (growthStatus === 'official_rest') return '휴식(공식) 중';
-    if (growthStatus === 'season_rest') return '시즌 휴식 중';
-    if (growthStatus === 'deferred') return '성장 유보';
-    if (growthStatus === 'suspended') return '성장 중단';
-    if (growthStatus === 'graduating') return '졸업 절차 중';
-    if (growthStatus === 'graduated') return '성장 완료(졸업)';
-    if (growthStatus === 'reinforcing') return '추가 성장 중';
+    if (growthStatus === "pending") return "클럽 온보딩 중";
+    if (growthStatus === "active") return "성장 중";
+    if (growthStatus === "resting") return "휴식(개인) 중";
+    if (growthStatus === "official_rest") return "휴식(공식) 중";
+    if (growthStatus === "season_rest") return "시즌 휴식 중";
+    if (growthStatus === "deferred") return "성장 유보";
+    if (growthStatus === "suspended") return "성장 중단";
+    if (growthStatus === "graduating") return "졸업 절차 중";
+    if (growthStatus === "graduated") return "성장 완료(졸업)";
+    if (growthStatus === "reinforcing") return "추가 성장 중";
 
-    return '클럽 온보딩 중';
+    return "클럽 온보딩 중";
   };
 
   // 날짜 포맷 변환 (2025-02-22 → 2025년 02월 22일 (토))
   const formatDateKorean = (dateStr: string | null): string => {
-    if (!dateStr) return '-';
+    if (!dateStr) return "-";
     const date = new Date(dateStr);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
     const weekDay = weekDays[date.getDay()];
     return `${year}년 ${month}월 ${day}일 (${weekDay})`;
   };
@@ -259,45 +245,40 @@ const Cluster3Content = () => {
 
   // 포트폴리오 아카이빙 데이터 (DB 저장용)
   const [portfolioArchives, setPortfolioArchives] = useState<string[]>(Array(10).fill(""));
-  const [portfolioArchiveChannels, setPortfolioArchiveChannels] = useState<string[]>([
-    'instagram', 'youtube', 'blog', 'tistory', 'twitter', 'threads', 'tiktok', 'behance', 'etc', 'etc'
-  ]);
+  const [portfolioArchiveChannels, setPortfolioArchiveChannels] = useState<string[]>(["instagram", "youtube", "blog", "tistory", "twitter", "threads", "tiktok", "behance", "etc", "etc"]);
   const [editingArchiveChannels, setEditingArchiveChannels] = useState<string[]>([]);
   const [isSavingArchives, setIsSavingArchives] = useState(false);
 
   // 포트폴리오 Output 데이터 (DB 저장용)
   const [portfolioOutputs, setPortfolioOutputs] = useState<string[]>(Array(5).fill(""));
   const [portfolioOutputChannels, setPortfolioOutputChannels] = useState<string[]>([
-    'threads',    // index 0 → 왼쪽2
-    'youtube',    // index 1 → 왼쪽1
-    'tiktok',     // index 2 → 가운데
-    'youtube',    // index 3 → 오른쪽1
-    'tistory',    // index 4 → 오른쪽2
+    "threads", // index 0 → 왼쪽2
+    "youtube", // index 1 → 왼쪽1
+    "tiktok", // index 2 → 가운데
+    "youtube", // index 3 → 오른쪽1
+    "tistory", // index 4 → 오른쪽2
   ]);
   const [editingOutputChannels, setEditingOutputChannels] = useState<string[]>(Array(5).fill(""));
   const [isSavingOutputs, setIsSavingOutputs] = useState(false);
 
   // Detail 10 데이터 (DB 저장용 - portfolio_output_6~15)
   const [portfolioDetails, setPortfolioDetails] = useState<string[]>(Array(10).fill(""));
-  const [portfolioDetailChannels, setPortfolioDetailChannels] = useState<string[]>([
-    'youtube', 'twitter', 'youtube', 'threads', 'instagram',
-    'instagram', 'instagram', 'instagram', 'youtube', 'threads'
-  ]);
+  const [portfolioDetailChannels, setPortfolioDetailChannels] = useState<string[]>(["youtube", "twitter", "youtube", "threads", "instagram", "instagram", "instagram", "instagram", "youtube", "threads"]);
   const [editingDetailChannels, setEditingDetailChannels] = useState<string[]>(Array(10).fill(""));
   const [isSavingDetails, setIsSavingDetails] = useState(false);
 
   // 채널 옵션 목록
   const channelOptions = [
-    { value: '', label: '채널 선택', icon: '' },
-    { value: 'instagram', label: '인스타그램', icon: '/images/0/cluster 3/icon/Instagram.png' },
-    { value: 'youtube', label: '유튜브', icon: '/images/0/cluster 3/icon/Youtube.png' },
-    { value: 'blog', label: '블로그', icon: '/images/0/cluster 3/icon/Naver Blog.png' },
-    { value: 'tistory', label: '티스토리', icon: '/images/0/cluster 3/icon/Tstory.png' },
-    { value: 'twitter', label: 'X(트위터)', icon: '/images/0/cluster 3/icon/X.png' },
-    { value: 'threads', label: '쓰레드', icon: '/images/0/cluster 3/icon/Threads.png' },
-    { value: 'tiktok', label: '틱톡', icon: '/images/0/cluster 3/icon/TikTok.png' },
-    { value: 'behance', label: '비핸스', icon: '/images/0/cluster 3/icon/Behance.png' },
-    { value: 'etc', label: '기타', icon: '/images/0/cluster 3/icon/etc 2.png' },
+    { value: "", label: "채널 선택", icon: "" },
+    { value: "instagram", label: "인스타그램", icon: "/images/0/cluster 3/icon/Instagram.png" },
+    { value: "youtube", label: "유튜브", icon: "/images/0/cluster 3/icon/Youtube.png" },
+    { value: "blog", label: "블로그", icon: "/images/0/cluster 3/icon/Naver Blog.png" },
+    { value: "tistory", label: "티스토리", icon: "/images/0/cluster 3/icon/Tstory.png" },
+    { value: "twitter", label: "X(트위터)", icon: "/images/0/cluster 3/icon/X.png" },
+    { value: "threads", label: "쓰레드", icon: "/images/0/cluster 3/icon/Threads.png" },
+    { value: "tiktok", label: "틱톡", icon: "/images/0/cluster 3/icon/TikTok.png" },
+    { value: "behance", label: "비핸스", icon: "/images/0/cluster 3/icon/Behance.png" },
+    { value: "etc", label: "기타", icon: "/images/0/cluster 3/icon/etc 2.png" },
   ];
 
   // 포트폴리오 아카이빙 데이터 가져오기
@@ -306,7 +287,7 @@ const Cluster3Content = () => {
       if (!session?.user?.email) return;
 
       try {
-        const response = await fetch('/api/portfolio-archives');
+        const response = await fetch("/api/portfolio-archives");
         const result = await response.json();
 
         if (response.ok && result.data) {
@@ -335,9 +316,9 @@ const Cluster3Content = () => {
   const savePortfolioArchives = async (links: string[], channels: string[]) => {
     setIsSavingArchives(true);
     try {
-      const response = await fetch('/api/portfolio-archives', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/portfolio-archives", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioArchives: links, portfolioArchiveChannels: channels }),
       });
 
@@ -375,7 +356,7 @@ const Cluster3Content = () => {
       if (!session?.user?.email) return;
 
       try {
-        const response = await fetch('/api/portfolio-outputs');
+        const response = await fetch("/api/portfolio-outputs");
         const result = await response.json();
 
         if (response.ok && result.data) {
@@ -405,9 +386,9 @@ const Cluster3Content = () => {
   const savePortfolioOutputs = async (links: string[], channels: string[]) => {
     setIsSavingOutputs(true);
     try {
-      const response = await fetch('/api/portfolio-outputs', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/portfolio-outputs", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioOutputs: links, portfolioOutputChannels: channels }),
       });
 
@@ -418,7 +399,7 @@ const Cluster3Content = () => {
         // topWorksSlides 링크도 업데이트
         const updatedSlides = topWorksSlides.map((slide, index) => ({
           ...slide,
-          link: links[index] || ""
+          link: links[index] || "",
         }));
         setTopWorksSlides(updatedSlides);
         alert("저장되었습니다.");
@@ -443,7 +424,7 @@ const Cluster3Content = () => {
       if (!session?.user?.email) return;
 
       try {
-        const response = await fetch('/api/portfolio-details');
+        const response = await fetch("/api/portfolio-details");
         const result = await response.json();
 
         if (response.ok && result.data) {
@@ -473,9 +454,9 @@ const Cluster3Content = () => {
   const savePortfolioDetails = async (links: string[], channels: string[]) => {
     setIsSavingDetails(true);
     try {
-      const response = await fetch('/api/portfolio-details', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/portfolio-details", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioDetails: links, portfolioDetailChannels: channels }),
       });
 
@@ -486,7 +467,7 @@ const Cluster3Content = () => {
         // detailThumbnails 링크도 업데이트
         const updatedThumbnails = detailThumbnails.map((thumb, index) => ({
           ...thumb,
-          link: links[index] || ""
+          link: links[index] || "",
         }));
         setDetailThumbnails(updatedThumbnails);
         alert("저장되었습니다.");
@@ -515,7 +496,7 @@ const Cluster3Content = () => {
 
       try {
         // URL에 userId가 있으면 해당 유저의 데이터를 가져옴
-        const apiUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : '/api/profile';
+        const apiUrl = urlUserId ? `/api/profile?userId=${urlUserId}` : "/api/profile";
         const response = await fetch(apiUrl);
         const result = await response.json();
 
@@ -539,8 +520,8 @@ const Cluster3Content = () => {
         // 성장 점수 기록 데이터 설정 (badges에서 가져옴)
         if (result.badges) {
           setPointsData({
-            dangam: result.badges.stars || 0,       // 단감 = star (별)
-            injeolmi: result.badges.shields || 0,   // 인절미 = total_shields (이미 계산된 값: shields_net - lightnings)
+            dangam: result.badges.stars || 0, // 단감 = star (별)
+            injeolmi: result.badges.shields || 0, // 인절미 = total_shields (이미 계산된 값: shields_net - lightnings)
             eoheung: result.badges.lightnings || 0, // 어흥 = lightning (번개)
           });
         }
@@ -572,7 +553,7 @@ const Cluster3Content = () => {
 
     const targetPercent = reliabilityRate;
     // 393 = 전체 반원 길이, 0% = 393, 100% = 0
-    const targetOffset = 393 - (393 * targetPercent / 100);
+    const targetOffset = 393 - (393 * targetPercent) / 100;
 
     const timer = setTimeout(() => {
       setProgressOffset(targetOffset);
@@ -667,7 +648,7 @@ const Cluster3Content = () => {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (section2Ref.current) {
@@ -680,23 +661,23 @@ const Cluster3Content = () => {
   // 포트폴리오 채널 카드 데이터 (16개 표시, 10개만 DB 연동)
   // SNS 아이콘 순서: 인스타, 유튜브, 블로그, 티스토리, X, 쓰레드, 틱톡, 비핸스, 기타1, 기타2, (11-16번은 반복)
   const snsIconOrder = [
-    '/images/0/cluster 3/icon/Instagram.png',
-    '/images/0/cluster 3/icon/Youtube.png',
-    '/images/0/cluster 3/icon/Naver Blog.png',
-    '/images/0/cluster 3/icon/Tstory.png',
-    '/images/0/cluster 3/icon/X.png',
-    '/images/0/cluster 3/icon/Threads.png',
-    '/images/0/cluster 3/icon/TikTok.png',
-    '/images/0/cluster 3/icon/Behance.png',
-    '/images/0/cluster 3/icon/etc 2.png',
-    '/images/0/cluster 3/icon/etc 2.png',
+    "/images/0/cluster 3/icon/Instagram.png",
+    "/images/0/cluster 3/icon/Youtube.png",
+    "/images/0/cluster 3/icon/Naver Blog.png",
+    "/images/0/cluster 3/icon/Tstory.png",
+    "/images/0/cluster 3/icon/X.png",
+    "/images/0/cluster 3/icon/Threads.png",
+    "/images/0/cluster 3/icon/TikTok.png",
+    "/images/0/cluster 3/icon/Behance.png",
+    "/images/0/cluster 3/icon/etc 2.png",
+    "/images/0/cluster 3/icon/etc 2.png",
     // 11-16번 카드용 (페이지 2)
-    '/images/0/cluster 3/icon/etc 3.png',
-    '/images/0/cluster 3/icon/etc 2.png',
-    '/images/0/cluster 3/icon/etc 3.png',
-    '/images/0/cluster 3/icon/etc 1.png',
-    '/images/0/cluster 3/icon/etc 2.png',
-    '/images/0/cluster 3/icon/etc 3.png',
+    "/images/0/cluster 3/icon/etc 3.png",
+    "/images/0/cluster 3/icon/etc 2.png",
+    "/images/0/cluster 3/icon/etc 3.png",
+    "/images/0/cluster 3/icon/etc 1.png",
+    "/images/0/cluster 3/icon/etc 2.png",
+    "/images/0/cluster 3/icon/etc 3.png",
   ];
 
   const [channelCards, setChannelCards] = useState([
@@ -730,29 +711,25 @@ const Cluster3Content = () => {
 
   // Detail 10 썸네일 데이터 (10개, 2줄 5개)
   const [detailThumbnails, setDetailThumbnails] = useState([
-    { id: 1, link: 'https://www.example.com' },
-    { id: 2, link: 'https://kr.pinterest.com/' },
-    { id: 3, link: 'https://blog.naver.com/oranke_official/223247582032' },
-    { id: 4, link: 'https://www.youtube.com/watch?v=kCxf76VkRmY' },
-    { id: 5, link: 'https://blog.naver.com/kimdg1309/223115604346' },
-    { id: 6, link: 'https://www.youtube.com/watch?v=eD5A-tOjZaw' },
-    { id: 7, link: 'https://blog.naver.com/oranke_official/223514614072' },
-    { id: 8, link: 'https://www.tiktok.com/ko-KR/' },
-    { id: 9, link: 'https://www.youtube.com/watch?v=kCxf76VkRmY' },
-    { id: 10, link: 'https://www.tistory.com/' },
+    { id: 1, link: "" },
+    { id: 2, link: "" },
+    { id: 3, link: "" },
+    { id: 4, link: "" },
+    { id: 5, link: "" },
+    { id: 6, link: "" },
+    { id: 7, link: "" },
+    { id: 8, link: "" },
+    { id: 9, link: "" },
+    { id: 10, link: "" },
   ]);
 
   // 기타 아이콘 목록
-  const etcIcons = [
-    '/images/0/cluster 3/icon/etc 1.png',
-    '/images/0/cluster 3/icon/etc 2.png',
-    '/images/0/cluster 3/icon/etc 3.png'
-  ];
+  const etcIcons = ["/images/0/cluster 3/icon/etc 1.png", "/images/0/cluster 3/icon/etc 2.png", "/images/0/cluster 3/icon/etc 3.png"];
 
   // URL에 프로토콜 추가 함수
   const ensureProtocol = (url: string) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
     }
     return `https://${url}`;
@@ -762,14 +739,14 @@ const Cluster3Content = () => {
   const getIconByUrl = (url: string, id?: number) => {
     if (!url) return null; // 링크 없으면 null (그라데이션 표시)
     const lowerUrl = url.toLowerCase();
-    if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return '/images/0/cluster 3/icon/Youtube.png';
-    if (lowerUrl.includes('instagram.com')) return '/images/0/cluster 3/icon/Instagram.png';
-    if (lowerUrl.includes('blog.naver.com') || lowerUrl.includes('m.blog.naver.com')) return '/images/0/cluster 3/icon/Naver Blog.png';
-    if (lowerUrl.includes('tistory.com')) return '/images/0/cluster 3/icon/Tstory.png';
-    if (lowerUrl.includes('tiktok.com')) return '/images/0/cluster 3/icon/TikTok.png';
-    if (lowerUrl.includes('threads.net') || lowerUrl.includes('threads.com')) return '/images/0/cluster 3/icon/Threads.png';
-    if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return '/images/0/cluster 3/icon/X.png';
-    if (lowerUrl.includes('behance.net')) return '/images/0/cluster 3/icon/Behance.png';
+    if (lowerUrl.includes("youtube.com") || lowerUrl.includes("youtu.be")) return "/images/0/cluster 3/icon/Youtube.png";
+    if (lowerUrl.includes("instagram.com")) return "/images/0/cluster 3/icon/Instagram.png";
+    if (lowerUrl.includes("blog.naver.com") || lowerUrl.includes("m.blog.naver.com")) return "/images/0/cluster 3/icon/Naver Blog.png";
+    if (lowerUrl.includes("tistory.com")) return "/images/0/cluster 3/icon/Tstory.png";
+    if (lowerUrl.includes("tiktok.com")) return "/images/0/cluster 3/icon/TikTok.png";
+    if (lowerUrl.includes("threads.net") || lowerUrl.includes("threads.com")) return "/images/0/cluster 3/icon/Threads.png";
+    if (lowerUrl.includes("twitter.com") || lowerUrl.includes("x.com")) return "/images/0/cluster 3/icon/X.png";
+    if (lowerUrl.includes("behance.net")) return "/images/0/cluster 3/icon/Behance.png";
     // 기타 링크는 etc 아이콘
     return etcIcons[id ? id % etcIcons.length : Math.floor(Math.random() * etcIcons.length)];
   };
@@ -777,13 +754,13 @@ const Cluster3Content = () => {
   // 카드 데이터의 링크로 state 초기화
   useEffect(() => {
     if (section3Links.length === 0) {
-      setSection3Links(channelCards.slice(0, 16).map(card => card.link));
+      setSection3Links(channelCards.slice(0, 16).map((card) => card.link));
     }
     if (section4Links.length === 0) {
-      setSection4Links(topWorksSlides.map(slide => slide.link));
+      setSection4Links(topWorksSlides.map((slide) => slide.link));
     }
     if (section5Links.length === 0) {
-      setSection5Links(detailThumbnails.map(thumb => thumb.link));
+      setSection5Links(detailThumbnails.map((thumb) => thumb.link));
     }
   }, []);
 
@@ -792,9 +769,12 @@ const Cluster3Content = () => {
       {/* Section 1: CLUB FINAL INDEX - 새 디자인 */}
       <section className="cluster3-section1">
         {/* 플로팅 아이콘 */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
+        <div className="floating-icons" style={{ display: "flex" }}>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
         </div>
@@ -824,9 +804,7 @@ const Cluster3Content = () => {
           <p>클럽의 마지막 성장 주차까지 종료한 크루의 경우, 그대로 클럽 마지막 최종 결과표가 되기도 할 거에요. 😊</p>
           <p className="small-text">내가 가고 있는 이 길이 어디쯤 와있는지, 내가 초심을 잃지 않고 목표를 향해, 성장을 향해 잘 나아가고 있는지를, 확인하세요!</p>
           <p className="small-text">당신의 시간과 성장은 얼마나 자랑스러우신가요?</p>
-          <p className="quote-text">
-            I believe that every right implies a responsibility; every opportunity, an obligation; every possession, a duty.
-          </p>
+          <p className="quote-text">I believe that every right implies a responsibility; every opportunity, an obligation; every possession, a duty.</p>
           <p className="quote-highlight">"모든 권리에는 책임이 따르고, 모든 기회에는 의무가 따르며, 모든 소유물에는 의무가 따른다고 믿는다."</p>
           <p className="quote-author">-존 D. 록펠러 (John D. Rockefeller)-</p>
         </div>
@@ -836,26 +814,9 @@ const Cluster3Content = () => {
           <div className="progress-semi-circle">
             <svg viewBox="0 0 300 170">
               {/* 배경 반원 */}
-              <path
-                className="progress-bg"
-                d="M 25 150 A 125 125 0 0 1 275 150"
-                fill="none"
-                stroke="rgba(250, 171, 7, 0.5)"
-                strokeWidth="20"
-                strokeLinecap="butt"
-              />
+              <path className="progress-bg" d="M 25 150 A 125 125 0 0 1 275 150" fill="none" stroke="rgba(250, 171, 7, 0.5)" strokeWidth="20" strokeLinecap="butt" />
               {/* 진행 반원 (애니메이션) */}
-              <path
-                className="progress-bar"
-                d="M 25 150 A 125 125 0 0 1 275 150"
-                fill="none"
-                stroke="url(#progressGradient)"
-                strokeWidth="20"
-                strokeDasharray="393"
-                strokeDashoffset={progressOffset}
-                strokeLinecap="butt"
-                style={{ transition: 'stroke-dashoffset 1.5s ease-out' }}
-              />
+              <path className="progress-bar" d="M 25 150 A 125 125 0 0 1 275 150" fill="none" stroke="url(#progressGradient)" strokeWidth="20" strokeDasharray="393" strokeDashoffset={progressOffset} strokeLinecap="butt" style={{ transition: "stroke-dashoffset 1.5s ease-out" }} />
               <defs>
                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#FAAB07" />
@@ -865,7 +826,7 @@ const Cluster3Content = () => {
             </svg>
             <div className="progress-text">
               <span className="progress-percent">{progressPercent}%</span>
-                <span className="progress-label">일정 신뢰도</span>
+              <span className="progress-label">일정 신뢰도</span>
             </div>
           </div>
         </div>
@@ -882,26 +843,28 @@ const Cluster3Content = () => {
             </div>
             <div className="card-body">
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장 상태</span>
-                <span className="info-value highlight">
-                  {growthInfo ? getGrowthStatusText(growthInfo.status, growthInfo.growthStatus) : '-'}
+                <span className="info-label">
+                  <span className="dot">·</span> 성장 상태
                 </span>
+                <span className="info-value highlight">{growthInfo ? getGrowthStatusText(growthInfo.status, growthInfo.growthStatus) : "-"}</span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장 시작일</span>
-                <span className="info-value">
-                  {growthInfo?.startDate ? formatDateKorean(growthInfo.startDate) : '-'}
+                <span className="info-label">
+                  <span className="dot">·</span> 성장 시작일
                 </span>
+                <span className="info-value">{growthInfo?.startDate ? formatDateKorean(growthInfo.startDate) : "-"}</span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장 종료일</span>
-                <span className={`info-value ${growthInfo?.endDate ? '' : 'be-cluving'}`}>
-                  {growthInfo?.endDate ? formatDateKorean(growthInfo.endDate) : 'Be Cluving'}
+                <span className="info-label">
+                  <span className="dot">·</span> 성장 종료일
                 </span>
+                <span className={`info-value ${growthInfo?.endDate ? "" : "be-cluving"}`}>{growthInfo?.endDate ? formatDateKorean(growthInfo.endDate) : "Be Cluving"}</span>
               </div>
             </div>
             <div className="card-footer">
-              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+              <span className="watch-pricing">
+                WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" />
+              </span>
             </div>
           </div>
 
@@ -915,37 +878,76 @@ const Cluster3Content = () => {
             </div>
             <div className="card-body">
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장(성공) 주차</span>
-                <span className="info-value week">{growthPeriodStats?.approvedWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.approvedSeasons ?? 0})</span><span className="unit">주</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 성장(성공) 주차
+                </span>
+                <span className="info-value week">
+                  {growthPeriodStats?.approvedWeeks ?? 0}
+                  <span className="highlight-orange">({growthPeriodStats?.approvedSeasons ?? 0})</span>
+                  <span className="unit">주</span>
+                </span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장(실패) 주차</span>
-                <span className="info-value week">{growthPeriodStats?.unapprovedWeeks ?? 0}<span className="unit">주</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 성장(실패) 주차
+                </span>
+                <span className="info-value week">
+                  {growthPeriodStats?.unapprovedWeeks ?? 0}
+                  <span className="unit">주</span>
+                </span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 휴식(개인) 주차</span>
-                <span className="info-value week">{growthPeriodStats?.restWeeks ?? 0}<span className="highlight-orange">({growthPeriodStats?.restSeasons ?? 0})</span><span className="unit">주</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 휴식(개인) 주차
+                </span>
+                <span className="info-value week">
+                  {growthPeriodStats?.restWeeks ?? 0}
+                  <span className="highlight-orange">({growthPeriodStats?.restSeasons ?? 0})</span>
+                  <span className="unit">주</span>
+                </span>
               </div>
               <div className="info-row club-break-row">
-                <span className="info-label"><span className="dot">·</span> 휴식(공식) 주차</span>
-                <span className="info-value week">{growthPeriodStats?.clubBreakWeeks ?? 0}<span className="unit">주</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 휴식(공식) 주차
+                </span>
+                <span className="info-value week">
+                  {growthPeriodStats?.clubBreakWeeks ?? 0}
+                  <span className="unit">주</span>
+                </span>
                 <div className="club-break-tooltip">공식 휴식 주차(구정 설 연휴, 추석, 중간/기말고사 등)에 사전 승인된 &apos;활동&apos;을 진행하여 적격요건을 달성한 경우, 해당 주차는 &apos;휴식(공식) 주차&apos;가 아닌, &apos;성장(성공) 주차&apos;에 반영됩니다.</div>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장 가능 주차</span>
-                <span className="info-value week">{growthPeriodStats?.availableWeeks ?? 0}<span className="unit">주</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 성장 가능 주차
+                </span>
+                <span className="info-value week">
+                  {growthPeriodStats?.availableWeeks ?? 0}
+                  <span className="unit">주</span>
+                </span>
               </div>
               <div className="info-row separator">
-                <span className="info-label"><span className="dot">·</span> 성장 휴식 시즌</span>
-                <span className="info-value season">{growthPeriodStats?.restSeasons ?? 0}<span className="unit">시즌</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 성장 휴식 시즌
+                </span>
+                <span className="info-value season">
+                  {growthPeriodStats?.restSeasons ?? 0}
+                  <span className="unit">시즌</span>
+                </span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 성장(성공) 시즌</span>
-                <span className="info-value season">{growthPeriodStats?.approvedSeasons ?? 0}<span className="unit">시즌</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 성장(성공) 시즌
+                </span>
+                <span className="info-value season">
+                  {growthPeriodStats?.approvedSeasons ?? 0}
+                  <span className="unit">시즌</span>
+                </span>
               </div>
             </div>
             <div className="card-footer">
-              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+              <span className="watch-pricing">
+                WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" />
+              </span>
             </div>
           </div>
 
@@ -959,20 +961,37 @@ const Cluster3Content = () => {
             </div>
             <div className="card-body">
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 단감(총합) <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" /></span>
-                <span className="info-value number">{pointsData.dangam.toLocaleString()}<span className="unit">개</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 단감(총합) <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" />
+                </span>
+                <span className="info-value number">
+                  {pointsData.dangam.toLocaleString()}
+                  <span className="unit">개</span>
+                </span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 인절미(총합) <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" /></span>
-                <span className="info-value number">{pointsData.injeolmi.toLocaleString()}<span className="unit">개</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 인절미(총합) <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" />
+                </span>
+                <span className="info-value number">
+                  {pointsData.injeolmi.toLocaleString()}
+                  <span className="unit">개</span>
+                </span>
               </div>
               <div className="info-row">
-                <span className="info-label"><span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" /></span>
-                <span className={`info-value number ${pointsData.eoheung > 0 ? 'negative' : ''}`}>{pointsData.eoheung > 0 ? `-${pointsData.eoheung.toLocaleString()}` : pointsData.eoheung.toLocaleString()}<span className="unit">개</span></span>
+                <span className="info-label">
+                  <span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" />
+                </span>
+                <span className={`info-value number ${pointsData.eoheung > 0 ? "negative" : ""}`}>
+                  {pointsData.eoheung > 0 ? `-${pointsData.eoheung.toLocaleString()}` : pointsData.eoheung.toLocaleString()}
+                  <span className="unit">개</span>
+                </span>
               </div>
             </div>
             <div className="card-footer">
-              <span className="watch-pricing">WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" /></span>
+              <span className="watch-pricing">
+                WATCH GROWTH <img src="/images/0/cluster 3/icon/_.png" alt="icon" />
+              </span>
             </div>
           </div>
         </div>
@@ -981,9 +1000,12 @@ const Cluster3Content = () => {
       {/* Section 2: 졸업 자격 조건 - 배경 이미지 영역 */}
       <section className="cluster3-section2" ref={section2Ref}>
         {/* 플로팅 아이콘 */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
+        <div className="floating-icons" style={{ display: "flex" }}>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
         </div>
@@ -1006,8 +1028,8 @@ const Cluster3Content = () => {
             </div>
           </div>
           <p className="section-comment section2-comment">
-            클럽 활동 중 함께 활동하는 수백명의 크루들 간의 경쟁을 기준으로,<br />
-            매 주 단위 &apos;강화&apos; / &apos;성장&apos; 순위를 집계하여 누적된, 나의 최종 클럽 활동 성적입니다.
+            클럽 활동 중 함께 활동하는 수백명의 크루들 간의 경쟁을 기준으로,
+            <br />매 주 단위 &apos;강화&apos; / &apos;성장&apos; 순위를 집계하여 누적된, 나의 최종 클럽 활동 성적입니다.
           </p>
         </div>
 
@@ -1015,22 +1037,16 @@ const Cluster3Content = () => {
         <div className="section2-cards">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((rank) => {
             // 라벨 표시: 1->정승, 2->정1품, 3->정2품 ... 10->정9품
-            const displayRank = rank === 1 ? '정승' : rank - 1;
+            const displayRank = rank === 1 ? "정승" : rank - 1;
             return (
               <div
                 key={rank}
-                className={`rank-card ${rank === (gradeStats?.grade || 10) ? 'active' : 'inactive'}`}
+                className={`rank-card ${rank === (gradeStats?.grade || 10) ? "active" : "inactive"}`}
                 style={{
-                  transform: !animationComplete && highlightedRank !== -1 && highlightedRank >= rank
-                    ? `scale(${1 + 0.08 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}) translateY(${-5 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}px)`
-                    : undefined,
-                  boxShadow: !animationComplete && highlightedRank === rank
-                    ? '0 8px 25px rgba(250, 171, 7, 0.6)'
-                    : !animationComplete && highlightedRank !== -1 && Math.abs(highlightedRank - rank) === 1
-                      ? '0 4px 15px rgba(250, 171, 7, 0.3)'
-                      : undefined,
-                  transition: !animationComplete ? 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)' : undefined,
-                  zIndex: !animationComplete && highlightedRank === rank ? 10 : undefined
+                  transform: !animationComplete && highlightedRank !== -1 && highlightedRank >= rank ? `scale(${1 + 0.08 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}) translateY(${-5 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}px)` : undefined,
+                  boxShadow: !animationComplete && highlightedRank === rank ? "0 8px 25px rgba(250, 171, 7, 0.6)" : !animationComplete && highlightedRank !== -1 && Math.abs(highlightedRank - rank) === 1 ? "0 4px 15px rgba(250, 171, 7, 0.3)" : undefined,
+                  transition: !animationComplete ? "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)" : undefined,
+                  zIndex: !animationComplete && highlightedRank === rank ? 10 : undefined,
                 }}
               >
                 <div className="rank-medal">
@@ -1040,7 +1056,7 @@ const Cluster3Content = () => {
                   <img src={`/images/0/cluster 3/image/정 ${rank} 품.png`} alt={`Rank ${rank}`} />
                 </div>
                 <div className="rank-label">
-                  {displayRank === '정승' ? (
+                  {displayRank === "정승" ? (
                     <>
                       <span className="rank-prefix">정</span>
                       <span className="rank-number">승</span>
@@ -1062,10 +1078,27 @@ const Cluster3Content = () => {
       {/* Section 3: 포트폴리오 마케팅 Channel */}
       <section className="cluster3-section3">
         {/* 플로팅 아이콘 */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
-          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection3Links([...portfolioArchives]); setEditingArchiveChannels([...portfolioArchiveChannels]); setSection3ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
+        <div className="floating-icons" style={{ display: "flex" }}>
+          <div
+            className="edit-icon"
+            style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+            onClick={
+              isOwner
+                ? () => {
+                    setEditingSection3Links([...portfolioArchives]);
+                    setEditingArchiveChannels([...portfolioArchiveChannels]);
+                    setSection3ModalOpen(true);
+                  }
+                : undefined
+            }
+          >
+            <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+          </div>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
         </div>
@@ -1076,18 +1109,16 @@ const Cluster3Content = () => {
 
         <div className="section3-header">
           <div className="header-left">
-          <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
-            포트폴리오 아카이빙 Channel
-          </h2>
+            <h2 className="subtitle">
+              <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: "39px", height: "39px", objectFit: "contain", marginRight: "-24px", position: "relative", top: "-8px", zIndex: -1 }} />
+              포트폴리오 아카이빙 Channel
+            </h2>
             <div className="header-sub">
-              <span className="view-all" onClick={() => handleArrowClick('section3')} style={{ cursor: 'pointer' }}>
-                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
+              <span className="view-all" onClick={() => handleArrowClick("section3")} style={{ cursor: "pointer" }}>
+                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: "14px", height: "14px", objectFit: "contain", marginLeft: "4px" }} />
               </span>
             </div>
-            <p className="section-comment section3-comment">
-              클럽 활동 중 쌓아 올린 커리어 결과물이 누적된 포트폴리오 아카이빙 채널 리스트 입니다.
-            </p>
+            <p className="section-comment section3-comment">클럽 활동 중 쌓아 올린 커리어 결과물이 누적된 포트폴리오 아카이빙 채널 리스트 입니다.</p>
           </div>
         </div>
 
@@ -1099,20 +1130,20 @@ const Cluster3Content = () => {
             let snsImage: string;
             if (cardIndex < 10) {
               const selectedChannel = portfolioArchiveChannels[cardIndex];
-              const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
+              const channelOption = channelOptions.find((opt) => opt.value === selectedChannel);
               snsImage = channelOption?.icon || snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
             } else {
               snsImage = snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
             }
-            const isEtcIcon = snsImage.includes('etc');
+            const isEtcIcon = snsImage.includes("etc");
             return (
-              <div key={card.id} className={`channel-card${card.link ? ' has-link' : ''}`} onClick={() => card.link && window.open(ensureProtocol(card.link), '_blank')}>
+              <div key={card.id} className={`channel-card${card.link ? " has-link" : ""}`} onClick={() => card.link && window.open(ensureProtocol(card.link), "_blank")}>
                 <div className="card-image">
                   <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.tag}</div>
                   <div className="card-like">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                   </div>
                 </div>
@@ -1121,10 +1152,10 @@ const Cluster3Content = () => {
                   <div className="card-info">
                     <div className="info-row">
                       <div className="info-author">
-                        <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? ' sns-icon-etc' : ''}`} />
+                        <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? " sns-icon-etc" : ""}`} />
                         <div className="author-text">
                           <span className="info-label">Created by:</span>
-                          <span className="author-name">{engName || 'Unknown'}</span>
+                          <span className="author-name">{engName || "Unknown"}</span>
                         </div>
                       </div>
                     </div>
@@ -1146,11 +1177,7 @@ const Cluster3Content = () => {
         {/* 섹션 3 페이지네이션 */}
         <div className="section3-pagination">
           {[1, 2].map((num) => (
-            <span
-              key={num}
-              className={`page-num ${section3Page === num - 1 ? 'active' : ''} ${num === 2 ? 'last' : ''}`}
-              onClick={() => setSection3Page(num - 1)}
-            >
+            <span key={num} className={`page-num ${section3Page === num - 1 ? "active" : ""} ${num === 2 ? "last" : ""}`} onClick={() => setSection3Page(num - 1)}>
               {num}
             </span>
           ))}
@@ -1160,10 +1187,27 @@ const Cluster3Content = () => {
       {/* Section 4: 포트폴리오 아카이빙 Output */}
       <section className="cluster3-section4">
         {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
-          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection4Links([...portfolioOutputs]); setEditingOutputChannels([...portfolioOutputChannels]); setSection4ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
+        <div className="floating-icons" style={{ display: "flex" }}>
+          <div
+            className="edit-icon"
+            style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+            onClick={
+              isOwner
+                ? () => {
+                    setEditingSection4Links([...portfolioOutputs]);
+                    setEditingOutputChannels([...portfolioOutputChannels]);
+                    setSection4ModalOpen(true);
+                  }
+                : undefined
+            }
+          >
+            <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+          </div>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
             <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
         </div>
@@ -1174,35 +1218,27 @@ const Cluster3Content = () => {
 
         <div className="section4-top-header">
           <div className="header-left">
-          <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
-            포트폴리오 아카이빙 output
-          </h2>
+            <h2 className="subtitle">
+              <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: "39px", height: "39px", objectFit: "contain", marginRight: "-24px", position: "relative", top: "-8px", zIndex: -1 }} />
+              포트폴리오 아카이빙 output
+            </h2>
             <div className="header-sub">
-              <span className="view-all" onClick={() => handleArrowClick('section4')} style={{ cursor: 'pointer' }}>
-                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
+              <span className="view-all" onClick={() => handleArrowClick("section4")} style={{ cursor: "pointer" }}>
+                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: "14px", height: "14px", objectFit: "contain", marginLeft: "4px" }} />
               </span>
             </div>
           </div>
         </div>
         <div className="section4-header">
           <h2 className="section4-title">World Of Top Works</h2>
-          <p className="section4-desc">
-            *본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다. 전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.
-          </p>
+          <p className="section4-desc">*본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다. 전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.</p>
         </div>
 
         <div className="section4-tabs">
-          <button
-            className={`tab-btn creative ${bouncingBtn === 'creative' ? 'btn-bounce' : ''}`}
-            onClick={() => handleBtnClick('creative')}
-          >
+          <button className={`tab-btn creative ${bouncingBtn === "creative" ? "btn-bounce" : ""}`} onClick={() => handleBtnClick("creative")}>
             #Creative More <img src="/images/0/cluster 3/icon/화살표.png" alt="arrow" className="btn-arrow" />
           </button>
-          <button
-            className={`tab-btn practical ${bouncingBtn === 'practical' ? 'btn-bounce' : ''}`}
-            onClick={() => handleBtnClick('practical')}
-          >
+          <button className={`tab-btn practical ${bouncingBtn === "practical" ? "btn-bounce" : ""}`} onClick={() => handleBtnClick("practical")}>
             #Practical More <img src="/images/0/cluster 3/icon/화살표.png" alt="arrow" className="btn-arrow" />
           </button>
         </div>
@@ -1211,8 +1247,8 @@ const Cluster3Content = () => {
           {topWorksSlides.map((slide, index) => {
             // 선택된 채널에 따른 아이콘 표시
             const selectedChannel = portfolioOutputChannels[index];
-            const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
-            const channelIcon = channelOption?.icon || '';
+            const channelOption = channelOptions.find((opt) => opt.value === selectedChannel);
+            const channelIcon = channelOption?.icon || "";
 
             // 현재 활성 슬라이드 기준으로 원형 회전 위치 계산
             const totalSlides = topWorksSlides.length;
@@ -1223,25 +1259,15 @@ const Cluster3Content = () => {
             if (position < -2) position += totalSlides;
 
             return (
-              <div
-                key={slide.id}
-                className={`slider-item position-${position}${slide.link ? ' has-link' : ''}`}
-                data-position={position}
-                onClick={() => slide.link && window.open(ensureProtocol(slide.link), '_blank')}
-                style={{ cursor: 'pointer' }}
-              >
+              <div key={slide.id} className={`slider-item position-${position}${slide.link ? " has-link" : ""}`} data-position={position} onClick={() => position === 0 && slide.link && window.open(ensureProtocol(slide.link), "_blank")} style={{ cursor: position === 0 ? "pointer" : "default" }}>
                 <img src={`/images/0/cluster 3/image/2-${slide.id}.png`} alt={`Work ${slide.id}`} />
                 <div className="card-overlay">
                   <div className="card-top">
                     <div className="info-author">
-                      {!channelIcon ? (
-                        <div className="sns-icon sns-gradient"></div>
-                      ) : (
-                        <img src={channelIcon} alt="SNS" className="sns-icon" />
-                      )}
+                      {!channelIcon ? <div className="sns-icon sns-gradient"></div> : <img src={channelIcon} alt="SNS" className="sns-icon" />}
                       <div className="author-text">
                         <span className="info-label">Posted by :</span>
-                        <span className="author-name">{engName || 'Unknown'}</span>
+                        <span className="author-name">{engName || "Unknown"}</span>
                       </div>
                     </div>
                   </div>
@@ -1249,7 +1275,7 @@ const Cluster3Content = () => {
                     <div className="card-tag">09h 99m 99s</div>
                     <div className="card-like">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                       </svg>
                     </div>
                   </div>
@@ -1261,11 +1287,7 @@ const Cluster3Content = () => {
 
         <div className="section4-pagination">
           {[1, 2, 3, 4, 5].map((num) => (
-            <span
-              key={num}
-              className={`page-num ${activeSlide === num - 1 ? 'active' : ''} ${num === 5 ? 'last' : ''}`}
-              onClick={() => setActiveSlide(num - 1)}
-            >
+            <span key={num} className={`page-num ${activeSlide === num - 1 ? "active" : ""} ${num === 5 ? "last" : ""}`} onClick={() => setActiveSlide(num - 1)}>
               {num}
             </span>
           ))}
@@ -1273,64 +1295,78 @@ const Cluster3Content = () => {
 
         {/* Section 5: The Detail 10 - 섹션4 배경 안에 포함 */}
         <div className="cluster3-section5">
-        {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
-          <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => { setEditingSection5Links([...portfolioDetails]); setEditingDetailChannels([...portfolioDetailChannels]); setSection5ModalOpen(true); } : undefined}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
-        <div className="section5-header">
-          <div className="header-left">
-          <h2 className="subtitle">
-            <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: '39px', height: '39px', objectFit: 'contain', marginRight: '-24px', position: 'relative', top: '-8px', zIndex: -1 }} />
-            The Detail 10
-          </h2>
-            <div className="header-sub">
-              <span className="view-all" onClick={() => handleArrowClick('section5')} style={{ cursor: 'pointer' }}>
-                View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: '14px', height: '14px', objectFit: 'contain', marginLeft: '4px' }} />
-              </span>
+          {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
+          <div className="floating-icons" style={{ display: "flex" }}>
+            <div
+              className="edit-icon"
+              style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+              onClick={
+                isOwner
+                  ? () => {
+                      setEditingSection5Links([...portfolioDetails]);
+                      setEditingDetailChannels([...portfolioDetailChannels]);
+                      setSection5ModalOpen(true);
+                    }
+                  : undefined
+              }
+            >
+              <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+            </div>
+            <div className="edit-icon search-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <div className="tooltip">등록된 도움말이 없습니다</div>
             </div>
           </div>
-          <p className="section-comment section5-comment">
-            클럽에서 쌓아올린 모든 활동 중 더 자세하게 핵심으로 어필하고픈 second 10 개의 최고 결과물을 선별하여 기재하였습니다.
-          </p>
-        </div>
+          <div className="section5-header">
+            <div className="header-left">
+              <h2 className="subtitle">
+                <img src="/images/0/cluster 3/polygon.png" alt="triangle" style={{ width: "39px", height: "39px", objectFit: "contain", marginRight: "-24px", position: "relative", top: "-8px", zIndex: -1 }} />
+                The Detail 10
+              </h2>
+              <div className="header-sub">
+                <span className="view-all" onClick={() => handleArrowClick("section5")} style={{ cursor: "pointer" }}>
+                  View All Bids <img src="/images/0/cluster 3/arrow.png" alt="arrow" style={{ width: "14px", height: "14px", objectFit: "contain", marginLeft: "4px" }} />
+                </span>
+              </div>
+            </div>
+            <p className="section-comment section5-comment">
+              클럽에서 쌓아올린 모든 활동 중 더 자세하게 핵심으로 어필하고픈 <br />
+              second 10 개의 최고 결과물을 선별하여 기재하였습니다.
+            </p>
+          </div>
 
-        <div className="detail-grid">
-          {detailThumbnails.map((thumb, index) => {
-            // 선택된 채널에 따른 아이콘 표시
-            const selectedChannel = portfolioDetailChannels[index];
-            const channelOption = channelOptions.find(opt => opt.value === selectedChannel);
-            const channelIcon = channelOption?.icon || '';
+          <div className="detail-grid">
+            {detailThumbnails.map((thumb, index) => {
+              // 선택된 채널에 따른 아이콘 표시
+              const selectedChannel = portfolioDetailChannels[index];
+              const channelOption = channelOptions.find((opt) => opt.value === selectedChannel);
+              const channelIcon = channelOption?.icon || "";
 
-            return (
-              <div key={thumb.id} className={`detail-item${thumb.link ? ' has-link' : ''}`} onClick={() => thumb.link && window.open(ensureProtocol(thumb.link), '_blank')} style={{ cursor: thumb.link ? 'pointer' : 'default' }}>
-                <img src={`/images/0/cluster 3/image/3-${thumb.id}.png`} alt={`Detail ${thumb.id}`} />
-                <div className="item-overlay">
-                  <div className="like-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                    <span>99 Like</span>
-                  </div>
-                  <div className="item-bottom">
-                    {!channelIcon ? (
-                      <div className="sns-icon sns-gradient"></div>
-                    ) : (
-                      <img src={channelIcon} alt="SNS" className="sns-icon" />
-                    )}
-                    <div className="item-info">
-                      <span className="item-tags">#Detail, #Micro</span>
-                      <span className="item-author">@{engName || 'Unknown'}</span>
+              return (
+                <div key={thumb.id} className={`detail-item${thumb.link ? " has-link" : ""}`} onClick={() => thumb.link && window.open(ensureProtocol(thumb.link), "_blank")} style={{ cursor: thumb.link ? "pointer" : "default" }}>
+                  <img src={`/images/0/cluster 3/image/3-${thumb.id}.png`} alt={`Detail ${thumb.id}`} />
+                  <div className="item-overlay">
+                    <div className="like-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                      <span>99 Like</span>
+                    </div>
+                    <div className="item-bottom">
+                      {!channelIcon ? <div className="sns-icon sns-gradient"></div> : <img src={channelIcon} alt="SNS" className="sns-icon" />}
+                      <div className="item-info">
+                        <span className="item-tags">#Detail, #Micro</span>
+                        <span className="item-author">@{engName || "Unknown"}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -1340,23 +1376,29 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>포트폴리오 아카이빙 channel 링크 편집</h3>
-              <p className="modal-subtitle">클럽 활동 중 자신의 결과물을 업로드 한 SNS 채널 링크를 등록해주세요<br /><span className="subtitle-gray">(인스타, 유튜브, 블로그, 티스토리, 트위터, 쓰레드, 틱톡, 비핸스, 기타)</span></p>
+              <p className="modal-subtitle">
+                클럽 활동 중 자신의 결과물을 업로드 한 SNS 채널 링크를 등록해주세요
+                <br />
+                <span className="subtitle-gray">(인스타, 유튜브, 블로그, 티스토리, 트위터, 쓰레드, 틱톡, 비핸스, 기타)</span>
+              </p>
               <button className="modal-close-btn" onClick={() => setSection3ModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
             </div>
             <div className="section-modal-body">
               {editingSection3Links.map((link, index) => {
+                const prevFilled = index === 0 || editingSection3Links[index - 1]?.trim();
+                const isDisabled = !prevFilled;
                 return (
-                  <div key={index} className="link-edit-item">
+                  <div key={index} className={`link-edit-item${isDisabled ? " disabled" : ""}`}>
                     <div className="link-item-header">
                       <span className="link-label">Channel {index + 1}</span>
                     </div>
-                    <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
+                    <p style={{ color: "#FFC107", fontSize: "16px", margin: "0 0 8px 0" }}>채널 선택:</p>
                     <CustomSelect
                       className="channel-select"
-                      style={{ display: 'block', marginBottom: '8px' }}
-                      value={editingArchiveChannels[index] || ''}
+                      style={{ display: "block", marginBottom: "8px", pointerEvents: isDisabled ? "none" : "auto", opacity: isDisabled ? 0.4 : 1 }}
+                      value={link?.trim() ? editingArchiveChannels[index] || "" : ""}
                       onChange={(val) => {
                         const newChannels = [...editingArchiveChannels];
                         newChannels[index] = val;
@@ -1368,9 +1410,21 @@ const Cluster3Content = () => {
                       type="url"
                       placeholder="링크를 입력하세요 (https://...)"
                       value={link}
+                      disabled={isDisabled}
                       onChange={(e) => {
                         const newLinks = [...editingSection3Links];
                         newLinks[index] = e.target.value;
+                        // 링크를 비우면 하위 항목 초기화
+                        if (!e.target.value.trim()) {
+                          for (let i = index + 1; i < newLinks.length; i++) {
+                            newLinks[i] = "";
+                          }
+                          const newChannels = [...editingArchiveChannels];
+                          for (let i = index + 1; i < newChannels.length; i++) {
+                            newChannels[i] = "";
+                          }
+                          setEditingArchiveChannels(newChannels);
+                        }
                         setEditingSection3Links(newLinks);
                       }}
                     />
@@ -1379,7 +1433,9 @@ const Cluster3Content = () => {
               })}
             </div>
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection3ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection3ModalOpen(false)}>
+                취소
+              </button>
               <button
                 className="save-btn"
                 disabled={isSavingArchives}
@@ -1389,7 +1445,9 @@ const Cluster3Content = () => {
                     setSection3ModalOpen(false);
                   }
                 }}
-              >{isSavingArchives ? '저장 중...' : '저장'}</button>
+              >
+                {isSavingArchives ? "저장 중..." : "저장"}
+              </button>
             </div>
           </div>
         </div>
@@ -1407,38 +1465,55 @@ const Cluster3Content = () => {
               </button>
             </div>
             <div className="section-modal-body">
-              {editingSection4Links.map((link, index) => (
-                <div key={index} className="link-edit-item">
-                  <div className="link-item-header">
-                    <span className="link-label">Work {index + 1}</span>
+              {editingSection4Links.map((link, index) => {
+                const prevFilled = index === 0 || editingSection4Links[index - 1]?.trim();
+                const isDisabled = !prevFilled;
+                return (
+                  <div key={index} className={`link-edit-item${isDisabled ? " disabled" : ""}`}>
+                    <div className="link-item-header">
+                      <span className="link-label">Work {index + 1}</span>
+                    </div>
+                    <p style={{ color: "#FFC107", fontSize: "16px", margin: "0 0 8px 0" }}>채널 선택:</p>
+                    <CustomSelect
+                      className="channel-select"
+                      style={{ display: "block", marginBottom: "8px", pointerEvents: isDisabled ? "none" : "auto", opacity: isDisabled ? 0.4 : 1 }}
+                      value={link?.trim() ? editingOutputChannels[index] || "" : ""}
+                      onChange={(val) => {
+                        const newChannels = [...editingOutputChannels];
+                        newChannels[index] = val;
+                        setEditingOutputChannels(newChannels);
+                      }}
+                      options={channelOptions}
+                    />
+                    <input
+                      type="url"
+                      placeholder="링크를 입력하세요 (https://...)"
+                      value={link}
+                      disabled={isDisabled}
+                      onChange={(e) => {
+                        const newLinks = [...editingSection4Links];
+                        newLinks[index] = e.target.value;
+                        if (!e.target.value.trim()) {
+                          for (let i = index + 1; i < newLinks.length; i++) {
+                            newLinks[i] = "";
+                          }
+                          const newChannels = [...editingOutputChannels];
+                          for (let i = index + 1; i < newChannels.length; i++) {
+                            newChannels[i] = "";
+                          }
+                          setEditingOutputChannels(newChannels);
+                        }
+                        setEditingSection4Links(newLinks);
+                      }}
+                    />
                   </div>
-                  <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
-                  <CustomSelect
-                    className="channel-select"
-                    style={{ display: 'block', marginBottom: '8px' }}
-                    value={editingOutputChannels[index] || ''}
-                    onChange={(val) => {
-                      const newChannels = [...editingOutputChannels];
-                      newChannels[index] = val;
-                      setEditingOutputChannels(newChannels);
-                    }}
-                    options={channelOptions}
-                  />
-                  <input
-                    type="url"
-                    placeholder="링크를 입력하세요 (https://...)"
-                    value={link}
-                    onChange={(e) => {
-                      const newLinks = [...editingSection4Links];
-                      newLinks[index] = e.target.value;
-                      setEditingSection4Links(newLinks);
-                    }}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)}>
+                취소
+              </button>
               <button
                 className="save-btn"
                 disabled={isSavingOutputs}
@@ -1449,13 +1524,15 @@ const Cluster3Content = () => {
                     // 슬라이드 데이터 업데이트
                     const updatedSlides = topWorksSlides.map((slide, index) => ({
                       ...slide,
-                      link: editingSection4Links[index]
+                      link: editingSection4Links[index],
                     }));
                     setTopWorksSlides(updatedSlides);
                     setSection4ModalOpen(false);
                   }
                 }}
-              >{isSavingOutputs ? '저장 중...' : '저장'}</button>
+              >
+                {isSavingOutputs ? "저장 중..." : "저장"}
+              </button>
             </div>
           </div>
         </div>
@@ -1467,44 +1544,64 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>The Detail 10 링크 편집</h3>
-              <p className="modal-subtitle">위 대표 결과물 5개를 제외한, 클럽 활동 결과물 중<br />추가로 보여주고 싶은 결과물 링크를 등록해 주세요.</p>
+              <p className="modal-subtitle">
+                위 대표 결과물 5개를 제외한, 클럽 활동 결과물 중<br />
+                추가로 보여주고 싶은 결과물 링크를 등록해 주세요.
+              </p>
               <button className="modal-close-btn" onClick={() => setSection5ModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
             </div>
             <div className="section-modal-body">
-              {editingSection5Links.map((link, index) => (
-                <div key={index} className="link-edit-item">
-                  <div className="link-item-header">
-                    <span className="link-label">Detail {index + 1}</span>
+              {editingSection5Links.map((link, index) => {
+                const prevFilled = index === 0 || editingSection5Links[index - 1]?.trim();
+                const isDisabled = !prevFilled;
+                return (
+                  <div key={index} className={`link-edit-item${isDisabled ? " disabled" : ""}`}>
+                    <div className="link-item-header">
+                      <span className="link-label">Detail {index + 1}</span>
+                    </div>
+                    <p style={{ color: "#FFC107", fontSize: "16px", margin: "0 0 8px 0" }}>채널 선택:</p>
+                    <CustomSelect
+                      className="channel-select"
+                      style={{ display: "block", marginBottom: "8px", pointerEvents: isDisabled ? "none" : "auto", opacity: isDisabled ? 0.4 : 1 }}
+                      value={link?.trim() ? editingDetailChannels[index] || "" : ""}
+                      onChange={(val) => {
+                        const newChannels = [...editingDetailChannels];
+                        newChannels[index] = val;
+                        setEditingDetailChannels(newChannels);
+                      }}
+                      options={channelOptions}
+                    />
+                    <input
+                      type="url"
+                      placeholder="링크를 입력하세요 (https://...)"
+                      value={link}
+                      disabled={isDisabled}
+                      onChange={(e) => {
+                        const newLinks = [...editingSection5Links];
+                        newLinks[index] = e.target.value;
+                        if (!e.target.value.trim()) {
+                          for (let i = index + 1; i < newLinks.length; i++) {
+                            newLinks[i] = "";
+                          }
+                          const newChannels = [...editingDetailChannels];
+                          for (let i = index + 1; i < newChannels.length; i++) {
+                            newChannels[i] = "";
+                          }
+                          setEditingDetailChannels(newChannels);
+                        }
+                        setEditingSection5Links(newLinks);
+                      }}
+                    />
                   </div>
-                  <p style={{color: '#FFC107', fontSize: '16px', margin: '0 0 8px 0'}}>채널 선택:</p>
-                  <CustomSelect
-                    className="channel-select"
-                    style={{ display: 'block', marginBottom: '8px' }}
-                    value={editingDetailChannels[index] || ''}
-                    onChange={(val) => {
-                      const newChannels = [...editingDetailChannels];
-                      newChannels[index] = val;
-                      setEditingDetailChannels(newChannels);
-                    }}
-                    options={channelOptions}
-                  />
-                  <input
-                    type="url"
-                    placeholder="링크를 입력하세요 (https://...)"
-                    value={link}
-                    onChange={(e) => {
-                      const newLinks = [...editingSection5Links];
-                      newLinks[index] = e.target.value;
-                      setEditingSection5Links(newLinks);
-                    }}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection5ModalOpen(false)}>취소</button>
+              <button className="cancel-btn" onClick={() => setSection5ModalOpen(false)}>
+                취소
+              </button>
               <button
                 className="save-btn"
                 disabled={isSavingDetails}
@@ -1515,7 +1612,9 @@ const Cluster3Content = () => {
                     setSection5ModalOpen(false);
                   }
                 }}
-              >{isSavingDetails ? '저장 중...' : '저장'}</button>
+              >
+                {isSavingDetails ? "저장 중..." : "저장"}
+              </button>
             </div>
           </div>
         </div>
