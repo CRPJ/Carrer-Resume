@@ -1085,8 +1085,12 @@ const Cluster3Content = () => {
             onClick={
               isOwner
                 ? () => {
-                    setEditingSection3Links([...portfolioArchives]);
-                    setEditingArchiveChannels([...portfolioArchiveChannels]);
+                    // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
+                    const paired = portfolioArchives.map((link, i) => ({ link, channel: portfolioArchiveChannels[i] || "" }));
+                    const filled = paired.filter(item => item.link?.trim());
+                    const total = portfolioArchives.length;
+                    setEditingSection3Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
+                    setEditingArchiveChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
                     setSection3ModalOpen(true);
                   }
                 : undefined
@@ -1194,8 +1198,12 @@ const Cluster3Content = () => {
             onClick={
               isOwner
                 ? () => {
-                    setEditingSection4Links([...portfolioOutputs]);
-                    setEditingOutputChannels([...portfolioOutputChannels]);
+                    // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
+                    const paired = portfolioOutputs.map((link, i) => ({ link, channel: portfolioOutputChannels[i] || "" }));
+                    const filled = paired.filter(item => item.link?.trim());
+                    const total = portfolioOutputs.length;
+                    setEditingSection4Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
+                    setEditingOutputChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
                     setSection4ModalOpen(true);
                   }
                 : undefined
@@ -1303,8 +1311,12 @@ const Cluster3Content = () => {
               onClick={
                 isOwner
                   ? () => {
-                      setEditingSection5Links([...portfolioDetails]);
-                      setEditingDetailChannels([...portfolioDetailChannels]);
+                      // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
+                      const paired = portfolioDetails.map((link, i) => ({ link, channel: portfolioDetailChannels[i] || "" }));
+                      const filled = paired.filter(item => item.link?.trim());
+                      const total = portfolioDetails.length;
+                      setEditingSection5Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
+                      setEditingDetailChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
                       setSection5ModalOpen(true);
                     }
                   : undefined
