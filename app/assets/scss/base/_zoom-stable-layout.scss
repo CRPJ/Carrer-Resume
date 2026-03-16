@@ -1,28 +1,25 @@
 // =============================================
-// 반응형 레이아웃 시스템 - 모니터 크기별 대응
+// 고정 너비 레이아웃 시스템
+// - 100% zoom(1920×1080)에서 좌우 여백 없음
+// - 축소 시에만 좌우 여백 생성
+// - 확대/창 축소 시 가로 스크롤
 // =============================================
-// 파일 위치: app/assets/scss/base/_zoom-stable-layout.scss
 
-// ===== CSS 변수 정의 (1977px 시안 기준 - 고정값) =====
-// ★ scale로 처리하므로 미디어쿼리 불필요
+// ===== CSS 변수 정의 =====
 :root {
   // 레이아웃 크기 (고정)
-  --content-max-width: 1977px;
-  // 사이드바(프로필) 영역은 고정 폭으로 안정화 (해상도/높이/zoom에 의해 변동되지 않게)
+  --content-max-width: 1900px;
   --sidebar-width: 497px;
   --sidebar-left-offset: 110px;
   --header-height: 66px;
-  // zoom 상한(예: 4K)에서 남는 영역까지 포용하는 "외곽" 최대 폭
-  // (3840px / 1.5 = 2560px 정도를 커버)
-  --outer-max-width: 2600px;
-  
+
   // 간격
   --spacing-xs: 8px;
   --spacing-sm: 16px;
   --spacing-md: 24px;
   --spacing-lg: 40px;
   --spacing-xl: 60px;
-  
+
   // 폰트 크기
   --font-title-xl: 72px;
   --font-title-lg: 48px;
@@ -32,134 +29,22 @@
   --font-body: 16px;
   --font-body-sm: 14px;
   --font-caption: 12px;
-  
+
   // 탭 버튼 크기
   --tab-width: 250px;
   --tab-height: 48px;
   --tab-font-size: 14px;
 }
 
-// ===== 1200px 이하 (모바일) - 사이드바 숨김 =====
-@media (max-width: 1199px) {
-  :root {
-    --sidebar-width: 0px;
-    --sidebar-left-offset: 0px;
-  }
-}
-
-// ===== 데스크탑 확대 시 모바일 미디어쿼리 방지 =====
-// JS(ResponsiveScale)가 @media (max-width:1199px) 규칙들을 직접 비활성화
-// → 별도 CSS 오버라이드 불필요
-
-// ===== 1200~1400px (노트북/중간폭) - 타이트 데스크톱 =====
-// CSS zoom이 media query를 무력화하므로, JS가 html.tight-desktop 클래스를 토글
-// → gap/padding을 줄이고, 사이드바 카드를 확대하여 공간 효율 극대화
-html.tight-desktop {
-  // 콘텐츠 좌우 패딩: zoom 보정으로 시각적 8px 유지
-  .nftg-content.nftg-content-home,
-  .nftg-app .nftg-content.nftg-content-home {
-    padding-left: calc(8px / var(--app-zoom, 1)) !important;
-    padding-right: calc(8px / var(--app-zoom, 1)) !important;
-  }
-
-  // desktop-layout flex gap: zoom 보정으로 시각적 8px 유지
-  .nftg-content-home .desktop-layout,
-  .desktop-layout {
-    gap: calc(8px / var(--app-zoom, 1)) !important;
-  }
-
-  // 왼쪽 네비게이션 사이드바도 축소
-  .nftg-app .nftg-sidebar,
-  .nftg-sidebar {
-    width: 65px;
-
-    .sidebar__wrapper {
-      padding: 8px 0;
-    }
-
-    .sidebar__logo img {
-      width: 50px;
-      height: 50px;
-    }
-
-    .sidebar--links a {
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-    }
-
-    .sidebar--images a {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
-  .nftg-app .nftg-layout,
-  .nftg-layout {
-    margin-left: 65px;
-    width: calc(100% - 65px);
-  }
-
-  .header {
-    padding-left: 65px !important;
-  }
-}
-
-// ===== 1400~1700px (중간폭 데스크톱) - 미드 데스크톱 =====
-// CSS zoom이 padding을 축소하므로, zoom에 반비례하는 동적 padding으로 시각적 8px 유지
-html.mid-desktop {
-  .nftg-content.nftg-content-home,
-  .nftg-app .nftg-content.nftg-content-home {
-    padding-left: calc(8px / var(--app-zoom, 1)) !important;
-    padding-right: calc(8px / var(--app-zoom, 1)) !important;
-  }
-
-  // 왼쪽 네비게이션 사이드바 축소
-  .nftg-app .nftg-sidebar,
-  .nftg-sidebar {
-    width: 70px;
-
-    .sidebar__logo img {
-      width: 52px;
-      height: 52px;
-    }
-
-    .sidebar--links a {
-      width: 42px;
-      height: 42px;
-      font-size: 20px;
-    }
-
-    .sidebar--images a {
-      width: 42px;
-      height: 42px;
-    }
-  }
-
-  .nftg-app .nftg-layout,
-  .nftg-layout {
-    margin-left: 70px;
-    width: calc(100% - 70px);
-  }
-
-  .header {
-    padding-left: 70px !important;
-  }
-}
-
-
 // ===== 공통 레이아웃 스타일 =====
 
-// ★ zoom으로 모든 모니터 대응 (position: fixed도 영향 받음)
 html {
   background-color: #0a0a0a;
-  // zoom은 JS에서 적용
 }
 
 body {
-  width: 100%;
-  min-width: var(--content-max-width); // ★ 브라우저 확대 시 축소 방지 → 스크롤바 생성
-  max-width: var(--outer-max-width); // ★ 넓은 모니터에서도 레이아웃 일관성
+  width: var(--content-max-width);
+  min-width: var(--content-max-width);
   margin: 0 auto !important;
   position: relative;
 }
@@ -167,22 +52,16 @@ body {
 .nftg-content,
 .nftg-content-home {
   width: 100%;
-  max-width: var(--outer-max-width);
+  max-width: var(--content-max-width);
   margin-left: auto;
   margin-right: auto;
 }
-
-// ★★★ 모든 모니터에서 동일하게 보이도록 zoom 적용 ★★★
-// JavaScript(ResponsiveScale.tsx)에서 html에 zoom 적용
-// zoom은 transform과 달리 position: fixed도 함께 확대/축소됨!
-
-// ★ 사이드바, 헤더는 scale로 자동 조정되므로 미디어쿼리 불필요
 
 // 전체 너비 섹션 (배경만 확장, 콘텐츠는 중앙 고정)
 .full-width-section {
   width: 100%;
   position: relative;
-  
+
   // 배경용 가상 요소
   &::before {
     content: '';
@@ -194,7 +73,7 @@ body {
     height: 100%;
     z-index: -1;
   }
-  
+
   // 콘텐츠는 중앙 고정
   .section-inner {
     max-width: var(--content-max-width);
@@ -215,41 +94,33 @@ body {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
   flex-shrink: 0;
-  
-  @media (max-width: 1199px) {
-    display: none;
-  }
 }
 
 // 콘텐츠 그리드
 .content-grid {
   display: flex;
   gap: var(--spacing-md);
-  
+
   .content-main {
     flex: 1;
     min-width: 0;
   }
-  
+
   .content-sidebar {
     width: var(--sidebar-width);
     flex-shrink: 0;
-    
-    @media (max-width: 1199px) {
-      display: none;
-    }
   }
 }
 
 
-// ===== Cluster2 전용 반응형 =====
+// ===== Cluster2 전용 =====
 
 .cluster2-content,
 .cluster3-content,
 .cluster4-content,
 .home-two-content {
   max-width: var(--content-max-width);
-  
+
   // ★ 모든 자식 요소 잘림 방지
   & > *,
   .c2-section,
@@ -263,13 +134,13 @@ body {
     overflow-x: hidden;
     box-sizing: border-box;
   }
-  
+
   // 섹션 제목
   .section-title,
   .c2-title {
     font-size: var(--font-title-lg);
   }
-  
+
   // 섹션 간격
   .section-gap {
     margin-bottom: var(--spacing-xl);
@@ -282,7 +153,7 @@ body {
   & > * {
     margin-bottom: 80px;
   }
-  
+
   // 마지막 섹션은 마진 제거
   & > *:last-child {
     margin-bottom: 0;
@@ -328,11 +199,7 @@ body {
 // ★ 콘텐츠 영역 전체 잘림 방지
 .home-two-content-col {
   max-width: calc(100% - var(--sidebar-width, 474px)) !important;
-  overflow-x: hidden;
-  
-  @media (max-width: 1199px) {
-    max-width: 100% !important;
-  }
+  overflow-x: visible;
 }
 
 // ★★★ Club Review (Section4) 잘림 방지 ★★★
@@ -340,32 +207,32 @@ body {
   max-width: 100% !important;
   width: 100% !important;
   padding-left: 0 !important;
-  padding-right: 40px !important; // 오른쪽 여백 더 확보
+  padding-right: 40px !important;
   box-sizing: border-box;
   overflow: visible !important;
-  
+
   .section4-left {
     flex-shrink: 0;
     max-width: 100%;
-    
+
     .quote-card-item {
       max-width: 100%;
       width: 100%;
       min-width: unset !important;
     }
   }
-  
+
   .section4-right {
     flex: 1;
-    min-width: 0; // flex item 오버플로우 방지
+    min-width: 0;
     max-width: 100%;
     overflow: visible !important;
-    padding-right: 10px; // 오른쪽 여백 추가
-    
+    padding-right: 10px;
+
     .total-complete-box {
       max-width: 100%;
     }
-    
+
     .review-grid-9 {
       max-width: 100%;
       overflow: visible !important;
@@ -380,25 +247,23 @@ body {
   box-sizing: border-box;
   padding-left: 20px;
   padding-right: 20px;
-  height: auto !important; // 고정 높이 해제
-  min-height: 933px; // 최소 높이만 유지
-  overflow: visible !important; // 아래쪽 잘림 방지
-  
+  height: auto !important;
+  min-height: 933px;
+  overflow: visible !important;
+
   .intro-cards {
     max-width: 100%;
     overflow: visible !important;
-    
-    // ★ 2행 3열 그리드로 변경
-    // minmax(0, 1fr): 콘텐츠(한글 자모 등)가 그리드 컬럼을 밀어내지 않도록 최소폭 0 강제
+
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     grid-template-rows: repeat(2, auto) !important;
-    gap: 70px !important; // 30px → 70px 피그마 일치
-    
+    gap: 70px !important;
+
     .intro-row {
-      display: contents !important; // 부모 그리드에 직접 참여
+      display: contents !important;
     }
-    
+
     .intro-card {
       width: 317px !important;
       min-width: 317px !important;
@@ -411,30 +276,25 @@ body {
   }
 }
 
-// 탭 메뉴 반응형 — Figma 2-row layout
+// 탭 메뉴 — Figma 2-row layout
+// Grid 사용: 줌 비율 변경 시 서브픽셀 반올림을 grid track 레벨에서 처리하여
+// 탭 잘림/여백 없이 부모 너비를 정확히 채움
 .cluster-tabs {
-  position: relative;
-  max-width: min(100%, var(--content-max-width));
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
   .cluster-tabs-row {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 18px;
-    flex-wrap: nowrap;
+    width: 100%;
   }
 
   .cluster-tab {
-    width: 259px;
-    min-width: 259px;
+    min-width: 0;
     height: 56px;
     font-size: 14px;
-    flex-shrink: 0;
-
-    @media (max-width: 1199px) {
-      width: 180px;
-      min-width: 180px;
-      height: 44px;
-      font-size: 11px;
-    }
+    box-sizing: border-box;
   }
 }

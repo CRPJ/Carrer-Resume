@@ -3,29 +3,20 @@
 import { useState, useEffect, useRef } from "react";
 import ClusterTabs from "@/components/home-career/ClusterTabs";
 import Sidebar from "@/components/home-career/Sidebar";
-import Cluster1Content from "@/components/cluster-1/Cluster1Content";
 import Animations from "@/components/shared/Animations";
 
-const Cluster1Page = () => {
+export default function ClusterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isMobile, setIsMobile] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const sidebarShellRef = useRef<HTMLDivElement>(null);
   const sidebarInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 화면 크기 체크
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-
-    // 초기 실행
-    checkMobile();
-
-    window.addEventListener('resize', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
+    setIsMobile(false);
   }, []);
 
   // JavaScript 기반 sticky 구현 (CSS zoom과 호환)
@@ -38,27 +29,26 @@ const Cluster1Page = () => {
       const header = document.querySelector('header');
       if (header) return header.getBoundingClientRect().bottom;
       return 57;
-  };
+    };
 
     let rafId: number | null = null;
     let isFixed = false;
 
     // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
     const computeTop = (zoom: number, height: number) => {
-      const defaultTop = getHeaderBottom() / zoom;
+      const defaultTop = getHeaderBottom();
       let top = defaultTop;
-  
+
       const footer = document.querySelector("footer");
       if (footer) {
-          const footerTop = footer.getBoundingClientRect().top / zoom;
-          const margin = 68 / zoom;
-          const maxTop = Math.floor(footerTop - height - margin);
-          // footer에 밀려도 header 아래로는 유지
-          top = Math.max(Math.min(defaultTop, maxTop), defaultTop);
+        const footerTop = footer.getBoundingClientRect().top;
+        const margin = 4;
+        const maxTop = footerTop - height - margin;
+        top = Math.min(defaultTop, maxTop);
       }
-  
+
       return top;
-  };
+    };
 
     const apply = () => {
       rafId = null;
@@ -77,28 +67,26 @@ const Cluster1Page = () => {
         return;
       }
 
-
-      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      const zoom = 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
       const shouldFix = shellRect.top <= headerBottom;
 
+      // 고정 진입
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
-        const height = inner.getBoundingClientRect().height / zoom;
-
-        // zoom 보정: fixed 요소의 left/top은 zoom으로 나눠줘야 함
-        const left = shellRect.left / zoom;
+        const height = inner.getBoundingClientRect().height;
+        const left = shellRect.left;
         const top = computeTop(zoom, height);
 
         shell.style.width = `${width}px`;
         shell.style.height = `${inner.offsetHeight}px`;
 
-        inner.style.position = "fixed";
+        inner.style.position = 'fixed';
         inner.style.top = `${top}px`;
         inner.style.left = `${left}px`;
         inner.style.width = `${width}px`;
-        inner.style.zIndex = "9999";
+        inner.style.zIndex = '9999';
 
         isFixed = true;
         return;
@@ -106,21 +94,22 @@ const Cluster1Page = () => {
 
       // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
       if (isFixed && shouldFix) {
-        const height = inner.getBoundingClientRect().height / zoom;
+        const height = inner.getBoundingClientRect().height;
         const top = computeTop(zoom, height);
         inner.style.top = `${top}px`;
         return;
       }
 
+      // 고정 해제
       if (isFixed && !shouldFix) {
-        shell.style.width = "";
-        shell.style.height = "";
+        shell.style.width = '';
+        shell.style.height = '';
 
-        inner.style.position = "relative";
-        inner.style.top = "0";
-        inner.style.left = "0";
-        inner.style.width = "";
-        inner.style.zIndex = "100";
+        inner.style.position = 'relative';
+        inner.style.top = '0';
+        inner.style.left = '0';
+        inner.style.width = '';
+        inner.style.zIndex = '100';
 
         isFixed = false;
       }
@@ -133,24 +122,27 @@ const Cluster1Page = () => {
 
     const handleResize = () => {
       isFixed = false;
-      shell.style.width = "";
-      shell.style.height = "";
-      inner.style.position = "relative";
-      inner.style.top = "0";
-      inner.style.left = "0";
-      inner.style.width = "";
+
+      shell.style.width = '';
+      shell.style.height = '';
+      inner.style.position = 'relative';
+      inner.style.top = '0';
+      inner.style.left = '0';
+      inner.style.width = '';
 
       if (rafId != null) window.cancelAnimationFrame(rafId);
       rafId = window.requestAnimationFrame(apply);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    // 초기 실행
     rafId = window.requestAnimationFrame(apply);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
       if (rafId != null) window.cancelAnimationFrame(rafId);
     };
   }, [isMobile]);
@@ -160,40 +152,36 @@ const Cluster1Page = () => {
     return (
       <main ref={mainRef} className="nftg-content nftg-content-home mobile-layout">
         <Animations />
-        
-        {/* 모바일: 세로 배치 */}
+
         <div className="mobile-container">
-          {/* 1. 프로필 카드 (상단) */}
           <div className="mobile-sidebar-section">
             <Sidebar />
           </div>
-          
-          {/* 2. 클러스터 탭 */}
+
           <div className="mobile-tabs-section">
             <ClusterTabs />
           </div>
-          
-          {/* 3. 메인 콘텐츠 */}
+
           <div className="mobile-content-section">
-            <Cluster1Content />
+            {children}
           </div>
         </div>
       </main>
     );
   }
 
-  // 데스크탑 레이아웃 - JavaScript로 sticky 동작 구현
+  // 데스크탑 레이아웃
   return (
     <main ref={mainRef} className="nftg-content nftg-content-home">
       <Animations />
-      
+
       <div className="desktop-layout" style={{
         display: 'flex',
         gap: '20px',
         alignItems: 'flex-start',
         position: 'relative',
       }}>
-        {/* 사이드바 - JS로 스크롤 따라오기 */}
+        {/* 사이드바 */}
         <div
           ref={sidebarShellRef}
           className="sidebar-sticky-wrapper"
@@ -203,17 +191,21 @@ const Cluster1Page = () => {
             <Sidebar />
           </div>
         </div>
-        
+
         {/* 메인 콘텐츠 */}
-        <div className="home-two-content-col" style={{ flex: 1, minWidth: 0 }}>
+        <div
+          className="home-two-content-col"
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
           <ClusterTabs />
           <div className="home-two-content">
-            <Cluster1Content />
+            {children}
           </div>
         </div>
       </div>
     </main>
   );
-};
-
-export default Cluster1Page;
+}

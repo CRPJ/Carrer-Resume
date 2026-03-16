@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const Cluster41Content = () => {
@@ -10,6 +10,7 @@ const Cluster41Content = () => {
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
 
+  const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
@@ -28,12 +29,36 @@ const Cluster41Content = () => {
   const resultBtnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
+    // 고정 너비 레이아웃: 항상 데스크탑 모드
+    setIsMobile(false);
+  }, []);
+
+  // 필터 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (seasonBtnRef.current && !seasonBtnRef.current.contains(e.target as Node)) {
+        setSeasonDropdownOpen(false);
+      }
+      if (resultBtnRef.current && !resultBtnRef.current.contains(e.target as Node)) {
+        setResultDropdownOpen(false);
+      }
     };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (window.location.hash === '#weekly-filter-bar') {
+      const tryScroll = () => {
+        const el = document.getElementById('weekly-filter-bar');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 150;
+          window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' });
+        }
+      };
+      setTimeout(tryScroll, 500);
+      setTimeout(tryScroll, 1000);
+    }
   }, []);
 
   // 현재 시즌 정보 상태
@@ -1094,12 +1119,13 @@ const Cluster41Content = () => {
     });
 
     // 배열로 변환 후 정렬 (년도 내림차순, 시즌 순서)
-    return Array.from(uniqueSeasons.values())
+    const seasons = Array.from(uniqueSeasons.values())
       .sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year; // 년도 내림차순
         return (seasonOrder[b.season] || 0) - (seasonOrder[a.season] || 0); // 시즌 내림차순
       })
       .map(s => `${s.year}년, ${s.season} 시즌`);
+    return ["전체", ...seasons];
   }, [dbWeeklyData]);
 
   const resultOptions = [
@@ -1114,7 +1140,7 @@ const Cluster41Content = () => {
   const filteredDbData = dbWeeklyData.filter((week) => {
     // 시즌 필터
     let seasonMatch = true;
-    if (selectedSeason !== "역대 시즌") {
+    if (selectedSeason !== "역대 시즌" && selectedSeason !== "전체") {
       // "2025년, 여름 시즌" → year: 2025, season: 여름
       const seasonParts = selectedSeason.replace("년,", "").split(" ");
       const year = parseInt(seasonParts[0]); // 2025
@@ -1298,20 +1324,20 @@ const Cluster41Content = () => {
       <section className="cluster4-section1" ref={headerRef}>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <div className="tab active">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </div>
-          <Link href={`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`} className="tab">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
               <span className="badge-text">Season Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
-          </Link>
+          </div>
         </div>
 
         {/* 타이틀 */}
@@ -1323,7 +1349,7 @@ const Cluster41Content = () => {
 
         {/* 설명 텍스트 */}
         <div className="section1-description">
-          <p>이 페이지에서는 주차별로(weekly), 시즌별로(season) 차곡차곡 성장한 클럽의 내역이 나옵니다.</p>
+          <p>이 페이지에서는 주차별로(weekly), 시즌별로(season) 차곡차곡 성장한 크루의 내역이 나옵니다.</p>
           <p>잠깐의 열정과 객기는 누구나 가질 수 있지만, 역경과 부침, 짜증나는 고난과 요동치는 감정을 이겨내며 꾸준하게 성장할 수 있는 사람은 생각보다 적습니다.😊</p>
           <p className="small-text">1주, 1개월, 1분기, 1반기, 1년.. 세상에서 평가하는 나의 신뢰성은 어떠한가요?</p>
           <p className="quote-text">
@@ -1350,7 +1376,13 @@ const Cluster41Content = () => {
                 <h3 className="season-title-shadow">WEEKLY GROWTH</h3>
                 <h3 className="season-title">WEEKLY GROWTH</h3>
               </div>
-              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster4/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+              <div className="season-badge">
+                <svg className="badge-outline" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" stroke="#FAAB07" strokeWidth="1.69311" fill="none"/>
+                </svg>
+                <svg className="badge-border" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" fill="#FAAB07" stroke="#FAAB07" strokeWidth="1.69311"/>
+                </svg>
                 <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>
@@ -1554,7 +1586,7 @@ const Cluster41Content = () => {
             </button>
           </div>
         ) : (
-          <div className="weekly-filter-bar">
+          <div className="weekly-filter-bar" id="weekly-filter-bar">
             {/* 254x40 Reset 카드 */}
             <div
               className="filter-card filter-card-large"
@@ -1725,9 +1757,6 @@ const Cluster41Content = () => {
         {isMobile && filterSheetOpen && (
           <div
             className="filter-sheet-overlay"
-            onMouseDown={(e) => {
-              if (e.target === e.currentTarget) setFilterSheetOpen(false);
-            }}
           >
             <div className="filter-sheet" onMouseDown={(e) => e.stopPropagation()}>
               <div className="filter-sheet-header">

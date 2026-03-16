@@ -909,23 +909,19 @@ svg {
   }
 
   .nftg-layout {
-    width: calc(100% - 75px);
-    flex-grow: 1;
-    margin-left: 75px;
-    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    flex: 1;
+    min-width: 0;
+    height: auto;
     min-height: 100vh;
   }
 
   .nftg-content {
     padding: 0px 8px;
-    margin-top: var(--header-height, 66px);
     overflow-x: clip;
-    
+
     // nftg-content-home은 sticky 작동을 위해 overflow: visible 필요
     &.nftg-content-home {
       overflow: visible;
-      // 가로 오버플로우(원치 않는 스크롤바)만 차단하고,
-      // 세로/스티키 동작은 유지
       overflow-x: clip;
 
       @supports not (overflow-x: clip) {
@@ -935,12 +931,12 @@ svg {
   }
 
   .nftg-content-home {
-    // ★ 헤더 실제 높이(--header-divider-y)에 동기화 → 줌 레벨 변경 시에도 틈 없음
-    margin-top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
+    // sticky 헤더이므로 margin-top 불필요 (헤더가 flow에 있음)
+    margin-top: 4px;
 
     .home-two-sidebar {
       position: sticky;
-      top: calc(var(--header-divider-y, var(--header-height, 66px)) + 16px);
+      top: calc(var(--header-divider-y, var(--header-height, 66px)) + 4px);
     }
   }
 }
@@ -949,17 +945,11 @@ svg {
   display: flex;
   .nftg-sidebar {
     width: 0px;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-    }
+    display: none;
   }
 
   .nftg-layout {
-    width: 100%;
-    flex-grow: 1;
-    margin-left: 0px;
-    height: auto; // sticky 작동을 위해 100% -> auto로 변경
+    flex: 1;
     min-height: 100vh;
   }
 
@@ -1437,6 +1427,161 @@ svg {
   }
 }
 
-/* ==== 
+/* ====
+ --------- (2.04) Global Modal Style Unification ---------
+ Based on section1-modal reference (cluster2)
+ ==== */
+
+// 1. Modal Container — border-radius: 0 (sharp corners)
+.section1-modal,
+.section-modal,
+.edu-modal,
+.section4-modal,
+.intro-modal,
+.section21-modal,
+.section2-modal,
+.section3-modal,
+.delete-confirm-modal,
+.modal-content,
+.edit-modal-content {
+  border-radius: 0 !important;
+}
+
+// 2. Modal Header — divider + title/subtitle styles
+[class*="modal-header"] {
+  border-bottom: 1px solid rgba(255, 165, 0, 0.2) !important;
+
+  h3 {
+    color: #FAAB07 !important;
+    font-family: 'Cafe24Ohsquare', sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 34px !important;
+    word-wrap: break-word;
+  }
+
+  .modal-subtitle {
+    color: #fff !important;
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 30px !important;
+    word-wrap: break-word;
+  }
+}
+
+// 3. Modal Close Button — square bordered box (section1-modal style)
+[class*="modal-close"] {
+  width: 32px !important;
+  height: 32px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: #999 !important;
+  font-size: 1.125rem !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #ffa500 !important;
+    border-color: #ffa500 !important;
+  }
+}
+
+// 4. Modal Footer — divider + button fonts
+[class*="modal-footer"] {
+  border-top: 1px solid rgba(255, 165, 0, 0.2) !important;
+
+  button,
+  .cancel-btn,
+  .save-btn {
+    font-family: 'Pretendard', sans-serif !important;
+  }
+}
+
+// 5. Edit Modal (.resume-card) — 헤더/푸터 고정 + 본문 스크롤 레이아웃
+.edit-modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  font-family: 'Pretendard', sans-serif;
+
+  .edit-modal-header {
+    flex-shrink: 0;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .edit-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 165, 0, 0.5);
+      border-radius: 3px;
+
+      &:hover {
+        background: #FFA500;
+      }
+    }
+  }
+
+  .edit-modal-footer {
+    flex-shrink: 0;
+  }
+}
+
+// 6. Modal Dropdown (select) — hover cursor + background
+.edit-modal-content select,
+.section-modal select {
+  cursor: pointer !important;
+
+  &:hover {
+    background: #2a2f3e !important;
+  }
+
+  option {
+    cursor: pointer;
+    background: #1a1f2e;
+
+    &:hover {
+      background: #2a2f3e;
+    }
+  }
+}
+
+/* ====
+ --------- (2.04) global modal styles end ---------
+ ==== */
+
+/* ====
+ --------- (2.05) Floating Icons — edit/search 아이콘 y좌표 정렬 ---------
+ ==== */
+.floating-icons .edit-icon i {
+  line-height: 1;
+}
+/* ====
+ --------- (2.05) floating icon alignment end ---------
+ ==== */
+
+/* ====
  --------- (2.03) global styles end ---------
  ==== */

@@ -50,7 +50,7 @@
         position: absolute;
         right: 15px;
         top: auto !important;
-        bottom: -80px;
+        bottom: -70px;
         width: 759px;
         height: 957px;
         z-index: 10;
@@ -79,14 +79,14 @@
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {
-    width: 100%;
-    max-width: 1330px;
+    width: calc(100% + 27px);
+    max-width: none;
     height: 105px;
     position: relative;
     margin-bottom: 20px;
     background-image: url('/images/0/cluster4/4-1-card/bg img 1.png');
     background-size: cover;
-    background-position: center;
+    background-position: right center;
     background-repeat: no-repeat;
 
     // 70% 검정 오버레이
@@ -101,7 +101,7 @@
       z-index: 1;
     }
 
-    // 하단 주황색 divider (1023px)
+    // 하단 divider (1023px)
     &::after {
       content: '';
       position: absolute;
@@ -110,19 +110,25 @@
       transform: translateX(-50%);
       width: 1023px;
       height: 1px;
-      background: #FFA500;
+      background: #ECBB02;
+      z-index: 2;
     }
 
     // 네비게이션 버튼들
     .nav-buttons {
       position: absolute;
-      right: 20px;
+      right: 65px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       align-items: center;
       gap: 12px;
       z-index: 2;
+
+      // 모든 버튼 내 텍스트에 font-weight 명시 적용
+      span {
+        font-weight: 700 !important;
+      }
 
       .nav-btn-prev {
         display: flex;
@@ -134,11 +140,12 @@
         background: #fff;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 700 !important;
+        text-transform: capitalize;
+        line-height: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -170,11 +177,12 @@
         background: #FAAB07;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 700 !important;
+        text-transform: capitalize;
+        line-height: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
@@ -206,11 +214,12 @@
         background: #FFE3AA;
         border: none;
         border-radius: 12px;
-        color: #000;
+        color: #1A1A1A;
         font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 1rem;
-        font-weight: 700;
-        text-shadow: 0.3px 0 0 currentColor;
+        font-weight: 700 !important;
+        text-transform: capitalize;
+        line-height: 16px;
         text-decoration: none;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -219,6 +228,10 @@
           width: 16px;
           height: 16px;
           object-fit: contain;
+        }
+
+        span {
+          margin-left: -4px;
         }
 
         &:hover {
@@ -241,31 +254,38 @@
 
     .tab {
       position: relative;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: #000;
-      border: 1px solid #000;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
       text-decoration: none;
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.80), 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
+      width: 44px;
+      height: 44px;
 
-      &:hover {
-        background: #222;
+      // hover 브릿지: tab-badge까지 hover 영역 연결
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -8px;
+        width: 8px;
+        height: 100%;
       }
 
-      &.active {
+      // cluster4-1: 두번째 탭(book)이 active
+      &:first-child {
+        background: #161816;
+      }
+
+      &:last-child {
         background: #FAAB07;
-        border-color: #FAAB07;
-        box-shadow: 0 0 10px rgba(250, 171, 7, 0.8), 0 0 20px rgba(250, 171, 7, 0.5);
       }
 
       .tab-icon {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         object-fit: contain;
       }
 
@@ -273,21 +293,18 @@
         position: absolute;
         left: 100%;
         top: 50%;
-        transform: translateY(-50%) translateX(-10px);
-        margin-left: 8px;
-        display: flex;
+        transform: translateY(-50%);
+        display: none;
         align-items: center;
         justify-content: center;
         gap: 8px;
         background: #FFEC8F;
         padding: 8px 24px;
         border-radius: 8px;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.3s ease;
         white-space: nowrap;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         z-index: 100;
+        cursor: pointer;
 
         .badge-text {
           font-family: 'Pretendard', sans-serif;
@@ -304,9 +321,7 @@
       }
 
       &:hover .tab-badge {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(-50%) translateX(0);
+        display: flex;
       }
     }
   }
@@ -904,7 +919,7 @@
   width: 100%;
   padding: 0;
   background: transparent;
-  border-radius: 16px;
+  border-radius: 0;
   border: none;
 
   .detail-header {
@@ -948,10 +963,11 @@
   .floating-icons {
     display: flex;
     position: absolute;
-    top: 20px;
-    right: 46px;
+    top: 14px;
+    right: 47px;
     z-index: 100;
     gap: 5px;
+    align-items: center;
 
     .edit-icon {
       width: 22px;
@@ -971,13 +987,13 @@
       }
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 11px;
+        height: 11px;
       }
 
       img {
-        width: 12px;
-        height: 12px;
+        width: 11px;
+        height: 11px;
         object-fit: contain;
       }
 
@@ -1024,17 +1040,23 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-    gap: 24px;
+    gap: 38px;
     width: 100%;
-    padding: 0;
-    padding-top: 0;
-    margin-top: 0;
-    padding-right: 0;
-    overflow: hidden;
+    margin-top: 41px;
+    padding: 0 40px;
+    box-sizing: border-box;
+    overflow: visible;
 
-    .floating-icons {
-      top: 0;
-      right: 160px;
+    // 1번째 floating-icons: 연계 동료 편집
+    > .floating-icons:nth-child(1) {
+      top: 615px;
+      right: 40px;
+    }
+
+    // 2번째 floating-icons: 주차 평판 남기기
+    > .floating-icons:nth-child(2) {
+      top: 167px;
+      right: 40px;
     }
 
     // 왼쪽: 큰 주차 이미지
@@ -1106,9 +1128,9 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 5px;
       padding-top: 0;
-      margin-top: -18px;
+      margin-top: 0;
 
       // 헤더
       .section1-header {
@@ -1122,58 +1144,65 @@
           margin-bottom: 0;
 
           .section1-title {
+            color: var(--color-white-solid, white);
+            font-size: 32px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 2rem;
             font-weight: 800;
-            color: #fff;
+            text-transform: capitalize;
+            line-height: 44px;
+            word-wrap: break-word;
             margin: 0;
           }
 
           .status-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             background: transparent;
 
             &.success {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #9DFA07;
-                text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
             &.fail {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #FF6B6B;
-                text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
             &.rest-personal {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #65E3FF;
-                text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
             &.rest-official {
               span {
+                font-family: 'Manrope', sans-serif;
                 font-size: 1.375rem;
-                font-weight: 700;
+                font-weight: 800;
                 color: #FFEA48;
-                text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
               }
             }
 
             img {
-              width: 50px;
-              height: 50px;
+              width: 49px;
+              height: 54px;
               position: relative;
               top: -5px;
             }
@@ -1183,23 +1212,27 @@
         .header-info-row {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 0;
+          gap: 8px;
+          margin-top: 13px !important;
+          margin-bottom: 13px !important;
           flex-wrap: wrap;
 
           .info-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 16px;
-            height: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            gap: 6px;
+            height: 39px;
+            padding: 9px 12px;
+            border: none;
+            outline: 1px solid rgba(255, 255, 255, 0.12);
+            outline-offset: -1px;
             border-radius: 12px;
             font-family: 'Pretendard', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #fff;
-            margin-top: -8px;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--color-white-solid, white);
+            text-transform: capitalize;
+            line-height: 19px;
 
             img {
               width: 16px;
@@ -1208,8 +1241,12 @@
             }
 
             .highlight {
-              color: #FFA500;
-              font-weight: 700;
+              color: #FAAB07;
+              font-size: 16px;
+              font-family: 'Pretendard', sans-serif;
+              font-weight: 800;
+              text-transform: capitalize;
+              line-height: 19px;
             }
           }
         }
@@ -1252,7 +1289,10 @@
               align-items: center;
               gap: 4px;
               color: #fff;
+              font-family: 'Poppins', sans-serif;
               font-size: 0.875rem;
+              font-weight: 700;
+              line-height: 35px;
 
               .item-icon {
                 width: 16px;
@@ -1264,7 +1304,8 @@
                 font-family: 'Black Ops One', cursive;
                 color: #fff;
                 font-weight: 400;
-                font-size: 1.125rem;
+                font-size: 0.875rem;
+                line-height: 35px;
               }
             }
           }
@@ -1300,7 +1341,7 @@
         .section-title-row {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           margin-bottom: 12px;
 
           .section-icon {
@@ -1316,12 +1357,13 @@
           }
 
           .section-count {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             font-weight: 700;
             color: #fff;
 
             .count-num {
+              font-family: 'Chakra Petch', sans-serif;
               font-size: 1.125rem;
               font-weight: 700;
               color: #FFA500;
@@ -1581,7 +1623,7 @@
         .section-title-row {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           margin-bottom: 12px;
 
           .section-icon {
@@ -1590,19 +1632,20 @@
           }
 
           .section-label {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             font-weight: 700;
             color: #fff;
           }
 
           .section-count {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             font-weight: 700;
             color: #fff;
 
             .count-num {
+              font-family: 'Chakra Petch', sans-serif;
               font-size: 1.125rem;
               font-weight: 700;
               color: #FFA500;
@@ -1616,7 +1659,7 @@
           gap: 8px;
 
           .colleague-card {
-            width: 645px;
+            width: 100%;
             background: rgba(50, 50, 50, 0.8);
             border-radius: 20px;
             padding: 12px 14px;
@@ -1699,22 +1742,24 @@
   .reputation-cards-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
 
     .reputation-card {
       width: 100%;
-      height: 250px;
-      background: rgba(50, 50, 50, 0.8);
+      background: #232323;
       border-radius: 20px;
-      padding: 14px;
+      padding: 12px 15px;
       box-sizing: border-box;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
 
       .card-profile {
         display: flex;
         align-items: center;
         gap: 14px;
-        margin-bottom: 10px;
+        margin-bottom: 0;
 
         .profile-image {
           flex-shrink: 0;
@@ -1732,19 +1777,22 @@
           flex: 1;
           min-width: 0;
 
-          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; }
-          .label { color: #999; font-size: 0.875rem !important; }
+          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; font-size: 18px; line-height: 25px; }
+          .label { color: #999999; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 400; line-height: 25px; }
           .profile-name {
-            font-size: 1.125rem !important;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px !important;
+            color: rgba(255, 255, 255, 0.50);
+            font-weight: 400;
             margin-bottom: 2px;
-            .text { font-size: 1.125rem !important; }
+            line-height: 25px;
+            .text { font-size: 18px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; line-height: 25px; }
           }
           .profile-details {
-            font-size: 0.875rem !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2;
-            .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 0.875rem !important; }
-            .text { font-size: 0.875rem !important; }
-            .nickname { color: #FAAB07; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+            font-size: 14px !important; color: rgba(255, 255, 255, 0.50); line-height: 25px; font-weight: 400 !important;
+            .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; line-height: 25px; display: flex; align-items: baseline; overflow: hidden; }
+            .text { font-size: 14px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700 !important; line-height: 25px; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
+            .label { flex-shrink: 0; }
+            .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700 !important; line-height: 25px; }
           }
         }
       }
@@ -1752,25 +1800,25 @@
       .profile-divider {
         width: 100%;
         height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-        margin: 10px 0;
+        background: rgba(255, 255, 255, 0.08);
+        margin: 0;
       }
 
       .card-rating {
-        display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-        .stars { display: flex; align-items: center; gap: 1px;
-          img.star { width: 14px; height: 14px; object-fit: contain; display: block; }
+        display: flex; align-items: center; gap: 10px; margin-bottom: 0;
+        .stars { display: flex; align-items: center; gap: 4px;
+          img.star { width: 12.7px; height: 18px; object-fit: contain; display: block; }
           .star.half {
             position: relative;
-            width: 14px;
-            height: 14px;
+            width: 12.7px;
+            height: 18px;
             display: inline-block;
             img {
               position: absolute;
               left: 0;
               top: 0;
-              width: 14px;
-              height: 14px;
+              width: 12.7px;
+              height: 18px;
               object-fit: contain;
             }
             .star-half-filled {
@@ -1782,16 +1830,16 @@
             }
           }
         }
-        .rating-count { font-size: 0.75rem; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em; }
+        .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.7px; line-height: 18px; padding-left: 4px; }
       }
 
-      .card-description { font-size: 0.75rem; color: #fff; margin-bottom: 10px; font-family: 'Pretendard', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; .more-icon { width: 14px; height: 14px; object-fit: contain; } }
+      .card-description { font-size: 13px; color: #fff; margin-bottom: 0; font-family: 'Pretendard', sans-serif; font-weight: 600; line-height: 22px; display: flex; align-items: center; gap: 5px; .more-icon { width: 15px; height: 15px; object-fit: contain; } }
 
       .card-footer {
-        display: flex; align-items: center; gap: 8px;
-        .fm-badge { font-size: 1rem; color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.05em;  background: none; padding: 0; display: flex; align-items: center; gap: 4px; .wifi-icon { width: 14px; height: 14px; object-fit: contain; } }
-        .footer-divider { color: rgba(255, 255, 255, 0.3); }
-        .tag { font-size: 0.6rem; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.05em; line-height: 9.6px; }
+        display: flex; align-items: center; gap: 8px; padding: 3.5px 0 2.8px 0;
+        .fm-badge { font-size: 15px; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 400; line-height: 19.5px; letter-spacing: 0.7px; background: none; padding: 0; display: flex; align-items: center; gap: 8px; .wifi-icon { width: 13.7px; height: 13px; object-fit: contain; } }
+        .footer-divider { width: 1px; height: 15.2px; background: rgba(255, 255, 255, 0.1); color: transparent; }
+        .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.7px; line-height: 9.6px; }
       }
 
       &.empty {
@@ -1814,13 +1862,13 @@
   .colleague-cards {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 
     .colleague-card {
       width: 100%;
-      background: rgba(50, 50, 50, 0.8);
+      background: #232323;
       border-radius: 20px;
-      padding: 12px 14px;
+      padding: 12px 15px;
 
       &.empty {
         background: rgb(50, 50, 50) !important;
@@ -1854,14 +1902,15 @@
         }
         .profile-info {
           flex: 1; min-width: 0;
-          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; }
-          .label { color: #a3a3a3; font-size: 0.875rem !important; }
-          .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 0.75rem; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; height: 26px; padding: 0 16px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; white-space: nowrap; } .view-icon { width: 20px; height: 20px; object-fit: contain; filter: brightness(0) invert(1); } } }
-          .profile-name { font-size: 1.125rem !important; color: rgba(255, 255, 255, 0.5); .text { font-size: 1.125rem !important; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 800; } }-family: 'Pretendard', sans-serif; font-weight: 700; } }
-          .profile-details { font-size: 0.875rem !important; color: rgba(255, 255, 255, 0.5); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 0.875rem !important; } .text { font-size: 0.875rem !important; } .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+          .text { color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; font-size: 18px; line-height: 25px; }
+          .label { color: #999999; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 400; line-height: 25px; }
+          .profile-name-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; .date-view { display: flex; align-items: center; gap: 6px; .date { font-size: 0.75rem; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 800; height: 26px; padding: 8.5px 10px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; display: flex; align-items: center; justify-content: center; white-space: nowrap; } .view-icon { width: 24px; height: 24px; object-fit: contain; filter: brightness(0) invert(1); } } }
+          .profile-name { font-size: 18px !important; color: rgba(255, 255, 255, 0.50); line-height: 25px; .text { font-size: 18px !important; color: #fff; font-family: 'Manrope', sans-serif; font-weight: 800; line-height: 25px; } }
+          .profile-details { font-size: 14px !important; color: rgba(255, 255, 255, 0.50); font-weight: 400; line-height: 25px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; } .text { font-size: 14px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700; line-height: 25px; } .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700; line-height: 25px; } }
         }
       }
     }
+  }
 
   // ============================================
   // 섹션 2 레이아웃
@@ -1874,8 +1923,8 @@
     position: relative;
 
     .floating-icons {
-      top: 60px;
-      right: 46px;
+      top: 14px;
+      right: 47px;
     }
 
     &::before {
@@ -1914,16 +1963,16 @@
           width: 494px;
 
           .growth-title {
-            font-size: 1.25rem;
+            font-size: 22px;
             font-weight: 700;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             text-transform: uppercase;
-            line-height: 32px;
+            line-height: 33px;
         }
 
           .growth-count {
-            font-size: 1.125rem;
+            font-size: 18px;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
@@ -1934,13 +1983,13 @@
             gap: 6px;
 
             .star-icon {
-              width: 18px;
-              height: 18px;
+              width: 18.3px;
+              height: 13px;
               object-fit: contain;
             }
 
             .highlight {
-              font-size: 1.25rem;
+              font-size: 20px;
               font-weight: 700;
               color: #F59E0B;
               font-family: 'Chakra Petch', sans-serif;
@@ -1950,7 +1999,7 @@
 
         .progress-bar-container {
           width: 494px;
-          height: 12px;
+          height: 15.5px;
           background: #333532;
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 0;
@@ -1979,19 +2028,19 @@
           align-items: baseline;
 
           .number {
-            font-size: 2.25rem;
+            font-size: 40px;
             font-weight: 400;
-            color: #F59E0B;
+            color: #FAAB07;
             font-family: 'Black Ops One', cursive;
-            line-height: 36px;
+            line-height: 35px;
           }
 
           .percent {
-            font-size: 1.875rem;
+            font-size: 40px;
             font-weight: 400;
             color: #fff;
             font-family: 'Black Ops One', cursive;
-            line-height: 36px;
+            line-height: 35px;
           }
         }
       }
@@ -1999,18 +2048,18 @@
       .growth-right {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 9px;
         align-items: flex-start;
         margin-left: auto;
         margin-right: 64px;
 
         .growth-label {
-          font-size: 1.25rem;
+          font-size: 22px;
           font-weight: 700;
           color: #fff;
           font-family: 'Chakra Petch', sans-serif;
           text-transform: uppercase;
-          line-height: 20px;
+          line-height: 19px;
           position: relative;
           top: 5px;
       }
@@ -2023,15 +2072,18 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 1rem;
+            font-size: 16px;
             font-weight: 600;
             font-family: 'Manrope', sans-serif;
             color: #fff;
+            text-transform: capitalize;
+            white-space: nowrap;
 
             .legend-icon {
-              width: 44px;
-              height: 44px;
+              width: 45px;
+              height: 45px;
               object-fit: contain;
+              filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.5));
 
               &.glow {
                   transform: none;
@@ -2044,14 +2096,15 @@
 
     // 실무 정보 섹션
     .work-info-section {
+      margin-top: 75px;
       margin-bottom: 72px;
       position: relative;
-      padding-left: 24px;
+      padding-left: 40px;
       padding-right: 46px;
 
       .floating-icons {
-        top: 0;
-        right: 46px;
+        top: 14px;
+        right: 47px;
       }
 
       .section-header-row {
@@ -2063,31 +2116,34 @@
         .section-title-left {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 5px;
 
           .section-icon {
-            width: 36px;
-            height: 36px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
           }
 
           .section-name {
-            font-size: 1.875rem;
+            font-size: 28px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
             white-space: nowrap;
-            line-height: 40px;
+            line-height: 44px;
+            text-transform: capitalize;
             overflow: visible;
           }
 
           .section-count {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #FED7AA;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffe3aa;
             margin-left: 120px;
-            font-family: 'Pretendard', sans-serif;
-        
+            font-family: 'Manrope', sans-serif;
+            text-transform: capitalize;
+            line-height: 19px;
+
             .highlight {
                 font-size: 1.5rem;
                 font-weight: 800;
@@ -2103,18 +2159,22 @@
           margin-left: 120px;
 
           .rate-label {
-            font-size: 1.125rem;
+            font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-weight: 800;
+            text-transform: capitalize;
+            line-height: 19px;
         }
-        
+
         .rate-value {
-            font-size: 1.125rem;
+            font-size: 18px;
             color: #fff;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-weight: 800;
-        
+            text-transform: capitalize;
+            line-height: 19px;
+
             .highlight {
                 font-size: 1.5rem;
                 font-weight: 800;
@@ -2126,12 +2186,12 @@
 
       .work-info-cards {
         display: grid;
-        grid-template-columns: repeat(3, 412px);
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px;
 
         .work-info-card {
           position: relative;
-          width: 412px;
+          width: 100%;
           background: #232323;
           border-radius: 20px;
           overflow: visible;
@@ -2293,14 +2353,15 @@
       position: relative;
       margin-top: 120px;
       margin-bottom: 72px;
-      padding-left: 24px;
+      padding-left: 40px;
+      padding-right: 42px;
       overflow: visible;
       max-height: none;
       height: auto;
 
       .floating-icons {
-        top: 0;
-        right: 46px;
+        top: 14px;
+        right: 47px;
       }
 
       .section-header-row {
@@ -2312,31 +2373,34 @@
         .section-title-left {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 5px;
 
           .section-icon {
-            width: 36px;
-            height: 36px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
           }
 
           .section-name {
-            font-size: 1.875rem;
+            font-size: 28px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
             white-space: nowrap;
-            line-height: 40px;
+            line-height: 44px;
+            text-transform: capitalize;
             overflow: visible;
           }
 
           .section-count {
-            font-size: 1.125rem;
+            font-size: 20px;
             font-weight: 800;
-            color: #FED7AA;
+            color: #ffe3aa;
             margin-left: 120px;
             font-family: 'Manrope', sans-serif;
-        
+            text-transform: capitalize;
+            line-height: 19px;
+
             .highlight {
                 font-size: 1.5rem;
                 font-weight: 800;
@@ -2353,18 +2417,22 @@
           margin-left: 120px;
 
           .rate-label {
-            font-size: 1.125rem;
+            font-size: 18px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
+            text-transform: capitalize;
+            line-height: 19px;
           }
 
           .rate-value {
-            font-size: 1.125rem;
+            font-size: 18px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
-        
+            text-transform: capitalize;
+            line-height: 19px;
+
             .highlight {
                 font-size: 1.5rem;
                 font-weight: 800;
@@ -2382,7 +2450,8 @@
         overflow: visible;
         display: flex;
         flex-direction: row;
-        max-width: 71%;
+        width: 920px;
+        max-width: 100%;
         padding: 14px;
         gap: 12px;
 
@@ -2451,8 +2520,8 @@
           .card-title-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 7px;
             flex-wrap: wrap;
 
             .title-icon {
@@ -2462,57 +2531,56 @@
             }
 
             .card-title {
-              font-size: 0.875rem;
+              font-size: 14px;
               font-weight: 500;
-              color: #FEF9C3;
+              color: #ffec8f;
               font-family: 'Manrope', sans-serif;
               line-height: 16px;
             }
 
             .verified-icon {
-              width: 14px;
-              height: 14px;
+              width: 16px;
+              height: 16px;
               object-fit: contain;
               margin-left: 4px;
             }
 
             .verified-text {
-              font-size: 0.875rem;
+              font-size: 14px;
               font-weight: 500;
               color: #fff;
-              opacity: 0.6;
               font-family: 'Manrope', sans-serif;
               line-height: 16px;
             }
 
             .code-tag {
-              font-size: 0.875rem;
+              font-size: 14px;
               font-weight: 500;
-              color: #FEF9C3;
+              color: #ffec8f;
               font-family: 'Pretendard', sans-serif;
               line-height: 16px;
             }
 
             .info-tag {
-              font-size: 1rem;
-              color: #F59E0B;
-              background: rgba(245, 158, 11, 0.1);
-              padding: 4px 8px;
+              font-size: 15px;
+              color: #faab07;
+              background: rgba(250, 171, 7, 0.1);
+              padding: 4px 7.2px;
               border-radius: 4px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 600;
               white-space: nowrap;
-              line-height: 16px;
+              line-height: 15px;
             }
           }
 
           .main-desc {
-            font-size: 0.875rem;
+            font-size: 14px;
             color: #fff;
-            line-height: 1.6;
+            line-height: 21px;
             font-family: 'Pretendard', sans-serif;
             font-weight: 500;
-            margin: 0 0 12px 0;
+            margin: 0 0 10px 0;
           }
 
           .sub-title-row {
@@ -2528,18 +2596,18 @@
             }
 
             .sub-label {
-              font-size: 0.875rem;
+              font-size: 14px;
               font-weight: 500;
-              color: #FEF9C3;
+              color: #ffec8f;
               font-family: 'Manrope', sans-serif;
               line-height: 16px;
             }
           }
 
           .sub-desc {
-            font-size: 0.75rem;
+            font-size: 14px;
             color: #fff;
-            line-height: 1.5;
+            line-height: 21px;
             font-family: 'Pretendard', sans-serif;
             font-weight: 400;
             display: inline;
@@ -2613,8 +2681,8 @@
     position: relative;
 
     .floating-icons {
-      top: 60px;
-      right: 46px;
+      top: 14px;
+      right: 47px;
     }
 
     .section-header-row {
@@ -2626,31 +2694,34 @@
       .section-title-left {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
 
         .section-icon {
-          width: 36px;
-          height: 36px;
+          width: 45px;
+          height: 45px;
           object-fit: contain;
         }
 
         .section-name {
-          font-size: 1.875rem;
+          font-size: 28px;
           font-weight: 700;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
           white-space: nowrap;
-          line-height: 40px;
+          line-height: 44px;
+          text-transform: capitalize;
           overflow: visible;
         }
 
         .section-count {
-          font-size: 1.125rem;
+          font-size: 20px;
           font-weight: 800;
-          color: #FED7AA;
+          color: #ffe3aa;
           margin-left: 120px;
-          font-family: 'Pretendard', sans-serif;
-      
+          font-family: 'Manrope', sans-serif;
+          text-transform: capitalize;
+          line-height: 19px;
+
           .highlight {
               font-size: 1.5rem;
               font-weight: 800;
@@ -2666,18 +2737,22 @@
         margin-left: 120px;
 
         .rate-label {
-          font-size: 1.125rem;
+          font-size: 18px;
           color: #fff;
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Manrope', sans-serif;
           font-weight: 800;
+          text-transform: capitalize;
+          line-height: 19px;
         }
 
         .rate-value {
-          font-size: 1.125rem;
+          font-size: 18px;
           color: #fff;
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Manrope', sans-serif;
           font-weight: 800;
-      
+          text-transform: capitalize;
+          line-height: 19px;
+
           .highlight {
               font-size: 1.5rem;
               font-weight: 800;
@@ -2692,13 +2767,14 @@
     .work-career-section {
         margin-bottom: 20px;
         position: relative;
-        padding-left: 24px;
+        padding-left: 40px;
     }
     .work-career-section {
       margin-top: 70px;
+      padding-right: 42px;
 
       .section-bottom-divider {
-        margin: 30px auto 0 auto;
+        margin: 60px auto 0 auto;
       }
     }
 
@@ -2706,8 +2782,8 @@
     .work-career-section {
 
       .floating-icons {
-        top: 0;
-        right: 46px;
+        top: 14px;
+        right: 47px;
       }
 
       .section-bottom-divider {
@@ -2733,7 +2809,7 @@
           display: flex;
           flex-direction: column;
           padding: 14px;
-          gap: 12px;
+          gap: 15px;
 
           &.empty {
             opacity: 1;
@@ -2742,7 +2818,7 @@
           .card-top-row {
             display: flex;
             flex-direction: row;
-            gap: 12px;
+            gap: 20px;
 
             .card-icon-area {
               width: 60px;
@@ -2776,27 +2852,27 @@
               .card-header-row {
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 10px;
                 margin-bottom: 6px;
 
                 .code-tag {
-                  font-size: 0.875rem;
+                  font-size: 14px;
                   font-weight: 500;
-                  color: #FEF9C3;
+                  color: #ffec8f;
                   font-family: 'Manrope', sans-serif;
                   line-height: 16px;
                 }
 
                 .badge-tag {
-                  font-size: 1rem;
-                  color: #F59E0B;
-                  background: rgba(245, 158, 11, 0.1);
-                  padding: 4px 8px;
+                  font-size: 15px;
+                  color: #faab07;
+                  background: rgba(250, 171, 7, 0.1);
+                  padding: 4px 7.2px;
                   border-radius: 4px;
                   font-family: 'Pretendard', sans-serif;
                   font-weight: 600;
                   white-space: nowrap;
-                  line-height: 16px;
+                  line-height: 15px;
                 }
               }
 
@@ -2855,12 +2931,13 @@
           .card-bottom-area {
             display: flex;
             flex-direction: column;
+            gap: 15px;
 
             .card-title-row {
               display: flex;
               align-items: center;
               gap: 10px;
-              margin-bottom: 8px;
+              margin-bottom: 0;
 
               .title-icon {
                 width: 16px;
@@ -2869,44 +2946,43 @@
               }
 
               .card-title {
-                font-size: 0.875rem;
+                font-size: 14px;
                 font-weight: 500;
-                color: #FEF9C3;
+                color: #ffec8f;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
               }
 
               .verified-icon {
-                width: 14px;
-                height: 14px;
+                width: 16px;
+                height: 16px;
                 object-fit: contain;
                 margin-left: 4px;
               }
 
               .verified-text {
-                font-size: 0.875rem;
+                font-size: 14px;
                 font-weight: 500;
                 color: #fff;
-                opacity: 0.6;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
               }
             }
 
             .main-desc {
-              font-size: 0.875rem;
+              font-size: 14px;
               color: #fff;
-              line-height: 1.6;
+              line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 500;
-              margin: 0 0 12px 0;
+              margin: 0;
             }
 
             .sub-title-row {
               display: flex;
               align-items: center;
-              gap: 10px;
-              margin-bottom: 8px;
+              gap: 6px;
+              margin-bottom: 0;
 
               .sub-icon {
                 width: 16px;
@@ -2915,18 +2991,18 @@
               }
 
               .sub-label {
-                font-size: 0.875rem;
+                font-size: 14px;
                 font-weight: 500;
-                color: #FEF9C3;
+                color: #ffec8f;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
               }
             }
 
             .sub-desc {
-              font-size: 0.875rem;
+              font-size: 14px;
               color: #fff;
-              line-height: 1.5;
+              line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 400;
               display: inline;
@@ -2949,9 +3025,10 @@
             z-index: 10;
 
             img {
-              width: 55px;
-              height: 55px;
+              width: 53px;
+              height: 53px;
               object-fit: contain;
+              filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.5));
             }
           }
         }
@@ -2959,15 +3036,15 @@
 
       .work-career-cards {
         display: grid;
-        grid-template-columns: repeat(3, 384px);
+        grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(2, auto);
-        gap: 16px;
+        gap: 20px;
 
         .work-career-card {
           position: relative;
-          width: 384px;
+          width: 100%;
           min-height: 457px;
-          background: #232323;
+          background: #1e1e1e;
           border-radius: 20px;
           overflow: visible;
           display: flex;
@@ -2997,7 +3074,7 @@
           .card-top-row {
             display: flex;
             flex-direction: row;
-            gap: 12px;
+            gap: 20px;
 
             .card-icon-area {
               width: 70px;
@@ -3033,24 +3110,23 @@
                 margin-bottom: 6px;
 
                 .verified-icon {
-                  width: 14px;
-                  height: 14px;
+                  width: 16px;
+                  height: 16px;
                   object-fit: contain;
                 }
 
                 .verified-text {
-                  font-size: 0.875rem;
+                  font-size: 14px;
                   font-weight: 500;
                   color: #fff;
-                  opacity: 0.6;
                   font-family: 'Manrope', sans-serif;
                   line-height: 16px;
                 }
 
                 .code-tag {
-                  font-size: 0.875rem;
+                  font-size: 14px;
                   font-weight: 500;
-                  color: #FEF9C3;
+                  color: #ffec8f;
                   font-family: 'Manrope', sans-serif;
                   line-height: 16px;
                 }
@@ -3076,31 +3152,33 @@
               }
 
               .card-title {
-                font-size: 0.875rem;
+                font-size: 14px;
                 font-weight: 500;
-                color: #FEF9C3;
+                color: #ffec8f;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
               }
 
               .verified-icon {
-                width: 14px;
-                height: 14px;
+                width: 16px;
+                height: 16px;
                 object-fit: contain;
                 margin-left: 4px;
               }
 
               .verified-text {
-                font-size: 0.75rem;
-                color: rgba(255, 255, 255, 0.6);
-                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                font-family: 'Manrope', sans-serif;
+                line-height: 16px;
               }
             }
 
             .main-desc {
-              font-size: 0.75rem;
+              font-size: 14px;
               color: #fff;
-              line-height: 1.6;
+              line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 500;
               margin: 0 0 12px 0;
@@ -3109,7 +3187,7 @@
             .sub-title-row {
               display: flex;
               align-items: center;
-              gap: 10px;
+              gap: 6px;
               margin-bottom: 8px;
 
               .sub-icon {
@@ -3119,18 +3197,18 @@
               }
 
               .sub-label {
-                font-size: 0.875rem;
+                font-size: 14px;
                 font-weight: 500;
-                color: #FEF9C3;
+                color: #ffec8f;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
               }
             }
 
             .sub-desc {
-              font-size: 0.875rem;
+              font-size: 14px;
               color: #fff;
-              line-height: 1.5;
+              line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 400;
               display: inline;
@@ -3156,9 +3234,10 @@
             align-items: center;
 
             img {
-              width: 55px;
-              height: 55px;
+              width: 53px;
+              height: 53px;
               object-fit: contain;
+              filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.5));
             }
 
             .not-applicable-text {
@@ -3177,38 +3256,35 @@
         .work-career-card {
           .grade-row {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             margin-bottom: 10px;
 
             .grade {
               width: 36px;
-              height: 36px;
-              border-radius: 50%;
-              background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
+              height: 35px;
+              border-radius: 30px;
+              background: #bebebe;
               color: #9C9C9C;
-              font-size: 1.5rem;
-              line-height: 24px;
+              font-size: 25px;
+              line-height: 25px;
               font-weight: 400;
               display: flex;
               align-items: center;
               justify-content: center;
               font-family: 'Black Ops One', sans-serif;
-              text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
+              text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
               box-shadow:
-                3px 3px 6px rgba(0, 0, 0, 0.3),
-                -2px -2px 4px rgba(255, 255, 255, 0.1),
-                inset 1px 1px 2px rgba(255, 255, 255, 0.3),
-                inset -1px -1px 2px rgba(0, 0, 0, 0.1);
+                inset 0 4px 4px rgba(255, 255, 255, 0.5),
+                inset -2px -5px 4px rgba(0, 0, 0, 0.2);
 
               &.active {
-                background: linear-gradient(145deg, #ffbc1a, #d99200);
+                background: #faab07;
                 color: #fff;
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35), 0 0 10px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 220, 100, 0.7), 0 0 30px rgba(255, 200, 50, 0.5);
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
                 box-shadow:
-                  3px 3px 6px rgba(0, 0, 0, 0.3),
-                  -2px -2px 4px rgba(255, 200, 50, 0.2),
-                  inset 1px 1px 2px rgba(255, 255, 255, 0.4),
-                  inset -1px -1px 2px rgba(0, 0, 0, 0.1);
+                  0 0 15px rgba(255, 225, 159, 0.6),
+                  inset 0 4px 4px rgba(255, 255, 255, 0.5),
+                  inset -2px -5px 4px rgba(0, 0, 0, 0.2);
               }
             }
           }
@@ -3216,22 +3292,22 @@
           .category-text {
             display: inline-block;
             width: fit-content;
-            font-size: 1rem;
-            color: #F59E0B;
-            background: rgba(245, 158, 11, 0.1);
-            padding: 4px 8px;
+            font-size: 15px;
+            color: #faab07;
+            background: rgba(250, 171, 7, 0.1);
+            padding: 4px 7.2px;
             border-radius: 4px;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 500;
             white-space: nowrap;
-            line-height: 16px;
+            line-height: 15px;
             margin: 0 0 10px 0;
           }
 
           .main-desc-white {
-            font-size: 0.875rem;
+            font-size: 14px;
             color: #fff;
-            line-height: 1.6;
+            line-height: 21px;
             font-family: 'Pretendard', sans-serif;
             font-weight: 500;
             margin: 0 0 12px 0;
@@ -3281,18 +3357,18 @@
                   gap: 4px;
 
                   .supervised-text {
-                    font-size: 0.75rem;
+                    font-size: 12px;
                     color: rgba(255, 255, 255, 0.3);
                     font-family: 'Azeret Mono', monospace;
-                    line-height: 20px;
+                    line-height: 19px;
                   }
 
                   .profile-name {
-                    font-size: 0.75rem;
+                    font-size: 14px;
                     font-weight: 400;
                     color: #fff;
                     font-family: 'Pretendard', sans-serif;
-                    line-height: 20px;
+                    line-height: 19px;
 
                     strong {
                       font-weight: 700;
@@ -3317,10 +3393,10 @@
             margin-top: 12px;
 
             .current-bid {
-              font-size: 0.75rem;
+              font-size: 12px;
               color: rgba(255, 255, 255, 0.3);
               font-family: 'Azeret Mono', monospace;
-              line-height: 20px;
+              line-height: 19px;
             }
 
             .date-view {
@@ -3591,25 +3667,62 @@
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    overflow-y: auto;
-    padding: 40px 0;
+    overflow: hidden;
     padding-left: 73px;
   }
 
   .section-modal {
     width: 504px;
-    height: 606px;
     max-width: none;
-    max-height: 606px;
+    max-height: calc(100vh - 80px);
     background: #0d1117;
-    border: 1px solid #FFA500;
-    border-radius: 0;
+    border: 1px solid #FAAB07;
+    border-radius: 16px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
 
     &.section-modal-wide {
       width: 700px;
+    }
+
+    &.section-modal-work-edit {
+      width: 520px;
+      height: 690px;
+      max-height: calc(100vh - 80px);
+    }
+
+    &.section-modal-colleague-edit {
+      width: 480px;
+      height: auto;
+      max-height: 80vh;
+    }
+
+    &.section-modal-reputation-form {
+      width: 487px;
+      height: 448px;
+      max-height: 448px;
+
+      .section-modal-header {
+        padding: 16px 20px 10px;
+
+        h3 {
+          font-size: 1.125rem;
+          padding-top: 4px;
+        }
+
+        .modal-subtitle {
+          font-size: 0.75rem;
+        }
+      }
+
+      .section-modal-body {
+        padding: 10px 20px;
+      }
+
+      .section-modal-footer {
+        padding: 14px 20px;
+      }
     }
 
     .section-modal-header {
@@ -3623,13 +3736,14 @@
       min-height: auto;
       border-bottom: none;
       background: transparent;
+      flex-shrink: 0;
 
       h3 {
         margin: 0;
         font-family: 'Cafe24Ohsquare', sans-serif;
         font-size: 1.375rem;
         font-weight: 700;
-        color: #FFA500;
+        color: #FAAB07;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -3639,7 +3753,7 @@
         &::before {
           content: '✦';
           font-size: 0.875rem;
-          color: #FFA500;
+          color: #FAAB07;
         }
       }
 
@@ -4518,7 +4632,9 @@
 
     // 주차 평판 상세보기 모달
     &.reputation-view-modal {
-      max-width: 480px;
+      width: 480px;
+      height: 454px;
+      max-height: calc(100vh - 80px);
 
       .section-modal-header {
         display: flex;
@@ -4765,7 +4881,9 @@
     // 연계 동료 상세보기 모달
     &.colleague-view-modal {
       width: 660px;
+      height: 364px;
       max-width: 90vw;
+      max-height: calc(100vh - 80px);
 
       .section-modal-header {
         display: flex;
@@ -4961,8 +5079,18 @@
 
     // 실무 정보/역량/경험/경력 상세보기 모달
     &.work-view-modal {
-      width: 650px;
+      width: 540px;
+      height: 85vh;
       max-width: 90vw;
+      max-height: calc(100vh - 40px);
+
+      .work-view-fixed {
+        flex-shrink: 0;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
       .section-modal-header {
         display: flex;
@@ -5306,7 +5434,7 @@
         .header-edit-title {
           font-size: 1rem;
           font-weight: 700;
-          color: #FFA500;
+          color: #FAAB07;
           font-family: 'Pretendard', sans-serif;
           margin-bottom: 16px;
 
@@ -5367,8 +5495,8 @@
 
               &:focus {
                 outline: none;
-                border-color: #FFA500;
-                box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                border-color: #FAAB07;
+                box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
               }
 
               &.readonly-input {
@@ -5408,11 +5536,11 @@
                 &:hover,
                 &.active,
                 &:has(input:checked) {
-                  background: rgba(255, 165, 0, 0.15);
-                  border-color: #FFA500;
+                  background: rgba(250, 171, 7, 0.15);
+                  border-color: #FAAB07;
 
                   span {
-                    color: #FFA500;
+                    color: #FAAB07;
                   }
                 }
               }
@@ -5434,7 +5562,7 @@
 
                 &:focus {
                   outline: none;
-                  border-color: #FFA500;
+                  border-color: #FAAB07;
                 }
               }
 
@@ -5444,7 +5572,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #FFA500;
+                background: #FAAB07;
                 border: none;
                 border-radius: 8px;
                 cursor: pointer;
@@ -5529,7 +5657,7 @@
 
                 .crew-nickname {
                   font-size: 0.75rem;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Pretendard', sans-serif;
                 }
               }
@@ -5538,10 +5666,10 @@
             .crew-actions {
               .view-btn {
                 padding: 8px 16px;
-                background: rgba(255, 165, 0, 0.15);
-                border: 1px solid #FFA500;
+                background: rgba(250, 171, 7, 0.15);
+                border: 1px solid #FAAB07;
                 border-radius: 6px;
-                color: #FFA500;
+                color: #FAAB07;
                 font-size: 0.8125rem;
                 font-weight: 600;
                 font-family: 'Pretendard', sans-serif;
@@ -5549,7 +5677,7 @@
                 transition: all 0.2s ease;
 
                 &:hover {
-                  background: #FFA500;
+                  background: #FAAB07;
                   color: #000;
                 }
               }
@@ -5559,8 +5687,8 @@
 
         // 연계 동료 안내 문구
         &.colleague-guide {
-          background: rgba(255, 165, 0, 0.08);
-          border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+          background: rgba(250, 171, 7, 0.08);
+          border-bottom: 1px solid rgba(250, 171, 7, 0.2);
 
           .guide-text {
             p {
@@ -5575,7 +5703,7 @@
               }
 
               .guide-requirement {
-                color: #FFA500;
+                color: #FAAB07;
                 font-size: 0.875rem;
               }
 
@@ -5590,9 +5718,9 @@
         .count-badge {
           display: inline-block;
           padding: 2px 10px;
-          background: rgba(255, 165, 0, 0.2);
+          background: rgba(250, 171, 7, 0.2);
           border-radius: 12px;
-          color: #FFA500;
+          color: #FAAB07;
           font-size: 0.8125rem;
           font-weight: 600;
           margin-left: 8px;
@@ -5606,7 +5734,7 @@
 
           .selected-colleague-card {
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 165, 0, 0.3);
+            border: 1px solid rgba(250, 171, 7, 0.3);
             border-radius: 12px;
             padding: 12px;
 
@@ -5624,7 +5752,7 @@
                 .to-text {
                   font-size: 1.25rem;
                   font-weight: 700;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Georgia', serif;
                   font-style: italic;
                 }
@@ -5634,7 +5762,7 @@
                   font-weight: 800;
                   color: #fff;
                   font-family: 'Georgia', serif;
-                  text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+                  text-shadow: 0 0 10px rgba(250, 171, 7, 0.5);
                 }
               }
 
@@ -5644,7 +5772,7 @@
                 justify-content: center;
                 width: 28px;
                 height: 28px;
-                background: #FFA500;
+                background: #FAAB07;
                 border-radius: 50%;
                 color: #000;
                 font-size: 0.875rem;
@@ -5688,7 +5816,7 @@
                 height: 52px;
                 border-radius: 50%;
                 overflow: hidden;
-                border: 2px solid rgba(255, 165, 0, 0.4);
+                border: 3px solid #FAAB07;
                 flex-shrink: 0;
                 background: #CCC;
 
@@ -5735,7 +5863,7 @@
 
                 .colleague-nickname {
                   font-size: 0.6875rem;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Pretendard', sans-serif;
                 }
               }
@@ -5749,7 +5877,7 @@
                 display: block;
                 font-size: 0.75rem;
                 font-weight: 600;
-                color: #FFA500;
+                color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
                 margin-bottom: 6px;
 
@@ -5785,8 +5913,8 @@
 
                   &:focus {
                     outline: none;
-                    border-color: #FFA500;
-                    box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                    border-color: #FAAB07;
+                    box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
                   }
                 }
 
@@ -5846,7 +5974,7 @@
                 &.add-sublabel {
                   font-size: 0.75rem;
                   font-weight: 400;
-                  color: #FFA500;
+                  color: #FAAB07;
                 }
               }
             }
@@ -5855,20 +5983,20 @@
               cursor: pointer;
 
               &:hover {
-                background: rgba(255, 165, 0, 0.08);
-                border-color: rgba(255, 165, 0, 0.4);
+                background: rgba(250, 171, 7, 0.08);
+                border-color: rgba(250, 171, 7, 0.4);
 
                 .add-icon {
-                  background: rgba(255, 165, 0, 0.3);
-                  border-color: #FFA500;
+                  background: rgba(250, 171, 7, 0.3);
+                  border-color: #FAAB07;
 
                   svg {
-                    color: #FFA500;
+                    color: #FAAB07;
                   }
                 }
 
                 span {
-                  color: #FFA500;
+                  color: #FAAB07;
                 }
               }
             }
@@ -5905,8 +6033,8 @@
             transition: all 0.2s ease;
 
             &:hover {
-              background: rgba(255, 165, 0, 0.05);
-              border-color: rgba(255, 165, 0, 0.2);
+              background: rgba(250, 171, 7, 0.05);
+              border-color: rgba(250, 171, 7, 0.2);
             }
 
             .crew-profile {
@@ -5919,7 +6047,7 @@
                 height: 40px;
                 border-radius: 50%;
                 overflow: hidden;
-                border: 1px solid rgba(255, 165, 0, 0.3);
+                border: 1px solid rgba(250, 171, 7, 0.3);
 
                 img {
                   width: 100%;
@@ -5951,7 +6079,7 @@
 
                 .crew-nickname {
                   font-size: 0.6875rem;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Pretendard', sans-serif;
                 }
               }
@@ -5959,10 +6087,10 @@
 
             .select-btn {
               padding: 6px 14px;
-              background: rgba(255, 165, 0, 0.15);
-              border: 1px solid #FFA500;
+              background: rgba(250, 171, 7, 0.15);
+              border: 1px solid #FAAB07;
               border-radius: 6px;
-              color: #FFA500;
+              color: #FAAB07;
               font-size: 0.75rem;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
@@ -5970,7 +6098,7 @@
               transition: all 0.2s ease;
 
               &:hover {
-                background: #FFA500;
+                background: #FAAB07;
                 color: #000;
               }
             }
@@ -5992,14 +6120,14 @@
                 transition: all 0.2s ease;
 
                 &:hover {
-                  background: rgba(255, 165, 0, 0.2);
-                  border-color: #FFA500;
-                  color: #FFA500;
+                  background: rgba(250, 171, 7, 0.2);
+                  border-color: #FAAB07;
+                  color: #FAAB07;
                 }
 
                 &:nth-child(1) {
                   &:hover, &.selected {
-                    background: linear-gradient(135deg, #FFD700, #FFA500);
+                    background: linear-gradient(135deg, #FFD700, #FAAB07);
                     border-color: #FFD700;
                     color: #000;
                     box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
@@ -6057,7 +6185,7 @@
               display: block;
               font-size: 0.875rem;
               font-weight: 600;
-              color: #FFA500;
+              color: #FAAB07;
               font-family: 'Pretendard', sans-serif;
               margin-bottom: 10px;
 
@@ -6120,7 +6248,7 @@
               .rating-value {
                 font-size: 0.75rem;
                 font-weight: 600;
-                color: #FFA500;
+                color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
               }
             }
@@ -6147,8 +6275,8 @@
 
                 &:focus {
                   outline: none;
-                  border-color: #FFA500;
-                  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                  border-color: #FAAB07;
+                  box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
                 }
               }
 
@@ -6173,14 +6301,14 @@
               transition: all 0.2s ease;
 
               &:focus-within {
-                border-color: #FFA500;
-                box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                border-color: #FAAB07;
+                box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
               }
 
               .hashtag {
                 font-size: 1rem;
                 font-weight: 700;
-                color: #FFA500;
+                color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
               }
 
@@ -6218,7 +6346,7 @@
 
           .reputation-reviewer-card {
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 165, 0, 0.3);
+            border: 1px solid rgba(250, 171, 7, 0.3);
             border-radius: 12px;
             padding: 14px;
 
@@ -6231,7 +6359,7 @@
               .reviewer-badge {
                 font-size: 1.125rem;
                 font-weight: 700;
-                color: #FFA500;
+                color: #FAAB07;
                 font-family: 'Georgia', serif;
                 font-style: italic;
               }
@@ -6272,7 +6400,7 @@
                 height: 40px;
                 border-radius: 50%;
                 overflow: hidden;
-                border: 2px solid rgba(255, 165, 0, 0.4);
+                border: 2px solid rgba(250, 171, 7, 0.4);
                 flex-shrink: 0;
 
                 img {
@@ -6310,7 +6438,7 @@
                 display: block;
                 font-size: 0.6875rem;
                 font-weight: 600;
-                color: #FFA500;
+                color: #FAAB07;
                 font-family: 'Pretendard', sans-serif;
                 margin-bottom: 4px;
 
@@ -6373,7 +6501,7 @@
                 .rating-value {
                   font-size: 0.75rem;
                   font-weight: 600;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Pretendard', sans-serif;
                 }
               }
@@ -6396,8 +6524,8 @@
 
                 &:focus {
                   outline: none;
-                  border-color: #FFA500;
-                  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                  border-color: #FAAB07;
+                  box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
                 }
               }
 
@@ -6412,14 +6540,14 @@
                 transition: all 0.2s ease;
 
                 &:focus-within {
-                  border-color: #FFA500;
-                  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+                  border-color: #FAAB07;
+                  box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
                 }
 
                 .hashtag {
                   font-size: 0.75rem;
                   font-weight: 700;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-family: 'Pretendard', sans-serif;
                 }
 
@@ -6502,20 +6630,20 @@
               }
 
               &:hover {
-                background: rgba(255, 165, 0, 0.08);
-                border-color: rgba(255, 165, 0, 0.4);
+                background: rgba(250, 171, 7, 0.08);
+                border-color: rgba(250, 171, 7, 0.4);
 
                 .add-icon {
-                  background: rgba(255, 165, 0, 0.3);
-                  border-color: #FFA500;
+                  background: rgba(250, 171, 7, 0.3);
+                  border-color: #FAAB07;
 
                   svg {
-                    color: #FFA500;
+                    color: #FAAB07;
                   }
                 }
 
                 span {
-                  color: #FFA500;
+                  color: #FAAB07;
                 }
               }
             }
@@ -6546,11 +6674,11 @@
         .edit-badge {
           display: inline-block;
           padding: 2px 8px;
-          background: rgba(255, 165, 0, 0.2);
+          background: rgba(250, 171, 7, 0.2);
           border-radius: 4px;
           font-size: 0.6875rem;
           font-weight: 600;
-          color: #FFA500;
+          color: #FAAB07;
           margin-left: 8px;
         }
 
@@ -6602,7 +6730,7 @@
 
             .profile-fm {
               font-size: 0.75rem;
-              color: #FFA500;
+              color: #FAAB07;
               font-weight: 600;
               font-family: 'Pretendard', sans-serif;
             }
@@ -6639,7 +6767,7 @@
               }
 
               &.active svg {
-                filter: drop-shadow(0 0 6px rgba(255, 165, 0, 0.6));
+                filter: drop-shadow(0 0 6px rgba(250, 171, 7, 0.6));
               }
             }
           }
@@ -6647,7 +6775,7 @@
           .rating-value {
             font-size: 1.125rem;
             font-weight: 700;
-            color: #FFA500;
+            color: #FAAB07;
             font-family: 'Pretendard', sans-serif;
           }
         }
@@ -6675,8 +6803,8 @@
 
             &:focus {
               outline: none;
-              border-color: #FFA500;
-              box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+              border-color: #FAAB07;
+              box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
             }
           }
 
@@ -6706,14 +6834,14 @@
             transition: all 0.2s ease;
 
             &:focus-within {
-              border-color: #FFA500;
-              box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+              border-color: #FAAB07;
+              box-shadow: 0 0 0 2px rgba(250, 171, 7, 0.2);
             }
 
             .hashtag {
               font-size: 1rem;
               font-weight: 700;
-              color: #FFA500;
+              color: #FAAB07;
               font-family: 'Pretendard', sans-serif;
             }
 

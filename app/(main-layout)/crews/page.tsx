@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Animations from "@/components/shared/Animations";
 import Breadcrumb from "@/components/shared/Breadcrumb";
+import { useDataMasking } from "@/hooks/useDataMasking";
 
 interface Crew {
   id: string;
@@ -37,6 +38,7 @@ const statusOptions = ["활동 중", "활동 졸업", "활동 중단"];
 const ITEMS_PER_PAGE = 50;
 
 const page = () => {
+  const { mask } = useDataMasking();
   const [crews, setCrews] = useState<Crew[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -66,12 +68,7 @@ const page = () => {
   const statusRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < 1200);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    setIsMobile(false);
   }, []);
 
   useEffect(() => {
@@ -183,7 +180,7 @@ const page = () => {
         <div className="container-fluid" style={{ paddingLeft: 15, paddingRight: 15, maxWidth: '100%' }}>
 
           {/* 필터 바 — cluster4-weekly-list 래퍼로 기존 CSS 활용 */}
-          <div className="cluster4-weekly-list" style={{ padding: 0, margin: 0, maxWidth: '100%' }}>
+          <div className="cluster4-weekly-list crews-filter-only" style={{ padding: 0, margin: 0, maxWidth: '100%', background: 'transparent' }}>
           {isMobile ? (
             <div className="weekly-filter-bar weekly-filter-bar--mobile" onKeyDown={handleKeyDown}>
               <button
@@ -590,9 +587,9 @@ const page = () => {
                             <p className="text-sm fw-6">
                               <Link href={`/cluster-4?userId=${crew.id}`} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
                             </p>
-                            <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={crew.universityMajor}>
+                            <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={`${mask.school(crew.university)} ${mask.major(crew.major)}`}>
                               <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
-                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{crew.universityMajor}</span>
+                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mask.school(crew.university)} {mask.major(crew.major)}</span>
                             </p>
                           </div>
                           <div className="trending__single-footer">

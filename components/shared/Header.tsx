@@ -221,12 +221,12 @@ const Header = () => {
           <div className="row">
             <div className="col-12">
               <nav className="navbar p-0">
-                <div className="navbar__logo d-xl-none">
+                <div className="navbar__logo d-none">
                   <Link href="/" aria-label="home page" title="logo" className="not-cursor">
                     <Image src={logo} alt="Image" width={77} height={77} />
                   </Link>
                 </div>
-                <div className="navbar__menu d-none d-xl-block">
+                <div className="navbar__menu">
                   <ul className="navbar__list">
                     {menu.map(({ id, title, url, submenus }) => (
                       <Fragment key={id}>
@@ -303,7 +303,7 @@ const Header = () => {
                       <i className="ti ti-bell"></i>
                       <span>3</span>
                     </button>
-                    <Link href="/profile" className="wallet-ic d-none d-xl-none" title="view wallet">
+                    <Link href="/profile" className="wallet-ic d-none" title="view wallet">
                       <span className="icon-drop">
                         <i className="ti ti-wallet"></i>
                       </span>
@@ -320,7 +320,7 @@ const Header = () => {
                       {/* <FontSizeControl /> */}
                     </div>
                     <Profile />
-                    <button onClick={() => setMobileMenu(true)} className={`open-offcanvas-nav d-flex d-xl-none open-mobile-menu ${mobileMenu && "open-offcanvas-nav-active"}`} aria-label="toggle mobile menu" title="open offcanvas menu">
+                    <button onClick={() => setMobileMenu(true)} className={`open-offcanvas-nav d-none open-mobile-menu ${mobileMenu && "open-offcanvas-nav-active"}`} aria-label="toggle mobile menu" title="open offcanvas menu">
                       <span className="icon-bar top-bar"></span>
                       <span className="icon-bar middle-bar"></span>
                       <span className="icon-bar bottom-bar"></span>
@@ -333,7 +333,7 @@ const Header = () => {
         </div>
 
         {/* <!-- ==== mobile menu start ==== --> */}
-        <div className={`mobile-menu d-block d-xl-none ${mobileMenu && "show-menu"}`}>
+        <div className={`mobile-menu d-none ${mobileMenu && "show-menu"}`}>
           <nav className={`mobile-menu__wrapper`}>
             <div className="mobile-menu__header nav-fade">
               <div className="logo">

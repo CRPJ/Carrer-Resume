@@ -1,11 +1,13 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
+import { useDataMasking } from "@/hooks/useDataMasking";
+import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -20,6 +22,7 @@ const IDENTITY_TAB_IMAGES = [
 const Sidebar = () => {
   const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
@@ -274,6 +277,74 @@ const Sidebar = () => {
     setIsMounted(true);
   }, []);
 
+  // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
+  const cacheInitRef = useRef(false);
+  useLayoutEffect(() => {
+    if (cacheInitRef.current || !cachedProfile?.data) return;
+    cacheInitRef.current = true;
+
+    const profile = cachedProfile.data;
+    setHasData(true);
+
+    const addressParts = (profile.address || "").split(" ");
+    setUserProfile({
+      name: profile.display_name || "",
+      nameEng: profile.eng_name || "",
+      gender: profile.gender || "",
+      birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
+      city: addressParts[0] || "",
+      district: addressParts.slice(1).join(" ") || "",
+      phone: profile.phone ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****") : "",
+      email: profile.email || "",
+      school: "",
+      major: "",
+      major2: "",
+      major3: "",
+      enrollPeriod: "",
+      graduationStatus: "",
+      gpa: "",
+      gpaMax: "",
+      quote: profile.bio || "",
+      photo: profile.profile_photo_url || "",
+    });
+
+    const statusMap: Record<string, "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge"> = {
+      active: "Running",
+      weekly_rest: "On Rest",
+      seasonal_rest: "Recharging",
+      graduated: "Complete",
+      suspended: "Next Challenge",
+    };
+    if (profile.status && statusMap[profile.status]) {
+      setCrewStatus(statusMap[profile.status]);
+    }
+
+    if (cachedProfile.completionRate !== undefined && cachedProfile.completionRate !== null) {
+      setHasCompletionData(true);
+      setCompletionRate(cachedProfile.completionRate);
+    }
+    if (cachedProfile.reliabilityRate !== undefined && cachedProfile.reliabilityRate !== null) {
+      setHasReliabilityData(true);
+      setReliabilityRate(cachedProfile.reliabilityRate);
+    }
+    if (cachedProfile.practicalCounts) {
+      const { competency, experience, info, career } = cachedProfile.practicalCounts;
+      setPracticalCompetency(competency);
+      setPracticalExperience(experience);
+      setPracticalInfo(info);
+      setPracticalCareer(career);
+      setHasActivityData(competency > 0 || experience > 0 || info > 0 || career > 0);
+    }
+    if (cachedProfile.badges) {
+      setBadgeData(cachedProfile.badges);
+      setHasBadgeData(true);
+    }
+    if (cachedProfile.seasonHistories && cachedProfile.seasonHistories.length > 0) {
+      setSeasonHistories(cachedProfile.seasonHistories);
+      setHasSeasonData(true);
+    }
+  }, [cachedProfile]);
+
   // 아이콘 링크 state
   const [iconLink1, setIconLink1] = useState("https://www.google.com/");
   const [iconLink2, setIconLink2] = useState("https://youtu.be/xf6q5dgn1hU?si=tNK3I1-QIsJ9JmvF");
@@ -307,80 +378,58 @@ const Sidebar = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isCustomAddress, setIsCustomAddress] = useState(false);
 
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleDropdownOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.custom-dropdown-list') && !target.closest('.chamfer-box')) {
+        setOpenDropdown(null);
+      }
+    };
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleDropdownOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleDropdownOutsideClick);
+    };
+  }, [openDropdown]);
+
   // 화면 높이 기반 카드 스케일 조절 (비율 유지)
   // NOTE: 가로(좌/우) 비율 안정화를 위해 "사이드바 폭"은 고정(497px)으로 유지하고
   // 카드만 필요 시 축소(<= 1)한다. (4K에서 카드가 커지며 4:6처럼 보이는 문제 방지)
   const [cardScale, setCardScale] = useState(1);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false); // 모바일 프로필 슬라이드
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // .resume-card 높이를 뷰포트에 맞게 실시간 재계산
+  useResumeCardHeight(cardRef, isMobileView);
 
   useEffect(() => {
-    // ★ outerWidth 기반 실제 리사이즈 감지
-    // 브라우저 줌(Ctrl+/-)은 outerWidth를 바꾸지 않으므로 자연스럽게 스킵됨
-    let lastOuterWidth = window.outerWidth;
-    let initialized = false;
+    // 고정 너비 레이아웃: 항상 데스크탑
+    setIsMobileView(false);
 
     const calculateScale = () => {
-      const currentOuterWidth = window.outerWidth;
-
-      // 초기화 이후: outerWidth가 변하지 않았으면 브라우저 줌 → 스킵
-      if (initialized && Math.abs(currentOuterWidth - lastOuterWidth) < 5) {
-        return;
-      }
-
-      initialized = true;
-      lastOuterWidth = currentOuterWidth;
-
-      const mobile = window.outerWidth < 1200;
-      setIsMobileView(mobile);
-
-      const BASE_CARD_HEIGHT = 810; // 높이 기준값 완화 → 카드가 헤더 SHOP 위치까지 확장
+      const BASE_CARD_HEIGHT = 810;
       const BASE_SIDEBAR_WIDTH = 497;
 
-      // 모바일: CSS 반응형 그대로 사용
-      if (mobile) {
-        setCardScale(1);
-        document.documentElement.style.removeProperty("--sidebar-width");
-        return;
-      }
-
-      // ★ 카드만 축소, 헤더·nav는 그대로 (네이버 방식)
-      // CSS zoom 적용 전/후 innerHeight가 달라지는 문제 방지:
-      // innerHeight(CSS px) × currentZoom = 물리 픽셀 → ÷ expectedZoom = 안정된 CSS px
-      const BASE_WIDTH = 1977;
-      const MAX_ZOOM = 2.0;
-      const w = window.outerWidth;
-      const expectedZoom = w >= 1200 ? Math.min(w / BASE_WIDTH, MAX_ZOOM) : 1;
-      const currentZoom = parseFloat(document.documentElement.style.zoom || '1');
-      const rawHeight = window.visualViewport?.height || window.innerHeight;
-      const rawWidth = window.visualViewport?.width || window.innerWidth;
-      const viewportHeight = (rawHeight * currentZoom) / expectedZoom;
-      const viewportWidth = (rawWidth * currentZoom) / expectedZoom;
-
-      // 1) 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
-      const availableHeight = viewportHeight - 130; // 헤더 높이 제외
+      // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
+      const viewportHeight = window.innerHeight;
+      const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
-      // 2) 폭 기반 스케일: 우측 콘텐츠 최소 600px 확보
-      const MIN_CONTENT_WIDTH = 600;
-      const GAP = 20;
-      const maxSidebarByWidth = viewportWidth - GAP - MIN_CONTENT_WIDTH;
-      const scaleByWidth = maxSidebarByWidth / BASE_SIDEBAR_WIDTH;
-
-      // 높이·폭 중 더 제한적인 쪽 적용, 최대 1.25(SHOP 위치까지 확대 허용), 최소 0.55
-      let scale = Math.min(1.25, scaleByHeight, scaleByWidth);
+      // 높이 기반으로 적용, 최대 1.25, 최소 0.55
+      let scale = Math.min(1.25, scaleByHeight);
       scale = Math.max(0.55, scale);
 
       setCardScale(scale);
 
-      // 사이드바 폭을 스케일에 맞게 조정 → 우측 콘텐츠 영역이 자동 확장
+      // 사이드바 폭을 스케일에 맞게 조정
       const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
       document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
     };
 
     calculateScale();
-
-    // ★ window.resize만 사용 (visualViewport는 브라우저 줌에도 발동하므로 제외)
     window.addEventListener("resize", calculateScale);
 
     return () => {
@@ -763,6 +812,30 @@ const Sidebar = () => {
     }
   }, [session, targetUserId]);
 
+  // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
+  useEffect(() => {
+    const handleSloganUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.slogan1?.content !== undefined) {
+        setUserProfile((prev) => {
+          if (!prev) return prev;
+          return { ...prev, quote: detail.slogan1.content || "" };
+        });
+      }
+    };
+    window.addEventListener('sloganUpdated', handleSloganUpdated);
+    return () => window.removeEventListener('sloganUpdated', handleSloganUpdated);
+  }, []);
+
+  // 학력 변경 이벤트 수신 → .resume-card 즉시 반영
+  useEffect(() => {
+    const handleEducationUpdated = () => {
+      fetchEducations();
+    };
+    window.addEventListener('educationUpdated', handleEducationUpdated);
+    return () => window.removeEventListener('educationUpdated', handleEducationUpdated);
+  }, []);
+
   // Error state for validation
   const [errors, setErrors] = useState({
     lastName: "",
@@ -956,6 +1029,39 @@ const Sidebar = () => {
     setIsEditModalOpen(true);
   };
 
+  // 모달 필드 네비게이션: Enter로 다음 필드 이동
+  const navigateToNextField = (currentNavIndex: number) => {
+    const allNav = Array.from(document.querySelectorAll('[data-nav-index]')) as HTMLElement[];
+    const sorted = allNav.sort((a, b) => Number(a.getAttribute('data-nav-index')) - Number(b.getAttribute('data-nav-index')));
+    const currentPos = sorted.findIndex((el) => Number(el.getAttribute('data-nav-index')) === currentNavIndex);
+    if (currentPos < 0 || currentPos >= sorted.length - 1) {
+      const submitBtn = document.querySelector('.edit-modal-content button[type="submit"]') as HTMLButtonElement;
+      if (submitBtn) submitBtn.click();
+      return;
+    }
+    const next = sorted[currentPos + 1];
+    const dropdownName = next.getAttribute('data-nav-dropdown');
+    if (dropdownName) {
+      setOpenDropdown(dropdownName);
+      next.focus();
+    } else {
+      next.focus();
+    }
+  };
+
+  const handleEnterKeyNavigation = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const el = e.currentTarget as HTMLElement;
+    const navIndex = Number(el.getAttribute('data-nav-index'));
+    const dropdownName = el.getAttribute('data-nav-dropdown');
+    if (dropdownName) {
+      setOpenDropdown(dropdownName);
+    } else {
+      navigateToNextField(navIndex);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -994,7 +1100,7 @@ const Sidebar = () => {
       const result = await response.json();
 
       if (result.success) {
-        alert("프로필이 성공적으로 저장되었습니다.");
+        alert("저장되었습니다.");
         setIsEditModalOpen(false);
         // 캐시 무효화 후 프로필 데이터 새로고침
         clearProfileCache();
@@ -1377,6 +1483,7 @@ const Sidebar = () => {
         }}
       >
         <div
+          ref={cardRef}
           className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
           style={{
             position: "relative",
@@ -1539,13 +1646,13 @@ const Sidebar = () => {
                           className="detail-icon"
                           style={{ display: "inline-block", verticalAlign: "text-bottom", margin: "0 2px 0 45px" }}
                         />{" "}
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.birthDate}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.birthDate(currentProfile.birthDate)}
                       </span>
                     </div>
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
                       <span>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.city} {currentProfile.district}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || '') + ' ' + (currentProfile.district || ''))}
                       </span>
                     </div>
                     <div className="detail-row">
@@ -1603,7 +1710,7 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.email}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.email(currentProfile.email)}
                       </span>
                     </div>
                     <div className="detail-row">
@@ -1623,7 +1730,7 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.school}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.school(currentProfile.school)}
                       </span>
                     </div>
 
@@ -1648,7 +1755,7 @@ const Sidebar = () => {
                           gap: "5px",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span>{currentProfile.major}
+                        <span style={{ color: currentProfile.lightColor }}>·</span>{mask.major(currentProfile.major)}
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
                           <path d="M8.33 6.67L11.67 10L8.33 13.33" stroke="#FFEC8F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -1658,7 +1765,7 @@ const Sidebar = () => {
                     <div className="detail-row">
                       <span style={{ width: "16px" }}></span>
                       <span className="sub-text" style={{ color: currentProfile.lightColor }}>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.enrollPeriod}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.period(currentProfile.enrollPeriod)}
                       </span>
                     </div>
                   </div>
@@ -1692,7 +1799,7 @@ const Sidebar = () => {
                   <div className="detail-row">
                     <span style={{ width: "16px" }}></span>
                     <span className="sub-text">
-                      <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gpa} <span style={{ color: currentProfile.lightColor }}>/{currentProfile.gpaMax}</span>
+                      <span style={{ color: currentProfile.lightColor }}>·</span> {mask.gpa(currentProfile.gpa)} <span style={{ color: currentProfile.lightColor }}>/{currentProfile.gpaMax}</span>
                     </span>
                   </div>
                 </div>
@@ -1970,7 +2077,6 @@ const Sidebar = () => {
             zIndex: 99999,
             paddingTop: "20px",
           }}
-          onClick={() => setIsEditModalOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
             <Image src="/images/0/cluster 1/card01.png" alt="Contact Info" width={540} height={150} style={{ display: "block" }} />
@@ -2013,31 +2119,72 @@ const Sidebar = () => {
               alignItems: "center",
               justifyContent: "center",
               zIndex: 99999,
-              overflowY: "auto", // ← 여기 추가
+              overflow: "hidden",
               padding: "40px 0", // ← 여기 추가
             }}
-            onClick={() => setIsEditModalOpen(false)}
           >
-            {/* modal (자식 div) - maxHeight 제거 */}
+            {/* modal (자식 div) */}
             <div
               className="edit-modal-content"
               style={{
                 backgroundColor: "#1a1d29",
-                borderRadius: "8px",
                 border: "1px solid #FFA500",
                 boxShadow: "0 0 10px rgba(255, 165, 0, 0.15)",
-                padding: "40px 32px 40px 40px", // ← 원래대로 40px
                 width: "580px",
-                maxHeight: "700px", // ← 제한 제거
-                overflowY: "auto", // ← visible로 변경
-                fontFamily: "'Pretendard', sans-serif",
-                marginTop: "0px",
+                maxHeight: "700px",
               }}
-              onClick={(e) => e.stopPropagation()}
             >
-              <h6 style={{ color: "#fff", fontSize: "20px", fontWeight: 600, margin: "0 0 30px 0" }}>프로필 수정</h6>
+              {/* Cafe24Ohsquare 폰트 선언 */}
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: `
+                @font-face {
+                  font-family: 'Cafe24Ohsquare';
+                  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+                  font-weight: normal;
+                  font-style: normal;
+                  font-display: swap;
+                }
+              `,
+                }}
+              />
+              {/* 상단 헤더 바 */}
+              <div
+                className="edit-modal-header"
+                style={{
+                  padding: "20px 28px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  position: "relative",
+                }}
+              >
+                <div>
+                  <h3 style={{ margin: 0 }}>프로필 수정</h3>
+                  <p className="modal-subtitle" style={{ marginTop: "6px", marginBottom: 0 }}>프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.</p>
+                </div>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => {
+                    if (confirm('변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?')) {
+                      setIsEditModalOpen(false);
+                    }
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: "18px",
+                    right: "20px",
+                  }}
+                >
+                  &#x2715;
+                </button>
+              </div>
+
 
               <form onSubmit={handleSubmit}>
+              {/* 모달 본문 */}
+              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px" }}>
                 {/* 성 & 이름 - 일렬 배치 */}
                 <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                   {/* 성 */}
@@ -2047,8 +2194,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="lastName"
+                      data-nav-index={1}
                       value={formData.lastName}
                       onChange={(e) => handleNameChange(e, "lastName", 2)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={2}
                       placeholder="홍"
                       style={{
@@ -2073,8 +2222,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="firstName"
+                      data-nav-index={2}
                       value={formData.firstName}
                       onChange={(e) => handleNameChange(e, "firstName", 5)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={5}
                       placeholder="길동"
                       style={{
@@ -2102,8 +2253,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="lastNameEng"
+                      data-nav-index={3}
                       value={formData.lastNameEng}
                       onChange={(e) => handleEngNameChange(e, "lastNameEng", 20)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={20}
                       placeholder="Hong"
                       style={{
@@ -2128,8 +2281,10 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="firstNameEng"
+                      data-nav-index={4}
                       value={formData.firstNameEng}
                       onChange={(e) => handleEngNameChange(e, "firstNameEng", 30)}
+                      onKeyDown={handleEnterKeyNavigation}
                       maxLength={30}
                       placeholder="Gildong"
                       style={{
@@ -2155,7 +2310,8 @@ const Sidebar = () => {
                     <button
                       type="button"
                       className="chamfer-box"
-                      onClick={() => setFormData((prev) => ({ ...prev, gender: "male" }))}
+                      data-nav-index={5}
+                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "male" })); setTimeout(() => navigateToNextField(5), 0); }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2177,7 +2333,7 @@ const Sidebar = () => {
                     <button
                       type="button"
                       className="chamfer-box"
-                      onClick={() => setFormData((prev) => ({ ...prev, gender: "female" }))}
+                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "female" })); setTimeout(() => navigateToNextField(5), 0); }}
                       style={{
                         flex: 1,
                         padding: "14px 16px",
@@ -2211,18 +2367,18 @@ const Sidebar = () => {
                   .edit-modal-content * {
                     font-family: 'Pretendard', sans-serif !important;
                   }
-                  .edit-modal-content::-webkit-scrollbar {
+                  .edit-modal-body::-webkit-scrollbar {
                     width: 8px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-track {
+                  .edit-modal-body::-webkit-scrollbar-track {
                     background: #252836;
                     border-radius: 4px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-thumb {
+                  .edit-modal-body::-webkit-scrollbar-thumb {
                     background: #FFA500;
                     border-radius: 4px;
                   }
-                  .edit-modal-content::-webkit-scrollbar-thumb:hover {
+                  .edit-modal-body::-webkit-scrollbar-thumb:hover {
                     background: #22c55e;
                   }
                   .custom-dropdown-list::-webkit-scrollbar {
@@ -2244,6 +2400,9 @@ const Sidebar = () => {
                     <div style={{ flex: 1.2, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={6}
+                        data-nav-dropdown="year"
                         onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}
                         style={{
                           padding: "14px 12px",
@@ -2289,14 +2448,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year) => (
+                          {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year, idx) => (
                             <div
                               key={year}
                               onClick={() => {
                                 const month = formData.birthDate.split("-")[1] || "";
                                 const day = formData.birthDate.split("-")[2] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${day}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("month");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2326,6 +2485,9 @@ const Sidebar = () => {
                     <div style={{ flex: 1, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={7}
+                        data-nav-dropdown="month"
                         onClick={() => setOpenDropdown(openDropdown === "month" ? null : "month")}
                         style={{
                           padding: "14px 12px",
@@ -2371,14 +2533,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month, idx) => (
                             <div
                               key={month}
                               onClick={() => {
                                 const year = formData.birthDate.split("-")[0] || "";
                                 const day = formData.birthDate.split("-")[2] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${String(month).padStart(2, "0")}-${day}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("day");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2408,6 +2570,9 @@ const Sidebar = () => {
                     <div style={{ flex: 1, position: "relative" }}>
                       <div
                         className="chamfer-box"
+                        tabIndex={0}
+                        data-nav-index={8}
+                        data-nav-dropdown="day"
                         onClick={() => setOpenDropdown(openDropdown === "day" ? null : "day")}
                         style={{
                           padding: "14px 12px",
@@ -2453,14 +2618,14 @@ const Sidebar = () => {
                             boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                           }}
                         >
-                          {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                          {Array.from({ length: 31 }, (_, i) => i + 1).map((day, idx) => (
                             <div
                               key={day}
                               onClick={() => {
                                 const year = formData.birthDate.split("-")[0] || "";
                                 const month = formData.birthDate.split("-")[1] || "";
                                 setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${String(day).padStart(2, "0")}` }));
-                                setOpenDropdown(null);
+                                setOpenDropdown("city");
                               }}
                               style={{
                                 padding: "12px 14px",
@@ -2497,6 +2662,9 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={9}
+                          data-nav-dropdown="city"
                           onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
                           style={{
                             padding: "14px 12px",
@@ -2542,12 +2710,12 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {Object.keys(koreaRegions).map((city) => (
+                            {Object.keys(koreaRegions).map((city, idx) => (
                               <div
                                 key={city}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, addressCity: city, addressDistrict: "" }));
-                                  setOpenDropdown(null);
+                                  setOpenDropdown("district");
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2602,6 +2770,9 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={10}
+                          data-nav-dropdown="district"
                           onClick={() => {
                             if (formData.addressCity) {
                               setOpenDropdown(openDropdown === "district" ? null : "district");
@@ -2652,12 +2823,13 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {koreaRegions[formData.addressCity]?.map((district) => (
+                            {koreaRegions[formData.addressCity]?.map((district, idx) => (
                               <div
                                 key={district}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, addressDistrict: district }));
                                   setOpenDropdown(null);
+                                  setTimeout(() => navigateToNextField(10), 0);
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2691,8 +2863,10 @@ const Sidebar = () => {
                           className="modal-input chamfer-box"
                           type="text"
                           name="customAddress"
+                          data-nav-index={9}
                           value={formData.customAddress}
                           onChange={handleInputChange}
+                          onKeyDown={handleEnterKeyNavigation}
                           placeholder="해외 또는 기타 주소를 입력해주세요 (예: 미국 캘리포니아, 독도)"
                           style={{
                             flex: 1,
@@ -2782,11 +2956,13 @@ const Sidebar = () => {
                           type="text"
                           name="phoneMid"
                           className="phone-input modal-input chamfer-box"
+                          data-nav-index={11}
                           value={phoneMid}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
                             setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           maxLength={4}
                           placeholder="0000"
                           style={{
@@ -2808,11 +2984,13 @@ const Sidebar = () => {
                           type="text"
                           name="phoneLast"
                           className="phone-input modal-input chamfer-box"
+                          data-nav-index={12}
                           value={phoneLast}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
                             setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           maxLength={4}
                           placeholder="0000"
                           style={{
@@ -2842,6 +3020,7 @@ const Sidebar = () => {
                       className="modal-input chamfer-box"
                       type="text"
                       name="emailId"
+                      data-nav-index={13}
                       value={formData.emailId}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -2857,6 +3036,7 @@ const Sidebar = () => {
                           setErrors((prev) => ({ ...prev, email: "" }));
                         }
                       }}
+                      onKeyDown={handleEnterKeyNavigation}
                       placeholder="example"
                       style={{
                         flex: 1,
@@ -2877,6 +3057,9 @@ const Sidebar = () => {
                       <div style={{ flex: 1, position: "relative" }}>
                         <div
                           className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={14}
+                          data-nav-dropdown="emailDomain"
                           onClick={() => setOpenDropdown(openDropdown === "emailDomain" ? null : "emailDomain")}
                           style={{
                             padding: "14px 12px",
@@ -2922,12 +3105,13 @@ const Sidebar = () => {
                               boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
                             }}
                           >
-                            {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain) => (
+                            {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain, idx) => (
                               <div
                                 key={domain}
                                 onClick={() => {
                                   setFormData((prev) => ({ ...prev, emailDomain: domain }));
                                   setOpenDropdown(null);
+                                  setTimeout(() => navigateToNextField(14), 0);
                                 }}
                                 style={{
                                   padding: "12px 14px",
@@ -2983,11 +3167,13 @@ const Sidebar = () => {
                           className="modal-input chamfer-box"
                           type="text"
                           name="customEmailDomain"
+                          data-nav-index={14}
                           value={formData.customEmailDomain}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^a-zA-Z0-9.-]/g, "");
                             setFormData((prev) => ({ ...prev, customEmailDomain: value }));
                           }}
+                          onKeyDown={handleEnterKeyNavigation}
                           placeholder="domain.com"
                           style={{
                             flex: 1,
@@ -3043,12 +3229,14 @@ const Sidebar = () => {
                     className="modal-input chamfer-box"
                     type="text"
                     name="vision"
+                    data-nav-index={15}
                     value={formData.vision}
                     onChange={(e) => {
                       if (e.target.value.length <= 10) {
                         setFormData((prev) => ({ ...prev, vision: e.target.value }));
                       }
                     }}
+                    onKeyDown={handleEnterKeyNavigation}
                     placeholder="가고 싶은 기업/브랜드를 기재합니다. (ex.구글)"
                     maxLength={10}
                     style={{
@@ -3078,8 +3266,10 @@ const Sidebar = () => {
                       <input
                         className="modal-input chamfer-box"
                         type="url"
+                        data-nav-index={16}
                         value={iconLink3}
                         onChange={(e) => handleIconLinkChange(e.target.value, 3)}
+                        onKeyDown={handleEnterKeyNavigation}
                         placeholder="https://example.com"
                         style={{
                           width: "100%",
@@ -3098,17 +3288,9 @@ const Sidebar = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
-                <div
-                  style={{
-                    width: "100%",
-                    height: "1px",
-                    backgroundColor: "#3a3d4a",
-                    margin: "16px 0 32px 0",
-                  }}
-                />
-
-                {/* Submit Button */}
+              </div>
+              {/* 모달 푸터 */}
+              <div className="edit-modal-footer">
                 <style
                   dangerouslySetInnerHTML={{
                     __html: `
@@ -3145,6 +3327,7 @@ const Sidebar = () => {
                 >
                   작성완료
                 </button>
+              </div>
               </form>
             </div>
           </div>,
@@ -3165,21 +3348,21 @@ const Sidebar = () => {
             alignItems: "center",
             zIndex: 2000,
           }}
-          onClick={() => setIsPhoneCommentModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "16px",
+              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid #FFA500",
             }}
           >
             {/* 헤더 */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>
+            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px", padding: 0 }}>
               {/* 전화 아이콘 */}
               <div
                 style={{
@@ -3196,27 +3379,17 @@ const Sidebar = () => {
               <div style={{ flex: 1 }}>
                 <h3
                   style={{
-                    color: "#fff",
-                    fontSize: "18px",
-                    fontWeight: 600,
                     margin: 0,
                     lineHeight: 1.4,
-                    fontFamily: "Pretendard, sans-serif",
                   }}
                 >
                   연락이 필요하시면, 하단 내용을 참고해주세요 :)
                 </h3>
               </div>
               <button
+                className="modal-close-btn"
                 onClick={() => setIsPhoneCommentModalOpen(false)}
                 style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "#8a8d98",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  padding: 0,
-                  lineHeight: 1,
                   flexShrink: 0,
                 }}
               >
@@ -3256,21 +3429,21 @@ const Sidebar = () => {
             alignItems: "center",
             zIndex: 2000,
           }}
-          onClick={() => setIsPhoneCommentModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: "#1a1d29",
-              borderRadius: "16px",
+              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid #FFA500",
             }}
           >
             {/* 헤더 */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>
+            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px", padding: 0 }}>
               {/* 전화 아이콘 */}
               <div
                 style={{
@@ -3287,9 +3460,6 @@ const Sidebar = () => {
               <div>
                 <h3
                   style={{
-                    color: "#fff",
-                    fontSize: "18px",
-                    fontWeight: 600,
                     margin: 0,
                     lineHeight: 1.4,
                   }}
@@ -3297,9 +3467,8 @@ const Sidebar = () => {
                   연락이 가능한 시간대와 코멘트를 작성해 주세요 :)
                 </h3>
                 <p
+                  className="modal-subtitle"
                   style={{
-                    color: "#8a8d98",
-                    fontSize: "14px",
                     margin: "2px 0 0 0",
                   }}
                 >

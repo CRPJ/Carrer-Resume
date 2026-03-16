@@ -2,9 +2,61 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useDataMasking } from "@/hooks/useDataMasking";
+
+// TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+const DUMMY_SEASON_ROLES = [
+  { teamName: '엔터테인먼트 팀', partName: '내돈내산 파트', roleLabel: '운영진(앰배서더)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 1.jpg' },
+  { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 3, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 2.jpg' },
+  { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/crew profile/여 3.jpg' },
+];
+
+// TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+const DUMMY_SEASON_REPUTATIONS = [
+  {
+    id: 'dummy-rep-1',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '안유현', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 4.webp',
+    },
+  },
+  {
+    id: 'dummy-rep-2',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '이지민', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 5.jpg',
+    },
+  },
+  {
+    id: 'dummy-rep-3',
+    rating: 6,
+    keyword_1: '추진력추진력력',
+    keyword_2: '추진력추진력력',
+    content: '안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십',
+    reviewer: {
+      display_name: '유성이', gender: '여', birth_date: '2002-01-01',
+      university: '서울대학교', major_first: '미디어커뮤니케이션학과',
+      teamName: '엔터테인먼트팀', partName: '내돈내산파트', vision: '엔비디아구글테슬라쿵',
+      profile_photo_url: '/images/0/crew profile/여 6.jpg',
+    },
+  },
+];
 
 // 기본 시즌 데이터 (데이터가 없을 때 사용)
 const defaultSeasonData = {
@@ -49,6 +101,7 @@ const defaultSeasonData = {
 const Cluster4Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
@@ -90,6 +143,7 @@ const Cluster4Content = () => {
     openModalFn();
 };
 
+  const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
   const [section3Page, setSection3Page] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
@@ -1362,12 +1416,12 @@ const Cluster4Content = () => {
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
     if (!urlUserId) {
-      setSeasonReputationError("평판을 남길 대상을 찾을 수 없습니다.");
+      alert("평판을 남길 대상을 찾을 수 없습니다.");
       return;
     }
 
     if (!selectedSeasonId) {
-      setSeasonReputationError("시즌을 선택해주세요.");
+      alert("시즌을 선택해주세요.");
       return;
     }
 
@@ -1393,26 +1447,21 @@ const Cluster4Content = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        setSeasonReputationError(result.error || "저장에 실패했습니다.");
+        alert(result.error || "저장에 실패했습니다.");
         return;
       }
-
-      setSeasonReputationSuccess(true);
 
       // 평판 목록 새로고침 (현재 보고 있는 시즌의 평판)
       if (urlUserId && currentSeason?.id) {
         fetchSeasonReputations(urlUserId, currentSeason.id);
       }
 
-      // 1.5초 후 모달 닫기
-      setTimeout(() => {
-        setSeasonReputationModalOpen(false);
-        setSeasonReputationSuccess(false);
-        setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
-      }, 1500);
+      alert("저장되었습니다.");
+      setSeasonReputationModalOpen(false);
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
     } catch (error) {
       console.error("시즌 평판 저장 오류:", error);
-      setSeasonReputationError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReputationSaving(false);
     }
@@ -1434,28 +1483,28 @@ const Cluster4Content = () => {
   // 시즌 리뷰 저장
   const handleSaveSeasonReview = async () => {
     if (!currentSeason?.id) {
-      setSeasonReviewError("시즌 정보를 찾을 수 없습니다.");
+      alert("시즌 정보를 찾을 수 없습니다.");
       return;
     }
 
     // 0.0~5.0 범위, 0.5 단위 검증
     if (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 5 || (seasonReviewEditData.rating * 2) % 1 !== 0) {
-      setSeasonReviewError("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
+      alert("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
       return;
     }
 
     if (!seasonReviewEditData.review.trim()) {
-      setSeasonReviewError("리뷰를 입력해주세요.");
+      alert("리뷰를 입력해주세요.");
       return;
     }
 
     if (seasonReviewEditData.review.length > 30) {
-      setSeasonReviewError("리뷰는 30자 이내로 작성해주세요.");
+      alert("리뷰는 30자 이내로 작성해주세요.");
       return;
     }
 
     if (!seasonReviewEditData.link.trim()) {
-      setSeasonReviewError("링크를 입력해주세요.");
+      alert("링크를 입력해주세요.");
       return;
     }
 
@@ -1477,11 +1526,9 @@ const Cluster4Content = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setSeasonReviewError(data.error || "저장에 실패했습니다.");
+        alert(data.error || "저장에 실패했습니다.");
         return;
       }
-
-      setSeasonReviewSuccess(true);
 
       // 현재 시즌 데이터 업데이트
       setSeasonHistories(prev => prev.map((season) =>
@@ -1490,14 +1537,11 @@ const Cluster4Content = () => {
           : season
       ));
 
-      // 1.5초 후 모달 닫기
-      setTimeout(() => {
-        setSeasonReviewModalOpen(false);
-        setSeasonReviewSuccess(false);
-      }, 1500);
+      alert("저장되었습니다.");
+      setSeasonReviewModalOpen(false);
     } catch (error) {
       console.error("시즌 리뷰 저장 오류:", error);
-      setSeasonReviewError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReviewSaving(false);
     }
@@ -1507,18 +1551,25 @@ const Cluster4Content = () => {
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1" ref={headerRef}>
+        {/* Floating Icons - search-icon */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`)}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
-          </Link>
-          <div className="tab active">
+          </div>
+          <div className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
-            <div className="tab-badge">
+            <div className="tab-badge" onClick={() => router.push(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`)}>
               <span className="badge-text">Season Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
@@ -1534,7 +1585,7 @@ const Cluster4Content = () => {
 
         {/* 설명 텍스트 */}
         <div className="section1-description">
-          <p>이 페이지에서는 주차별로(weekly), 시즌별로(season) 차곡차곡 성장한 클럽의 내역이 나옵니다.</p>
+          <p>이 페이지에서는 주차별로(weekly), 시즌별로(season) 차곡차곡 성장한 크루의 내역이 나옵니다.</p>
           <p>잠깐의 열정과 객기는 누구나 가질 수 있지만, 역경과 부침, 짜증나는 고난과 요동치는 감정을 이겨내며 꾸준하게 성장할 수 있는 사람은 생각보다 적습니다.😊</p>
           <p className="small-text">1주, 1개월, 1분기, 1반기, 1년.. 세상에서 평가하는 나의 신뢰성은 어떠한가요?</p>
           <p className="quote-text">
@@ -1547,6 +1598,13 @@ const Cluster4Content = () => {
 
       {/* Section 2: SEASON GROWTH 카드 */}
       <section className="cluster4-section2">
+        {/* Floating Icons - search-icon */}
+        <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="edit-icon search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
+            <div className="tooltip">등록된 도움말이 없습니다</div>
+          </div>
+        </div>
         <div className="season-growth-card visible">
           {/* 왼쪽 콘텐츠 */}
           <div className="card-left">
@@ -1556,7 +1614,13 @@ const Cluster4Content = () => {
                 <h3 className="season-title-shadow">SEASON GROWTH</h3>
                 <h3 className="season-title">SEASON GROWTH</h3>
               </div>
-              <div className="season-badge" style={{ backgroundImage: "url('/images/0/cluster4/button.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(50% + 5px) center' }}>
+              <div className="season-badge">
+                <svg className="badge-outline" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" stroke="#FAAB07" strokeWidth="1.69311" fill="none"/>
+                </svg>
+                <svg className="badge-border" viewBox="0 0 124 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0.84668 0.846558H122.847V26.7666L98.4467 48.8466H0.84668V0.846558Z" fill="#FAAB07" stroke="#FAAB07" strokeWidth="1.69311"/>
+                </svg>
                 <span className="badge-text">{getGrowthBadgeText(userStatus, growthStatus)}</span>
               </div>
             </div>
@@ -1645,13 +1709,13 @@ const Cluster4Content = () => {
         <div className="section3-banner">
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <img src="/images/0/cluster 3/icon -  modify.png" alt="Modify" style={{ width: '22px', height: '22px', objectFit: 'contain', cursor: 'pointer' }} onClick={() => {
+            <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => {
               if (isOwner) {
                 alert('시즌 평판은 타 크루끼리 작성합니다.');
               } else {
                 openSeasonReputationModal();
               }
-            }} />
+            }}><i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i></div>
             <div className="edit-icon search-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
               <div className="tooltip">등록된 도움말이 없습니다</div>
@@ -1669,28 +1733,13 @@ const Cluster4Content = () => {
           </div>
         </div>
 
-        {/* 페이지네이션 */}
-        <div className="section3-pagination">
-          {seasonHistories.length > 0 ? seasonHistories.map((_: SeasonHistoryData, index: number) => (
-            <span
-              key={index}
-              className={`page-num ${section3Page === index ? 'active' : ''} ${index === seasonHistories.length - 1 ? 'last' : ''}`}
-              onClick={() => handlePageChange(index)}
-            >
-              {index + 1}
-            </span>
-          )) : (
-            <span className="page-num active last">1</span>
-          )}
-        </div>
-
         <div className="season-detail-container" style={{ backgroundImage: `url('${currentSeason.image}')` }}>
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
             <div className={`area-1-title ${isTextFading ? 'fading' : ''}`}>
               <div className="season-main-title">
-                <span className="year-orange">{currentSeason.year}</span>년도_{currentSeason.season} 시즌
+                <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: 'inline-block', width: '0.6em' }}></span><span className="season-highlight">{currentSeason.season}</span> 시즌
               </div>
               <div className="date-status">
                 <span className="date-range">{currentSeason.dateRange}</span>
@@ -1833,7 +1882,7 @@ const Cluster4Content = () => {
                       bottom: '8px',
                       right: '8px',
                       background: 'rgba(255, 165, 0, 0.2)',
-                      border: '1px solid #FFA500',
+                      border: '1px solid #FAAB07',
                       borderRadius: '50%',
                       width: '28px',
                       height: '28px',
@@ -1847,7 +1896,7 @@ const Cluster4Content = () => {
                     onMouseEnter={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; } : undefined}
                     onMouseLeave={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; } : undefined}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
@@ -1948,20 +1997,27 @@ const Cluster4Content = () => {
               <div className="area-8-season-status">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
                 <div className="status-badges">
-                  {currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0 ? (
-                    currentSeason.seasonRoles.map((roleItem, index) => (
+                  {(() => {
+                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                    const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
+                      ? currentSeason.seasonRoles
+                      : [];
+                    const totalSlots = 3;
+                    // DB 데이터가 기준 미만이면 더미로 채움
+                    const roles = dbRoles.length >= totalSlots
+                      ? dbRoles.slice(0, totalSlots)
+                      : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
+                    return roles.map((roleItem, index) => (
                       <div className="badge-item" key={index}>
                         <div className="badge-icon">
-                        <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
+                          <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
                         </div>
                         <div className="badge-info">
                           {roleItem.isAdmin ? (
-                            // 운영진: 운영진(n기) | 클럽 단위 |
                             <span className="badge-text">
                               운영진({roleItem.adminGeneration}기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span>
                             </span>
                           ) : (
-                            // 일반/심화 크루: 팀 | 파트 |
                             <span className="badge-text">
                               {roleItem.teamName || '-'} <span className="separator">|</span> <span className="sub-text">{roleItem.partName || '-'}</span> <span className="separator">|</span>
                             </span>
@@ -1969,19 +2025,8 @@ const Cluster4Content = () => {
                         </div>
                         <span className="badge-status yellow">{roleItem.roleLabel}</span>
                       </div>
-                    ))
-                  ) : (
-                    // 역할 이력이 없을 때 기본 표시
-                    <div className="badge-item">
-                      <div className="badge-icon">
-                        <img src={profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
-                      </div>
-                      <div className="badge-info">
-                        <span className="badge-text">- <span className="separator">|</span> <span className="sub-text">-</span> <span className="separator">|</span></span>
-                      </div>
-                      <span className="badge-status yellow">{roleLabels[currentSeason.roleInSeason] || '일반'}</span>
-                    </div>
-                  )}
+                    ));
+                  })()}
                 </div>
               </div>
 
@@ -1989,14 +2034,20 @@ const Cluster4Content = () => {
               <div className="area-9-season-reputation">
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
                 <div className="profile-cards">
-                  {seasonReputations.length > 0 ? (
-                    seasonReputations.slice(0, 3).map((reputation) => {
+                  {(() => {
+                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
+                    const totalSlots = 3;
+                    const dbReputations = seasonReputations.slice(0, totalSlots);
+                    // DB 데이터가 기준 미만이면 더미로 채움
+                    const allReputations = dbReputations.length >= totalSlots
+                      ? dbReputations
+                      : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
+
+                    return allReputations.map((reputation: any) => {
                       const reviewer = reputation.reviewer;
                       const currentYear = new Date().getFullYear();
-                      // birth_date에서 연도 추출해서 나이 계산
                       const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
                       const age = birthYear ? currentYear - birthYear : null;
-                      // gender는 이미 '남'/'여' 형태로 저장되어 있음
                       const genderLabel = reviewer?.gender || '-';
                       const fullStars = Math.floor(reputation.rating / 2);
                       const hasHalfStar = reputation.rating % 2 === 1;
@@ -2014,7 +2065,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="info">
                               <div className="row1">
-                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {age || '-'} <span className="separator">|</span> {reviewer?.university || '-'} <span className="separator">|</span> {reviewer?.major_first || '-'}
+                                {reviewer?.display_name || '익명'} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {mask.age(age)}세 <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span> {mask.major(reviewer?.major_first)}
                               </div>
                               <div className="row2">
                                 {reviewer?.teamName || '-'} <span className="separator">|</span> {reviewer?.partName || '-'}{reviewer?.vision && <> <span className="separator">|</span> {reviewer.vision}</>}
@@ -2071,22 +2122,27 @@ const Cluster4Content = () => {
                           </div>
                         </div>
                       );
-                    })
-                  ) : (
-                    <div style={{
-                      width: '100%',
-                      padding: '40px 20px',
-                      textAlign: 'center',
-                      color: 'rgba(255,255,255,0.4)',
-                      fontSize: '14px'
-                    }}>
-                      아직 이 시즌에 대한 평판이 없습니다.
-                    </div>
-                  )}
+                    });
+                  })()}
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 페이지네이션 */}
+        <div className="section3-pagination">
+          {seasonHistories.length > 0 ? seasonHistories.map((_: SeasonHistoryData, index: number) => (
+            <span
+              key={index}
+              className={`page-num ${section3Page === index ? 'active' : ''} ${index === seasonHistories.length - 1 ? 'last' : ''}`}
+              onClick={() => handlePageChange(index)}
+            >
+              {index + 1}
+            </span>
+          )) : (
+            <span className="page-num active last">1</span>
+          )}
         </div>
       </section>
 
@@ -2107,34 +2163,36 @@ const Cluster4Content = () => {
             zIndex: 99999,
             backdropFilter: 'blur(5px)',
           }}
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReputationModalOpen(false); }}
         >
-          <div style={{
-            width: '460px',
+          <div className="edit-modal-content" style={{
+            width: '500px',
             maxWidth: '90vw',
-            maxHeight: '80vh',
-            background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
-            border: '1px solid #FFA500',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
+            height: '620px',
+            maxHeight: 'calc(100vh - 80px)',
+            background: '#0d1117',
+            border: '1px solid #FAAB07',
           }}>
             {/* Header */}
-            <div style={{
+            <div className="edit-modal-header" style={{
               padding: '20px 24px',
-              borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
-              background: 'rgba(255, 165, 0, 0.05)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              background: 'rgba(0,0,0,0.2)',
             }}>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FFA500' }}>✦ 시즌 평판</h3>
-              <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
+              <div>
+                <h3 style={{ margin: 0 }}>✦ 시즌 평판</h3>
+                <span className="modal-subtitle" style={{ display: 'block', marginTop: '8px' }}>이번 시즌에 대한 해당 크루의 평판을 남겨주세요</span>
+              </div>
+              <button className="modal-close" onClick={() => setSeasonReputationModalOpen(false)} style={{ marginLeft: '12px', flexShrink: 0 }}>&times;</button>
             </div>
 
             {/* Body */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+            <div className="edit-modal-body" style={{ padding: '20px 24px' }}>
               
               {/* 평점 */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {[1, 2, 3, 4, 5].map((starIndex) => {
@@ -2151,20 +2209,20 @@ const Cluster4Content = () => {
                             setSeasonReputationEditData(prev => ({ ...prev, rating: Math.max(0, newRating) }));
                           }}
                         >
-                          <svg viewBox="0 0 24 24" fill={isFull ? '#FFA500' : 'none'} stroke="#FFA500" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
+                          <svg viewBox="0 0 24 24" fill={isFull ? '#FAAB07' : 'none'} stroke="#FAAB07" strokeWidth="2" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                           {isHalf && (
                             <svg viewBox="0 0 24 24" style={{ position: 'absolute', width: '100%', height: '100%' }}>
                               <defs><clipPath id={`sr-half-${starIndex}`}><rect x="0" y="0" width="12" height="24" /></clipPath></defs>
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#sr-half-${starIndex})`} />
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FAAB07" clipPath={`url(#sr-half-${starIndex})`} />
                             </svg>
                           )}
                         </div>
                       );
                     })}
                   </div>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FFA500' }}>
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#FAAB07' }}>
                     {seasonReputationEditData.rating} / 10
                   </span>
                 </div>
@@ -2172,7 +2230,7 @@ const Cluster4Content = () => {
 
               {/* 내용 */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   내용 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 100자)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -2204,12 +2262,12 @@ const Cluster4Content = () => {
 
               {/* 키워드 */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
                 </label>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FAAB07', minWidth: '20px' }}>#</span>
                     <select
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword1: e.target.value }))}
@@ -2219,7 +2277,7 @@ const Cluster4Content = () => {
                         height: '44px',
                         padding: '0 10px',
                         background: '#1a1f2e',
-                        border: '2px solid #FFA500',
+                        border: '2px solid #FAAB07',
                         borderRadius: '8px',
                         color: '#fff',
                         fontSize: '13px',
@@ -2247,7 +2305,7 @@ const Cluster4Content = () => {
                     </select>
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '20px' }}>#</span>
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: '#FAAB07', minWidth: '20px' }}>#</span>
                     <select
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData(prev => ({ ...prev, keyword2: e.target.value }))}
@@ -2257,7 +2315,7 @@ const Cluster4Content = () => {
                         height: '44px',
                         padding: '0 10px',
                         background: '#1a1f2e',
-                        border: '2px solid #FFA500',
+                        border: '2px solid #FAAB07',
                         borderRadius: '8px',
                         color: '#fff',
                         fontSize: '13px',
@@ -2288,25 +2346,12 @@ const Cluster4Content = () => {
               </div>
             </div>
 
-            {/* 에러/성공 메시지 */}
-            {seasonReputationError && (
-              <div style={{ padding: '12px 24px', background: 'rgba(255, 59, 48, 0.1)', borderTop: '1px solid rgba(255, 59, 48, 0.3)' }}>
-                <p style={{ margin: 0, color: '#FF3B30', fontSize: '14px' }}>{seasonReputationError}</p>
-              </div>
-            )}
-            {seasonReputationSuccess && (
-              <div style={{ padding: '12px 24px', background: 'rgba(52, 199, 89, 0.1)', borderTop: '1px solid rgba(52, 199, 89, 0.3)' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>시즌 평판이 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
-
             {/* Footer */}
-            <div style={{
+            <div className="edit-modal-footer" style={{
               display: 'flex',
               justifyContent: 'flex-end',
               gap: '12px',
               padding: '16px 24px',
-              borderTop: '1px solid rgba(255, 165, 0, 0.2)',
               background: 'rgba(0,0,0,0.2)',
             }}>
               <button
@@ -2334,7 +2379,7 @@ const Cluster4Content = () => {
                 style={{
                   padding: '10px 24px',
                   border: 'none',
-                  background: '#FFA500',
+                  background: '#FAAB07',
                   color: '#000',
                   fontSize: '14px',
                   fontWeight: 600,
@@ -2392,13 +2437,12 @@ const Cluster4Content = () => {
               zIndex: 99999,
               backdropFilter: 'blur(5px)',
             }}
-            onMouseDown={(e) => { if (e.target === e.currentTarget) setReputationDetailModalOpen(false); }}
           >
             <div style={{
               width: '500px',
               maxHeight: '80vh',
               background: 'linear-gradient(145deg, #1a1d2e 0%, #0d0f1a 100%)',
-              borderRadius: '16px',
+              borderRadius: '0px',
               border: '1px solid rgba(255, 165, 0, 0.3)',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.1)',
               overflow: 'hidden',
@@ -2411,7 +2455,7 @@ const Cluster4Content = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <h3 style={{ margin: 0, color: '#FFA500', fontSize: '18px', fontWeight: 600 }}>시즌 평판 상세</h3>
+                <h3 style={{ margin: 0, color: '#FAAB07', fontSize: '18px', fontWeight: 600 }}>시즌 평판 상세</h3>
                 <button
                   onClick={() => setReputationDetailModalOpen(false)}
                   style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '24px', cursor: 'pointer', padding: '4px' }}
@@ -2432,7 +2476,7 @@ const Cluster4Content = () => {
                       {reviewer?.display_name || '익명'}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px' }}>
-                      {genderLabel} | {age || '-'}세 | {reviewer?.university || '-'} | {reviewer?.major_first || '-'}
+                      {genderLabel} | {mask.age(age)}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: '2px' }}>
                       {reviewer?.teamName || '-'} | {reviewer?.partName || '-'}{reviewer?.vision && ` | ${reviewer.vision}`}
@@ -2443,7 +2487,7 @@ const Cluster4Content = () => {
                 {/* Keywords */}
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                   {selectedReputation.keyword_1 && (
-                    <span style={{ padding: '6px 12px', background: 'rgba(255, 165, 0, 0.2)', borderRadius: '20px', color: '#FFA500', fontSize: '13px' }}>
+                    <span style={{ padding: '6px 12px', background: 'rgba(250, 171, 7, 0.2)', borderRadius: '20px', color: '#FAAB07', fontSize: '13px' }}>
                       #{selectedReputation.keyword_1}
                     </span>
                   )}
@@ -2483,7 +2527,7 @@ const Cluster4Content = () => {
                           <img key={`empty-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: '18px', height: '18px', opacity: 0.2 }} />
                         ))}
                       </div>
-                      <span style={{ color: '#FFA500', fontSize: '14px', fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
+                      <span style={{ color: '#FAAB07', fontSize: '14px', fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
                     </div>
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>|</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2517,14 +2561,13 @@ const Cluster4Content = () => {
             zIndex: 99999,
             backdropFilter: 'blur(5px)',
           }}
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setSeasonReviewModalOpen(false); }}
         >
           <div style={{
             width: '450px',
             maxWidth: '90vw',
             background: 'linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)',
-            border: '1px solid #FFA500',
-            borderRadius: '12px',
+            border: '1px solid #FAAB07',
+            borderRadius: '0px',
             overflow: 'hidden',
           }}>
             {/* Header */}
@@ -2533,7 +2576,7 @@ const Cluster4Content = () => {
               borderBottom: '1px solid rgba(255, 165, 0, 0.2)',
               background: 'rgba(255, 165, 0, 0.05)',
             }}>
-              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FFA500' }}>✦ 시즌 리뷰</h3>
+              <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: '#FAAB07' }}>✦ 시즌 리뷰</h3>
               <span style={{ color: '#999', fontSize: '14px' }}>이번 시즌에 대한 나의 평가를 남겨주세요</span>
             </div>
 
@@ -2541,7 +2584,7 @@ const Cluster4Content = () => {
             <div style={{ padding: '20px 24px' }}>
               {/* 평점 선택 */}
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>평점</label>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <select
                     value={seasonReviewEditData.rating.toString()}
@@ -2552,9 +2595,9 @@ const Cluster4Content = () => {
                       height: '48px',
                       padding: '12px 14px',
                       background: '#1a1f2e',
-                      border: '2px solid #FFA500',
+                      border: '2px solid #FAAB07',
                       borderRadius: '8px',
-                      color: '#FFA500',
+                      color: '#FAAB07',
                       fontSize: '16px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -2585,7 +2628,7 @@ const Cluster4Content = () => {
                       );
                     })}
                   </div>
-                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FFA500' }}>
+                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FAAB07' }}>
                     {seasonReviewEditData.rating.toFixed(1)} / 5.0
                   </span>
                 </div>
@@ -2593,7 +2636,7 @@ const Cluster4Content = () => {
 
               {/* 리뷰 입력 */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   한줄평 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 30자)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -2630,7 +2673,7 @@ const Cluster4Content = () => {
 
               {/* 링크 입력 */}
               <div style={{ marginTop: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FFA500', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>
                   링크
                 </label>
                 <input
@@ -2653,20 +2696,8 @@ const Cluster4Content = () => {
               </div>
             </div>
 
-            {/* 에러/성공 메시지 */}
-            {seasonReviewError && (
-              <div style={{ padding: '12px 24px', background: 'rgba(255, 59, 48, 0.1)', borderTop: '1px solid rgba(255, 59, 48, 0.3)' }}>
-                <p style={{ margin: 0, color: '#FF3B30', fontSize: '14px' }}>{seasonReviewError}</p>
-              </div>
-            )}
-            {seasonReviewSuccess && (
-              <div style={{ padding: '12px 24px', background: 'rgba(52, 199, 89, 0.1)', borderTop: '1px solid rgba(52, 199, 89, 0.3)' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>시즌 리뷰가 저장되었습니다!</p>
-              </div>
-            )}
-
             {/* Footer */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(255, 165, 0, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '16px 24px', borderTop: '1px solid rgba(250, 171, 7, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
               <button
                 onClick={() => setSeasonReviewModalOpen(false)}
                 disabled={seasonReviewSaving}
@@ -2678,7 +2709,7 @@ const Cluster4Content = () => {
                 style={{
                   padding: '10px 24px',
                   border: 'none',
-                  background: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? '#444' : 'linear-gradient(135deg, #FFA500 0%, #FF8C00 100%)',
+                  background: (seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim()) ? '#444' : 'linear-gradient(135deg, #FAAB07 0%, #E09A06 100%)',
                   color: '#fff',
                   fontSize: '14px',
                   fontWeight: 600,

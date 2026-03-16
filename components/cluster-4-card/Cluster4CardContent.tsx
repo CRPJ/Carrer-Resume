@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useDataMasking } from "@/hooks/useDataMasking";
 
 
 interface Cluster4CardContentProps {
@@ -61,6 +62,7 @@ const formatMajor = (value: string) => {
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
@@ -1067,6 +1069,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workExpModalOpen, setWorkExpModalOpen] = useState(false);
   const [workCareerModalOpen, setWorkCareerModalOpen] = useState(false);
 
+  // 탭 팝오버 상태
+  const [showWeeklyGrowthBadge, setShowWeeklyGrowthBadge] = useState(false);
+
+  // 탭 팝오버 외부 클릭 시 닫기
+  useEffect(() => {
+    if (!showWeeklyGrowthBadge) return;
+    const handleClickOutside = () => setShowWeeklyGrowthBadge(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showWeeklyGrowthBadge]);
+
   // 상단 섹션 모달 상태
   const [headerModalOpen, setHeaderModalOpen] = useState(false);
   const [headerModalType, setHeaderModalType] = useState<'본인' | '타크루' | null>(null);
@@ -1183,7 +1196,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 연계 동료 저장 함수
   const saveWeeklyColleagues = async () => {
     if (!weekId) {
-      setColleagueSaveError("주차 정보를 찾을 수 없습니다.");
+      alert("주차 정보를 찾을 수 없습니다.");
       return;
     }
 
@@ -1210,21 +1223,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const json = await res.json();
 
       if (!res.ok) {
-        setColleagueSaveError(json.error || "저장에 실패했습니다.");
+        alert(json.error || "저장에 실패했습니다.");
         return;
       }
 
-      setColleagueSaveSuccess(true);
       // 연계 동료 데이터 새로고침
       fetchWeeklyColleagues();
-      // 2초 후 모달 닫기 및 상태 초기화
-      setTimeout(() => {
-        setHeaderModalOpen(false);
-        setColleagueSaveSuccess(false);
-      }, 2000);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
     } catch (error) {
       console.error("연계 동료 저장 오류:", error);
-      setColleagueSaveError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setColleagueSaving(false);
     }
@@ -1233,22 +1242,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 저장 함수
   const saveWeeklyReputation = async () => {
     if (!urlUserId || !weekId) {
-      setReputationSaveError("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+      alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return;
     }
 
     if (reputationEditData.rating === 0) {
-      setReputationSaveError("평점을 입력해주세요.");
+      alert("평점을 입력해주세요.");
       return;
     }
 
     if (!reputationEditData.content.trim()) {
-      setReputationSaveError("내용을 입력해주세요.");
+      alert("내용을 입력해주세요.");
       return;
     }
 
     if (!reputationEditData.keyword) {
-      setReputationSaveError("키워드를 선택해주세요.");
+      alert("키워드를 선택해주세요.");
       return;
     }
 
@@ -1272,22 +1281,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const json = await res.json();
 
       if (!res.ok) {
-        setReputationSaveError(json.error || "저장에 실패했습니다.");
+        alert(json.error || "저장에 실패했습니다.");
         return;
       }
 
-      setReputationSaveSuccess(true);
       // 주차 평판 데이터 새로고침
       fetchWeeklyReputations();
-      // 2초 후 모달 닫기 및 상태 초기화
-      setTimeout(() => {
-        setHeaderModalOpen(false);
-        setReputationEditData({ rating: 0, content: "", keyword: "" });
-        setReputationSaveSuccess(false);
-      }, 2000);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
-      setReputationSaveError("서버 오류가 발생했습니다.");
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setReputationSaving(false);
     }
@@ -1328,8 +1333,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const currentImage = "/images/0/cluster4/4-1-card/image.png";
   const currentTitle = weekData
     ? weekData.isBreakSeason
-      ? `${weekData.seasonYear}년, ${weekData.toSeasonName} 시즌, 전환 주차`
-      : `${weekData.seasonYear}년, ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
+      ? `${weekData.seasonYear} ${weekData.toSeasonName} 시즌, 전환 주차`
+      : `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`
     : "로딩 중...";
 
   // 날짜 포맷팅 함수 (2025 - 01 - 06 (월) 형식)
@@ -1390,43 +1395,52 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const tagColors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint', 'tag--dark'];
 
   // 주차 평판 데이터 (API 데이터 기반)
+  // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
+  const dummyReputations = [
+    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
+    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
+    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+  ];
+
   const reputationData = useMemo(() => {
     // 태그 색상 배열
     const colors = ['tag--pink', 'tag--red', 'tag--yellow', 'tag--purple', 'tag--green', 'tag--cyan', 'tag--mint'];
 
     // API에서 가져온 데이터를 UI 형식으로 변환
-    const apiData = weeklyReputations.map((rep, index) => {
-      const reviewer = rep.reviewer;
-      // 나이 계산
-      let age: string | number = '-';
-      if (reviewer?.birth_date) {
-        const birthYear = new Date(reviewer.birth_date).getFullYear();
-        const currentYear = new Date().getFullYear();
-        age = currentYear - birthYear;
-      }
+    const apiData = weeklyReputations.length > 0
+      ? weeklyReputations.map((rep, index) => {
+          const reviewer = rep.reviewer;
+          // 나이 계산
+          let age: string | number = '-';
+          if (reviewer?.birth_date) {
+            const birthYear = new Date(reviewer.birth_date).getFullYear();
+            const currentYear = new Date().getFullYear();
+            age = currentYear - birthYear;
+          }
 
-      return {
-        id: rep.id,
-        name: reviewer?.display_name || '-',
-        gender: reviewer?.gender || '-',
-        age: age,
-        profileImg: reviewer?.profile_photo_url || '',
-        university: reviewer?.university || '-',
-        major: reviewer?.major_first || '-',
-        team: reviewer?.teamName || '-',
-        part: reviewer?.partName || '-',
-        nickname: reviewer?.vision || '-',
-        rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
-        ratingCount: `${rep.rating} / 10`,
-        description: rep.content || '-',
-        fm: 1, // FM은 항상 1
-        tagColor: colors[index % colors.length],
-        tagText: `#${rep.keyword || '-'}`,
-        isEmpty: false,
-      };
-    });
+          return {
+            id: rep.id,
+            name: reviewer?.display_name || '-',
+            gender: reviewer?.gender || '-',
+            age: age,
+            profileImg: reviewer?.profile_photo_url || '',
+            university: reviewer?.university || '-',
+            major: reviewer?.major_first || '-',
+            team: reviewer?.teamName || '-',
+            part: reviewer?.partName || '-',
+            nickname: reviewer?.vision || '-',
+            rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
+            ratingCount: `${rep.rating} / 10`,
+            description: rep.content || '-',
+            fm: 1, // FM은 항상 1
+            tagColor: colors[index % colors.length],
+            tagText: `#${rep.keyword || '-'}`,
+            isEmpty: false,
+          };
+        })
+      : dummyReputations; // 데이터 없으면 더미 데이터 폴백
 
-    // 최대 3개까지, 빈 슬롯 채우기
+    // 최대 4개까지, 빈 슬롯 채우기
     const result = [...apiData];
     while (result.length < 4) {
       result.push({
@@ -1450,7 +1464,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
     }
 
-    return result.slice(0, 4); // 최대 3개만 반환
+    return result.slice(0, 4); // 최대 4개만 반환
   }, [weeklyReputations]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
@@ -1463,24 +1477,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   }).filter(user => !selectedColleagues.find(c => c.id === user.id));
 
+  // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
+  const dummyColleagues = [
+    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
+    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
+    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
+  ];
+
   // 연계 동료 데이터 (API 데이터 기반)
   const colleagueData = useMemo(() => {
     // API에서 가져온 selectedColleagues를 UI 형식으로 변환
-    const apiData = selectedColleagues.map((c) => ({
-      id: c.id,
-      name: c.name || '-',
-      gender: c.gender || '-',
-      age: c.age || '-',
-      profileImg: c.profileImg || '',
-      university: c.university || '-',
-      major: c.major || '-',
-      team: c.team || '-',
-      part: c.part || '-',
-      nickname: c.nickname || '-',
-      date: c.createdAt ? formatDate(c.createdAt) : '-',
-      message: c.message || '',
-      isEmpty: false,
-    }));
+    const apiData = selectedColleagues.length > 0
+      ? selectedColleagues.map((c) => ({
+          id: c.id,
+          name: c.name || '-',
+          gender: c.gender || '-',
+          age: c.age || '-',
+          profileImg: c.profileImg || '',
+          university: c.university || '-',
+          major: c.major || '-',
+          team: c.team || '-',
+          part: c.part || '-',
+          nickname: c.nickname || '-',
+          date: c.createdAt ? formatDate(c.createdAt) : '-',
+          message: c.message || '',
+          isEmpty: false,
+        }))
+      : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
@@ -1999,7 +2022,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       ratingCount: hasActivity ? `${ratingScore} / 10` : '- / 10',
       hasWeb: (detail?.output_links?.length || 0) > 0,
       icon: getExperienceIconPath(activityTypeId),
-      isEmpty: !hasActivity,
+      isEmpty: false,
       enhancementStatus: enhStatus,
     };
   });
@@ -2141,14 +2164,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab active">
+          <div
+            className={`tab active${showWeeklyGrowthBadge ? ' badge-visible' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowWeeklyGrowthBadge(!showWeeklyGrowthBadge);
+            }}
+            style={{ cursor: 'pointer', width: '44px', height: '44px' }}
+          >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge">
+            <Link
+              href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`}
+              className="tab-badge"
+              onClick={(e) => e.stopPropagation()}
+            >
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
-            </div>
-          </Link>
-          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab">
+            </Link>
+          </div>
+          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
@@ -2183,7 +2217,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}`} className="nav-btn-filled">
+          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ''}#weekly-filter-bar`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -2194,19 +2228,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       <div className="section1-layout">
         {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
         {(
-          <div className="floating-icons" style={{ display: 'flex' }}>
+          <div className="floating-icons" style={{ display: 'flex', top: '700px', right: '40px' }}>
             <div className="edit-icon" onClick={() => {
               if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
             }} style={{ cursor: 'pointer' }}>
-              <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="연계 동료 편집" />
-            </div>
-            <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <div className="tooltip">등록된 도움말이 없습니다</div>
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
           </div>
         )}
@@ -2217,7 +2244,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               if (isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); });
             }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
-              <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" style={{ width: '24px', height: '24px' }} />
+              <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" />
             </div>
           </div>
         )}
@@ -2330,17 +2357,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       {!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                     </div>
                     <div className="profile-info">
-                      <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                      <div className="profile-name">{isEmpty ? <><span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span></> : <><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                       <div className="profile-details">
                         {isEmpty ? (
                           <>
-                            <div className="detail-line"><span className="text">-</span></div>
-                            <div className="detail-line"><span className="text">&nbsp;</span></div>
+                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="text">&nbsp;</span></div>
                           </>
                         ) : (
                           <>
-                            <div className="detail-line"><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
                             <div className="detail-line"><span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                           </>
@@ -2394,7 +2421,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="profile-info">
                       <div className="profile-name-row">
-                        <div className="profile-name"><span className="text">{isEmpty ? '-' : user.name}</span>{!isEmpty && <> | <span className="text">{user.gender}</span> | <span className="text">{user.age}</span></>}</div>
+                        <div className="profile-name">{isEmpty ? <><span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span></> : <><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
                         <div className="date-view">
                           <span className="date">{isEmpty ? '0000 - 00 - 00 (일)' : user.date}</span>
                           <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
@@ -2402,9 +2429,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                       <div className="profile-details">
                         {isEmpty ? (
-                          <span className="text">-</span>
+                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>-</span><span className="label">파트</span></>
                         ) : (
-                          <><span className="text">{formatSchool(user.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(user.major)}</span><span className="label">학과</span> | <span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>{user.team}</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
                         )}
                       </div>
                     </div>
@@ -2453,7 +2480,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2539,7 +2566,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkAbilityModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2615,7 +2642,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     )}
                   </div>
                   <p className="main-desc">{!hasActivity ? '-' : (displayActivity?.title || '-')}</p>
-                  <div className="sub-title-rcow">
+                  <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
@@ -2653,7 +2680,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkExpModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2769,7 +2796,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 initializeEditingDetails();
                 setWorkCareerModalOpen(true);
               }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
-                <img src="/images/0/cluster 3/icon/Edit_Pencil_Line_01.png" alt="Edit" />
+                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -2880,8 +2907,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 정보 모달 ========== */}
       {workInfoModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 정보 편집</h3>
             </div>
@@ -3061,8 +3088,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 역량 모달 ========== */}
       {workAbilityModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 역량 편집</h3>
             </div>
@@ -3253,8 +3280,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경험 모달 ========== */}
       {workExpModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 경험 편집</h3>
             </div>
@@ -3450,8 +3477,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경력 모달 ========== */}
       {workCareerModalOpen && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-work-edit">
             <div className="section-modal-header">
               <h3>실무 경력 편집</h3>
             </div>
@@ -3661,8 +3688,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
       {headerModalOpen && headerModalType === '본인' && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-colleague-edit">
             <div className="section-modal-header">
               <h3>연계 동료 편집</h3>
             </div>
@@ -3699,7 +3726,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             {colleague.profileImg ? <img src={colleague.profileImg} alt={colleague.name} /> : <div className="profile-placeholder"></div>}
                           </div>
                           <div className="colleague-info">
-                            <div className="colleague-name">{colleague.name} | {colleague.gender} | {colleague.age}</div>
+                            <div className="colleague-name">{colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세</div>
                             <div className="colleague-details">{colleague.team} 팀 | {colleague.part} 파트 | {colleague.nickname}</div>
                           </div>
                         </div>
@@ -3778,7 +3805,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               {user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}
                             </div>
                             <div className="crew-info">
-                              <div className="crew-name">{user.name} | {user.gender} | {user.age}</div>
+                              <div className="crew-name">{user.name} | {user.gender} | {mask.age(user.age)}세</div>
                               <div className="crew-details">{user.team} 팀 | {user.part} 파트 | {user.nickname}</div>
                             </div>
                           </div>
@@ -3809,17 +3836,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
-            {/* 저장 상태 메시지 */}
-            {colleagueSaveError && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{colleagueSaveError}</p>
-              </div>
-            )}
-            {colleagueSaveSuccess && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>연계 동료가 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setColleagueSaveError(null); setColleagueSaveSuccess(false); }}>취소</button>
               <button
@@ -3834,8 +3850,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 상단 섹션 타크루 모달 (타크루가 나에 대해 평판을 남김) ========== */}
       {headerModalOpen && headerModalType === '타크루' && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setHeaderModalOpen(false); }}>
-          <div className="section-modal section-modal-wide">
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-reputation-form">
             <div className="section-modal-header">
               <h3>주차 평판</h3>
               <span className="modal-subtitle">해당 크루에게 평판을 남겨주세요</span>
@@ -3964,17 +3980,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
-            {/* 저장 상태 메시지 */}
-            {reputationSaveError && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#FF6B6B', fontSize: '14px' }}>{reputationSaveError}</p>
-              </div>
-            )}
-            {reputationSaveSuccess && (
-              <div style={{ padding: '0 20px 10px', textAlign: 'center' }}>
-                <p style={{ margin: 0, color: '#34C759', fontSize: '14px' }}>주차 평판이 성공적으로 저장되었습니다!</p>
-              </div>
-            )}
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setReputationSaveError(null); setReputationSaveSuccess(false); }}>취소</button>
               <button
@@ -3989,7 +3994,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 주차 평판 카드 상세보기 모달 ========== */}
       {reputationViewModalOpen && selectedReputationCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setReputationViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal reputation-view-modal">
             <div className="section-modal-header">
               <h3>주차 평판</h3>
@@ -4003,11 +4008,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
-                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{selectedReputationCard.age}</span>
+                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{mask.age(selectedReputationCard.age)}세</span>
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(selectedReputationCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedReputationCard.major)}</span><span className="label">학과</span>
+                      <span className="text">{formatSchool(mask.school(selectedReputationCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedReputationCard.major))}</span><span className="label">학과</span>
                     </div>
                     <div className="detail-line">
                       <span className="text">{selectedReputationCard.team}</span><span className="label">팀</span> | <span className="text">{selectedReputationCard.part}</span><span className="label">파트</span>
@@ -4053,7 +4058,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 연계 동료 카드 상세보기 모달 ========== */}
       {colleagueViewModalOpen && selectedColleagueCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setColleagueViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal colleague-view-modal">
             <div className="section-modal-header">
               <h3>연계 동료</h3>
@@ -4078,11 +4083,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="profile-info">
                   <div className="profile-name">
-                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{selectedColleagueCard.age}</span>
+                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{mask.age(selectedColleagueCard.age)}세</span>
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(selectedColleagueCard.university)}</span><span className="label">학교</span> | <span className="text">{formatMajor(selectedColleagueCard.major)}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
                     </div>
                   </div>
                 </div>
@@ -4100,13 +4105,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 정보 카드 상세보기 모달 ========== */}
       {workInfoViewModalOpen && selectedWorkInfoCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkInfoViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 정보</h3>
               <button className="modal-close-btn" onClick={() => setWorkInfoViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4155,7 +4160,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Sub Title</div>
                 <div className="section-content">{selectedWorkInfoCard.subTitle || '-'}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4206,13 +4213,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         };
 
         return (
-          <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkAbilityViewModalOpen(false); }}>
+          <div className="section-modal-overlay">
             <div className="section-modal work-view-modal">
               <div className="section-modal-header">
                 <h3>실무 역량</h3>
                 <button className="modal-close-btn" onClick={() => setWorkAbilityViewModalOpen(false)}>×</button>
               </div>
-              <div className="section-modal-body">
+              <div className="work-view-fixed">
                 {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
                 <div className="work-view-header-row">
                   <div className="work-view-left">
@@ -4242,7 +4249,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="section-label">Sub Title</div>
                   <div className="section-content">{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}</div>
                 </div>
+              </div>
 
+              <div className="section-modal-body">
                 {/* Output Link */}
                 <div className="work-view-section">
                   <div className="section-label">Output Link</div>
@@ -4281,13 +4290,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경험 카드 상세보기 모달 ========== */}
       {workExpViewModalOpen && selectedWorkExpCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkExpViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경험</h3>
               <button className="modal-close-btn" onClick={() => setWorkExpViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4340,7 +4349,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="section-label">Sub Title</div>
                 <div className="section-content">{weekActivityDetails.find(d => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || '-'}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4378,13 +4389,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 실무 경력 카드 상세보기 모달 ========== */}
       {workCareerViewModalOpen && selectedWorkCareerCard && (
-        <div className="section-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setWorkCareerViewModalOpen(false); }}>
+        <div className="section-modal-overlay">
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경력</h3>
               <button className="modal-close-btn" onClick={() => setWorkCareerViewModalOpen(false)}>×</button>
             </div>
-            <div className="section-modal-body">
+            <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
               <div className="work-view-header-row">
                 <div className="work-view-left">
@@ -4432,7 +4443,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   return weekActivityDetails.find(d => d.activity_type_id === activityType)?.sub_title || '-';
                 })()}</div>
               </div>
+            </div>
 
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>

@@ -1,24 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-const MOBILE_BREAKPOINT = 1200;
-
+/**
+ * 고정 너비 레이아웃: 항상 데스크탑 모드
+ * 모바일/태블릿 반응형 완전 제거
+ */
 export function useMobileDetect() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.outerWidth < MOBILE_BREAKPOINT);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-    };
-  }, []);
-
-  return isMobile;
+  return false;
 }

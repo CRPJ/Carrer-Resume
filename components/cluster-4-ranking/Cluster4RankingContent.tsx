@@ -164,6 +164,37 @@ const Cluster4RankingContent = () => {
     return weeks.filter(w => w.seasonYear === year && w.seasonName === season);
   }, [weeks, selectedSeason]);
 
+  // hash fragment 기반 스크롤 (#weekly-filter-bar)
+  useEffect(() => {
+    if (window.location.hash === '#weekly-filter-bar') {
+      const tryScroll = () => {
+        const el = document.getElementById('weekly-filter-bar');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top, left: 0, behavior: 'auto' });
+        }
+      };
+      // DOM 렌더링 + 데이터 fetch 완료 대기
+      setTimeout(tryScroll, 500);
+      setTimeout(tryScroll, 1000);
+    }
+  }, []);
+
+  // 드롭다운 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.filter-dropdown')) {
+        setSeasonDropdownOpen(false);
+        setWeekDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // 버튼 위치 업데이트
   const updateSeasonPos = () => {
     if (seasonBtnRef.current) {
@@ -423,9 +454,9 @@ const Cluster4RankingContent = () => {
       <div className="cluster4-content cluster4-content--week">
 
         {/* Section 3: 랭킹 리스트 */}
-        <section className="cluster4-weekly-list">
+        <section className="cluster4-weekly-list" id="cluster4-weekly-list">
           {/* 필터 바 */}
-          <div className="weekly-filter-bar">
+          <div className="weekly-filter-bar" id="weekly-filter-bar">
             <div
               className="filter-card filter-card-large"
               onClick={() => {

@@ -1,5 +1,6 @@
 // Cluster 4 - Club Challenge Growth Styles
-@import url('https://fonts.googleapis.com/css2?family=Khula:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Khula:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&family=Poppins:wght@700&family=Press+Start+2P&family=Chakra+Petch:wght@700&family=Rajdhani:wght@400;500&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
@@ -55,6 +56,74 @@
   // 섹션 간 기본 여백(너무 붙어 보이는 문제 완화)
   --c4-section-gap: clamp(22px, 2.6vw, 60px);
 
+  // 공통 플로팅 아이콘 스타일 (section1, section2용)
+  > section > .floating-icons {
+    position: absolute;
+    top: 40px;
+    right: 47px;
+    display: flex;
+    gap: 5px;
+    z-index: 2;
+    align-items: center;
+
+    .edit-icon {
+      width: 22px;
+      height: 22px;
+      background: #FAAB07;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+
+      &:hover {
+        transform: scale(1.1);
+        background: #FFC919;
+      }
+
+      svg {
+        width: 11px;
+        height: 11px;
+      }
+
+      .tooltip {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: #222;
+        color: #fff;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 400;
+        padding: 8px 12px;
+        border-radius: 8px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: -6px;
+          right: 8px;
+          border-left: 6px solid transparent;
+          border-right: 6px solid transparent;
+          border-bottom: 6px solid #222;
+        }
+      }
+
+      &.search-icon:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
   // Section 1: CLUB CHALLENGE GROWTH
   .cluster4-section1 {
     width: 100%;
@@ -96,8 +165,8 @@
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      height: 3px;
-      background: #D4C700;
+      height: 1px;
+      background: #ECBB02;
       z-index: 10;
     }
 
@@ -114,31 +183,38 @@
 
       .tab {
         position: relative;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: #000;
-        border: 1px solid #000;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s ease;
         text-decoration: none;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.80), 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
+        width: 44px;
+        height: 44px;
 
-        &:hover {
-          background: #222;
+        // hover 브릿지: tab-badge까지 hover 영역 연결
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -8px;
+          width: 8px;
+          height: 100%;
         }
 
-        &.active {
+        // cluster4: 첫번째 탭(전구)이 active
+        &:first-child {
           background: #FAAB07;
-          border-color: #FAAB07;
-          box-shadow: 0 0 10px rgba(250, 171, 7, 0.8), 0 0 20px rgba(250, 171, 7, 0.5);
+        }
+
+        &:last-child {
+          background: #161816;
         }
 
         .tab-icon {
-          width: 32px;
-          height: 32px;
+          width: 40px;
+          height: 40px;
           object-fit: contain;
         }
 
@@ -146,21 +222,18 @@
           position: absolute;
           left: 100%;
           top: 50%;
-          transform: translateY(-50%) translateX(-10px);
-          margin-left: 8px;
-          display: flex;
+          transform: translateY(-50%);
+          display: none;
           align-items: center;
           justify-content: center;
           gap: 8px;
           background: #FFEC8F;
           padding: 8px 24px;
           border-radius: 8px;
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.3s ease;
           white-space: nowrap;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
           z-index: 100;
+          cursor: pointer;
 
           .badge-text {
             font-family: 'Pretendard', sans-serif;
@@ -177,9 +250,7 @@
         }
 
         &:hover .tab-badge {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(-50%) translateX(0);
+          display: flex;
         }
       }
     }
@@ -227,7 +298,7 @@
       // Cluster2/3와 동일한 여백/줄바꿈 전략으로 통일
       max-width: min(62ch, 1100px);
       margin: 0 auto;
-      padding: 30px 40px 0 70px;
+      padding: 30px 40px 0;
       line-height: 1.8;
       position: relative;
       z-index: 1;
@@ -238,10 +309,9 @@
       hyphens: auto;
       text-wrap: pretty;
 
-      // Cluster2/3와 동일하게 데스크탑에서만 살짝 우측 이동
-      @media (min-width: 1200px) {
-        transform: translateX(clamp(0px, 2.2vw, 72px));
-      }
+      // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
+      // @media (min-width: 1200px) unwrapped:
+      transform: translateX(clamp(0px, 2.2vw, 72px));
 
       p {
         font-family: 'HakgyoansimTuho', sans-serif;
@@ -342,8 +412,8 @@
         content: '';
         position: absolute;
         top: 108px;
-        left: -28px;
-        width: calc(100% + 56px);
+        left: 0;
+        width: 100%;
         height: 626px;
         background-image: url('/images/0/cluster4/4-1/bg image.png');
         background-size: 140% 140%;
@@ -366,9 +436,9 @@
         content: '';
         position: absolute;
         top: 0;
-        left: -28px;
+        left: 0;
         top: 108px;
-        width: calc(100% + 56px);
+        width: 100%;
         height: 626px;
         background-image: url('/images/0/cluster4/bg border.png');
         background-size: 100% 100%;
@@ -382,8 +452,8 @@
       .card-background {
         position: absolute;
         top: 108px;
-        left: -28px;
-        width: calc(100% + 56px);
+        left: 0;
+        width: 100%;
         height: 626px;
         overflow: hidden;
         border-radius: 8px;
@@ -421,29 +491,31 @@
         }
 
         .season-title-shadow {
-          font-family: 'Pretendard', sans-serif;
-          font-size: 3.4375rem;
-          font-weight: 900;
-          color: #111;
-          -webkit-text-stroke: 1px rgba(250, 171, 7, 0.56);
-          text-stroke: 1px rgba(250, 171, 7, 0.56);
+          font-family: 'Khula', sans-serif;
+          font-size: 3.75rem;
+          font-weight: 800;
+          color: #000;
+          -webkit-text-stroke: 1px #FAAB07;
+          text-stroke: 1px #FAAB07;
           letter-spacing: 0;
+          text-transform: uppercase;
           margin: 0;
           position: absolute;
-          top: 3px;
-          left: 3px;
+          top: 4px;
+          left: -3px;
           z-index: 0;
           white-space: nowrap;
           @include stacked-title-layer(1.08, true);
         }
 
         .season-title {
-          font-family: 'Pretendard', sans-serif;
-          font-size: 3.4375rem;
-          font-weight: 900;
+          font-family: 'Khula', sans-serif;
+          font-size: 3.75rem;
+          font-weight: 800;
           color: #FFF;
           margin: 0;
           letter-spacing: 0;
+          text-transform: uppercase;
           position: relative;
           z-index: 1;
           white-space: nowrap;
@@ -457,35 +529,54 @@
           justify-content: center;
           width: 127px;
           min-width: 127px;
-          height: 56px;
-          min-height: 56px;
+          height: 52px;
+          min-height: 52px;
           flex-shrink: 0;
           overflow: visible;
-          margin-left: 20px;
+          margin-left: 5px;
+
+          .badge-outline {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+          }
+
+          .badge-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+          }
 
           .badge-text {
+            position: relative;
+            z-index: 2;
             font-size: 1.125rem;
             font-weight: 700;
             color: #000;
             white-space: nowrap;
-            margin-left: -2px;
           }
         }
 
         .collection-card {
           display: inline-flex;
-          padding: 21px 40px;
+          padding: 20px 38px;
           align-items: flex-start;
-          gap: 31px;
+          gap: 30px;
           background: #232323;
           border: 2px solid #3A3A3A;
-          border-radius: 31px;
+          border-radius: 30px;
           margin-bottom: 25px;
           box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
 
           .collection-icon {
-            width: 61px;
-            height: 61px;
+            width: 59px;
+            height: 59px;
             flex-shrink: 0;
             border-radius: 64px;
             overflow: hidden;
@@ -530,7 +621,7 @@
             font-weight: 400;
             color: #fff;
             margin: 0;
-            line-height: 32px;
+            line-height: 30px;
             white-space: normal;
 
             strong {
@@ -554,15 +645,15 @@
         .details-card {
           display: flex;
           width: 440px;
-          padding: 21px;
+          padding: 20px;
           flex-direction: column;
           align-items: flex-start;
           margin-top: -10px;
-          gap: 16px;
+          gap: 20px;
           background: #232323;
           border: 1px solid rgba(100, 100, 110, 0.6);
-          border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(255, 255, 255, 0.25);
+          border-radius: 12px;
+          box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.50);
 
           .details-header {
             display: flex;
@@ -605,8 +696,8 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              height: 19px;
-              margin-bottom: 15px;
+              height: 20px;
+              margin-bottom: 16px;
 
               &:last-child {
                 margin-bottom: 0;
@@ -617,25 +708,29 @@
                 font-size: 0.875rem;
                 color: #fff;
                 font-weight: 600;
+                line-height: 20px;
               }
 
               .detail-value {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
-                color: #fff;
+                color: #fef08a;
                 text-align: right;
                 font-weight: 700;
+                line-height: 20px;
 
                 .number {
                   font-size: 1rem;
-                  color: #fff;
+                  color: #fef08a;
                   font-weight: 700;
+                  line-height: 20px;
                 }
 
                 .orange-highlight {
-                  font-size: 0.875rem;
-                  color: #FFEC8F;
+                  font-size: 1rem;
+                  color: #f59e0b;
                   font-weight: 700;
+                  line-height: 20px;
                 }
 
                 .white-text {
@@ -649,7 +744,7 @@
 
       .card-right {
         position: absolute;
-        right: -30px;
+        right: -80px;
         top: -10px !important;
         width: 702px;
         height: 732px;
@@ -1287,8 +1382,9 @@
         border: 1px solid rgba(80, 80, 90, 0.4);
 
         .season-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 1.75rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
+          font-weight: 700;
           color: #FFF;
           margin: 0 0 12px 0;
 
@@ -1371,8 +1467,8 @@
         align-items: flex-start;
 
         .season-image-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 2rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
           color: #FFF;
           margin: 0;
           font-weight: 700;
@@ -1491,8 +1587,9 @@
         border-bottom: 1px solid #333;
 
         .season-main-title {
-          font-family: 'Cafe24Ohsquare', sans-serif;
-          font-size: 1.75rem;
+          font-family: 'Poppins', sans-serif;
+          font-size: 2.25rem;
+          font-weight: 700;
           color: #FFF;
           margin: 0;
 
@@ -1954,20 +2051,37 @@
 .cluster4-section3 {
   width: 100%;
   max-width: 1330px;
-  padding: 30px 0 10px 0;
-  margin-top: 20px;
+  padding: 0 0 10px 0;
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
+  background: #000;
+
+  // Vector 38: 섹션1 하단 노란색 구분선 (피그마 시안)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: #ECBB02;
+    z-index: 10;
+  }
 
   // SEASON CHALLENGE 배너
   .section3-banner {
     width: 100%;
-    padding: 79px 40px 40px 40px; 
-    margin-bottom: 20px;
+    padding: 79px 40px 60px 40px;
+    margin-bottom: 50px;
     background-image: url('/images/0/cluster4/Bg img 02 .png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     text-align: center;
     position: relative;
+    overflow: visible;
 
     &::before {
       content: '';
@@ -1983,11 +2097,12 @@
     // 플로팅 아이콘 (우측 상단)
     .floating-icons {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      top: 40px;
+      right: 47px;
       display: flex;
       gap: 5px;
       z-index: 2;
+      align-items: center;
 
       .edit-icon {
         width: 22px;
@@ -2007,13 +2122,13 @@
         }
 
         svg {
-          width: 12px;
-          height: 12px;
+          width: 11px;
+          height: 11px;
         }
 
         img {
-          width: 12px;
-          height: 12px;
+          width: 11px;
+          height: 11px;
           object-fit: contain;
         }
 
@@ -2077,10 +2192,10 @@
 
     .section3-banner-description {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.25rem;
+      font-size: 1.875rem !important;
       color: #FFF;
       font-weight: 400;
-      line-height: 22px;
+      line-height: 2.5rem !important;
       margin-bottom: 0;
       position: relative;
       z-index: 1;
@@ -2090,22 +2205,25 @@
         border-left: none !important;
         padding-left: 0 !important;
         font-family: 'HakgyoansimTuho', sans-serif !important;
+        font-size: 1.875rem !important;
+        line-height: 2.5rem !important;
       }
     }
 
     .section3-banner-notice {
       font-family: 'HakgyoansimTuho', sans-serif !important;
-      font-size: 1.25rem;
+      font-size: 1.3125rem !important;
       color: #FFF;
       position: relative;
       z-index: 1;
-      margin-top: 30px;
+      margin-top: 20px;
 
       p {
         margin: 0;
         border-left: none !important;
         padding-left: 0 !important;
         font-family: 'HakgyoansimTuho', sans-serif !important;
+        font-size: 1.3125rem !important;
       }
     }
   }
@@ -2325,7 +2443,7 @@
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    padding: 30px 30px;
+    padding: 30px 15px 30px 40px;
     width: 100%;
     max-width: 1330px;
     height: 695px;
@@ -2363,7 +2481,7 @@
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 20px;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       opacity: 1;
       position: relative;
       z-index: 100;
@@ -2372,7 +2490,7 @@
       .area-1-title {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 20px;
         opacity: 1;
         transform: translateY(0);
         transition: opacity 0.6s ease-out, transform 0.6s ease-out;
@@ -2384,25 +2502,39 @@
         }
 
         .season-main-title {
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Poppins', 'Pretendard', sans-serif;
           font-size: 2.25rem;
           font-weight: 700;
+          letter-spacing: -1.08px;
           color: #FFF;
           margin: 0;
+          text-transform: uppercase;
+          line-height: 54px;
 
           .year-orange {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Poppins', 'Pretendard', sans-serif;
             font-size: 2.25rem;
             font-weight: 700;
-            color: #FFA500;
+            color: #FAAB07;
+            text-transform: uppercase;
+            line-height: 54px;
+          }
+
+          .season-highlight {
+            font-family: 'Poppins', 'Pretendard', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #FAAB07;
+            text-transform: uppercase;
+            line-height: 54px;
           }
 
           &::after {
             content: '';
             display: inline-block;
-            width: 4px;
-            height: 4px;
-            background: #FFA500;
+            width: 2px;
+            height: 2px;
+            background: #FAAB07;
             border-radius: 50%;
             margin-left: 16px;
             vertical-align: middle;
@@ -2419,13 +2551,14 @@
             font-size: 0.875rem;
             font-weight: 600;
             color: #FFF;
+            line-height: 35px;
 
             &::after {
               content: '';
               display: inline-block;
-              width: 4px;
-              height: 4px;
-              background: #FFA500;
+              width: 2px;
+              height: 2px;
+              background: #FAAB07;
               border-radius: 50%;
               margin-left: 12px;
               vertical-align: middle;
@@ -2433,19 +2566,21 @@
           }
 
           .status-badge {
-            background: #FFA500;
+            background: #FAAB07;
             border: none;
             width: 87px;
             height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 17.5px;
+            border-radius: 20px;
+            font-family: 'Pretendard', sans-serif;
             font-size: 0.875rem;
             color: #FFF;
             font-weight: 700;
             cursor: pointer;
-            padding-top: 2px;
+            padding: 0 10px;
+            line-height: 35px;
           }
         }
       }
@@ -2473,11 +2608,12 @@
           font-size: 1.5rem;
           color: #FFF;
           font-weight: 400;
+          line-height: 30px;
         }
 
         .qualified-items {
           display: flex;
-          gap: 16px;
+          gap: 15px;
           overflow: visible;
           position: relative;
           z-index: 101;
@@ -2485,7 +2621,7 @@
           .item-group {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
             position: relative;
             cursor: pointer;
             z-index: 102;
@@ -2510,18 +2646,19 @@
             }
 
             .qualified-icon {
-              width: 24px;
-              height: 24px;
+              width: 28px;
+              height: 28px;
               object-fit: contain;
             }
 
             .item {
               font-family: var(--rajdhani), sans-serif;
               font-size: 0.75rem;
-              font-weight: 600;
+              font-weight: 500;
               color: #FAAB07;
               border-bottom: 1px solid rgba(250, 171, 7, 0.5);
-              padding: 0 8px 2px 8px;
+              padding: 9px 9px 5.16px 5.16px;
+              line-height: 18px;
             }
 
             .trophy {
@@ -2586,8 +2723,8 @@
     // 메인 컨텐츠 그리드 (3열)
     .main-content-grid {
       display: grid;
-      grid-template-columns: 300px 1fr 300px;  // 380px 1fr 340px → 축소
-      gap: 15px;                                // 20px → 15px
+      grid-template-columns: 300px 1fr 342px;  // 피그마 우측 342px
+      gap: 15px;
       position: relative;
       z-index: 1;
 
@@ -2597,8 +2734,9 @@
         display: flex;
         align-items: flex-start;
         justify-content: center;
+        padding-left: 40px;
         overflow: visible;
-        padding-top: 30px;    
+        padding-top: 60px;
 
         .season-image-stack {
           width: 315px;
@@ -2666,7 +2804,7 @@
               left: 8px;
               z-index: 2;
               opacity: 0.8;
-              transform: rotate(4deg);
+              transform: rotate(6deg);
 
               .card-frame {
                 background: linear-gradient(135deg, #FAAB07 0%, #FFE3AA 100%);
@@ -2768,7 +2906,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-left: 70px;
+        margin-left: 108px;
         align-items: flex-start;
         opacity: 1;
         transform: translateY(0);
@@ -2784,27 +2922,30 @@
         .area-4-stats {
           display: flex;
           gap: 25px;
-          padding: 12px 0;
+          padding: 0;
 
           .stat {
-            font-size: 0.875rem;
-            color: #CCC;
+            font-family: 'Poppins', 'Pretendard', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #FFF;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
+            line-height: 35px;
 
             &::before {
               content: '';
               display: inline-block;
               width: 2px;
               height: 2px;
-              background: #FFA500;
+              background: #FAAB07;
               border-radius: 50%;
             }
 
             .stat-icon {
-              width: 18px;
-              height: 18px;
+              width: 20px;
+              height: 21px;
               object-fit: contain;
             }
 
@@ -2813,13 +2954,15 @@
               font-size: 1.375rem;
               color: #FFF;
               font-weight: 400;
+              line-height: 35px;
             }
 
             .unit {
-              font-family: 'Pretendard', sans-serif;
+              font-family: var(--black-ops-one), cursive;
               font-size: 1rem;
-              color: #CCC;
+              color: #FFF;
               font-weight: 400;
+              line-height: 35px;
             }
           }
         }
@@ -2828,18 +2971,18 @@
         .area-5-rating {
           display: flex;
           align-items: center;
-          gap: 16px;
-          width: 490px;
+          gap: 20px;
+          width: 466px;
           height: 80px;
-          padding: 16px;
-          background: #222;
+          padding: 10px;
+          background: #1b1b1b;
           border-radius: 30px;
 
           .rating-avatar {
             flex-shrink: 0;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
             overflow: hidden;
 
             img {
@@ -2867,8 +3010,8 @@
                 gap: 2px;
 
                 .star-icon {
-                  width: 12px;
-                  height: 12px;
+                  width: 12.71px;
+                  height: 18px;
                   object-fit: contain;
 
                   &.empty {
@@ -2877,28 +3020,38 @@
                 }
 
                 .rating-text {
+                  font-family: 'Rajdhani', sans-serif;
+                  font-weight: 500;
                   font-size: 0.875rem;
                   color: #FFF;
-                  margin-left: 8px;
-                  line-height: 1;
+                  margin-left: 10px;
+                  letter-spacing: 0.7px;
+                  line-height: 22.5px;
                 }
               }
 
               .review-label {
-                font-family: 'Pretendard', sans-serif;
+                font-family: 'Manrope', sans-serif;
                 font-size: 0.875rem;
-                color: #000;
-                font-weight: 600;
-                background: #FFA500;
-                padding: 1px 14px;
-                border-radius: 999px;
+                color: #161616;
+                font-weight: 700;
+                background: #FAAB07;
+                padding: 10px;
+                border-radius: 14px;
+                height: 29px;
+                line-height: 22px;
+                display: flex;
+                align-items: center;
               }
             }
 
             .review-comment {
+              font-family: 'Khula', sans-serif;
+              font-weight: 400;
               font-size: 1rem;
               color: rgba(255, 255, 255, 0.7);
               margin: 0;
+              line-height: 26px;
             }
           }
         }
@@ -2906,7 +3059,7 @@
         // 영역 6: 원형 차트 3개
         .area-6-circles {
           display: flex;
-          gap: 25px;
+          gap: 40px;
           justify-content: space-around;
           padding: 30px 0;
 
@@ -2968,8 +3121,8 @@
                 top: -5px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 28px;
-                height: 28px;
+                width: 30px;
+                height: 34px;
                 object-fit: contain;
                 z-index: 10;
               }
@@ -2979,6 +3132,7 @@
                 top: 33px;
                 left: 50%;
                 transform: translateX(-50%);
+                font-family: 'Pretendard', sans-serif;
                 font-size: 1.5rem;
                 font-weight: 700;
                 color: #FFF;
@@ -2994,15 +3148,18 @@
               z-index: 20;
 
               .label-main {
-                font-size: 1.25rem;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 700;
                 color: #FFF;
                 margin-bottom: 4px;
                 line-height: 1;
               }
 
               .label-sub {
-                font-size: 0.875rem;
-                font-weight: 300;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 1rem;
+                font-weight: 400;
                 color: #FFF;
                 margin-top: -2px;
                 line-height: 1;
@@ -3022,7 +3179,7 @@
         .area-7-progress {
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 10px;
           padding: 16px 0;
 
           .progress-item {
@@ -3034,39 +3191,48 @@
               width: 465.572px;
 
               .name {
+                font-family: 'Pretendard', sans-serif;
                 font-size: 1rem;
+                font-weight: 700;
                 color: #FFF;
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 5px;
+                text-transform: uppercase;
+                line-height: 40px;
 
                 .progress-icon {
                   width: 20px;
-                  height: 20px;
+                  height: 30px;
                   object-fit: contain;
                 }
               }
 
               .value {
+                font-family: 'Pretendard', sans-serif;
                 font-size: 0.875rem;
                 color: #FFF;
-                font-weight: 600;
+                font-weight: 700;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 5px;
                 white-space: nowrap;
+                text-transform: uppercase;
+                line-height: 31px;
 
                 .stars-icon {
                   width: 18px;
-                  height: 18px;
+                  height: 13px;
                   flex-shrink: 0;
                   object-fit: contain;
                 }
 
                 .highlight {
                   font-size: 1rem;
-                  color: #FFA500;
+                  color: #FAAB07;
                   font-weight: 700;
+                  text-transform: uppercase;
+                  line-height: 31px;
                 }
               }
             }
@@ -3098,9 +3264,9 @@
       .right-column {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 30px;
         padding: 0;
-        overflow: hidden;          // 추가: 넘침 방지
+        overflow: hidden;
 
         &.fading {
           opacity: 0;
@@ -3110,20 +3276,22 @@
 
         // 영역 8: 시즌 상태
         .area-8-season-status {
-          width: 100%;   
+          width: 100%;
 
           .section-title {
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            letter-spacing: 0.7px;
+            margin: 0 0 10px 0;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
 
             .section-icon {
-              width: 20px;
-              height: 20px;
+              width: 21px;
+              height: 21px;
               object-fit: contain;
               margin-top: -4px;
             }
@@ -3133,7 +3301,8 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
-            max-height: 96px;          // 배지 2개만 보이는 높이
+            background: #0b0b0b;
+            max-height: 101px;         // 피그마 높이
             overflow-y: auto;          // visible → auto
             overflow-x: hidden;
             scrollbar-width: thin;
@@ -3197,6 +3366,7 @@
               .badge-info {
                 display: flex;
                 align-items: center;
+                gap: 8px;
 
                 .badge-text {
                   font-family: 'Pretendard', sans-serif;
@@ -3233,7 +3403,7 @@
               
                 &.yellow {
                   background: #FAAB07;
-                  color: #171717;
+                  color: #111111;
                 }
 
                 &.orange {
@@ -3247,20 +3417,22 @@
 
         // 영역 9: 시즌 평판
         .area-9-season-reputation {
-          width: 100%;   // 370px → 100%  
+          width: 100%;   // 370px → 100%
 
           .section-title {
+            font-family: 'Chakra Petch', sans-serif;
             font-size: 1rem;
             color: #FFF;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            letter-spacing: 0.7px;
+            margin: 0 0 10px 0;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
 
             .section-icon {
-              width: 20px;
-              height: 20px;
+              width: 21px;
+              height: 21px;
               object-fit: contain;
               margin-top: -4px;
             }
@@ -3270,8 +3442,9 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            max-height: 340px;         // 카드 2개 + 세번째 살짝 보이는 높이
+            gap: 20px;
+            background: #1b1b1b;
+            max-height: 490px;         // 피그마 높이 맞춤
             overflow-y: auto;          // visible → auto
             overflow-x: hidden;
             padding: 3px 3px 3px 0;  
@@ -3310,6 +3483,7 @@
               overflow: visible;
               border-left: 1px solid rgba(255, 255, 255, 0.1);
               border-right: 1px solid rgba(255, 255, 255, 0.1);
+              height: 150px;
             
               // 상단 좌측 teal 데코 라인
               &::before {
@@ -3370,8 +3544,8 @@
                 align-items: flex-start;
 
                 .avatar {
-                  width: 48px;
-                  height: 48px;
+                  width: 42px;
+                  height: 42px;
                   border-radius: 50%;
                   overflow: hidden;
                   flex-shrink: 0;
@@ -3394,31 +3568,42 @@
                   min-width: 0;
 
                   .row1 {
+                    font-family: 'Pretendard', sans-serif;
                     font-size: 0.75rem;
                     color: #FFF;
-                    font-weight: 500;
+                    font-weight: 400;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     letter-spacing: -0.5px;
+                    line-height: 19px;
 
                     .separator {
+                      font-family: 'Azeret Mono', monospace;
                       color: #FFF;
                       margin: 0 1px;
+                      font-size: 0.75rem;
+                      line-height: 19px;
                     }
                   }
 
                   .row2 {
+                    font-family: 'Pretendard', sans-serif;
                     font-size: 0.75rem;
                     color: #FFF;
+                    font-weight: 400;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     letter-spacing: -0.5px;
+                    line-height: 19px;
 
                     .separator {
+                      font-family: 'Azeret Mono', monospace;
                       color: #FFF;
                       margin: 0 1px;
+                      font-size: 0.75rem;
+                      line-height: 19px;
                     }
                   }
                 }
@@ -3434,12 +3619,12 @@
                   background: rgba(0, 255, 190, 0.1);
                   color: #00FFBE;
                   border-radius: 4px;
-                  font-family: 'Pretendard', sans-serif;
-                  font-size: 0.625rem;
-                  font-weight: 600;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-size: 0.6rem;
+                  font-weight: 500;
                   white-space: nowrap;
-                  padding: 4px 8px;
-                  line-height: 1;
+                  padding: 4px 7.2px;
+                  line-height: 9.6px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -3450,12 +3635,13 @@
                   background: rgba(235, 247, 72, 0.1);
                   color: #EBF748;
                   border-radius: 4px;
-                  font-family: 'Pretendard', sans-serif;
-                  font-size: 0.625rem;
-                  font-weight: 600;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-size: 0.6rem;
+                  font-weight: 500;
                   white-space: nowrap;
-                  padding: 4px 8px;
-                  line-height: 1;
+                  padding: 4px 7.2px;
+                  line-height: 9.6px;
+                  letter-spacing: 0.7px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -3466,16 +3652,18 @@
               .comment {
                 display: flex;
                 align-items: flex-start;
-                gap: 3px;
-                font-size: 0.75rem;
+                gap: 4px;
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.8125rem;
+                font-weight: 500;
                 color: #FFF;
                 margin-top: 16px;
-                line-height: 1.4;
+                line-height: 20px;
 
                 .speech-icon {
                   flex-shrink: 0;
-                  width: 16px;
-                  height: 16px;
+                  width: 20px;
+                  height: 20px;
                   margin-top: -2px;
                 }
 
@@ -3502,8 +3690,11 @@
                   display: flex;
                   align-items: center;
                   gap: 10px;
+                  font-family: 'Rajdhani', sans-serif;
+                  font-weight: 400;
                   font-size: 0.9375rem;
-                  color: #888;
+                  color: #FFF;
+                  letter-spacing: 0.7px;
                   margin-top: 3px;
 
                   .wifi-icon {
@@ -3558,11 +3749,14 @@
                   }
 
                   .rating-score {
-                    font-size: 0.9375rem;
-                    color: #888;
+                    font-family: 'Rajdhani', sans-serif;
+                    font-weight: 400;
+                    font-size: 0.75rem;
+                    color: rgba(255, 255, 255, 0.9);
                     margin-left: 12px;
                     margin-top: 2px;
-                    line-height: 12px;
+                    line-height: 18px;
+                    letter-spacing: 0.7px;
                     display: flex;
                     align-items: center;
                   }
@@ -3583,6 +3777,32 @@
   padding: 80px 0 40px 0;
   margin-top: 40px;
   overflow: visible;
+  position: relative;
+  z-index: 2;
+  background: #000;
+
+  // crews 페이지에서는 구분선/배경 제거
+  &.crews-filter-only {
+    background: transparent;
+    margin-top: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  // Vector 38: 섹션1 하단 노란색 구분선 (피그마 시안)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: #ECBB02;
+    z-index: 10;
+  }
 
   // 필터 바
   .weekly-filter-bar {
@@ -3718,6 +3938,7 @@
 
             &:hover {
               background: rgba(255, 165, 0, 0.1);
+              color: #fff;
             }
 
             &.selected {
@@ -3759,8 +3980,7 @@
     width: 1225px;
     height: 206px;
     background: #272727;
-    border-radius: 12px;
-    border: 1px solid #333;
+    border-radius: 20px;
     transition: all 0.3s;
     position: relative;
 
@@ -3775,7 +3995,7 @@
       flex-shrink: 0;
       width: 269px;
       height: 206px;
-      border-radius: 12px;
+      border-radius: 15px;
       overflow: hidden;
       position: relative;
       margin: -20px 0 -20px -20px;
@@ -3871,9 +4091,9 @@
           background: rgba(255, 255, 255, 0.2);
           color: #9DFA07;
           padding: 2px 10px;
-          border-radius: 20px;
+          border-radius: 50px;
           font-size: 0.75rem;
-          font-weight: 600;
+          font-weight: 400;
           font-family: 'Cafe24Ohsquare', sans-serif;
 
           &.fail {
@@ -3925,22 +4145,22 @@
         .weekly-card-title {
           font-family: 'Pretendard', sans-serif;
           font-size: 1.125rem;
-          font-weight: 700;
+          font-weight: 800;
           color: #fff;
+          line-height: 25px;
           margin: 0;
         }
 
         .weekly-card-date {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 0 16px;
-          height: 40px;
+          gap: 6px;
+          padding: 9px 12px;
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 12px;
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Manrope', sans-serif;
           font-size: 0.875rem;
-          font-weight: 600;
+          font-weight: 800;
           color: #fff;
 
           .date-icon {
@@ -3953,14 +4173,13 @@
         .weekly-card-week {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 0 16px;
-          height: 40px;
+          gap: 6px;
+          padding: 9px 12px;
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 12px;
-          font-family: 'Pretendard', sans-serif;
+          font-family: 'Manrope', sans-serif;
           font-size: 0.875rem;
-          font-weight: 600;
+          font-weight: 800;
           color: #fff;
 
           .week-icon {
@@ -3986,6 +4205,7 @@
         font-size: 0.875rem;
         font-weight: 400;
         color: #fff;
+        line-height: 19px;
 
         .info-group {
           display: flex;
@@ -4000,11 +4220,17 @@
         }
 
         .info-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+
           &.team {
+            min-width: 160px;
             color: #fff;
 
             strong {
               font-weight: 700;
+              flex-shrink: 0;
             }
 
             .text-gray {
@@ -4013,10 +4239,12 @@
           }
 
           &.part {
+            min-width: 200px;
             color: #fff;
 
             strong {
               font-weight: 700;
+              flex-shrink: 0;
             }
 
             .text-gray {
@@ -4032,6 +4260,10 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            line-height: 35px;
 
             .item-icon {
               width: 16px;
@@ -4043,7 +4275,8 @@
               font-family: 'Black Ops One', cursive;
               color: #fff;
               font-weight: 400;
-              font-size: 1.125rem;
+              font-size: 0.875rem;
+              line-height: 35px;
             }
           }
         }
@@ -4052,14 +4285,14 @@
           &.role {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 16px;
-            height: 40px;
+            gap: 6px;
+            padding: 9px 12px;
+            min-width: 154px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 800;
             color: #fff;
 
             .role-icon {
@@ -4087,7 +4320,7 @@
         margin-top: 2px;
         margin-bottom: 2px;
         font-family: 'Pretendard', sans-serif;
-        font-size: 0.875rem;
+        font-size: 0.9375rem;
         font-weight: 400;
         color: #fff;
 
@@ -4128,6 +4361,9 @@
           align-items: center;
           gap: 6px;
           color: #fff;
+          font-family: 'Chakra Petch', sans-serif;
+          font-weight: 700;
+          font-size: 0.875rem;
 
           .leaf-icon {
             width: 20px;
@@ -4137,7 +4373,7 @@
 
           strong {
             color: #FAAB07;
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 700;
           }
         }
@@ -4190,7 +4426,7 @@
 
             .num {
               color: #FAAB07;
-              font-size: 1.0625rem;
+              font-size: 1rem;
               font-weight: 700;
             }
           }
@@ -4210,7 +4446,7 @@
 
         .num {
           color: #FAAB07;
-          font-size: 1.0625rem;
+          font-size: 1rem;
           font-weight: 700;
         }
 
@@ -4235,10 +4471,13 @@
       gap: 4px;
 
       .status-text {
-        font-size: 1.0625rem;
-        font-weight: 700;
+        font-family: 'Pretendard', sans-serif;
+        font-size: 1.125rem;
+        font-weight: 800;
         color: #9DFA07;
-        text-shadow: 0 0 8px rgba(157, 250, 7, 0.5);
+        text-transform: capitalize;
+        line-height: 19px;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 1.0);
       }
 
       &.fail .status-text {
@@ -4371,7 +4610,7 @@
   // =========================================================
   // Mobile UX: 필터 바텀시트 + 카드 요약/펼침
   // =========================================================
-  @media (max-width: 1199px) {
+  /* @media (max-width: 1199px) {
     max-width: 100%;
     padding: 40px 16px 24px 16px;
     margin-top: 20px;
@@ -4506,6 +4745,7 @@
         font-size: 0.875rem;
         font-weight: 600;
         outline: none;
+        cursor: pointer;
       }
     }
 
@@ -4751,7 +4991,7 @@
         cursor: pointer;
       }
     }
-  }
+  } */
 }
 
 // ============================================
@@ -5078,32 +5318,31 @@
 
 
 // ★ 4K 대응: zoom 1.5 적용 시 viewport ≈ 2560px → 1330px이 너무 좁음
-@media screen and (min-width: 1800px) {
-  .cluster4-content {
-    max-width: 100% !important;
+// @media screen and (min-width: 1800px) unwrapped:
+.cluster4-content {
+  max-width: 100% !important;
+}
+
+.cluster4-section1,
+.cluster4-section2,
+.cluster4-section3-banner,
+.cluster4-section3,
+.cluster4-section4,
+.cluster4-weekly-list {
+  max-width: 100% !important;
+}
+
+.season-detail-container {
+  max-width: 100% !important;
+
+  // 3열 그리드 비율 조정: 고정px → 비율 기반
+  .main-content-grid {
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(300px, 1.2fr) !important;
+    gap: 30px !important;
   }
 
-  .cluster4-section1,
-  .cluster4-section2,
-  .cluster4-section3-banner,
-  .cluster4-section3,
-  .cluster4-section4,
-  .cluster4-weekly-list {
-    max-width: 100% !important;
-  }
-
-  .season-detail-container {
-    max-width: 100% !important;
-
-    // 3열 그리드 비율 조정: 고정px → 비율 기반
-    .main-content-grid {
-      grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(300px, 1.2fr) !important;
-      gap: 30px !important;
-    }
-
-    // 상단 헤더도 비율 맞춤
-    .top-header-row {
-      gap: 30px !important;
-    }
+  // 상단 헤더도 비율 맞춤
+  .top-header-row {
+    gap: 30px !important;
   }
 }

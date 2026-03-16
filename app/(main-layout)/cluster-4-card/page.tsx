@@ -19,10 +19,10 @@ const Cluster4CardPage = () => {
   });
   const mainRef = useRef<HTMLElement>(null);
 
-  // tight-desktop 감지를 위한 헬퍼
+  // 고정 너비 레이아웃: body 왼쪽 여백 + 사이드바 오프셋
   const getSidebarLeft = () => {
-    const isTight = document.documentElement.classList.contains('tight-desktop');
-    return isTight ? '73px' : '83px';
+    const bodyLeft = document.body.getBoundingClientRect().left;
+    return `${bodyLeft + 83}px`;
   };
 
   // 현재 주차로 리다이렉트

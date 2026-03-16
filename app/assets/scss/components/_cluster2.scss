@@ -48,10 +48,11 @@
   .floating-icons {
     display: none;
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 40px;
+    right: 47px; // 전 섹션 통일: search-icon이 기존 pencil-icon x좌표에 위치
     z-index: 100;
     gap: 5px;
+    align-items: center;
 
     .edit-icon {
       width: 22px;
@@ -71,13 +72,13 @@
       }
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 11px;
+        height: 11px;
       }
 
       img {
-        width: 12px;
-        height: 12px;
+        width: 11px;
+        height: 11px;
         object-fit: contain;
       }
 
@@ -169,9 +170,8 @@
 
       // Figma(Image 프레임) 대비: 텍스트 블록이 조금 더 "오른쪽"에 위치
       // - 작은 화면에서는 밀림이 과해질 수 있어 데스크톱에서만 적용
-      @media (min-width: 1200px) {
-        transform: translateX(clamp(0px, 2.2vw, 72px));
-      }
+      // @media (min-width: 1200px) unwrapped:
+      transform: translateX(clamp(0px, 2.2vw, 72px));
 
       p {
         font-family: "HakgyoansimTuho", sans-serif;
@@ -303,7 +303,7 @@
     }
 
     .floating-icons {
-      top: -50px;
+      top: 5px;
     }
 
     // 왼쪽 영역
@@ -1076,10 +1076,21 @@
     position: relative;
     width: 100%;
     max-width: 1325px;
-    margin: 50px 0;
+    margin: 100px 0 50px 0;
     padding: 25px 0;
     background: transparent;
     overflow: visible;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1023px;
+      height: 2px;
+      background-color: rgba(236, 187, 2, 1);
+    }
 
     &:hover .floating-icons {
       display: flex;
@@ -1108,7 +1119,7 @@
       .btn-wrapper {
         position: relative;
         display: inline-block;
-        margin-right: 14px;
+        margin-right: 57px; // 기존 14px + 43px: 도형 우측 끝을 search-icon 우측 끝(right:47px)에 정렬
         margin-bottom: 14px;
         margin-left: -40px; // 전체적으로 왼쪽 이동
 
@@ -1129,14 +1140,14 @@
         position: relative;
         width: 135px;
         height: 50px;
-        padding: 0 10px 8px 0; // 대각선 컷 보정: 우측·하단 여백으로 시각적 중앙
+        padding: 0 6px 4px 0; // 대각선 컷 보정: 시각적 중앙 정렬
         display: flex;
         align-items: center;
         justify-content: center;
         background: #faab07;
         color: #000;
         border: none;
-        font-size: 1rem;
+        font-size: 1.25rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -2500,6 +2511,33 @@
         }
       }
     }
+
+    // 링크 없는 카드에 반투명 오버레이 (cluster3과 동일한 스타일)
+    .total-complete-box:not(.has-link)::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 24px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .review-week-item:not(.has-link)::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      z-index: 1;
+      pointer-events: none;
+    }
   }
 
   // 자기소개서 섹션
@@ -3349,6 +3387,7 @@
   .intro-modal {
     width: 600px;
     max-width: 90vw;
+    height: min(85vh, 750px); // 상세보기/수정 모달 크기 통일: max-height → height
     max-height: min(85vh, 750px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
@@ -3561,6 +3600,8 @@
       flex: 1;
       overflow-y: auto;
       padding: 24px;
+      display: flex;
+      flex-direction: column;
 
       &::-webkit-scrollbar {
         width: 6px;
@@ -3608,6 +3649,10 @@
       }
 
       .content-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
         .content-text {
           font-size: 0.9375rem;
           line-height: 1.9;
@@ -3622,9 +3667,13 @@
 
         .textarea-wrapper {
           position: relative;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
 
           .content-textarea {
             width: 100%;
+            flex: 1;
             min-height: 300px;
             font-size: 0.9375rem;
             line-height: 1.9;
@@ -4128,10 +4177,10 @@
     width: 562px;
     height: 826px; // 피그마 시안 562×826px 고정
     max-height: 826px;
-    @media (max-height: 900px) {
+    /* @media (max-height: 900px) {
       height: 80vh;
       max-height: 80vh;
-    }
+    } */
     margin: 20px 0;
     overflow: hidden;
     position: relative;
@@ -4853,7 +4902,7 @@
               border-left: 2px solid transparent;
 
               &:hover {
-                background: rgba(255, 165, 0, 0.08);
+                background: rgba(255, 165, 0, 0.1);
                 color: #fff;
                 border-left-color: #ffa500;
               }
@@ -5558,24 +5607,38 @@
                     max-height: 180px;
                     overflow-y: auto;
                     background: #1a1a1a;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 165, 0, 0.3);
                     border-top: none;
                     z-index: 1000;
 
                     .dropdown-option {
-                      padding: 8px 10px;
+                      padding: 12px 16px;
+                      font-family: "Pretendard", sans-serif;
                       font-size: 0.875rem;
-                      color: #fff;
+                      color: #aaa;
                       cursor: pointer;
-                      transition: background 0.2s;
+                      transition: all 0.15s;
+                      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+
+                      &:last-child {
+                        border-bottom: none;
+                      }
 
                       &:hover {
-                        background: #252525;
+                        background: rgba(255, 165, 0, 0.1);
+                        color: #fff;
                       }
 
                       &.selected {
-                        background: #333;
+                        background: rgba(255, 165, 0, 0.15);
                         color: #ffa500;
+                        font-weight: 500;
+
+                        &::before {
+                          content: "✓";
+                          margin-right: 8px;
+                          font-size: 0.75rem;
+                        }
                       }
 
                       &.disabled {

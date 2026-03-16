@@ -75,9 +75,9 @@
   width: 489px !important;
   min-width: 489px !important;
   max-width: 489px !important;
-  height: 875px !important;
-  min-height: 875px !important;
-  max-height: 875px !important;
+  height: 855px !important;
+  min-height: 855px !important;
+  max-height: 855px !important;
   will-change: transform;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -85,7 +85,8 @@
   border: 1px solid #313f11 !important;
   box-shadow: none;
   border-radius: 0 !important;
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: auto;
   font-family:
     "Pretendard",
     -apple-system,
@@ -130,7 +131,7 @@
     pointer-events: none;
   }
 
-  // ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
+  /* ===== 모바일에서 고정 너비 해제 (1199px 이하) =====
   @media only screen and (max-width: 1199px) {
     width: 100% !important;
     min-width: 0 !important;
@@ -266,7 +267,7 @@
       width: 100% !important;
       max-width: 100% !important;
     }
-  }
+  } */
 
   // ===== mobile-layout 클래스 기반 반응형 (미디어쿼리와 독립) =====
   body:has(.mobile-layout) & {
@@ -407,7 +408,7 @@
       }
     }
 
-    // 768px 이상: 여유 있으므로 폰트 키움
+    /* 768px 이상: 여유 있으므로 폰트 키움
     @media (min-width: 768px) {
       .activity-line {
         font-size: 0.6875rem !important;
@@ -443,9 +444,9 @@
           }
         }
       }
-    }
+    } */
 
-    // 1024px 이상: 더 여유
+    /* 1024px 이상: 더 여유
     @media (min-width: 1024px) {
       .activity-line {
         font-size: 0.75rem !important;
@@ -472,7 +473,7 @@
           font-size: 0.75rem !important;
         }
       }
-    }
+    } */
 
     // hexagon 버튼 숨기기
     button[aria-label*="hexagon"] {
@@ -638,7 +639,7 @@
     font-size: 1.4rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 32px;
+    line-height: 1.2;
     color: #fff;
     margin: 0;
     margin-bottom: -1px;
@@ -647,7 +648,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    word-break: keep-all;
+    word-break: break-all;
     overflow-wrap: break-word;
     position: relative;
 
@@ -1181,7 +1182,7 @@
   // Notices
   .resume-notices {
     padding: 10px 20px 8px 0;
-    margin-top: 18px;
+    margin-top: 4px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1633,10 +1634,10 @@
   gap: 15px;
 
   .cluster-tabs-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     align-items: center;
     gap: 18px;
-    flex-wrap: nowrap;
   }
 
   .cluster-tab {
@@ -1645,8 +1646,7 @@
     justify-content: center;
     position: relative;
     height: 56px;
-    width: 259px;
-    min-width: 259px;
+    min-width: 0;
     padding: 23px 20px;
     border-radius: 0;
     font-family: var(--chakra-petch), "Chakra Petch", sans-serif;
@@ -1665,7 +1665,6 @@
     white-space: nowrap;
     transition: all 0.15s ease;
     cursor: pointer;
-    flex-shrink: 0;
     // Figma: BACKGROUND_BLUR radius 12
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
