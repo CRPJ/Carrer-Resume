@@ -3429,7 +3429,7 @@
             flex-direction: column;
             gap: 15px;
             background: #1b1b1b;
-            max-height: 340px;         // 카드 3장(480px) > 340px → 스크롤 발생
+            max-height: 378px;         // 카드 2.5개 보임 (150×2 + 15gap + 75절반 ≈ 390 > 378)
             overflow-y: auto;
             overflow-x: hidden;
             padding: 3px 3px 3px 0;
@@ -3657,14 +3657,13 @@
                 .pm {
                   display: flex;
                   align-items: center;
-                  gap: 10px;
+                  gap: 6px;
                   font-family: 'Rajdhani', sans-serif;
                   font-weight: 400;
                   font-size: 0.9375rem;
                   color: #FFF;
                   letter-spacing: 0.7px;
                   line-height: 19.5px;
-                  margin-top: 3px;
 
                   .wifi-icon {
                     width: 14px;

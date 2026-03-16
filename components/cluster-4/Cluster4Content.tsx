@@ -1695,13 +1695,6 @@ const Cluster4Content = () => {
 
       {/* Section 2: SEASON GROWTH 카드 */}
       <section className="cluster4-section2">
-        {/* Floating Icons - search-icon */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
         <div className="season-growth-card visible">
           {/* 왼쪽 콘텐츠 */}
           <div className="card-left">
@@ -2191,7 +2184,7 @@ const Cluster4Content = () => {
                               <span className="arrow-icon" style={{
                                 width: '15px',
                                 height: '15px',
-                                padding: '10px',
+                                padding: '5px',
                                 flexShrink: 0,
                                 background: '#FAAB07',
                                 borderRadius: '5px',
