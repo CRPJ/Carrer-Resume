@@ -1655,13 +1655,6 @@ const Cluster4Content = () => {
     <div className="cluster4-content">
       {/* Section 1: CLUB CHALLENGE GROWTH */}
       <section className="cluster4-section1" ref={headerRef}>
-        {/* Floating Icons - search-icon */}
-        <div className="floating-icons" style={{ display: 'flex' }}>
-          <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
-          </div>
-        </div>
         {/* 좌측 상단 탭 (세로 정렬) */}
         <div className="top-tabs">
           <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
@@ -2190,27 +2183,23 @@ const Cluster4Content = () => {
                             </div>
                             <div
                               className="comment"
-                              style={{ cursor: 'pointer', position: 'relative' }}
+                              style={{ cursor: 'pointer' }}
                               onClick={() => { setSelectedReputation(reputation); setReputationDetailModalOpen(true); }}
                             >
                               <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
-                              {reputation.content.length > 30 ? `${reputation.content.substring(0, 30)}...` : reputation.content}
+                              <span className="comment-text">{reputation.content}</span>
                               <span className="arrow-icon" style={{
-                                position: 'absolute',
-                                right: '8px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                width: '10px',
-                                height: '10px',
+                                width: '15px',
+                                height: '15px',
+                                padding: '10px',
+                                flexShrink: 0,
                                 background: '#FAAB07',
-                                borderRadius: '3px',
+                                borderRadius: '5px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '2px',
-                                boxSizing: 'content-box'
+                                justifyContent: 'center'
                               }}>
-                                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                <svg width="11" height="10" viewBox="0 0 11 10" fill="none">
                                   <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </span>

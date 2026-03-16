@@ -3429,7 +3429,7 @@
             flex-direction: column;
             gap: 15px;
             background: #1b1b1b;
-            max-height: 490px;         // 피그마 높이 맞춤
+            max-height: 340px;         // 카드 3장(480px) > 340px → 스크롤 발생
             overflow-y: auto;
             overflow-x: hidden;
             padding: 3px 3px 3px 0;
@@ -3448,10 +3448,11 @@
                 rgba(15, 30, 26, 0.5) 40%,
                 rgba(255, 255, 255, 0.08) 100%
               );
-              padding: 12px;
+              padding: 0;
               border-radius: 0;
               display: flex;
               flex-direction: column;
+              justify-content: space-between;
               flex-shrink: 0;
               overflow: hidden;
               border-left: 1px solid rgba(255, 255, 255, 0.1);
@@ -3512,7 +3513,8 @@
               .card-top {
                 display: flex;
                 gap: 10px;
-                align-items: flex-start;
+                align-items: center;
+                padding: 6px 6px 0 6px;
 
                 .avatar {
                   width: 42px;
@@ -3584,7 +3586,7 @@
                 display: flex;
                 flex-direction: row;
                 gap: 8px;
-                margin-top: 4px;
+                padding: 4px 6px;
 
                 .tag {
                   background: rgba(0, 255, 190, 0.1);
@@ -3622,35 +3624,27 @@
 
               .comment {
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 gap: 4px;
+                padding: 0 6px;
                 font-family: 'Pretendard', sans-serif;
                 font-size: 0.8125rem;
                 font-weight: 500;
                 color: #FFF;
-                margin-top: 16px;
                 line-height: 20px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 100%;
 
                 .speech-icon {
                   flex-shrink: 0;
                   width: 20px;
                   height: 20px;
-                  margin-top: -2px;
                 }
 
                 .comment-text {
-                  margin-top: 2px;
-                }
-
-                .more-icon {
-                  width: 16px;
-                  height: 16px;
-                  margin-left: 4px;
-                  margin-top: -4px;
+                  flex: 1;
+                  min-width: 0;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
               }
 
@@ -3658,8 +3652,7 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-top: 4px;
-                margin-right: 8px;
+                padding: 0 6px 6px 6px;
 
                 .pm {
                   display: flex;
