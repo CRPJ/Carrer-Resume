@@ -1636,7 +1636,7 @@ const Sidebar = () => {
                   <div className="resume-details">
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/User_01-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/User_01-px.png" : "/images/0/cluster 1/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
-                      <span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gender}{" "}
                         <Image
                           src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Gift-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Gift-px.png" : "/images/0/cluster 1/small icon/Gift.png"}
@@ -1651,7 +1651,7 @@ const Sidebar = () => {
                     </div>
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
-                      <span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || '') + ' ' + (currentProfile.district || ''))}
                       </span>
                     </div>
@@ -1753,6 +1753,10 @@ const Sidebar = () => {
                           display: "flex",
                           alignItems: "center",
                           gap: "5px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          maxWidth: "180px",
                         }}
                       >
                         <span style={{ color: currentProfile.lightColor }}>·</span>{mask.major(currentProfile.major)}

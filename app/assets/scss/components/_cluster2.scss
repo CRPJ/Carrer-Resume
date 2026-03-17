@@ -372,6 +372,9 @@
             color: #fff;
             line-height: 30px;
             transition: color 0.3s ease;
+            min-width: 80px;
+            flex-shrink: 0;
+            text-align: center;
           }
 
           &:hover .hex-label {
@@ -462,6 +465,8 @@
           display: flex;
           align-items: center;
           gap: 8px;
+          min-width: 70px;
+          flex-shrink: 0;
 
           .joined-text {
             font-family: "Pretendard", sans-serif;
@@ -976,6 +981,9 @@
               color: #fff;
               font-weight: 500;
               line-height: 26.1px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             .author-role {
@@ -984,6 +992,9 @@
               font-weight: 400;
               color: #999;
               line-height: 22.4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
           }
         }
@@ -1317,6 +1328,9 @@
                 padding: 0;
                 line-height: 34px;
                 transform: translateY(-7px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
 
                 .highlight-orange {
                   color: #faab07;
@@ -1331,6 +1345,9 @@
                 margin: 0;
                 padding: 0;
                 line-height: 26px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
 
@@ -1797,6 +1814,9 @@
             position: relative;
             z-index: 1;
             left: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
         }
 
@@ -1843,6 +1863,11 @@
             font-size: 1rem;
             font-weight: 600;
             line-height: 24px;
+            min-width: 100px;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             &.highlight {
               color: #fff;

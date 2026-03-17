@@ -918,8 +918,8 @@
 .weekly-card-detail {
   width: 100%;
   padding: 0;
-  background: transparent;
-  border-radius: 0;
+  background: #0c0f14;
+  border-radius: 20px;
   border: none;
 
   .detail-header {
@@ -1040,10 +1040,10 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-    gap: 38px;
+    gap: 27px;
     width: 100%;
     margin-top: 41px;
-    padding: 0 40px;
+    padding: 0 40px 0 21px;
     box-sizing: border-box;
     overflow: visible;
 
@@ -1068,14 +1068,14 @@
         position: relative;
         width: 540px;
         height: 1053px;
-        border-radius: 16px;
+        border-radius: 15px;
         overflow: hidden;
 
         .main-week-image {
           width: 100%;
           height: 100%;
           display: block;
-          border-radius: 16px;
+          border-radius: 15px;
           object-fit: cover;
         }
 
@@ -1094,12 +1094,14 @@
             justify-content: center;
             gap: 4px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
+            border-radius: 50px;
+            padding: 2px 10px;
+            font-family: 'Cafe24 Ohsquare', sans-serif;
 
             .badge-count {
-              font-size: 0.875rem;
-              font-weight: 700;
-              color: #fff;
+              font-size: 12px;
+              font-weight: 400;
+              color: #9DFA07;
             }
 
             &.heart-badge {
@@ -1150,7 +1152,10 @@
             font-weight: 800;
             text-transform: capitalize;
             line-height: 44px;
-            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
             margin: 0;
           }
 
@@ -1163,40 +1168,48 @@
             &.success {
               span {
                 font-family: 'Manrope', sans-serif;
-                font-size: 1.375rem;
+                font-size: 22px;
                 font-weight: 800;
                 color: #9DFA07;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.50);
               }
             }
 
             &.fail {
               span {
                 font-family: 'Manrope', sans-serif;
-                font-size: 1.375rem;
+                font-size: 22px;
                 font-weight: 800;
                 color: #FF6B6B;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.50);
               }
             }
 
             &.rest-personal {
               span {
                 font-family: 'Manrope', sans-serif;
-                font-size: 1.375rem;
+                font-size: 22px;
                 font-weight: 800;
                 color: #65E3FF;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.50);
               }
             }
 
             &.rest-official {
               span {
                 font-family: 'Manrope', sans-serif;
-                font-size: 1.375rem;
+                font-size: 22px;
                 font-weight: 800;
                 color: #FFEA48;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.50);
               }
             }
 
@@ -1233,6 +1246,11 @@
             color: var(--color-white-solid, white);
             text-transform: capitalize;
             line-height: 19px;
+            flex-shrink: 0;
+
+            &.date { min-width: 260px; }
+            &.role { min-width: 120px; }
+            &.week { min-width: 120px; }
 
             img {
               width: 16px;
@@ -1254,9 +1272,10 @@
         .header-info-row2 {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          flex-wrap: wrap;
+          justify-content: flex-start;
+          flex-direction: row;
+          gap: 25px;
+          flex-wrap: nowrap;
           margin-top: 13px;
 
           .info-group {
@@ -1266,14 +1285,23 @@
             font-family: 'Pretendard', sans-serif;
             font-size: 0.875rem;
 
+            &.left {
+              min-width: 0;
+              flex-shrink: 0;
+            }
+
             &.right {
-              gap: 8px;
+              gap: 12px;
+              flex-shrink: 0;
             }
           }
 
           .info-item {
             &.team, &.part {
               color: #fff;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
 
               strong {
                 font-weight: 700;
@@ -1287,25 +1315,35 @@
             &.with-icon {
               display: flex;
               align-items: center;
-              gap: 4px;
+              gap: 5px;
               color: #fff;
               font-family: 'Poppins', sans-serif;
               font-size: 0.875rem;
               font-weight: 700;
               line-height: 35px;
+              min-width: 80px;
+              flex-shrink: 0;
+              white-space: nowrap;
 
               .item-icon {
                 width: 16px;
-                height: 16px;
+                height: 17px;
                 object-fit: contain;
               }
 
               .number-value {
                 font-family: 'Black Ops One', cursive;
-                color: rgba(236, 187, 2, 1);
+                color: #fff;
                 font-weight: 400;
-                font-size: 1.0625rem;
+                font-size: 18px;
                 line-height: 35px;
+              }
+
+              .unit-text {
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                color: #fff;
               }
             }
           }
@@ -1351,22 +1389,24 @@
 
           .section-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 1rem;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
+            min-width: 80px;
+            flex-shrink: 0;
           }
 
           .section-count {
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 1rem;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
 
             .count-num {
               font-family: 'Chakra Petch', sans-serif;
-              font-size: 1.125rem;
+              font-size: 17px;
               font-weight: 700;
-              color: #FFA500;
+              color: #FAAB07;
             }
           }
         }
@@ -1417,12 +1457,20 @@
                   font-weight: 600;
                   color: #fff;
                   margin-bottom: 4px;
+                  min-width: 60px;
+                  flex-shrink: 0;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
 
                 .profile-details {
                   font-size: 0.6875rem;
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.4;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
 
                   .university {
                     color: #4fc3f7;
@@ -1633,22 +1681,24 @@
 
           .section-label {
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 1rem;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
+            min-width: 80px;
+            flex-shrink: 0;
           }
 
           .section-count {
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 1rem;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
 
             .count-num {
               font-family: 'Chakra Petch', sans-serif;
-              font-size: 1.125rem;
+              font-size: 17px;
               font-weight: 700;
-              color: #FFA500;
+              color: #FAAB07;
             }
           }
         }
@@ -1713,6 +1763,11 @@
                 .profile-name {
                   font-size: 1.125rem !important;
                   color: rgba(255, 255, 255, 0.5);
+                  min-width: 60px;
+                  flex-shrink: 0;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                   .text { font-size: 1.125rem !important; }
                 }
 
@@ -1721,6 +1776,9 @@
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.2;
                   white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 100%;
                   .text { font-size: 0.875rem !important; }
                   .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
                 }
@@ -1960,11 +2018,11 @@
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-          width: 494px;
+          width: 465.57px;
 
           .growth-title {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 400;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             text-transform: uppercase;
@@ -1972,7 +2030,7 @@
         }
 
           .growth-count {
-            font-size: 18px;
+            font-size: 14px;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
@@ -1981,6 +2039,8 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            overflow: hidden;
+            white-space: nowrap;
 
             .star-icon {
               width: 18.3px;
@@ -1989,17 +2049,17 @@
             }
 
             .highlight {
-              font-size: 20px;
+              font-size: 16px;
               font-weight: 700;
-              color: #F59E0B;
+              color: #FAAB07;
               font-family: 'Chakra Petch', sans-serif;
             }
           }
         }
 
         .progress-bar-container {
-          width: 494px;
-          height: 15.5px;
+          width: 465.57px;
+          height: 12px;
           background: #333532;
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 0;
@@ -2028,7 +2088,7 @@
           align-items: baseline;
 
           .number {
-            font-size: 40px;
+            font-size: 18px;
             font-weight: 400;
             color: #FAAB07;
             font-family: 'Black Ops One', cursive;
@@ -2036,7 +2096,7 @@
           }
 
           .percent {
-            font-size: 40px;
+            font-size: 15px;
             font-weight: 400;
             color: #fff;
             font-family: 'Black Ops One', cursive;
@@ -2054,8 +2114,8 @@
         margin-right: 64px;
 
         .growth-label {
-          font-size: 22px;
-          font-weight: 700;
+          font-size: 15px;
+          font-weight: 400;
           color: #fff;
           font-family: 'Chakra Petch', sans-serif;
           text-transform: uppercase;
@@ -2078,6 +2138,9 @@
             color: #fff;
             text-transform: capitalize;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
 
             .legend-icon {
               width: 45px;
@@ -2125,7 +2188,7 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
@@ -2133,21 +2196,27 @@
             line-height: 44px;
             text-transform: capitalize;
             overflow: visible;
+
+            .keyword-highlight {
+              color: #9DFA07;
+              font-weight: 700;
+            }
           }
 
           .section-count {
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffe3aa;
-            margin-left: 120px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 120px;
+            flex-shrink: 0;
             font-family: 'Manrope', sans-serif;
             text-transform: capitalize;
             line-height: 19px;
 
             .highlight {
-                font-size: 1.5rem;
-                font-weight: 800;
-                color: #F59E0B;
+                font-size: 17px;
+                font-weight: 700;
+                color: #FAAB07;
             }
           }
         }
@@ -2156,29 +2225,30 @@
           display: flex;
           align-items: center;
           gap: 8px;
-          margin-left: 120px;
+          min-width: 120px;
+          flex-shrink: 0;
 
           .rate-label {
-            font-size: 18px;
+            font-size: 14px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
-            font-weight: 800;
+            font-weight: 400;
             text-transform: capitalize;
             line-height: 19px;
         }
 
         .rate-value {
-            font-size: 18px;
+            font-size: 14px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
-            font-weight: 800;
+            font-weight: 400;
             text-transform: capitalize;
             line-height: 19px;
 
             .highlight {
-                font-size: 1.5rem;
-                font-weight: 800;
-                color: #F59E0B;
+                font-size: 17px;
+                font-weight: 700;
+                color: #FAAB07;
             }
           }
         }
@@ -2215,6 +2285,7 @@
                 width: 16px;
                 height: 16px;
                 object-fit: contain;
+                flex-shrink: 0;
               }
 
               .card-title {
@@ -2223,6 +2294,10 @@
                 color: #FEF9C3;
                 font-family: 'Manrope', sans-serif;
                 line-height: 16px;
+                flex-shrink: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
 
               .verified-icon {
@@ -2230,6 +2305,7 @@
                 height: 14px;
                 object-fit: contain;
                 margin-left: 4px;
+                flex-shrink: 0;
               }
 
               .verified-text {
@@ -2318,7 +2394,10 @@
                 text-align: left;
                 flex: 1;
                 margin: 0;
-                display: inline;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
 
                 .card-arrow {
                   width: 16px;
@@ -2382,7 +2461,7 @@
           }
 
           .section-name {
-            font-size: 28px;
+            font-size: 14px;
             font-weight: 700;
             color: #fff;
             font-family: 'Pretendard', sans-serif;
@@ -2390,21 +2469,27 @@
             line-height: 44px;
             text-transform: capitalize;
             overflow: visible;
+
+            .keyword-highlight {
+              color: #9DFA07;
+              font-weight: 700;
+            }
           }
 
           .section-count {
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffe3aa;
-            margin-left: 120px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 120px;
+            flex-shrink: 0;
             font-family: 'Manrope', sans-serif;
             text-transform: capitalize;
             line-height: 19px;
 
             .highlight {
-                font-size: 1.5rem;
-                font-weight: 800;
-                color: #F59E0B;
+                font-size: 17px;
+                font-weight: 700;
+                color: #FAAB07;
                 font-family: 'Manrope', sans-serif;
             }
           }
@@ -2414,29 +2499,30 @@
           display: flex;
           align-items: center;
           gap: 8px;
-          margin-left: 120px;
+          min-width: 120px;
+          flex-shrink: 0;
 
           .rate-label {
-            font-size: 18px;
+            font-size: 14px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
-            font-weight: 800;
+            font-weight: 400;
             text-transform: capitalize;
             line-height: 19px;
           }
 
           .rate-value {
-            font-size: 18px;
+            font-size: 14px;
             color: #fff;
             font-family: 'Manrope', sans-serif;
-            font-weight: 800;
+            font-weight: 400;
             text-transform: capitalize;
             line-height: 19px;
 
             .highlight {
-                font-size: 1.5rem;
-                font-weight: 800;
-                color: #F59E0B;
+                font-size: 17px;
+                font-weight: 700;
+                color: #FAAB07;
                 font-family: 'Manrope', sans-serif;
             }
           }
@@ -2703,7 +2789,7 @@
         }
 
         .section-name {
-          font-size: 28px;
+          font-size: 14px;
           font-weight: 700;
           color: #fff;
           font-family: 'Pretendard', sans-serif;
@@ -2711,21 +2797,26 @@
           line-height: 44px;
           text-transform: capitalize;
           overflow: visible;
+
+          .keyword-highlight {
+            color: #9DFA07;
+            font-weight: 700;
+          }
         }
 
         .section-count {
-          font-size: 20px;
-          font-weight: 800;
-          color: #ffe3aa;
+          font-size: 14px;
+          font-weight: 700;
+          color: #fff;
           margin-left: 120px;
           font-family: 'Manrope', sans-serif;
           text-transform: capitalize;
           line-height: 19px;
 
           .highlight {
-              font-size: 1.5rem;
-              font-weight: 800;
-              color: #F59E0B;
+              font-size: 17px;
+              font-weight: 700;
+              color: #FAAB07;
           }
         }
       }
@@ -2737,26 +2828,26 @@
         margin-left: 120px;
 
         .rate-label {
-          font-size: 18px;
+          font-size: 14px;
           color: #fff;
           font-family: 'Manrope', sans-serif;
-          font-weight: 800;
+          font-weight: 400;
           text-transform: capitalize;
           line-height: 19px;
         }
 
         .rate-value {
-          font-size: 18px;
+          font-size: 14px;
           color: #fff;
           font-family: 'Manrope', sans-serif;
-          font-weight: 800;
+          font-weight: 400;
           text-transform: capitalize;
           line-height: 19px;
 
           .highlight {
-              font-size: 1.5rem;
-              font-weight: 800;
-              color: #F59E0B;
+              font-size: 17px;
+              font-weight: 700;
+              color: #FAAB07;
           }
         }
       }
@@ -3149,6 +3240,7 @@
                 width: 16px;
                 height: 16px;
                 object-fit: contain;
+                flex-shrink: 0;
               }
 
               .card-title {

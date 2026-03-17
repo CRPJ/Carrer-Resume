@@ -507,6 +507,8 @@
             line-height: 1;
             display: flex;
             align-items: center;
+            min-width: 200px;
+            flex-shrink: 0;
           }
         }
 
@@ -564,6 +566,9 @@
               display: flex;
               align-items: center;
               gap: 4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
 
               .dot {
                 color: #FED402;
@@ -586,6 +591,9 @@
               font-weight: 600;
               color: #FFEC8F;
               text-align: right;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
 
               &.highlight {
                 color: #FFEC8F;
@@ -861,6 +869,7 @@
           color: #FFFFFF;
           word-wrap: break-word;
           margin-right: 36px;
+          flex-shrink: 0;
         }
 
         .progress-percent {
@@ -870,6 +879,7 @@
           line-height: 75px;
           color: #FED402;
           margin-right: 18px;
+          flex-shrink: 0;
         }
 
         .progress-unit {
@@ -878,6 +888,7 @@
           font-weight: 400;
           line-height: 75px;
           color: #FFFFFF;
+          flex-shrink: 0;
         }
       }
 
@@ -1383,6 +1394,9 @@
             margin: 0 0 10px 0;
             line-height: 1.3;
             font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .card-info {
@@ -1438,12 +1452,19 @@
                   flex-direction: column;
                   gap: 0;
                   line-height: 1;
+                  min-width: 150px;
+                  flex-shrink: 0;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
 
                   .info-label {
                     font-family: 'Azeret Mono', 'Pretendard', sans-serif;
                     font-size: 0.75rem;
                     font-weight: 400;
                     color: #888;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                   }
 
                   .author-name {
@@ -1451,6 +1472,9 @@
                     font-size: 0.75rem;
                     color: #fff;
                     margin-top: -5px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                   }
                 }
               }
@@ -1975,6 +1999,10 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0;
+                min-width: 150px;
+                flex-shrink: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 .info-label {
                   font-family: 'Pretendard', sans-serif;
@@ -1983,6 +2011,9 @@
                   color: rgba(255, 255, 255, 0.7);
                   line-height: 1;
                   margin-bottom: 7px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
 
                 .author-name {
@@ -1990,6 +2021,9 @@
                   font-size: 0.75rem;
                   color: #fff;
                   line-height: 1;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
               }
             }
@@ -2378,12 +2412,19 @@
               display: flex;
               flex-direction: column;
               gap: 0;
+              min-width: 0;
+              overflow: hidden;
+              max-width: 100%;
+              text-overflow: ellipsis;
 
               .item-tags {
                 font-family: 'Pretendard', sans-serif;
                 font-size: 1rem;
                 font-weight: 700;
                 color: #fff;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
 
               .item-author {
@@ -2392,6 +2433,9 @@
                 font-weight: 400;
                 color: rgba(255, 255, 255, 0.7);
                 margin-top: -3px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
           }
@@ -2612,6 +2656,9 @@
             cursor: pointer;
             box-sizing: border-box;
             transition: all 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFA500' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
@@ -2663,6 +2710,7 @@
           font-size: 0.875rem;
           transition: all 0.2s;
           box-sizing: border-box;
+          text-overflow: ellipsis;
 
           &::placeholder {
             color: #444;

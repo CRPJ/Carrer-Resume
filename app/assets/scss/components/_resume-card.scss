@@ -598,6 +598,7 @@
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
             filter: brightness(0) invert(0.77) sepia(1) saturate(1.79);
+            flex-shrink: 0;
           }
 
           .icon {
@@ -617,6 +618,13 @@
               font-size: 0.8125rem;
               color: #999;
             }
+          }
+
+          > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
           }
         }
       }
@@ -824,6 +832,9 @@
         flex: none;
         margin-left: 8px;
         text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         &.red {
           color: #ffec8f;
@@ -1045,6 +1056,8 @@
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
 
             &.active {
@@ -1061,6 +1074,8 @@
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
 
             &.pending {

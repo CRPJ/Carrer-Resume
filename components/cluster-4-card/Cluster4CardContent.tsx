@@ -2310,21 +2310,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   단감
                   <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
                   <strong className="number-value">{weekPoints.star}</strong>
-                  개
+                  <span className="unit-text">개</span>
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
                   <strong className="number-value">{weekPoints.shield - weekPoints.lightning}</strong>
-                  개
+                  <span className="unit-text">개</span>
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   어흥
                   <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
                   <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
-                  개
+                  <span className="unit-text">개</span>
                 </span>
               </div>
             </div>
@@ -2494,7 +2494,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
-              <span className="section-name">실무 정보</span>
+              <span className="section-name">실무 <span className="keyword-highlight">정보</span></span>
               <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
@@ -2580,7 +2580,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
-              <span className="section-name">실무 역량</span>
+              <span className="section-name">실무 <span className="keyword-highlight">역량</span></span>
               <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
@@ -2694,7 +2694,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
-              <span className="section-name">실무 경험</span>
+              <span className="section-name">실무 <span className="keyword-highlight">경험</span></span>
               <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
@@ -2810,7 +2810,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-header-row">
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
-              <span className="section-name">실무 경력</span>
+              <span className="section-name">실무 <span className="keyword-highlight">경력</span></span>
               <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
