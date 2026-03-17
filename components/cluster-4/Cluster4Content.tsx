@@ -1946,8 +1946,10 @@ const Cluster4Content = () => {
                   <div className="top-row">
                     <div className="stars-row">
                       {[1, 2, 3, 4, 5].map((star) => {
-                        const isFull = currentSeason.rating >= star;
-                        const isHalf = currentSeason.rating >= star - 0.5 && currentSeason.rating < star;
+                        const fullValue = star * 2;
+                        const halfValue = star * 2 - 1;
+                        const isFull = currentSeason.rating >= fullValue;
+                        const isHalf = !isFull && currentSeason.rating >= halfValue;
                         return (
                           <img
                             key={star}
@@ -2659,55 +2661,54 @@ const Cluster4Content = () => {
             {/* Body */}
             <div className="edit-modal-body" style={{ padding: '20px 24px' }}>
               {/* 평점 선택 */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#FAAB07', marginBottom: '10px' }}>평점</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <select
-                    value={seasonReviewEditData.rating.toString()}
-                    onChange={(e) => setSeasonReviewEditData(prev => ({ ...prev, rating: parseFloat(e.target.value) }))}
-                    style={{
-                      display: 'block',
-                      width: '100px',
-                      height: '48px',
-                      padding: '12px 14px',
-                      background: '#1a1f2e',
-                      border: '2px solid #FAAB07',
-                      borderRadius: '8px',
-                      color: '#FAAB07',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      outline: 'none',
-                    }}
-                  >
-                    {[0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0].map((val) => (
-                      <option key={val} value={val.toString()} style={{ background: '#1a1f2e', color: '#fff' }}>{val.toFixed(1)}</option>
-                    ))}
-                  </select>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {[1, 2, 3, 4, 5].map((starIndex) => {
-                      const isFull = seasonReviewEditData.rating >= starIndex;
-                      const isHalf = seasonReviewEditData.rating >= starIndex - 0.5 && seasonReviewEditData.rating < starIndex;
-                      return (
-                        <div key={starIndex} style={{ width: '24px', height: '24px', position: 'relative' }}>
-                          <img
-                            src="/images/0/cluster4/icon - star.png"
-                            alt="star"
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              opacity: isFull ? 1 : isHalf ? 0.6 : 0.2,
-                              filter: isFull || isHalf ? 'none' : 'grayscale(100%)',
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#FAAB07' }}>
-                    {seasonReviewEditData.rating.toFixed(1)} / 5.0
-                  </span>
+              <div className="slogan-rating-row" style={{ marginBottom: '20px' }}>
+                <label className="slogan-rating-label" style={{ color: '#FAAB07', fontSize: '14px', fontWeight: 600 }}>평점</label>
+                <div className="slogan-star-rating">
+                  {[1, 2, 3, 4, 5].map((starIndex) => {
+                    const fullValue = starIndex * 2;
+                    const halfValue = starIndex * 2 - 1;
+                    const currentRating = seasonReviewEditData.rating;
+                    const isHalf = currentRating >= halfValue && currentRating < fullValue;
+                    const isFull = currentRating >= fullValue;
+                    return (
+                      <div key={starIndex} className="star-wrapper">
+                        <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                        {isHalf && (
+                          <svg className="star-half-fill" viewBox="0 0 24 24">
+                            <defs>
+                              <clipPath id={`reviewHalfClip-${starIndex}`}>
+                                <rect x="0" y="0" width="12" height="24" />
+                              </clipPath>
+                            </defs>
+                            <polygon
+                              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                              fill="#FFA500"
+                              clipPath={`url(#reviewHalfClip-${starIndex})`}
+                            />
+                          </svg>
+                        )}
+                        {isFull && (
+                          <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                        )}
+                        <button
+                          className="star-click-area star-click-left"
+                          type="button"
+                          onClick={() => setSeasonReviewEditData(prev => ({ ...prev, rating: halfValue }))}
+                        />
+                        <button
+                          className="star-click-area star-click-right"
+                          type="button"
+                          onClick={() => setSeasonReviewEditData(prev => ({ ...prev, rating: fullValue }))}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
+                <span className="slogan-rating-value">{seasonReviewEditData.rating} / 10</span>
               </div>
 
               {/* 리뷰 입력 */}
