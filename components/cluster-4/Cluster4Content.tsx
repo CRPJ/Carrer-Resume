@@ -1823,6 +1823,8 @@ const Cluster4Content = () => {
           </div>
         </div>
 
+        <div style={{ width: '200px', height: '1px', background: 'rgba(250, 171, 7, 1)', margin: '0 auto' }} />
+
         <div className="season-detail-container" style={{ backgroundImage: `url('${currentSeason.image}')` }}>
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
@@ -1831,6 +1833,7 @@ const Cluster4Content = () => {
               <div className="season-main-title">
                 <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: 'inline-block', width: '1.2em' }}></span><span className="season-highlight">{currentSeason.season}</span> 시즌
               </div>
+              <span className="bullet-dot" style={{ display: 'inline-block', width: '2px', height: '2px', background: '#FAAB07', borderRadius: '50%', marginLeft: '15px', transform: 'translateY(-4px)' }}></span>
               <div className="date-status">
                 <span className="date-range">{currentSeason.dateRange}</span>
                 <button className={`status-badge ${currentSeason.statusClass}`}>{currentSeason.status}</button>
@@ -1984,11 +1987,9 @@ const Cluster4Content = () => {
                     </svg>
                     <img src="/images/0/cluster4/icon/icon - 주차 활용도.png" alt="주차 활용도" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.weekUsage}%</div>
-                  </div>
-                  <div className="circle-label">
-                    <div className="label-main">주차 활용도</div>
                     <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.approvedWeeks ?? 0}</span>주</div>
                   </div>
+                  <div className="label-main">주차 활용도</div>
                 </div>
                 <div className="circle-item">
                   <div className="circle yellow">
@@ -1998,11 +1999,9 @@ const Cluster4Content = () => {
                     </svg>
                     <img src="/images/0/cluster4/icon/icon - 일정 신뢰도.png" alt="일정 신뢰도" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.scheduleReliability}%</div>
-                  </div>
-                  <div className="circle-label">
-                    <div className="label-main">일정 신뢰도</div>
                     <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.reliableWeeks ?? 0}</span>주</div>
                   </div>
+                  <div className="label-main">일정 신뢰도</div>
                 </div>
                 <div className="circle-item">
                   <div className="circle green">
@@ -2012,11 +2011,9 @@ const Cluster4Content = () => {
                     </svg>
                     <img src="/images/0/cluster4/icon/icon - 시즌 성장률.png" alt="시즌 성장률" className="circle-icon" />
                     <div className="percent">{currentSeason.circles.seasonGrowth}%</div>
-                  </div>
-                  <div className="circle-label">
-                    <div className="label-main">시즌 성장률</div>
                     <div className="label-sub">총 {currentSeason.circles.totalActivities ?? 0}개 중 <span className="highlight">{currentSeason.circles.completedActivities ?? 0}</span>개</div>
                   </div>
+                  <div className="label-main">시즌 성장률</div>
                 </div>
               </div>
 
