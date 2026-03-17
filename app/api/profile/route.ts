@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -1197,67 +1198,78 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 기존 프로필 확인 (1차: email, 2차: auth_email)
+    // 어드민이 다른 유저를 대상으로 편집하는 경우
+    const targetUserId = extractTargetUserId(request);
     let existingProfile: { id: string } | null = null;
 
-    const { data: profileByEmail } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", email)
-      .maybeSingle();
-
-    if (profileByEmail) {
-      existingProfile = profileByEmail;
-    }
-
-    if (!existingProfile) {
-      const { data: profileByAuth } = await supabaseAdmin
+    if (targetUserId && isAdminEmail(email)) {
+      const { data: targetProfile } = await supabaseAdmin
         .from("user_profiles")
         .select("id")
-        .eq("auth_email", email)
+        .eq("id", targetUserId)
         .maybeSingle();
-
-      if (profileByAuth) {
-        existingProfile = profileByAuth;
-      }
-    }
-
-    // 3차: 카카오 이름으로 display_name 매칭
-    if (!existingProfile && session.user?.name) {
-      const cleanName = session.user.name.replace(/\s+/g, "");
-      const { data: profileByName } = await supabaseAdmin
+      existingProfile = targetProfile;
+    } else {
+      // user_profiles에서 기존 프로필 확인 (1차: email, 2차: auth_email)
+      const { data: profileByEmail } = await supabaseAdmin
         .from("user_profiles")
         .select("id")
-        .eq("display_name", cleanName)
+        .eq("email", email)
         .maybeSingle();
 
-      if (profileByName) {
-        existingProfile = profileByName;
-        await supabaseAdmin
-          .from("user_profiles")
-          .update({ auth_email: email })
-          .eq("id", profileByName.id);
+      if (profileByEmail) {
+        existingProfile = profileByEmail;
       }
-    }
 
-    // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
-    if (!existingProfile && session.user?.id) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidRegex.test(session.user.id)) {
-        const { data: profileById } = await supabaseAdmin
+      if (!existingProfile) {
+        const { data: profileByAuth } = await supabaseAdmin
           .from("user_profiles")
           .select("id")
-          .eq("id", session.user.id)
+          .eq("auth_email", email)
           .maybeSingle();
 
-        if (profileById) {
-          existingProfile = profileById;
+        if (profileByAuth) {
+          existingProfile = profileByAuth;
+        }
+      }
+
+      // 3차: 카카오 이름으로 display_name 매칭
+      if (!existingProfile && session.user?.name) {
+        const cleanName = session.user.name.replace(/\s+/g, "");
+        const { data: profileByName } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id")
+          .eq("display_name", cleanName)
+          .maybeSingle();
+
+        if (profileByName) {
+          existingProfile = profileByName;
           await supabaseAdmin
             .from("user_profiles")
             .update({ auth_email: email })
+            .eq("id", profileByName.id);
+        }
+      }
+
+      // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
+      if (!existingProfile && session.user?.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("id")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            existingProfile = profileById;
+            await supabaseAdmin
+              .from("user_profiles")
+              .update({ auth_email: email })
             .eq("id", profileById.id)
             .is("auth_email", null);
         }
+      }
       }
     }
 

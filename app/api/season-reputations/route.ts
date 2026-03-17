@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -149,7 +152,8 @@ export async function GET(request: Request) {
 // POST: 시즌 평판 작성 (다른 사람에게 평판 남기기)
 export async function POST(request: Request) {
   try {
-    const { profile: reviewerProfile, error } = await getUserProfile();
+    const adminTargetUserId = extractTargetUserId(request);
+    const { profile: reviewerProfile, error } = await getUserProfile("id", adminTargetUserId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: error.status });
@@ -289,13 +293,24 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE: 시즌 평판 삭제 (본인이 작성한 것만)
+// DELETE: 시즌 평판 삭제 (본인이 작성한 것만, 어드민은 모두 삭제 가능)
 export async function DELETE(request: Request) {
   try {
-    const { profile, error } = await getUserProfile();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+    }
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+    const isAdmin = isAdminEmail(session.user.email);
+
+    if (!isAdmin) {
+      const targetUserId = extractTargetUserId(request);
+      const { profile, error } = await getUserProfile("id", targetUserId);
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: error.status });
+      }
+      // profile.id를 아래에서 사용
+      var reviewerProfileId = profile.id;
     }
 
     if (!supabaseAdmin) {
@@ -312,12 +327,17 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // 본인이 작성한 평판인지 확인 후 삭제
-    const { error: deleteError } = await supabaseAdmin
+    // 어드민은 아무 평판이나 삭제 가능, 일반 유저는 본인 작성만
+    let deleteQuery = supabaseAdmin
       .from("season_reputations")
       .delete()
-      .eq("id", reputationId)
-      .eq("reviewer_id", profile.id);
+      .eq("id", reputationId);
+
+    if (!isAdmin) {
+      deleteQuery = deleteQuery.eq("reviewer_id", reviewerProfileId!);
+    }
+
+    const { error: deleteError } = await deleteQuery;
 
     if (deleteError) {
       console.error("시즌 평판 삭제 오류:", deleteError);
@@ -337,5 +357,47 @@ export async function DELETE(request: Request) {
       { error: "서버 오류가 발생했습니다." },
       { status: 500 }
     );
+  }
+}
+
+// PUT: 시즌 평판 수정 (어드민 전용)
+export async function PUT(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email || !isAdminEmail(session.user.email)) {
+      return NextResponse.json({ error: "어드민 권한이 필요합니다." }, { status: 403 });
+    }
+
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    }
+
+    const body = await request.json();
+    const { id, rating, content, keyword1, keyword2 } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "평판 ID가 필요합니다." }, { status: 400 });
+    }
+
+    const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (rating !== undefined) updateData.rating = rating;
+    if (content !== undefined) updateData.content = content;
+    if (keyword1 !== undefined) updateData.keyword_1 = keyword1;
+    if (keyword2 !== undefined) updateData.keyword_2 = keyword2;
+
+    const { error: updateError } = await supabaseAdmin
+      .from("season_reputations")
+      .update(updateData)
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("시즌 평판 수정 오류:", updateError);
+      return NextResponse.json({ error: "시즌 평판 수정에 실패했습니다." }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, message: "시즌 평판이 수정되었습니다." });
+  } catch (error) {
+    console.error("시즌 평판 수정 API 오류:", error);
+    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
   }
 }

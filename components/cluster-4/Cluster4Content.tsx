@@ -104,7 +104,17 @@ const Cluster4Content = () => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
-  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+  // 어드민(마더) 계정은 모든 프로필 편집 가능
+  const isOwner = session?.user?.isAdmin || !urlUserId || (session?.user?.id === urlUserId);
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (urlUserId && session?.user?.isAdmin) {
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}targetUserId=${urlUserId}`;
+    }
+    return path;
+  };
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -129,6 +139,12 @@ const Cluster4Content = () => {
   const handleEditClick = async (openModalFn: () => void) => {
     // 개발 모드: 비로그인 상태에서도 모달 열기 허용
     if (!session) {
+      openModalFn();
+      return;
+    }
+
+    // 어드민(마더) 계정은 승인 체크 건너뛰기
+    if (session.user?.isAdmin) {
       openModalFn();
       return;
     }
@@ -272,6 +288,9 @@ const Cluster4Content = () => {
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
   const [selectedReputation, setSelectedReputation] = useState<SeasonReputationData | null>(null);
+
+  // 어드민 평판 수정 시 사용하는 평판 ID
+  const [editingReputationId, setEditingReputationId] = useState<string | null>(null);
 
   // 시즌 리뷰 모달 상태 (본인의 시즌 평가)
   const [seasonReviewModalOpen, setSeasonReviewModalOpen] = useState(false);
@@ -1415,6 +1434,35 @@ const Cluster4Content = () => {
 
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
+    // 어드민 수정 모드
+    if (editingReputationId && session?.user?.isAdmin) {
+      setSeasonReputationSaving(true);
+      try {
+        const response = await fetch('/api/season-reputations', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingReputationId,
+            rating: seasonReputationEditData.rating,
+            content: seasonReputationEditData.content,
+            keyword1: seasonReputationEditData.keyword1,
+            keyword2: seasonReputationEditData.keyword2,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) { alert(result.error || "수정에 실패했습니다."); return; }
+
+        const targetId = urlUserId || session?.user?.id;
+        if (targetId && currentSeason?.id) fetchSeasonReputations(targetId, currentSeason.id);
+        alert("수정되었습니다.");
+        setSeasonReputationModalOpen(false);
+        setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+        setEditingReputationId(null);
+      } catch { alert("서버 오류가 발생했습니다."); }
+      finally { setSeasonReputationSaving(false); }
+      return;
+    }
+
     if (!urlUserId) {
       alert("평판을 남길 대상을 찾을 수 없습니다.");
       return;
@@ -1429,7 +1477,7 @@ const Cluster4Content = () => {
     setSeasonReputationError(null);
 
     try {
-      const response = await fetch('/api/season-reputations', {
+      const response = await fetch(apiUrl('/api/season-reputations'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1452,13 +1500,15 @@ const Cluster4Content = () => {
       }
 
       // 평판 목록 새로고침 (현재 보고 있는 시즌의 평판)
-      if (urlUserId && currentSeason?.id) {
-        fetchSeasonReputations(urlUserId, currentSeason.id);
+      const targetId = urlUserId || session?.user?.id;
+      if (targetId && currentSeason?.id) {
+        fetchSeasonReputations(targetId, currentSeason.id);
       }
 
       alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
       setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+      setEditingReputationId(null);
     } catch (error) {
       console.error("시즌 평판 저장 오류:", error);
       alert("서버 오류가 발생했습니다.");
@@ -1512,7 +1562,7 @@ const Cluster4Content = () => {
     setSeasonReviewError(null);
 
     try {
-      const res = await fetch("/api/season-review", {
+      const res = await fetch(apiUrl("/api/season-review"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1710,7 +1760,7 @@ const Cluster4Content = () => {
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => {
-              if (isOwner) {
+              if (isOwner && !session?.user?.isAdmin) {
                 alert('시즌 평판은 타 크루끼리 작성합니다.');
               } else {
                 openSeasonReputationModal();
@@ -2539,6 +2589,44 @@ const Cluster4Content = () => {
                     {new Date(selectedReputation.created_at).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
+
+                {/* 어드민 전용: 수정/삭제 버튼 */}
+                {session?.user?.isAdmin && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => {
+                        setSeasonReputationEditData({
+                          rating: selectedReputation.rating,
+                          content: selectedReputation.content,
+                          keyword1: selectedReputation.keyword_1 || '',
+                          keyword2: selectedReputation.keyword_2 || '',
+                        });
+                        setEditingReputationId(selectedReputation.id);
+                        setReputationDetailModalOpen(false);
+                        setSeasonReputationModalOpen(true);
+                      }}
+                      style={{ padding: '8px 16px', background: 'rgba(250, 171, 7, 0.2)', border: '1px solid #FAAB07', borderRadius: '6px', color: '#FAAB07', fontSize: '13px', cursor: 'pointer' }}
+                    >수정</button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('이 평판을 삭제하시겠습니까?')) return;
+                        try {
+                          const res = await fetch(`/api/season-reputations?id=${selectedReputation.id}`, { method: 'DELETE' });
+                          const json = await res.json();
+                          if (json.success) {
+                            alert('삭제되었습니다.');
+                            setReputationDetailModalOpen(false);
+                            const targetId = urlUserId || session?.user?.id;
+                            if (targetId && currentSeason?.id) fetchSeasonReputations(targetId, currentSeason.id);
+                          } else {
+                            alert(json.error || '삭제 실패');
+                          }
+                        } catch { alert('삭제 중 오류 발생'); }
+                      }}
+                      style={{ padding: '8px 16px', background: 'rgba(255, 60, 60, 0.2)', border: '1px solid #ff3c3c', borderRadius: '6px', color: '#ff3c3c', fontSize: '13px', cursor: 'pointer' }}
+                    >삭제</button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -65,7 +65,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
-  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+  // 어드민(마더) 계정은 모든 프로필 편집 가능
+  const isOwner = session?.user?.isAdmin || !urlUserId || (session?.user?.id === urlUserId);
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (urlUserId && session?.user?.isAdmin) {
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}targetUserId=${urlUserId}`;
+    }
+    return path;
+  };
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -90,6 +100,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleEditClick = async (openModalFn: () => void) => {
     // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
+      openModalFn();
+      return;
+    }
+
+    // 어드민(마더) 계정은 승인 체크 건너뛰기
+    if (session.user?.isAdmin) {
       openModalFn();
       return;
     }
@@ -1125,6 +1141,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
   const [selectedReputationCard, setSelectedReputationCard] = useState<any>(null);
+  // 어드민 평판 수정 시 사용하는 평판 ID
+  const [editingWeeklyReputationId, setEditingWeeklyReputationId] = useState<string | null>(null);
 
   // 연계 동료 카드 상세보기 모달 상태
   const [colleagueViewModalOpen, setColleagueViewModalOpen] = useState(false);
@@ -1211,7 +1229,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         message: c.message || '',
       }));
 
-      const res = await fetch("/api/weekly-colleagues", {
+      const res = await fetch(apiUrl("/api/weekly-colleagues"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1241,6 +1259,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 주차 평판 저장 함수
   const saveWeeklyReputation = async () => {
+    // 어드민 수정 모드
+    if (editingWeeklyReputationId && session?.user?.isAdmin) {
+      setReputationSaving(true);
+      try {
+        const res = await fetch('/api/weekly-reputations', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingWeeklyReputationId,
+            rating: reputationEditData.rating,
+            content: reputationEditData.content.trim(),
+            keyword: reputationEditData.keyword,
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) { alert(json.error || '수정에 실패했습니다.'); return; }
+
+        fetchWeeklyReputations();
+        alert('수정되었습니다.');
+        setHeaderModalOpen(false);
+        setReputationEditData({ rating: 0, content: '', keyword: '' });
+        setEditingWeeklyReputationId(null);
+      } catch { alert('서버 오류가 발생했습니다.'); }
+      finally { setReputationSaving(false); }
+      return;
+    }
+
     if (!urlUserId || !weekId) {
       alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return;
@@ -1266,7 +1311,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setReputationSaveSuccess(false);
 
     try {
-      const res = await fetch("/api/weekly-reputations", {
+      const res = await fetch(apiUrl("/api/weekly-reputations"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1290,6 +1335,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       alert("저장되었습니다.");
       setHeaderModalOpen(false);
       setReputationEditData({ rating: 0, content: "", keyword: "" });
+      setEditingWeeklyReputationId(null);
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
       alert("서버 오류가 발생했습니다.");
@@ -1397,9 +1443,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 데이터 (API 데이터 기반)
   // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyReputations = [
-    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
-    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
-    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', rawRating: 9, rawKeyword: '리더십', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
+    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', rawRating: 8, rawKeyword: '분석력', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
+    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', rawRating: 7, rawKeyword: '창의성', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
   ];
 
   const reputationData = useMemo(() => {
@@ -1432,6 +1478,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
             ratingCount: `${rep.rating} / 10`,
             description: rep.content || '-',
+            rawRating: rep.rating, // 원본 10점 만점
+            rawKeyword: rep.keyword || '', // 원본 키워드
             fm: 1, // FM은 항상 1
             tagColor: colors[index % colors.length],
             tagText: `#${rep.keyword || '-'}`,
@@ -1457,6 +1505,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: 0,
         ratingCount: "- / 10",
         description: "-",
+        rawRating: 0,
+        rawKeyword: '',
         fm: 0,
         tagColor: 'tag--dark',
         tagText: '-',
@@ -1822,7 +1872,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 운영진 링크 이후의 사용자 링크만 필터링 (빈 링크 제외)
       const userLinks = detail.outputLinks.slice(adminCount).filter(link => link.url.trim() !== '');
 
-      const response = await fetch('/api/activity-details', {
+      const response = await fetch(apiUrl('/api/activity-details'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2241,7 +2291,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => {
-              if (isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
+              if (isOwner && !session?.user?.isAdmin) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); });
             }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" />
@@ -2673,7 +2723,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
-                if (!isAnyActivityActive(workExpActivityTypes)) {
+                if (!session?.user?.isAdmin && !isAnyActivityActive(workExpActivityTypes)) {
                   alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
                   return;
                 }
@@ -2785,13 +2835,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
               <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
-                // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단
-                const hasEditableCareer = displayWorkCareerCards.some(card =>
-                  !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date()
-                );
-                if (!hasEditableCareer) {
-                  alert('2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)');
-                  return;
+                // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단 (어드민은 항상 가능)
+                if (!session?.user?.isAdmin) {
+                  const hasEditableCareer = displayWorkCareerCards.some(card =>
+                    !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date()
+                  );
+                  if (!hasEditableCareer) {
+                    alert('2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)');
+                    return;
+                  }
                 }
                 initializeEditingDetails();
                 setWorkCareerModalOpen(true);
@@ -4051,6 +4103,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <span className={`tag ${selectedReputationCard.tagColor}`}>{selectedReputationCard.tagText}</span>
                 </div>
               </div>
+
+              {/* 어드민 전용: 수정/삭제 버튼 */}
+              {session?.user?.isAdmin && !selectedReputationCard.isEmpty && (
+                <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => {
+                      setReputationEditData({
+                        rating: selectedReputationCard.rawRating || 0,
+                        content: selectedReputationCard.description || '',
+                        keyword: selectedReputationCard.rawKeyword || '',
+                      });
+                      setEditingWeeklyReputationId(selectedReputationCard.id);
+                      setReputationViewModalOpen(false);
+                      setHeaderModalType('타크루');
+                      setHeaderModalOpen(true);
+                      fetchKeywordsIfNeeded();
+                    }}
+                    style={{ padding: '8px 16px', background: 'rgba(250, 171, 7, 0.2)', border: '1px solid #FAAB07', borderRadius: '6px', color: '#FAAB07', fontSize: '13px', cursor: 'pointer' }}
+                  >수정</button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm('이 평판을 삭제하시겠습니까?')) return;
+                      try {
+                        const res = await fetch(`/api/weekly-reputations?id=${selectedReputationCard.id}`, { method: 'DELETE' });
+                        const json = await res.json();
+                        if (json.success) {
+                          alert('삭제되었습니다.');
+                          setReputationViewModalOpen(false);
+                          fetchWeeklyReputations();
+                        } else {
+                          alert(json.error || '삭제 실패');
+                        }
+                      } catch { alert('삭제 중 오류 발생'); }
+                    }}
+                    style={{ padding: '8px 16px', background: 'rgba(255, 60, 60, 0.2)', border: '1px solid #ff3c3c', borderRadius: '6px', color: '#ff3c3c', fontSize: '13px', cursor: 'pointer' }}
+                  >삭제</button>
+                </div>
+              )}
             </div>
           </div>
         </div>

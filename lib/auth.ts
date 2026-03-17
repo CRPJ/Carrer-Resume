@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import KakaoProvider from "next-auth/providers/kakao";
 import { supabaseAdmin } from "./supabase";
+import { isAdminEmail } from "./admin";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -137,6 +138,9 @@ export const authOptions: AuthOptions = {
         token.accessToken = (user as { accessToken?: string }).accessToken;
       }
 
+      // 어드민(마더) 계정 체크
+      token.isAdmin = isAdminEmail(token.email as string);
+
       // 카카오 로그인 시 user_profiles ID 확인
       if (account?.provider === "kakao" && user?.email && supabaseAdmin) {
         try {
@@ -204,6 +208,7 @@ export const authOptions: AuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
+        session.user.isAdmin = token.isAdmin as boolean;
         (session as { accessToken?: string }).accessToken = token.accessToken as string;
         (session as { isApproved?: boolean }).isApproved = token.isApproved as boolean;
       }

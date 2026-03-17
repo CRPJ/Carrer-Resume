@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -169,42 +170,53 @@ export async function PUT(request: Request) {
       );
     }
 
-    // user_profiles에서 사용자 ID 조회 (1차: email, 2차: auth_email, 3차: session UUID)
+    // 어드민이 다른 유저를 대상으로 편집하는 경우
+    const targetUserId = extractTargetUserId(request);
     let profile: { id: string } | null = null;
 
-    const { data: profileByEmail } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", session.user.email)
-      .maybeSingle();
-
-    if (profileByEmail) {
-      profile = profileByEmail;
-    }
-
-    if (!profile) {
-      const { data: profileByAuth } = await supabaseAdmin
+    if (targetUserId && isAdminEmail(session.user.email)) {
+      const { data: targetProfile } = await supabaseAdmin
         .from("user_profiles")
         .select("id")
-        .eq("auth_email", session.user.email)
+        .eq("id", targetUserId)
+        .maybeSingle();
+      profile = targetProfile;
+    } else {
+      // user_profiles에서 사용자 ID 조회 (1차: email, 2차: auth_email, 3차: session UUID)
+      const { data: profileByEmail } = await supabaseAdmin
+        .from("user_profiles")
+        .select("id")
+        .eq("email", session.user.email)
         .maybeSingle();
 
-      if (profileByAuth) {
-        profile = profileByAuth;
+      if (profileByEmail) {
+        profile = profileByEmail;
       }
-    }
 
-    if (!profile && session.user?.id) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidRegex.test(session.user.id)) {
-        const { data: profileById } = await supabaseAdmin
+      if (!profile) {
+        const { data: profileByAuth } = await supabaseAdmin
           .from("user_profiles")
           .select("id")
-          .eq("id", session.user.id)
+          .eq("auth_email", session.user.email)
           .maybeSingle();
 
-        if (profileById) {
-          profile = profileById;
+        if (profileByAuth) {
+          profile = profileByAuth;
+        }
+      }
+
+      if (!profile && session.user?.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("id")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            profile = profileById;
+          }
         }
       }
     }

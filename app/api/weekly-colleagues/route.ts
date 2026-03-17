@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-server";
 import { getCachedTeams, getCachedParts } from "@/lib/cached-data";
 import { getUserProfile } from "@/lib/get-user-profile";
+import { extractTargetUserId } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -156,7 +157,8 @@ export async function GET(request: Request) {
 // POST: 연계 동료 저장 (전체 덮어쓰기)
 export async function POST(request: Request) {
   try {
-    const { profile: userProfile, error } = await getUserProfile();
+    const targetUserId = extractTargetUserId(request);
+    const { profile: userProfile, error } = await getUserProfile("id", targetUserId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: error.status });

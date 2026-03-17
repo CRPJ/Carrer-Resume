@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
+import { extractTargetUserId } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -47,7 +48,8 @@ export async function GET(request: Request) {
 // PUT: 시즌 리뷰 저장
 export async function PUT(request: Request) {
   try {
-    const { profile, error } = await getUserProfile();
+    const targetUserId = extractTargetUserId(request);
+    const { profile, error } = await getUserProfile("id", targetUserId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: error.status });

@@ -27,6 +27,16 @@ const Sidebar = () => {
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (targetUserId && session?.user?.isAdmin) {
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}targetUserId=${targetUserId}`;
+    }
+    return path;
+  };
+
   const [isOwner, setIsOwner] = useState(true);
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
@@ -651,11 +661,14 @@ const Sidebar = () => {
         setHasData(true);
         const profile = result.data;
 
-        // 본인 여부 확인
+        // 본인 여부 확인 (어드민 계정은 모든 프로필 편집 가능)
         const currentUserId = session?.user?.id;
         const fetchedProfileId = profile.id;
         console.log("[isOwner] session.user.id:", currentUserId, "| targetUserId:", targetUserId, "| profile.id:", fetchedProfileId);
-        if (currentUserId) {
+        if (session?.user?.isAdmin) {
+          console.log("[isOwner] 어드민(마더) 계정 — 전체 편집 권한");
+          setIsOwner(true);
+        } else if (currentUserId) {
           const ownerCheck = !targetUserId || targetUserId === currentUserId || fetchedProfileId === currentUserId;
           console.log("[isOwner] 결과:", ownerCheck, "| !targetUserId:", !targetUserId, "| url일치:", targetUserId === currentUserId, "| profile일치:", fetchedProfileId === currentUserId);
           setIsOwner(ownerCheck);
@@ -946,7 +959,11 @@ const Sidebar = () => {
   // 프로필 데이터 로드 함수
   const loadProfile = async () => {
     try {
-      const response = await fetch("/api/profile/");
+      // 어드민이 다른 유저 프로필 편집 시 해당 유저의 데이터 로드
+      const profileUrl = targetUserId && session?.user?.isAdmin
+        ? `/api/profile/?userId=${targetUserId}`
+        : "/api/profile/";
+      const response = await fetch(profileUrl);
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -1017,11 +1034,14 @@ const Sidebar = () => {
       return;
     }
 
-    const approved = await checkApprovalStatus();
+    // 어드민(마더) 계정은 승인 체크 건너뛰기
+    if (!session.user?.isAdmin) {
+      const approved = await checkApprovalStatus();
 
-    if (!approved) {
-      alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
-      return;
+      if (!approved) {
+        alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
+        return;
+      }
     }
 
     // 승인된 경우 프로필 로드 후 모달 열기
@@ -1089,7 +1109,7 @@ const Sidebar = () => {
         contact_available: formData.phoneComment || null,
       };
 
-      const response = await fetch("/api/profile/", {
+      const response = await fetch(apiUrl("/api/profile/"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -3533,7 +3553,7 @@ const Sidebar = () => {
               className="chamfer-box phone-modal-btn"
               onClick={async () => {
                 try {
-                  const response = await fetch("/api/profile/", {
+                  const response = await fetch(apiUrl("/api/profile/"), {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ contact_available: formData.phoneComment || null }),

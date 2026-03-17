@@ -88,7 +88,17 @@ const Cluster2Content = () => {
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
 
   // 본인 프로필인지 확인: URL에 userId가 없거나, 로그인한 사용자 ID와 같으면 본인
-  const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+  // 어드민(마더) 계정은 모든 프로필 편집 가능
+  const isOwner = session?.user?.isAdmin || !urlUserId || (session?.user?.id === urlUserId);
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (urlUserId && session?.user?.isAdmin) {
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}targetUserId=${urlUserId}`;
+    }
+    return path;
+  };
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isWiggling, setIsWiggling] = useState(false);
@@ -194,7 +204,7 @@ const Cluster2Content = () => {
       formData.append('file', processedFile);
       formData.append('type', photoType);
 
-      const response = await fetch('/api/photos/upload', {
+      const response = await fetch(apiUrl('/api/photos/upload'), {
         method: 'POST',
         body: formData,
       });
@@ -258,7 +268,7 @@ const Cluster2Content = () => {
   const handleSavePhotos = async () => {
     setPhotoSaving(true);
     try {
-      const response = await fetch('/api/photos', {
+      const response = await fetch(apiUrl('/api/photos'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -455,7 +465,7 @@ const Cluster2Content = () => {
   const handleSaveSlogans = async () => {
     setSloganSaving(true);
     try {
-      const response = await fetch('/api/slogans', {
+      const response = await fetch(apiUrl('/api/slogans'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -596,7 +606,7 @@ const Cluster2Content = () => {
   const handleSaveVideos = async () => {
     setVideoSaving(true);
     try {
-      const response = await fetch('/api/videos', {
+      const response = await fetch(apiUrl('/api/videos'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -713,7 +723,7 @@ const Cluster2Content = () => {
   const handleSaveEducations = async (processedData: EduData[]) => {
     setEduSaving(true);
     try {
-      const response = await fetch('/api/educations', {
+      const response = await fetch(apiUrl('/api/educations'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -886,7 +896,7 @@ const Cluster2Content = () => {
 
     setIntroSaving(true);
     try {
-      const response = await fetch('/api/introductions', {
+      const response = await fetch(apiUrl('/api/introductions'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -920,7 +930,7 @@ const Cluster2Content = () => {
   const handleSaveReviewLinks = async () => {
     setReviewLinkSaving(true);
     try {
-      const response = await fetch('/api/review-link', {
+      const response = await fetch(apiUrl('/api/review-link'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

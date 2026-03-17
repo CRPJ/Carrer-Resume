@@ -49,7 +49,17 @@ const Cluster3Content = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
-  const isOwner = !urlUserId || session?.user?.id === urlUserId;
+  // 어드민(마더) 계정은 모든 프로필 편집 가능
+  const isOwner = session?.user?.isAdmin || !urlUserId || session?.user?.id === urlUserId;
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (urlUserId && session?.user?.isAdmin) {
+      const separator = path.includes('?') ? '&' : '?';
+      return `${path}${separator}targetUserId=${urlUserId}`;
+    }
+    return path;
+  };
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -74,6 +84,12 @@ const Cluster3Content = () => {
   const handleEditClick = async (openModalFn: () => void) => {
     if (!session) {
       alert("로그인이 필요합니다.");
+      return;
+    }
+
+    // 어드민(마더) 계정은 승인 체크 건너뛰기
+    if (session.user?.isAdmin) {
+      openModalFn();
       return;
     }
 
@@ -316,7 +332,7 @@ const Cluster3Content = () => {
   const savePortfolioArchives = async (links: string[], channels: string[]) => {
     setIsSavingArchives(true);
     try {
-      const response = await fetch("/api/portfolio-archives", {
+      const response = await fetch(apiUrl("/api/portfolio-archives"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioArchives: links, portfolioArchiveChannels: channels }),
@@ -386,7 +402,7 @@ const Cluster3Content = () => {
   const savePortfolioOutputs = async (links: string[], channels: string[]) => {
     setIsSavingOutputs(true);
     try {
-      const response = await fetch("/api/portfolio-outputs", {
+      const response = await fetch(apiUrl("/api/portfolio-outputs"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioOutputs: links, portfolioOutputChannels: channels }),
@@ -454,7 +470,7 @@ const Cluster3Content = () => {
   const savePortfolioDetails = async (links: string[], channels: string[]) => {
     setIsSavingDetails(true);
     try {
-      const response = await fetch("/api/portfolio-details", {
+      const response = await fetch(apiUrl("/api/portfolio-details"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portfolioDetails: links, portfolioDetailChannels: channels }),
