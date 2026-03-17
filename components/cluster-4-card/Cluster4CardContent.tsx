@@ -2182,7 +2182,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </Link>
           </div>
-          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
+          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ''}`} className="tab" style={{ width: '44px', height: '44px' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
@@ -2244,7 +2244,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               if (isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); });
             }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
-              <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판 남기기" />
+              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
           </div>
         )}
