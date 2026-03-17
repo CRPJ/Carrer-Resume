@@ -1796,7 +1796,7 @@ const Cluster4Content = () => {
       {/* Section 3: 2025년도_여름 시즌 */}
       <section className="cluster4-section3">
         {/* SEASON CHALLENGE 배너 */}
-        <div className="section3-banner">
+        <div className="section3-banner" style={{ marginBottom: 0, paddingBottom: '88px' }}>
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => {
@@ -1822,10 +1822,8 @@ const Cluster4Content = () => {
             <p>*모든 시즌들이 누적된 결과는 위 탭 [Club Final Index]에서 확인하실 수 있습니다. 😊</p>
           </div>
         </div>
-
-        <div style={{ width: '200px', height: '1px', background: 'rgba(250, 171, 7, 1)', margin: '0 auto' }} />
-
-        <div className="season-detail-container" style={{ backgroundImage: `url('${currentSeason.image}')` }}>
+        <div style={{ width: '1023px', height: '1px', background: 'rgba(250, 171, 7, 1)', margin: '0 auto' }} />
+        <div className="season-detail-container" style={{ backgroundImage: `url('${currentSeason.image}')`, marginTop: 0, paddingTop: '30px' }}>
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
