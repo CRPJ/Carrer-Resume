@@ -1959,39 +1959,19 @@ const Cluster4Content = () => {
                       })}
                       <span className="rating-text">{currentSeason.rating || 0} / 10</span>
                     </div>
-                    <span className="review-label">Season Review</span>
+                    <div className="review-label-group">
+                      <span className="review-label">Season Review</span>
+                      <div
+                        className="edit-icon"
+                        onClick={(e) => { e.stopPropagation(); handleEditClick(openSeasonReviewModal); }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+                      </div>
+                    </div>
                   </div>
                   <p className="review-comment">"{currentSeason.review || '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나'}"</p>
                 </div>
-                {/* 편집 아이콘 (본인만 표시) */}
-                {(
-                  <button
-                    onClick={isOwner ? (e) => { e.stopPropagation(); handleEditClick(openSeasonReviewModal); } : (e) => { e.stopPropagation(); }}
-                    style={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      right: '8px',
-                      background: 'rgba(255, 165, 0, 0.2)',
-                      border: '1px solid #FAAB07',
-                      borderRadius: '50%',
-                      width: '28px',
-                      height: '28px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: isOwner ? 'pointer' : 'not-allowed',
-                      transition: 'all 0.2s ease',
-                      opacity: isOwner ? 1 : 0.4,
-                    }}
-                    onMouseEnter={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.4)'; } : undefined}
-                    onMouseLeave={isOwner ? (e) => { e.currentTarget.style.background = 'rgba(255, 165, 0, 0.2)'; } : undefined}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAAB07" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                  </button>
-                )}
               </div>
 
               {/* 영역 6: 원형 차트 3개 */}

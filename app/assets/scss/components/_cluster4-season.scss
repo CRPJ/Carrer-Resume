@@ -2480,7 +2480,7 @@
     .top-header-row {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 20px;
+      gap: 10px;
       padding-bottom: 15px;
       opacity: 1;
       position: relative;
@@ -2654,7 +2654,7 @@
 
             .item {
               font-family: var(--rajdhani), sans-serif;
-              font-size: 0.75rem;
+              font-size: 0.9375rem;
               font-weight: 500;
               color: #FAAB07;
               border-bottom: 1px solid rgba(250, 171, 7, 0.5);
@@ -2724,7 +2724,7 @@
     // 메인 컨텐츠 그리드 (3열)
     .main-content-grid {
       display: grid;
-      grid-template-columns: 300px 1fr 342px;  // 피그마 우측 342px
+      grid-template-columns: 275px 1fr 367px;  // area-3 왼쪽 이동 + area-8/9 확대
       gap: 15px;
       position: relative;
       z-index: 1;
@@ -2735,7 +2735,7 @@
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        padding-left: 40px;
+        padding-left: 15px;
         overflow: visible;
         padding-top: 60px;
 
@@ -2907,7 +2907,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-left: 108px;
+        margin-left: 82px;
         align-items: flex-start;
         opacity: 1;
         transform: translateY(0);
@@ -2922,8 +2922,9 @@
         // 영역 4: 통계 바
         .area-4-stats {
           display: flex;
-          gap: 25px;
+          gap: 21px;
           padding: 0;
+          width: 465.572px;
 
           .stat {
             font-family: 'Poppins', 'Pretendard', sans-serif;
@@ -2932,8 +2933,10 @@
             color: #FFF;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             line-height: 35px;
+            white-space: nowrap;
+            flex-shrink: 0;
 
             &::before {
               content: '';
@@ -2956,6 +2959,7 @@
               color: #FFF;
               font-weight: 400;
               line-height: 35px;
+              min-width: 2.5em;
             }
 
             .unit {
@@ -2964,20 +2968,23 @@
               color: #FFF;
               font-weight: 400;
               line-height: 35px;
+              margin-left: -19px;
             }
           }
         }
 
         // 영역 5: 평점 및 리뷰
         .area-5-rating {
+          margin-top: 10px;
           display: flex;
           align-items: center;
           gap: 20px;
-          width: 466px;
+          width: 465.572px;
           height: 80px;
           padding: 10px;
           background: #1b1b1b;
-          border-radius: 30px;
+          border-radius: 0;
+          border: 1px solid rgba(255, 255, 255, 0.15);
 
           .rating-avatar {
             flex-shrink: 0;
@@ -3031,18 +3038,40 @@
                 }
               }
 
-              .review-label {
-                font-family: 'Manrope', sans-serif;
-                font-size: 0.875rem;
-                color: #161616;
-                font-weight: 700;
-                background: #FAAB07;
-                padding: 10px;
-                border-radius: 14px;
-                height: 29px;
-                line-height: 22px;
+              .review-label-group {
                 display: flex;
                 align-items: center;
+                gap: 8px;
+
+                .review-label {
+                  font-family: 'Manrope', sans-serif;
+                  font-size: 0.875rem;
+                  color: #161616;
+                  font-weight: 700;
+                  background: #FAAB07;
+                  padding: 10px;
+                  border-radius: 14px;
+                  height: 29px;
+                  line-height: 22px;
+                  display: flex;
+                  align-items: center;
+                }
+
+                .edit-icon {
+                  width: 22px;
+                  height: 22px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: rgba(255, 165, 0, 0.2);
+                  border: 1px solid #FAAB07;
+                  border-radius: 50%;
+                  transition: all 0.2s ease;
+
+                  &:hover {
+                    background: rgba(255, 165, 0, 0.4);
+                  }
+                }
               }
             }
 
@@ -3229,7 +3258,7 @@
                 }
 
                 .highlight {
-                  font-size: 1rem;
+                  font-size: 1.5rem;
                   color: #FAAB07;
                   font-weight: 700;
                   text-transform: uppercase;
@@ -3268,7 +3297,7 @@
         gap: 4px;
         padding: 0;
         overflow: hidden;
-        margin-left: 29px;
+        margin-left: 4px;
         margin-top: -11px;
 
         &.fading {
@@ -3318,8 +3347,8 @@
             .badge-item {
               display: inline-flex;
               align-items: center;
-              gap: 8px;
-              width: 338px;
+              gap: 4px;
+              width: calc(100% - 2px);
               height: 38px;
               flex-shrink: 0;
               padding: 5px;                // 5px 0 5px 2px → 5px
@@ -3338,7 +3367,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-right: 4px;
+                margin-right: 0;
                 border: 1px solid #FAAB07;
 
                 img {
@@ -3402,6 +3431,7 @@
 
         // 영역 9: 시즌 평판
         .area-9-season-reputation {
+          margin-top: 23px;
           width: 100%;   // 370px → 100%
 
           .section-title {
