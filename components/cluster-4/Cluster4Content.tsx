@@ -76,25 +76,25 @@ const defaultSeasonData = {
     { teamName: '운영진(3기)', partName: '클럽 단위', roleLabel: '팀장(헬스케어 팀)', isAdmin: false, adminGeneration: 4, startedAt: '2025-03-23', profileImage: '/images/0/cluster4/cluster4-1/Ellipse 8.png' },
     { teamName: '운영진(4기)', partName: '클럽 단위', roleLabel: '앰배서더', isAdmin: false, adminGeneration: 5, startedAt: '2025-03-23', profileImage: '/images/0/cluster4/cluster4-1/Ellipse 9.png' },
   ],
-  stats: { dangam: 25, injeolmi: 30, eoheung: -2 },
-  rating: 6,
+  stats: { dangam: 999, injeolmi: 999, eoheung: -999 }, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+  rating: 10, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
   review: '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나',
   reviewLink: '',
   circles: {
-    weekUsage: 80,
-    scheduleReliability: 90,
-    seasonGrowth: 70,
-    approvedWeeks: 8,
-    totalOperatingWeeks: 10,
-    reliableWeeks: 9,
-    completedActivities: 75,
-    totalActivities: 120
+    weekUsage: 100, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    scheduleReliability: 100, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    seasonGrowth: 100, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    approvedWeeks: 999, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    totalOperatingWeeks: 999, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    reliableWeeks: 999, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    completedActivities: 999, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    totalActivities: 999 // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
   },
   progress: {
-    info: { total: 40, completed: 20, rate: 50 },
-    competency: { total: 40, completed: 30, rate: 80 },
-    experience: { total: 40, completed: 40, rate: 100 },
-    career: { total: 40, completed: 4, rate: 10 }
+    info: { total: 999, completed: 999, rate: 100 }, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    competency: { total: 999, completed: 999, rate: 100 }, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    experience: { total: 999, completed: 999, rate: 100 }, // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
+    career: { total: 999, completed: 999, rate: 100 } // TODO: 레이아웃 테스트용 최대치 — 확인 후 원래 값으로 복원
   }
 };
 
@@ -1980,38 +1980,53 @@ const Cluster4Content = () => {
               {/* 영역 6: 원형 차트 3개 */}
               <div className="area-6-circles">
                 <div className="circle-item">
-                  <div className="circle pink">
-                    <svg viewBox="0 0 100 100">
-                      <circle className="bg" cx="50" cy="50" r="40" />
-                      <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.weekUsage / 100)} />
-                    </svg>
+                  <div className="label-sub">
+                    <div>총 <span className="num-fixed">{currentSeason.circles.totalOperatingWeeks ?? 0}</span>주 중</div>
+                    <div><span className="highlight">{currentSeason.circles.approvedWeeks ?? 0}</span>주</div>
+                  </div>
+                  <div className="circle-wrapper">
                     <img src="/images/0/cluster4/icon/icon - 주차 활용도.png" alt="주차 활용도" className="circle-icon" />
-                    <div className="percent">{currentSeason.circles.weekUsage}%</div>
-                    <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.approvedWeeks ?? 0}</span>주</div>
+                    <div className="circle pink">
+                      <svg viewBox="0 0 100 100">
+                        <circle className="bg" cx="50" cy="50" r="40" />
+                        <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.weekUsage / 100)} />
+                      </svg>
+                      <div className="percent">{currentSeason.circles.weekUsage}%</div>
+                    </div>
                   </div>
                   <div className="label-main">주차 활용도</div>
                 </div>
                 <div className="circle-item">
-                  <div className="circle yellow">
-                    <svg viewBox="0 0 100 100">
-                      <circle className="bg" cx="50" cy="50" r="40" />
-                      <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.scheduleReliability / 100)} />
-                    </svg>
+                  <div className="label-sub">
+                    <div>총 <span className="num-fixed">{currentSeason.circles.totalOperatingWeeks ?? 0}</span>주 중</div>
+                    <div><span className="highlight">{currentSeason.circles.reliableWeeks ?? 0}</span>주</div>
+                  </div>
+                  <div className="circle-wrapper">
                     <img src="/images/0/cluster4/icon/icon - 일정 신뢰도.png" alt="일정 신뢰도" className="circle-icon" />
-                    <div className="percent">{currentSeason.circles.scheduleReliability}%</div>
-                    <div className="label-sub">총 {currentSeason.circles.totalOperatingWeeks ?? 0}주 중 <span className="highlight">{currentSeason.circles.reliableWeeks ?? 0}</span>주</div>
+                    <div className="circle yellow">
+                      <svg viewBox="0 0 100 100">
+                        <circle className="bg" cx="50" cy="50" r="40" />
+                        <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.scheduleReliability / 100)} />
+                      </svg>
+                      <div className="percent">{currentSeason.circles.scheduleReliability}%</div>
+                    </div>
                   </div>
                   <div className="label-main">일정 신뢰도</div>
                 </div>
                 <div className="circle-item">
-                  <div className="circle green">
-                    <svg viewBox="0 0 100 100">
-                      <circle className="bg" cx="50" cy="50" r="40" />
-                      <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.seasonGrowth / 100)} />
-                    </svg>
+                  <div className="label-sub">
+                    <div>총 <span className="num-fixed">{currentSeason.circles.totalActivities ?? 0}</span>개 중</div>
+                    <div><span className="highlight">{currentSeason.circles.completedActivities ?? 0}</span>개</div>
+                  </div>
+                  <div className="circle-wrapper">
                     <img src="/images/0/cluster4/icon/icon - 시즌 성장률.png" alt="시즌 성장률" className="circle-icon" />
-                    <div className="percent">{currentSeason.circles.seasonGrowth}%</div>
-                    <div className="label-sub">총 {currentSeason.circles.totalActivities ?? 0}개 중 <span className="highlight">{currentSeason.circles.completedActivities ?? 0}</span>개</div>
+                    <div className="circle green">
+                      <svg viewBox="0 0 100 100">
+                        <circle className="bg" cx="50" cy="50" r="40" />
+                        <circle className="fill" cx="50" cy="50" r="40" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - currentSeason.circles.seasonGrowth / 100)} />
+                      </svg>
+                      <div className="percent">{currentSeason.circles.seasonGrowth}%</div>
+                    </div>
                   </div>
                   <div className="label-main">시즌 성장률</div>
                 </div>
@@ -2021,8 +2036,8 @@ const Cluster4Content = () => {
               <div className="area-7-progress">
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 ({currentSeason.progress.info.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.info.total} 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 (<span className="num-fixed">{currentSeason.progress.info.rate}</span>%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.info.total}</span> 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.info.rate}%` }}></div>
@@ -2030,8 +2045,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 ({currentSeason.progress.competency.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.competency.total} 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 (<span className="num-fixed">{currentSeason.progress.competency.rate}</span>%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.competency.total}</span> 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.competency.rate}%` }}></div>
@@ -2039,8 +2054,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 ({currentSeason.progress.experience.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.experience.total} 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 (<span className="num-fixed">{currentSeason.progress.experience.rate}</span>%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.experience.total}</span> 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.experience.rate}%` }}></div>
@@ -2048,8 +2063,8 @@ const Cluster4Content = () => {
                 </div>
                 <div className="progress-item">
                   <div className="progress-header">
-                    <span className="name"><img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 ({currentSeason.progress.career.rate}%)</span>
-                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 {currentSeason.progress.career.total} 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개</span>
+                    <span className="name"><img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 (<span className="num-fixed">{currentSeason.progress.career.rate}</span>%)</span>
+                    <span className="value"><img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.career.total}</span> 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개</span>
                   </div>
                   <div className="bar">
                     <div className="fill yellow" style={{ width: `${currentSeason.progress.career.rate}%` }}></div>
@@ -2062,7 +2077,7 @@ const Cluster4Content = () => {
             <div className={`right-column ${isTextFading ? 'fading' : ''}`}>
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태 <span className="count-label">(<span className="num-fixed">{currentSeason.seasonRoles?.length ?? 0}</span>개)</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={statusBadgesRef} className="status-badges" onScroll={updateScrollbar8}>
                     {(() => {
@@ -2106,7 +2121,7 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span className="count-label">(<span className="num-fixed">{seasonReputations.length}</span>개)</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
                     {(() => {

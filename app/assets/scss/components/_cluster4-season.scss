@@ -2770,9 +2770,10 @@
           display: flex;
           align-items: flex-start;
           justify-content: center;
-          padding-left: 15px;
+          padding-left: 0; // 15px → 0 (좌측으로 약 15px 이동)
+          margin-left: -5px; // 추가 5px 좌측 이동 (총 20px)
           overflow: visible;
-          padding-top: 60px;
+          padding-top: 80px; // 60px → 80px (아래로 20px 이동)
 
           .season-image-stack {
             width: 315px;
@@ -2937,7 +2938,7 @@
           // 영역 4: 통계 바
           .area-4-stats {
             display: flex;
-            gap: 21px;
+            gap: 37px;
             padding: 0;
             width: 465.572px;
 
@@ -2948,7 +2949,7 @@
               color: #fff;
               display: flex;
               align-items: center;
-              gap: 8px;
+              gap: 2px;
               line-height: 35px;
               white-space: nowrap;
               flex-shrink: 0;
@@ -2974,7 +2975,9 @@
                 color: #fff;
                 font-weight: 400;
                 line-height: 35px;
-                min-width: 2.5em;
+                display: inline-block;
+                min-width: 3ch;
+                text-align: right;
               }
 
               .unit {
@@ -2983,7 +2986,6 @@
                 color: #fff;
                 font-weight: 400;
                 line-height: 35px;
-                margin-left: -19px;
               }
             }
           }
@@ -3105,71 +3107,63 @@
           // 영역 6: 원형 차트 3개
           .area-6-circles {
             display: flex;
-            gap: 40px;
+            gap: 20px;
             justify-content: space-around;
-            padding: 27px 0 30px 0;
+            padding: 10px 0 15px 0;
             margin-top: 1px;
             overflow: visible;
             height: 180px;
             flex-shrink: 0;
 
             .circle-item {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 8px;
-              width: 123px;
+              position: relative;
+              width: 140px;
+              height: 160px;
 
-              .circle {
-                position: relative;
-                width: 100%;
-                height: 123px;
+              // "총 N주 중 / N주": 우상단에 원과 반쯤 겹침
+              .label-sub {
+                position: absolute;
+                top: 12px;
+                right: 0;
+                text-align: right;
+                font-family: "Pretendard", sans-serif;
+                font-size: 16px;
+                font-weight: 400;
+                color: #fff;
+                line-height: 1.4;
+                white-space: nowrap;
+                z-index: 5;
 
-                svg {
-                  width: 100%;
-                  height: 100%;
-                  transform: rotate(-90deg);
-
-                  .bg {
-                    fill: none;
-                    stroke: #ffda8d;
-                    stroke-width: 7;
-                    opacity: 0.8;
-                  }
-
-                  .fill {
-                    fill: none;
-                    stroke-width: 7;
-                    stroke-linecap: butt;
-                    transition: stroke-dashoffset 1s ease;
-                  }
+                .num-fixed {
+                  display: inline-block;
+                  min-width: 3ch;
+                  text-align: right;
                 }
 
-                &.pink .fill {
-                  stroke: #ff7676;
+                .highlight {
+                  display: inline-block;
+                  min-width: 3ch;
+                  text-align: right;
+                  font-size: 20px;
+                  font-weight: 800;
+                  color: #faab07;
                 }
+              }
 
-                &.yellow .fill {
-                  stroke: #ff7676;
-                }
+              // 원 + 아이콘 래퍼: 세로 중앙에 배치
+              .circle-wrapper {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 110px;
+                height: 110px;
 
-                &.green .fill {
-                  stroke: #ff7676;
-                }
-
-                .icon {
-                  position: absolute;
-                  top: 0;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  font-size: 1.5rem;
-                  line-height: 1;
-                }
-
+                // 아이콘: 원 좌상단 경계에 걸침
                 .circle-icon {
                   position: absolute;
-                  top: 8px;
-                  left: 15px;
+                  top: -8px;
+                  left: 5px;
                   transform: rotate(-30deg);
                   width: 26px;
                   height: 30px;
@@ -3177,46 +3171,69 @@
                   z-index: 10;
                 }
 
-                .percent {
-                  position: absolute;
-                  top: 30px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  font-family: "Pretendard", sans-serif;
-                  font-size: 1.875rem;
-                  font-weight: 700;
-                  color: #fff;
-                  line-height: 1;
-                }
+                .circle {
+                  position: relative;
+                  width: 110px;
+                  height: 110px;
 
-                .label-sub {
-                  position: absolute;
-                  top: 65px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  font-family: "Pretendard", sans-serif;
-                  font-size: 1rem;
-                  font-weight: 400;
-                  color: #fff;
-                  line-height: 1;
-                  white-space: nowrap;
-                  z-index: 20;
+                  svg {
+                    width: 100%;
+                    height: 100%;
+                    transform: rotate(-90deg);
 
-                  .highlight {
-                    font-size: 1.25rem;
-                    font-weight: 800;
-                    color: #faab07;
+                    .bg {
+                      fill: none;
+                      stroke: #ffda8d;
+                      stroke-width: 7;
+                      opacity: 0.8;
+                    }
+
+                    .fill {
+                      fill: none;
+                      stroke-width: 7;
+                      stroke-linecap: butt;
+                      transition: stroke-dashoffset 1s ease;
+                    }
+                  }
+
+                  &.pink .fill {
+                    stroke: #ff7676;
+                  }
+
+                  &.yellow .fill {
+                    stroke: #ff7676;
+                  }
+
+                  &.green .fill {
+                    stroke: #ff7676;
+                  }
+
+                  // 원 안: 퍼센트만
+                  .percent {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-family: "Pretendard", sans-serif;
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    color: #fff;
+                    line-height: 1;
                   }
                 }
               }
 
+              // 원 아래: 라벨 (중앙 정렬, 간격 최소화)
               .label-main {
+                position: absolute;
+                bottom: 15px;
+                left: 0;
+                right: 0;
                 font-family: "Pretendard", sans-serif;
-                font-size: 1rem;
+                font-size: 0.875rem;
                 font-weight: 700;
                 color: #fff;
                 text-align: center;
-                margin-top: -8px;
                 line-height: 1;
               }
             }
@@ -3249,6 +3266,12 @@
                   text-transform: uppercase;
                   line-height: 40px;
 
+                  .num-fixed {
+                    display: inline-block;
+                    min-width: 3ch;
+                    text-align: right;
+                  }
+
                   .progress-icon {
                     width: 20px;
                     height: 30px;
@@ -3273,6 +3296,12 @@
                     height: 13px;
                     flex-shrink: 0;
                     object-fit: contain;
+                  }
+
+                  .highlight, .num-fixed {
+                    display: inline-block;
+                    min-width: 3ch;
+                    text-align: right;
                   }
 
                   .highlight {
@@ -3347,6 +3376,18 @@
                 object-fit: contain;
                 margin-top: -4px;
               }
+
+              .count-label {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.5);
+                font-weight: 400;
+
+                .num-fixed {
+                  display: inline-block;
+                  min-width: 2ch;
+                  text-align: right;
+                }
+              }
             }
 
             .status-badges {
@@ -3367,7 +3408,8 @@
               .badge-item {
                 display: inline-flex;
                 align-items: center;
-                gap: 4px;
+                justify-content: flex-start;
+                gap: 8px;
                 width: calc(100% - 2px);
                 height: 38px;
                 flex-shrink: 0;
@@ -3398,11 +3440,11 @@
                 }
 
                 .badge-info {
+                  flex: none;
+                  min-width: 0;
+                  overflow: hidden;
                   display: flex;
                   align-items: center;
-                  gap: 8px;
-                  min-width: 200px;
-                  flex-shrink: 0;
 
                   .badge-text {
                     font-family: "Pretendard", sans-serif;
@@ -3412,10 +3454,9 @@
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    max-width: 100%;
                     line-height: 28px;
-                    display: flex;
-                    align-items: center;
+                    display: inline-block;
+                    vertical-align: middle;
 
                     .separator {
                       color: rgba(255, 255, 255, 0.5);
@@ -3438,7 +3479,7 @@
                   font-weight: 600;
                   line-height: 15px;
                   padding: 3px 10px;
-                  margin: 0 5px 0 1px;
+                  margin: 0 5px 0 0;
                   border-radius: 20px;
                   white-space: nowrap;
                   overflow: hidden;
@@ -3482,6 +3523,18 @@
                 height: 21px;
                 object-fit: contain;
                 margin-top: -4px;
+              }
+
+              .count-label {
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.5);
+                font-weight: 400;
+
+                .num-fixed {
+                  display: inline-block;
+                  min-width: 2ch;
+                  text-align: right;
+                }
               }
             }
 
