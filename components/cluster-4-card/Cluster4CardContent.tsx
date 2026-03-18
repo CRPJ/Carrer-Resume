@@ -163,10 +163,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number;  // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 4, success: 3 });
-  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 3, success: 2 });
-  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 3, success: 1 });
-  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 3, success: 2 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 7, success: 5 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 1, success: 1 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 4, success: 4 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 5, success: 3 });
 
   // 강화 상태 판단용 (해당 주차 데이터)
   interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
@@ -2033,8 +2033,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         enhancementStatus: enhStatus,
       };
     }),
-    // 빈 카드 1개 // TODO: 더미 데이터 — DB 연동 후 제거
-    { id: 99, activityTypeId: '', code: '-', badge: '-', title: '-', verified: false, rating: 0, ratingCount: '- / 10', hasWeb: false, icon: '', isEmpty: true, enhancementStatus: 'not_applicable' as EnhancementStatus },
   ];
 
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)

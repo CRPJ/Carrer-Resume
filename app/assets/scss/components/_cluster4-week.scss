@@ -1097,7 +1097,7 @@
             .badge-count {
               font-size: 12px;
               font-weight: 400;
-              color: #9DFA07;
+              color: #fff;
             }
 
             &.heart-badge {
@@ -1385,9 +1385,11 @@
 
           .section-label {
             font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
             color: #fff;
+            line-height: 24px;
+            text-transform: uppercase;
             min-width: 80px;
             flex-shrink: 0;
           }
@@ -1686,10 +1688,12 @@
           }
 
           .section-label {
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 14px;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 16px;
             font-weight: 700;
             color: #fff;
+            line-height: 24px;
+            text-transform: uppercase;
             min-width: 80px;
             flex-shrink: 0;
           }
@@ -3228,9 +3232,9 @@
               }
 
               .icon-placeholder {
-                width: 70px;
-                height: 70px;
-                background: #CCC;
+                width: 71px;
+                height: 65px;
+                background: #AAAAAA;
                 border-radius: 0;
               }
             }
@@ -3485,7 +3489,7 @@
                   }
 
                   &.empty {
-                    background: #444;
+                    background: #777777;
                   }
                 }
 
@@ -3502,7 +3506,7 @@
                   }
 
                   .profile-name {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 400;
                     color: #fff;
                     font-family: 'Pretendard', sans-serif;
@@ -3547,12 +3551,12 @@
                 color: #fff;
                 font-family: 'Manrope', sans-serif;
                 font-weight: 800;
-                font-size: 0.75rem;
+                font-size: 12px;
                 line-height: 9px;
-                width: 119px;
-                height: 26px;
+                padding: 8.5px 10px;
                 background: rgba(255, 255, 255, 0.2);
                 border-radius: 9999px;
+                backdrop-filter: blur(1px);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -3582,11 +3586,11 @@
             }
 
             .likes {
-              font-size: 1rem;
+              font-size: 16px;
               color: #fff;
-              font-family: 'Manrope', sans-serif;
+              font-family: 'Pretendard', sans-serif;
               font-weight: 800;
-              line-height: 20px;
+              line-height: 22px;
               display: flex;
               align-items: center;
               gap: 4px;
