@@ -710,7 +710,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             }
           }
         }
-        setCumulativeApprovedWeeks(currentApprovedCount);
+        // 현재 주차가 활동 주차이면 eligible 체크에 포함 (+1)
+        const currentWeekIsActive = !currentWeek.is_club_break && weekId !== onboardingWeekIdForCount;
+        const currentWeekAlreadyInSuccess = successWeeksData.some((sw: any) => sw.week_id === weekId);
+        const cumulativeForEligible = currentApprovedCount + (currentWeekIsActive && !currentWeekAlreadyInSuccess ? 1 : 0);
+        setCumulativeApprovedWeeks(cumulativeForEligible);
 
         // 이전/다음 주차 ID 가져오기
         const allUserWeeks = allUserWeeksResult.data;
@@ -804,8 +808,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             }));
           setAllUserCompletedActivities(allCompletedActivities);
 
-          // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 값 사용
-          const currentCumulativeApproved = currentApprovedCount;
+          // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 cumulativeForEligible 사용
+          const currentCumulativeApproved = cumulativeForEligible;
 
           // 실무 정보: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 해당 주차의 활성화된 활동 수
           const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
@@ -813,19 +817,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 역량: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 1 (매주 최대 1개 선택 가능)
           const competencyTotal = isOnboardingWeekLocal ? 0 : 1;
 
-          // 실무 경험: eligible 조건 체크 (cluster-4-1과 동일한 로직)
+          // 실무 경험: eligible 조건 체크 (개설 여부와 무관하게 모든 experience 타입 대상)
           let experienceTotal = 0;
           if (!isOnboardingWeekLocal) {
-            const experienceActivities = activeActivities.filter(a => experienceTypesList.includes(a.activity_type_id));
-
-            experienceActivities.forEach(a => {
-              const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
-
-              if (!typeInfo) {
-                experienceTotal++; // 정보가 없으면 기본 포함
-                return;
-              }
-
+            experienceInfos.forEach(typeInfo => {
               // eligible_min/max 체크 (null이면 제한 없음)
               const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
               const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
@@ -836,7 +831,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 if (typeInfo.count_once_in_total) {
                   // 이미 이전 주차에서 완료했는지 확인
                   const previouslyCompleted = allCompletedActivities.some(
-                    (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+                    (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
                   );
                   if (!previouslyCompleted) {
                     experienceTotal++;
@@ -886,7 +881,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 역량 success: 온보딩 주차면 0 (강화율 계산에서 제외)
           const competencySuccess = isOnboardingWeekLocal ? 0 : (competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0);
-          const experienceSuccess = isOnboardingWeekLocal ? 0 : experienceTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
+          // 실무 경험 success: eligible한 모든 타입 중 강화 성공한 것만 카운트 (개설 여부 무관)
+          const eligibleExperienceTypes: string[] = [];
+          if (!isOnboardingWeekLocal) {
+            experienceInfos.forEach(typeInfo => {
+              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                if (typeInfo.count_once_in_total) {
+                  const previouslyCompleted = allCompletedActivities.some(
+                    (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
+                  );
+                  if (!previouslyCompleted) eligibleExperienceTypes.push(typeInfo.id);
+                } else {
+                  eligibleExperienceTypes.push(typeInfo.id);
+                }
+              }
+            });
+          }
+          const experienceSuccess = isOnboardingWeekLocal ? 0 : eligibleExperienceTypes.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
           setInfoStats({ total: infoTotal, success: infoSuccess });
@@ -1647,6 +1660,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = 'success' | 'waiting' | 'failed' | 'not_applicable';
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
+    // 실무 경험 활동의 eligible 조건 체크
+    const expInfo = experienceTypeInfos.find(info => info.id === activityType);
+    if (expInfo) {
+      const minWeek = expInfo.eligible_min_approved_weeks ?? 1;
+      const maxWeek = expInfo.eligible_max_approved_weeks ?? 999;
+      if (cumulativeApprovedWeeks < minWeek || cumulativeApprovedWeeks > maxWeek) {
+        return 'not_applicable';
+      }
+    }
+
     // 해당 활동 정보 가져오기
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
 
@@ -1654,7 +1677,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const record = weekActivityRecords.find(ar => ar.activity_type_id === activityType);
 
     // 1. 해당 없음: 활동이 개설되지 않음 AND 크루가 참여하지도 않음
-    if (!activity?.is_active && (!record || !record.is_completed)) return 'not_applicable';
+    if (!activity?.is_active && (!record || !record.is_completed)) {
+      // eligible 조건을 통과한 실무 경험 활동은 개설 안 됐어도 '강화 실패'로 처리
+      if (expInfo) return 'failed';
+      return 'not_applicable';
+    }
 
     if (!record || !record.is_completed) {
       // 레코드 없거나 is_completed = false → 강화 실패

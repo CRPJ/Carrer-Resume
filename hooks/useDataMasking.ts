@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import {
   maskBirthDate,
   maskAddress,
@@ -13,17 +15,46 @@ import {
   maskAge,
 } from '@/lib/dataMasking';
 
+const ADMIN_KEY = 'crpj-admin-2024';
+
 /**
- * 비로그인 사용자용 데이터 마스킹 훅
- * - 로그인된 사용자: 원본 데이터 그대로 반환
- * - 비로그인 사용자: 마스킹된 데이터 반환
+ * 데이터 마스킹 훅
+ * - 관리자 모드 (?admin=비밀키): 모든 원본 데이터 그대로 반환 (세션 유지)
+ * - 일반 로그인 사용자: 개인정보 마스킹, 나머지 원본
+ * - 비로그인 사용자: 전체 마스킹
  */
 export function useDataMasking() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const isLoggedIn = !!session;
 
-  // 개인정보(생년월일/주소/이메일/학교/전공)는 항상 마스킹, 나머지는 로그인 시 원본
-  const m = {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // URL에 ?admin=키 가 있으면 sessionStorage에 저장
+    const adminParam = searchParams.get('admin');
+    if (adminParam === ADMIN_KEY) {
+      sessionStorage.setItem('adminMode', 'true');
+    }
+    // sessionStorage에 adminMode가 있으면 관리자 모드
+    setIsAdmin(sessionStorage.getItem('adminMode') === 'true');
+  }, [searchParams]);
+
+  // 관리자 모드: 모든 정보 원본 그대로
+  const raw = {
+    birthDate: (v: string | null | undefined) => v || '-',
+    address: (v: string | null | undefined) => v || '-',
+    email: (v: string | null | undefined) => v || '-',
+    school: (v: string | null | undefined) => v || '-',
+    major: (v: string | null | undefined) => v || '-',
+    gpa: (v: string | number | null | undefined) => String(v ?? '-'),
+    year: (v: string | number | null | undefined) => String(v ?? '-'),
+    period: (v: string | null | undefined) => v || '-',
+    age: (v: string | number | null | undefined) => String(v ?? '-'),
+  };
+
+  // 일반 사용자: 개인정보 항상 마스킹, 나머지는 로그인 시 원본
+  const masked = {
     birthDate: (v: string | null | undefined) => maskBirthDate(v),
     address: (v: string | null | undefined) => maskAddress(v),
     email: (v: string | null | undefined) => maskEmail(v),
@@ -35,5 +66,5 @@ export function useDataMasking() {
     age: (v: string | number | null | undefined) => isLoggedIn ? String(v ?? '-') : maskAge(v),
   };
 
-  return { isLoggedIn, mask: m };
+  return { isLoggedIn, isAdmin, mask: isAdmin ? raw : masked };
 }

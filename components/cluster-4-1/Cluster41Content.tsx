@@ -500,11 +500,16 @@ const Cluster41Content = () => {
   const getCumulativeApprovedWeeks = (weekEndDate: string) => {
     if (dbWeeklyData[0]?.id.startsWith('dummy')) return 25;
     // 해당 주차까지의 전체 승인된(성공) 주차 수 (모든 시즌 통틀어)
-    return dbWeeklyData
+    const approvedCount = dbWeeklyData
       .filter(w =>
         w.endDate <= weekEndDate &&
         w.growthStatus === '성공'
       ).length;
+    // 현재 주차가 활동 주차(성공/미인정/대기)이면 eligible 체크에 포함
+    const currentWeek = dbWeeklyData.find(w => w.endDate === weekEndDate);
+    const isCurrentWeekActive = currentWeek && !['공식 휴식', '클럽 온보딩', '시즌 휴식', '활동 휴식'].includes(currentWeek.growthStatus);
+    const alreadyCounted = currentWeek?.growthStatus === '성공';
+    return approvedCount + (isCurrentWeekActive && !alreadyCounted ? 1 : 0);
   };
 
   // 주차별 실무 강화율 계산 함수들 (소수점 올림 처리)
@@ -594,42 +599,32 @@ const Cluster41Content = () => {
     // 2. 해당 주차까지의 누적 성공 주차 수 계산 (현재 주차 포함)
     const cumulativeApproved = getCumulativeApprovedWeeks(weekData.endDate);
 
-    // 3. 해당 주차에 열린 experience 활동 중 유저의 누적 주차에 eligible한 것만 필터링
-    const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
-    const experienceActivities = weekOpenActivities.filter(wa => experienceTypeIds.includes(wa.activity_type_id));
-
+    // 3. 모든 experience 타입 중 eligible한 것 필터링 (개설 여부와 무관)
     let eligibleTotal = 0;
-    experienceActivities.forEach(wa => {
-      const typeInfo = experienceTypeInfos.find(info => info.id === wa.activity_type_id);
-      if (!typeInfo) {
-        eligibleTotal++; // 정보가 없으면 기본 포함
-        return;
-      }
-
-      // eligible_min/max 체크 (null이면 제한 없음)
+    const eligibleExperienceTypeIds: string[] = [];
+    experienceTypeInfos.forEach(typeInfo => {
       const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
       const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-      // 누적 주차가 eligible 범위 내인지 확인
       if (cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek) {
-        // count_once_in_total 체크 (1회만 가능한 활동)
         if (typeInfo.count_once_in_total) {
-          // 이미 이전 주차에서 완료했는지 확인
           const previouslyCompleted = userActivities.some(a =>
-            a.activity_type_id === wa.activity_type_id &&
+            a.activity_type_id === typeInfo.id &&
             a.week_id !== weekId
           );
           if (!previouslyCompleted) {
             eligibleTotal++;
+            eligibleExperienceTypeIds.push(typeInfo.id);
           }
         } else {
           eligibleTotal++;
+          eligibleExperienceTypeIds.push(typeInfo.id);
         }
       }
     });
 
-    // 4. 강화 성공한 experience 활동 개수 (is_completed + (48시간 경과 OR 2차 정보 기입))
-    const experienceCount = experienceTypeIds.filter(activityTypeId =>
+    // 4. 강화 성공한 experience 활동 개수 (eligible한 활동 중에서만)
+    const experienceCount = eligibleExperienceTypeIds.filter(activityTypeId =>
       isEnhancementSuccess(weekId, activityTypeId)
     ).length;
 
@@ -812,6 +807,7 @@ const Cluster41Content = () => {
         let apiActivityWeekIds: string[] = [];
         let apiRestWeekIds: string[] = [];
         let apiOnboardingWeekId: string | null = null;
+        let apiActivityDetails: any[] = [];
 
         try {
           const apiUrl = currentTargetUserId ? `/api/profile?userId=${currentTargetUserId}` : '/api/profile';
@@ -851,6 +847,10 @@ const Cluster41Content = () => {
           // API에서 역할 이력 가져오기
           if (response.ok && result.userRoleHistory) {
             setUserRoleHistory(result.userRoleHistory);
+          }
+          // API에서 2차 정보(activityDetails) 가져오기 (RLS 우회 - service role key 사용)
+          if (response.ok && result.activityDetails) {
+            apiActivityDetails = result.activityDetails;
           }
           // API에서 온보딩 주차 ID 가져오기
           if (response.ok && result.onboardingWeekId) {
@@ -905,8 +905,7 @@ const Cluster41Content = () => {
             userActivitiesResult,
             activityTypesResult,
             careerRecordsResult,
-            weeklyActivitiesResult,
-            activityDetailsResult
+            weeklyActivitiesResult
           ] = await Promise.all([
             // user_weekly_growth
             supabase.from('user_weekly_growth').select('week_id, is_success, is_resting, is_club_break').eq('user_id', userId),
@@ -921,10 +920,6 @@ const Cluster41Content = () => {
             // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회) + opened_at 추가
             userWeekIds.length > 0
               ? supabase.from('weekly_activities').select('week_id, activity_type_id, is_active, opened_at').in('week_id', userWeekIds)
-              : Promise.resolve({ data: [], error: null }),
-            // activity_details - 2차 정보 (강화 성공 판단용)
-            userWeekIds.length > 0
-              ? supabase.from('activity_details').select('week_id, activity_type_id, sub_title, output_links').eq('user_id', userId).in('week_id', userWeekIds)
               : Promise.resolve({ data: [], error: null })
           ]);
 
@@ -942,7 +937,8 @@ const Cluster41Content = () => {
           if (userPointsResult.data) setUserPoints(userPointsResult.data);
           if (userActivitiesResult.data) setUserActivities(userActivitiesResult.data);
           if (weeklyActivitiesResult.data) setWeeklyActivities(weeklyActivitiesResult.data);
-          if (activityDetailsResult.data) setActivityDetails(activityDetailsResult.data);
+          // activityDetails는 profile API에서 가져온 데이터 사용 (RLS로 인해 클라이언트 직접 쿼리 불가)
+          if (apiActivityDetails.length > 0) setActivityDetails(apiActivityDetails);
           if (careerRecordsResult.data) {
             setUserCareerRecords(careerRecordsResult.data as CareerRecordData[]);
           }
