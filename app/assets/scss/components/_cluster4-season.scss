@@ -2938,9 +2938,10 @@
           // 영역 4: 통계 바
           .area-4-stats {
             display: flex;
-            gap: 37px;
+            gap: 21px;
             padding: 0;
             width: 465.572px;
+            margin-left: -68px; // -83px에서 +15px 우측 이동
 
             .stat {
               font-family: "Poppins", "Pretendard", sans-serif;
@@ -2949,7 +2950,7 @@
               color: #fff;
               display: flex;
               align-items: center;
-              gap: 2px;
+              gap: 8px;
               line-height: 35px;
               white-space: nowrap;
               flex-shrink: 0;
@@ -2986,6 +2987,7 @@
                 color: #fff;
                 font-weight: 400;
                 line-height: 35px;
+                margin-left: 4px;
               }
             }
           }
@@ -3147,6 +3149,9 @@
                   font-size: 20px;
                   font-weight: 800;
                   color: #faab07;
+                  background: rgba(0, 0, 0, 0.5);
+                  padding: 2px 6px;
+                  border-radius: 3px;
                 }
               }
 
@@ -3272,6 +3277,12 @@
                     text-align: right;
                   }
 
+                  .rate-number {
+                    display: inline-block;
+                    min-width: 3ch;
+                    text-align: right;
+                  }
+
                   .progress-icon {
                     width: 20px;
                     height: 30px;
@@ -3378,9 +3389,11 @@
               }
 
               .count-label {
+                font-family: "Pretendard", sans-serif;
                 font-size: 12px;
                 color: rgba(255, 255, 255, 0.5);
                 font-weight: 400;
+                margin-left: 8px;
 
                 .num-fixed {
                   display: inline-block;
@@ -3526,9 +3539,11 @@
               }
 
               .count-label {
+                font-family: "Pretendard", sans-serif;
                 font-size: 12px;
                 color: rgba(255, 255, 255, 0.5);
                 font-weight: 400;
+                margin-left: 8px;
 
                 .num-fixed {
                   display: inline-block;
