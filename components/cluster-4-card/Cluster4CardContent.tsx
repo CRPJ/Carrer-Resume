@@ -1456,9 +1456,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 데이터 (API 데이터 기반)
   // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyReputations = [
-    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', rawRating: 9, rawKeyword: '리더십', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
-    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', rawRating: 8, rawKeyword: '분석력', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
-    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', rawRating: 7, rawKeyword: '창의성', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+    { id: 'dummy-rep-1', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', rating: 0, ratingCount: '- / 10', description: '-', rawRating: 0, rawKeyword: '-', fm: 0, tagColor: 'tag--pink', tagText: '#-', isEmpty: true },
+    { id: 'dummy-rep-2', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', rating: 0, ratingCount: '- / 10', description: '-', rawRating: 0, rawKeyword: '-', fm: 0, tagColor: 'tag--red', tagText: '#-', isEmpty: true },
+    { id: 'dummy-rep-3', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', rating: 0, ratingCount: '- / 10', description: '-', rawRating: 0, rawKeyword: '-', fm: 0, tagColor: 'tag--yellow', tagText: '#-', isEmpty: true },
   ];
 
   const reputationData = useMemo(() => {
@@ -1540,11 +1540,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   }).filter(user => !selectedColleagues.find(c => c.id === user.id));
 
-  // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
+  // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백) — 빈 상태로 표시
   const dummyColleagues = [
-    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
-    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
-    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
+    { id: 'dummy-col-1', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', date: '-', message: '', isEmpty: true },
+    { id: 'dummy-col-2', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', date: '-', message: '', isEmpty: true },
+    { id: 'dummy-col-3', name: '-', gender: '-', age: '-', profileImg: '', university: '-', major: '-', team: '-', part: '-', nickname: '-', date: '-', message: '', isEmpty: true },
   ];
 
   // 연계 동료 데이터 (API 데이터 기반)
