@@ -1758,7 +1758,7 @@ const Cluster4Content = () => {
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 가능 시즌</span>
-                  <span className="detail-value"><span className="number">{growthPeriodStats?.availableSeasons ?? '-'}</span> <span className="white-text">개 시즌</span></span>
+                  <span className="detail-value"><span className="number">{seasonHistories.length}</span> <span className="white-text">개 시즌</span></span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">성장 성공 시즌</span>
@@ -2079,7 +2079,7 @@ const Cluster4Content = () => {
             <div className={`right-column ${isTextFading ? 'fading' : ''}`}>
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태 <span className="count-label"><span className="num-fixed">{currentSeason.seasonRoles?.length ?? 0}</span>개</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태 <span className="count-label"><span className="num-fixed">{Math.max(currentSeason.seasonRoles?.length ?? 0, 3)}</span>개</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={statusBadgesRef} className="status-badges" onScroll={updateScrollbar8}>
                     {(() => {
@@ -2123,7 +2123,7 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span className="count-label"><span className="num-fixed">{seasonReputations.length}</span>개</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span className="count-label"><span className="num-fixed">{Math.max(seasonReputations.length, 3)}</span>개</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
                     {(() => {

@@ -4243,6 +4243,9 @@
           color: #fff;
           line-height: 25px;
           margin: 0;
+          display: inline-block;
+          min-width: 280px;
+          flex-shrink: 0;
         }
 
         .weekly-card-date {
