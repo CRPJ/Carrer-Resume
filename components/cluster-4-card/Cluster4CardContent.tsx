@@ -1397,9 +1397,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 데이터 (API 데이터 기반)
   // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyReputations = [
-    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
-    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
-    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '/images/0/crew profile/여 1.jpg', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
+    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '/images/0/crew profile/남 1.webp', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
+    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '/images/0/crew profile/여 2.jpg', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
   ];
 
   const reputationData = useMemo(() => {
@@ -1479,9 +1479,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyColleagues = [
-    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
-    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
-    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
+    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '/images/0/crew profile/여 3.jpg', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
+    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '/images/0/crew profile/남 2.jpg', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
+    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '/images/0/crew profile/여 4.webp', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
   ];
 
   // 연계 동료 데이터 (API 데이터 기반)
@@ -2160,7 +2160,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   return (
-    <div className="cluster4-card-content weekly-card-detail" style={{ border: '1px solid #365314', marginRight: '27px' }}>
+    <div className="cluster4-card-content weekly-card-detail" style={{ marginRight: '27px' }}>
       {/* 탭 영역 */}
       <div className="top-tabs-wrapper">
         <div className="top-tabs">
@@ -2226,17 +2226,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       {/* ========== 섹션 1: 주차 이미지 + 헤더 + 평판 + 동료 ========== */}
       <div className="section1-layout">
-        {/* 플로팅 아이콘 - 본인: 연계 동료 편집, 타인: 주차 평판 남기기 */}
-        {(
-          <div className="floating-icons" style={{ display: 'flex', top: '700px', right: '40px' }}>
-            <div className="edit-icon" onClick={() => {
-              if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
-              handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
-            }} style={{ cursor: 'pointer' }}>
-              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
-            </div>
-          </div>
-        )}
         {/* 주차 평판 남기기 버튼 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
@@ -2394,6 +2383,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           {/* 연계 동료 */}
           <div className="colleague-section">
+            {/* 플로팅 아이콘 - 연계 동료 편집 */}
+            {(
+              <div className="floating-icons" style={{ display: 'flex' }}>
+                <div className="edit-icon" onClick={() => {
+                  if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
+                  handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
+                }} style={{ cursor: 'pointer' }}>
+                  <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+                </div>
+              </div>
+            )}
             <div className="section-title-row">
               <img src="/images/0/cluster4/icon/icon - 연계 동료.png" alt="연계 동료" className="section-icon" />
               <span className="section-label">연계 동료</span>
@@ -2495,8 +2495,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">정보</span></span>
-              <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             </div>
+            <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
@@ -2581,8 +2581,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">역량</span></span>
-              <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             </div>
+            <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
@@ -2695,8 +2695,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경험</span></span>
-              <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             </div>
+            <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
@@ -2811,8 +2811,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경력</span></span>
-              <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             </div>
+            <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
