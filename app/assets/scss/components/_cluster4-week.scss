@@ -1,5 +1,6 @@
 // Cluster 4 - Club Challenge Growth Styles
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Azeret+Mono:wght@400&family=Poppins:wght@400;700&display=swap');
 
 @font-face {
   font-family: 'Cafe24Ohsquare';
@@ -2756,29 +2757,31 @@
 
       .character-image {
         position: absolute;
+        top: 0;
         right: 0;
-        top: -48px;
         width: 326px;
         height: 314px;
         overflow: hidden;
-        opacity: 0.6;
+        z-index: 0;
+
+        > img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
 
         &::after {
           content: '';
           position: absolute;
           top: 0;
           left: 0;
-          bottom: 0;
-          width: 80px;
-          background: linear-gradient(to left, transparent, #000);
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(270deg, rgba(12, 15, 20, 0) 0%, #0C0F14 100%), rgba(0, 0, 0, 0.40);
           pointer-events: none;
         }
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
+
       }
     }
   }
