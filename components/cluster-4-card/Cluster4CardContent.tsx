@@ -146,6 +146,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 'wa-9', activity_type_id: 'exp-1', title: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-10', activity_type_id: 'exp-2', title: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-11', activity_type_id: 'exp-3', title: '[콘텐츠 마케팅] "어떤 제품/서비스더라도, 마케터가 제대로 \'표현\' 하지 못한다면, 그저 \'낙서\' 에 불과해. 나는 어떻게 내 제품/서비스를 표현할 수 있을까?', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-12', activity_type_id: 'exp-4', title: '[퍼포먼스 마케팅] "광고비 1원도 허투루 쓰지 않는 퍼포먼스 마케터의 세계. ROAS, CPA, CTR 지표를 직접 분석하고 캠페인을 최적화해보자!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] }, // TODO: 더미 데이터 — DB 연동 후 제거
   ]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
@@ -183,6 +184,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'exp-3', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'exp-4', is_completed: true }, // TODO: 더미 데이터 — DB 연동 후 제거
   ]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
@@ -199,13 +201,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
     { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
     { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-4', sub_title: '퍼포먼스 마케팅 캠페인 최적화 실습을 통해 ROAS 200% 달성 전략을 수립하고 실행 결과를 분석하여 개선안 도출 완료', output_links: [] }, // TODO: 더미 데이터 — DB 연동 후 제거
   ]);
 
   // 활동별 평점 (activity_type_id → points)
   const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map([
+    ['comp-1', 6], // TODO: 더미 데이터 — DB 연동 후 제거
     ['exp-1', 6],
     ['exp-2', 6],
     ['exp-3', 6],
+    ['exp-4', 8], // TODO: 더미 데이터 — DB 연동 후 제거
   ]));
 
   // DB에서 가져온 activity_types 정보
@@ -220,7 +225,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     ['comp-1', { id: 'comp-1', name: '[실무 Info]인하우스 & 에이전시', line_code: 'CP09 - UN010', cluster_id: 'practical_competency', description: null }],
     ['exp-1', { id: 'exp-1', name: '[커리어]마케터 Launch', line_code: 'EX01 - SFA01', cluster_id: 'practical_experience', description: null }],
     ['exp-2', { id: 'exp-2', name: '[생산성]상호 피드백', line_code: 'EX02 - RUA99', cluster_id: 'practical_experience', description: null }],
-    ['exp-3', { id: 'exp-3', name: '[콘텐츠]마케팅 실무', line_code: 'EX03 - CMP01', cluster_id: 'practical_experience', description: null }],
+    ['exp-3', { id: 'exp-3', name: '[콘텐츠]마케팅 실무', line_code: 'EX03 - RUA99', cluster_id: 'practical_experience', description: null }],
     ['exp-4', { id: 'exp-4', name: '[퍼포먼스]마케팅 실무', line_code: 'EX04 - PMP01', cluster_id: 'practical_experience', description: null }],
   ]));
   const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(['comp-1']);
@@ -383,6 +388,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'exp-1': '실무 경험 - [커리어]마케터 Launch.png',
     'exp-2': '실무 경험 - [생산성]상호 피드백.png',
     'exp-3': '실무 경험 - [콘텐츠]마케팅 실무.png',
+    'exp-4': '실무 경험 - [퍼포먼스]마케팅 실무.png', // TODO: 더미 데이터 — DB 연동 후 제거
   };
 
   // 실무 경험 아이콘 경로 가져오기 헬퍼 함수
@@ -1999,33 +2005,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
-  // 실무 경험 카드 데이터 (동적 생성)
-  const workExpCards = workExpActivityTypes.map((activityTypeId, index) => {
-    const activityType = activityTypesMap.get(activityTypeId);
-    const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
-    const detail = weekActivityDetails.find(d => d.activity_type_id === activityTypeId);
-    const enhStatus = getEnhancementStatus(activityTypeId);
-    const hasActivity = !!activity;
+  // 실무 경험 카드 데이터 (동적 생성 + 빈 카드)
+  const workExpCards = [
+    ...workExpActivityTypes.map((activityTypeId, index) => {
+      const activityType = activityTypesMap.get(activityTypeId);
+      const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
+      const detail = weekActivityDetails.find(d => d.activity_type_id === activityTypeId);
+      const enhStatus = getEnhancementStatus(activityTypeId);
+      const hasActivity = !!activity;
 
-    // 별점 계산 (points 테이블에서 가져온 평점 사용, 0~10 정수)
-    const ratingScore = activityRatings.get(activityTypeId) || 0;
-    const rating = ratingScore / 2; // 별 표시용 (0~5)
+      // 별점 계산 (points 테이블에서 가져온 평점 사용, 0~10 정수)
+      const ratingScore = activityRatings.get(activityTypeId) || 0;
+      const rating = ratingScore / 2; // 별 표시용 (0~5)
 
-    return {
-      id: index + 1,
-      activityTypeId,
-      code: activityType?.line_code || '-',
-      badge: activityType?.name || '-',
-      title: activity?.title || '-',
-      verified: enhStatus === 'success',
-      rating: rating,
-      ratingCount: hasActivity ? `${ratingScore} / 10` : '- / 10',
-      hasWeb: (detail?.output_links?.length || 0) > 0,
-      icon: getExperienceIconPath(activityTypeId),
-      isEmpty: false,
-      enhancementStatus: enhStatus,
-    };
-  });
+      return {
+        id: index + 1,
+        activityTypeId,
+        code: activityType?.line_code || '-',
+        badge: activityType?.name || '-',
+        title: activity?.title || '-',
+        verified: enhStatus === 'success',
+        rating: rating,
+        ratingCount: hasActivity ? `${ratingScore} / 10` : '- / 10',
+        hasWeb: (detail?.output_links?.length || 0) > 0,
+        icon: getExperienceIconPath(activityTypeId),
+        isEmpty: false,
+        enhancementStatus: enhStatus,
+      };
+    }),
+    // 빈 카드 1개 // TODO: 더미 데이터 — DB 연동 후 제거
+    { id: 99, activityTypeId: '', code: '-', badge: '-', title: '-', verified: false, rating: 0, ratingCount: '- / 10', hasWeb: false, icon: '', isEmpty: true, enhancementStatus: 'not_applicable' as EnhancementStatus },
+  ];
 
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)
   const workCareerCards = careerRecords.length > 0

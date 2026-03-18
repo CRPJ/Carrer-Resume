@@ -76,7 +76,8 @@
   width: calc(100% - 27px);   // 우측 27px 여백 확보
   max-width: 1330px;
   position: relative;
-  overflow-x: hidden;
+  // overflow-x: hidden → clip 변경: hidden은 overflow-y를 auto로 강제하여 내부 스크롤 발생
+  overflow-x: clip;
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {
@@ -2457,7 +2458,7 @@
       margin-bottom: 72px;
       padding-left: 40px;
       padding-right: 42px;
-      overflow: visible;
+      overflow: hidden; // character-image가 밖으로 넘치지 않도록
       max-height: none;
       height: auto;
 
@@ -2760,8 +2761,10 @@
         top: 0;
         right: 0;
         width: 326px;
-        height: 314px;
+        height: 100%; // 부모 높이에 맞춤
+        max-height: 100%;
         overflow: hidden;
+        pointer-events: none;
         z-index: 0;
 
         > img {
