@@ -7,6 +7,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import koreaRegionsData from "@/data/korea-regions.json";
 
@@ -27,28 +29,30 @@ const Sidebar = () => {
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
+  const demoMode = checkDemoMode();
   const [isOwner, setIsOwner] = useState(true);
-  const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
-  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
-  const [completionRate, setCompletionRate] = useState<number | null>(80);
-  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
-  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(demoMode ? DUMMY_SIDEBAR_EXTRA.reliabilityRate : 100);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(demoMode);
+  const [completionRate, setCompletionRate] = useState<number | null>(demoMode ? DUMMY_SIDEBAR_EXTRA.completionRate : 80);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(demoMode);
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalCompetency : 21); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalExperience : 21); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalInfo : 21); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalCareer : 21); // 실무 경력 누적
+  const [hasActivityData, setHasActivityData] = useState<boolean>(demoMode);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
   const [badge2, setBadge2] = useState(0);
   const [badge3, setBadge3] = useState(0);
   // 배지 데이터 상태 (user_cumulative_points 테이블)
-  const [badgeData, setBadgeData] = useState({
+  const [badgeData, setBadgeData] = useState(
+    demoMode ? DUMMY_SIDEBAR_EXTRA.badgeData : {
     stars: 99999, // 별
     lightnings: 9999, // 번개
     shields: 99999, // 방패
   });
-  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(demoMode);
 
   // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
   interface SeasonHistory {
@@ -268,11 +272,11 @@ const Sidebar = () => {
     gpaMax: string;
     quote: string;
     photo: string;
-  } | null>(null);
+  } | null>(demoMode ? DUMMY_USER_PROFILE : null);
 
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
-  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
+  const [hasData, setHasData] = useState(demoMode); // 데이터 있음/없음 상태
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -280,6 +284,7 @@ const Sidebar = () => {
   // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
   const cacheInitRef = useRef(false);
   useLayoutEffect(() => {
+    if (demoMode) return; // 더미 모드면 캐시 초기화 스킵
     if (cacheInitRef.current || !cachedProfile?.data) return;
     cacheInitRef.current = true;
 
@@ -477,7 +482,7 @@ const Sidebar = () => {
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
   const [debugPanelType, setDebugPanelType] = useState<"OK" | "EC" | "PX">("OK");
-  const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">("Running");
+  const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">(demoMode ? DUMMY_SIDEBAR_EXTRA.crewStatus : "Running");
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -807,10 +812,11 @@ const Sidebar = () => {
 
   // 세션 또는 targetUserId 변경 시 프로필 로드
   useEffect(() => {
+    if (demoMode) return; // 더미 모드면 API 안 부름
     if (session || targetUserId) {
       fetchUserProfile();
     }
-  }, [session, targetUserId]);
+  }, [session, targetUserId, demoMode]);
 
   // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {

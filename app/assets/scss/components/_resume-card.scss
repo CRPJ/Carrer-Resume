@@ -1287,9 +1287,9 @@
         justify-content: center;
         background: rgba(0, 0, 0, 0.6);
 
-        // 도장이 찍히면 배경 제거
+        // 도장이 찍혀도 배경 사각형 유지
         &.stamped {
-          background: transparent;
+          // background 그대로 유지
         }
       }
 

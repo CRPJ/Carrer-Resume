@@ -4,11 +4,14 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
 
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
+  const isDemoMode = checkDemoMode();
 
   const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
@@ -71,7 +74,11 @@ const Cluster41Content = () => {
     isBreakSeason: boolean;
     fromSeason: string | null;
     toSeason: string | null;
-  } | null>(null);
+  } | null>(isDemoMode ? {
+    year: 26, name: '봄', currentWeek: 1,
+    isClubBreak: false, holidayName: null,
+    isBreakSeason: false, fromSeason: null, toSeason: null
+  } : null);
 
   // 성장 기간 집계 데이터 상태
   interface GrowthPeriodStats {
@@ -95,6 +102,8 @@ const Cluster41Content = () => {
 
   // 주차별 평판 개수 (week_card_id -> count)
   const [weeklyReputationCounts, setWeeklyReputationCounts] = useState<{ [key: string]: number }>({});
+  const [weeklyFmScores, setWeeklyFmScores] = useState<{ [key: string]: number }>({});
+  const [weeklyColleagueCounts, setWeeklyColleagueCounts] = useState<{ [key: string]: number }>({});
 
   // 성장 시작/종료 주차 정보 상태
   interface WeekInfo {
@@ -128,10 +137,11 @@ const Cluster41Content = () => {
     roleInSeason: string;
   }
   const [seasonCards, setSeasonCards] = useState<SeasonCardData[]>([]);
-  const [isLoadingSeasons, setIsLoadingSeasons] = useState(true);
+  const [isLoadingSeasons, setIsLoadingSeasons] = useState(!isDemoMode);
 
   // 주차별 평판 개수 가져오기
   useEffect(() => {
+    if (isDemoMode) return;
     const fetchWeeklyReputationCounts = async () => {
       if (!targetUserId) return;
       try {
@@ -154,8 +164,25 @@ const Cluster41Content = () => {
     fetchWeeklyReputationCounts();
   }, [targetUserId]);
 
+  // 데모 모드: 주차별 평판/FM/동료 데이터 설정
+  useEffect(() => {
+    if (!isDemoMode) return;
+    const counts: { [key: string]: number } = {};
+    const fmScores: { [key: string]: number } = {};
+    const colleagues: { [key: string]: number } = {};
+    Object.entries(DUMMY_WEEK_EXTRA).forEach(([weekId, extra]) => {
+      counts[weekId] = extra.reputationCount;
+      fmScores[weekId] = extra.fmScore;
+      colleagues[weekId] = extra.colleagueCount;
+    });
+    setWeeklyReputationCounts(counts);
+    setWeeklyFmScores(fmScores);
+    setWeeklyColleagueCounts(colleagues);
+  }, [isDemoMode]);
+
   // 현재 시즌 정보 가져오기
   useEffect(() => {
+    if (isDemoMode) return;
     const fetchCurrentSeason = async () => {
       const today = new Date().toISOString().split('T')[0];
 
@@ -228,8 +255,10 @@ const Cluster41Content = () => {
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
 
-  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>([]);
-  const [isLoadingWeeks, setIsLoadingWeeks] = useState(true);
+  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>(
+    isDemoMode ? DUMMY_WEEKLY_LIST : []
+  );
+  const [isLoadingWeeks, setIsLoadingWeeks] = useState(!isDemoMode);
   const [isPendingApproval, setIsPendingApproval] = useState(false);
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
 
@@ -356,7 +385,8 @@ const Cluster41Content = () => {
 
   // 특정 날짜에 해당하는 팀/파트 정보 찾기
   const getTeamPartForDate = (date: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return { teamName: '운영진(6기)', partName: '팀장(엔터드라마팀)' };
+    // 데모 모드 팀/파트는 getFormattedTeamPart에서 DUMMY_WEEK_EXTRA로 처리
+    if (isDemoMode) return { teamName: null, partName: null };
     const dateObj = new Date(date);
 
     // 해당 날짜에 활성화된 user_team_parts 찾기
@@ -384,7 +414,8 @@ const Cluster41Content = () => {
   // 1순위: user_role_history 테이블에서 해당 날짜에 맞는 역할
   // 2순위: user_profiles.role 기본값
   const getRoleForDate = (date: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return { roleLabel: '운영진(앰배서더)' };
+    // 데모 모드 역할은 렌더링에서 DUMMY_WEEK_EXTRA로 직접 처리
+    if (isDemoMode) return null;
     const dateObj = new Date(date);
 
     // 1순위: 해당 날짜에 활성화된 역할 이력 찾기
@@ -425,6 +456,11 @@ const Cluster41Content = () => {
   // 운영진일 때 팀/파트 포맷 변환
   const getFormattedTeamPart = (date: string, week: DBWeekData) => {
     if (week.isBreakSeason) return { teamName: '-', partName: '-' };
+    // 데모 모드: DUMMY_WEEK_EXTRA에서 팀/파트 조회
+    if (isDemoMode && DUMMY_WEEK_EXTRA[week.id]) {
+      const extra = DUMMY_WEEK_EXTRA[week.id];
+      return { teamName: extra.teamPart.teamName || '-', partName: extra.teamPart.partName || '-' };
+    }
     const teamPart = getTeamPartForDate(date);
     const roleInfo = getRoleForDate(date);
 
@@ -452,13 +488,11 @@ const Cluster41Content = () => {
 
   // 특정 주차의 포인트 정보 계산
   const getPointsForWeek = (weekId: string) => {
-    if (weekId === 'dummy-1') return { star: 25, shield: 30, lightning: 2 };
-    if (weekId === 'dummy-2') return { star: 25, shield: 30, lightning: 2 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { star: 25, shield: 30, lightning: 2 };
-    if (weekId.startsWith('dummy')) return { star: 0, shield: 0, lightning: 0 };
-    
+    // 데모 모드: DUMMY_WEEK_EXTRA에서 포인트 조회
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].points;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { star: 0, shield: 0, lightning: 0 };
+
     const weekPoints = userPoints.filter(p => p.week_id === weekId);
-    if (weekId.startsWith('dummy')) return { star: 25, shield: 30, lightning: 2 };
 
     const star = weekPoints
       .filter(p => p.point_type === 'star')
@@ -477,7 +511,14 @@ const Cluster41Content = () => {
 
   // 누적 인절미 계산 (특정 주차까지의 누적 shield - lightning)
   const getCumulativeInjeolmi = (weekEndDate: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return 30;
+    if (isDemoMode) {
+      // 데모: 해당 주차까지 누적 shield - lightning 합산
+      const relevantWeeks = dbWeeklyData.filter(w => w.endDate <= weekEndDate);
+      return relevantWeeks.reduce((sum, w) => {
+        const ex = DUMMY_WEEK_EXTRA[w.id];
+        return sum + (ex ? ex.points.shield - ex.points.lightning : 0);
+      }, 0);
+    }
     // 해당 주차 종료일까지의 모든 포인트
     const relevantWeekIds = dbWeeklyData
       .filter(w => w.endDate <= weekEndDate)
@@ -498,7 +539,9 @@ const Cluster41Content = () => {
 
   // 활동 누적 주차 계산 (해당 주차까지 전체 승인된 주차 수)
   const getCumulativeApprovedWeeks = (weekEndDate: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return 25;
+    if (isDemoMode) {
+      return dbWeeklyData.filter(w => w.endDate <= weekEndDate && w.growthStatus === '성공').length;
+    }
     // 해당 주차까지의 전체 승인된(성공) 주차 수 (모든 시즌 통틀어)
     return dbWeeklyData
       .filter(w =>
@@ -542,10 +585,8 @@ const Cluster41Content = () => {
 
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 4, total: 6 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].infoRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차는 강화율 계산에서 제외 (이력으로만 존재)
     if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
@@ -561,10 +602,8 @@ const Cluster41Content = () => {
 
   // 주차별 실무 역량 강화율 (competency) - 매주 분모는 항상 1
   const getWeeklyCompetencyRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 1, total: 1 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].competencyRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차는 강화율 계산에서 제외
     if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 실무 역량은 매주 분모가 항상 1
@@ -579,10 +618,8 @@ const Cluster41Content = () => {
 
   // 주차별 실무 경험 강화율 (experience) - 유저의 누적 활동 주차에 따라 P값 동적 계산
   const getWeeklyExperienceRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 4 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].experienceRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차는 강화율 계산에서 제외
     if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
     // 1. 해당 주차 정보 찾기
@@ -645,10 +682,8 @@ const Cluster41Content = () => {
   // P(분모) = 해당 주차에 진행 중인 경력 프로젝트 수 (참여한 것 - pending/enhanced)
   // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수
   const getWeeklyCareerRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 5 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].careerRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차는 강화율 계산에서 제외
     if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
 
@@ -671,10 +706,8 @@ const Cluster41Content = () => {
   // k = {(a' + b' + c' + d') / (a + b + c + d)} * 100% (소수점 올림)
   // 주의: 각 파트 강화율(p,q,r,s)은 k 계산에 포함되지 않음
   const getWeeklyGrowthRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 13, total: 13 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 7 };
-    if (weekId.startsWith('dummy-') && ['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 50, count: 7, total: 13 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 0 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].growthRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
 
     const info = getWeeklyInfoRate(weekId);
     const competency = getWeeklyCompetencyRate(weekId);
@@ -790,6 +823,8 @@ const Cluster41Content = () => {
 
   // DB에서 주차 데이터 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 더미 모드면 API 안 부름
+
     const abortController = new AbortController();
     const currentTargetUserId = targetUserId; // 현재 요청 시점의 targetUserId 저장
 
@@ -1900,7 +1935,7 @@ const Cluster41Content = () => {
                           const weekPoints = getPointsForWeek(week.id);
                           const injeolmi = weekPoints.shield - weekPoints.lightning;
                           const teamPart = getFormattedTeamPart(week.startDate, week);
-                          const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+                          const roleInfo = week.isBreakSeason ? null : (isDemoMode && DUMMY_WEEK_EXTRA[week.id] ? { roleLabel: DUMMY_WEEK_EXTRA[week.id].roleLabel } : getRoleForDate(week.startDate));
 
                           return (
                             <>
@@ -1987,7 +2022,7 @@ const Cluster41Content = () => {
                       {(() => {
                         // 전환 주차는 팀/파트/역할을 '-'로 표시
                         const teamPart = getFormattedTeamPart(week.startDate, week);
-                        const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+                        const roleInfo = week.isBreakSeason ? null : (isDemoMode && DUMMY_WEEK_EXTRA[week.id] ? { roleLabel: DUMMY_WEEK_EXTRA[week.id].roleLabel } : getRoleForDate(week.startDate));
                         return (
                           <>
                             <div className="info-group">
@@ -2076,8 +2111,8 @@ const Cluster41Content = () => {
                             </div>
                             <div className="weekly-card-extra-stats">
                               <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/3</span></span>
                               <span className="stat empty"></span>
                             </div>
                           </div>

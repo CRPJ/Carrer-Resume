@@ -1551,49 +1551,28 @@ svg {
   }
 }
 
-// 7. 모달 본문 스크롤바 — 전역 적용 (.resume-activities 스타일 기반, 색상만 변경)
-// 24개 모달 전부 매칭: 단일 클래스 + 2단 중첩 + 3단 중첩(페이지 wrapper 포함)
-.edit-modal-body,
-.modal-body,
-.section-modal-body,
-.intro-modal-body,
+// 7. 모달 본문 스크롤바 — 전역 단순 셀렉터 (중첩 제거)
 .section1-modal-body,
 .section2-modal-body,
 .section21-modal-body,
 .section3-modal-body,
 .section4-modal-body,
-// 2단 중첩 (부모 모달 + body)
-.edit-modal-content .edit-modal-body,
-.section-modal .section-modal-body,
-.section4-modal .section4-modal-body,
-.intro-modal .intro-modal-body,
-.section1-modal .section1-modal-body,
-.section2-modal .section2-modal-body,
-.section21-modal .section21-modal-body,
-.section3-modal .section3-modal-body,
-.edu-modal .modal-body,
-// 3단 중첩 (페이지 wrapper + 부모 모달 + body) — 컴포넌트 SCSS와 동일 specificity
-.cluster2-content .section1-modal .section1-modal-body,
-.cluster2-content .section2-modal .section2-modal-body,
-.cluster2-content .section21-modal .section21-modal-body,
-.cluster2-content .section3-modal .section3-modal-body,
-.cluster2-content .section4-modal .section4-modal-body,
-.cluster2-content .intro-modal .intro-modal-body,
-.cluster2-content .edu-modal .modal-body,
-.cluster3-content .section-modal .section-modal-body,
-.cluster4-content .section-modal .section-modal-body,
-.cluster4-card-content .section-modal .section-modal-body {
-  padding-right: 8px;
-
+.section-modal-body,
+.intro-modal-body,
+.edit-modal-body,
+.modal-body {
   &::-webkit-scrollbar {
-    width: 2px !important;
+    width: 6px !important;
   }
   &::-webkit-scrollbar-thumb {
     background: rgba(236, 187, 2, 1) !important;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
   }
   &::-webkit-scrollbar-thumb:hover {
     background: rgba(236, 187, 2, 0.8) !important;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent !important;
   }
   &::-webkit-scrollbar-button {
     display: none !important;

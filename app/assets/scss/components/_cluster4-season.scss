@@ -3102,6 +3102,10 @@
                 color: rgba(255, 255, 255, 0.7);
                 margin: 0;
                 line-height: 26px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 100%;
               }
             }
           }
@@ -4383,8 +4387,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 9px 12px;
             min-width: 154px;
+            margin-left: -15px;
+            padding: 9px 12px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             font-family: "Manrope", sans-serif;

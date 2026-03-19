@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES } from "@/constants/dummyData";
 
 // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
 const DUMMY_SEASON_ROLES = [
@@ -105,6 +107,7 @@ const Cluster4Content = () => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
+  const isDemoMode = checkDemoMode();
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   // 승인 상태 확인 함수
@@ -128,6 +131,7 @@ const Cluster4Content = () => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    if (isDemoMode) { openModalFn(); return; } // 더미 모드: 체크 스킵
     // 개발 모드: 비로그인 상태에서도 모달 열기 허용
     if (!session) {
       openModalFn();
@@ -201,6 +205,7 @@ const Cluster4Content = () => {
     keyword_1: string | null;
     keyword_2: string | null;
     created_at: string;
+    fmScore?: number;
     reviewer: {
       id: string;
       display_name: string;
@@ -324,7 +329,11 @@ const Cluster4Content = () => {
     isBreakSeason: boolean;
     fromSeason: string | null;
     toSeason: string | null;
-  } | null>(null);
+  } | null>(isDemoMode ? {
+    year: 2026, name: '겨울', currentWeek: 8,
+    isClubBreak: false, holidayName: null,
+    isBreakSeason: true, fromSeason: '겨울', toSeason: '봄'
+  } : null);
 
   // 사용자의 상태 (status, growth_status)
   const [userStatus, setUserStatus] = useState<string | null>(null);
@@ -447,13 +456,18 @@ const Cluster4Content = () => {
   // 메인 프로필 사진
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>('/images/0/cluster4/cluster4-1/이안0.png');
 
-  // 현재 선택된 시즌 데이터 (동적 데이터 우선, 없으면 기본 데이터)
-  const currentSeason: SeasonHistoryData = seasonHistories.length > 0
-    ? seasonHistories[section3Page] || seasonHistories[0]
-    : defaultSeasonData as SeasonHistoryData;
+  // 현재 선택된 시즌 데이터 (데모 모드 → seasonHistories 페이지네이션 우선, 없으면 기본 데이터)
+  const currentSeason: SeasonHistoryData = isDemoMode
+    ? (seasonHistories.length > 0
+      ? seasonHistories[section3Page] || seasonHistories[0]
+      : DUMMY_SEASON_DATA as unknown as SeasonHistoryData)
+    : seasonHistories.length > 0
+      ? seasonHistories[section3Page] || seasonHistories[0]
+      : defaultSeasonData as SeasonHistoryData;
 
   // 현재 시즌 정보 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     const fetchCurrentSeason = async () => {
       const today = new Date().toISOString().split('T')[0];
 
@@ -511,6 +525,7 @@ const Cluster4Content = () => {
 
   // 활동 통계 가져오기 (현재 주차 기준)
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     const fetchActivityStats = async () => {
       if (!session?.user?.id && !urlUserId) return;
 
@@ -763,6 +778,7 @@ const Cluster4Content = () => {
 
   // 사용자 프로필에서 status, growth_status, growthEndInfo, growthStartInfo, growthPeriodStats, role 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     const fetchUserStatus = async () => {
       try {
         // urlUserId가 있으면 해당 사용자, 없으면 본인 프로필 조회
@@ -930,11 +946,13 @@ const Cluster4Content = () => {
 
   // 컴포넌트 마운트 시 키워드 목록 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 더미 모드: API 호출 스킵
     fetchReputationKeywords();
   }, []);
 
   // 시즌 평판 데이터 가져오기 (시즌 변경 시마다)
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     // 대상 사용자 ID (urlUserId가 있으면 해당 사용자, 없으면 본인)
     const targetId = urlUserId || session?.user?.id;
     if (!targetId || !currentSeason?.id) return;
@@ -945,6 +963,28 @@ const Cluster4Content = () => {
 
     fetchSeasonReputations(targetId, currentSeason.id);
   }, [urlUserId, session?.user?.id, currentSeason?.id]);
+
+  // 데모 모드일 때 더미 데이터 일괄 적용
+  useEffect(() => {
+    if (isDemoMode) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setSeasonReputations(DUMMY_SEASON_DATA.seasonReputations as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setSeasonHistories(DUMMY_SEASON_HISTORIES as any);
+    }
+  }, [isDemoMode]);
+
+  // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신
+  useEffect(() => {
+    if (!isDemoMode) return;
+    const currentHistory = DUMMY_SEASON_HISTORIES[section3Page];
+    if (currentHistory) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setSeasonReputations(currentHistory.seasonReputations as any);
+    } else {
+      setSeasonReputations([]);
+    }
+  }, [section3Page, isDemoMode]);
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
@@ -1433,6 +1473,14 @@ const Cluster4Content = () => {
 
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
+    if (isDemoMode) {
+      console.log('Demo: 시즌 평판 저장', seasonReputationEditData);
+      alert("저장되었습니다.");
+      setSeasonReputationModalOpen(false);
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+      return;
+    }
+
     if (!urlUserId) {
       alert("평판을 남길 대상을 찾을 수 없습니다.");
       return;
@@ -1500,6 +1548,13 @@ const Cluster4Content = () => {
 
   // 시즌 리뷰 저장
   const handleSaveSeasonReview = async () => {
+    if (isDemoMode) {
+      console.log('Demo: 시즌 리뷰 저장', seasonReviewEditData);
+      alert("저장되었습니다.");
+      setSeasonReviewModalOpen(false);
+      return;
+    }
+
     if (!currentSeason?.id) {
       alert("시즌 정보를 찾을 수 없습니다.");
       return;
@@ -1802,6 +1857,7 @@ const Cluster4Content = () => {
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" style={{ cursor: 'pointer' }} onClick={() => {
+              if (isDemoMode) { openSeasonReputationModal(); return; }
               if (isOwner) {
                 alert('시즌 평판은 타 크루끼리 작성합니다.');
               } else {
@@ -1975,7 +2031,7 @@ const Cluster4Content = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="review-comment">"{currentSeason.review || '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나'}"</p>
+                  <p className="review-comment">{(() => { const r = currentSeason.review || '이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나'; return r.length > 30 ? r.slice(0, 30) + '...' : r; })()}</p>
                 </div>
               </div>
 
@@ -2079,20 +2135,14 @@ const Cluster4Content = () => {
             <div className={`right-column ${isTextFading ? 'fading' : ''}`}>
               {/* 영역 8: 시즌 상태 */}
               <div className="area-8-season-status">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태 <span className="count-label"><span className="num-fixed">{Math.max(currentSeason.seasonRoles?.length ?? 0, 3)}</span>개</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태 <span className="count-label"><span className="num-fixed">{currentSeason.seasonRoles?.length ?? 0}</span>개</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={statusBadgesRef} className="status-badges" onScroll={updateScrollbar8}>
                     {(() => {
-                      // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                      const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
+                      const roles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
                         ? currentSeason.seasonRoles
                         : [];
-                      const totalSlots = 3;
-                      // DB 데이터가 기준 미만이면 더미로 채움
-                      const roles = dbRoles.length >= totalSlots
-                        ? dbRoles.slice(0, totalSlots)
-                        : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
-                      return roles.map((roleItem, index) => (
+                      return roles.map((roleItem: any, index: number) => (
                         <div className="badge-item" key={index}>
                           <div className="badge-icon">
                             <img src={roleItem.profileImage || profilePhotoUrl || '/images/avatar/avatar.png'} alt="profile" />
@@ -2123,19 +2173,11 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span className="count-label"><span className="num-fixed">{Math.max(seasonReputations.length, 3)}</span>개</span></h4>
+                <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span className="count-label"><span className="num-fixed">{seasonReputations.length}</span>개</span></h4>
                 <div style={{ position: 'relative' }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
                     {(() => {
-                      // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                      const totalSlots = 3;
-                      const dbReputations = seasonReputations.slice(0, totalSlots);
-                      // DB 데이터가 기준 미만이면 더미로 채움
-                      const allReputations = dbReputations.length >= totalSlots
-                        ? dbReputations
-                        : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
-
-                      return allReputations.map((reputation: any) => {
+                      return seasonReputations.map((reputation: any) => {
                         const reviewer = reputation.reviewer;
                         const currentYear = new Date().getFullYear();
                         const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
@@ -2193,7 +2235,7 @@ const Cluster4Content = () => {
                               </span>
                             </div>
                             <div className="stats">
-                              <span className="pm"><img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :325</span>
+                              <span className="pm"><img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :{reputation.fmScore ?? 0}</span>
                               <span className="rating">
                                 {[...Array(fullStars)].map((_, i) => (
                                   <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />

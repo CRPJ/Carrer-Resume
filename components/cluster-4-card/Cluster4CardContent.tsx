@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 
 
 interface Cluster4CardContentProps {
@@ -65,6 +66,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
+  const isDemoMode = checkDemoMode();
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   // 승인 상태 확인 함수
@@ -88,6 +90,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
+    if (isDemoMode) { openModalFn(); return; } // 더미 모드: 체크 스킵
     // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
       openModalFn();
@@ -106,7 +109,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // DB에서 가져온 주차 데이터 상태
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
-  const [isLoadingWeek, setIsLoadingWeek] = useState(true);
+  const [isLoadingWeek, setIsLoadingWeek] = useState(!isDemoMode);
 
   // 팀/파트/역할/포인트 데이터 상태
   const [teamName, setTeamName] = useState<string | null>('미디어');
@@ -421,6 +424,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     const fetchWeekData = async () => {
       if (!weekId) return;
 
@@ -925,6 +929,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // career-records는 urlUserId가 있으면 Stage 1에서 이미 로드됨 (earlyCareerResult)
   // currentUserId만 있는 경우(본인 조회)에만 별도 fetch
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     const fetchCareerRecords = async () => {
       if (!weekId) return;
       // urlUserId가 있으면 Stage 1에서 이미 처리됨
@@ -979,6 +984,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchKeywordsIfNeeded = async () => {
+    if (isDemoMode) return; // 더미 모드: API 스킵
     if (reputationKeywords.length > 0) return;
     try {
       const res = await fetch("/api/reputation-keywords");
@@ -1011,11 +1017,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 주차 평판 데이터 초기 로드 (urlUserId가 없는 경우만 - 있으면 Stage 1에서 이미 로드됨)
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     if (!urlUserId) fetchWeeklyReputations();
   }, [urlUserId, weekId]);
 
   // 크루 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchCrewListIfNeeded = async () => {
+    if (isDemoMode) return; // 더미 모드: API 스킵
     if (allCrewList.length > 0) return; // 이미 로드됨
     try {
       const excludeId = urlUserId || session?.user?.id || '';
@@ -1066,6 +1074,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 초기 로드 (urlUserId가 없는 경우만 - 있으면 Stage 1에서 이미 로드됨)
   useEffect(() => {
+    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
     if (!urlUserId) fetchWeeklyColleagues();
   }, [urlUserId, weekId, session?.user?.id]);
 
@@ -1201,6 +1210,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 저장 함수
   const saveWeeklyColleagues = async () => {
+    if (isDemoMode) {
+      console.log('Demo: 연계 동료 저장', selectedColleagues);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
+      return;
+    }
     if (!weekId) {
       alert("주차 정보를 찾을 수 없습니다.");
       return;
@@ -1247,6 +1262,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 주차 평판 저장 함수
   const saveWeeklyReputation = async () => {
+    if (isDemoMode) {
+      console.log('Demo: 주차 평판 저장', reputationEditData);
+      alert("저장되었습니다.");
+      setHeaderModalOpen(false);
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+      return;
+    }
     if (!urlUserId || !weekId) {
       alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return;
@@ -1815,6 +1837,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 2차 정보 저장 (운영진 링크 제외, 사용자 링크만 저장)
   const saveActivityDetail = async (activityType: string) => {
+    if (isDemoMode) {
+      console.log('Demo: 활동 상세 저장', activityType, editingDetails[activityType]);
+      return;
+    }
     if (!currentUserId || !weekId) return;
 
     setIsSaving(true);
@@ -2238,7 +2264,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={() => {
-              if (isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
+              if (!isDemoMode && isOwner) { alert('주차 평판은 타 크루만이 작성할 수 있습니다.'); return; }
               handleEditClick(() => { setHeaderModalType('타크루'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); fetchKeywordsIfNeeded(); });
             }} style={{ cursor: 'pointer' }} title="주차 평판 남기기">
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
@@ -2395,7 +2421,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             {(
               <div className="floating-icons" style={{ display: 'flex' }}>
                 <div className="edit-icon" onClick={() => {
-                  if (!isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
+                  if (!isDemoMode && !isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
                   handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
                 }} style={{ cursor: 'pointer' }}>
                   <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
@@ -2484,10 +2510,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {(
          <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
+              <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkInfoModalOpen(true);
-              }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
+              }) : undefined} style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}>
                 <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
@@ -2570,10 +2596,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
+              <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => {
                 initializeEditingDetails();
                 setWorkAbilityModalOpen(true);
-              }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
+              }) : undefined} style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}>
                 <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
@@ -2680,14 +2706,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
-                if (!isAnyActivityActive(workExpActivityTypes)) {
+              <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => {
+                if (!isDemoMode && !isAnyActivityActive(workExpActivityTypes)) {
                   alert('아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.');
                   return;
                 }
                 initializeEditingDetails();
                 setWorkExpModalOpen(true);
-              }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
+              }) : undefined} style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}>
                 <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
@@ -2792,18 +2818,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {(
             <div className="floating-icons" style={{ display: 'flex' }}>
-              <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => {
-                // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단
-                const hasEditableCareer = displayWorkCareerCards.some(card =>
-                  !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date()
-                );
-                if (!hasEditableCareer) {
-                  alert('2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)');
-                  return;
+              <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => {
+                if (!isDemoMode) {
+                  // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단
+                  const hasEditableCareer = displayWorkCareerCards.some(card =>
+                    !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date()
+                  );
+                  if (!hasEditableCareer) {
+                    alert('2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)');
+                    return;
+                  }
                 }
                 initializeEditingDetails();
                 setWorkCareerModalOpen(true);
-              }) : undefined} style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }}>
+              }) : undefined} style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}>
                 <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
               </div>
               <div className="edit-icon search-icon">
