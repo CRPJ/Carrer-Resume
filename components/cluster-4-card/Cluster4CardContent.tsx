@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+
 import { useDataMasking } from "@/hooks/useDataMasking";
 
 
@@ -125,14 +125,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
-  const [teamName, setTeamName] = useState<string | null>('미디어');
-  const [partName, setPartName] = useState<string | null>('웹툰드라마');
-  const [generation, setGeneration] = useState<number | null>(3);
+  const [teamName, setTeamName] = useState<string | null>(null);
+  const [partName, setPartName] = useState<string | null>(null);
+  const [generation, setGeneration] = useState<number | null>(null);
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
-  const [roleLabel, setRoleLabel] = useState<string | null>('운영진(앰배서더)');
-  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 25, lightning: 30, shield: -2 });
-  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(30);
-  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(25);
+  const [roleLabel, setRoleLabel] = useState<string | null>(null);
+  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
+  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
+  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
 
   // 이전/다음 주차 ID
   const [prevWeekId, setPrevWeekId] = useState<string | null>(null);
@@ -150,19 +150,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     opened_at: string | null;  // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
     output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
-  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
-    { id: 'wa-1', activity_type_id: 'wisdom', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-2', activity_type_id: 'essay', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-3', activity_type_id: 'infodesk', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-4', activity_type_id: 'calendar', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-5', activity_type_id: 'forum', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-6', activity_type_id: 'session', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-7', activity_type_id: 'etc_a', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-8', activity_type_id: 'comp-1', title: '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-9', activity_type_id: 'exp-1', title: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-10', activity_type_id: 'exp-2', title: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-11', activity_type_id: 'exp-3', title: '[콘텐츠 마케팅] "어떤 제품/서비스더라도, 마케터가 제대로 \'표현\' 하지 못한다면, 그저 \'낙서\' 에 불과해. 나는 어떻게 내 제품/서비스를 표현할 수 있을까?', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-  ]);
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
   interface UserActivity {
@@ -178,28 +166,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number;  // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 4, success: 3 });
-  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 3, success: 2 });
-  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 3, success: 1 });
-  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 3, success: 2 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 0, success: 0 });
 
   // 강화 상태 판단용 (해당 주차 데이터)
   interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
-  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([
-    { week_id: 'dummy-1', activity_type_id: 'wisdom', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'essay', is_completed: false },
-    { week_id: 'dummy-1', activity_type_id: 'infodesk', is_completed: false },
-    { week_id: 'dummy-1', activity_type_id: 'calendar', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'forum', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'session', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'exp-3', is_completed: true },
-  ]);
+  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
   // 2차 정보 (서브타이틀, 아웃풋링크) - 해당 주차 데이터
@@ -210,19 +184,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     sub_title: string | null;
     output_links: OutputLink[] | null;
   }
-  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
-    { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-  ]);
+  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
 
   // 활동별 평점 (activity_type_id → points)
-  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map([
-    ['exp-1', 6],
-    ['exp-2', 6],
-    ['exp-3', 6],
-  ]));
+  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
 
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
@@ -232,15 +197,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     cluster_id: string;
     description: string | null;
   }
-  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map([
-    ['comp-1', { id: 'comp-1', name: '[실무 Info]인하우스 & 에이전시', line_code: 'CP09 - UN010', cluster_id: 'practical_competency', description: null }],
-    ['exp-1', { id: 'exp-1', name: '[커리어]마케터 Launch', line_code: 'EX01 - SFA01', cluster_id: 'practical_experience', description: null }],
-    ['exp-2', { id: 'exp-2', name: '[생산성]상호 피드백', line_code: 'EX02 - RUA99', cluster_id: 'practical_experience', description: null }],
-    ['exp-3', { id: 'exp-3', name: '[콘텐츠]마케팅 실무', line_code: 'EX03 - CMP01', cluster_id: 'practical_experience', description: null }],
-    ['exp-4', { id: 'exp-4', name: '[퍼포먼스]마케팅 실무', line_code: 'EX04 - PMP01', cluster_id: 'practical_experience', description: null }],
-  ]));
-  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(['comp-1']);
-  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>(['exp-1', 'exp-2', 'exp-3', 'exp-4']);
+  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map());
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
+  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
   // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함) - cluster-4-1과 동일
@@ -300,33 +259,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     supervisor_company: string | null;
     supervisor_profile_img: string | null;
   }
-  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
-    {
-      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r1', user_id: 'u1', enhancement_status: 'enhanced', grade: 'S', grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '대리', supervisor_department: '서비스기획팀', supervisor_company: '우아한형제들', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
-    },
-    {
-      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
-    },
-    {
-      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자3.png',
-    },
-    {
-      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r4', user_id: 'u1', enhancement_status: 'enhanced', grade: 'D', grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '조지 워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자4.png',
-    },
-    {
-      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r5', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
-    },
-  ]);
+  const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([]);
   const [isLoadingCareerRecords, setIsLoadingCareerRecords] = useState(false);
 
   // 모달 편집 상태 (activity_type_id별로 관리)
@@ -441,62 +374,53 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       try {
         setIsLoadingWeek(true);
 
-        // ========== 1단계: 모든 독립 데이터 최대 병렬 로드 ==========
-        const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}&context=card` : '/api/profile?context=card';
+        // ========== 1단계: 프로필 API (weekId 번들) + 보조 API 최대 병렬 로드 ==========
+        const profileUrl = urlUserId
+          ? `/api/profile?userId=${urlUserId}&context=card&weekId=${weekId}`
+          : `/api/profile?context=card&weekId=${weekId}`;
         const earlyUserId = urlUserId || null;
 
-        // 기본 DB + 프로필 쿼리
-        const basePromise = Promise.all([
-          supabase.from('activity_types')
-            .select('id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total')
-            .eq('is_active', true),
-          supabase.from('weeks')
-            .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)')
-            .eq('id', weekId)
-            .single(),
-          fetch(profileUrl),
-          supabase.from('weeks')
-            .select('id, start_date, end_date, season_id, seasons(name)')
-            .order('start_date', { ascending: false }),
-          supabase.from('weekly_activities')
-            .select('id, activity_type_id, title, is_active, opened_at, output_links')
-            .eq('week_id', weekId),
-        ]);
-
-        // urlUserId가 있으면 API fetch + DB 쿼리도 동시 시작
+        // 프로필 API (주차 번들 포함) + 보조 API 동시 시작
         const earlyApiPromise = earlyUserId ? Promise.all([
           fetch(`/api/career-records?week_id=${weekId}&user_id=${earlyUserId}`, { cache: 'no-store' }).then(r => r.json()).catch(() => null),
           fetch(`/api/weekly-reputations?targetUserId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
           fetch(`/api/weekly-colleagues?userId=${earlyUserId}&weekCardId=${weekId}`).then(r => r.json()).catch(() => null),
         ]) : Promise.resolve([null, null, null] as const);
 
-        const earlyDbPromise = earlyUserId ? Promise.all([
-          supabase.from('user_weekly_growth')
-            .select('is_success, is_resting, is_club_break, failure_reason')
-            .eq('user_id', earlyUserId)
-            .eq('week_id', weekId)
-            .maybeSingle(),
-          supabase.from('points')
-            .select('week_id, point_type, points')
-            .eq('user_id', earlyUserId),
-          supabase.from('user_weekly_growth')
-            .select('week_id, weeks!inner(end_date)')
-            .eq('user_id', earlyUserId)
-            .eq('is_success', true),
-        ]) : null;
-
         // 모든 병렬 요청 동시 대기
-        const [baseResults, earlyApiResults, earlyDbResults] = await Promise.all([
-          basePromise, earlyApiPromise, earlyDbPromise
+        const [profileResponse, earlyApiResults] = await Promise.all([
+          fetch(profileUrl),
+          earlyApiPromise,
         ]);
-        const [activityTypesResult, currentWeekResult, profileResponse, allUserWeeksResult, activitiesResult] = baseResults;
         const [earlyCareerResult, earlyReputationsResult, earlyColleaguesResult] = earlyApiResults;
 
-        const activityTypesData = activityTypesResult.data;
-        const currentWeek = currentWeekResult.data;
-        const weekError = currentWeekResult.error;
+        // 프로필 정보 처리 (weekBundle 포함)
+        const profileResult = await profileResponse.json();
+        if (!profileResponse.ok || !profileResult.data?.id) {
+          console.error('Failed to fetch profile');
+          return;
+        }
 
-        if (weekError) throw weekError;
+        const userId = profileResult.data.id;
+        setCurrentUserId(userId);
+        const apiActivityWeekIds = profileResult.activityWeekIds || [];
+        const apiRestWeekIds = profileResult.restWeekIds || [];
+        const apiApprovedActivities = profileResult.approvedActivities || [];
+        const apiActivityRecords = profileResult.activityRecords || [];
+        const apiActivityDetails = profileResult.activityDetails || [];
+        const apiActivityPoints = profileResult.activityPoints || [];
+
+        // profile API에서 제공하는 teams, parts 사용
+        const apiTeams = profileResult.teams || [];
+        const apiParts = profileResult.parts || [];
+        const apiUserTeamParts = profileResult.userTeamParts || [];
+
+        // ========== weekBundle에서 주차 관련 데이터 추출 (서버 사이드 번들) ==========
+        const wb = profileResult.weekBundle;
+        if (!wb || !wb.currentWeek) throw new Error('Week not found');
+
+        const activityTypesData = wb.activityTypes;
+        const currentWeek = wb.currentWeek;
 
         // activity_types 처리
         const typesMap = new Map<string, ActivityTypeInfo>();
@@ -506,7 +430,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const experienceInfos: ExperienceTypeInfo[] = [];
 
         if (activityTypesData) {
-          activityTypesData.forEach((at) => {
+          activityTypesData.forEach((at: any) => {
             typesMap.set(at.id, at);
             if (at.cluster_id === 'practical_competency') {
               competencyIds.push(at.id);
@@ -530,7 +454,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         }
 
         // 현재 주차 정보 처리
-        if (!currentWeek) throw new Error('Week not found');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const seasonData = currentWeek.seasons as any;
         const rawSeasonName = seasonData?.name || '';
@@ -546,61 +469,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           seasonName = '시즌 전환';
         }
 
-        // 프로필 정보 처리
-        const profileResult = await profileResponse.json();
-        if (!profileResponse.ok || !profileResult.data?.id) {
-          console.error('Failed to fetch profile');
-          return;
-        }
-
-        const userId = profileResult.data.id;
-        setCurrentUserId(userId);
-        const apiActivityWeekIds = profileResult.activityWeekIds || [];
-        const apiRestWeekIds = profileResult.restWeekIds || [];
-        const apiApprovedActivities = profileResult.approvedActivities || [];
-        const apiActivityRecords = profileResult.activityRecords || [];
-        const apiActivityDetails = profileResult.activityDetails || [];
-        const apiActivityPoints = profileResult.activityPoints || [];
-
-        // profile API에서 제공하는 teams, parts 사용
-        const apiTeams = profileResult.teams || [];
-        const apiParts = profileResult.parts || [];
-        const apiUserTeamParts = profileResult.userTeamParts || [];
-
-        // ========== 2단계: userId 의존 데이터 (Stage 1에서 선행 실행 안 된 경우만) ==========
         const today = new Date().toISOString().split('T')[0];
         const userStartDate = profileResult.growthInfo?.startDate || '1900-01-01';
 
-        let weeklyGrowthResult, pointsResult, successWeeksResult;
-        if (earlyDbResults) {
-          // Stage 1에서 이미 병렬 실행됨
-          [weeklyGrowthResult, pointsResult, successWeeksResult] = earlyDbResults;
-        } else {
-          // urlUserId가 없어서 profile에서 userId를 받은 후에야 실행 가능
-          [weeklyGrowthResult, pointsResult, successWeeksResult] = await Promise.all([
-            supabase.from('user_weekly_growth')
-              .select('is_success, is_resting, is_club_break, failure_reason')
-              .eq('user_id', userId)
-              .eq('week_id', weekId)
-              .maybeSingle(),
-            supabase.from('points')
-              .select('week_id, point_type, points')
-              .eq('user_id', userId),
-            supabase.from('user_weekly_growth')
-              .select('week_id, weeks!inner(end_date)')
-              .eq('user_id', userId)
-              .eq('is_success', true)
-          ]);
-        }
+        // weekBundle에서 직접 사용 (클라이언트 Supabase 쿼리 제거)
+        const weeklyGrowthData = wb.weeklyGrowth;
+        const allPointsData = wb.allPoints || [];
+        const successWeeksData = wb.successWeeks || [];
+        const allUserWeeksData = wb.allWeeks || [];
 
-        // 누적 주차는 Stage 1의 allUserWeeksResult를 클라이언트 필터로 대체
-        const allWeeksForCumulative = (allUserWeeksResult.data || []).filter(
+        // 누적 주차 필터
+        const allWeeksForCumulative = allUserWeeksData.filter(
           (w: any) => w.end_date && w.end_date <= currentWeek.end_date
         );
         const allWeeksResult = { data: allWeeksForCumulative };
 
         // 성장 상태 결정
-        const weeklyGrowth = weeklyGrowthResult.data;
+        const weeklyGrowth = weeklyGrowthData;
         const onboardingWeekId = profileResult.onboardingWeekId;
         const isCurrentWeekOnboarding = weekId === onboardingWeekId;
 
@@ -678,18 +563,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         }
 
         // 포인트 정보 처리
-        const allPointsData = pointsResult.data || [];
-        const weekPointsData = allPointsData.filter(p => p.week_id === weekId);
+        const weekPointsData = allPointsData.filter((p: any) => p.week_id === weekId);
         if (weekPointsData.length > 0) {
-          const star = weekPointsData.filter(p => p.point_type === 'star').reduce((sum, p) => sum + p.points, 0);
-          const lightning = weekPointsData.filter(p => p.point_type === 'lightning').reduce((sum, p) => sum + p.points, 0);
-          const shield = weekPointsData.filter(p => p.point_type === 'shield').reduce((sum, p) => sum + p.points, 0);
+          const star = weekPointsData.filter((p: any) => p.point_type === 'star').reduce((sum: number, p: any) => sum + p.points, 0);
+          const lightning = weekPointsData.filter((p: any) => p.point_type === 'lightning').reduce((sum: number, p: any) => sum + p.points, 0);
+          const shield = weekPointsData.filter((p: any) => p.point_type === 'shield').reduce((sum: number, p: any) => sum + p.points, 0);
           setWeekPoints({ star, lightning, shield });
         }
 
         // 누적 성공 주차 수 계산
         let currentApprovedCount = 0;
-        const successWeeksData = successWeeksResult.data || [];
         if (successWeeksData.length > 0) {
           currentApprovedCount = successWeeksData.filter((sw: any) => {
             const weekEndDate = sw.weeks?.end_date;
@@ -717,7 +600,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         setCumulativeApprovedWeeks(cumulativeForEligible);
 
         // 이전/다음 주차 ID 가져오기
-        const allUserWeeks = allUserWeeksResult.data;
+        const allUserWeeks = allUserWeeksData;
 
         if (allUserWeeks && allUserWeeks.length > 0) {
           // 클라이언트에서 날짜 필터링 + break 시즌 제외
@@ -740,13 +623,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
         }
 
-        // 9. 주간 활동 데이터 처리 (이미 병렬로 가져옴)
-        const activitiesData = activitiesResult.data;
-        const activitiesError = activitiesResult.error;
+        // 9. 주간 활동 데이터 처리 (weekBundle에서 가져옴)
+        const activitiesData = wb.weeklyActivities;
 
-        if (activitiesError) {
-          console.error('주간 활동 데이터 로드 오류:', activitiesError);
-        } else if (activitiesData) {
+        if (activitiesData) {
           setWeeklyActivities(activitiesData);
 
           // 11. 파트별 강화 집계 계산
@@ -2235,6 +2115,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     return stars;
   };
+
+  if (isLoadingWeek) {
+    return (
+      <div className="cluster4-card-content weekly-card-detail" style={{ border: '1px solid #365314', marginRight: '27px', minHeight: '400px' }} />
+    );
+  }
 
   return (
     <div className="cluster4-card-content weekly-card-detail" style={{ border: '1px solid #365314', marginRight: '27px' }}>

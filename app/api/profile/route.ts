@@ -155,6 +155,44 @@ export async function GET(request: NextRequest) {
 
     // ========== context=card: 카드 페이지용 경량 응답 (시즌 통계/계산 전부 스킵) ==========
     if (context === 'card') {
+      const weekId = searchParams.get('weekId');
+
+      // weekId가 있으면 주차 관련 데이터도 함께 번들 (클라이언트 Supabase 직접 쿼리 제거)
+      const weekQueries = weekId ? [
+        // [10] activity_types (full columns for card page)
+        supabaseAdmin.from("activity_types")
+          .select("id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total")
+          .eq("is_active", true),
+        // [11] current week
+        supabaseAdmin.from("weeks")
+          .select("id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)")
+          .eq("id", weekId)
+          .single(),
+        // [12] all weeks (for prev/next navigation)
+        supabaseAdmin.from("weeks")
+          .select("id, start_date, end_date, season_id, seasons(name)")
+          .order("start_date", { ascending: false }),
+        // [13] weekly_activities for this week
+        supabaseAdmin.from("weekly_activities")
+          .select("id, activity_type_id, title, is_active, opened_at, output_links")
+          .eq("week_id", weekId),
+        // [14] user_weekly_growth for this week
+        supabaseAdmin.from("user_weekly_growth")
+          .select("is_success, is_resting, is_club_break, failure_reason")
+          .eq("user_id", profile.id)
+          .eq("week_id", weekId)
+          .maybeSingle(),
+        // [15] all points for user (all types)
+        supabaseAdmin.from("points")
+          .select("week_id, point_type, points")
+          .eq("user_id", profile.id),
+        // [16] success weeks for cumulative count
+        supabaseAdmin.from("user_weekly_growth")
+          .select("week_id, weeks!inner(end_date)")
+          .eq("user_id", profile.id)
+          .eq("is_success", true),
+      ] as const : [];
+
       const [
         joinedWeekResult,
         allRestsResult,
@@ -166,6 +204,7 @@ export async function GET(request: NextRequest) {
         userTeamPartsResult,
         teamsData,
         partsData,
+        ...weekResults
       ] = await Promise.all([
         profile.onboarding_week_id
           ? supabaseAdmin.from("weeks").select("start_date").eq("id", profile.onboarding_week_id).maybeSingle()
@@ -179,11 +218,23 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
         getCachedParts(),
+        ...weekQueries,
       ]);
 
       const activityRecordsData = activityRecordsResult.data || [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const completedActivities = activityRecordsData.filter((ar: any) => ar.is_completed);
+
+      // weekId가 있으면 주차 번들 데이터 포함
+      const weekBundle = weekId && weekResults.length === 7 ? {
+        activityTypes: weekResults[0]?.data || [],
+        currentWeek: weekResults[1]?.data || null,
+        allWeeks: weekResults[2]?.data || [],
+        weeklyActivities: weekResults[3]?.data || [],
+        weeklyGrowth: weekResults[4]?.data || null,
+        allPoints: weekResults[5]?.data || [],
+        successWeeks: weekResults[6]?.data || [],
+      } : null;
 
       return NextResponse.json({
         success: true,
@@ -202,6 +253,7 @@ export async function GET(request: NextRequest) {
         userTeamParts: userTeamPartsResult.data || [],
         teams: teamsData || [],
         parts: partsData || [],
+        weekBundle,
       });
     }
 
