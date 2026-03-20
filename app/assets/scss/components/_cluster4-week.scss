@@ -4992,18 +4992,27 @@
               margin-bottom: 1px;
               white-space: nowrap;
               font-size: 0.875rem;
+              display: flex;
+              align-items: baseline;
+              overflow: hidden;
 
               .text {
                 font-size: 0.875rem;
                 color: #fff;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                flex: 0 1 auto;
               }
 
               .label {
                 font-size: 0.875rem;
                 color: #999;
                 font-family: 'Pretendard', sans-serif;
+                flex-shrink: 0;
               }
 
               .nickname {
@@ -5272,19 +5281,27 @@
 
             .detail-line {
               margin-bottom: 1px;
-              white-space: normal;
-              word-break: break-word;
+              white-space: nowrap;
               font-size: 0.875rem;
+              display: flex;
+              align-items: baseline;
+              overflow: hidden;
 
               .text {
                 font-size: 0.875rem;
                 color: #fff;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                flex: 0 1 auto;
               }
 
               .label {
                 font-size: 0.875rem;
+                flex-shrink: 0;
                 color: #999;
                 font-family: 'Pretendard', sans-serif;
               }
@@ -5918,6 +5935,9 @@
                   color: rgba(255, 255, 255, 0.6);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
 
                 .crew-nickname {
@@ -6112,6 +6132,9 @@
                   color: rgba(255, 255, 255, 0.6);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
 
                 .colleague-team {
@@ -6335,6 +6358,9 @@
                   color: rgba(255, 255, 255, 0.7);
                   font-family: 'Pretendard', sans-serif;
                   margin-bottom: 2px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
 
                   .label {
                     color: rgba(255, 255, 255, 0.4);
@@ -6991,6 +7017,9 @@
               color: rgba(255, 255, 255, 0.6);
               font-family: 'Pretendard', sans-serif;
               margin-bottom: 4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             .profile-fm {

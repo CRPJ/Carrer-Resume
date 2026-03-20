@@ -293,6 +293,55 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     supervisor_company: string | null;
     supervisor_profile_img: string | null;
   }
+
+  const makeDemoCareer = (
+    index: number, company: string, status: string, grade: string, participated: boolean
+  ): CareerRecord => ({
+    id: `cr-demo-${index}`, project_id: `p-demo-${index}`, week_id: 'demo',
+    company_name: company, company_logo_url: `/images/0/cluster4/icon/실무 경력/감독자${index % 2 === 0 ? '' : '2'}.${index % 2 === 0 ? 'jpg' : 'png'}`,
+    job_position: `${company} 마케팅`, project_name: `${company} ${participated ? '마케팅 캠페인 기획 및 실행 프로젝트' : '해당 프로젝트'}`,
+    project_description: participated ? `${company}에서 진행한 마케팅 프로젝트의 상세 설명입니다` : null,
+    line_code: `${String.fromCharCode(65 + (index % 26))}${String.fromCharCode(65 + ((index + 1) % 26))}${10 + index}-${10000 + index}`,
+    line_name: `${company} 마케팅`, output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
+    record_id: `r-demo-${index}`, user_id: 'u1', enhancement_status: status as CareerRecord['enhancement_status'],
+    grade: grade || null, grade_points: participated ? Math.floor(Math.random() * 100) : 0,
+    career_code: `${String.fromCharCode(65 + (index % 26))}${String.fromCharCode(65 + ((index + 1) % 26))}${10 + index}-${10000 + index}`,
+    supervisor_name: ['김민지', '박서연', '조워싱턴', '이지은', '최수현'][index % 5],
+    supervisor_position: ['대리', '과장', '팀장', '차장', '부장'][index % 5],
+    supervisor_department: `${company} 마케팅팀`, supervisor_company: company,
+    supervisor_profile_img: `/images/0/cluster4/icon/실무 경력/감독자${index % 2 === 0 ? '' : '2'}.${index % 2 === 0 ? 'jpg' : 'png'}`,
+  });
+
+  const getDemoCareerRecords = (wId: string): CareerRecord[] => {
+    const weekNum = parseInt(wId.replace(/\D/g, '')) || 0;
+    const caseNum = weekNum % 6;
+    switch (caseNum) {
+      case 0: return [];
+      case 1: return [
+        makeDemoCareer(1, '네이버', 'enhanced', 'S', true), makeDemoCareer(2, '카카오', 'enhanced', 'A', true),
+        makeDemoCareer(3, '라인', 'not_applicable', '', false), makeDemoCareer(4, '쿠팡', 'not_applicable', '', false),
+      ];
+      case 2: return [
+        makeDemoCareer(1, '삼성전자', 'not_applicable', '', false), makeDemoCareer(2, 'LG전자', 'not_applicable', '', false),
+        makeDemoCareer(3, 'SK하이닉스', 'not_applicable', '', false), makeDemoCareer(4, '현대자동차', 'not_applicable', '', false),
+        makeDemoCareer(5, 'KT', 'not_applicable', '', false), makeDemoCareer(6, 'POSCO', 'not_applicable', '', false),
+      ];
+      case 3: return [
+        makeDemoCareer(1, '구글코리아', 'enhanced', 'S', true), makeDemoCareer(2, '애플코리아', 'enhanced', 'A', true),
+        makeDemoCareer(3, '마이크로소프트', 'enhanced', 'B', true), makeDemoCareer(4, '아마존웹서비스', 'pending', 'C', true),
+        makeDemoCareer(5, '메타코리아', 'enhanced', 'A', true), makeDemoCareer(6, '테슬라코리아', 'not_applicable', '', false),
+        makeDemoCareer(7, '엔비디아', 'not_applicable', '', false),
+      ];
+      case 4: return Array.from({ length: 15 }, (_, i) => {
+        const companies = ['우아한형제들', '토스', '당근마켓', '비바리퍼블리카', '야놀자', 'NHN', '넷마블', '엔씨소프트', '크래프톤', '스마일게이트', '하이브', 'JYP', 'YG', 'CJ ENM', '롯데이노베이트'];
+        const isP = i < 10;
+        return makeDemoCareer(i + 1, companies[i], isP ? (i % 3 === 0 ? 'enhanced' : i % 3 === 1 ? 'pending' : 'failed') : 'not_applicable', isP ? ['S', 'A', 'B', 'C', 'D'][i % 5] : '', isP);
+      });
+      case 5: return [makeDemoCareer(1, '스타벅스코리아', 'enhanced', 'S', true)];
+      default: return [];
+    }
+  };
+
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
     {
       id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/naver webtoon.png', job_position: '서비스기획팀', project_name: '배달의민족 브랜드 바이럴 마케팅 캠페인 기획 및 실행', project_description: '소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석', line_code: 'AA22-11111', line_name: '마케팅(바이럴)', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
@@ -311,6 +360,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     },
   ]);
   const [isLoadingCareerRecords, setIsLoadingCareerRecords] = useState(false);
+  const [careerPage, setCareerPage] = useState(0);
 
   // 모달 편집 상태 (activity_type_id별로 관리)
   const [editingDetails, setEditingDetails] = useState<{
@@ -457,6 +507,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         setWeekPoints(dummyExtra.points);
         setCumulativeInjeolmi(dummyExtra.points.shield);
       }
+
+      // 데모 모드 실무 경력 더미 데이터
+      setCareerRecords(getDemoCareerRecords(weekId));
+      setCareerPage(0);
 
       // 이전/다음 주차 ID 설정
       const weekIndex = DUMMY_WEEKLY_LIST.findIndex(w => w.id === weekId);
@@ -998,12 +1052,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }, [currentUserId, weekId, urlUserId]);
 
   // 실무 경력 통계 업데이트 (computed status 기반)
-  // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
+  // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
-    // 전체 프로젝트 수 (최대 5개)
+    // 전체 프로젝트 수 (제한 없음)
     const rawTotal = careerRecords.length;
-    const total = Math.min(rawTotal, 5);
+    const total = rawTotal;
     // computed status 기반: pending이어도 2차 정보 작성 or 마감 경과 시 성공으로 카운트
     const enhancedCount = careerRecords.filter((r, index) => {
       if (r.enhancement_status === 'enhanced') return true;
@@ -2185,16 +2239,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     secondaryInfoDeadline: null as string | null,
   });
 
-  // 참여한 경력이 없으면 빈 카드 표시, 있으면 5의 배수로 패딩
-  const displayWorkCareerCards = workCareerCards.length > 0
+  // 참여한 카드(a)를 앞으로, 해당 없음 카드(b)를 뒤로 정렬
+  const sortedWorkCareerCards = [...workCareerCards].sort((a, b) => {
+    if (a.isNotApplicable === b.isNotApplicable) return 0;
+    return a.isNotApplicable ? 1 : -1;
+  });
+
+  // 참여한 경력이 없으면 빈 카드 6개 표시, 있으면 6의 배수로 패딩
+  const displayWorkCareerCards = sortedWorkCareerCards.length > 0
     ? [
-        ...workCareerCards,
+        ...sortedWorkCareerCards,
         ...Array.from(
-          { length: (5 - (workCareerCards.length % 5)) % 5 },
-          (_, i) => emptyCareerCard(workCareerCards.length + i + 1)
+          { length: (6 - (sortedWorkCareerCards.length % 6)) % 6 },
+          (_, i) => emptyCareerCard(sortedWorkCareerCards.length + i + 1)
         ),
       ]
-    : [emptyCareerCard(1)];
+    : Array.from({ length: 6 }, (_, i) => emptyCareerCard(i + 1));
+
+  // 페이지네이션: 6개씩 한 페이지
+  const CAREER_CARDS_PER_PAGE = 6;
+  const totalCareerPages = Math.ceil(displayWorkCareerCards.length / CAREER_CARDS_PER_PAGE);
+  const currentCareerCards = displayWorkCareerCards.slice(
+    careerPage * CAREER_CARDS_PER_PAGE,
+    (careerPage + 1) * CAREER_CARDS_PER_PAGE
+  );
 
   // 별점 렌더링 함수 (반개 지원)
   const renderStars = (rating: number) => {
@@ -2901,7 +2969,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-career-cards">
-            {displayWorkCareerCards.map((card, cardIndex) => {
+            {currentCareerCards.map((card, cardIndex) => {
               const isEmpty = card.isEmpty;
               return (
               <div key={card.id} className="work-career-card-wrapper">
@@ -2985,6 +3053,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               );
             })}
           </div>
+          {totalCareerPages > 1 && (
+            <div className="career-pagination" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
+              {Array.from({ length: totalCareerPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCareerPage(i)}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    border: careerPage === i ? '2px solid #FAAB07' : '1px solid #555',
+                    background: careerPage === i ? '#FAAB07' : 'transparent',
+                    color: careerPage === i ? '#000' : '#fff',
+                    cursor: 'pointer', fontWeight: 700, fontSize: '14px',
+                  }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="section-bottom-divider"></div>
         </div>
       </div>
