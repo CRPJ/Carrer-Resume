@@ -138,18 +138,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
-    { id: 'wa-1', activity_type_id: 'wisdom', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-2', activity_type_id: 'essay', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-3', activity_type_id: 'infodesk', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-4', activity_type_id: 'calendar', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-5', activity_type_id: 'forum', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-6', activity_type_id: 'session', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-7', activity_type_id: 'etc_a', title: 'CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-8', activity_type_id: 'comp-1', title: '[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-9', activity_type_id: 'exp-1', title: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-10', activity_type_id: 'exp-2', title: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-11', activity_type_id: 'exp-3', title: '[콘텐츠 마케팅] "어떤 제품/서비스더라도, 마케터가 제대로 \'표현\' 하지 못한다면, 그저 \'낙서\' 에 불과해. 나는 어떻게 내 제품/서비스를 표현할 수 있을까?', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-12', activity_type_id: 'exp-4', title: '[퍼포먼스 마케팅] "광고비 1원도 허투루 쓰지 않는 퍼포먼스 마케터의 세계. ROAS, CPA, CTR 지표를 직접 분석하고 캠페인을 최적화해보자!"', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] }, // TODO: 더미 데이터 — DB 연동 후 제거
+    { id: 'wa-1', activity_type_id: 'wisdom', title: '글로벌 마케팅 트렌드 분석 리포트', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-2', activity_type_id: 'essay', title: '브랜드 스토리텔링의 핵심 요소와 소비자 인식 변화에 대한 에세이 작성', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-3', activity_type_id: 'infodesk', title: 'MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-4', activity_type_id: 'calendar', title: '주간 마케팅 캘린더 일정 관리 및 팀 공유', is_active: true, opened_at: '2099-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-5', activity_type_id: 'forum', title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-6', activity_type_id: 'session', title: '데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션', is_active: false, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-7', activity_type_id: 'etc_a', title: '크로스 펑셔널 협업 프로젝트: 제품팀과 마케팅팀의 Go-to-Market 전략 수립 워크숍 결과물 정리', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-8', activity_type_id: 'comp-1', title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-9', activity_type_id: 'exp-1', title: '커리어 역량 진단 테스트 결과', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-10', activity_type_id: 'exp-2', title: '동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-11', activity_type_id: 'exp-3', title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-12', activity_type_id: 'exp-4', title: '퍼포먼스 마케팅 캠페인 ROAS 분석 및 예산 재배분 최적화 전략 수립', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
   ]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
@@ -175,11 +175,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   interface ActivityRecord { week_id: string; activity_type_id: string; is_completed: boolean; }
   const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([
     { week_id: 'dummy-1', activity_type_id: 'wisdom', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'essay', is_completed: false },
+    { week_id: 'dummy-1', activity_type_id: 'essay', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'infodesk', is_completed: false },
     { week_id: 'dummy-1', activity_type_id: 'calendar', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'forum', is_completed: true },
-    { week_id: 'dummy-1', activity_type_id: 'session', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'session', is_completed: false },
     { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
@@ -200,20 +200,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     output_links: OutputLink[] | null;
   }
   const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
-    { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 지 관건이고 이 사용자가 활용한 소재가 매력 매79..', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...', output_links: [] },
-    { week_id: 'dummy-1', activity_type_id: 'exp-4', sub_title: '퍼포먼스 마케팅 캠페인 최적화 실습을 통해 ROAS 200% 달성 전략을 수립하고 실행 결과를 분석하여 개선안 도출 완료', output_links: [] }, // TODO: 더미 데이터 — DB 연동 후 제거
+    { week_id: 'dummy-1', activity_type_id: 'comp-1', sub_title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-1', sub_title: '마케터 역량 진단 결과 요약 및 성장 로드맵', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-2', sub_title: '동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-3', sub_title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오', output_links: [] },
+    { week_id: 'dummy-1', activity_type_id: 'exp-4', sub_title: '구글 애즈와 메타 광고 플랫폼을 활용한 퍼포먼스 마케팅 캠페인 최적화 실습 결과 보고서: ROAS 분석 포함', output_links: [] },
   ]);
 
   // 활동별 평점 (activity_type_id → points)
   const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map([
-    ['comp-1', 6], // TODO: 더미 데이터 — DB 연동 후 제거
-    ['exp-1', 6],
+    ['comp-1', 6],
+    ['exp-1', 3],
     ['exp-2', 6],
-    ['exp-3', 6],
-    ['exp-4', 8], // TODO: 더미 데이터 — DB 연동 후 제거
+    ['exp-3', 10],
+    ['exp-4', 8],
   ]));
 
   // DB에서 가져온 activity_types 정보
@@ -294,29 +294,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
     {
-      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/cluster4/icon/실무 경력/네이버 웹툰.png', job_position: '서비스기획팀', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
+      id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/naver webtoon.png', job_position: '서비스기획팀', project_name: '배달의민족 브랜드 바이럴 마케팅 캠페인 기획 및 실행', project_description: '소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석', line_code: 'AA22-11111', line_name: '마케팅(바이럴)', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
       record_id: 'r1', user_id: 'u1', enhancement_status: 'enhanced', grade: 'S', grade_points: 99, career_code: 'AA22-11111',
       supervisor_name: '김민지', supervisor_position: '대리', supervisor_department: '서비스기획팀', supervisor_company: '우아한형제들', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
     },
     {
-      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/씨제이.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
+      id: 'cr-2', project_id: 'p2', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/CJ_logo.svg.png', job_position: '브랜드마케팅', project_name: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', project_description: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오', line_code: 'BB33-22222', line_name: '퍼포먼스마케팅', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r2', user_id: 'u1', enhancement_status: 'enhanced', grade: 'A', grade_points: 85, career_code: 'BB33-22222',
+      supervisor_name: '박서연', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자2.png',
     },
     {
-      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/티비엔.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자3.png',
-    },
-    {
-      id: 'cr-4', project_id: 'p4', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r4', user_id: 'u1', enhancement_status: 'enhanced', grade: 'D', grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '조지 워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자4.png',
-    },
-    {
-      id: 'cr-5', project_id: 'p5', week_id: 'w1', company_name: '에스엠엔터테인먼트', company_logo_url: '/images/0/cluster4/icon/실무 경력/우아한형제들.png', job_position: '브랜드마케팅', project_name: '실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지 한번 테스트해보자는거야 이정도면 될까 이것도 역시 80일이삼사오육칠팔구십일이삼사오육칠팔구100', project_description: '실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력이 있습니다 아주 멋지군요 아주 69..', line_code: 'AA22-11111', line_name: '마케팅(바이럴) 혹시 몰라', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
-      record_id: 'r5', user_id: 'u1', enhancement_status: 'not_applicable', grade: null, grade_points: 99, career_code: 'AA22-11111',
-      supervisor_name: '김민지', supervisor_position: '과장', supervisor_department: '브랜드마케팅', supervisor_company: '에스엠엔터테인먼트', supervisor_profile_img: '/images/0/cluster4/icon/실무 경력/감독자.jpg',
+      id: 'cr-3', project_id: 'p3', week_id: 'w1', company_name: '', company_logo_url: null, job_position: '', project_name: '개인 프로젝트', project_description: null, line_code: null, line_name: null, output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
+      record_id: 'r3', user_id: 'u1', enhancement_status: 'not_applicable', grade: 'D', grade_points: 1, career_code: null,
+      supervisor_name: '조워싱턴', supervisor_position: null, supervisor_department: null, supervisor_company: null, supervisor_profile_img: null,
     },
   ]);
   const [isLoadingCareerRecords, setIsLoadingCareerRecords] = useState(false);
@@ -424,7 +414,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
-    if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
+    if (isDemoMode) {
+      setWeekData({
+        id: 'demo-week',
+        weekNumber: 3,
+        seasonYear: 2025,
+        seasonName: '여름',
+        isBreakSeason: false,
+        toSeasonName: null,
+        startDate: '2025-03-23',
+        endDate: '2025-03-30',
+        isClubBreak: false,
+        holidayName: null,
+        growthStatus: '성공'
+      });
+      return;
+    }
     const fetchWeekData = async () => {
       if (!weekId) return;
 
@@ -1425,9 +1430,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 데이터 (API 데이터 기반)
   // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyReputations = [
-    { id: 'dummy-rep-1', name: '김미현', gender: '여', age: 24, profileImg: '/images/0/crew profile/여 1.jpg', university: '한국외국어대', major: '스페인어과', team: '운영진', part: '클럽장', nickname: '열정의 불꽃', rating: 4.5, ratingCount: '9 / 10', description: '항상 긍정적인 에너지로 팀을 이끌어주는 크루입니다', fm: 1, tagColor: 'tag--pink', tagText: '#리더십', isEmpty: false },
-    { id: 'dummy-rep-2', name: '이준호', gender: '남', age: 26, profileImg: '/images/0/crew profile/남 1.webp', university: '서울대학교', major: '미디어커뮤니케이션학과', team: '엔터테인먼트팀', part: '내돈내산파트', nickname: '조용한 실력자', rating: 4, ratingCount: '8 / 10', description: '꼼꼼한 분석력과 실행력이 돋보이는 크루입니다', fm: 1, tagColor: 'tag--red', tagText: '#분석력', isEmpty: false },
-    { id: 'dummy-rep-3', name: '박서연', gender: '여', age: 23, profileImg: '/images/0/crew profile/여 2.jpg', university: '연세대학교', major: '경영학과', team: '마케팅팀', part: '브랜드파트', nickname: '창의적 사고가', rating: 3.5, ratingCount: '7 / 10', description: '새로운 아이디어를 제시하며 팀에 활력을 불어넣습니다', fm: 1, tagColor: 'tag--yellow', tagText: '#창의성', isEmpty: false },
+    { id: 'dummy-rep-1', name: '오준', gender: '남', age: 22, profileImg: '/images/0/crew profile/남 1.webp', university: '한대', major: '경영', team: '기획', part: '전략', nickname: '짧음', rating: 0.5, ratingCount: '1 / 10', description: '짧은코멘트', fm: 1, tagColor: 'tag--pink', tagText: '#힘', isEmpty: false },
+    { id: 'dummy-rep-2', name: '김서연아', gender: '여', age: 25, profileImg: '/images/0/crew profile/여 1.jpg', university: '성균관대학교', major: '컴퓨터공학', team: '마케팅전략', part: '브랜드콘텐츠', nickname: '중간닉네임임', rating: 3, ratingCount: '6 / 10', description: '중간길이의코멘트입니다이번주', fm: 42, tagColor: 'tag--red', tagText: '#추진력있는', isEmpty: false },
+    { id: 'dummy-rep-3', name: '알렉산더워싱턴', gender: '남', age: 29, profileImg: '/images/0/crew profile/남 2.jpg', university: '한국예술종합', major: '미디어커뮤니케이션', team: '엔터테인먼트사업', part: '글로벌마케팅전략', nickname: '엔비디아구글테슬라쿵', rating: 5, ratingCount: '10 / 10', description: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', fm: 999, tagColor: 'tag--yellow', tagText: '#끈기와인내의결과물', isEmpty: false },
   ];
 
   const reputationData = useMemo(() => {
@@ -1507,9 +1512,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyColleagues = [
-    { id: 'dummy-col-1', name: '최유진', gender: '여', age: '25', profileImg: '/images/0/crew profile/여 3.jpg', university: '고려대학교', major: '사회학과', team: '기획팀', part: '전략파트', nickname: '전략가', date: '2026 - 03 - 01 (토)', message: '함께 프로젝트를 진행하며 많이 배웠습니다', isEmpty: false },
-    { id: 'dummy-col-2', name: '정민수', gender: '남', age: '27', profileImg: '/images/0/crew profile/남 2.jpg', university: '성균관대학교', major: '컴퓨터공학과', team: '개발팀', part: '백엔드파트', nickname: '코딩왕', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았습니다', isEmpty: false },
-    { id: 'dummy-col-3', name: '한소희', gender: '여', age: '23', profileImg: '/images/0/crew profile/여 4.webp', university: '이화여자대학교', major: '디자인학과', team: '디자인팀', part: 'UI파트', nickname: '디자인 요정', date: '2026 - 03 - 03 (월)', message: '디자인 감각이 뛰어난 동료입니다', isEmpty: false },
+    { id: 'dummy-col-1', name: '윤아', gender: '여', age: '21', profileImg: '/images/0/crew profile/여 3.jpg', university: '한대', major: '경영', team: '기획', part: '전략', nickname: '윤아', date: '2026 - 03 - 01 (토)', message: '좋은 동료', isEmpty: false },
+    { id: 'dummy-col-2', name: '박진우', gender: '남', age: '26', profileImg: '/images/0/crew profile/남 2.jpg', university: '성균관대학교', major: '컴퓨터공학', team: '마케팅전략', part: '브랜드콘텐츠', nickname: '마케팅장인', date: '2026 - 03 - 02 (일)', message: '기술적인 부분에서 큰 도움을 받았고 앞으로도 함께 성장하고 싶습니다', isEmpty: false },
+    { id: 'dummy-col-3', name: '크리스티나앤더슨', gender: '여', age: '28', profileImg: '/images/0/crew profile/여 4.webp', university: '한국예술종합', major: '미디어커뮤니케이션', team: '엔터테인먼트사업', part: '글로벌마케팅전략', nickname: '글로벌마케터의꿈나무', date: '2026 - 03 - 03 (월)', message: '다양한 관점에서 프로젝트를 바라보는 시각이 인상적이었고 특히 글로벌 마케팅 전략 수립 과정에서 보여준 리더십과 커뮤니케이션 능력이 뛰어났습니다', isEmpty: false },
   ];
 
   // 연계 동료 데이터 (API 데이터 기반)
@@ -2403,7 +2408,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
                     <span className="rating-count">{isEmpty ? '- / 10' : user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{isEmpty ? '-' : <>{user.description.slice(0, 20)}... <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
+                  <div className="card-description">{isEmpty ? '-' : <>{user.description.length > 20 ? `${user.description.slice(0, 20)}...` : user.description} <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
                   <div className="card-footer">
                     <span className="fm-badge"><img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
                     <span className="footer-divider">|</span>
@@ -2675,12 +2680,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </>
                     )}
                   </div>
-                  <p className="main-desc">{!hasActivity ? '-' : (displayActivity?.title || '-')}</p>
+                  <p className="main-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{!hasActivity ? '-' : (displayActivity?.title || '-')}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{!hasActivity ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{!hasActivity ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                 </div>
                 {hasActivity && (
                   <div className="status-badge">
@@ -2792,7 +2797,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-')}{!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                 </div>
                 {!isEmpty && (
                   <div className={`status-badge ${card.enhancementStatus}`}>
@@ -2895,12 +2900,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                   </div>
-                  <p className="main-desc-white">{isEmpty ? '-' : card.title}</p>
+                  <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : card.title}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Subtitle</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (card.projectDescription || '-')}{!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}</span>
+                  <span className="sub-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : <>{card.projectDescription || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
                     <div className="supervisor-info">

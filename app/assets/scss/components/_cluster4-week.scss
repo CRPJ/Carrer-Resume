@@ -1901,7 +1901,7 @@
         .rating-count { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.9); font-family: 'Rajdhani', sans-serif; letter-spacing: 0.7px; line-height: 18px; padding-left: 4px; }
       }
 
-      .card-description { font-size: 13px; color: #fff; margin-bottom: 0; font-family: 'Pretendard', sans-serif; font-weight: 600; line-height: 22px; display: flex; align-items: center; gap: 5px; .more-icon { width: 15px; height: 15px; object-fit: contain; } }
+      .card-description { font-size: 13px; color: #fff; margin-bottom: 0; font-family: 'Pretendard', sans-serif; font-weight: 600; line-height: 22px; display: flex; align-items: center; gap: 5px; .more-icon { width: 15px; height: 15px; object-fit: contain; margin-left: auto; flex-shrink: 0; } }
 
       .card-footer {
         display: flex; align-items: center; gap: 8px; padding: 3.5px 0 2.8px 0;
@@ -2413,14 +2413,18 @@
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
+                min-height: calc(3 * 0.75rem * 1.6);
+                max-height: calc(3 * 0.75rem * 1.6);
+                position: relative;
+                padding-right: 24px;
 
                 .card-arrow {
+                  position: absolute;
+                  right: 0;
+                  bottom: 0;
                   width: 16px;
                   height: 16px;
                   object-fit: contain;
-                  display: inline;
-                  vertical-align: middle;
-                  margin-left: 4px;
                 }
               }
             }
@@ -2570,8 +2574,12 @@
         gap: 12px;
 
         .card-icon-area {
-          width: 60px;
-          height: 60px;
+          width: 326px;
+          min-width: 326px;
+          max-width: 326px;
+          height: 314px;
+          min-height: 314px;
+          max-height: 314px;
           flex-shrink: 0;
           display: flex;
           align-items: center;
@@ -2634,6 +2642,8 @@
           display: flex;
           flex-direction: column;
           margin-left: -3px;
+          max-width: calc(100% - 326px);
+          min-width: 0;
 
           .card-title-row {
             display: flex;
@@ -2699,6 +2709,12 @@
             font-family: 'Pretendard', sans-serif;
             font-weight: 500;
             margin: 0 0 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 42px;
+            max-height: 42px;
           }
 
           .sub-title-row {
@@ -2728,20 +2744,22 @@
             line-height: 21px;
             font-family: 'Pretendard', sans-serif;
             font-weight: 400;
-            display: inline;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 100%;
+            min-height: 42px;
+            max-height: 42px;
+            position: relative;
+            padding-right: 24px;
 
             .card-arrow {
+              position: absolute;
+              right: 0;
+              bottom: 0;
               width: 16px;
               height: 16px;
               object-fit: contain;
-              flex-shrink: 0;
-              margin-left: 4px;
-              display: inline;
-              vertical-align: middle;
             }
           }
         }
@@ -3073,6 +3091,8 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            min-width: 0;
+            overflow: hidden;
 
             .card-title-row {
               display: flex;
@@ -3117,6 +3137,12 @@
               font-family: 'Pretendard', sans-serif;
               font-weight: 500;
               margin: 0;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              min-height: 63px;
+              max-height: 63px;
             }
 
             .sub-title-row {
@@ -3146,15 +3172,25 @@
               line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 400;
-              display: inline;
+              display: -webkit-box;
+              -webkit-line-clamp: 4;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              min-height: 84px;
+              max-height: 84px;
+              position: relative;
+              padding-right: 24px;
+              box-sizing: border-box;
+              width: 100%;
+              max-width: 100%;
 
               .card-arrow {
+                position: absolute;
+                right: 0;
+                bottom: 0;
                 width: 16px;
                 height: 16px;
                 object-fit: contain;
-                display: inline;
-                vertical-align: middle;
-                margin-left: 4px;
               }
             }
           }
@@ -3279,6 +3315,8 @@
             display: flex;
             flex-direction: column;
             flex: 1;
+            overflow: hidden;
+            min-width: 0;
 
             .card-title-row {
               display: flex;
@@ -3324,6 +3362,12 @@
               font-family: 'Pretendard', sans-serif;
               font-weight: 500;
               margin: 0 0 12px 0;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              min-height: 42px;
+              max-height: 42px;
             }
 
             .sub-title-row {
@@ -3353,15 +3397,25 @@
               line-height: 21px;
               font-family: 'Pretendard', sans-serif;
               font-weight: 400;
-              display: inline;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              min-height: 42px;
+              max-height: 42px;
+              position: relative;
+              padding-right: 24px;
+              box-sizing: border-box;
+              width: 100%;
+              max-width: 100%;
 
               .card-arrow {
+                position: absolute;
+                right: 0;
+                bottom: 0;
                 width: 16px;
                 height: 16px;
                 object-fit: contain;
-                display: inline;
-                vertical-align: middle;
-                margin-left: 4px;
               }
             }
           }
@@ -3453,6 +3507,12 @@
             font-family: 'Pretendard', sans-serif;
             font-weight: 500;
             margin: 0 0 12px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 42px;
+            max-height: 42px;
           }
 
           .supervisor-section {
@@ -5006,9 +5066,11 @@
     // 연계 동료 상세보기 모달
     &.colleague-view-modal {
       width: 660px;
-      height: 364px;
+      min-height: 364px;
+      height: auto;
       max-width: 90vw;
       max-height: calc(100vh - 80px);
+      overflow: hidden auto;
 
       .section-modal-header {
         display: flex;
@@ -5040,6 +5102,9 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
       }
 
       .colleague-header-row {
@@ -5133,7 +5198,8 @@
 
             .detail-line {
               margin-bottom: 1px;
-              white-space: nowrap;
+              white-space: normal;
+              word-break: break-word;
               font-size: 0.875rem;
 
               .text {
