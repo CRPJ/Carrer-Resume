@@ -3244,13 +3244,49 @@
         grid-template-rows: repeat(2, auto);
         gap: 20px;
 
+        .work-career-card-wrapper {
+          position: relative;
+          min-width: 0;
+          overflow: visible;
+
+          .status-badge {
+            position: absolute;
+            top: -20px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            img {
+              width: 53px;
+              height: 53px;
+              object-fit: contain;
+              filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.5));
+            }
+
+            .not-applicable-text {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #DC2626;
+              line-height: 20px;
+              font-family: 'Pretendard', sans-serif;
+              margin-top: 4px;
+              margin-right: 20px;
+            }
+          }
+        }
+
         .work-career-card {
           position: relative;
           width: 100%;
+          max-width: 100%;
+          height: 457px;
           min-height: 457px;
+          max-height: 457px;
           background: #1e1e1e;
           border-radius: 20px;
-          overflow: visible;
+          overflow: hidden;
           display: flex;
           flex-direction: column;
           padding: 14px;
@@ -3279,6 +3315,7 @@
             display: flex;
             flex-direction: row;
             gap: 20px;
+            overflow: hidden;
 
             .card-icon-area {
               width: 70px;
@@ -3349,7 +3386,7 @@
             > .card-arrow {
               position: absolute;
               right: 0;
-              bottom: 0;
+              bottom: 139px;
               z-index: 1;
             }
 
@@ -3457,7 +3494,7 @@
 
           .status-badge {
             position: absolute;
-            top: -20px;
+            top: 0px;
             right: 10px;
             z-index: 10;
             display: flex;
@@ -3536,6 +3573,8 @@
           }
 
           .main-desc-white {
+            width: 100%;
+            max-width: 100%;
             font-size: 14px;
             color: #fff;
             line-height: 21px;

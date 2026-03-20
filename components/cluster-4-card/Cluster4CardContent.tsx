@@ -2904,8 +2904,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             {displayWorkCareerCards.map((card, cardIndex) => {
               const isEmpty = card.isEmpty;
               return (
+              <div key={card.id} className="work-career-card-wrapper">
               <div
-                key={card.id}
                 className={`work-career-card ${isEmpty ? 'empty' : ''} ${card.isFailed ? 'failed' : ''} ${card.isNotApplicable ? 'not-applicable' : ''}`}
                 onClick={() => {
                   if (!isEmpty) {
@@ -2941,12 +2941,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                   </div>
-                  <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : (() => { const text = card.title || '-'; return text.length > 80 ? text.slice(0, 80) + '...' : text; })()}</p>
+                  <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : (() => { const text = card.title || '-'; return text.length > 100 ? text.slice(0, 100) + '...' : text; })()}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Subtitle</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (() => { const text = card.projectDescription || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (() => { const text = card.projectDescription || '-'; return text.length > 70 ? text.slice(0, 70) + '...' : text; })()}</span>
                   {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
@@ -2974,12 +2974,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <span className="likes"><img src="/images/0/cluster4/icon/icon%20-%209.png" alt="likes" className="likes-icon" />{isEmpty ? '0,99' : card.likes}</span>
                   </div>
                 </div>
-                {!isEmpty && card.statusBadge && (
-                  <div className="status-badge">
-                    <img src={card.statusBadge} alt="status" />
-                    {card.isNotApplicable && <span className="not-applicable-text">해당 없음</span>}
-                  </div>
-                )}
+              </div>
+              {!isEmpty && card.statusBadge && (
+                <div className="status-badge">
+                  <img src={card.statusBadge} alt="status" />
+                  {card.isNotApplicable && <span className="not-applicable-text">해당 없음</span>}
+                </div>
+              )}
               </div>
               );
             })}
