@@ -2013,7 +2013,7 @@
       justify-content: flex-start;
       gap: 36px;
       padding: 20px 0;
-      margin-top: 10px;
+      margin-top: 5px;
       margin-bottom: 30px;
 
       .growth-left {
@@ -2022,7 +2022,7 @@
         gap: 8px;
         margin-left: 64px;
         position: relative;
-        top: -15px;
+        top: -20px;
 
         .progress-header {
           display: flex;
@@ -2036,7 +2036,7 @@
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             text-transform: uppercase;
-            line-height: 33px;
+            line-height: 19px;
         }
 
           .growth-count {
@@ -2170,7 +2170,7 @@
 
     // 실무 정보 섹션
     .work-info-section {
-      margin-top: 75px;
+      margin-top: 80px;
       margin-bottom: 72px;
       position: relative;
       padding-left: 40px;
@@ -2471,7 +2471,7 @@
     .work-ability-section {
       position: relative;
       margin-top: 120px;
-      margin-bottom: 72px;
+      margin-bottom: 40px;
       padding-left: 40px;
       padding-right: 42px;
       overflow: hidden; // character-image가 밖으로 넘치지 않도록
@@ -2948,7 +2948,7 @@
         padding-left: 40px;
     }
     .work-career-section {
-      margin-top: 70px;
+      margin-top: 120px;
       padding-right: 42px;
 
       .section-bottom-divider {
@@ -2968,14 +2968,14 @@
         width: 1023px;
         height: 1px;
         background: #FFA500;
-        margin: 20px auto 0 auto;
+        margin: 25px auto 0 auto;
       }
 
       .work-exp-cards {
         display: grid;
         grid-template-columns: repeat(2, 545px);
         gap: 16px;
-        margin-top: 30px;
+        margin-top: 0px;
 
         .work-exp-card {
           position: relative;
