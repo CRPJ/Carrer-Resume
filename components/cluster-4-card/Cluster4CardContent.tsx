@@ -516,12 +516,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setCareerRecords(getDemoCareerRecords(weekId));
       setCareerPage(0);
 
-      // 이전/다음 주차 ID 설정
+      // 이전/다음 주차 ID 설정 (내림차순: index-1 = 더 최근(다음), index+1 = 더 과거(이전))
       const weekIndex = DUMMY_WEEKLY_LIST.findIndex(w => w.id === weekId);
-      if (weekIndex > 0) setNextWeekId(null); // 첫번째 = 최신
       if (weekIndex >= 0) {
-        if (weekIndex > 0) setPrevWeekId(DUMMY_WEEKLY_LIST[weekIndex - 1].id);
-        if (weekIndex < DUMMY_WEEKLY_LIST.length - 1) setNextWeekId(DUMMY_WEEKLY_LIST[weekIndex + 1].id);
+        if (weekIndex > 0) setNextWeekId(DUMMY_WEEKLY_LIST[weekIndex - 1].id);
+        if (weekIndex < DUMMY_WEEKLY_LIST.length - 1) setPrevWeekId(DUMMY_WEEKLY_LIST[weekIndex + 1].id);
       }
 
       return;
@@ -2499,14 +2498,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="profile-details">
                         {isEmpty ? (
                           <>
-                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">학과</span></div>
-                            <div className="detail-line"><span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '80px' }}>-</span><span className="label">파트</span></div>
+                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학교</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">팀</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="text">&nbsp;</span></div>
                           </>
                         ) : (
                           <>
-                            <div className="detail-line"><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
-                            <div className="detail-line"><span className="text">{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span></div>
+                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                           </>
                         )}

@@ -1862,7 +1862,7 @@
             font-size: 14px !important; color: rgba(255, 255, 255, 0.50); line-height: 25px; font-weight: 400 !important;
             .detail-line { margin-bottom: 1px; white-space: nowrap; font-size: 14px !important; line-height: 25px; display: flex; align-items: baseline; overflow: hidden; }
             .text { font-size: 14px !important; color: #fff; font-family: 'Pretendard', sans-serif; font-weight: 700 !important; line-height: 25px; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
-            .label { flex-shrink: 0; }
+            .label { flex-shrink: 0; min-width: 26px; display: inline-block; }
             .nickname { color: #FAAB07; font-size: 14px !important; font-family: 'Pretendard', sans-serif; font-weight: 700 !important; line-height: 25px; }
           }
         }
@@ -1908,9 +1908,9 @@
 
       .card-footer {
         display: flex; align-items: center; gap: 8px; padding: 3.5px 0 2.8px 0;
-        .fm-badge { font-size: 15px; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 400; line-height: 19.5px; letter-spacing: 0.7px; background: none; padding: 0; display: flex; align-items: center; gap: 8px; .wifi-icon { width: 13.7px; height: 13px; object-fit: contain; } }
-        .footer-divider { width: 1px; height: 15.2px; background: rgba(255, 255, 255, 0.1); color: transparent; }
-        .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.7px; line-height: 9.6px; }
+        .fm-badge { font-size: 15px; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 400; line-height: 19.5px; letter-spacing: 0.7px; background: none; padding: 0; display: flex; align-items: center; gap: 8px; min-width: 80px; flex-shrink: 0; .wifi-icon { width: 13.7px; height: 13px; object-fit: contain; } }
+        .footer-divider { width: 1px; height: 15.2px; background: rgba(255, 255, 255, 0.1); color: transparent; flex-shrink: 0; }
+        .tag { font-size: 9.6px; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 0.7px; line-height: 9.6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
       }
 
       &.empty {
