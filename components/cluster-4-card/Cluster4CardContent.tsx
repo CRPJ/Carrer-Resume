@@ -1468,7 +1468,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
-  const currentImage = "/images/0/cluster4/4-1-card/image.png";
+  const currentImage = isRestMode
+    ? restImage
+    : weekData
+      ? getWeekImagePath(weekData)
+      : '/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png';
   const currentTitle = weekData
     ? weekData.isBreakSeason
       ? `${weekData.seasonYear} ${weekData.toSeasonName} 시즌, 전환 주차`
