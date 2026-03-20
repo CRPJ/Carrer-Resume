@@ -148,8 +148,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 'wa-3', activity_type_id: 'infodesk', title: 'MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-4', activity_type_id: 'calendar', title: '주간 마케팅 캘린더 일정 관리 및 팀 공유', is_active: true, opened_at: '2099-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-5', activity_type_id: 'forum', title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-6', activity_type_id: 'session', title: '데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션', is_active: false, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
-    { id: 'wa-7', activity_type_id: 'etc_a', title: '크로스 펑셔널 협업 프로젝트: 제품팀과 마케팅팀의 Go-to-Market 전략 수립 워크숍 결과물 정리', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-6', activity_type_id: 'session', title: '데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
+    { id: 'wa-7', activity_type_id: 'practical_lecture', title: '크로스 펑셔널 협업 프로젝트: 제품팀과 마케팅팀의 Go-to-Market 전략 수립 워크숍 결과물 정리', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-8', activity_type_id: 'comp-1', title: '가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-9', activity_type_id: 'exp-1', title: '커리어 역량 진단 테스트 결과', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
     { id: 'wa-10', activity_type_id: 'exp-2', title: '동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습', is_active: true, opened_at: '2025-01-01T00:00:00Z', output_links: [] },
@@ -171,7 +171,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number;  // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 7, success: 5 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 8, success: 5 });
   const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 1, success: 1 });
   const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 4, success: 4 });
   const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 5, success: 3 });
@@ -185,7 +185,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { week_id: 'dummy-1', activity_type_id: 'calendar', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'forum', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'session', is_completed: false },
-    { week_id: 'dummy-1', activity_type_id: 'etc_a', is_completed: true },
+    { week_id: 'dummy-1', activity_type_id: 'practical_lecture', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'comp-1', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'exp-1', is_completed: true },
     { week_id: 'dummy-1', activity_type_id: 'exp-2', is_completed: true },
@@ -346,6 +346,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
+  const getDemoSectionStates = (wId: string) => {
+    const weekNum = parseInt(wId.replace(/\D/g, '')) || 0;
+    const caseNum = weekNum % 10;
+    return {
+      competencyParticipated: ![3, 6, 7, 10].includes(caseNum),
+      isRestWeek: caseNum === 7,
+      careerCase: caseNum,
+    };
+  };
+
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
     {
       id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/naver webtoon.png', job_position: '서비스기획팀', project_name: '배달의민족 브랜드 바이럴 마케팅 캠페인 기획 및 실행', project_description: '소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석', line_code: 'AA22-11111', line_name: '마케팅(바이럴)', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
@@ -376,7 +386,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [isSaving, setIsSaving] = useState(false);
 
   // activity_type_id별 파트 분류 (기본값 - DB에서 가져온 후 업데이트됨)
-  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
   // competencyTypes, experienceTypes, careerTypes는 이제 state로 관리됨
 
   // 역할 라벨 매핑
@@ -841,7 +851,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           // 11. 파트별 강화 집계 계산
           // activity_type_id별 파트 분류 (DB에서 가져온 데이터 사용)
-          const infoTypesList = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+          const infoTypesList = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
           const competencyTypesList = competencyIds.length > 0 ? competencyIds : [];
           const experienceTypesList = experienceIds.length > 0 ? experienceIds : [];
           const careerTypesList = careerIds.length > 0 ? careerIds : ['practical_project'];
@@ -1664,11 +1674,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'calendar': { category: '캘린더', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
     'forum': { category: '포럼', tagColor: 'tag--green', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 포럼.png', isFruit: true },
     'session': { category: '세션', tagColor: 'tag--cyan', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 세션.png', isFruit: true },
-    'etc_a': { category: '기타a', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: false },
+    'practical_lecture': { category: '실무특강', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: true },
+    'community': { category: '커뮤니티', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
   };
 
   // 실무 정보에 해당하는 activity types
-  const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'etc_a'];
+  const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'practical_lecture', 'community'];
   // 실무 역량 activity types - DB에서 가져온 practical_competency 클러스터
   const workAbilityActivityTypes = competencyTypeIds;
   // 실무 경험 activity types - DB에서 가져온 practical_experience 클러스터
@@ -2015,7 +2026,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return { total, success };
     };
 
-    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
+    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
     // 온보딩 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
     if (isOnboardingWeek) {
       setInfoStats({ total: 0, success: 0 });
@@ -2126,8 +2137,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         outputLinks: mergedOutputLinks,
       };
     }),
-    // 빈 카드 2개
-    { id: 8, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
+    // 빈 카드 1개 (8개 데이터 + 1개 보이드 = 9개, 3×3)
     { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
@@ -2157,6 +2167,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         icon: getExperienceIconPath(activityTypeId),
         isEmpty: false,
         enhancementStatus: enhStatus,
+        hasActivity,
       };
     }),
   ];
@@ -2248,16 +2259,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return a.isNotApplicable ? 1 : -1;
   });
 
-  // 참여한 경력이 없으면 빈 카드 6개 표시, 있으면 6의 배수로 패딩
+  // 데이터 수만큼만 표시, 0개면 빈 카드 1개만
   const displayWorkCareerCards = sortedWorkCareerCards.length > 0
-    ? [
-        ...sortedWorkCareerCards,
-        ...Array.from(
-          { length: (6 - (sortedWorkCareerCards.length % 6)) % 6 },
-          (_, i) => emptyCareerCard(sortedWorkCareerCards.length + i + 1)
-        ),
-      ]
-    : Array.from({ length: 6 }, (_, i) => emptyCareerCard(i + 1));
+    ? sortedWorkCareerCards
+    : [emptyCareerCard(1)];
 
   // 페이지네이션: 6개씩 한 페이지
   const CAREER_CARDS_PER_PAGE = 6;
@@ -2766,7 +2771,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     />
                   )}
                   {!hasActivity && <div className="icon-placeholder"></div>}
-                  {enhancementStatus === 'failed' && (
+                  {(enhancementStatus === 'failed' || !hasActivity) && (
                     <div className="failed-overlay">
                       <span className="failed-text">강화 실패</span>
                       <span className="failed-emoji">😿</span>
@@ -2798,14 +2803,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <span className="sub-desc">{!hasActivity ? '-' : (() => { const text = weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
                   {hasActivity && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
-                {hasActivity && (
-                  <div className="status-badge">
-                    {enhancementStatus === 'success' && <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" />}
-                    {enhancementStatus === 'waiting' && <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" />}
-                    {enhancementStatus === 'failed' && <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />}
-                    {enhancementStatus === 'not_applicable' && <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />}
-                  </div>
-                )}
+                <div className="status-badge">
+                  {hasActivity && enhancementStatus === 'success' && <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" />}
+                  {hasActivity && enhancementStatus === 'waiting' && <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" />}
+                  {(enhancementStatus === 'failed' || !hasActivity) && <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />}
+                  {hasActivity && enhancementStatus === 'not_applicable' && <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />}
+                </div>
               </div>
             );
           })()}
@@ -2871,6 +2874,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="card-top-row">
                   <div className="card-icon-area">
                     {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
+                    {!card.hasActivity && !isEmpty && (
+                      <div className="failed-overlay">
+                        <span className="failed-text">강화 실패</span>
+                        <span className="failed-emoji">😿</span>
+                      </div>
+                    )}
                   </div>
                   <div className="card-header-area">
                     <div className="card-header-row">
@@ -2912,8 +2921,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
                 {!isEmpty && (
-                  <div className={`status-badge ${card.enhancementStatus}`}>
+                  <div className={`status-badge ${!card.hasActivity ? 'failed' : card.enhancementStatus}`}>
                     {(() => {
+                      if (!card.hasActivity) return <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />;
                       const statusImages: Record<string, string> = {
                         'success': '/images/0/cluster4/icon/5 강화 성공.png',
                         'waiting': '/images/0/cluster4/icon/6 강화 대기.png',
@@ -3057,21 +3067,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             })}
           </div>
           {totalCareerPages > 1 && (
-            <div className="career-pagination" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
+            <div className="section3-pagination">
               {Array.from({ length: totalCareerPages }).map((_, i) => (
-                <button
+                <span
                   key={i}
+                  className={`page-num ${careerPage === i ? 'active' : ''} ${i === totalCareerPages - 1 ? 'last' : ''}`}
                   onClick={() => setCareerPage(i)}
-                  style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    border: careerPage === i ? '2px solid #FAAB07' : '1px solid #555',
-                    background: careerPage === i ? '#FAAB07' : 'transparent',
-                    color: careerPage === i ? '#000' : '#fff',
-                    cursor: 'pointer', fontWeight: 700, fontSize: '14px',
-                  }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {i + 1}
-                </button>
+                </span>
               ))}
             </div>
           )}

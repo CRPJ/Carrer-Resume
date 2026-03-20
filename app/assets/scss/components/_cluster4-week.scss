@@ -2383,14 +2383,19 @@
                     align-items: center;
                     gap: 4px;
                     z-index: 2;
+                    overflow: hidden;
+                    max-width: 100%;
 
                     .failed-text {
-                      font-size: 14px;
+                      font-size: 28px;
                       font-weight: 700;
                       color: #FF0D0D;
                       font-family: 'Pretendard', sans-serif;
                       white-space: nowrap;
-                      line-height: 21px;
+                      line-height: 32px;
+                      max-width: 100%;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
                     }
 
                     .failed-emoji {
@@ -2627,14 +2632,19 @@
               align-items: center;
               gap: 4px;
               z-index: 2;
+              overflow: hidden;
+              max-width: 100%;
 
               .failed-text {
-                font-size: 14px;
+                font-size: 28px;
                 font-weight: 700;
                 color: #FF0D0D;
                 font-family: 'Pretendard', sans-serif;
                 white-space: nowrap;
-                line-height: 21px;
+                line-height: 32px;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
               }
 
               .failed-emoji {
@@ -2956,6 +2966,38 @@
 
       .section-bottom-divider {
         margin: 60px auto 0 auto;
+      }
+
+      .section3-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 15px 0;
+
+        .page-num {
+          font-family: 'Pretendard', sans-serif;
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fff;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          display: flex;
+          align-items: center;
+
+          &:hover { color: #ddf247; transform: scale(1.1); }
+
+          &.active {
+            color: #ddf247;
+            transform: scale(1.1);
+            &::after { content: ""; display: inline-block; width: 30px; height: 1px; background: #ddf247; margin-left: 20px; }
+          }
+
+          &.last.active {
+            &::after { display: none; }
+            &::before { content: ""; display: inline-block; width: 30px; height: 1px; background: #ddf247; margin-right: 20px; }
+          }
+        }
       }
     }
 
