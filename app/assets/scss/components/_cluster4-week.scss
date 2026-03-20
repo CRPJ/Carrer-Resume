@@ -1789,8 +1789,11 @@
                   overflow: hidden;
                   text-overflow: ellipsis;
                   max-width: 100%;
-                  .text { font-size: 0.875rem !important; }
-                  .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; }
+                  display: flex;
+                  align-items: baseline;
+                  .text { font-size: 0.875rem !important; min-width: 0 !important; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }
+                  .label { flex-shrink: 0; }
+                  .nickname { color: #F59E0B; font-size: 0.875rem !important; font-family: 'Pretendard', sans-serif; font-weight: 700; flex-shrink: 0; }
                 }
               }
             }
@@ -5281,27 +5284,19 @@
 
             .detail-line {
               margin-bottom: 1px;
-              white-space: nowrap;
+              white-space: normal;
+              word-break: break-word;
               font-size: 0.875rem;
-              display: flex;
-              align-items: baseline;
-              overflow: hidden;
 
               .text {
                 font-size: 0.875rem;
                 color: #fff;
                 font-family: 'Pretendard', sans-serif;
                 font-weight: 700;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-                flex: 0 1 auto;
               }
 
               .label {
                 font-size: 0.875rem;
-                flex-shrink: 0;
                 color: #999;
                 font-family: 'Pretendard', sans-serif;
               }
@@ -7017,9 +7012,6 @@
               color: rgba(255, 255, 255, 0.6);
               font-family: 'Pretendard', sans-serif;
               margin-bottom: 4px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
             }
 
             .profile-fm {

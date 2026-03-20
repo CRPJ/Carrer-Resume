@@ -68,6 +68,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get('userId') || searchParams.get('userID');
   const isDemoMode = checkDemoMode();
+  const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
+    const t = text || '-';
+    return t.length > maxLen ? t.slice(0, maxLen) + '...' : t;
+  };
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
   // 승인 상태 확인 함수
@@ -2574,9 +2578,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                       <div className="profile-details">
                         {isEmpty ? (
-                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>-</span><span className="label">파트</span></>
+                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">파트</span></>
                         ) : (
-                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{truncate(user.nickname)}</span></>
                         )}
                       </div>
                     </div>
@@ -3898,7 +3902,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                           <div className="colleague-info">
                             <div className="colleague-name">{colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세</div>
-                            <div className="colleague-details">{(colleague.team || '-').slice(0, 6)} 팀 | {(colleague.part || '-').slice(0, 6)} 파트 | {colleague.nickname}</div>
+                            <div className="colleague-details">{truncate(colleague.team)} 팀 | {truncate(colleague.part)} 파트 | {truncate(colleague.nickname)}</div>
                           </div>
                         </div>
                         <div className="colleague-message-section">
@@ -3977,7 +3981,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             </div>
                             <div className="crew-info">
                               <div className="crew-name">{user.name} | {user.gender} | {mask.age(user.age)}세</div>
-                              <div className="crew-details">{(user.team || '-').slice(0, 6)} 팀 | {(user.part || '-').slice(0, 6)} 파트 | {user.nickname}</div>
+                              <div className="crew-details">{truncate(user.team)} 팀 | {truncate(user.part)} 파트 | {truncate(user.nickname)}</div>
                             </div>
                           </div>
                           <div className="rank-select-buttons">
@@ -4183,13 +4187,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(mask.school(selectedReputationCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedReputationCard.major))}</span><span className="label">학과</span>
+                      <span className="text">{truncate(formatSchool(mask.school(selectedReputationCard.university)))}</span><span className="label">학교</span> | <span className="text">{truncate(formatMajor(mask.major(selectedReputationCard.major)))}</span><span className="label">학과</span>
                     </div>
                     <div className="detail-line">
-                      <span className="text">{(selectedReputationCard.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(selectedReputationCard.part || '-').slice(0, 6)}</span><span className="label">파트</span>
+                      <span className="text">{truncate(selectedReputationCard.team)}</span><span className="label">팀</span> | <span className="text">{truncate(selectedReputationCard.part)}</span><span className="label">파트</span>
                     </div>
                     <div className="detail-line">
-                      <span className="nickname">{selectedReputationCard.nickname}</span>
+                      <span className="nickname">{truncate(selectedReputationCard.nickname)}</span>
                     </div>
                   </div>
                 </div>
@@ -4258,7 +4262,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{(selectedColleagueCard.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(selectedColleagueCard.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team || '-'}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part || '-'}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
                     </div>
                   </div>
                 </div>
