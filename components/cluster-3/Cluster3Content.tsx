@@ -982,8 +982,8 @@ const Cluster3Content = () => {
                 <span className="info-label">
                   <span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" />
                 </span>
-                <span className={`info-value number ${pointsData.eoheung > 0 ? "negative" : ""}`}>
-                  {pointsData.eoheung > 0 ? `-${pointsData.eoheung.toLocaleString()}` : pointsData.eoheung.toLocaleString()}
+                <span className="info-value number">
+                  {Math.abs(pointsData.eoheung).toLocaleString()}
                   <span className="unit">개</span>
                 </span>
               </div>

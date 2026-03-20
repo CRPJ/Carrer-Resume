@@ -1320,7 +1320,7 @@ const Cluster4RankingContent = () => {
                       <span className="info-item with-icon">
                         어흥
                         <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                        <strong className="number-value">{user.lightning > 0 ? `-${user.lightning}` : user.lightning}</strong>
+                        <strong className="number-value">{Math.abs(user.lightning)}</strong>
                         개
                       </span>
                     </div>
