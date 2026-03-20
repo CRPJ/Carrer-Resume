@@ -127,7 +127,7 @@ export const DUMMY_WEEK_EXTRA: Record<string, {
   },
   'dw-09': { // 성공
     points: { star: 200, shield: 250, lightning: 100 },
-    teamPart: { teamName: '엔터테인먼트사업', partName: '글로벌마케팅전략' }, roleLabel: '운영진(앰배서더)',
+    teamPart: { teamName: '엔터테인먼트', partName: '글로벌마케팅' }, roleLabel: '운영진(앰배서더)',
     growthRate: { rate: 100, count: 68, total: 68 },
     infoRate: { rate: 100, count: 40, total: 40 }, competencyRate: { rate: 100, count: 5, total: 5 },
     experienceRate: { rate: 100, count: 8, total: 8 }, careerRate: { rate: 100, count: 15, total: 15 },

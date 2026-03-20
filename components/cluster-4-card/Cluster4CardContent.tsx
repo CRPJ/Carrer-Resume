@@ -2360,15 +2360,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     ? '클럽 온보딩'
                     : teamName === '운영진' && generation
                       ? `운영진(${generation}기)`
-                      : (teamName || '-')
+                      : (teamName || '-').slice(0, 6)
                 }</span></span>
                 <span className="info-divider">|</span>
                 <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '신입OT'
                     : teamName === '운영진' && partName === '팀장' && managedTeamName
-                      ? `팀장(${managedTeamName})`
-                      : (partName || '-')
+                      ? `팀장(${managedTeamName})`.slice(0, 6)
+                      : (partName || '-').slice(0, 6)
                 }</span></span>
               </div>
               <div className="info-group right">
@@ -2389,7 +2389,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   어흥
                   <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                  <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
+                  <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
                   <span className="unit-text">개</span>
                 </span>
               </div>
@@ -2434,7 +2434,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         ) : (
                           <>
                             <div className="detail-line"><span className="text">{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
-                            <div className="detail-line"><span className="text">{user.team}</span><span className="label">팀</span> | <span className="text">{user.part}</span><span className="label">파트</span></div>
+                            <div className="detail-line"><span className="text">{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span></div>
                             <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
                           </>
                         )}
@@ -2508,7 +2508,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isEmpty ? (
                           <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>-</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>-</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>-</span><span className="label">파트</span></>
                         ) : (
-                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>{user.team}</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>{user.part}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
+                          <><span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ display: 'inline-block', minWidth: '70px' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ display: 'inline-block', minWidth: '50px' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ display: 'inline-block', minWidth: '60px' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{user.nickname}</span></>
                         )}
                       </div>
                     </div>
@@ -3811,7 +3811,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                           <div className="colleague-info">
                             <div className="colleague-name">{colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세</div>
-                            <div className="colleague-details">{colleague.team} 팀 | {colleague.part} 파트 | {colleague.nickname}</div>
+                            <div className="colleague-details">{(colleague.team || '-').slice(0, 6)} 팀 | {(colleague.part || '-').slice(0, 6)} 파트 | {colleague.nickname}</div>
                           </div>
                         </div>
                         <div className="colleague-message-section">
@@ -3890,7 +3890,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             </div>
                             <div className="crew-info">
                               <div className="crew-name">{user.name} | {user.gender} | {mask.age(user.age)}세</div>
-                              <div className="crew-details">{user.team} 팀 | {user.part} 파트 | {user.nickname}</div>
+                              <div className="crew-details">{(user.team || '-').slice(0, 6)} 팀 | {(user.part || '-').slice(0, 6)} 파트 | {user.nickname}</div>
                             </div>
                           </div>
                           <div className="rank-select-buttons">
@@ -4099,7 +4099,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="text">{formatSchool(mask.school(selectedReputationCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedReputationCard.major))}</span><span className="label">학과</span>
                     </div>
                     <div className="detail-line">
-                      <span className="text">{selectedReputationCard.team}</span><span className="label">팀</span> | <span className="text">{selectedReputationCard.part}</span><span className="label">파트</span>
+                      <span className="text">{(selectedReputationCard.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(selectedReputationCard.part || '-').slice(0, 6)}</span><span className="label">파트</span>
                     </div>
                     <div className="detail-line">
                       <span className="nickname">{selectedReputationCard.nickname}</span>
@@ -4171,7 +4171,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <div className="profile-details">
                     <div className="detail-line">
-                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{selectedColleagueCard.team}</span><span className="label">팀</span> | <span className="text">{selectedColleagueCard.part}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span><span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span><span className="label">학과</span> | <span className="text">{(selectedColleagueCard.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text">{(selectedColleagueCard.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
                     </div>
                   </div>
                 </div>

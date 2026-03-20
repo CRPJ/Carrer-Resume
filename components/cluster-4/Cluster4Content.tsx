@@ -12,9 +12,9 @@ import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES } from "@/constants/dummyData
 
 // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
 const DUMMY_SEASON_ROLES = [
-  { teamName: "엔터테인먼트 팀", partName: "내돈내산 파트", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 1.jpg" },
-  { teamName: "운영진(3기)", partName: "클럽 단위", roleLabel: "팀장(헬스케어 팀)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 2.jpg" },
-  { teamName: "운영진(4기)", partName: "클럽 단위", roleLabel: "앰배서더", isAdmin: false, adminGeneration: 4, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 3.jpg" },
+  { teamName: "엔터테인먼트", partName: "내돈내산파트", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 1.jpg" },
+  { teamName: "운영(3기)", partName: "클럽 단위", roleLabel: "팀장(헬스케어 팀)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 2.jpg" },
+  { teamName: "운영(4기)", partName: "클럽 단위", roleLabel: "앰배서더", isAdmin: false, adminGeneration: 4, startedAt: "2025-03-23", profileImage: "/images/0/crew profile/여 3.jpg" },
 ];
 
 // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
@@ -31,7 +31,7 @@ const DUMMY_SEASON_REPUTATIONS = [
       birth_date: "2002-01-01",
       university: "서울대학교",
       major_first: "미디어커뮤니케이션학과",
-      teamName: "엔터테인먼트팀",
+      teamName: "엔터테인먼트",
       partName: "내돈내산파트",
       vision: "엔비디아구글테슬라쿵",
       profile_photo_url: "/images/0/crew profile/여 4.webp",
@@ -49,7 +49,7 @@ const DUMMY_SEASON_REPUTATIONS = [
       birth_date: "2002-01-01",
       university: "서울대학교",
       major_first: "미디어커뮤니케이션학과",
-      teamName: "엔터테인먼트팀",
+      teamName: "엔터테인먼트",
       partName: "내돈내산파트",
       vision: "엔비디아구글테슬라쿵",
       profile_photo_url: "/images/0/crew profile/여 5.jpg",
@@ -67,7 +67,7 @@ const DUMMY_SEASON_REPUTATIONS = [
       birth_date: "2002-01-01",
       university: "서울대학교",
       major_first: "미디어커뮤니케이션학과",
-      teamName: "엔터테인먼트팀",
+      teamName: "엔터테인먼트",
       partName: "내돈내산파트",
       vision: "엔비디아구글테슬라쿵",
       profile_photo_url: "/images/0/crew profile/여 6.jpg",
@@ -89,9 +89,9 @@ const defaultSeasonData = {
   roleInSeason: "운영진(앰배서더)",
   isQualified: true,
   seasonRoles: [
-    { teamName: "엔터테인먼트 팀", partName: "내돈내산 파트", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 7.png" },
-    { teamName: "운영진(3기)", partName: "클럽 단위", roleLabel: "팀장(헬스케어 팀)", isAdmin: false, adminGeneration: 4, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 8.png" },
-    { teamName: "운영진(4기)", partName: "클럽 단위", roleLabel: "앰배서더", isAdmin: false, adminGeneration: 5, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 9.png" },
+    { teamName: "엔터테인먼트", partName: "내돈내산파트", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 7.png" },
+    { teamName: "운영(3기)", partName: "클럽 단위", roleLabel: "팀장(헬스케어 팀)", isAdmin: false, adminGeneration: 4, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 8.png" },
+    { teamName: "운영(4기)", partName: "클럽 단위", roleLabel: "앰배서더", isAdmin: false, adminGeneration: 5, startedAt: "2025-03-23", profileImage: "/images/0/cluster4/cluster4-1/Ellipse 9.png" },
   ],
   stats: { dangam: 25, injeolmi: 999, eoheung: 3 }, // TODO: 더미 데이터 — 자릿수 테스트용
   rating: 10,
@@ -256,7 +256,7 @@ const Cluster4Content = () => {
         university: "서울대학교",
         major_first: "미디어커뮤니케이션학과",
         profile_photo_url: "/images/0/cluster4/cluster4-1/Ellipse 10.png",
-        teamName: "엔터테인먼트팀",
+        teamName: "엔터테인먼트",
         partName: "내돈내산파트",
         vision: "엔비디아구글테슬라쿵",
       },
@@ -279,7 +279,7 @@ const Cluster4Content = () => {
         university: "서울대학교",
         major_first: "미디어커뮤니케이션학과",
         profile_photo_url: "/images/0/cluster4/cluster4-1/Ellipse 11.png",
-        teamName: "엔터테인먼트팀",
+        teamName: "엔터테인먼트",
         partName: "내돈내산파트",
         vision: "엔비디아구글테슬라쿵",
       },
@@ -302,7 +302,7 @@ const Cluster4Content = () => {
         university: "서울대학교",
         major_first: "미디어커뮤니케이션학과",
         profile_photo_url: "/images/0/cluster4/cluster4-1/Ellipse 12.png",
-        teamName: "엔터테인먼트팀",
+        teamName: "엔터테인먼트",
         partName: "내돈내산파트",
         vision: "엔비디아구글테슬라쿵",
       },
@@ -2153,7 +2153,7 @@ const Cluster4Content = () => {
                                   </span>
                                 ) : (
                                   <span className="badge-text">
-                                    {roleItem.teamName || "-"} <span className="separator">|</span> <span className="sub-text">{roleItem.partName || "-"}</span> <span className="separator">|</span>
+                                    {(roleItem.teamName || "-").slice(0, 6)} <span className="separator">|</span> <span className="sub-text">{(roleItem.partName || "-").slice(0, 6)}</span> <span className="separator">|</span>
                                   </span>
                                 )}
                               </div>
@@ -2239,7 +2239,7 @@ const Cluster4Content = () => {
                                     {mask.major(reviewer?.major_first)}
                                   </div>
                                   <div className="row2">
-                                    {reviewer?.teamName || "-"} <span className="separator">|</span> {reviewer?.partName || "-"}
+                                    {(reviewer?.teamName || "-").slice(0, 6)} <span className="separator">|</span> {(reviewer?.partName || "-").slice(0, 6)}
                                     {reviewer?.vision && (
                                       <>
                                         {" "}
@@ -2705,7 +2705,7 @@ const Cluster4Content = () => {
                         {genderLabel} | {mask.age(age)}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
                       </div>
                       <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "2px" }}>
-                        {reviewer?.teamName || "-"} | {reviewer?.partName || "-"}
+                        {(reviewer?.teamName || "-").slice(0, 6)} | {(reviewer?.partName || "-").slice(0, 6)}
                         {reviewer?.vision && ` | ${reviewer.vision}`}
                       </div>
                     </div>

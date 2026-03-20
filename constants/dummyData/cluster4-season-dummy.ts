@@ -66,8 +66,8 @@ export const DUMMY_SEASON_DATA = {
     },
     {
       profileImage: randomCrewProfile(),
-      teamName: "엔터테인먼트사업",
-      partName: "글로벌마케팅전",
+      teamName: "엔터테인먼트",
+      partName: "글로벌마케팅",
       roleLabel: "운영진(앰배서더)",
       isAdmin: true,
       adminGeneration: 4,
@@ -110,7 +110,7 @@ export const DUMMY_SEASON_DATA = {
         major_first: "컴퓨터공학",
         profile_photo_url: randomCrewProfile(),
         teamName: "마케팅전략",
-        partName: "브랜드콘텐츠파트",
+        partName: "브랜드콘텐츠",
         vision: "디지털마케터",
       },
     },
@@ -128,8 +128,8 @@ export const DUMMY_SEASON_DATA = {
         university: "한국예술종합",
         major_first: "미디어커뮤니케이션",
         profile_photo_url: randomCrewProfile(),
-        teamName: "엔터테인먼트사업",
-        partName: "글로벌마케팅전략파트",
+        teamName: "엔터테인먼트",
+        partName: "글로벌마케팅",
         vision: "엔비디아구글테슬라쿵",
       },
     },
@@ -197,7 +197,7 @@ export const DUMMY_SEASON_HISTORIES = [
     progress: { info: { total: 50, completed: 48, rate: 96 }, competency: { total: 10, completed: 9, rate: 90 }, experience: { total: 12, completed: 11, rate: 92 }, career: { total: 20, completed: 18, rate: 90 } },
     // 시즌 상태: 6개 (최대)
     seasonRoles: [
-      { profileImage: randomCrewProfile(), teamName: "엔터테인먼트사업", partName: "글로벌마케팅전략파트", roleLabel: "팀장(미디어 팀)", isAdmin: false, adminGeneration: null },
+      { profileImage: randomCrewProfile(), teamName: "엔터테인먼트", partName: "글로벌마케팅", roleLabel: "팀장(미디어 팀)", isAdmin: false, adminGeneration: null },
       { profileImage: randomCrewProfile(), teamName: "마케팅전략", partName: "브랜드콘텐츠", roleLabel: "운영진(앰배서더)", isAdmin: true, adminGeneration: 4 },
       { profileImage: randomCrewProfile(), teamName: "개발", partName: "백엔드", roleLabel: "일반", isAdmin: false, adminGeneration: null },
       { profileImage: randomCrewProfile(), teamName: "디자인", partName: "UI", roleLabel: "파트장", isAdmin: false, adminGeneration: null },
@@ -213,7 +213,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_1: "#리더십리더십",
         keyword_2: "#추진력추진력력",
         fmScore: 999,
-        reviewer: { display_name: "알렉산더최", gender: "남", birth_date: "1999-01-01", university: "한국예술종합", major_first: "미디어커뮤니케이션", profile_photo_url: randomCrewProfile(), teamName: "엔터테인먼트사업", partName: "글로벌마케팅전략", vision: "엔비디아구글테슬라쿵" },
+        reviewer: { display_name: "알렉산더최", gender: "남", birth_date: "1999-01-01", university: "한국예술종합", major_first: "미디어커뮤니케이션", profile_photo_url: randomCrewProfile(), teamName: "엔터테인먼트", partName: "글로벌마케팅", vision: "엔비디아구글테슬라쿵" },
       },
       {
         id: "r2-2",

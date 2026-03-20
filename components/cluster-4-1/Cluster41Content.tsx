@@ -1940,8 +1940,8 @@ const Cluster41Content = () => {
                           return (
                             <>
                               <div className="weekly-card-details-top">
-                                <div className="detail-chip"><strong>[팀]</strong> {teamPart.teamName || "-"}</div>
-                                <div className="detail-chip"><strong>[파트]</strong> {teamPart.partName || "-"}</div>
+                                <div className="detail-chip"><strong>[팀]</strong> {(teamPart.teamName || "-").slice(0, 6)}</div>
+                                <div className="detail-chip"><strong>[파트]</strong> {(teamPart.partName || "-").slice(0, 6)}</div>
                                 <div className="detail-chip"><strong>[역할]</strong> {roleInfo?.roleLabel || "-"}</div>
                               </div>
 
@@ -1967,7 +1967,7 @@ const Cluster41Content = () => {
                               <div className="weekly-card-details-bottom">
                                 <div className="metric">단감 <strong>{weekPoints.star}</strong></div>
                                 <div className="metric">인절미 <strong>{injeolmi}</strong></div>
-                                <div className="metric">어흥 <strong>{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong></div>
+                                <div className="metric">어흥 <strong>{Math.abs(weekPoints.lightning)}</strong></div>
                                 <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/3</span></div>
                               </div>
                             </>
@@ -2028,12 +2028,12 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray">{teamPart.teamName || '-'}</span>
+                                <span className="text-gray">{(teamPart.teamName || '-').slice(0, 6)}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray">{teamPart.partName || '-'}</span>
+                                <span className="text-gray">{(teamPart.partName || '-').slice(0, 6)}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}
@@ -2070,7 +2070,7 @@ const Cluster41Content = () => {
                             <span className="info-item with-icon">
                               어흥
                               <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                              <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
+                              <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
                               개
                             </span>
                           </div>

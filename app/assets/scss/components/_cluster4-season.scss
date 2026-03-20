@@ -4316,7 +4316,10 @@
           font-size: 0.875rem;
 
           &.items {
-            gap: 10px;
+            gap: 6px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            flex-shrink: 0;
           }
         }
 
@@ -4360,11 +4363,13 @@
           &.with-icon {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             font-family: "Poppins", sans-serif;
             font-weight: 700;
             font-size: 0.875rem;
             line-height: 35px;
+            flex-shrink: 0;
+            white-space: nowrap;
 
             .item-icon {
               width: 16px;
