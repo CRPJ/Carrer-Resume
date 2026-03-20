@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
 
 
 interface Cluster4CardContentProps {
@@ -415,19 +416,56 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
     if (isDemoMode) {
-      setWeekData({
-        id: 'demo-week',
-        weekNumber: 3,
-        seasonYear: 2025,
-        seasonName: '여름',
-        isBreakSeason: false,
-        toSeasonName: null,
-        startDate: '2025-03-23',
-        endDate: '2025-03-30',
-        isClubBreak: false,
-        holidayName: null,
-        growthStatus: '성공'
-      });
+      // weekId로 공유 더미 데이터 조회 (cluster-4 시즌 페이지와 동기화)
+      const dummyWeek = DUMMY_WEEKLY_LIST.find(w => w.id === weekId);
+      const dummyExtra = DUMMY_WEEK_EXTRA[weekId];
+
+      if (dummyWeek) {
+        setWeekData({
+          id: dummyWeek.id,
+          weekNumber: dummyWeek.weekNumber,
+          seasonYear: dummyWeek.seasonYear,
+          seasonName: dummyWeek.seasonName,
+          isBreakSeason: dummyWeek.isBreakSeason,
+          toSeasonName: dummyWeek.toSeason,
+          startDate: dummyWeek.startDate,
+          endDate: dummyWeek.endDate,
+          isClubBreak: dummyWeek.isClubBreak,
+          holidayName: dummyWeek.holidayName,
+          growthStatus: dummyWeek.growthStatus
+        });
+      } else {
+        setWeekData({
+          id: 'demo-week',
+          weekNumber: 3,
+          seasonYear: 2025,
+          seasonName: '여름',
+          isBreakSeason: false,
+          toSeasonName: null,
+          startDate: '2025-03-23',
+          endDate: '2025-03-30',
+          isClubBreak: false,
+          holidayName: null,
+          growthStatus: '성공'
+        });
+      }
+
+      if (dummyExtra) {
+        setTeamName(dummyExtra.teamPart.teamName);
+        setPartName(dummyExtra.teamPart.partName);
+        setRoleLabel(dummyExtra.roleLabel);
+        setWeekPoints(dummyExtra.points);
+        setCumulativeInjeolmi(dummyExtra.points.shield);
+      }
+
+      // 이전/다음 주차 ID 설정
+      const weekIndex = DUMMY_WEEKLY_LIST.findIndex(w => w.id === weekId);
+      if (weekIndex > 0) setNextWeekId(null); // 첫번째 = 최신
+      if (weekIndex >= 0) {
+        if (weekIndex > 0) setPrevWeekId(DUMMY_WEEKLY_LIST[weekIndex - 1].id);
+        if (weekIndex < DUMMY_WEEKLY_LIST.length - 1) setNextWeekId(DUMMY_WEEKLY_LIST[weekIndex + 1].id);
+      }
+
       return;
     }
     const fetchWeekData = async () => {
@@ -2582,7 +2620,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       )}
                     </div>
-                    <span className="card-desc">{isEmpty ? '-' : <>{card.title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                    <span className="card-desc">{isEmpty ? '-' : (card.title || '-')}</span>
+                    {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                   </div>
                 </div>
                 {!isEmpty && card.status && card.statusIcon && (
@@ -2680,12 +2719,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </>
                     )}
                   </div>
-                  <p className="main-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{!hasActivity ? '-' : (displayActivity?.title || '-')}</p>
+                  <p className="main-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{!hasActivity ? '-' : (() => { const text = displayActivity?.title || '-'; return text.length > 80 ? text.slice(0, 80) + '...' : text; })()}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{!hasActivity ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc">{!hasActivity ? '-' : (() => { const text = weekActivityDetails.find(d => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
+                  {hasActivity && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
                 {hasActivity && (
                   <div className="status-badge">
@@ -2792,12 +2832,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </>
                     )}
                   </div>
-                  <p className="main-desc">{isEmpty ? '-' : card.title}</p>
+                  <p className="main-desc">{isEmpty ? '-' : (() => { const text = card.title || '-'; return text.length > 80 ? text.slice(0, 80) + '...' : text; })()}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : <>{weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (() => { const text = weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
+                  {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
                 {!isEmpty && (
                   <div className={`status-badge ${card.enhancementStatus}`}>
@@ -2900,12 +2941,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                     <span className="card-title">Main Title</span>
                   </div>
-                  <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : card.title}</p>
+                  <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : (() => { const text = card.title || '-'; return text.length > 80 ? text.slice(0, 80) + '...' : text; })()}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Subtitle</span>
                   </div>
-                  <span className="sub-desc" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : <>{card.projectDescription || '-'}<img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" /></>}</span>
+                  <span className="sub-desc">{isEmpty ? '-' : (() => { const text = card.projectDescription || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
+                  {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                   <div className="supervisor-section">
                     <span className="supervisor-label">실무 기업 감독자</span>
                     <div className="supervisor-info">
