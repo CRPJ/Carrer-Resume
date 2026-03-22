@@ -424,6 +424,8 @@ const Cluster41Content = () => {
 
   // 운영진일 때 팀/파트 포맷 변환
   const getFormattedTeamPart = (date: string, week: DBWeekData) => {
+    // 온보딩 주차는 '클럽온보딩' / '신입OT' 표시
+    if (onboardingWeekId && week.id === onboardingWeekId) return { teamName: '클럽온보딩', partName: '신입OT' };
     if (week.isBreakSeason) return { teamName: '-', partName: '-' };
     const teamPart = getTeamPartForDate(date);
     const roleInfo = getRoleForDate(date);
@@ -507,7 +509,7 @@ const Cluster41Content = () => {
       ).length;
     // 현재 주차가 활동 주차(성공/미인정/대기)이면 eligible 체크에 포함
     const currentWeek = dbWeeklyData.find(w => w.endDate === weekEndDate);
-    const isCurrentWeekActive = currentWeek && !['공식 휴식', '클럽 온보딩', '시즌 휴식', '활동 휴식'].includes(currentWeek.growthStatus);
+    const isCurrentWeekActive = currentWeek && !['공식 휴식', '시즌 휴식', '활동 휴식'].includes(currentWeek.growthStatus);
     const alreadyCounted = currentWeek?.growthStatus === '성공';
     return approvedCount + (isCurrentWeekActive && !alreadyCounted ? 1 : 0);
   };
@@ -551,8 +553,7 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
-    // 온보딩 주차는 강화율 계산에서 제외 (이력으로만 존재)
-    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
+    // 온보딩 주차도 강화율 정상 계산 (팀/파트 + 강화 성공/실패 표시)
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
     const total = weekOpenActivities.filter(wa => infoTypeIds.includes(wa.activity_type_id)).length;
@@ -570,8 +571,7 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
-    // 온보딩 주차는 강화율 계산에서 제외
-    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
+    // 온보딩 주차도 강화율 정상 계산
     // 실무 역량은 매주 분모가 항상 1
     const total = 1;
     // 강화 성공한 competency 타입 활동 개수 (count) - 최대 1
@@ -588,8 +588,7 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
-    // 온보딩 주차는 강화율 계산에서 제외
-    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
+    // 온보딩 주차도 강화율 정상 계산
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
@@ -644,8 +643,7 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
     if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
-    // 온보딩 주차는 강화율 계산에서 제외
-    if (onboardingWeekId && weekId === onboardingWeekId) return { rate: 0, count: 0, total: 0 };
+    // 온보딩 주차도 강화율 정상 계산
 
     // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
     const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
@@ -1045,7 +1043,7 @@ const Cluster41Content = () => {
             seasonName,
             startDate: week.start_date,
             endDate: week.end_date,
-            isClubBreak: week.is_club_break || isBreakSeason, // break 시즌도 공식 휴식으로 처리
+            isClubBreak: (apiOnboardingWeekId && week.id === apiOnboardingWeekId) ? false : (week.is_club_break || isBreakSeason),
             isBreakSeason, // 전환 주차 여부
             fromSeason: breakFromSeason,
             toSeason: breakToSeason,
@@ -1264,8 +1262,8 @@ const Cluster41Content = () => {
       return dummyImages[week.id] || '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
     }
 
-    // 전환 주차 (break season) → 중간 주차 이미지 사용
-    if (week.isBreakSeason && week.fromSeason && week.toSeason) {
+    // 전환 주차 (break season) → 중간 주차 이미지 사용 (온보딩 주차는 정상 이미지)
+    if (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId) && week.fromSeason && week.toSeason) {
       return `/images/0/cluster4/주차 이미지/중간 주차 (${week.fromSeason}-${week.toSeason}).png`;
     }
 
@@ -1277,7 +1275,9 @@ const Cluster41Content = () => {
       '가을': 9
     };
 
-    const startMonth = seasonStartMonth[week.seasonName] || 1;
+    // 온보딩 주차가 break 시즌에 속하면 toSeason(다음 시즌)으로 이미지 경로 생성
+    const effectiveSeasonName = (week.isBreakSeason && week.toSeason) ? week.toSeason : week.seasonName;
+    const startMonth = seasonStartMonth[effectiveSeasonName] || 1;
     const monthOffset = Math.floor((week.weekNumber - 1) / 4);
     const month = startMonth + monthOffset;
     const weekOfMonth = ((week.weekNumber - 1) % 4) + 1;
@@ -1285,7 +1285,7 @@ const Cluster41Content = () => {
     // 공휴일이 있는 경우 파일명에 추가
     const holidaySuffix = week.holidayName ? ` ${week.holidayName}` : '';
 
-    return `/images/0/cluster4/주차 이미지/${week.seasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+    return `/images/0/cluster4/주차 이미지/${effectiveSeasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
   };
 
   const renderStars = (rating: number) => {
@@ -1896,7 +1896,7 @@ const Cluster41Content = () => {
                           const weekPoints = getPointsForWeek(week.id);
                           const injeolmi = weekPoints.shield - weekPoints.lightning;
                           const teamPart = getFormattedTeamPart(week.startDate, week);
-                          const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+                          const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
 
                           return (
                             <>
@@ -1983,7 +1983,7 @@ const Cluster41Content = () => {
                       {(() => {
                         // 전환 주차는 팀/파트/역할을 '-'로 표시
                         const teamPart = getFormattedTeamPart(week.startDate, week);
-                        const roleInfo = week.isBreakSeason ? null : getRoleForDate(week.startDate);
+                        const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
                         return (
                           <>
                             <div className="info-group">

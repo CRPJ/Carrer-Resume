@@ -735,15 +735,8 @@ const Cluster4Content = () => {
         return { total: experienceTotal, success: experienceSuccess };
       };
 
-      // 온보딩 주차면 모든 파트 total=0, 아니면 정상 계산
-      if (isOnboardingWeek) {
-        setActivityStats({
-          info: { total: 0, success: 0 },
-          competency: { total: 0, success: 0 },
-          experience: { total: 0, success: 0 },
-          career: { total: 0, success: 0 },
-        });
-      } else {
+      // 온보딩 주차도 정상 계산 (팀/파트 + 강화 성공/실패 표시)
+      {
         const infoStats = calcStats(infoTypeIds);
         const competencyStats = calcStats(competencyTypeIds);
         const experienceStats = calcExperienceStats(); // eligible 조건 적용

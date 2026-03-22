@@ -691,15 +691,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 cumulativeForEligible 사용
           const currentCumulativeApproved = cumulativeForEligible;
 
-          // 실무 정보: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 해당 주차의 활성화된 활동 수
-          const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
+          // 실무 정보: 해당 주차의 활성화된 활동 수 (온보딩 주차도 정상 계산)
+          const infoTotal = activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
 
-          // 실무 역량: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 1 (매주 최대 1개 선택 가능)
-          const competencyTotal = isOnboardingWeekLocal ? 0 : 1;
+          // 실무 역량: 매주 최대 1개 선택 가능 (온보딩 주차도 정상 계산)
+          const competencyTotal = 1;
 
           // 실무 경험: eligible 조건 체크 (개설 여부와 무관하게 모든 experience 타입 대상)
           let experienceTotal = 0;
-          if (!isOnboardingWeekLocal) {
+          {
             experienceInfos.forEach(typeInfo => {
               // eligible_min/max 체크 (null이면 제한 없음)
               const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
@@ -759,11 +759,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           };
 
           const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
-          // 실무 역량 success: 온보딩 주차면 0 (강화율 계산에서 제외)
-          const competencySuccess = isOnboardingWeekLocal ? 0 : (competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0);
+          // 실무 역량 success (온보딩 주차도 정상 계산)
+          const competencySuccess = competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0;
           // 실무 경험 success: eligible한 모든 타입 중 강화 성공한 것만 카운트 (개설 여부 무관)
           const eligibleExperienceTypes: string[] = [];
-          if (!isOnboardingWeekLocal) {
+          {
             experienceInfos.forEach(typeInfo => {
               const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
               const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
@@ -779,7 +779,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               }
             });
           }
-          const experienceSuccess = isOnboardingWeekLocal ? 0 : eligibleExperienceTypes.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
+          const experienceSuccess = eligibleExperienceTypes.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
           setInfoStats({ total: infoTotal, success: infoSuccess });
@@ -1494,11 +1494,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const allActivityTypes = [...workInfoActivityTypes, ...workAbilityActivityTypes, ...workExpActivityTypes, ...workCareerActivityTypes];
 
   // 실무 역량: 유저가 완료한 활동 찾기 (is_completed = true인 것 중 첫 번째)
+  // activity_record가 있으면 weekly_activities.is_active 여부와 관계없이 표시
   const findFirstCompletedAbilityActivity = () => {
     for (const actType of workAbilityActivityTypes) {
-      const activity = weeklyActivities.find(a => a.activity_type_id === actType && a.is_active);
       const record = weekActivityRecords.find(ar => ar.activity_type_id === actType);
-      if (activity && record?.is_completed) return activity;
+      if (record?.is_completed) {
+        const activity = weeklyActivities.find(a => a.activity_type_id === actType);
+        if (activity) return activity;
+        // weekly_activities에 없어도 activity_types 정보로 대체
+        const typeInfo = activityTypesMap.get(actType);
+        if (typeInfo) return { activity_type_id: actType, title: typeInfo.name, is_active: false, week_id: weekId } as any;
+      }
     }
     return null;
   };
@@ -1515,9 +1521,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 실무 역량: 유저가 선택한(record가 있는) 활동 찾기
   const findFirstSelectedAbilityActivity = () => {
     for (const actType of workAbilityActivityTypes) {
-      const activity = weeklyActivities.find(a => a.activity_type_id === actType && a.is_active);
       const record = weekActivityRecords.find(ar => ar.activity_type_id === actType);
-      if (activity && record) return activity; // record가 있으면 유저가 선택한 것
+      if (record) {
+        const activity = weeklyActivities.find(a => a.activity_type_id === actType);
+        if (activity) return activity;
+        const typeInfo = activityTypesMap.get(actType);
+        if (typeInfo) return { activity_type_id: actType, title: typeInfo.name, is_active: false, week_id: weekId } as any;
+      }
     }
     return null;
   };
