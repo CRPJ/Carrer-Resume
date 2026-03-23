@@ -304,7 +304,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     id: `cr-demo-${index}`, project_id: `p-demo-${index}`, week_id: 'demo',
     company_name: company, company_logo_url: `/images/0/cluster4/icon/실무 경력/감독자${index % 2 === 0 ? '' : '2'}.${index % 2 === 0 ? 'jpg' : 'png'}`,
     job_position: `${company} 마케팅`, project_name: `${company} ${participated ? '마케팅 캠페인 기획 및 실행 프로젝트' : '해당 프로젝트'}`,
-    project_description: participated ? `${company}에서 진행한 마케팅 프로젝트의 상세 설명입니다` : null,
+    project_description: participated ? [
+      '짧은 설명',
+      '마케팅 캠페인 전략',
+      '소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석',
+      '브랜드 스토리텔링의 핵심 요소와 소비자 인식 변화에 대한 에세이 작성 및 결과물 정리 보고서 작성까지',
+      '퍼포먼스 마케팅 ROAS 분석',
+      `${company}에서 진행한 마케팅 프로젝트의 상세 설명입니다`,
+    ][index % 6] : null,
     line_code: `${String.fromCharCode(65 + (index % 26))}${String.fromCharCode(65 + ((index + 1) % 26))}${10 + index}-${10000 + index}`,
     line_name: `${company} 마케팅`, output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
     record_id: `r-demo-${index}`, user_id: 'u1', enhancement_status: status as CareerRecord['enhancement_status'],
@@ -350,8 +357,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const weekNum = parseInt(wId.replace(/\D/g, '')) || 0;
     const caseNum = weekNum % 10;
     return {
-      competencyParticipated: ![3, 6, 7, 10].includes(caseNum),
-      isRestWeek: caseNum === 7,
+      competencyParticipated: ![3, 0].includes(caseNum),
+      isRestWeek: [5, 7, 9].includes(caseNum),
       careerCase: caseNum,
     };
   };
@@ -386,7 +393,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [isSaving, setIsSaving] = useState(false);
 
   // activity_type_id별 파트 분류 (기본값 - DB에서 가져온 후 업데이트됨)
-  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
+  const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community', 'etc_a'];
   // competencyTypes, experienceTypes, careerTypes는 이제 state로 관리됨
 
   // 역할 라벨 매핑
@@ -851,7 +858,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           // 11. 파트별 강화 집계 계산
           // activity_type_id별 파트 분류 (DB에서 가져온 데이터 사용)
-          const infoTypesList = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
+          const infoTypesList = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community', 'etc_a'];
           const competencyTypesList = competencyIds.length > 0 ? competencyIds : [];
           const experienceTypesList = experienceIds.length > 0 ? experienceIds : [];
           const careerTypesList = careerIds.length > 0 ? careerIds : ['practical_project'];
@@ -1697,12 +1704,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     'calendar': { category: '캘린더', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
     'forum': { category: '포럼', tagColor: 'tag--green', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 포럼.png', isFruit: true },
     'session': { category: '세션', tagColor: 'tag--cyan', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 세션.png', isFruit: true },
-    'practical_lecture': { category: '실무특강', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: true },
-    'community': { category: '커뮤니티', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 캘린더.png', isFruit: true },
+    'practical_lecture': { category: '실무특강', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 실무특강.png', isFruit: true },
+    'community': { category: '커뮤니티', tagColor: 'tag--dark', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 커뮤니티.png', isFruit: true },
+    'etc_a': { category: '기타a', tagColor: 'tag--mint', icon: '/images/0/cluster4/icon/실무 정보/실무 정보 - 기타a.png', isFruit: true },
   };
 
   // 실무 정보에 해당하는 activity types
-  const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'practical_lecture', 'community'];
+  const workInfoActivityTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'practical_lecture', 'community', 'etc_a'];
   // 실무 역량 activity types - DB에서 가져온 practical_competency 클러스터
   const workAbilityActivityTypes = competencyTypeIds;
   // 실무 경험 activity types - DB에서 가져온 practical_experience 클러스터
@@ -2049,7 +2057,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return { total, success };
     };
 
-    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community'];
+    const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'practical_lecture', 'community', 'etc_a'];
     // 온보딩 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
     if (isOnboardingWeek) {
       setInfoStats({ total: 0, success: 0 });
@@ -2160,8 +2168,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         outputLinks: mergedOutputLinks,
       };
     }),
-    // 빈 카드 1개 (8개 데이터 + 1개 보이드 = 9개, 3×3)
-    { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
   // 휴식 모드일 때 실무 정보 카드 전부 '해당 없음' + 보이드
@@ -2186,7 +2192,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             outputLinks: [],
           };
         }),
-        { id: 9, activityType: '', title: '', subTitle: '', verified: false, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
       ]
     : workInfoCards;
 
@@ -3102,7 +3107,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <p className="main-desc-white" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{isEmpty ? '-' : (() => { const text = card.title || '-'; return text.length > 100 ? text.slice(0, 100) + '...' : text; })()}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
-                    <span className="sub-label">Subtitle</span>
+                    <span className="sub-label">Sub Title</span>
                   </div>
                   <span className="sub-desc">{isEmpty ? '-' : (() => { const text = card.projectDescription || '-'; return text.length > 70 ? text.slice(0, 70) + '...' : text; })()}</span>
                   {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
