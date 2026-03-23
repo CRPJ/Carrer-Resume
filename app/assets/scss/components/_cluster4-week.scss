@@ -4065,7 +4065,7 @@
   }
 
   .section-modal {
-    width: 794px;
+    width: 680px;
     max-width: 95vw;
     height: auto;
     max-height: 964px;
@@ -4077,23 +4077,23 @@
     flex-direction: column;
 
     &.section-modal-wide {
-      width: 794px;
+      width: 680px;
     }
 
     &.section-modal-work-edit {
-      width: 794px;
+      width: 680px;
       height: auto;
       max-height: 964px;
     }
 
     &.section-modal-colleague-edit {
-      width: 794px;
+      width: 680px;
       height: auto;
       max-height: 529px;
     }
 
     &.section-modal-reputation-form {
-      width: 794px;
+      width: 680px;
       height: auto;
       max-height: 529px;
       max-height: 448px;
@@ -5010,7 +5010,7 @@
 
     // 주차 평판 상세보기 모달
     &.reputation-view-modal {
-      width: 794px;
+      width: 680px;
       height: auto;
       max-height: 529px;
 
@@ -5267,7 +5267,7 @@
 
     // 연계 동료 상세보기 모달
     &.colleague-view-modal {
-      width: 794px;
+      width: 680px;
       min-height: 364px;
       height: auto;
       max-width: 95vw;
@@ -5472,7 +5472,7 @@
 
     // 실무 정보/역량/경험/경력 상세보기 모달
     &.work-view-modal {
-      width: 794px;
+      width: 680px;
       height: auto;
       max-width: 95vw;
       max-height: 964px;
