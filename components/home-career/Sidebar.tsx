@@ -214,6 +214,16 @@ const Sidebar = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    if (isEditModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isEditModalOpen]);
   const [isSaving, setIsSaving] = useState(false);
 
   // 실제 유저 프로필 데이터
@@ -2093,7 +2103,7 @@ const Sidebar = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

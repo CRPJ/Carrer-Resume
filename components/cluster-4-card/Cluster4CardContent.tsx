@@ -1312,6 +1312,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workCareerViewModalOpen, setWorkCareerViewModalOpen] = useState(false);
   const [selectedWorkCareerCard, setSelectedWorkCareerCard] = useState<any>(null);
 
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    const anyOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
+    if (anyOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [workInfoModalOpen, workAbilityModalOpen, workExpModalOpen, workCareerModalOpen, headerModalOpen, reputationViewModalOpen, colleagueViewModalOpen, workInfoViewModalOpen, workAbilityViewModalOpen, workExpViewModalOpen, workCareerViewModalOpen]);
+
   // 동료 삭제 함수
   const removeColleague = (id: number) => {
     setSelectedColleagues(prev => prev.filter(c => c.id !== id));

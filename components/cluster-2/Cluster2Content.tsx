@@ -815,6 +815,17 @@ const Cluster2Content = () => {
   const [isEditingIntro, setIsEditingIntro] = useState(false);
   const [editingIntroData, setEditingIntroData] = useState({ content: '' });
   const [introSaving, setIntroSaving] = useState(false);
+
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    const anyOpen = section1ModalOpen || section2ModalOpen || section21ModalOpen || section3ModalOpen || section4ModalOpen || introModalOpen;
+    if (anyOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [section1ModalOpen, section2ModalOpen, section21ModalOpen, section3ModalOpen, section4ModalOpen, introModalOpen]);
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     '', // Total Complete (cluving_review_link)
     '', // 3 weeks

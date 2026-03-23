@@ -324,6 +324,17 @@ const Cluster4Content = () => {
   const [seasonReviewError, setSeasonReviewError] = useState<string | null>(null);
   const [seasonReviewSuccess, setSeasonReviewSuccess] = useState(false);
 
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    const anyOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen;
+    if (anyOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [seasonReputationModalOpen, reputationDetailModalOpen, seasonReviewModalOpen]);
+
   // 활동 통계 (주차 성장률)
   const [activityStats, setActivityStats] = useState<{
     info: { total: number; success: number };

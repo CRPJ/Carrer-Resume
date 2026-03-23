@@ -1587,6 +1587,12 @@ svg {
   }
 }
 
+// 8. 모달 오버레이 투명도 통일
+[class*="modal-overlay"] {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(4px);
+}
+
 /* ====
  --------- (2.04) global modal styles end ---------
  ==== */
