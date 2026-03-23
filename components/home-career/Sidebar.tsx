@@ -982,6 +982,11 @@ const Sidebar = () => {
 
   // 프로필 수정 버튼 클릭 핸들러
   const handleEditButtonClick = async () => {
+    if (demoMode) {
+      setIsEditModalOpen(true);
+      return;
+    }
+
     if (!session) {
       alert("로그인이 필요합니다.");
       return;
@@ -1034,6 +1039,12 @@ const Sidebar = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (demoMode) {
+      alert("저장되었습니다.");
+      setIsEditModalOpen(false);
+      return;
+    }
 
     const missingFields = validateForm();
 
@@ -1465,7 +1476,7 @@ const Sidebar = () => {
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
           {(
             <button
-              onClick={isOwner ? handleEditButtonClick : undefined}
+              onClick={(isOwner || demoMode) ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
                 top: "6px",
@@ -1478,11 +1489,11 @@ const Sidebar = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                cursor: isOwner ? "pointer" : "not-allowed",
+                cursor: (isOwner || demoMode) ? "pointer" : "not-allowed",
                 zIndex: 20,
                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                 padding: 0,
-                opacity: isOwner ? 1 : 0.4,
+                opacity: (isOwner || demoMode) ? 1 : 0.4,
               }}
             >
               <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#000" }}></i>

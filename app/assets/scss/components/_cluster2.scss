@@ -3178,10 +3178,10 @@
   }
 
   .section4-modal {
-    width: 501px;
-    height: 758px;
-    max-width: 90vw;
-    max-height: min(90vh, 758px);
+    width: 562px;
+    height: auto;
+    max-width: 95vw;
+    max-height: min(90vh, 826px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     overflow: hidden;
@@ -3393,10 +3393,10 @@
   }
 
   .intro-modal {
-    width: 600px;
-    max-width: 90vw;
-    height: min(85vh, 750px); // 상세보기/수정 모달 크기 통일: max-height → height
-    max-height: min(85vh, 750px);
+    width: 562px;
+    max-width: 95vw;
+    height: auto;
+    max-height: min(90vh, 826px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -4654,9 +4654,9 @@
     background: #0d0d0d;
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 523px;
-    height: 926px;
-    max-height: min(90vh, 926px);
+    width: 562px;
+    height: auto;
+    max-height: min(90vh, 826px);
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -5067,9 +5067,9 @@
     background: #0d0d0d;
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 683px;
-    height: 1210px;
-    max-height: min(90vh, 1210px);
+    width: 562px;
+    height: auto;
+    max-height: min(90vh, 826px);
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
