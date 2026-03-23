@@ -1628,6 +1628,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 데이터 (API 데이터 기반)
   const colleagueData = useMemo(() => {
+    // 휴식 모드일 때 빈 카드 3개 반환
+    if (isRestMode) {
+      return Array.from({ length: 3 }, (_, i) => ({
+        id: `empty-colleague-${i}` as any,
+        name: "-",
+        gender: "-",
+        age: "-",
+        profileImg: "",
+        university: "-",
+        major: "-",
+        team: "-",
+        part: "-",
+        nickname: "-",
+        date: "-",
+        message: "",
+        isEmpty: true,
+      }));
+    }
+
     // API에서 가져온 selectedColleagues를 UI 형식으로 변환
     const apiData = selectedColleagues.length > 0
       ? selectedColleagues.map((c) => ({
@@ -1668,7 +1687,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     return result.slice(0, 3); // 최대 3개만 반환
-  }, [selectedColleagues]);
+  }, [selectedColleagues, isRestMode]);
 
   // 실무 정보 activity_type_id → UI 매핑
   const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
@@ -2145,6 +2164,32 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { id: 9, activityType: '', title: '', subTitle: '', verified: true, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
   ];
 
+  // 휴식 모드일 때 실무 정보 카드 전부 '해당 없음' + 보이드
+  const effectiveWorkInfoCards = isRestMode
+    ? [
+        ...workInfoActivityTypes.map((activityType, index) => {
+          const config = activityTypeConfig[activityType];
+          return {
+            id: index + 1,
+            activityType,
+            title: '-',
+            subTitle: '',
+            verified: false,
+            category: config?.category || activityType,
+            tagColor: config?.tagColor || '',
+            status: 'not_applicable' as EnhancementStatus,
+            statusIcon: enhancementStatusIcons['not_applicable'],
+            icon: config?.icon || '',
+            isFruit: config?.isFruit || false,
+            isFailed: false,
+            isEmpty: false,
+            outputLinks: [],
+          };
+        }),
+        { id: 9, activityType: '', title: '', subTitle: '', verified: false, category: '', tagColor: '', status: 'not_applicable' as EnhancementStatus, statusIcon: '', icon: '', isFruit: false, isFailed: false, isEmpty: true, outputLinks: [] },
+      ]
+    : workInfoCards;
+
   // 실무 경험 카드 데이터 (동적 생성 + 빈 카드)
   const workExpCards = [
     ...workExpActivityTypes.map((activityTypeId, index) => {
@@ -2175,6 +2220,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       };
     }),
   ];
+
+  // 휴식 모드일 때 실무 경험 카드 — 강화실패 + Main=activity_type name + Sub=보이드
+  const effectiveWorkExpCards = isRestMode
+    ? workExpCards.map(card => ({
+        ...card,
+        title: card.badge || '-',  // Main Title = activity_type name
+        hasActivity: false,
+        enhancementStatus: 'failed' as EnhancementStatus,
+        isFailed: true,
+      }))
+    : workExpCards;
 
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)
   const workCareerCards = careerRecords.length > 0
@@ -2257,10 +2313,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     secondaryInfoDeadline: null as string | null,
   });
 
+  // 휴식 모드일 때 실무 경력 카드 전부 '해당 없음'으로 강제
+  const effectiveWorkCareerCards = isRestMode
+    ? workCareerCards.map(card => ({
+        ...card,
+        statusBadge: '/images/0/cluster4/icon/8 해당 없음.png',
+        isNotApplicable: true,
+        isFailed: false,
+        verified: false,
+      }))
+    : workCareerCards;
+
   // 참여한 카드(a)를 앞으로, 해당 없음 카드(b)를 뒤로 정렬
-  const sortedWorkCareerCards = [...workCareerCards].sort((a, b) => {
-    if (a.isNotApplicable === b.isNotApplicable) return 0;
-    return a.isNotApplicable ? 1 : -1;
+  const sortedWorkCareerCards = [...effectiveWorkCareerCards].sort((a, b) => {
+    if (a.isNotApplicable !== b.isNotApplicable) {
+      return a.isNotApplicable ? 1 : -1;
+    }
+    const nameA = (a.badge || '').trim();
+    const nameB = (b.badge || '').trim();
+    return nameA.localeCompare(nameB, 'ko', { sensitivity: 'base' });
   });
 
   // 데이터 수만큼만 표시, 0개면 빈 카드 1개만
@@ -2660,7 +2731,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-info-cards">
-            {workInfoCards.map((card) => {
+            {effectiveWorkInfoCards.map((card) => {
               const isEmpty = card.isEmpty;
               return (
               <div
@@ -2750,9 +2821,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             // 유저가 완료한 활동 또는 선택한(record가 있는) 활동 찾기
             const completedActivity = findFirstCompletedAbilityActivity();
             const selectedActivity = findFirstSelectedAbilityActivity(); // 유저가 선택한 활동 (record 있음)
-            const displayActivity = completedActivity || selectedActivity; // 완료했거나 선택한 활동만 표시
+            const displayActivity = isRestMode ? null : (completedActivity || selectedActivity); // 휴식 모드일 때 활동 없음 처리
             const activityTypeInfo = displayActivity ? getActivityTypeInfo(displayActivity.activity_type_id) : null;
-            const enhancementStatus = displayActivity ? getEnhancementStatus(displayActivity.activity_type_id) : 'not_applicable';
+            const enhancementStatus = isRestMode ? 'failed' as EnhancementStatus : (displayActivity ? getEnhancementStatus(displayActivity.activity_type_id) : 'not_applicable');
             const hasActivity = !!displayActivity; // 유저가 선택한 활동이 있는지
             const hasCompletedActivity = !!completedActivity; // 완료된 활동이 있는지 여부
 
@@ -2860,7 +2931,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-exp-cards">
-            {workExpCards.map((card, cardIndex) => {
+            {effectiveWorkExpCards.map((card, cardIndex) => {
               const isEmpty = card.isEmpty;
               const expActivityType = workExpActivityTypes[cardIndex];
               return (

@@ -78,6 +78,7 @@
   position: relative;
   // overflow-x: hidden → clip 변경: hidden은 overflow-y를 auto로 강제하여 내부 스크롤 발생
   overflow-x: clip;
+  overflow-y: visible;
 
   // 탭 영역 wrapper (1330x105)
   .top-tabs-wrapper {
@@ -1992,6 +1993,7 @@
     padding-top: 50px;
     margin-top: 25px;
     position: relative;
+    overflow: visible;
 
     .floating-icons {
       top: 14px;
