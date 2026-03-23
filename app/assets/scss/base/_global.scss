@@ -1453,8 +1453,8 @@ svg {
 
   h3 {
     color: #FAAB07 !important;
-    font-family: 'Cafe24Ohsquare', sans-serif !important;
-    font-size: 16px !important;
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 21px !important;
     font-weight: 400 !important;
     line-height: 34px !important;
     word-wrap: break-word;
@@ -1463,7 +1463,7 @@ svg {
   .modal-subtitle {
     color: #fff !important;
     font-family: 'Pretendard', sans-serif !important;
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 30px !important;
     word-wrap: break-word;
@@ -1561,18 +1561,24 @@ svg {
 .intro-modal-body,
 .edit-modal-body,
 .modal-body {
+  scrollbar-width: thin !important;
+  scrollbar-color: #FFA500 #252836 !important;
+  overflow-y: scroll !important;
+
   &::-webkit-scrollbar {
-    width: 6px !important;
+    width: 3px !important;
+    display: block !important;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(236, 187, 2, 1) !important;
-    border-radius: 4px !important;
+    background: #FFA500 !important;
+    border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background: rgba(236, 187, 2, 0.8) !important;
+    background: #22c55e !important;
   }
   &::-webkit-scrollbar-track {
-    background: transparent !important;
+    background: #252836 !important;
+    border-radius: 2px;
   }
   &::-webkit-scrollbar-button {
     display: none !important;
