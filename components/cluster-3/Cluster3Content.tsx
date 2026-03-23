@@ -235,24 +235,15 @@ const Cluster3Content = () => {
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
   const [section5ModalOpen, setSection5ModalOpen] = useState(false);
 
-  // 모달 열릴 때 배경 스크롤 잠금 (스크롤 위치 보존)
+  // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
     const anyOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
     if (anyOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
       document.body.style.overflow = '';
-      if (scrollY) window.scrollTo(0, parseInt(scrollY) * -1);
     }
-    return () => { document.body.style.position = ''; document.body.style.top = ''; document.body.style.width = ''; document.body.style.overflow = ''; };
+    return () => { document.body.style.overflow = ''; };
   }, [section3ModalOpen, section4ModalOpen, section5ModalOpen]);
 
   // 링크 데이터 관리 (카드 데이터에서 초기화)

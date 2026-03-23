@@ -1312,24 +1312,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workCareerViewModalOpen, setWorkCareerViewModalOpen] = useState(false);
   const [selectedWorkCareerCard, setSelectedWorkCareerCard] = useState<any>(null);
 
-  // 모달 열릴 때 배경 스크롤 잠금 (스크롤 위치 보존)
+  // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
     const anyOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
     if (anyOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
       document.body.style.overflow = '';
-      if (scrollY) window.scrollTo(0, parseInt(scrollY) * -1);
     }
-    return () => { document.body.style.position = ''; document.body.style.top = ''; document.body.style.width = ''; document.body.style.overflow = ''; };
+    return () => { document.body.style.overflow = ''; };
   }, [workInfoModalOpen, workAbilityModalOpen, workExpModalOpen, workCareerModalOpen, headerModalOpen, reputationViewModalOpen, colleagueViewModalOpen, workInfoViewModalOpen, workAbilityViewModalOpen, workExpViewModalOpen, workCareerViewModalOpen]);
 
   // 동료 삭제 함수
@@ -4251,11 +4242,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 키워드 */}
                   <div className="form-field">
                     <label>
-                      키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(1개 선택, 총 {reputationKeywords.length}개)</span>
+                      키워드 <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>(최대 7자)</span>
                     </label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '16px', fontWeight: 700, color: '#FFA500', minWidth: '24px' }}>#</span>
-                      <select
+                      <input
+                        type="text"
+                        placeholder="키워드를 입력하세요"
+                        maxLength={7}
                         value={reputationEditData.keyword}
                         onChange={(e) => setReputationEditData(prev => ({ ...prev, keyword: e.target.value }))}
                         style={{
@@ -4268,28 +4262,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           borderRadius: '0',
                           color: '#fff',
                           fontSize: '14px',
-                          cursor: 'pointer',
                           outline: 'none',
                         }}
-                      >
-                        <option value="">키워드를 선택해주세요</option>
-                        {reputationKeywords.length === 0 ? (
-                          <option value="" disabled>키워드 로딩 중...</option>
-                        ) : (
-                          [1, 2, 3, 4, 5].map(clusterNum => {
-                            const clusterKeywords = reputationKeywords.filter(k => k.cluster_number === clusterNum);
-                            if (clusterKeywords.length === 0) return null;
-                            const clusterInfo = clusterKeywords[0];
-                            return (
-                              <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
-                                {clusterKeywords.map(k => (
-                                  <option key={k.id} value={k.keyword}>{k.keyword}</option>
-                                ))}
-                              </optgroup>
-                            );
-                          })
-                        )}
-                      </select>
+                      />
                     </div>
                   </div>
                 </div>
