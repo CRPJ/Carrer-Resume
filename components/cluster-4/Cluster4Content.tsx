@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
@@ -2415,7 +2413,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Body */}
-            <SimpleBar className="edit-modal-body modal-simplebar" style={{ maxHeight: '350px', padding: "20px 24px" }} autoHide={false}>
+            <div className="edit-modal-body" style={{ padding: "20px 24px" }}>
               {/* 평점 */}
               <div style={{ marginBottom: "24px" }}>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>평점</label>
@@ -2538,7 +2536,7 @@ const Cluster4Content = () => {
                   </div>
                 </div>
               </div>
-            </SimpleBar>
+            </div>
 
             {/* Footer */}
             <div
@@ -2759,7 +2757,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Body */}
-            <SimpleBar className="edit-modal-body modal-simplebar" style={{ maxHeight: '350px', padding: "20px 24px" }} autoHide={false}>
+            <div className="edit-modal-body" style={{ padding: "20px 24px" }}>
               {/* 평점 선택 */}
               <div className="slogan-rating-row" style={{ marginBottom: "20px" }}>
                 <label className="slogan-rating-label" style={{ color: "#FAAB07", fontSize: "14px", fontWeight: 600 }}>
@@ -2861,7 +2859,7 @@ const Cluster4Content = () => {
                   }}
                 />
               </div>
-            </SimpleBar>
+            </div>
 
             {/* Footer */}
             <div className="edit-modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "12px", padding: "16px 24px", borderTop: "1px solid rgba(250, 171, 7, 0.2)", background: "rgba(0,0,0,0.2)" }}>

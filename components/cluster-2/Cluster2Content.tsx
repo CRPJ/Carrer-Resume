@@ -3,8 +3,6 @@
 // #ToDo 커리어넷 API 키 발급 후 전국 학교 목록 연동
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
@@ -2042,7 +2040,7 @@ const Cluster2Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <SimpleBar className="section1-modal-body modal-simplebar" style={{ maxHeight: '750px', position: 'relative' }} autoHide={false}>
+            <div className="section1-modal-body" style={{ position: 'relative' }}>
               {/* 로딩 오버레이 */}
               {photoLoading && (
                 <div style={{
@@ -2156,7 +2154,7 @@ const Cluster2Content = () => {
                   ))}
                 </div>
               </div>
-            </SimpleBar>
+            </div>
             <div className="section1-modal-footer">
               <button className="cancel-btn" onClick={() => setSection1ModalOpen(false)} disabled={photoSaving}>취소</button>
               <button className="save-btn" onClick={handleSavePhotos} disabled={photoSaving || photoLoading}>
@@ -2178,7 +2176,7 @@ const Cluster2Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <SimpleBar className="section2-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section2-modal-body">
               {/* 슬로건 1 */}
               <div className="slogan-edit-item">
                 <span className="slogan-label">슬로건 1</span>
@@ -2493,7 +2491,7 @@ const Cluster2Content = () => {
                   <span className="slogan-rating-value">{editingSloganData.slogan3.rating} / 10</span>
                 </div>
               </div>
-            </SimpleBar>
+            </div>
             <div className="section2-modal-footer">
               <button className="cancel-btn" onClick={() => setSection2ModalOpen(false)} disabled={sloganSaving}>취소</button>
               <button
@@ -2519,7 +2517,7 @@ const Cluster2Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <SimpleBar className="section21-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section21-modal-body">
               {editingVideoData.map((video, index) => (
                 <div key={video.id} className="video-edit-item">
                   <div className="video-edit-header">
@@ -2572,7 +2570,7 @@ const Cluster2Content = () => {
                   )}
                 </div>
               ))}
-            </SimpleBar>
+            </div>
             <div className="section21-modal-footer">
               <button className="cancel-btn" onClick={() => setSection21ModalOpen(false)} disabled={videoSaving}>취소</button>
               <button
@@ -2654,7 +2652,7 @@ const Cluster2Content = () => {
                 </button>
               </div>
             </div>
-            <SimpleBar className="intro-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="intro-modal-body">
               <div className="subtitle-section">
                 <p className="subtitle-text">{introCards[selectedIntroCard].subtitle}</p>
               </div>
@@ -2678,7 +2676,7 @@ const Cluster2Content = () => {
                   <p className="content-text">{introCards[selectedIntroCard].content}</p>
                 )}
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
@@ -2694,7 +2692,7 @@ const Cluster2Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <SimpleBar className="section4-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section4-modal-body">
               {/* Total Complete */}
               <div className="link-edit-item total">
                 <div className="link-item-header">
@@ -2731,7 +2729,7 @@ const Cluster2Content = () => {
                   />
                 </div>
               ))}
-            </SimpleBar>
+            </div>
             <div className="section4-modal-footer">
               <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)} disabled={reviewLinkSaving}>취소</button>
               <button
@@ -2806,7 +2804,7 @@ const Cluster2Content = () => {
                 </button>
               </div>
             </div>
-            <SimpleBar className="section3-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false} scrollableNodeProps={{ ref: modalBodyRef }}>
+            <div className="section3-modal-body" ref={modalBodyRef}>
               {editingEduData.map((edu, index) => (
                 <div key={index} className={`edu-edit-card ${edu.isFinal ? 'is-final' : ''}`}>
                   {/* 헤더: 번호 + 학력 선택 + 대표학력 버튼 */}
@@ -3542,7 +3540,7 @@ const Cluster2Content = () => {
                   </div>
                 </div>
               ))}
-            </SimpleBar>
+            </div>
             <div className="section3-modal-footer">
               <button
                 className="save-btn"

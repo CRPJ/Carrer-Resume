@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -3220,7 +3218,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <h3>실무 정보 편집</h3>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {workInfoCards.filter(card => !card.isEmpty).map((card, index) => (
                 <div key={card.id} className="modal-card-item modal-card-workinfo">
                   {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
@@ -3383,7 +3381,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
               ))}
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkInfoModalOpen(false)}>취소</button>
               <button className="save-btn" onClick={saveAllActivityDetails} disabled={isSaving}>
@@ -3401,7 +3399,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <h3>실무 역량 편집</h3>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {(() => {
                 const abilityActivity = findFirstAbilityActivity();
                 const abilityActivityTypeInfo = abilityActivity ? getActivityTypeInfo(abilityActivity.activity_type_id) : null;
@@ -3557,7 +3555,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
                 );
               })()}
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkAbilityModalOpen(false)}>취소</button>
               {(() => {
@@ -3593,7 +3591,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <h3>실무 경험 편집</h3>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {workExpCards.filter(card => !card.isEmpty).map((card, index) => (
                 <div key={card.id} className="modal-card-item modal-card-workinfo">
                   {/* 상단 헤더: 과일 아이콘 + 태그 + 강화 상태 뱃지 */}
@@ -3760,7 +3758,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
               ))}
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkExpModalOpen(false)}>취소</button>
               <button className="save-btn" onClick={async () => {
@@ -3790,7 +3788,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <h3>실무 경력 편집</h3>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {displayWorkCareerCards.filter(card => !card.isEmpty).map((card, index) => {
                 const statusText = card.verified ? '강화성공' : card.isFailed ? '강화실패' : '강화대기';
                 const statusClass = card.verified ? 'success' : card.isFailed ? 'failed' : 'pending';
@@ -3970,7 +3968,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               );
               })}
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setWorkCareerModalOpen(false)}>취소</button>
               <button className="save-btn" onClick={async () => {
@@ -4001,7 +3999,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <h3>연계 동료 편집</h3>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               <div className="modal-card-item modal-card-header-edit">
                 {/* 안내 문구 */}
                 <div className="header-edit-section colleague-guide">
@@ -4143,7 +4141,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
               </div>
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setColleagueSaveError(null); setColleagueSaveSuccess(false); }}>취소</button>
               <button
@@ -4164,7 +4162,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>주차 평판</h3>
               <span className="modal-subtitle">해당 크루에게 평판을 남겨주세요</span>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               <div className="modal-card-item modal-card-header-edit reputation-form-modal">
                 {/* 평판 작성 폼 */}
                 <div className="reputation-form">
@@ -4271,7 +4269,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
               </div>
-            </SimpleBar>
+            </div>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => { setHeaderModalOpen(false); setReputationSaveError(null); setReputationSaveSuccess(false); }}>취소</button>
               <button
@@ -4292,7 +4290,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>주차 평판</h3>
               <button className="modal-close-btn" onClick={() => setReputationViewModalOpen(false)}>×</button>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {/* 프로필 */}
               <div className="reputation-view-profile">
                 <div className="profile-image">
@@ -4343,7 +4341,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <span className={`tag ${selectedReputationCard.tagColor}`}>{selectedReputationCard.tagText}</span>
                 </div>
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
@@ -4356,7 +4354,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <h3>연계 동료</h3>
               <button className="modal-close-btn" onClick={() => setColleagueViewModalOpen(false)}>×</button>
             </div>
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {/* To. 뱃지 + 날짜 */}
               <div className="colleague-header-row">
                 <div className="colleague-to-badge">
@@ -4390,7 +4388,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="message-label">Thank you message</div>
                 <div className="message-content">{selectedColleagueCard.message}</div>
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
@@ -4454,7 +4452,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
             </div>
 
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4478,7 +4476,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   })}
                 </div>
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
@@ -4543,7 +4541,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
 
-              <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+              <div className="section-modal-body">
                 {/* Output Link */}
                 <div className="work-view-section">
                   <div className="section-label">Output Link</div>
@@ -4574,7 +4572,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     })()}
                   </div>
                 </div>
-              </SimpleBar>
+              </div>
             </div>
           </div>
         );
@@ -4643,7 +4641,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
             </div>
 
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4674,7 +4672,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   })()}
                 </div>
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
@@ -4737,7 +4735,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
             </div>
 
-            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
+            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -4769,7 +4767,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   })()}
                 </div>
               </div>
-            </SimpleBar>
+            </div>
           </div>
         </div>
       )}
