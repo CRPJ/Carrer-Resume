@@ -866,11 +866,14 @@
         }
 
         img {
-          box-shadow:
-            0 0 30px rgba(255, 215, 0, 0.9),
-            0 0 60px rgba(255, 165, 0, 0.7),
-            0 0 90px rgba(255, 200, 0, 0.5);
+          box-shadow: none;
         }
+      }
+
+      // 리본 박스(배경 PNG)에 금장 glow
+      .medal-text {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))
+                drop-shadow(0 0 16px rgba(255, 165, 0, 0.6));
       }
     }
 
@@ -924,7 +927,7 @@
       transition: width 0.3s ease;
 
       .medal-text-inner {
-        transform: rotate(-15deg);
+        transform: rotate(-20deg);
         display: inline-block;
       }
 
@@ -1271,6 +1274,12 @@
         position: relative;
         z-index: 10;
         margin-left: -5px;
+        overflow: visible;
+
+        img {
+          width: 69px !important;
+          height: 69px !important;
+        }
       }
 
       .notice-stamp-wrapper {
@@ -1286,6 +1295,12 @@
         align-items: center;
         justify-content: center;
         background: rgba(0, 0, 0, 0.6);
+        overflow: visible;
+
+        img {
+          width: 69px !important;
+          height: 69px !important;
+        }
 
         // 도장이 찍혀도 배경 사각형 유지
         &.stamped {
