@@ -6,6 +6,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 
 // 학력 데이터 타입
 interface EduData {
@@ -89,6 +90,7 @@ const Cluster2Content = () => {
 
   // 본인 프로필인지 확인: URL에 userId가 없거나, 로그인한 사용자 ID와 같으면 본인
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
+  const isDemoMode = checkDemoMode();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isWiggling, setIsWiggling] = useState(false);
@@ -256,6 +258,11 @@ const Cluster2Content = () => {
 
   // 사진 저장 함수
   const handleSavePhotos = async () => {
+    if (isDemoMode) {
+      alert('저장되었습니다.');
+      setSection1ModalOpen(false);
+      return;
+    }
     setPhotoSaving(true);
     try {
       const response = await fetch('/api/photos', {
@@ -453,6 +460,12 @@ const Cluster2Content = () => {
 
   // 슬로건 저장
   const handleSaveSlogans = async () => {
+    if (isDemoMode) {
+      setSloganData(editingSloganData);
+      alert('저장되었습니다.');
+      setSection2ModalOpen(false);
+      return;
+    }
     setSloganSaving(true);
     try {
       const response = await fetch('/api/slogans', {
@@ -594,6 +607,12 @@ const Cluster2Content = () => {
 
   // 영상 URL 저장
   const handleSaveVideos = async () => {
+    if (isDemoMode) {
+      setVideoData([...editingVideoData]);
+      alert('저장되었습니다.');
+      setSection21ModalOpen(false);
+      return;
+    }
     setVideoSaving(true);
     try {
       const response = await fetch('/api/videos', {
@@ -711,6 +730,12 @@ const Cluster2Content = () => {
 
   // 학력 저장 함수
   const handleSaveEducations = async (processedData: EduData[]) => {
+    if (isDemoMode) {
+      setEducationData(processedData);
+      alert('저장되었습니다.');
+      setSection3ModalOpen(false);
+      return;
+    }
     setEduSaving(true);
     try {
       const response = await fetch('/api/educations', {
@@ -881,6 +906,12 @@ const Cluster2Content = () => {
 
   // 자기소개서 저장
   const handleSaveIntroduction = async (cardIndex: number, content: string) => {
+    if (isDemoMode) {
+      setIntroductions(prev => ({ ...prev, [['growth_story', 'social_experience', 'career_direction', 'work_style', 'personal_story'][cardIndex]]: content }));
+      alert('저장되었습니다.');
+      setIntroModalOpen(false);
+      return;
+    }
     const fieldMapping = ['growth_story', 'social_experience', 'career_direction', 'work_style', 'personal_story'];
     const field = fieldMapping[cardIndex];
 
@@ -918,6 +949,12 @@ const Cluster2Content = () => {
 
   // 리뷰 링크 저장
   const handleSaveReviewLinks = async () => {
+    if (isDemoMode) {
+      setReviewLinks([...editingReviewLinks]);
+      alert('저장되었습니다.');
+      setSection4ModalOpen(false);
+      return;
+    }
     setReviewLinkSaving(true);
     try {
       const response = await fetch('/api/review-link', {
@@ -1202,7 +1239,7 @@ const Cluster2Content = () => {
             zIndex: 100,
             gap: '5px'
           }}>
-            <div className="edit-icon" style={{ cursor: isOwner ? 'pointer' : 'not-allowed', opacity: isOwner ? 1 : 0.4 }} onClick={isOwner ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
+            <div className="edit-icon" style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }} onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
                 <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF', pointerEvents: 'none' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1302,7 +1339,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1413,7 +1450,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1592,7 +1629,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1694,7 +1731,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={isOwner ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: isOwner ? 1 : 0.4, cursor: isOwner ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
             </div>
             <div className="edit-icon search-icon">

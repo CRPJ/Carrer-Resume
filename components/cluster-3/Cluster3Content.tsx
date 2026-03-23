@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -50,6 +51,7 @@ const Cluster3Content = () => {
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
+  const isDemoMode = checkDemoMode();
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -314,6 +316,13 @@ const Cluster3Content = () => {
 
   // 포트폴리오 아카이빙 저장 함수
   const savePortfolioArchives = async (links: string[], channels: string[]) => {
+    if (isDemoMode) {
+      setArchiveLinks(links);
+      setArchiveChannels(channels);
+      alert('저장되었습니다.');
+      setSection3ModalOpen(false);
+      return;
+    }
     setIsSavingArchives(true);
     try {
       const response = await fetch("/api/portfolio-archives", {
@@ -384,6 +393,13 @@ const Cluster3Content = () => {
 
   // 포트폴리오 Output 저장 함수
   const savePortfolioOutputs = async (links: string[], channels: string[]) => {
+    if (isDemoMode) {
+      setOutputLinks(links);
+      setOutputChannels(channels);
+      alert('저장되었습니다.');
+      setSection4ModalOpen(false);
+      return;
+    }
     setIsSavingOutputs(true);
     try {
       const response = await fetch("/api/portfolio-outputs", {
@@ -452,6 +468,13 @@ const Cluster3Content = () => {
 
   // Detail 10 저장 함수
   const savePortfolioDetails = async (links: string[], channels: string[]) => {
+    if (isDemoMode) {
+      setDetailLinks(links);
+      setDetailChannels(channels);
+      alert('저장되었습니다.');
+      setSection5ModalOpen(false);
+      return;
+    }
     setIsSavingDetails(true);
     try {
       const response = await fetch("/api/portfolio-details", {
@@ -1081,9 +1104,9 @@ const Cluster3Content = () => {
         <div className="floating-icons" style={{ display: "flex" }}>
           <div
             className="edit-icon"
-            style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+            style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
             onClick={
-              isOwner
+              (isOwner || isDemoMode)
                 ? () => {
                     // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                     const paired = portfolioArchives.map((link, i) => ({ link, channel: portfolioArchiveChannels[i] || "" }));
@@ -1194,9 +1217,9 @@ const Cluster3Content = () => {
         <div className="floating-icons" style={{ display: "flex" }}>
           <div
             className="edit-icon"
-            style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+            style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
             onClick={
-              isOwner
+              (isOwner || isDemoMode)
                 ? () => {
                     // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                     const paired = portfolioOutputs.map((link, i) => ({ link, channel: portfolioOutputChannels[i] || "" }));
@@ -1307,9 +1330,9 @@ const Cluster3Content = () => {
           <div className="floating-icons" style={{ display: "flex" }}>
             <div
               className="edit-icon"
-              style={{ cursor: isOwner ? "pointer" : "not-allowed", opacity: isOwner ? 1 : 0.4 }}
+              style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
               onClick={
-                isOwner
+                (isOwner || isDemoMode)
                   ? () => {
                       // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                       const paired = portfolioDetails.map((link, i) => ({ link, channel: portfolioDetailChannels[i] || "" }));
