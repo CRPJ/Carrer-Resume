@@ -3095,6 +3095,48 @@
                 background: #CCC;
                 border-radius: 0;
               }
+
+              &.failed {
+                position: relative;
+
+                > img {
+                  opacity: 0.3;
+                }
+
+                .failed-overlay {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
+                  gap: 2px;
+                  z-index: 2;
+                  overflow: hidden;
+                  max-width: 100%;
+
+                  .failed-text {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #FF0D0D;
+                    font-family: 'Pretendard', sans-serif;
+                    white-space: normal;
+                    word-break: keep-all;
+                    line-height: 1.3;
+                    text-align: center;
+                    max-width: 100%;
+                  }
+
+                  .failed-emoji {
+                    font-size: 16px;
+                    margin-top: 2px;
+                    display: block;
+                  }
+                }
+              }
             }
 
             .card-header-area {

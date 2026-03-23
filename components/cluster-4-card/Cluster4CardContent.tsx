@@ -2987,9 +2987,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 style={{ cursor: isEmpty ? 'default' : 'pointer' }}
               >
                 <div className="card-top-row">
-                  <div className="card-icon-area">
-                    {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
-                    {!isRestMode && !card.hasActivity && !isEmpty && (
+                  <div className={`card-icon-area ${!isEmpty && card.enhancementStatus === 'failed' ? 'failed' : ''}`}>
+                    {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.enhancementStatus === 'failed' ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
+                    {!isRestMode && !isEmpty && (!card.hasActivity || card.enhancementStatus === 'failed') && (
                       <div className="failed-overlay">
                         <span className="failed-text">강화 실패</span>
                         <span className="failed-emoji">😿</span>
