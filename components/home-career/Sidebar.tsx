@@ -2163,7 +2163,7 @@ const Sidebar = () => {
 
               <form onSubmit={handleSubmit}>
               {/* 모달 본문 */}
-              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px" }}>
+              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px", overflowY: "scroll" }}>
                 {/* 성 & 이름 - 일렬 배치 */}
                 <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                   {/* 성 */}
@@ -2351,14 +2351,18 @@ const Sidebar = () => {
                   }
                   .edit-modal-body::-webkit-scrollbar-track {
                     background: #252836;
-                    border-radius: 4px;
+                    border-radius: 2px;
                   }
                   .edit-modal-body::-webkit-scrollbar-thumb {
                     background: #FFA500;
-                    border-radius: 4px;
+                    border-radius: 2px;
                   }
                   .edit-modal-body::-webkit-scrollbar-thumb:hover {
                     background: #22c55e;
+                  }
+                  .edit-modal-body::-webkit-scrollbar-button {
+                    display: none;
+                    height: 0;
                   }
                   .custom-dropdown-list::-webkit-scrollbar {
                     width: 6px;
