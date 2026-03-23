@@ -3395,7 +3395,8 @@
   .intro-modal {
     width: 562px;
     max-width: 95vw;
-    height: auto;
+    height: 826px;
+    min-height: 826px;
     max-height: min(90vh, 826px);
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
@@ -3606,10 +3607,17 @@
 
     .intro-modal-body {
       flex: 1;
-      overflow-y: auto;
+      overflow-y: scroll;
       padding: 24px;
       display: flex;
       flex-direction: column;
+
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      scrollbar-width: thin;
+      scrollbar-color: #FFA500 #252836;
 
       .subtitle-section {
         margin-bottom: 20px;
