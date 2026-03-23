@@ -363,6 +363,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
   };
 
+  // 데모 모드 — 주차별 활동 레코드 (역량/경험 강화실패 분산)
+  const getDemoActivityRecords = (wId: string): ActivityRecord[] => {
+    const weekNum = parseInt(wId.replace(/\D/g, '')) || 0;
+    const caseNum = weekNum % 10;
+    const infoTypes = ['wisdom', 'essay', 'infodesk', 'calendar', 'forum', 'session', 'practical_lecture', 'community', 'etc_a'];
+
+    // 실무 정보 레코드 — 전 주차 공통 (기본 is_completed: true)
+    const infoRecords: ActivityRecord[] = infoTypes.map(t => ({ week_id: wId, activity_type_id: t, is_completed: true }));
+
+    // 실무 역량 — 주차별 분기
+    const compCompleted = (() => {
+      if ([3, 0].includes(caseNum)) return false;  // 미참여 → 강화 실패
+      if ([6].includes(caseNum)) return false;       // 참여했지만 강화 실패
+      return true;
+    })();
+    const compRecord: ActivityRecord = { week_id: wId, activity_type_id: 'comp-1', is_completed: compCompleted };
+
+    // 실무 경험 — 주차별 분기
+    const expStatuses: boolean[] = (() => {
+      if ([3, 0].includes(caseNum)) return [false, false, false, false]; // 전부 실패
+      if ([2].includes(caseNum)) return [true, true, false, false];      // 일부 성공, 일부 실패
+      if ([6].includes(caseNum)) return [true, false, true, false];      // 일부 대기, 일부 실패
+      return [true, true, true, true];                                    // 전부 성공
+    })();
+    const expRecords: ActivityRecord[] = ['exp-1', 'exp-2', 'exp-3', 'exp-4'].map((t, i) => ({
+      week_id: wId, activity_type_id: t, is_completed: expStatuses[i] ?? true,
+    }));
+
+    return [...infoRecords, compRecord, ...expRecords];
+  };
+
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
     {
       id: 'cr-1', project_id: 'p1', week_id: 'w1', company_name: '우아한형제들', company_logo_url: '/images/0/naver webtoon.png', job_position: '서비스기획팀', project_name: '배달의민족 브랜드 바이럴 마케팅 캠페인 기획 및 실행', project_description: '소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석', line_code: 'AA22-11111', line_name: '마케팅(바이럴)', output_links: [], secondary_info_deadline: null, created_at: '2025-12-22T00:00:00Z',
@@ -532,6 +563,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 데모 모드 실무 경력 더미 데이터
       setCareerRecords(getDemoCareerRecords(weekId));
       setCareerPage(0);
+
+      // 데모 모드 활동 레코드 (역량/경험 강화실패 분산)
+      setWeekActivityRecords(getDemoActivityRecords(weekId));
 
       // 이전/다음 주차 ID 설정 (내림차순: index-1 = 더 최근(다음), index+1 = 더 과거(이전))
       const weekIndex = DUMMY_WEEKLY_LIST.findIndex(w => w.id === weekId);
