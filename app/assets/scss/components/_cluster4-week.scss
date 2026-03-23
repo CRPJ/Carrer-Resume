@@ -4240,6 +4240,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: nowrap;
             margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -4248,6 +4249,9 @@
               display: flex;
               align-items: center;
               gap: 8px;
+              flex-wrap: nowrap;
+              min-width: 0;
+              overflow: hidden;
 
               .modal-fruit-icon {
                 width: 64px;
@@ -4357,6 +4361,8 @@
               display: flex;
               align-items: center;
               gap: 12px;
+              flex-shrink: 0;
+              white-space: nowrap;
 
               .modal-date-badge {
                 background: rgba(255, 255, 255, 0.2);
@@ -5534,9 +5540,10 @@
         .work-view-left {
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 8px;
           flex-wrap: nowrap;
           min-width: 0;
+          overflow: hidden;
 
           .work-icon-box {
             width: 80px;
@@ -5566,6 +5573,10 @@
             color: #fff;
             font-family: 'Pretendard', sans-serif;
             white-space: nowrap;
+            flex-shrink: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .code-badge {
@@ -5585,6 +5596,7 @@
         .work-view-right {
           flex-shrink: 0;
           white-space: nowrap;
+          margin-left: 12px;
           .status-badge {
             display: flex;
             flex-direction: row-reverse;

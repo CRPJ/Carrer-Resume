@@ -3610,7 +3610,8 @@
 
     .intro-modal-body {
       flex: 1;
-      overflow-y: scroll;
+      min-height: 0;
+      overflow-y: scroll !important;
       padding: 24px;
       display: flex;
       flex-direction: column;
