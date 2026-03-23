@@ -2487,92 +2487,52 @@ const Cluster4Content = () => {
               {/* 키워드 */}
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>
-                  키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(2개 선택, 총 {reputationKeywords.length}개)</span>
+                  키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 2개, 각 7자)</span>
                 </label>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FAAB07", minWidth: "20px" }}>#</span>
-                    <select
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
+                    <input
+                      type="text"
+                      placeholder="키워드를 입력하세요"
+                      maxLength={7}
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword1: e.target.value }))}
                       style={{
                         display: "block",
                         width: "100%",
-                        height: "44px",
-                        padding: "0 10px",
+                        height: "48px",
+                        padding: "12px 14px",
                         background: "#1a1f2e",
-                        border: "2px solid #FAAB07",
-                        borderRadius: "8px",
+                        border: "1px solid #FFA500",
+                        borderRadius: "0",
                         color: "#fff",
-                        fontSize: "13px",
-                        cursor: "pointer",
+                        fontSize: "14px",
                         outline: "none",
                       }}
-                    >
-                      <option value="">키워드 1 선택</option>
-                      {reputationKeywords.length === 0 ? (
-                        <option value="" disabled>
-                          키워드 로딩 중...
-                        </option>
-                      ) : (
-                        [1, 2, 3, 4, 5].map((clusterNum) => {
-                          const clusterKeywords = reputationKeywords.filter((k) => k.cluster_number === clusterNum);
-                          if (clusterKeywords.length === 0) return null;
-                          const clusterInfo = clusterKeywords[0];
-                          return (
-                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
-                              {clusterKeywords.map((k) => (
-                                <option key={k.id} value={k.keyword} disabled={k.keyword === seasonReputationEditData.keyword2}>
-                                  {k.keyword}
-                                </option>
-                              ))}
-                            </optgroup>
-                          );
-                        })
-                      )}
-                    </select>
+                    />
                   </div>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FAAB07", minWidth: "20px" }}>#</span>
-                    <select
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
+                    <input
+                      type="text"
+                      placeholder="키워드를 입력하세요"
+                      maxLength={7}
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }))}
                       style={{
                         display: "block",
                         width: "100%",
-                        height: "44px",
-                        padding: "0 10px",
+                        height: "48px",
+                        padding: "12px 14px",
                         background: "#1a1f2e",
-                        border: "2px solid #FAAB07",
-                        borderRadius: "8px",
+                        border: "1px solid #FFA500",
+                        borderRadius: "0",
                         color: "#fff",
-                        fontSize: "13px",
-                        cursor: "pointer",
+                        fontSize: "14px",
                         outline: "none",
                       }}
-                    >
-                      <option value="">키워드 2 선택</option>
-                      {reputationKeywords.length === 0 ? (
-                        <option value="" disabled>
-                          키워드 로딩 중...
-                        </option>
-                      ) : (
-                        [1, 2, 3, 4, 5].map((clusterNum) => {
-                          const clusterKeywords = reputationKeywords.filter((k) => k.cluster_number === clusterNum);
-                          if (clusterKeywords.length === 0) return null;
-                          const clusterInfo = clusterKeywords[0];
-                          return (
-                            <optgroup key={clusterNum} label={`${clusterNum}. ${clusterInfo.cluster_name}`}>
-                              {clusterKeywords.map((k) => (
-                                <option key={k.id} value={k.keyword} disabled={k.keyword === seasonReputationEditData.keyword1}>
-                                  {k.keyword}
-                                </option>
-                              ))}
-                            </optgroup>
-                          );
-                        })
-                      )}
-                    </select>
+                    />
                   </div>
                 </div>
               </div>
