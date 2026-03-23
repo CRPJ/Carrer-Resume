@@ -1312,15 +1312,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workCareerViewModalOpen, setWorkCareerViewModalOpen] = useState(false);
   const [selectedWorkCareerCard, setSelectedWorkCareerCard] = useState<any>(null);
 
-  // 모달 열릴 때 배경 스크롤 잠금
+  // 모달 열릴 때 배경 스크롤 잠금 (스크롤 위치 보존)
   useEffect(() => {
     const anyOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
     if (anyOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
+      if (scrollY) window.scrollTo(0, parseInt(scrollY) * -1);
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => { document.body.style.position = ''; document.body.style.top = ''; document.body.style.width = ''; document.body.style.overflow = ''; };
   }, [workInfoModalOpen, workAbilityModalOpen, workExpModalOpen, workCareerModalOpen, headerModalOpen, reputationViewModalOpen, colleagueViewModalOpen, workInfoViewModalOpen, workAbilityViewModalOpen, workExpViewModalOpen, workCareerViewModalOpen]);
 
   // 동료 삭제 함수

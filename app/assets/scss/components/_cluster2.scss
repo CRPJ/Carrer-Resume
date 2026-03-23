@@ -3197,6 +3197,7 @@
       padding: 20px 24px;
       border-bottom: 1px solid rgba(255, 165, 0, 0.2);
       background: rgba(255, 165, 0, 0.05);
+      flex-shrink: 0;
 
       h3 {
         margin: 0;
@@ -3261,6 +3262,7 @@
 
     .section4-modal-body {
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       padding: 16px 24px;
 
@@ -3338,6 +3340,7 @@
       padding: 20px 28px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
 
       .cancel-btn {
         font-family: "Pretendard", sans-serif;

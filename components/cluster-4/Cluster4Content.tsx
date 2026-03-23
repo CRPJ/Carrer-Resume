@@ -324,15 +324,24 @@ const Cluster4Content = () => {
   const [seasonReviewError, setSeasonReviewError] = useState<string | null>(null);
   const [seasonReviewSuccess, setSeasonReviewSuccess] = useState(false);
 
-  // 모달 열릴 때 배경 스크롤 잠금
+  // 모달 열릴 때 배경 스크롤 잠금 (스크롤 위치 보존)
   useEffect(() => {
     const anyOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen;
     if (anyOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
+      if (scrollY) window.scrollTo(0, parseInt(scrollY) * -1);
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => { document.body.style.position = ''; document.body.style.top = ''; document.body.style.width = ''; document.body.style.overflow = ''; };
   }, [seasonReputationModalOpen, reputationDetailModalOpen, seasonReviewModalOpen]);
 
   // 활동 통계 (주차 성장률)
