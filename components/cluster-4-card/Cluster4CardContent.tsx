@@ -2221,14 +2221,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }),
   ];
 
-  // 휴식 모드일 때 실무 경험 카드 — 강화실패 + Main=activity_type name + Sub=보이드
+  // 휴식 모드일 때 실무 경험 카드 — 해당 없음 + 보이드
   const effectiveWorkExpCards = isRestMode
     ? workExpCards.map(card => ({
         ...card,
-        title: card.badge || '-',  // Main Title = activity_type name
+        title: '-',
         hasActivity: false,
-        enhancementStatus: 'failed' as EnhancementStatus,
-        isFailed: true,
+        enhancementStatus: 'not_applicable' as EnhancementStatus,
+        isFailed: false,
       }))
     : workExpCards;
 
@@ -2679,7 +2679,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-left">
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
-              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
+              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {isRestMode ? 0 : infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{isRestMode ? 0 : infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
             <div className="progress-bar-container">
               <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
@@ -2724,10 +2724,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">정보</span></span>
             </div>
-            <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
+            <span className="section-count">총 {isRestMode ? 0 : infoStats.total}개 중 <span className="highlight">{isRestMode ? 0 : infoStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-info-cards">
@@ -2811,10 +2811,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">역량</span></span>
             </div>
-            <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
+            <span className="section-count">총 {isRestMode ? 0 : competencyStats.total}개 중 <span className="highlight">{isRestMode ? 0 : competencyStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           {(() => {
@@ -2823,7 +2823,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             const selectedActivity = findFirstSelectedAbilityActivity(); // 유저가 선택한 활동 (record 있음)
             const displayActivity = isRestMode ? null : (completedActivity || selectedActivity); // 휴식 모드일 때 활동 없음 처리
             const activityTypeInfo = displayActivity ? getActivityTypeInfo(displayActivity.activity_type_id) : null;
-            const enhancementStatus = isRestMode ? 'failed' as EnhancementStatus : (displayActivity ? getEnhancementStatus(displayActivity.activity_type_id) : 'not_applicable');
+            const enhancementStatus = isRestMode ? 'not_applicable' as EnhancementStatus : (displayActivity ? getEnhancementStatus(displayActivity.activity_type_id) : 'not_applicable');
             const hasActivity = !!displayActivity; // 유저가 선택한 활동이 있는지
             const hasCompletedActivity = !!completedActivity; // 완료된 활동이 있는지 여부
 
@@ -2846,7 +2846,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     />
                   )}
                   {!hasActivity && <div className="icon-placeholder"></div>}
-                  {(enhancementStatus === 'failed' || !hasActivity) && (
+                  {!isRestMode && (enhancementStatus === 'failed' || !hasActivity) && (
                     <div className="failed-overlay">
                       <span className="failed-text">강화 실패</span>
                       <span className="failed-emoji">😿</span>
@@ -2881,8 +2881,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="status-badge">
                   {hasActivity && enhancementStatus === 'success' && <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화 성공" />}
                   {hasActivity && enhancementStatus === 'waiting' && <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화 대기" />}
-                  {(enhancementStatus === 'failed' || !hasActivity) && <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />}
-                  {hasActivity && enhancementStatus === 'not_applicable' && <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />}
+                  {!isRestMode && (enhancementStatus === 'failed' || !hasActivity) && <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />}
+                  {(isRestMode || (hasActivity && enhancementStatus === 'not_applicable')) && <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />}
                 </div>
               </div>
             );
@@ -2924,10 +2924,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경험</span></span>
             </div>
-            <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
+            <span className="section-count">총 {isRestMode ? 0 : experienceStats.total}개 중 <span className="highlight">{isRestMode ? 0 : experienceStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-exp-cards">
@@ -2949,7 +2949,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="card-top-row">
                   <div className="card-icon-area">
                     {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}
-                    {!card.hasActivity && !isEmpty && (
+                    {!isRestMode && !card.hasActivity && !isEmpty && (
                       <div className="failed-overlay">
                         <span className="failed-text">강화 실패</span>
                         <span className="failed-emoji">😿</span>
@@ -2992,12 +2992,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">{isEmpty ? '-' : (() => { const text = weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
+                  <span className="sub-desc">{(isEmpty || isRestMode) ? '-' : (() => { const text = weekActivityDetails.find(d => d.activity_type_id === card.activityTypeId)?.sub_title || '-'; return text.length > 79 ? text.slice(0, 79) + '...' : text; })()}</span>
                   {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
                 {!isEmpty && (
-                  <div className={`status-badge ${!card.hasActivity ? 'failed' : card.enhancementStatus}`}>
+                  <div className={`status-badge ${isRestMode ? 'not_applicable' : (!card.hasActivity ? 'failed' : card.enhancementStatus)}`}>
                     {(() => {
+                      if (isRestMode) return <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />;
                       if (!card.hasActivity) return <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />;
                       const statusImages: Record<string, string> = {
                         'success': '/images/0/cluster4/icon/5 강화 성공.png',
@@ -3050,10 +3051,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경력</span></span>
             </div>
-            <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
+            <span className="section-count">총 {isRestMode ? 0 : careerStats.total}개 중 <span className="highlight">{isRestMode ? 0 : careerStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-career-cards">
