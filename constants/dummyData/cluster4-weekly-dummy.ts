@@ -19,18 +19,18 @@ export const DUMMY_WEEKLY_LIST: {
   growthStatus: string;
 }[] = [
   // 2026 봄 시즌
-  { id: 'dw-01', weekNumber: 3, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-16', endDate: '2026-03-22', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(개인)' },
-  { id: 'dw-02', weekNumber: 2, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-09', endDate: '2026-03-15', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
-  { id: 'dw-03', weekNumber: 1, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-02', endDate: '2026-03-08', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
+  { id: 'dw-01', weekNumber: 3, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-16', endDate: '2026-03-22', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
+  { id: 'dw-02', weekNumber: 2, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-09', endDate: '2026-03-15', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
+  { id: 'dw-03', weekNumber: 1, seasonYear: 2026, seasonName: '봄', startDate: '2026-03-02', endDate: '2026-03-08', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
   // 전환 주차
-  { id: 'dw-04', weekNumber: 0, seasonYear: 2026, seasonName: '봄', startDate: '2026-02-23', endDate: '2026-03-01', isClubBreak: false, isBreakSeason: false, fromSeason: '겨울', toSeason: '봄', holidayName: null, termNumber: null, growthStatus: '휴식(공식)' },
+  { id: 'dw-04', weekNumber: 0, seasonYear: 2026, seasonName: '봄', startDate: '2026-02-23', endDate: '2026-03-01', isClubBreak: false, isBreakSeason: false, fromSeason: '겨울', toSeason: '봄', holidayName: null, termNumber: null, growthStatus: '성공' },
   // 2026 겨울 시즌
-  { id: 'dw-05', weekNumber: 8, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-16', endDate: '2026-02-22', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
-  { id: 'dw-06', weekNumber: 7, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-09', endDate: '2026-02-15', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
-  { id: 'dw-07', weekNumber: 6, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-02', endDate: '2026-02-08', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
-  { id: 'dw-08', weekNumber: 5, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-26', endDate: '2026-02-01', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(개인)' },
-  { id: 'dw-09', weekNumber: 4, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-19', endDate: '2026-01-25', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
-  { id: 'dw-10', weekNumber: 3, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-12', endDate: '2026-01-18', isClubBreak: true, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: '설날', termNumber: null, growthStatus: '휴식(공식)' },
+  { id: 'dw-05', weekNumber: 8, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-16', endDate: '2026-02-22', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(개인)' },
+  { id: 'dw-06', weekNumber: 7, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-09', endDate: '2026-02-15', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
+  { id: 'dw-07', weekNumber: 6, seasonYear: 2026, seasonName: '겨울', startDate: '2026-02-02', endDate: '2026-02-08', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(공식)' },
+  { id: 'dw-08', weekNumber: 5, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-26', endDate: '2026-02-01', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '성공' },
+  { id: 'dw-09', weekNumber: 4, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-19', endDate: '2026-01-25', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(개인)' },
+  { id: 'dw-10', weekNumber: 3, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-12', endDate: '2026-01-18', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
   { id: 'dw-11', weekNumber: 2, seasonYear: 2026, seasonName: '겨울', startDate: '2026-01-05', endDate: '2026-01-11', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '실패' },
   { id: 'dw-12', weekNumber: 1, seasonYear: 2026, seasonName: '겨울', startDate: '2025-12-29', endDate: '2026-01-04', isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: '휴식(개인)' },
   // 전환 주차

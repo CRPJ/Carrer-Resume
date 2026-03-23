@@ -2679,14 +2679,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-left">
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
-              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {isRestMode ? 0 : infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{isRestMode ? 0 : infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
+              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
             </div>
-            <div className="progress-bar-container">
-              <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
+            <div className={`progress-bar-container ${isRestMode ? 'rest-dimmed' : ''}`}>
+              <div className="progress-bar" style={{ width: isRestMode ? '100%' : `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
+              {isRestMode && <span className="rest-message">휴식주차로서 집계되지 않습니다</span>}
             </div>
           </div>
           <div className="growth-center">
-            <span className="progress-percent"><span className="number">{(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}</span><span className="percent">%</span></span>
+            <span className="progress-percent"><span className="number">{isRestMode ? '-' : ((infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0))}</span><span className="percent">%</span></span>
           </div>
           <div className="growth-right">
             <span className="growth-label">라인별 강화 결과</span>
@@ -2724,10 +2725,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">정보</span></span>
             </div>
-            <span className="section-count">총 {isRestMode ? 0 : infoStats.total}개 중 <span className="highlight">{isRestMode ? 0 : infoStats.success}</span>개</span>
+            <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0)}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? '-' : (infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-info-cards">
@@ -2811,10 +2812,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">역량</span></span>
             </div>
-            <span className="section-count">총 {isRestMode ? 0 : competencyStats.total}개 중 <span className="highlight">{isRestMode ? 0 : competencyStats.success}</span>개</span>
+            <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0)}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? '-' : (competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           {(() => {
@@ -2924,10 +2925,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경험</span></span>
             </div>
-            <span className="section-count">총 {isRestMode ? 0 : experienceStats.total}개 중 <span className="highlight">{isRestMode ? 0 : experienceStats.success}</span>개</span>
+            <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0)}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? '-' : (experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-exp-cards">
@@ -3051,10 +3052,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경력</span></span>
             </div>
-            <span className="section-count">총 {isRestMode ? 0 : careerStats.total}개 중 <span className="highlight">{isRestMode ? 0 : careerStats.success}</span>개</span>
+            <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{isRestMode ? 0 : (careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0)}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isRestMode ? '-' : (careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-career-cards">

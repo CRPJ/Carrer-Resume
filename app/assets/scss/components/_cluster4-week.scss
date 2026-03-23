@@ -2080,6 +2080,7 @@
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 0;
           overflow: hidden;
+          position: relative;
 
           .progress-bar {
             height: 100%;
@@ -2087,6 +2088,27 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 0;
             transition: width 1s ease;
+          }
+
+          &.rest-dimmed {
+            overflow: visible;
+
+            .progress-bar {
+              background: rgba(128, 128, 128, 0.3);
+              border: none;
+            }
+
+            .rest-message {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              font-size: 11px;
+              color: rgba(255, 255, 255, 0.5);
+              font-family: 'Pretendard', sans-serif;
+              white-space: nowrap;
+              z-index: 1;
+            }
           }
         }
       }
