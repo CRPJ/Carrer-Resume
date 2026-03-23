@@ -2189,6 +2189,23 @@ const Cluster4Content = () => {
                   <span className="count-label">
                     <span className="num-fixed">{seasonReputations.length}</span>개
                   </span>
+                  <div
+                    className="edit-icon"
+                    style={{ cursor: "pointer", width: "22px", height: "22px", background: "rgba(255, 165, 0, 0.2)", border: "1px solid #faab07", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginLeft: "auto" }}
+                    onClick={() => {
+                      if (isDemoMode) {
+                        openSeasonReputationModal();
+                        return;
+                      }
+                      if (isOwner) {
+                        alert("시즌 평판은 타 크루끼리 작성합니다.");
+                      } else {
+                        openSeasonReputationModal();
+                      }
+                    }}
+                  >
+                    <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                  </div>
                 </h4>
                 <div style={{ position: "relative" }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
