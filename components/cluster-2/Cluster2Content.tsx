@@ -907,9 +907,11 @@ const Cluster2Content = () => {
   // 자기소개서 저장
   const handleSaveIntroduction = async (cardIndex: number, content: string) => {
     if (isDemoMode) {
-      setIntroductions(prev => ({ ...prev, [['growth_story', 'social_experience', 'career_direction', 'work_style', 'personal_story'][cardIndex]]: content }));
+      const newCards = [...introCards];
+      newCards[cardIndex] = { ...newCards[cardIndex], content };
+      setIntroCards(newCards);
+      setIsEditingIntro(false);
       alert('저장되었습니다.');
-      setIntroModalOpen(false);
       return;
     }
     const fieldMapping = ['growth_story', 'social_experience', 'career_direction', 'work_style', 'personal_story'];

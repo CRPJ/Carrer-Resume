@@ -317,8 +317,8 @@ const Cluster3Content = () => {
   // 포트폴리오 아카이빙 저장 함수
   const savePortfolioArchives = async (links: string[], channels: string[]) => {
     if (isDemoMode) {
-      setArchiveLinks(links);
-      setArchiveChannels(channels);
+      setPortfolioArchives(links);
+      setPortfolioArchiveChannels(channels);
       alert('저장되었습니다.');
       setSection3ModalOpen(false);
       return;
@@ -394,8 +394,8 @@ const Cluster3Content = () => {
   // 포트폴리오 Output 저장 함수
   const savePortfolioOutputs = async (links: string[], channels: string[]) => {
     if (isDemoMode) {
-      setOutputLinks(links);
-      setOutputChannels(channels);
+      setPortfolioOutputs(links);
+      setPortfolioOutputChannels(channels);
       alert('저장되었습니다.');
       setSection4ModalOpen(false);
       return;
@@ -469,8 +469,8 @@ const Cluster3Content = () => {
   // Detail 10 저장 함수
   const savePortfolioDetails = async (links: string[], channels: string[]) => {
     if (isDemoMode) {
-      setDetailLinks(links);
-      setDetailChannels(channels);
+      setPortfolioDetails(links);
+      setPortfolioDetailChannels(channels);
       alert('저장되었습니다.');
       setSection5ModalOpen(false);
       return;
