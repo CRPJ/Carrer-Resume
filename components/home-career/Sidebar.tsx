@@ -2347,7 +2347,7 @@ const Sidebar = () => {
                     font-family: 'Pretendard', sans-serif !important;
                   }
                   .edit-modal-body::-webkit-scrollbar {
-                    width: 8px;
+                    width: 3px;
                   }
                   .edit-modal-body::-webkit-scrollbar-track {
                     background: #252836;
