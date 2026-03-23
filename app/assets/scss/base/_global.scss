@@ -1551,39 +1551,36 @@ svg {
   }
 }
 
-// 7. 모달 본문 스크롤바 — 전역 단순 셀렉터 (중첩 제거)
+// 7. 모달 본문 스크롤바 — cluster4-1 스타일 복사 + thumb 색상 교체
 .section1-modal-body,
 .section2-modal-body,
 .section21-modal-body,
 .section3-modal-body,
 .section4-modal-body,
+.section5-modal-body,
+.section6-modal-body,
 .section-modal-body,
 .intro-modal-body,
 .edit-modal-body,
 .modal-body {
   scrollbar-width: thin !important;
-  scrollbar-color: #FFA500 #252836 !important;
-  overflow-y: scroll !important;
+  scrollbar-color: rgba(250, 171, 7, 1) #252836 !important;
 
   &::-webkit-scrollbar {
-    width: 1px !important;
-    display: block !important;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #FFA500 !important;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #22c55e !important;
+    width: 3px !important;
   }
   &::-webkit-scrollbar-track {
     background: #252836 !important;
     border-radius: 2px;
   }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(250, 171, 7, 1) !important;
+    border-radius: 2px;
+  }
   &::-webkit-scrollbar-button {
     display: none !important;
-    height: 0 !important;
     width: 0 !important;
+    height: 0 !important;
   }
 }
 
