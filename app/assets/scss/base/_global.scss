@@ -1452,8 +1452,8 @@ svg {
   border-bottom: 1px solid rgba(255, 165, 0, 0.2) !important;
 
   h3 {
-    color: #FAAB07 !important;
-    font-family: 'Pretendard', sans-serif !important;
+    color: #faab07 !important;
+    font-family: "Pretendard", sans-serif !important;
     font-size: 21px !important;
     font-weight: 800 !important;
     line-height: 34px !important;
@@ -1462,7 +1462,7 @@ svg {
 
   .modal-subtitle {
     color: #fff !important;
-    font-family: 'Pretendard', sans-serif !important;
+    font-family: "Pretendard", sans-serif !important;
     font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 30px !important;
@@ -1498,7 +1498,7 @@ svg {
   button,
   .cancel-btn,
   .save-btn {
-    font-family: 'Pretendard', sans-serif !important;
+    font-family: "Pretendard", sans-serif !important;
   }
 }
 
@@ -1507,7 +1507,7 @@ svg {
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
 
   .edit-modal-header {
     flex-shrink: 0;
@@ -1563,19 +1563,22 @@ svg {
 .intro-modal-body,
 .edit-modal-body,
 .modal-body {
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
   scrollbar-width: thin !important;
   scrollbar-color: rgba(250, 171, 7, 1) #252836 !important;
 
   &::-webkit-scrollbar {
-    width: 3px !important;
+    width: 6px !important;
   }
   &::-webkit-scrollbar-track {
-    background: #252836 !important;
-    border-radius: 2px;
+    background: transparent !important;
   }
   &::-webkit-scrollbar-thumb {
     background: rgba(250, 171, 7, 1) !important;
-    border-radius: 2px;
+    border-radius: 3px;
+    border: 2px solid transparent !important;
+    background-clip: content-box !important;
   }
   &::-webkit-scrollbar-button {
     display: none !important;
@@ -1588,6 +1591,28 @@ svg {
 [class*="modal-overlay"] {
   background: rgba(0, 0, 0, 0.85) !important;
   backdrop-filter: blur(4px);
+}
+
+// 9. SimpleBar 커스텀 스타일 — 모달 전용
+.modal-simplebar {
+  .simplebar-scrollbar::before {
+    background: rgba(250, 171, 7, 1) !important;
+    border-radius: 2px;
+    opacity: 1 !important;
+  }
+
+  .simplebar-track {
+    background: transparent !important;
+  }
+
+  .simplebar-track.simplebar-vertical {
+    width: 3px !important;
+    right: 4px;
+  }
+
+  .simplebar-scrollbar.simplebar-visible::before {
+    opacity: 1 !important;
+  }
 }
 
 /* ====

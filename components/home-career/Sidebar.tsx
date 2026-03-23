@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import SimpleBar from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css';
 import { useSession } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -2173,7 +2175,7 @@ const Sidebar = () => {
 
               <form onSubmit={handleSubmit}>
               {/* 모달 본문 */}
-              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px", overflowY: "scroll" }}>
+              <SimpleBar className="edit-modal-body modal-simplebar" style={{ maxHeight: '750px', padding: "30px 32px 40px 40px" }} autoHide={false}>
                 {/* 성 & 이름 - 일렬 배치 */}
                 <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                   {/* 성 */}
@@ -3281,7 +3283,7 @@ const Sidebar = () => {
                   </div>
                 </div>
 
-              </div>
+              </SimpleBar>
               {/* 모달 푸터 */}
               <div className="edit-modal-footer">
                 <style

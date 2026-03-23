@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import SimpleBar from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css';
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
@@ -1431,7 +1433,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
               {editingSection3Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection3Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1477,7 +1479,7 @@ const Cluster3Content = () => {
                   </div>
                 );
               })}
-            </div>
+            </SimpleBar>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setSection3ModalOpen(false)}>
                 취소
@@ -1510,7 +1512,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
               {editingSection4Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection4Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1555,7 +1557,7 @@ const Cluster3Content = () => {
                   </div>
                 );
               })}
-            </div>
+            </SimpleBar>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)}>
                 취소
@@ -1598,7 +1600,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <SimpleBar className="section-modal-body modal-simplebar" style={{ maxHeight: '750px' }} autoHide={false}>
               {editingSection5Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection5Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1643,7 +1645,7 @@ const Cluster3Content = () => {
                   </div>
                 );
               })}
-            </div>
+            </SimpleBar>
             <div className="section-modal-footer">
               <button className="cancel-btn" onClick={() => setSection5ModalOpen(false)}>
                 취소
