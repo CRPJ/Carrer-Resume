@@ -4065,9 +4065,10 @@
   }
 
   .section-modal {
-    width: 504px;
-    max-width: none;
-    max-height: calc(100vh - 80px);
+    width: 794px;
+    max-width: 95vw;
+    height: auto;
+    max-height: 964px;
     background: #0d1117;
     border: 1px solid #FAAB07;
     border-radius: 16px;
@@ -4076,24 +4077,25 @@
     flex-direction: column;
 
     &.section-modal-wide {
-      width: 700px;
+      width: 794px;
     }
 
     &.section-modal-work-edit {
-      width: 520px;
-      height: 690px;
-      max-height: calc(100vh - 80px);
+      width: 794px;
+      height: auto;
+      max-height: 964px;
     }
 
     &.section-modal-colleague-edit {
-      width: 480px;
+      width: 794px;
       height: auto;
-      max-height: 80vh;
+      max-height: 529px;
     }
 
     &.section-modal-reputation-form {
-      width: 487px;
-      height: 448px;
+      width: 794px;
+      height: auto;
+      max-height: 529px;
       max-height: 448px;
 
       .section-modal-header {
@@ -5008,9 +5010,9 @@
 
     // 주차 평판 상세보기 모달
     &.reputation-view-modal {
-      width: 480px;
-      height: 454px;
-      max-height: calc(100vh - 80px);
+      width: 794px;
+      height: auto;
+      max-height: 529px;
 
       .section-modal-header {
         display: flex;
@@ -5265,11 +5267,11 @@
 
     // 연계 동료 상세보기 모달
     &.colleague-view-modal {
-      width: 660px;
+      width: 794px;
       min-height: 364px;
       height: auto;
-      max-width: 90vw;
-      max-height: calc(100vh - 80px);
+      max-width: 95vw;
+      max-height: 435px;
       overflow: hidden auto;
 
       .section-modal-header {
@@ -5470,10 +5472,10 @@
 
     // 실무 정보/역량/경험/경력 상세보기 모달
     &.work-view-modal {
-      width: 540px;
-      height: 85vh;
-      max-width: 90vw;
-      max-height: calc(100vh - 40px);
+      width: 794px;
+      height: auto;
+      max-width: 95vw;
+      max-height: 964px;
 
       .work-view-fixed {
         flex-shrink: 0;
