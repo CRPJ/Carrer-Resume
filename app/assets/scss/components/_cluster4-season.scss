@@ -4305,6 +4305,8 @@
       .num-3 { display: inline-block; min-width: 3ch; text-align: right; }
       .num-2 { display: inline-block; min-width: 2ch; text-align: right; }
       .num-1 { display: inline-block; min-width: 1ch; text-align: right; }
+      .season-name-fixed { display: inline-block; min-width: 2em; text-align: right; }
+      .week-name-fixed { display: inline-block; min-width: 2em; text-align: right; }
 
       .weekly-card-info {
         display: flex;
@@ -4351,7 +4353,7 @@
             .text-gray {
               color: #aaa;
               display: inline-block;
-              width: 140px;
+              width: 125px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -4414,6 +4416,13 @@
               width: 16px;
               height: 16px;
               object-fit: contain;
+            }
+
+            > span {
+              max-width: 125px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
           }
 

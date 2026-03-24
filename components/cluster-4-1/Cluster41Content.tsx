@@ -39,7 +39,7 @@ const Cluster41Content = () => {
           const demoWeekOverrides: Record<string, typeof DUMMY_WEEK_EXTRA[string]> = {
             '윤재윤': {
               points: { star: 150, shield: 37, lightning: 30 },
-              teamPart: { teamName: '엔터테인먼트', partName: '팬마케팅' }, roleLabel: '일반',
+              teamPart: { teamName: '마케팅', partName: '전략파트' }, roleLabel: '일반',
               growthRate: { rate: 75, count: 16, total: 24 },
               infoRate: { rate: 100, count: 10, total: 10 },
               competencyRate: { rate: 0, count: 0, total: 1 },
@@ -49,7 +49,7 @@ const Cluster41Content = () => {
             },
             '전민경': {
               points: { star: 3, shield: 933, lightning: 45 },
-              teamPart: { teamName: '마케팅전략', partName: '브랜드콘텐츠' }, roleLabel: '운영진(앰배서더)',
+              teamPart: { teamName: '사업개발전략기획', partName: '제휴협력사업파트' }, roleLabel: '팀장(사업개발전략 팀)',
               growthRate: { rate: 100, count: 800, total: 999 },
               infoRate: { rate: 50, count: 5, total: 10 },
               competencyRate: { rate: 100, count: 99, total: 99 },
@@ -59,7 +59,7 @@ const Cluster41Content = () => {
             },
             '곽예원': {
               points: { star: 50, shield: 999, lightning: 999 },
-              teamPart: { teamName: '기획', partName: '전략파트' }, roleLabel: '심화',
+              teamPart: { teamName: '브랜드커뮤니케이션', partName: '디지털마케팅전략파트' }, roleLabel: '운영진(앰배서더)',
               growthRate: { rate: 1, count: 1, total: 8 },
               infoRate: { rate: 0, count: 0, total: 25 },
               competencyRate: { rate: 50, count: 2, total: 4 },
@@ -69,7 +69,7 @@ const Cluster41Content = () => {
             },
             '김의환': {
               points: { star: 88, shield: 200, lightning: 0 },
-              teamPart: { teamName: '개발', partName: '백엔드' }, roleLabel: '팀장(개발 팀)',
+              teamPart: { teamName: '글로벌크로스보더커머스', partName: '퍼포먼스마케팅최적화' }, roleLabel: '심화(에이전트파트장대행)',
               growthRate: { rate: 0, count: 0, total: 18 },
               infoRate: { rate: 70, count: 7, total: 10 },
               competencyRate: { rate: 0, count: 0, total: 2 },
@@ -1980,7 +1980,7 @@ const Cluster41Content = () => {
 
                       <div className="weekly-card-content">
                         <div className="weekly-card-header">
-                          <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                          <h4 className="weekly-card-title">{week.seasonYear}년, <span className="season-name-fixed">{week.seasonName}</span> 시즌, {week.isBreakSeason ? <><span className="week-name-fixed">전환</span> 주차</> : <><span className="week-name-fixed">{week.weekNumber}</span>주차</>}</h4>
                           <span className="weekly-card-date">
                             <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" className="date-icon" />
                             {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
@@ -2093,7 +2093,7 @@ const Cluster41Content = () => {
                   <div className="weekly-card-content">
                     {/* 첫 번째 줄: 타이틀, 날짜, 주차 */}
                     <div className="weekly-card-header">
-                      <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                      <h4 className="weekly-card-title">{week.seasonYear}년, <span className="season-name-fixed">{week.seasonName}</span> 시즌, {week.isBreakSeason ? <><span className="week-name-fixed">전환</span> 주차</> : <><span className="week-name-fixed">{week.weekNumber}</span>주차</>}</h4>
                       <span className="weekly-card-date">
                         <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" className="date-icon" />
                         {formatDate(week.startDate)} ~ {formatDate(week.endDate)}

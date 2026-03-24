@@ -151,8 +151,8 @@ export const DUMMY_WEEK_EXTRA: Record<
   "dw-07": {
     // 실패
     points: { star: 3, shield: 9, lightning: 2 },
-    teamPart: { teamName: "기획", partName: "전략파트" },
-    roleLabel: "일반",
+    teamPart: { teamName: "일이삼사오육칠팔구십", partName: "일이삼사오육칠팔구십" },
+    roleLabel: "일이삼사오육칠팔구십",
     growthRate: { rate: 7, count: 1, total: 18 },
     infoRate: { rate: 10, count: 1, total: 10 },
     competencyRate: { rate: 0, count: 0, total: 2 },
