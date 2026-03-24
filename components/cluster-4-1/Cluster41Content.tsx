@@ -2116,19 +2116,19 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray" style={{ display: 'inline-block', width: '124px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.teamName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.teamName || '-'}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray" style={{ display: 'inline-block', width: '124px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.partName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.partName || '-'}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}
                             <div className="info-group">
                               <span className="info-badge role">
                                 <img src="/images/0/cluster4/icon/icon - 8.png" alt="role" className="role-icon" />
-                                <span style={{ display: 'inline-block', maxWidth: '124px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{roleInfo?.roleLabel || '-'}</span>
+                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{roleInfo?.roleLabel || '-'}</span>
                               </span>
                             </div>
                           </>
