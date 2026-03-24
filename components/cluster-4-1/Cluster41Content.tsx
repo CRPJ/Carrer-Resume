@@ -35,6 +35,55 @@ const Cluster41Content = () => {
             setUserStatus(demoStatusMap[name].us);
             setGrowthStatus(demoStatusMap[name].gs);
           }
+          // 데모 모드 사용자별 weekly-card 더미 데이터 (자릿수 분산)
+          const demoWeekOverrides: Record<string, typeof DUMMY_WEEK_EXTRA[string]> = {
+            '윤재윤': {
+              points: { star: 150, shield: 37, lightning: 30 },
+              teamPart: { teamName: '엔터테인먼트', partName: '팬마케팅' }, roleLabel: '일반',
+              growthRate: { rate: 75, count: 16, total: 24 },
+              infoRate: { rate: 100, count: 10, total: 10 },
+              competencyRate: { rate: 0, count: 0, total: 1 },
+              experienceRate: { rate: 60, count: 3, total: 5 },
+              careerRate: { rate: 0, count: 0, total: 20 },
+              reputationCount: 2, fmScore: 85, colleagueCount: 1,
+            },
+            '전민경': {
+              points: { star: 3, shield: 933, lightning: 45 },
+              teamPart: { teamName: '마케팅전략', partName: '브랜드콘텐츠' }, roleLabel: '운영진(앰배서더)',
+              growthRate: { rate: 100, count: 800, total: 999 },
+              infoRate: { rate: 50, count: 5, total: 10 },
+              competencyRate: { rate: 100, count: 99, total: 99 },
+              experienceRate: { rate: 0, count: 0, total: 12 },
+              careerRate: { rate: 80, count: 4, total: 5 },
+              reputationCount: 3, fmScore: 9999, colleagueCount: 3,
+            },
+            '곽예원': {
+              points: { star: 50, shield: 999, lightning: 999 },
+              teamPart: { teamName: '기획', partName: '전략파트' }, roleLabel: '심화',
+              growthRate: { rate: 1, count: 1, total: 8 },
+              infoRate: { rate: 0, count: 0, total: 25 },
+              competencyRate: { rate: 50, count: 2, total: 4 },
+              experienceRate: { rate: 100, count: 15, total: 15 },
+              careerRate: { rate: 0, count: 0, total: 1 },
+              reputationCount: 0, fmScore: 0, colleagueCount: 0,
+            },
+            '김의환': {
+              points: { star: 88, shield: 200, lightning: 0 },
+              teamPart: { teamName: '개발', partName: '백엔드' }, roleLabel: '팀장(개발 팀)',
+              growthRate: { rate: 0, count: 0, total: 18 },
+              infoRate: { rate: 70, count: 7, total: 10 },
+              competencyRate: { rate: 0, count: 0, total: 2 },
+              experienceRate: { rate: 25, count: 1, total: 4 },
+              careerRate: { rate: 100, count: 10, total: 10 },
+              reputationCount: 0, fmScore: 1500, colleagueCount: 0,
+            },
+          };
+          if (name && demoWeekOverrides[name]) {
+            DUMMY_WEEK_EXTRA['dw-01'] = demoWeekOverrides[name];
+            setWeeklyReputationCounts(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].reputationCount }));
+            setWeeklyFmScores(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].fmScore }));
+            setWeeklyColleagueCounts(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].colleagueCount }));
+          }
         }
       } catch {
         // API 실패 시 기존 더미 문구로 fallback

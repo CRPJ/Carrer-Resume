@@ -248,6 +248,71 @@ const Sidebar = () => {
     photo: string;
   } | null>(demoMode ? DUMMY_USER_PROFILE : null);
 
+  // 데모 모드 사용자별 sidebar 더미 데이터 분기
+  useEffect(() => {
+    if (!demoMode || !targetUserId) return;
+    const fetchDemoName = async () => {
+      try {
+        const res = await fetch(`/api/profile/?userId=${targetUserId}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const name = json.data?.display_name || null;
+        if (!name) return;
+
+        const demoProfiles: Record<string, typeof DUMMY_USER_PROFILE> = {
+          '전민경': {
+            name: '전민경', nameEng: 'JEON MINKYUNG', gender: '여', birthDate: '1998.05.15',
+            city: '경기도', district: '성남시', phone: '010-8765-4321', email: 'minkyung.j@naver.com',
+            school: '성균관대학교', major: '경영학과', major2: '', major3: '',
+            enrollPeriod: '2017.03 - ~ing', graduationStatus: '재학', gpa: '3.8', gpaMax: '4.5',
+            quote: '끊임없이 도전하는 사람이 세상을 바꾼다',
+            photo: '/images/0/crew profile/여 1.jpg',
+          },
+          '곽예원': {
+            name: '곽예원', nameEng: 'KWAK YEWON', gender: '여', birthDate: '2000.11.23',
+            city: '부산광역시', district: '해운대구', phone: '010-1111-2222', email: 'yewon.kwak@gmail.com',
+            school: '부산대학교', major: '디자인학과', major2: '', major3: '',
+            enrollPeriod: '2019.03 - ~ing', graduationStatus: '재학', gpa: '4.0', gpaMax: '4.5',
+            quote: '감각을 넘어 전략으로, 디자인의 가치를 증명하다',
+            photo: '/images/0/crew profile/여 3.jpg',
+          },
+          '김의환': {
+            name: '김의환', nameEng: 'KIM UIHWAN', gender: '남', birthDate: '1995.08.30',
+            city: '인천광역시', district: '남동구', phone: '010-3333-4444', email: 'uihwan.kim@daum.net',
+            school: '인하대학교', major: '컴퓨터공학과', major2: '', major3: '',
+            enrollPeriod: '2014.03 - ~ing', graduationStatus: '재학', gpa: '3.2', gpaMax: '4.5',
+            quote: '코드 한 줄이 세상을 바꿀 수 있다고 믿는 개발자',
+            photo: '/images/0/crew profile/남 2.jpg',
+          },
+        };
+
+        const demoStats: Record<string, { reliability: number; completion: number; stars: number; lightnings: number; shields: number; info: number; competency: number; experience: number; career: number; status: "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge" }> = {
+          '전민경': { reliability: 85, completion: 93, stars: 150, lightnings: 45, shields: 88, info: 15, competency: 120, experience: 500, career: 8, status: 'Complete' },
+          '곽예원': { reliability: 42, completion: 67, stars: 50, lightnings: 200, shields: 0, info: 8, competency: 45, experience: 120, career: 3, status: 'On Rest' },
+          '김의환': { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: 'Next Challenge' },
+        };
+
+        if (demoProfiles[name]) {
+          setUserProfile(demoProfiles[name]);
+        }
+        if (demoStats[name]) {
+          const s = demoStats[name];
+          setReliabilityRate(s.reliability);
+          setCompletionRate(s.completion);
+          setBadgeData({ stars: s.stars, lightnings: s.lightnings, shields: s.shields });
+          setPracticalInfo(s.info);
+          setPracticalCompetency(s.competency);
+          setPracticalExperience(s.experience);
+          setPracticalCareer(s.career);
+          setCrewStatus(s.status);
+        }
+      } catch {
+        // API 실패 시 기존 윤재윤 더미 유지
+      }
+    };
+    fetchDemoName();
+  }, [demoMode, targetUserId]);
+
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
   const [hasData, setHasData] = useState(demoMode); // 데이터 있음/없음 상태
@@ -1727,7 +1792,7 @@ const Sidebar = () => {
 
                     {/* 학과명 — 별도 줄 (피그마 시안: #FFEC8F, 14px, Pretendard 400, lineHeight 24) */}
                     <div className="detail-row">
-                      <span style={{ width: "16px" }}></span>
+                      <span style={{ width: "16px", minWidth: "16px", display: "inline-block", flexShrink: 0 }}></span>
                       <span
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1758,7 +1823,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="detail-row">
-                      <span style={{ width: "16px" }}></span>
+                      <span style={{ width: "16px", minWidth: "16px", display: "inline-block", flexShrink: 0 }}></span>
                       <span className="sub-text" style={{ color: currentProfile.lightColor }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.period(currentProfile.enrollPeriod)}
                       </span>
