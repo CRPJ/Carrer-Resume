@@ -125,6 +125,43 @@ const Cluster4Content = () => {
   const isDemoMode = checkDemoMode();
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
 
+  // 데모 모드에서 사용자별 collection-content 문구 분기용
+  const [demoUserName, setDemoUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isDemoMode || !urlUserId) return;
+    const fetchName = async () => {
+      try {
+        const res = await fetch(`/api/profile/?userId=${urlUserId}`);
+        if (res.ok) {
+          const json = await res.json();
+          const name = json.data?.display_name || null;
+          setDemoUserName(name);
+          // 데모 모드 사용자별 성장 상태 설정
+          const demoStatusMap: Record<string, { us: string | null; gs: string | null }> = {
+            '전민경': { us: 'graduated', gs: '졸업 완료' },
+            '곽예원': { us: 'weekly_rest', gs: '주차 휴식 중' },
+            '김의환': { us: 'suspended', gs: '활동 중단' },
+          };
+          if (name && demoStatusMap[name]) {
+            setUserStatus(demoStatusMap[name].us);
+            setGrowthStatus(demoStatusMap[name].gs);
+          }
+        }
+      } catch {
+        // API 실패 시 기존 더미 문구로 fallback
+      }
+    };
+    fetchName();
+  }, [isDemoMode, urlUserId]);
+
+  const demoCollectionMessage = isDemoMode && demoUserName ? ({
+    '윤재윤': <>현재 클럽은, <strong>26년 봄 시즌, 1주차</strong>를 진행 중에 있습니다.</>,
+    '전민경': <>현재 클럽은, <strong>26년 가을 시즌, 16주차</strong>를 진행 중에 있습니다.</>,
+    '곽예원': <>현재 클럽은, <strong>26년 겨울 시즌, 99주차</strong>를 진행 중에 있습니다.</>,
+    '김의환': <>현재 클럽은, <strong>26년 여름 시즌, 전환 주차</strong>를 진행 중에 있습니다.</>,
+  } as Record<string, React.ReactNode>)[demoUserName] || null : null;
+
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
     if (!session) return false;
@@ -1749,22 +1786,24 @@ const Cluster4Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  {currentSeasonInfo?.isBreakSeason ? (
-                    <>
-                      현재 클럽은,{" "}
-                      <strong>
-                        {currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌
-                      </strong>
-                      에서{" "}
-                      <strong>
-                        {currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌
-                      </strong>
-                      으로 가는 휴식(시즌 전환) 중에 있습니다.
-                    </>
-                  ) : (
-                    <>
-                      현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : "로딩 중..."}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || "공식"})` : "진행"} 중에 있습니다.
-                    </>
+                  {demoCollectionMessage ? demoCollectionMessage : (
+                    currentSeasonInfo?.isBreakSeason ? (
+                      <>
+                        현재 클럽은,{" "}
+                        <strong>
+                          {currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌
+                        </strong>
+                        에서{" "}
+                        <strong>
+                          {currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌
+                        </strong>
+                        으로 가는 휴식(시즌 전환) 중에 있습니다.
+                      </>
+                    ) : (
+                      <>
+                        현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : "로딩 중..."}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || "공식"})` : "진행"} 중에 있습니다.
+                      </>
+                    )
                   )}
                 </p>
               </div>

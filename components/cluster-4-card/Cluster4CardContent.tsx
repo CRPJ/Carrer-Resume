@@ -2561,15 +2561,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     ? '클럽 온보딩'
                     : teamName === '운영진' && generation
                       ? `운영진(${generation}기)`
-                      : (teamName || '-').slice(0, 6)
+                      : ((teamName || '-').length > 4 ? (teamName || '-').slice(0, 4) + '...' : (teamName || '-'))
                 }</span></span>
                 <span className="info-divider">|</span>
                 <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '신입OT'
                     : teamName === '운영진' && partName === '팀장' && managedTeamName
-                      ? `팀장(${managedTeamName})`.slice(0, 6)
-                      : (partName || '-').slice(0, 6)
+                      ? ((`팀장(${managedTeamName})`).length > 4 ? (`팀장(${managedTeamName})`).slice(0, 4) + '...' : `팀장(${managedTeamName})`)
+                      : ((partName || '-').length > 4 ? (partName || '-').slice(0, 4) + '...' : (partName || '-'))
                 }</span></span>
               </div>
               <div className="info-group right">

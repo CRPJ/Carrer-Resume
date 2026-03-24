@@ -587,14 +587,15 @@
 
         .collection-card {
           display: inline-flex;
-          padding: 20px 38px;
+          padding: 20px 19px 20px 23px;
           align-items: flex-start;
-          gap: 30px;
+          gap: 19px;
           background: #232323;
           border: 2px solid #3a3a3a;
           border-radius: 30px;
           margin-bottom: 25px;
           box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.5);
+          max-width: 100%;
 
           .collection-icon {
             width: 59px;
@@ -611,7 +612,7 @@
           }
 
           .collection-content {
-            flex: 1;
+            flex: none;
             display: inline-flex;
             flex-direction: column;
             gap: 12px;
@@ -649,7 +650,7 @@
             color: #fff;
             margin: 0;
             line-height: 30px;
-            white-space: normal;
+            white-space: nowrap;
 
             strong {
               font-size: 1.25rem;
@@ -4290,6 +4291,9 @@
           }
 
           .week-number {
+            display: inline-block;
+            min-width: 2ch;
+            text-align: right;
             font-size: 1rem;
             color: #faab07;
             font-weight: 700;
@@ -4309,8 +4313,9 @@
         line-height: 19px;
 
         .info-group {
-          display: flex;
+          display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 10px;
           font-family: "Pretendard", sans-serif;
           font-size: 0.875rem;
@@ -4320,6 +4325,7 @@
             flex-wrap: nowrap;
             white-space: nowrap;
             flex-shrink: 0;
+            margin-left: auto;
           }
         }
 
@@ -4328,22 +4334,8 @@
           align-items: center;
           gap: 4px;
 
-          &.team {
-            min-width: 160px;
-            color: #fff;
-
-            strong {
-              font-weight: 700;
-              flex-shrink: 0;
-            }
-
-            .text-gray {
-              color: #aaa;
-            }
-          }
-
+          &.team,
           &.part {
-            min-width: 200px;
             color: #fff;
 
             strong {
@@ -4353,6 +4345,12 @@
 
             .text-gray {
               color: #aaa;
+              display: inline-block;
+              width: 140px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              vertical-align: middle;
             }
           }
 
@@ -4363,7 +4361,7 @@
           &.with-icon {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 6px;
             font-family: "Poppins", sans-serif;
             font-weight: 700;
             font-size: 0.875rem;
@@ -4378,6 +4376,9 @@
             }
 
             .number-value {
+              display: inline-block;
+              min-width: 3ch;
+              text-align: right;
               font-family: "Black Ops One", cursive;
               color: #fff;
               font-weight: 400;
@@ -4433,12 +4434,16 @@
 
         .progress-label {
           color: #fff;
+          flex-shrink: 0;
 
           .dot {
             color: #faab07;
           }
 
           strong {
+            display: inline-block;
+            min-width: 3ch;
+            text-align: right;
             color: #faab07;
             font-weight: 700;
           }
@@ -4473,6 +4478,7 @@
           font-family: "Chakra Petch", sans-serif;
           font-weight: 700;
           font-size: 0.875rem;
+          flex-shrink: 0;
 
           .leaf-icon {
             width: 20px;
@@ -4481,6 +4487,9 @@
           }
 
           strong {
+            display: inline-block;
+            min-width: 3ch;
+            text-align: right;
             color: #faab07;
             font-size: 0.875rem;
             font-weight: 700;
@@ -4526,6 +4535,9 @@
           }
 
           strong {
+            display: inline-block;
+            min-width: 3ch;
+            text-align: right;
             color: #faab07;
             font-weight: 700;
           }
@@ -4534,6 +4546,9 @@
             color: #fff;
 
             .num {
+              display: inline-block;
+              min-width: 2ch;
+              text-align: right;
               color: #faab07;
               font-size: 1rem;
               font-weight: 700;

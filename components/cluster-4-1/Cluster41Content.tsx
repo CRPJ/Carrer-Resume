@@ -13,6 +13,43 @@ const Cluster41Content = () => {
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
   const isDemoMode = checkDemoMode();
 
+  // 데모 모드에서 사용자별 collection-content 문구 분기용
+  const [demoUserName, setDemoUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isDemoMode || !targetUserId) return;
+    const fetchName = async () => {
+      try {
+        const res = await fetch(`/api/profile/?userId=${targetUserId}`);
+        if (res.ok) {
+          const json = await res.json();
+          const name = json.data?.display_name || null;
+          setDemoUserName(name);
+          // 데모 모드 사용자별 성장 상태 설정
+          const demoStatusMap: Record<string, { us: string | null; gs: string | null }> = {
+            '전민경': { us: 'graduated', gs: '졸업 완료' },
+            '곽예원': { us: 'weekly_rest', gs: '주차 휴식 중' },
+            '김의환': { us: 'suspended', gs: '활동 중단' },
+          };
+          if (name && demoStatusMap[name]) {
+            setUserStatus(demoStatusMap[name].us);
+            setGrowthStatus(demoStatusMap[name].gs);
+          }
+        }
+      } catch {
+        // API 실패 시 기존 더미 문구로 fallback
+      }
+    };
+    fetchName();
+  }, [isDemoMode, targetUserId]);
+
+  const demoCollectionMessage = isDemoMode && demoUserName ? ({
+    '윤재윤': <>현재 클럽은, <strong>26년 봄 시즌, 1주차</strong>를 진행 중에 있습니다.</>,
+    '전민경': <>현재 클럽은, <strong>26년 가을 시즌, 16주차</strong>를 진행 중에 있습니다.</>,
+    '곽예원': <>현재 클럽은, <strong>26년 겨울 시즌, 99주차</strong>를 진행 중에 있습니다.</>,
+    '김의환': <>현재 클럽은, <strong>26년 여름 시즌, 전환 주차</strong>를 진행 중에 있습니다.</>,
+  } as Record<string, React.ReactNode>)[demoUserName] || null : null;
+
   const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -1433,10 +1470,12 @@ const Cluster41Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  {currentSeasonInfo?.isBreakSeason ? (
-                    <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
-                  ) : (
-                    <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                  {demoCollectionMessage ? demoCollectionMessage : (
+                    currentSeasonInfo?.isBreakSeason ? (
+                      <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
+                    ) : (
+                      <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                    )
                   )}
                 </p>
               </div>
@@ -1940,8 +1979,8 @@ const Cluster41Content = () => {
                           return (
                             <>
                               <div className="weekly-card-details-top">
-                                <div className="detail-chip"><strong>[팀]</strong> {(teamPart.teamName || "-").slice(0, 6)}</div>
-                                <div className="detail-chip"><strong>[파트]</strong> {(teamPart.partName || "-").slice(0, 6)}</div>
+                                <div className="detail-chip"><strong>[팀]</strong> {teamPart.teamName || "-"}</div>
+                                <div className="detail-chip"><strong>[파트]</strong> {teamPart.partName || "-"}</div>
                                 <div className="detail-chip"><strong>[역할]</strong> {roleInfo?.roleLabel || "-"}</div>
                               </div>
 
@@ -2028,12 +2067,12 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray">{(teamPart.teamName || '-').slice(0, 6)}</span>
+                                <span className="text-gray">{teamPart.teamName || '-'}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray">{(teamPart.partName || '-').slice(0, 6)}</span>
+                                <span className="text-gray">{teamPart.partName || '-'}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}
