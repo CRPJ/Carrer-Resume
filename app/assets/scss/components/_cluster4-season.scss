@@ -4353,7 +4353,7 @@
             .text-gray {
               color: #aaa;
               display: inline-block;
-              width: 124px;
+              width: 124px !important;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -4423,7 +4423,7 @@
 
             > span {
               display: inline-block;
-              max-width: 100%;
+              max-width: 100% !important;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
