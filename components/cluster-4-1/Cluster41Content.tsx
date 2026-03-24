@@ -2116,12 +2116,12 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray">{teamPart.teamName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '124px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.teamName || '-'}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray">{teamPart.partName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '124px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.partName || '-'}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}
