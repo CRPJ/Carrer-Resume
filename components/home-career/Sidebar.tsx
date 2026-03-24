@@ -1835,27 +1835,13 @@ const Sidebar = () => {
 
                     {/* 학과명 — 별도 줄 (피그마 시안: #FFEC8F, 14px, Pretendard 400, lineHeight 24) */}
                     <div className="detail-row">
-                      <span style={{ width: "16px", minWidth: "16px", display: "inline-block", flexShrink: 0 }}></span>
+                      <span className="detail-spacer"></span>
                       <span
+                        className="major-text"
                         onClick={(e) => {
                           e.stopPropagation();
                           setTooltipVisible(tooltipVisible === "major" ? null : "major");
                           setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
-                        }}
-                        style={{
-                          color: "#FFEC8F",
-                          fontSize: "14px",
-                          fontFamily: "Pretendard, sans-serif",
-                          fontWeight: 400,
-                          lineHeight: "24px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          maxWidth: "180px",
                         }}
                       >
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.major(currentProfile.major)}
@@ -1866,7 +1852,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="detail-row">
-                      <span style={{ width: "16px", minWidth: "16px", display: "inline-block", flexShrink: 0 }}></span>
+                      <span className="detail-spacer"></span>
                       <span className="sub-text" style={{ color: currentProfile.lightColor }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.period(currentProfile.enrollPeriod)}
                       </span>
