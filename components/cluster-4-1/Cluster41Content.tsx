@@ -2051,7 +2051,7 @@ const Cluster41Content = () => {
                       </span>
                       <span className="weekly-card-week">
                         <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                        <span className="week-number">{getCumulativeApprovedWeeks(week.endDate)}</span> / 30 주차
+                        <span className="week-number num-2">{getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
                       </span>
                     </div>
 
@@ -2095,21 +2095,21 @@ const Cluster41Content = () => {
                             <span className="info-item with-icon">
                               단감
                               <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
-                              <strong className="number-value">{weekPoints.star}</strong>
+                              <strong className="number-value num-3">{weekPoints.star}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
                               인절미
                               <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                              <strong className="number-value">{injeolmi}</strong>
+                              <strong className="number-value num-3">{injeolmi}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
                               어흥
                               <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                              <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
+                              <strong className="number-value num-3">{Math.abs(weekPoints.lightning)}</strong>
                               개
                             </span>
                           </div>
@@ -2128,7 +2128,7 @@ const Cluster41Content = () => {
                       return (
                         <>
                           <div className="weekly-card-main-progress">
-                            <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong>{isRest ? '-' : growthRate.rate}%</strong></span>
+                            <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong><span className="num-3">{isRest ? '-' : growthRate.rate}</span>%</strong></span>
                             <div className="progress-bar-wrapper">
                               <div className="progress-bar">
                                 <div className="progress-fill" style={{ width: `${isRest ? 0 : growthRate.rate}%` }}></div>
@@ -2136,22 +2136,22 @@ const Cluster41Content = () => {
                             </div>
                             <span className="total-count">
                               <img src="/images/0/cluster4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
-                              총 {growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
+                              총 <span className="num-3">{growthRate.total}</span> 개 중 <strong><span className="num-3">{isRest ? '-' : growthRate.count}</span></strong> 개
                             </span>
                           </div>
 
                           {/* 네 번째, 다섯 번째 줄: 스탯들 */}
                           <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
                             <div className="weekly-card-stats">
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{isRest ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : infoRate.count}</span>/{infoRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : competencyRate.count}</span>/{competencyRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{isRest ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : experienceRate.count}</span>/{experienceRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : careerRate.count}</span>/{careerRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong><span className="num-3">{isRest ? '-' : infoRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{isRest ? '-' : infoRate.count}</span>/<span className="num-2">{infoRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong><span className="num-3">{isRest ? '-' : competencyRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{isRest ? '-' : competencyRate.count}</span>/<span className="num-2">{competencyRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong><span className="num-3">{isRest ? '-' : experienceRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{isRest ? '-' : experienceRate.count}</span>/<span className="num-2">{experienceRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong><span className="num-3">{isRest ? '-' : careerRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{isRest ? '-' : careerRate.count}</span>/<span className="num-2">{careerRate.total}</span>)</span></span>
                             </div>
                             <div className="weekly-card-extra-stats">
-                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/3</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num num-1">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num num-4">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num num-1">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
                               <span className="stat empty"></span>
                             </div>
                           </div>

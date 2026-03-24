@@ -4301,6 +4301,11 @@
         }
       }
 
+      .num-4 { display: inline-block; min-width: 4ch; text-align: right; }
+      .num-3 { display: inline-block; min-width: 3ch; text-align: right; }
+      .num-2 { display: inline-block; min-width: 2ch; text-align: right; }
+      .num-1 { display: inline-block; min-width: 1ch; text-align: right; }
+
       .weekly-card-info {
         display: flex;
         align-items: center;
@@ -4390,12 +4395,14 @@
 
         .info-badge {
           &.role {
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            min-width: 154px;
+            width: fit-content;
             margin-left: -15px;
             padding: 9px 12px;
+            white-space: nowrap;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             font-family: "Manrope", sans-serif;
@@ -4433,6 +4440,8 @@
         color: #fff;
 
         .progress-label {
+          position: relative;
+          left: -1px;
           color: #fff;
           flex-shrink: 0;
 
