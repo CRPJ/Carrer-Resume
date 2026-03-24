@@ -49,7 +49,7 @@ const Cluster41Content = () => {
             },
             '전민경': {
               points: { star: 3, shield: 933, lightning: 45 },
-              teamPart: { teamName: '사업개발전략기획', partName: '제휴협력사업파트' }, roleLabel: '팀장(사업개발전략 팀)',
+              teamPart: { teamName: '사업개발전략기획', partName: '제휴협력사업파트' }, roleLabel: '팀장(사업개발전략)',
               growthRate: { rate: 100, count: 800, total: 999 },
               infoRate: { rate: 50, count: 5, total: 10 },
               competencyRate: { rate: 100, count: 99, total: 99 },
@@ -59,7 +59,7 @@ const Cluster41Content = () => {
             },
             '곽예원': {
               points: { star: 50, shield: 999, lightning: 999 },
-              teamPart: { teamName: '브랜드커뮤니케이션', partName: '디지털마케팅전략파트' }, roleLabel: '운영진(앰배서더)',
+              teamPart: { teamName: '브랜드커뮤니케이션', partName: '디지털마케팅전략파' }, roleLabel: '운영진(앰배서더)',
               growthRate: { rate: 1, count: 1, total: 8 },
               infoRate: { rate: 0, count: 0, total: 25 },
               competencyRate: { rate: 50, count: 2, total: 4 },
@@ -69,7 +69,7 @@ const Cluster41Content = () => {
             },
             '김의환': {
               points: { star: 88, shield: 200, lightning: 0 },
-              teamPart: { teamName: '글로벌크로스보더커머스', partName: '퍼포먼스마케팅최적화' }, roleLabel: '심화(에이전트파트장대행)',
+              teamPart: { teamName: '글로벌크로스보더커머스', partName: '퍼포먼스마케팅최적화' }, roleLabel: '심화(에이전트파트장)',
               growthRate: { rate: 0, count: 0, total: 18 },
               infoRate: { rate: 70, count: 7, total: 10 },
               competencyRate: { rate: 0, count: 0, total: 2 },
