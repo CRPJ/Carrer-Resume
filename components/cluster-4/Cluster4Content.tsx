@@ -24,6 +24,7 @@ const DUMMY_SEASON_REPUTATIONS = [
     rating: 6,
     keyword_1: "추진력추진력력",
     keyword_2: "추진력추진력력",
+    keyword_3: "끈기와인내력",
     content: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
     reviewer: {
       display_name: "안유현",
@@ -42,6 +43,7 @@ const DUMMY_SEASON_REPUTATIONS = [
     rating: 6,
     keyword_1: "추진력추진력력",
     keyword_2: "추진력추진력력",
+    keyword_3: null,
     content: "안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십",
     reviewer: {
       display_name: "이지민",
@@ -60,6 +62,7 @@ const DUMMY_SEASON_REPUTATIONS = [
     rating: 6,
     keyword_1: "추진력추진력력",
     keyword_2: "추진력추진력력",
+    keyword_3: "성실성실성실성",
     content: "안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십",
     reviewer: {
       display_name: "유성이",
@@ -217,7 +220,8 @@ const Cluster4Content = () => {
     content: string;
     keyword1: string;
     keyword2: string;
-  }>({ rating: 0, content: "", keyword1: "", keyword2: "" });
+    keyword3: string;
+  }>({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
   const [seasonReputationSaving, setSeasonReputationSaving] = useState(false);
   const [seasonReputationError, setSeasonReputationError] = useState<string | null>(null);
   const [seasonReputationSuccess, setSeasonReputationSuccess] = useState(false);
@@ -259,6 +263,7 @@ const Cluster4Content = () => {
     content: string;
     keyword_1: string | null;
     keyword_2: string | null;
+    keyword_3: string | null;
     created_at: string;
     fmScore?: number;
     reviewer: {
@@ -282,8 +287,9 @@ const Cluster4Content = () => {
       season_history_id: "dummy-season-1",
       rating: 6,
       content: "안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...",
-      keyword_1: "#추진력추진력",
-      keyword_2: "#추진력추진력",
+      keyword_1: "추진력추진력",
+      keyword_2: "추진력추진력",
+      keyword_3: "끈기와인내력",
       created_at: "2025-03-23",
       reviewer: {
         id: "dummy-reviewer-1",
@@ -305,8 +311,9 @@ const Cluster4Content = () => {
       season_history_id: "dummy-season-1",
       rating: 6,
       content: "안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오...",
-      keyword_1: "#추진력추진력",
-      keyword_2: "#추진력추진력",
+      keyword_1: "추진력추진력",
+      keyword_2: "추진력추진력",
+      keyword_3: null,
       created_at: "2025-03-23",
       reviewer: {
         id: "dummy-reviewer-2",
@@ -330,6 +337,7 @@ const Cluster4Content = () => {
       content: "",
       keyword_1: null,
       keyword_2: null,
+      keyword_3: null,
       created_at: "2025-03-23",
       reviewer: {
         id: "dummy-reviewer-3",
@@ -1470,7 +1478,7 @@ const Cluster4Content = () => {
 
   // 시즌 평판 모달 열기
   const openSeasonReputationModal = () => {
-    setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+    setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
     setSeasonReputationError(null);
     setSeasonReputationSuccess(false);
     // 현재 보고 있는 시즌을 기본 선택
@@ -1484,7 +1492,7 @@ const Cluster4Content = () => {
       console.log("Demo: 시즌 평판 저장", seasonReputationEditData);
       alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
-      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
       return;
     }
 
@@ -1514,6 +1522,7 @@ const Cluster4Content = () => {
           content: seasonReputationEditData.content,
           keyword1: seasonReputationEditData.keyword1,
           keyword2: seasonReputationEditData.keyword2,
+          keyword3: seasonReputationEditData.keyword3,
         }),
       });
 
@@ -1531,7 +1540,7 @@ const Cluster4Content = () => {
 
       alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
-      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "" });
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
     } catch (error) {
       console.error("시즌 평판 저장 오류:", error);
       alert("서버 오류가 발생했습니다.");
@@ -2199,7 +2208,7 @@ const Cluster4Content = () => {
                                   </span>
                                 )}
                               </div>
-                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{roleItem.roleLabel || "-"}</span>
+                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", marginLeft: '-4px' }}>{roleItem.roleLabel || "-"}</span>
                             </div>
                           );
                         }
@@ -2211,7 +2220,7 @@ const Cluster4Content = () => {
                             <div className="badge-info">
                               <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
                             </div>
-                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>-</span>
+                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", marginLeft: '-4px' }}>-</span>
                           </div>
                         );
                       });
@@ -2260,23 +2269,24 @@ const Cluster4Content = () => {
                                 </div>
                                 <div className="info">
                                   <div className="row1">
-                                    <span style={{ display: 'inline-block', maxWidth: '56px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.display_name || "익명"}</span> <span className="separator">|</span> {genderLabel} <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>{mask.age(age)}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{mask.school(reviewer?.university)}</span> <span className="separator">|</span>{" "}
-                                    <span style={{ display: 'inline-block', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{mask.major(reviewer?.major_first)}</span>
+                                    <span style={{ display: 'inline-block', minWidth: '44px', maxWidth: '44px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.display_name || "익명"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '11px', maxWidth: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{genderLabel}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.age(age)}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.school(reviewer?.university)}</span> <span className="separator">|</span>{" "}
+                                    <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.major(reviewer?.major_first)}</span>
                                   </div>
                                   <div className="row2">
-                                    <span style={{ display: 'inline-block', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.teamName || "-"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.partName || "-"}</span>
+                                    <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.teamName || "-"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.partName || "-"}</span>
                                     {reviewer?.vision && (
                                       <>
                                         {" "}
-                                        <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer.vision}</span>
+                                        <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '110px', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer.vision}</span>
                                       </>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <div className="tags" style={{ display: 'flex', width: '100%' }}>
-                                {reputation.keyword_1 && <span className="tag" style={{ display: 'inline-block', flex: '0 0 33.33%', maxWidth: '33.33%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{reputation.keyword_1}</span>}
-                                {reputation.keyword_2 && <span className="tag-yellow" style={{ display: 'inline-block', flex: '0 0 33.33%', maxWidth: '33.33%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{reputation.keyword_2}</span>}
+                              <div className="tags" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap' }}>
+                                {reputation.keyword_1 && <span className="tag" style={{ display: 'inline-block', width: 'fit-content', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{(reputation.keyword_1 as string).slice(0, 7)}</span>}
+                                {reputation.keyword_2 && <span className="tag-yellow" style={{ display: 'inline-block', width: 'fit-content', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{(reputation.keyword_2 as string).slice(0, 7)}</span>}
+                                {reputation.keyword_3 && <span className="tag" style={{ display: 'inline-block', width: 'fit-content', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{(reputation.keyword_3 as string).slice(0, 7)}</span>}
                               </div>
                               <div
                                 className="comment"
@@ -2343,10 +2353,10 @@ const Cluster4Content = () => {
                               </div>
                               <div className="info">
                                 <div className="row1">
-                                  <span style={{ display: 'inline-block', maxWidth: '56px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span>
+                                  <span style={{ display: 'inline-block', minWidth: '44px', maxWidth: '44px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '11px', maxWidth: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span>
                                 </div>
                                 <div className="row2">
-                                  <span style={{ display: 'inline-block', maxWidth: '84px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '84px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span>
+                                  <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span>
                                 </div>
                               </div>
                             </div>
@@ -2518,9 +2528,9 @@ const Cluster4Content = () => {
               {/* 키워드 */}
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>
-                  키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 2개, 각 7자)</span>
+                  키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 3개, 각 7자)</span>
                 </label>
-                <div style={{ display: "flex", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
                     <input
@@ -2551,6 +2561,28 @@ const Cluster4Content = () => {
                       maxLength={7}
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }))}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: "48px",
+                        padding: "12px 14px",
+                        background: "#1a1f2e",
+                        border: "1px solid #FFA500",
+                        borderRadius: "0",
+                        color: "#fff",
+                        fontSize: "14px",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
+                    <input
+                      type="text"
+                      placeholder="키워드를 입력하세요"
+                      maxLength={7}
+                      value={seasonReputationEditData.keyword3}
+                      onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword3: e.target.value }))}
                       style={{
                         display: "block",
                         width: "100%",
@@ -2700,6 +2732,7 @@ const Cluster4Content = () => {
                   <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
                     {selectedReputation.keyword_1 && <span style={{ padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px" }}>#{selectedReputation.keyword_1}</span>}
                     {selectedReputation.keyword_2 && <span style={{ padding: "6px 12px", background: "rgba(255, 215, 0, 0.2)", borderRadius: "20px", color: "#FFD700", fontSize: "13px" }}>#{selectedReputation.keyword_2}</span>}
+                    {selectedReputation.keyword_3 && <span style={{ padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px" }}>#{selectedReputation.keyword_3}</span>}
                   </div>
 
                   {/* Content */}
