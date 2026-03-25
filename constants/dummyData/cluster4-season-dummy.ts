@@ -108,6 +108,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: null,
       keyword_3: null,
       fmScore: 1,
+      created_at: "2026-01-10",
       reviewer: {
         display_name: "김아",
         gender: "여",
@@ -128,6 +129,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: "성실성실",
       keyword_3: "열정",
       fmScore: 9999,
+      created_at: "2026-02-15",
       reviewer: {
         display_name: "윤재윤이",
         gender: "남",
@@ -148,6 +150,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: "짧",
       keyword_3: "중간길이태그",
       fmScore: 325,
+      created_at: "2026-03-01",
       reviewer: {
         display_name: "박서연이름길",
         gender: "여",
@@ -168,6 +171,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: null,
       keyword_3: null,
       fmScore: null,
+      created_at: "2026-01-01",
       reviewer: {
         display_name: null,
         gender: "-",
@@ -188,6 +192,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: "협업능력",
       keyword_3: null,
       fmScore: 50,
+      created_at: "2026-02-20",
       reviewer: {
         display_name: "이준",
         gender: "남",
@@ -208,6 +213,7 @@ export const DUMMY_SEASON_DATA = {
       keyword_2: "짧",
       keyword_3: "중",
       fmScore: 0,
+      created_at: "2026-03-15",
       reviewer: {
         display_name: "최하은",
         gender: "여",
@@ -260,6 +266,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: null,
         keyword_3: null,
         fmScore: 1,
+        created_at: "2025-04-10",
         reviewer: { display_name: "김아", gender: "여", birth_date: "2003-11-20", university: "한대", major_first: "경영", profile_photo_url: randomCrewProfile(), teamName: "기획", partName: "전략파트", vision: "별명짧" },
       },
     ],
@@ -302,6 +309,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: "추진력추진력력",
         keyword_3: "최대글자수테스",
         fmScore: 999,
+        created_at: "2025-06-01",
         reviewer: { display_name: "알렉산더최", gender: "남", birth_date: "1999-01-01", university: "한국예술종합학교", major_first: "미디어커뮤니케이션", profile_photo_url: randomCrewProfile(), teamName: "엔터테인먼트", partName: "글로벌마케팅", vision: "엔비디아구글테슬라쿵" },
       },
       {
@@ -312,6 +320,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: "배려",
         keyword_3: "팀워크",
         fmScore: 420,
+        created_at: "2025-06-05",
         reviewer: { display_name: "박준혁", gender: "남", birth_date: "2001-05-15", university: "성균관대학교", major_first: "컴퓨터공학과", profile_photo_url: randomCrewProfile(), teamName: "개발", partName: "백엔드", vision: "코딩왕" },
       },
       {
@@ -322,6 +331,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: null,
         keyword_3: null,
         fmScore: 42,
+        created_at: "2025-06-10",
         reviewer: { display_name: "이수", gender: "여", birth_date: "2002-08-10", university: "이화여자대학교", major_first: "디자인", profile_photo_url: randomCrewProfile(), teamName: "디자인", partName: "UI", vision: "요정" },
       },
       {
@@ -332,6 +342,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: null,
         keyword_3: null,
         fmScore: 1998,
+        created_at: "2025-07-01",
         reviewer: { display_name: "최유진", gender: "여", birth_date: "2001-03-25", university: "고려대학교", major_first: "사회학과", profile_photo_url: randomCrewProfile(), teamName: "기획", partName: "전략", vision: "전략가전략가" },
       },
       {
@@ -342,6 +353,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: "근성",
         keyword_3: null,
         fmScore: 100,
+        created_at: "2025-07-15",
         reviewer: { display_name: "정민수", gender: "남", birth_date: "2000-07-12", university: "서울과학기술", major_first: "경영정보시스템공학", profile_photo_url: randomCrewProfile(), teamName: "사업개발전략", partName: "제휴협력사업", vision: "사업가" },
       },
     ],
@@ -404,6 +416,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: null,
         keyword_3: null,
         fmScore: 15,
+        created_at: "2025-12-01",
         reviewer: { display_name: "한소희", gender: "여", birth_date: "2002-04-18", university: "이화", major_first: "디자인", profile_photo_url: randomCrewProfile(), teamName: "디자인", partName: "UI", vision: "디자인요정" },
       },
       {
@@ -414,6 +427,7 @@ export const DUMMY_SEASON_HISTORIES = [
         keyword_2: null,
         keyword_3: null,
         fmScore: 2,
+        created_at: "2025-12-10",
         reviewer: { display_name: "오", gender: "남", birth_date: "2003-12-01", university: "서울", major_first: "경제", profile_photo_url: randomCrewProfile(), teamName: "기획", partName: "전략", vision: "짧" },
       },
     ],

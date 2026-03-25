@@ -2718,21 +2718,21 @@ const Cluster4Content = () => {
                     <img src={reviewer?.profile_photo_url || "/images/avatar/avatar.png"} alt="profile" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255, 165, 0, 0.3)" }} />
                     <div>
                       <div style={{ color: "#fff", fontSize: "16px", fontWeight: 600, marginBottom: "4px" }}>{reviewer?.display_name || "익명"}</div>
-                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>
-                        {genderLabel} | {mask.age(age)}세 | {mask.school(reviewer?.university)} | {mask.major(reviewer?.major_first)}
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "12px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                        {genderLabel} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.age(age)} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.school(reviewer?.university)} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.major(reviewer?.major_first)}
                       </div>
-                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "2px" }}>
-                        {(reviewer?.teamName || "-").slice(0, 6)} | {(reviewer?.partName || "-").slice(0, 6)}
-                        {reviewer?.vision && ` | ${reviewer.vision}`}
+                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", fontFamily: "'Pretendard', sans-serif", marginTop: "2px", whiteSpace: "nowrap" }}>
+                        {reviewer?.teamName || "-"} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {reviewer?.partName || "-"}
+                        {reviewer?.vision && (<><span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {reviewer.vision}</>)}
                       </div>
                     </div>
                   </div>
 
                   {/* Keywords */}
                   <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-                    {selectedReputation.keyword_1 && <span style={{ padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px" }}>#{selectedReputation.keyword_1}</span>}
-                    {selectedReputation.keyword_2 && <span style={{ padding: "6px 12px", background: "rgba(255, 215, 0, 0.2)", borderRadius: "20px", color: "#FFD700", fontSize: "13px" }}>#{selectedReputation.keyword_2}</span>}
-                    {selectedReputation.keyword_3 && <span style={{ padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px" }}>#{selectedReputation.keyword_3}</span>}
+                    {selectedReputation.keyword_1 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_1 as string).slice(0, 7)}</span>}
+                    {selectedReputation.keyword_2 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(255, 215, 0, 0.2)", borderRadius: "20px", color: "#FFD700", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_2 as string).slice(0, 7)}</span>}
+                    {selectedReputation.keyword_3 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_3 as string).slice(0, 7)}</span>}
                   </div>
 
                   {/* Content */}
@@ -2762,15 +2762,15 @@ const Cluster4Content = () => {
                             <img key={`empty-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: "18px", height: "18px", opacity: 0.2 }} />
                           ))}
                         </div>
-                        <span style={{ color: "#FAAB07", fontSize: "14px", fontWeight: 600 }}>{selectedReputation.rating.toFixed(1)} / 10.0</span>
+                        <span style={{ color: "#FAAB07", fontSize: "14px", fontWeight: 600 }}>{selectedReputation.rating} / 10</span>
                       </div>
                       <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>|</span>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" style={{ width: "16px", height: "16px", opacity: 0.8 }} />
-                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px" }}>FM : 3</span>
+                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px" }}>FM : {selectedReputation.fmScore ?? 0}</span>
                       </div>
                     </div>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>{new Date(selectedReputation.created_at).toLocaleDateString("ko-KR")}</span>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>{selectedReputation.created_at && !isNaN(new Date(selectedReputation.created_at).getTime()) ? new Date(selectedReputation.created_at).toLocaleDateString("ko-KR") : "-"}</span>
                   </div>
                 </div>
               </div>
