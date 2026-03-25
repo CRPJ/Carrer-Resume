@@ -165,8 +165,8 @@ export const DUMMY_WEEK_EXTRA: Record<
   "dw-08": {
     // 휴식(개인) — 모두 0
     points: { star: 0, shield: 0, lightning: 0 },
-    teamPart: { teamName: null, partName: null },
-    roleLabel: "최대8자까지가능",
+    teamPart: { teamName: "일이삼사오육칠팔구", partName: "일이삼사오육칠팔구" },
+    roleLabel: "일이삼사오육칠팔구",
     growthRate: { rate: 0, count: 0, total: 0 },
     infoRate: { rate: 0, count: 0, total: 0 },
     competencyRate: { rate: 0, count: 0, total: 0 },
