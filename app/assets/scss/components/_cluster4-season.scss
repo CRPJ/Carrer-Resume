@@ -2919,7 +2919,7 @@
           display: flex;
           flex-direction: column;
           gap: 5px;
-          margin-left: 82px;
+          margin-left: 63px;
           align-items: flex-start;
           opacity: 1;
           transform: translateY(0);
@@ -3239,7 +3239,7 @@
                 left: 0;
                 right: 0;
                 font-family: "Pretendard", sans-serif;
-                font-size: 0.875rem;
+                font-size: 1.0625rem;
                 font-weight: 700;
                 color: #fff;
                 text-align: center;
@@ -3285,6 +3285,9 @@
                     display: inline-block;
                     min-width: 3ch;
                     text-align: right;
+                    font-size: 1.5rem;
+                    color: #faab07;
+                    font-weight: 700;
                   }
 
                   .progress-icon {
@@ -3360,7 +3363,7 @@
           gap: 4px;
           padding: 0;
           overflow: hidden;
-          margin-left: 4px;
+          margin-left: -15px;
           margin-top: -11px;
 
           &.fading {
@@ -3404,6 +3407,7 @@
                   display: inline-block;
                   min-width: 2ch;
                   text-align: right;
+                  font-size: 16px;
                 }
               }
             }
@@ -3429,7 +3433,8 @@
                 justify-content: flex-start;
                 gap: 8px;
                 width: calc(100% - 2px);
-                height: 38px;
+                aspect-ratio: 367 / 38;
+                height: auto;
                 flex-shrink: 0;
                 padding: 5px; // 5px 0 5px 2px → 5px
                 background: #1b1b1b;
@@ -3554,6 +3559,7 @@
                   display: inline-block;
                   min-width: 2ch;
                   text-align: right;
+                  font-size: 16px;
                 }
               }
             }
@@ -3576,7 +3582,7 @@
 
               .profile-card {
                 position: relative;
-                width: 337px;
+                width: 100%;
                 background: radial-gradient(ellipse 51.26% 226.96% at 50% 50%, rgba(15, 30, 26, 0.5) 0%, rgba(15, 30, 26, 0.5) 40%, rgba(255, 255, 255, 0.08) 100%);
                 padding: 0;
                 border-radius: 0;
@@ -3587,7 +3593,8 @@
                 overflow: hidden;
                 border-left: 1px solid rgba(255, 255, 255, 0.1);
                 border-right: 1px solid rgba(255, 255, 255, 0.1);
-                height: 150px;
+                aspect-ratio: 337 / 150;
+                height: auto;
 
                 // 상단 좌측 teal 데코 라인
                 &::before {

@@ -1917,7 +1917,7 @@ const Cluster4Content = () => {
             <div className={`area-1-title ${isTextFading ? "fading" : ""}`}>
               <div className="season-main-title">
                 <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: "inline-block", width: "1.2em" }}></span>
-                <span className="season-highlight">{currentSeason.season}</span> 시즌
+                <span className="season-highlight" style={{ display: 'inline-block', minWidth: '2em', textAlign: 'right' }}>{currentSeason.season}</span> 시즌
               </div>
               <span className="bullet-dot" style={{ display: "inline-block", width: "2px", height: "2px", background: "#FAAB07", borderRadius: "50%", marginLeft: "15px", transform: "translateY(0px)" }}></span>
               <div className="date-status">
@@ -2122,7 +2122,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 정보 강화율 <span className="rate-number">{currentSeason.progress.info.rate}</span>%
+                      <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 <span style={{ color: '#FF9B9B' }}>정보</span> 강화율 <span className="rate-number">{currentSeason.progress.info.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.info.total}</span> 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개
@@ -2135,7 +2135,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="2" className="progress-icon" /> 실무 역량 강화율 <span className="rate-number">{currentSeason.progress.competency.rate}</span>%
+                      <img src="/images/0/cluster4/icon/2 실무 경험.png" alt="2" className="progress-icon" /> 실무 <span style={{ color: '#FFD09B' }}>경험</span> 강화율 <span className="rate-number">{currentSeason.progress.competency.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.competency.total}</span> 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개
@@ -2148,7 +2148,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="3" className="progress-icon" /> 실무 경험 강화율 <span className="rate-number">{currentSeason.progress.experience.rate}</span>%
+                      <img src="/images/0/cluster4/icon/3 실무 역량.png" alt="3" className="progress-icon" /> 실무 <span style={{ color: '#A8D8A8' }}>역량</span> 강화율 <span className="rate-number">{currentSeason.progress.experience.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.experience.total}</span> 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개
@@ -2161,7 +2161,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 경력 강화율 <span className="rate-number">{currentSeason.progress.career.rate}</span>%
+                      <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 <span style={{ color: '#9BB8FF' }}>경력</span> 강화율 <span className="rate-number">{currentSeason.progress.career.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.career.total}</span> 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개
@@ -2200,15 +2200,15 @@ const Cluster4Content = () => {
                               <div className="badge-info">
                                 {roleItem.isAdmin ? (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>{`운영진(${roleItem.adminGeneration}기)`}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{`운영진(${roleItem.adminGeneration}기)`}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 ) : (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>{roleItem.teamName || "-"}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{roleItem.partName || "-"}</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{roleItem.teamName || "-"}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{roleItem.partName || "-"}</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 )}
                               </div>
-                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", marginLeft: '-4px' }}>{roleItem.roleLabel || "-"}</span>
+                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '12px', marginLeft: '-4px' }}>{roleItem.roleLabel || "-"}</span>
                             </div>
                           );
                         }
@@ -2218,9 +2218,9 @@ const Cluster4Content = () => {
                               <div style={{ width: "100%", height: "100%", background: "#555", borderRadius: "50%" }} />
                             </div>
                             <div className="badge-info">
-                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
+                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
                             </div>
-                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", marginLeft: '-4px' }}>-</span>
+                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '12px', marginLeft: '-4px' }}>-</span>
                           </div>
                         );
                       });
@@ -2269,15 +2269,15 @@ const Cluster4Content = () => {
                                 </div>
                                 <div className="info">
                                   <div className="row1">
-                                    <span style={{ display: 'inline-block', minWidth: '44px', maxWidth: '44px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.display_name || "익명"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '11px', maxWidth: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{genderLabel}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.age(age)}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.school(reviewer?.university)}</span> <span className="separator">|</span>{" "}
-                                    <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{mask.major(reviewer?.major_first)}</span>
+                                    <span style={{ display: 'inline-block', minWidth: '56px', maxWidth: '56px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.display_name || reviewer?.display_name === '-') ? 'left' : undefined }}>{reviewer?.display_name || "익명"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '14px', maxWidth: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (genderLabel === '-') ? 'left' : undefined }}>{genderLabel}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: (!age && age !== 0) ? 'left' : 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{mask.age(age)}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '98px', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.university || reviewer?.university === '-') ? 'left' : undefined }}>{mask.school(reviewer?.university)}</span> <span className="separator">|</span>{" "}
+                                    <span style={{ display: 'inline-block', minWidth: '98px', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.major_first || reviewer?.major_first === '-') ? 'left' : undefined }}>{mask.major(reviewer?.major_first)}</span>
                                   </div>
                                   <div className="row2">
-                                    <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.teamName || "-"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer?.partName || "-"}</span>
+                                    <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.teamName || reviewer?.teamName === '-') ? 'left' : undefined }}>{reviewer?.teamName || "-"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.partName || reviewer?.partName === '-') ? 'left' : undefined }}>{reviewer?.partName || "-"}</span>
                                     {reviewer?.vision && (
                                       <>
                                         {" "}
-                                        <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '110px', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>{reviewer.vision}</span>
+                                        <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '140px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{reviewer.vision}</span>
                                       </>
                                     )}
                                   </div>
@@ -2353,10 +2353,10 @@ const Cluster4Content = () => {
                               </div>
                               <div className="info">
                                 <div className="row1">
-                                  <span style={{ display: 'inline-block', minWidth: '44px', maxWidth: '44px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '11px', maxWidth: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span>
+                                  <span style={{ display: 'inline-block', minWidth: '56px', maxWidth: '56px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '14px', maxWidth: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '98px', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '98px', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
                                 </div>
                                 <div className="row2">
-                                  <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '66px', maxWidth: '66px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '12px' }}>-</span>
+                                  <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '84px', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
                                 </div>
                               </div>
                             </div>

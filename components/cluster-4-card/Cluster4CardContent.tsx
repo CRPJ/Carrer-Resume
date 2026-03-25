@@ -2859,7 +2859,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
+              <img src="/images/0/cluster4/icon/2 실무 경험.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">역량</span></span>
             </div>
             <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
@@ -2972,7 +2972,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           )}
           <div className="section-header-row">
             <div className="section-title-left">
-              <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
+              <img src="/images/0/cluster4/icon/3 실무 역량.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 <span className="keyword-highlight">경험</span></span>
             </div>
             <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
