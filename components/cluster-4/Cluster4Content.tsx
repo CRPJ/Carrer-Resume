@@ -156,10 +156,10 @@ const Cluster4Content = () => {
   }, [isDemoMode, urlUserId]);
 
   const demoCollectionMessage = isDemoMode && demoUserName ? ({
-    '윤재윤': <>현재 클럽은, <strong>26년 봄 시즌, 1주차</strong>를 진행 중에 있습니다.</>,
-    '전민경': <>현재 클럽은, <strong>26년 가을 시즌, 16주차</strong>를 진행 중에 있습니다.</>,
-    '곽예원': <>현재 클럽은, <strong>26년 겨울 시즌, 99주차</strong>를 진행 중에 있습니다.</>,
-    '김의환': <>현재 클럽은, <strong>26년 여름 시즌, 전환 주차</strong>를 진행 중에 있습니다.</>,
+    '윤재윤': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 봄 시즌</span>을 가동 중에 있습니다.</>,
+    '전민경': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 여름 시즌</span>을 준비 중인 전환 과정에 있습니다.</>,
+    '곽예원': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 겨울 시즌</span>을 가동 중에 있습니다.</>,
+    '김의환': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 가을 시즌</span>을 준비 중인 전환 과정에 있습니다.</>,
   } as Record<string, React.ReactNode>)[demoUserName] || null : null;
 
   // 승인 상태 확인 함수
@@ -1789,19 +1789,11 @@ const Cluster4Content = () => {
                   {demoCollectionMessage ? demoCollectionMessage : (
                     currentSeasonInfo?.isBreakSeason ? (
                       <>
-                        현재 클럽은,{" "}
-                        <strong>
-                          {currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌
-                        </strong>
-                        에서{" "}
-                        <strong>
-                          {currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌
-                        </strong>
-                        으로 가는 휴식(시즌 전환) 중에 있습니다.
+                        현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</span>을 준비 중인 전환 과정에 있습니다.
                       </>
                     ) : (
                       <>
-                        현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : "로딩 중..."}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || "공식"})` : "진행"} 중에 있습니다.
+                        현재 클럽은, {currentSeasonInfo ? <><span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>{currentSeasonInfo.year}년 {currentSeasonInfo.name} 시즌</span>을 가동 중에 있습니다.</> : "로딩 중..."}
                       </>
                     )
                   )}

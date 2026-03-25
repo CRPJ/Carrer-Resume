@@ -2128,7 +2128,7 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-badge role">
                                 <img src="/images/0/cluster4/icon/icon - 8.png" alt="role" className="role-icon" />
-                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{roleInfo?.roleLabel || '-'}</span>
+                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{roleInfo?.roleLabel || '-'}</span>
                               </span>
                             </div>
                           </>
