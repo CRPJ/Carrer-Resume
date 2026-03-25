@@ -2191,15 +2191,15 @@ const Cluster4Content = () => {
                               <div className="badge-info">
                                 {roleItem.isAdmin ? (
                                   <span className="badge-text">
-                                    운영진({roleItem.adminGeneration}기) <span className="separator">|</span> <span className="sub-text">클럽 단위</span> <span className="separator">|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>{`운영진(${roleItem.adminGeneration}기)`}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 ) : (
                                   <span className="badge-text">
-                                    {(roleItem.teamName || "-").slice(0, 6)} <span className="separator">|</span> <span className="sub-text">{(roleItem.partName || "-").slice(0, 6)}</span> <span className="separator">|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>{roleItem.teamName || "-"}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{roleItem.partName || "-"}</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 )}
                               </div>
-                              <span className="badge-status yellow">{roleItem.roleLabel}</span>
+                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{roleItem.roleLabel || "-"}</span>
                             </div>
                           );
                         }
@@ -2209,9 +2209,9 @@ const Cluster4Content = () => {
                               <div style={{ width: "100%", height: "100%", background: "#555", borderRadius: "50%" }} />
                             </div>
                             <div className="badge-info">
-                              <span className="badge-text">- <span className="separator">|</span> <span className="sub-text">-</span> <span className="separator">|</span></span>
+                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '0.75rem' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '78px', maxWidth: '78px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
                             </div>
-                            <span className="badge-status yellow">-</span>
+                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '104px', maxWidth: '104px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>-</span>
                           </div>
                         );
                       });
@@ -2260,23 +2260,23 @@ const Cluster4Content = () => {
                                 </div>
                                 <div className="info">
                                   <div className="row1">
-                                    {reviewer?.display_name || "익명"} <span className="separator">|</span> {genderLabel} <span className="separator">|</span> {mask.age(age)}세 <span className="separator">|</span> {mask.school(reviewer?.university)} <span className="separator">|</span>{" "}
-                                    {mask.major(reviewer?.major_first)}
+                                    <span style={{ display: 'inline-block', maxWidth: '56px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.display_name || "익명"}</span> <span className="separator">|</span> {genderLabel} <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>{mask.age(age)}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{mask.school(reviewer?.university)}</span> <span className="separator">|</span>{" "}
+                                    <span style={{ display: 'inline-block', maxWidth: '98px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{mask.major(reviewer?.major_first)}</span>
                                   </div>
                                   <div className="row2">
-                                    {(reviewer?.teamName || "-").slice(0, 6)} <span className="separator">|</span> {(reviewer?.partName || "-").slice(0, 6)}
+                                    <span style={{ display: 'inline-block', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.teamName || "-"}</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '84px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer?.partName || "-"}</span>
                                     {reviewer?.vision && (
                                       <>
                                         {" "}
-                                        <span className="separator">|</span> {reviewer.vision}
+                                        <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>{reviewer.vision}</span>
                                       </>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <div className="tags">
-                                {reputation.keyword_1 && <span className="tag">#{reputation.keyword_1}</span>}
-                                {reputation.keyword_2 && <span className="tag-yellow">#{reputation.keyword_2}</span>}
+                              <div className="tags" style={{ display: 'flex', width: '100%' }}>
+                                {reputation.keyword_1 && <span className="tag" style={{ display: 'inline-block', flex: '0 0 33.33%', maxWidth: '33.33%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{reputation.keyword_1}</span>}
+                                {reputation.keyword_2 && <span className="tag-yellow" style={{ display: 'inline-block', flex: '0 0 33.33%', maxWidth: '33.33%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>#{reputation.keyword_2}</span>}
                               </div>
                               <div
                                 className="comment"
@@ -2310,7 +2310,7 @@ const Cluster4Content = () => {
                               </div>
                               <div className="stats">
                                 <span className="pm">
-                                  <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM :{reputation.fmScore ?? 0}
+                                  <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: 'inline-block', minWidth: '4ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
                                 </span>
                                 <span className="rating">
                                   {[...Array(fullStars)].map((_, i) => (
@@ -2325,7 +2325,7 @@ const Cluster4Content = () => {
                                   {[...Array(emptyStars)].map((_, i) => (
                                     <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
                                   ))}
-                                  <span className="rating-score">{reputation.rating} / 10</span>
+                                  <span className="rating-score"><span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>{reputation.rating}</span> / 10</span>
                                 </span>
                               </div>
                             </div>
@@ -2343,10 +2343,10 @@ const Cluster4Content = () => {
                               </div>
                               <div className="info">
                                 <div className="row1">
-                                  <span>-</span> <span className="separator">|</span> <span>-</span> <span className="separator">|</span> <span>-</span>
+                                  <span style={{ display: 'inline-block', maxWidth: '56px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '98px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span>
                                 </div>
                                 <div className="row2">
-                                  <span>-</span> <span className="separator">|</span> <span>-</span>
+                                  <span style={{ display: 'inline-block', maxWidth: '84px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', maxWidth: '84px', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif" }}>-</span>
                                 </div>
                               </div>
                             </div>
@@ -2355,12 +2355,12 @@ const Cluster4Content = () => {
                               <span className="comment-text">-</span>
                             </div>
                             <div className="stats">
-                              <span className="pm">FM : -</span>
+                              <span className="pm">FM : <span style={{ display: 'inline-block', minWidth: '4ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif" }}>-</span></span>
                               <span className="rating">
                                 {[...Array(5)].map((_, i) => (
                                   <img key={`empty-star-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
                                 ))}
-                                <span className="rating-score">- / 10</span>
+                                <span className="rating-score"><span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>-</span> / 10</span>
                               </span>
                             </div>
                           </div>
