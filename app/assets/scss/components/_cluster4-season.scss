@@ -3671,13 +3671,15 @@
                   min-width: 0;
 
                   .row1 {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: nowrap;
                     font-family: "Pretendard", sans-serif;
                     font-size: 0.75rem;
                     color: #fff;
                     font-weight: 400;
                     white-space: nowrap;
                     overflow: hidden;
-                    text-overflow: ellipsis;
                     letter-spacing: -0.5px;
                     line-height: 19px;
 
@@ -3691,13 +3693,15 @@
                   }
 
                   .row2 {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: nowrap;
                     font-family: "Pretendard", sans-serif;
                     font-size: 0.75rem;
                     color: #fff;
                     font-weight: 400;
                     white-space: nowrap;
                     overflow: hidden;
-                    text-overflow: ellipsis;
                     letter-spacing: -0.5px;
                     line-height: 19px;
 
