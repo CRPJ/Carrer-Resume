@@ -3363,7 +3363,7 @@
           gap: 4px;
           padding: 0;
           overflow: hidden;
-          margin-left: -26px;
+          margin-left: -30px;
           margin-top: -11px;
 
           &.fading {
@@ -3475,8 +3475,6 @@
                     font-weight: 700;
                     color: #fff;
                     white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
                     line-height: 28px;
                     display: inline-block;
                     vertical-align: middle;
@@ -3505,8 +3503,6 @@
                   margin: 0 5px 0 0;
                   border-radius: 20px;
                   white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
                   display: flex;
                   align-items: center;
                   justify-content: center;
