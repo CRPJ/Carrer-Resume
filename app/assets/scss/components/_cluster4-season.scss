@@ -3568,7 +3568,7 @@
               position: relative;
               display: flex;
               flex-direction: column;
-              gap: 15px;
+              gap: 8px;
               background: #1b1b1b;
               max-height: 378px; // 카드 2.5개 보임 (150×2 + 15gap + 75절반 ≈ 390 > 378)
               overflow-y: auto;
@@ -3734,7 +3734,7 @@
                   color: #00ffbe;
                   border-radius: 4px;
                   font-family: "Rajdhani", sans-serif;
-                  font-size: 0.6rem;
+                  font-size: 11.6px;
                   font-weight: 500;
                   white-space: nowrap;
                   padding: 4px 7.2px;
@@ -3750,7 +3750,7 @@
                   color: #ebf748;
                   border-radius: 4px;
                   font-family: "Rajdhani", sans-serif;
-                  font-size: 0.6rem;
+                  font-size: 11.6px;
                   font-weight: 500;
                   white-space: nowrap;
                   padding: 4px 7.2px;
