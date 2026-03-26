@@ -2205,15 +2205,15 @@ const Cluster4Content = () => {
                               <div className="badge-info">
                                 {roleItem.isAdmin ? (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(`운영진(${roleItem.adminGeneration}기)`, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(`운영진(${roleItem.adminGeneration}기)`, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 ) : (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.teamName, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.partName, 6)}</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.teamName, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.partName, 6)}</span> <span className="separator" style={{ margin: '0' }}>|</span>
                                   </span>
                                 )}
                               </div>
-                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '88px', maxWidth: '88px', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '12px', marginLeft: '-4px' }}>{truncate(roleItem.roleLabel, 8)}</span>
+                              <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '115px', maxWidth: '115px', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px', padding: '4px 10px', marginLeft: '-4px' }}>{truncate(roleItem.roleLabel, 9)}</span>
                             </div>
                           );
                         }
@@ -2223,9 +2223,9 @@ const Cluster4Content = () => {
                               <div style={{ width: "100%", height: "100%", background: "#555", borderRadius: "50%" }} />
                             </div>
                             <div className="badge-info">
-                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '77px', maxWidth: '77px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
+                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
                             </div>
-                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '88px', maxWidth: '88px', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '12px', marginLeft: '-4px' }}>-</span>
+                            <span className="badge-status yellow" style={{ display: 'inline-block', minWidth: '115px', maxWidth: '115px', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px', padding: '4px 10px', marginLeft: '-4px' }}>-</span>
                           </div>
                         );
                       });
