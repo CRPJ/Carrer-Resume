@@ -70,7 +70,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const isDemoMode = checkDemoMode();
   const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
     const t = text || '-';
-    return t.length > maxLen ? t.slice(0, maxLen) + '...' : t;
+    return t.length > maxLen ? t.slice(0, maxLen) + '..' : t;
   };
   const isOwner = !urlUserId || (session?.user?.id === urlUserId);
 
@@ -2547,7 +2547,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
               <div className="info-badge role" style={{ width: 'fit-content', minWidth: 'auto', maxWidth: '150px', fontFamily: "'Pretendard', sans-serif" }}>
                 <img src="/images/0/cluster4/icon/Interface/Star-3.png" alt="role" />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(roleLabel || '-').length > 9 ? (roleLabel || '-').slice(0, 9) + '..' : (roleLabel || '-')}</span>
+                <span style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>{(roleLabel || '-').length > 9 ? (roleLabel || '-').slice(0, 9) + '..' : (roleLabel || '-')}</span>
               </div>
               <div className="info-badge week" style={{ flexShrink: 0, marginLeft: 'auto' }}>
                 <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
@@ -2556,15 +2556,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="header-info-row2" style={{ gap: '11px' }}>
               <div className="info-group left" style={{ flexShrink: 0 }}>
-                <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{
+                <span className="info-item team" style={{ display: 'inline-flex', minWidth: '189px', maxWidth: '189px', fontSize: '16px', fontFamily: "'Pretendard', sans-serif" }}><strong>[팀]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '클럽 온보딩'
                     : teamName === '운영진' && generation
                       ? `운영진(${generation}기)`
                       : ((teamName || '-').length > 6 ? (teamName || '-').slice(0, 6) + '..' : (teamName || '-'))
                 }</span></span>
-                <span className="info-divider">|</span>
-                <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
+                <span className="info-divider" style={{ marginLeft: '-76px' }}>|</span>
+                <span className="info-item part" style={{ display: 'inline-flex', minWidth: '189px', maxWidth: '189px', fontSize: '16px', fontFamily: "'Pretendard', sans-serif" }}><strong>[파트]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '신입OT'
                     : teamName === '운영진' && partName === '팀장' && managedTeamName
@@ -2572,26 +2572,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       : ((partName || '-').length > 6 ? (partName || '-').slice(0, 6) + '..' : (partName || '-'))
                 }</span></span>
               </div>
-              <div className="info-group right" style={{ gap: '8px', marginLeft: 'auto' }}>
+              <div className="info-group right" style={{ gap: '8px', fontSize: '17px', fontFamily: "'Pretendard', sans-serif", marginLeft: '-60px' }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   단감
                   <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
-                  <strong className="number-value">{weekPoints.star}</strong>
+                  <strong className="number-value" style={{ display: 'inline-block', minWidth: '3ch', textAlign: 'right' }}>{weekPoints.star}</strong>
                   <span className="unit-text">개</span>
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">{weekPoints.shield - weekPoints.lightning}</strong>
+                  <strong className="number-value" style={{ display: 'inline-block', minWidth: '3ch', textAlign: 'right' }}>{weekPoints.shield - weekPoints.lightning}</strong>
                   <span className="unit-text">개</span>
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   어흥
                   <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                  <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
+                  <strong className="number-value" style={{ display: 'inline-block', minWidth: '3ch', textAlign: 'right' }}>{Math.abs(weekPoints.lightning)}</strong>
                   <span className="unit-text">개</span>
                 </span>
               </div>
@@ -2626,18 +2626,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="profile-info">
                       <div className="profile-name">{isEmpty ? <><span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span></> : <><span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span></>}</div>
-                      <div className="profile-details">
+                      <div className="profile-details" style={{ fontSize: '16px' }}>
                         {isEmpty ? (
                           <>
-                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학교</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학과</span></div>
-                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">팀</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">파트</span></div>
+                            <div className="detail-line"><span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>-</span><span className="label" style={{ fontSize: '16px' }}>학교</span> | <span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>-</span><span className="label" style={{ fontSize: '16px' }}>학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>-</span><span className="label" style={{ fontSize: '16px' }}>팀</span> | <span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>-</span><span className="label" style={{ fontSize: '16px' }}>파트</span></div>
                             <div className="detail-line"><span className="text">&nbsp;</span></div>
                           </>
                         ) : (
                           <>
-                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span></div>
-                            <div className="detail-line"><span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ width: '69px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span></div>
-                            <div className="detail-line"><span className="nickname">{user.nickname}</span></div>
+                            <div className="detail-line"><span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>{truncate(formatSchool(mask.school(user.university)), 7)}</span><span className="label" style={{ fontSize: '16px' }}>학교</span> | <span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>{truncate(formatMajor(mask.major(user.major)), 7)}</span><span className="label" style={{ fontSize: '16px' }}>학과</span></div>
+                            <div className="detail-line"><span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>{(user.team || '-').slice(0, 6)}</span><span className="label" style={{ fontSize: '16px' }}>팀</span> | <span className="text" style={{ flex: 1, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap', textAlign: 'right' }}>{(user.part || '-').slice(0, 6)}</span><span className="label" style={{ fontSize: '16px' }}>파트</span></div>
+                            <div className="detail-line"><span className="nickname" style={{ fontSize: '16px' }}>{user.nickname}</span></div>
                           </>
                         )}
                       </div>
@@ -2646,13 +2646,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="profile-divider"></div>
                   <div className="card-rating">
                     <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
-                    <span className="rating-count">{isEmpty ? '- / 10' : user.ratingCount}</span>
+                    <span className="rating-count" style={{ fontSize: '14px' }}>{isEmpty ? '- / 10' : user.ratingCount}</span>
                   </div>
-                  <div className="card-description">{isEmpty ? '-' : <>{user.description.length > 20 ? `${user.description.slice(0, 20)}...` : user.description} <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
+                  <div className="card-description" style={{ fontSize: '15px' }}>{isEmpty ? '-' : <>{user.description.length > 20 ? `${user.description.slice(0, 20)}..` : user.description} <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" /></>}</div>
                   <div className="card-footer">
-                    <span className="fm-badge"><img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
+                    <span className="fm-badge" style={{ fontSize: '17px' }}><img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? '-' : user.fm}</span>
                     <span className="footer-divider">|</span>
-                    <span className={`tag ${isEmpty ? 'tag--dark' : user.tagColor}`}>{isEmpty ? '-' : user.tagText}</span>
+                    <span className={`tag ${isEmpty ? 'tag--dark' : user.tagColor}`} style={{ fontSize: '11.6px' }}>{isEmpty ? '-' : user.tagText}</span>
                   </div>
                 </div>
                 );
@@ -2668,7 +2668,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="edit-icon" onClick={() => {
                   if (!isDemoMode && !isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
                   handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
-                }} style={{ cursor: 'pointer' }}>
+                }} style={{ cursor: 'pointer', marginTop: '8px' }}>
                   <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
                 </div>
               </div>
@@ -2706,11 +2706,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
                         </div>
                       </div>
-                      <div className="profile-details">
+                      <div className="profile-details" style={{ fontSize: '16px' }}>
                         {isEmpty ? (
-                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>-</span><span className="label">파트</span></>
+                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>-</span><span className="label" style={{ fontSize: '16px' }}>학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>-</span><span className="label" style={{ fontSize: '16px' }}>학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>-</span><span className="label" style={{ fontSize: '16px' }}>팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>-</span><span className="label" style={{ fontSize: '16px' }}>파트</span></>
                         ) : (
-                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatSchool(mask.school(user.university))}</span><span className="label">학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formatMajor(mask.major(user.major))}</span><span className="label">학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.team || '-').slice(0, 6)}</span><span className="label">팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{(user.part || '-').slice(0, 6)}</span><span className="label">파트</span> | <span className="nickname">{truncate(user.nickname)}</span></>
+                          <><span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>{formatSchool(mask.school(user.university))}</span><span className="label" style={{ fontSize: '16px' }}>학교</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>{formatMajor(mask.major(user.major))}</span><span className="label" style={{ fontSize: '16px' }}>학과</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>{(user.team || '-').slice(0, 6)}</span><span className="label" style={{ fontSize: '16px' }}>팀</span> | <span className="text" style={{ width: '88px', flexShrink: 0, overflow: 'hidden', textOverflow: 'clip', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", whiteSpace: 'nowrap' }}>{(user.part || '-').slice(0, 6)}</span><span className="label" style={{ fontSize: '16px' }}>파트</span> | <span className="nickname" style={{ fontSize: '16px' }}>{truncate(user.nickname)}</span></>
                         )}
                       </div>
                     </div>
@@ -4250,7 +4250,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <input
                         type="text"
                         placeholder="키워드를 입력하세요"
-                        maxLength={7}
+                        maxLength={10}
                         value={reputationEditData.keyword}
                         onChange={(e) => setReputationEditData(prev => ({ ...prev, keyword: e.target.value }))}
                         style={{

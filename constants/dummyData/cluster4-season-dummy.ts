@@ -252,7 +252,7 @@ export const DUMMY_SEASON_HISTORIES = [
     progress: { info: { total: 40, completed: 20, rate: 50 }, competency: { total: 5, completed: 5, rate: 100 }, experience: { total: 8, completed: 3, rate: 38 }, career: { total: 999, completed: 999, rate: 100 } },
     // 시즌 상태: 3개
     seasonRoles: [
-      { profileImage: randomCrewProfile(), teamName: "기획이란무엇인가", partName: "전략파트", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3 },
+      { profileImage: randomCrewProfile(), teamName: "기획이란무엇인가", partName: "전략파트란무엇인가", roleLabel: "운영진(앰배서더)", isAdmin: false, adminGeneration: 3 },
       { profileImage: randomCrewProfile(), teamName: "일이삼사오육칠팔구십", partName: "일이삼사오육칠팔구십", roleLabel: "팀장(헬스케어 팀)", isAdmin: true, adminGeneration: 3 },
       { profileImage: randomCrewProfile(), teamName: null, partName: null, roleLabel: "앰배서더", isAdmin: true, adminGeneration: 4 },
     ],

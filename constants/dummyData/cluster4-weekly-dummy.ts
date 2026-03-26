@@ -67,7 +67,7 @@ export const DUMMY_WEEK_EXTRA: Record<
   "dw-01": {
     // 휴식(개인) — 모두 0
     points: { star: 0, shield: 0, lightning: 0 },
-    teamPart: { teamName: "엔터테인먼트", partName: "팬마케팅" },
+    teamPart: { teamName: "엔터테인먼트라구", partName: "팬마케팅이라구" },
     roleLabel: "일반",
     growthRate: { rate: 0, count: 0, total: 1 },
     infoRate: { rate: 0, count: 0, total: 0 },
