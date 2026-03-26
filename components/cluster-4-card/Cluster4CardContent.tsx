@@ -2563,8 +2563,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       ? `운영진(${generation}기)`
                       : ((teamName || '-').length > 6 ? (teamName || '-').slice(0, 6) + '..' : (teamName || '-'))
                 }</span></span>
-                <span className="info-divider" style={{ marginLeft: '-76px' }}>|</span>
-                <span className="info-item part" style={{ display: 'inline-flex', minWidth: '189px', maxWidth: '189px', fontSize: '16px', fontFamily: "'Pretendard', sans-serif" }}><strong>[파트]</strong> <span className="text-gray">{
+                <span className="info-divider" style={{ marginLeft: '-68px' }}>|</span>
+                <span className="info-item part" style={{ display: 'inline-flex', minWidth: '189px', maxWidth: '189px', fontSize: '16px', fontFamily: "'Pretendard', sans-serif", marginLeft: '-4px' }}><strong>[파트]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '신입OT'
                     : teamName === '운영진' && partName === '팀장' && managedTeamName
