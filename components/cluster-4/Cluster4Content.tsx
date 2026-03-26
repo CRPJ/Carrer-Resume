@@ -1914,13 +1914,13 @@ const Cluster4Content = () => {
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
-            <div className={`area-1-title ${isTextFading ? "fading" : ""}`}>
-              <div className="season-main-title">
+            <div className={`area-1-title ${isTextFading ? "fading" : ""}`} style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+              <div className="season-main-title" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
                 <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: "inline-block", width: "1.2em" }}></span>
                 <span className="season-highlight" style={{ display: 'inline-block', minWidth: '2em', textAlign: 'right' }}>{currentSeason.season}</span> 시즌
               </div>
               <span className="bullet-dot" style={{ display: "inline-block", width: "2px", height: "2px", background: "#FAAB07", borderRadius: "50%", marginLeft: "15px", transform: "translateY(0px)" }}></span>
-              <div className="date-status">
+              <div className="date-status" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}>
                 <span className="date-range">{currentSeason.dateRange}</span>
                 <button className={`status-badge ${currentSeason.statusClass}`}>{currentSeason.status}</button>
               </div>
