@@ -2545,34 +2545,35 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" />
                 <span>{weekData ? `${formatDate(weekData.startDate)} ~ ${formatDate(weekData.endDate)}` : '로딩 중...'}</span>
               </div>
-              <div className="info-badge role">
+              <div className="info-badge role" style={{ width: 'fit-content', minWidth: 'auto', maxWidth: '150px', fontFamily: "'Pretendard', sans-serif" }}>
                 <img src="/images/0/cluster4/icon/Interface/Star-3.png" alt="role" />
-                <span>{roleLabel || '-'}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(roleLabel || '-').length > 9 ? (roleLabel || '-').slice(0, 9) + '..' : (roleLabel || '-')}</span>
               </div>
-              <div className="info-badge week">
+              <div className="info-badge week" style={{ flexShrink: 0, marginLeft: 'auto' }}>
                 <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
                 <span><span className="highlight">{cumulativeApprovedWeeks}</span> / 30 주차</span>
               </div>
             </div>
-            <div className="header-info-row2">
-              <div className="info-group left">
+            <div className="header-info-row2" style={{ gap: '11px' }}>
+              <div className="info-group left" style={{ flexShrink: 0 }}>
                 <span className="info-item team"><strong>[팀]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '클럽 온보딩'
                     : teamName === '운영진' && generation
                       ? `운영진(${generation}기)`
-                      : ((teamName || '-').length > 4 ? (teamName || '-').slice(0, 4) + '...' : (teamName || '-'))
+                      : ((teamName || '-').length > 6 ? (teamName || '-').slice(0, 6) + '..' : (teamName || '-'))
                 }</span></span>
                 <span className="info-divider">|</span>
                 <span className="info-item part"><strong>[파트]</strong> <span className="text-gray">{
                   isOnboardingWeek
                     ? '신입OT'
                     : teamName === '운영진' && partName === '팀장' && managedTeamName
-                      ? ((`팀장(${managedTeamName})`).length > 4 ? (`팀장(${managedTeamName})`).slice(0, 4) + '...' : `팀장(${managedTeamName})`)
-                      : ((partName || '-').length > 4 ? (partName || '-').slice(0, 4) + '...' : (partName || '-'))
+                      ? ((`팀장(${managedTeamName})`).length > 6 ? (`팀장(${managedTeamName})`).slice(0, 6) + '..' : `팀장(${managedTeamName})`)
+                      : ((partName || '-').length > 6 ? (partName || '-').slice(0, 6) + '..' : (partName || '-'))
                 }</span></span>
               </div>
-              <div className="info-group right">
+              <div className="info-group right" style={{ gap: '8px', marginLeft: 'auto' }}>
+                <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   단감
                   <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
@@ -2601,8 +2602,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="reputation-section">
             <div className="section-title-row">
               <img src="/images/0/cluster4/icon/icon - 주차 평판.png" alt="주차 평판" className="section-icon" />
-              <span className="section-label">주차 평판</span>
-              <span className="section-count"><span className="count-num">{weeklyReputations.length}</span>/3</span>
+              <span className="section-label" style={{ fontSize: '20px' }}>주차 평판</span>
+              <span className="section-count" style={{ fontSize: '17px' }}><span className="count-num">{weeklyReputations.length}</span>/3</span>
             </div>
             <div className="reputation-cards-grid">
               {reputationData.map((user, index) => {
@@ -2663,7 +2664,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="colleague-section">
             {/* 플로팅 아이콘 - 연계 동료 편집 */}
             {(
-              <div className="floating-icons" style={{ display: 'flex' }}>
+              <div className="floating-icons" style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <div className="edit-icon" onClick={() => {
                   if (!isDemoMode && !isOwner) { alert('연계 크루는 본인만이 작성할 수 있습니다.'); return; }
                   handleEditClick(() => { setHeaderModalType('본인'); setHeaderModalOpen(true); fetchCrewListIfNeeded(); });
@@ -2674,8 +2675,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             )}
             <div className="section-title-row">
               <img src="/images/0/cluster4/icon/icon - 연계 동료.png" alt="연계 동료" className="section-icon" />
-              <span className="section-label">연계 동료</span>
-              <span className="section-count"><span className="count-num">{selectedColleagues.length}</span>/3</span>
+              <span className="section-label" style={{ fontSize: '20px' }}>연계 동료</span>
+              <span className="section-count" style={{ fontSize: '17px' }}><span className="count-num">{selectedColleagues.length}</span>/3</span>
             </div>
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
