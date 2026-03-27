@@ -2033,15 +2033,26 @@
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-          width: 465.57px;
+          width: 350px;
 
           .growth-title {
-            font-size: 22px;
+            font-size: 25px;
             font-weight: 700;
             color: #fff;
             font-family: 'Chakra Petch', sans-serif;
             text-transform: uppercase;
             line-height: 19px;
+
+            &::before {
+              content: '●';
+              display: inline-block;
+              margin-right: 8px;
+              font-size: 0.3em;
+              vertical-align: middle;
+              position: relative;
+              top: -0.15em;
+              line-height: 1;
+            }
         }
 
           .growth-count {
@@ -2074,7 +2085,7 @@
         }
 
         .progress-bar-container {
-          width: 465.57px;
+          width: 350px;
           height: 12px;
           background: #333532;
           border: 1px solid rgba(255, 255, 255, 0.15);
@@ -2150,9 +2161,12 @@
         align-items: flex-start;
         margin-left: auto;
         margin-right: 64px;
+        flex: 0 0 50%;
+        min-width: 0;
+        padding-left: 56px;
 
         .growth-label {
-          font-size: 22px;
+          font-size: 25px;
           font-weight: 700;
           color: #fff;
           font-family: 'Chakra Petch', sans-serif;
@@ -2160,11 +2174,24 @@
           line-height: 19px;
           position: relative;
           top: 5px;
+
+          &::before {
+            content: '●';
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 0.3em;
+            vertical-align: middle;
+            position: relative;
+            top: -0.15em;
+            line-height: 1;
+          }
       }
 
         .legend-items {
           display: flex;
           gap: 20px;
+          transform: scale(1.2);
+          transform-origin: left center;
 
           .legend-item {
             display: flex;
@@ -2197,7 +2224,7 @@
 
     // 실무 정보 섹션
     .work-info-section {
-      margin-top: 80px;
+      margin-top: 23px;
       margin-bottom: 72px;
       position: relative;
       padding-left: 40px;
@@ -2442,7 +2469,7 @@
               }
 
               .card-desc {
-                font-size: 0.75rem;
+                font-size: 0.9375rem;
                 color: #fff;
                 line-height: 1.6;
                 font-family: 'Pretendard', sans-serif;
@@ -2450,12 +2477,15 @@
                 text-align: left;
                 flex: 1;
                 margin: 0;
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                min-height: calc(3 * 0.75rem * 1.6);
-                max-height: calc(3 * 0.75rem * 1.6);
+                margin-left: 8px;
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis;
+                word-break: break-all;
+                min-height: calc(2 * 0.9375rem * 1.6);
+                max-height: calc(2 * 0.9375rem * 1.6) !important;
                 position: relative;
                 padding-right: 24px;
 
@@ -2604,7 +2634,7 @@
 
     .work-ability-section {
       position: relative;
-      margin-top: 120px;
+      margin-top: -31px;
       margin-bottom: 40px;
       padding-left: 40px;
       padding-right: 42px;
@@ -2974,7 +3004,7 @@
     }
 
     .work-career-section {
-      margin-top: 120px;
+      margin-top: 121px;
       padding-right: 42px;
 
       .section-bottom-divider {

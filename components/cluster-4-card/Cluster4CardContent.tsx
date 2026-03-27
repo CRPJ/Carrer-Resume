@@ -1414,6 +1414,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
   }, [workInfoModalOpen, workAbilityModalOpen, workExpModalOpen, workCareerModalOpen, headerModalOpen, reputationViewModalOpen, colleagueViewModalOpen, workInfoViewModalOpen, workAbilityViewModalOpen, workExpViewModalOpen, workCareerViewModalOpen]);
 
+  // card-desc의 … → .. 교체 (line-clamp 렌더링 완료 후)
+  useEffect(() => {
+    const replaceDots = () => {
+      const descs = document.querySelectorAll('.work-info-section .card-desc');
+      descs.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        if (htmlEl.scrollHeight > htmlEl.clientHeight + 1) {
+          const text = htmlEl.innerText;
+          if (text.endsWith('…')) {
+            htmlEl.innerText = text.slice(0, -1) + '..';
+          } else if (text.endsWith('...')) {
+            htmlEl.innerText = text.slice(0, -3) + '..';
+          }
+        }
+      });
+    };
+    const timer = setTimeout(replaceDots, 100);
+    return () => clearTimeout(timer);
+  });
+
   // 동료 삭제 함수
   const removeColleague = (id: number) => {
     setSelectedColleagues((prev) => prev.filter((c) => c.id !== id));
