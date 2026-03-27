@@ -2885,14 +2885,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <>
                               <div className="detail-line">
                                 <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(formatSchool(mask.school(user.university)), 7)}
+                                  {truncate(formatSchool(mask.school(user.university)), 6)}
                                 </span>
                                 <span className="label" style={{ fontSize: "16px" }}>
                                   학교
                                 </span>{" "}
                                 |{" "}
                                 <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(formatMajor(mask.major(user.major)), 7)}
+                                  {truncate(formatMajor(mask.major(user.major)), 6)}
                                 </span>
                                 <span className="label" style={{ fontSize: "16px" }}>
                                   학과
@@ -2900,14 +2900,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               </div>
                               <div className="detail-line">
                                 <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {(user.team || "-").slice(0, 6)}
+                                  {truncate(user.team || "-", 6)}
                                 </span>
                                 <span className="label" style={{ fontSize: "16px" }}>
                                   팀
                                 </span>{" "}
                                 |{" "}
                                 <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {(user.part || "-").slice(0, 6)}
+                                  {truncate(user.part || "-", 6)}
                                 </span>
                                 <span className="label" style={{ fontSize: "16px" }}>
                                   파트
@@ -2941,11 +2941,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="card-footer">
                       <span className="fm-badge" style={{ fontSize: "17px" }}>
-                        <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : {isEmpty ? "-" : user.fm}
+                        <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{isEmpty ? "-" : user.fm}</span>
                       </span>
                       <span className="footer-divider">|</span>
                       <span className={`tag ${isEmpty ? "tag--dark" : user.tagColor}`} style={{ fontSize: "11.6px" }}>
-                        {isEmpty ? "-" : user.tagText}
+                        {isEmpty ? "-" : truncate(user.tagText, 10)}
                       </span>
                     </div>
                   </div>
@@ -3032,21 +3032,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
@@ -3057,35 +3057,35 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ) : (
                             <>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {formatSchool(mask.school(user.university))}
+                                {truncate(formatSchool(mask.school(user.university)), 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {formatMajor(mask.major(user.major))}
+                                {truncate(formatMajor(mask.major(user.major)), 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {(user.team || "-").slice(0, 6)}
+                                {truncate(user.team || "-", 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {(user.part || "-").slice(0, 6)}
+                                {truncate(user.part || "-", 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 파트
                               </span>
-                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
-                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "left" }}>
-                                {(() => { const n = truncate(user.nickname); return n.length > 8 ? n.slice(0, 7) + ".." : n; })()}
+                              <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
+                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right" }}>
+                                {truncate(user.nickname, 4)}
                               </span>
                             </>
                           )}
@@ -3108,8 +3108,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
               <span className="growth-count">
-                <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중{" "}
-                <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개
+                <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 <span style={{ display: "inline-block", minWidth: "3ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total + competencyStats.total + experienceStats.total + careerStats.total}</span> 개 중{" "}
+                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개
               </span>
             </div>
             <div className={`progress-bar-container ${isRestMode ? "rest-dimmed" : ""}`}>
@@ -3190,12 +3190,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span>개 중 <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>{infoStats.success}</span>개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
-                <span className="highlight">{isRestMode ? "-" : infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%
+                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>{isRestMode ? "-" : infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%
               </span>
             </div>
           </div>
@@ -3276,12 +3276,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span>개 중 <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>{experienceStats.success}</span>개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
-                <span className="highlight">{isRestMode ? "-" : experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%
+                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>{isRestMode ? "-" : experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%
               </span>
             </div>
           </div>
@@ -3412,12 +3412,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span>개 중 <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>{competencyStats.success}</span>개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
-                <span className="highlight">{isRestMode ? "-" : competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%
+                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>{isRestMode ? "-" : competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%
               </span>
             </div>
           </div>
@@ -3533,12 +3533,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span>개 중 <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>{careerStats.success}</span>개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
-                <span className="highlight">{isRestMode ? "-" : careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%
+                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>{isRestMode ? "-" : careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%
               </span>
             </div>
           </div>
