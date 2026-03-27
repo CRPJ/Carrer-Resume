@@ -76,7 +76,7 @@ export default function ClusterLayout({
       if (!isFixed && shouldFix) {
         const width = shell.offsetWidth;
         const height = inner.getBoundingClientRect().height;
-        const left = shellRect.left;
+        const left = shellRect.left + window.scrollX;
         const top = computeTop(zoom, height);
 
         shell.style.width = `${width}px`;
@@ -84,7 +84,7 @@ export default function ClusterLayout({
 
         inner.style.position = 'fixed';
         inner.style.top = `${top}px`;
-        inner.style.left = `${left}px`;
+        inner.style.left = `${left - window.scrollX}px`;
         inner.style.width = `${width}px`;
         inner.style.zIndex = '9999';
 
@@ -92,11 +92,13 @@ export default function ClusterLayout({
         return;
       }
 
-      // 고정 상태 유지 중에도 footer 등장/사라짐에 따라 top을 갱신
+      // 고정 상태 유지 중에도 top/left를 갱신 (가로 스크롤 연동)
       if (isFixed && shouldFix) {
         const height = inner.getBoundingClientRect().height;
         const top = computeTop(zoom, height);
+        const pageLeft = shell.getBoundingClientRect().left + window.scrollX;
         inner.style.top = `${top}px`;
+        inner.style.left = `${pageLeft - window.scrollX}px`;
         return;
       }
 
