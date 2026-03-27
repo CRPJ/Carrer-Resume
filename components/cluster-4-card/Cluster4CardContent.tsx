@@ -3026,28 +3026,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <div className="profile-details" style={{ fontSize: "16px" }}>
                           {isEmpty ? (
                             <>
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 -
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
@@ -3056,36 +3056,36 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             </>
                           ) : (
                             <>
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 {formatSchool(mask.school(user.university))}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 {formatMajor(mask.major(user.major))}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 {(user.team || "-").slice(0, 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
-                              </span>{" "}
-                              |{" "}
-                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
                                 {(user.part || "-").slice(0, 6)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 파트
-                              </span>{" "}
-                              |{" "}
-                              <span className="nickname" style={{ fontSize: "16px" }}>
-                                {truncate(user.nickname)}
+                              </span>
+                              <span className="profile-divider" style={{ margin: "0 9px" }}>|</span>
+                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "left" }}>
+                                {(() => { const n = truncate(user.nickname); return n.length > 8 ? n.slice(0, 7) + ".." : n; })()}
                               </span>
                             </>
                           )}
