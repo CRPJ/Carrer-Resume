@@ -3084,7 +3084,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 파트
                               </span>
                               <span className="profile-divider" style={{ margin: "0 4px" }}>|</span>
-                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right" }}>
+                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto" }}>
                                 {truncate(user.nickname, 4)}
                               </span>
                             </>
