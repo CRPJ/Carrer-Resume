@@ -2738,7 +2738,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" />
                 <span>{weekData ? `${formatDate(weekData.startDate)} ~ ${formatDate(weekData.endDate)}` : "로딩 중..."}</span>
               </div>
-              <div className="info-badge role" style={{ width: "fit-content", minWidth: "auto", maxWidth: "150px", fontFamily: "'Pretendard', sans-serif" }}>
+              <div className="info-badge role" style={{ width: "fit-content", minWidth: "auto", maxWidth: "200px", fontFamily: "'Pretendard', sans-serif" }}>
                 <img src="/images/0/cluster4/icon/Interface/Star-3.png" alt="role" />
                 <span style={{ overflow: "hidden", whiteSpace: "nowrap" }}>{(roleLabel || "-").length > 9 ? (roleLabel || "-").slice(0, 9) + ".." : roleLabel || "-"}</span>
               </div>
