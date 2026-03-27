@@ -1401,6 +1401,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workCareerViewModalOpen, setWorkCareerViewModalOpen] = useState(false);
   const [selectedWorkCareerCard, setSelectedWorkCareerCard] = useState<any>(null);
 
+  // View 모달 편집 모드 상태
+  const [workInfoViewIsEditing, setWorkInfoViewIsEditing] = useState(false);
+  const [workAbilityViewIsEditing, setWorkAbilityViewIsEditing] = useState(false);
+  const [workExpViewIsEditing, setWorkExpViewIsEditing] = useState(false);
+  const [workCareerViewIsEditing, setWorkCareerViewIsEditing] = useState(false);
+
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
     const anyOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
@@ -3162,16 +3168,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="floating-icons" style={{ display: "flex" }}>
               <div
                 className="edit-icon"
-                onClick={
-                  isOwner || isDemoMode
-                    ? () =>
-                        handleEditClick(() => {
-                          initializeEditingDetails();
-                          setWorkInfoModalOpen(true);
-                        })
-                    : undefined
-                }
-                style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
+                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
+                style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
               </div>
@@ -3256,20 +3254,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="floating-icons" style={{ display: "flex" }}>
               <div
                 className="edit-icon"
-                onClick={
-                  isOwner || isDemoMode
-                    ? () =>
-                        handleEditClick(() => {
-                          if (!isDemoMode && !isAnyActivityActive(workExpActivityTypes)) {
-                            alert("아직 개설되지 않은 활동입니다. 운영진이 활동을 개설한 후 편집할 수 있습니다.");
-                            return;
-                          }
-                          initializeEditingDetails();
-                          setWorkExpModalOpen(true);
-                        })
-                    : undefined
-                }
-                style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
+                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
+                style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
               </div>
@@ -3404,16 +3390,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="floating-icons" style={{ display: "flex" }}>
               <div
                 className="edit-icon"
-                onClick={
-                  isOwner || isDemoMode
-                    ? () =>
-                        handleEditClick(() => {
-                          initializeEditingDetails();
-                          setWorkAbilityModalOpen(true);
-                        })
-                    : undefined
-                }
-                style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
+                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
+                style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
               </div>
@@ -3533,24 +3511,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="floating-icons" style={{ display: "flex" }}>
               <div
                 className="edit-icon"
-                onClick={
-                  isOwner || isDemoMode
-                    ? () =>
-                        handleEditClick(() => {
-                          if (!isDemoMode) {
-                            // 실무 경력은 프로젝트별 deadline 기반으로 편집 가능 여부 판단
-                            const hasEditableCareer = displayWorkCareerCards.some((card) => !card.isEmpty && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date());
-                            if (!hasEditableCareer) {
-                              alert("2차 정보 작성 기간이 아닙니다. (마감 기한이 설정되지 않았거나 이미 마감되었습니다.)");
-                              return;
-                            }
-                          }
-                          initializeEditingDetails();
-                          setWorkCareerModalOpen(true);
-                        })
-                    : undefined
-                }
-                style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
+                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
+                style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
               </div>
@@ -4939,9 +4901,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 정보</h3>
-              <button className="modal-close-btn" onClick={() => setWorkInfoViewModalOpen(false)}>
-                ×
-              </button>
+              <div className="header-right">
+                {!workInfoViewIsEditing ? (
+                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkInfoViewIsEditing(true)}>
+                    <i className="ti ti-pencil"></i> 수정
+                  </button>
+                ) : (
+                  <>
+                    <button className="cancel-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>취소</button>
+                    <button className="save-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>저장</button>
+                  </>
+                )}
+                <button className="modal-close-btn" onClick={() => { setWorkInfoViewModalOpen(false); setWorkInfoViewIsEditing(false); }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
             </div>
             <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
@@ -5020,9 +4994,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경험</h3>
-              <button className="modal-close-btn" onClick={() => setWorkExpViewModalOpen(false)}>
-                ×
-              </button>
+              <div className="header-right">
+                {!workExpViewIsEditing ? (
+                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkExpViewIsEditing(true)}>
+                    <i className="ti ti-pencil"></i> 수정
+                  </button>
+                ) : (
+                  <>
+                    <button className="cancel-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>취소</button>
+                    <button className="save-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>저장</button>
+                  </>
+                )}
+                <button className="modal-close-btn" onClick={() => { setWorkExpViewModalOpen(false); setWorkExpViewIsEditing(false); }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
             </div>
             <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
@@ -5133,9 +5119,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="section-modal work-view-modal">
                 <div className="section-modal-header">
                   <h3>실무 역량</h3>
-                  <button className="modal-close-btn" onClick={() => setWorkAbilityViewModalOpen(false)}>
-                    ×
-                  </button>
+                  <div className="header-right">
+                    {!workAbilityViewIsEditing ? (
+                      <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkAbilityViewIsEditing(true)}>
+                        <i className="ti ti-pencil"></i> 수정
+                      </button>
+                    ) : (
+                      <>
+                        <button className="cancel-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>취소</button>
+                        <button className="save-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>저장</button>
+                      </>
+                    )}
+                    <button className="modal-close-btn" onClick={() => { setWorkAbilityViewModalOpen(false); setWorkAbilityViewIsEditing(false); }}>
+                      <i className="ti ti-x"></i>
+                    </button>
+                  </div>
                 </div>
                 <div className="work-view-fixed">
                   {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
@@ -5205,9 +5203,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경력</h3>
-              <button className="modal-close-btn" onClick={() => setWorkCareerViewModalOpen(false)}>
-                ×
-              </button>
+              <div className="header-right">
+                {!workCareerViewIsEditing ? (
+                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkCareerViewIsEditing(true)}>
+                    <i className="ti ti-pencil"></i> 수정
+                  </button>
+                ) : (
+                  <>
+                    <button className="cancel-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>취소</button>
+                    <button className="save-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>저장</button>
+                  </>
+                )}
+                <button className="modal-close-btn" onClick={() => { setWorkCareerViewModalOpen(false); setWorkCareerViewIsEditing(false); }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
             </div>
             <div className="work-view-fixed">
               {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
