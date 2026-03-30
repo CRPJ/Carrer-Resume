@@ -1928,7 +1928,7 @@ const Cluster41Content = () => {
                               <div className="weekly-card-details-bottom">
                                 <div className="metric">단감 <strong>{weekPoints.star}</strong></div>
                                 <div className="metric">인절미 <strong>{injeolmi}</strong></div>
-                                <div className="metric">어흥 <strong>{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong></div>
+                                <div className="metric">어흥 <strong>{Math.abs(weekPoints.lightning)}</strong></div>
                                 <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/3</span></div>
                               </div>
                             </>
@@ -2031,7 +2031,7 @@ const Cluster41Content = () => {
                             <span className="info-item with-icon">
                               어흥
                               <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                              <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
+                              <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
                               개
                             </span>
                           </div>

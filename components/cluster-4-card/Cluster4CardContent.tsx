@@ -2296,7 +2296,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   어흥
                   <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                  <strong className="number-value">{weekPoints.lightning > 0 ? `-${weekPoints.lightning}` : weekPoints.lightning}</strong>
+                  <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
                   개
                 </span>
               </div>

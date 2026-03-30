@@ -1350,7 +1350,7 @@ const Sidebar = () => {
       // 배지 데이터는 실제 API 데이터 사용 (hasBadgeData가 true인 경우)
       animateNumber(setBadge1, hasBadgeData ? badgeData.stars : currentStats.badge1, 1000), // 별 (단감)
       animateNumber(setBadge2, hasBadgeData ? badgeData.shields : currentStats.badge2, 1000), // 방패 (인절미) - DB에서 이미 계산된 값
-      animateNumber(setBadge3, hasBadgeData ? (badgeData.lightnings > 0 ? -badgeData.lightnings : 0) : currentStats.badge3, 1000), // 번개 (어흥) - 0보다 클 때만 음수로 표시
+      animateNumber(setBadge3, hasBadgeData ? badgeData.lightnings : currentStats.badge3, 1000), // 번개 (어흥) - 양수로 표시
       animateNumber(setSkill1, currentStats.skill1, 1000),
       animateNumber(setSkill2, currentStats.skill2, 1000),
       animateNumber(setSkill3, currentStats.skill3, 1000),

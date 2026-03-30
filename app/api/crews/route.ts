@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-server";
 import { getCachedTeams, getCachedParts } from "@/lib/cached-data";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admin";
+import { maskSchool, maskMajor, maskAge } from "@/lib/dataMasking";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -114,6 +118,11 @@ export async function GET(request: Request) {
       weeksMap[gs.user_id] = gs.approved_weeks || 0;
     });
 
+    // 마스킹 옵션 결정
+    const session = await getServerSession(authOptions);
+    const maskIsAdmin = !!session?.user?.isAdmin || isAdminEmail(session?.user?.email);
+    const maskIsLoggedIn = !!session;
+
     // 데이터 변환
     const crewList = users.map(user => {
       // 나이 계산
@@ -130,19 +139,24 @@ export async function GET(request: Request) {
       const schoolName = education?.school_name || user.university || '-';
       const majorName = education?.major_name_1 || user.major_first || '-';
 
+      // 마스킹 적용
+      const displayAge = maskIsAdmin ? (age || '-') : (maskIsLoggedIn ? (age || '-') : maskAge(age));
+      const displaySchool = maskIsAdmin ? schoolName : (maskIsLoggedIn ? schoolName : maskSchool(schoolName));
+      const displayMajor = maskIsAdmin ? majorName : (maskIsLoggedIn ? majorName : maskMajor(majorName));
+
       return {
         id: user.id,
         name: user.display_name || '-',
         gender: user.gender || '-',
-        age: age || '-',
+        age: displayAge,
         profileImg: user.profile_photo_url || '',
-        university: schoolName,
-        major: majorName,
+        university: displaySchool,
+        major: displayMajor,
         team: teamPart?.teamName || '-',
         part: teamPart?.partName || '-',
         nickname: user.vision || '-',
         club: user.club || '-',
-        universityMajor: [schoolName, majorName].filter(v => v && v !== '-').join(' ') || '-',
+        universityMajor: [displaySchool, displayMajor].filter(v => v && v !== '-').join(' ') || '-',
         status: user.status || '-',
         growthStatus: user.growth_status || '-',
         totalStars: starsMap[user.id] || 0,

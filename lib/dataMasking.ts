@@ -116,3 +116,39 @@ export function maskPeriod(value: string | null | undefined): string {
   if (!value || value === '-') return '-';
   return value.replace(/[0-9]/g, '*');
 }
+
+/** 전화번호 마스킹: "010-1234-5678" → "010-1***-****" */
+export function maskPhone(value: string | null | undefined): string {
+  if (!value || value === '-') return '-';
+  return value.replace(/-/g, '').replace(/(\d{3})(\d{1})\d{3}(\d{4})/, '$1-$2***-****');
+}
+
+/**
+ * 서버 사이드 프로필 마스킹
+ * - isAdmin: 원본 그대로
+ * - isLoggedIn: 개인정보(phone, birth_date, address, email) 마스킹
+ * - 비로그인: 개인정보 + 학력 등 전체 마스킹
+ */
+export function maskProfileForResponse(
+  profile: Record<string, unknown>,
+  options: { isAdmin: boolean; isLoggedIn: boolean }
+): Record<string, unknown> {
+  if (options.isAdmin) return profile;
+
+  const masked = { ...profile };
+
+  // 개인정보 — 로그인/비로그인 모두 마스킹
+  masked.phone = maskPhone(profile.phone as string);
+  masked.birth_date = maskBirthDate(profile.birth_date as string);
+  masked.address = maskAddress(profile.address as string);
+  masked.email = maskEmail(profile.email as string);
+  if (masked.auth_email) masked.auth_email = maskEmail(profile.auth_email as string);
+
+  if (!options.isLoggedIn) {
+    // 비로그인 — 학력/나이 등 추가 마스킹
+    if (masked.university) masked.university = maskSchool(profile.university as string);
+    if (masked.major_first) masked.major_first = maskMajor(profile.major_first as string);
+  }
+
+  return masked;
+}

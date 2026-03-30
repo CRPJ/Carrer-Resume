@@ -1,5 +1,9 @@
 import { createAdminClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdminEmail } from '@/lib/admin'
+import { maskProfileForResponse } from '@/lib/dataMasking'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -79,9 +83,14 @@ export async function GET(
       practical_career_participated: complianceData?.practical_career_participated ?? 0
     }
 
+    // 마스킹 옵션 결정
+    const session = await getServerSession(authOptions)
+    const maskIsAdmin = !!session?.user?.isAdmin || isAdminEmail(session?.user?.email)
+    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: !!session }
+
     return NextResponse.json({
       success: true,
-      data: responseData
+      data: maskProfileForResponse(responseData, maskOpts)
     })
 
   } catch (error) {

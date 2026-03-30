@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
 import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { maskProfileForResponse } from "@/lib/dataMasking";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -151,6 +152,12 @@ export async function GET(request: NextRequest) {
 
     }
 
+    // 마스킹 옵션 결정 (세션 기반)
+    const maskSession = await getServerSession(authOptions);
+    const maskIsAdmin = !!maskSession?.user?.isAdmin || isAdminEmail(maskSession?.user?.email);
+    const maskIsLoggedIn = !!maskSession;
+    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: maskIsLoggedIn };
+
     const context = searchParams.get('context');
 
     // ========== context=card: 카드 페이지용 경량 응답 (시즌 통계/계산 전부 스킵) ==========
@@ -238,7 +245,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        data: profile,
+        data: maskProfileForResponse(profile, maskOpts),
         onboardingWeekId: profile.onboarding_week_id || null,
         growthInfo: { startDate: joinedWeekResult.data?.start_date || null },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1167,7 +1174,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: profile,
+      data: maskProfileForResponse(profile, maskOpts),
       practicalCounts,
       reliabilityRate: finalGrowthPeriodStats.reliabilityRate,
       completionRate,
