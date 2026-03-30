@@ -2772,7 +2772,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </span>
                 </span>
               </div>
-              <div className="info-group right" style={{ gap: "8px", fontSize: "17px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-44px" }}>
+              <div className="info-group right" style={{ gap: "8px", fontSize: "17px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-32px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   단감
