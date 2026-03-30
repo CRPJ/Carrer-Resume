@@ -36,9 +36,11 @@ export function useDataMasking() {
     if (adminParam === ADMIN_KEY) {
       sessionStorage.setItem('adminMode', 'true');
     }
-    // sessionStorage에 adminMode가 있으면 관리자 모드
-    setIsAdmin(sessionStorage.getItem('adminMode') === 'true');
-  }, [searchParams]);
+    // 마더(어드민) 계정 세션이면 자동으로 관리자 모드 활성화
+    const isAdminSession = !!session?.user?.isAdmin;
+    const isAdminStorage = sessionStorage.getItem('adminMode') === 'true';
+    setIsAdmin(isAdminSession || isAdminStorage);
+  }, [searchParams, session]);
 
   // 관리자 모드: 모든 정보 원본 그대로
   const raw = {
