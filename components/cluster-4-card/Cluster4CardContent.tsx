@@ -3123,11 +3123,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-title">주차 성장률</span>
               <span className="growth-count">
                 <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총{" "}
-                <span style={{ display: "inline-block", minWidth: "3ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>
+                <span style={{ display: "inline-block", minWidth: "2ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>
                   {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total}
                 </span>{" "}
                 개 중{" "}
-                <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
+                <span className="highlight" style={{ display: "inline-block", minWidth: "2ch", textAlign: "right" }}>
                   {infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}
                 </span>
                 개
