@@ -3825,6 +3825,8 @@
                     width: 12px;
                     height: 12px;
                     object-fit: contain;
+                    position: relative;
+                    left: -8px;
 
                     &.empty {
                       opacity: 0.3;
@@ -3833,6 +3835,7 @@
 
                   .star-half {
                     position: relative;
+                    left: -8px;
                     width: 12px;
                     height: 12px;
                     flex-shrink: 0;
@@ -3864,7 +3867,7 @@
                     font-weight: 400;
                     font-size: 0.75rem;
                     color: rgba(255, 255, 255, 0.9);
-                    margin-left: 2px;
+                    margin-left: 0 !important;
                     margin-top: 0;
                     line-height: 1;
                     position: relative;
