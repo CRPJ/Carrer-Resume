@@ -1064,7 +1064,7 @@
       .main-image-container {
         position: relative;
         width: 540px;
-        height: 1053px;
+        height: 1098px;
         border-radius: 15px;
         overflow: hidden;
 
@@ -1137,6 +1137,8 @@
       .section1-header {
         margin-top: 0;
         padding-top: 0;
+        overflow-x: visible;
+        overflow-y: visible;
 
         .header-title-row {
           display: flex;
@@ -1375,6 +1377,7 @@
 
       // 주차 평판 섹션
       .reputation-section {
+        margin-top: 26px;
         overflow-x: visible;
         overflow-y: visible;
 
