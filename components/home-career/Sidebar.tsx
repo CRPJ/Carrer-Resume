@@ -22,7 +22,7 @@ const IDENTITY_TAB_IMAGES = [
 const Sidebar = () => {
   const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
   const { data: session } = useSession();
-  const { mask } = useDataMasking();
+  const { mask, isAdmin } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
@@ -304,7 +304,11 @@ const Sidebar = () => {
       birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
       city: addressParts[0] || "",
       district: addressParts.slice(1).join(" ") || "",
-      phone: profile.phone ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****") : "",
+      phone: profile.phone
+        ? (session?.user?.isAdmin
+          ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
+          : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****"))
+        : "",
       email: profile.email || "",
       school: "",
       major: "",
@@ -682,7 +686,11 @@ const Sidebar = () => {
           birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
           city: addressParts[0] || "",
           district: addressParts.slice(1).join(" ") || "",
-          phone: profile.phone ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****") : "",
+          phone: profile.phone
+            ? (session?.user?.isAdmin
+              ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
+              : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****"))
+            : "",
           email: profile.email || "",
           school: "",
           major: "",
