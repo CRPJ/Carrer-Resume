@@ -72,6 +72,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
   };
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
+  // TODO: 백엔드 연동 시 API에서 받아오기
+  const isAdmin = false;
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -3187,13 +3189,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {
             <div className="floating-icons" style={{ display: "flex" }}>
-              <div
+              {/* <div
                 className="edit-icon"
-                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
                 style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
-              </div>
+              </div> */}
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
@@ -3280,13 +3281,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {
             <div className="floating-icons" style={{ display: "flex" }}>
-              <div
+              {/* <div
                 className="edit-icon"
-                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
                 style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
-              </div>
+              </div> */}
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
@@ -3423,13 +3423,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 로그인한 본인만 표시 */}
           {
             <div className="floating-icons" style={{ display: "flex" }}>
-              <div
+              {/* <div
                 className="edit-icon"
-                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
                 style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
-              </div>
+              </div> */}
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
@@ -3551,13 +3550,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           {/* 플로팅 아이콘 - 본인 프로필일 때만 표시 */}
           {
             <div className="floating-icons" style={{ display: "flex" }}>
-              <div
+              {/* <div
                 className="edit-icon"
-                // onClick 비활성화 — 편집은 View 모달 내 수정 버튼으로 진행
                 style={{ cursor: "default", opacity: 0.4 }}
               >
                 <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
-              </div>
+              </div> */}
               <div className="edit-icon search-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
@@ -4960,7 +4958,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
+                    <button className="save-edit-btn" onClick={() => {
+                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
+                      if (modal && selectedWorkInfoCard?.activityType) {
+                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails(prev => prev.map(d =>
+                          d.activity_type_id === selectedWorkInfoCard.activityType
+                            ? { ...d, sub_title: newSubTitle }
+                            : d
+                        ));
+                        setSelectedWorkInfoCard((prev: any) => prev ? { ...prev, subTitle: newSubTitle || "" } : prev);
+                      }
+                      setWorkInfoViewIsEditing(false);
+                    }}>
                       저장
                     </button>
                   </>
@@ -4976,56 +4987,56 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </button>
               </div>
             </div>
-            <div className="work-view-fixed">
-              {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
-              <div className="work-view-header-row">
-                <div className="work-view-left">
-                  <div className={`work-icon-box ${selectedWorkInfoCard.isFruit ? "fruit" : ""}`}>{selectedWorkInfoCard.icon && <img src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category} />}</div>
-                  <span className="category-title">{selectedWorkInfoCard.category}</span>
-                </div>
-                <div className="work-view-right">
-                  {selectedWorkInfoCard.status === "success" && (
-                    <div className="status-badge success">
-                      <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화성공" />
-                      <span>강화성공</span>
-                    </div>
-                  )}
-                  {selectedWorkInfoCard.status === "waiting" && (
-                    <div className="status-badge waiting">
-                      <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화대기" />
-                      <span>강화대기</span>
-                    </div>
-                  )}
-                  {selectedWorkInfoCard.status === "failed" && (
-                    <div className="status-badge fail">
-                      <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화실패" />
-                      <span>강화실패</span>
-                    </div>
-                  )}
-                  {selectedWorkInfoCard.status === "not_applicable" && (
-                    <div className="status-badge not-applicable">
-                      <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당없음" />
-                      <span>해당없음</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Main Title + Content */}
-              <div className="work-view-title-section">
-                <div className="main-title">Main Title</div>
-                <div className="content-text">{selectedWorkInfoCard.title}</div>
-                <div className="date-badge">{weekDateRange}</div>
-              </div>
-
-              {/* Sub Title */}
-              <div className="work-view-section">
-                <div className="section-label">Sub Title</div>
-                <div className="section-content">{selectedWorkInfoCard.subTitle || "-"}</div>
-              </div>
-            </div>
-
             <div className="section-modal-body">
+              <div className="work-view-fixed">
+                <div className="date-badge">{weekDateRange}</div>
+                {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
+                <div className="work-view-header-row">
+                  <div className="work-view-left">
+                    <div className={`work-icon-box ${selectedWorkInfoCard.isFruit ? "fruit" : ""}`}>{selectedWorkInfoCard.icon && <img src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category} />}</div>
+                    <span className="category-title">{selectedWorkInfoCard.category}</span>
+                  </div>
+                  <div className="work-view-right">
+                    {selectedWorkInfoCard.status === "success" && (
+                      <div className="status-badge success">
+                        <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화성공" />
+                        <span>강화성공</span>
+                      </div>
+                    )}
+                    {selectedWorkInfoCard.status === "waiting" && (
+                      <div className="status-badge waiting">
+                        <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화대기" />
+                        <span>강화대기</span>
+                      </div>
+                    )}
+                    {selectedWorkInfoCard.status === "failed" && (
+                      <div className="status-badge fail">
+                        <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화실패" />
+                        <span>강화실패</span>
+                      </div>
+                    )}
+                    {selectedWorkInfoCard.status === "not_applicable" && (
+                      <div className="status-badge not-applicable">
+                        <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당없음" />
+                        <span>해당없음</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Main Title + Content */}
+                <div className="work-view-title-section">
+                  <div className="main-title">Main Title</div>
+                  <div className={`content-text ${workInfoViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workInfoViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkInfoCard.title}</div>
+                </div>
+
+                {/* Sub Title */}
+                <div className="work-view-section">
+                  <div className="section-label">Sub Title</div>
+                  <div className={`section-content ${workInfoViewIsEditing ? "editing" : ""}`} contentEditable={workInfoViewIsEditing} suppressContentEditableWarning>{selectedWorkInfoCard.subTitle || "-"}</div>
+                </div>
+              </div>
+
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -5033,7 +5044,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {[0, 1, 2, 3, 4].map((idx) => {
                     const link = selectedWorkInfoCard.outputLinks?.[idx];
                     const hasLink = link?.url && link.url.trim() !== "";
-                    return (
+                    const prevLink = idx > 0 ? selectedWorkInfoCard.outputLinks?.[idx - 1] : null;
+                    const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
+                    const isDisabled = !prevHasLink;
+                    return workInfoViewIsEditing ? (
+                      <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
+                        <span className="link-num">{idx + 1}</span>
+                        <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
+                        <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                      </div>
+                    ) : (
                       <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
                         <span className="link-num">{idx + 1}</span>
                         <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>
@@ -5063,7 +5083,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>
+                    <button className="save-edit-btn" onClick={() => {
+                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
+                      if (modal && selectedWorkExpCard?.activityTypeId) {
+                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails(prev => prev.map(d =>
+                          d.activity_type_id === selectedWorkExpCard.activityTypeId
+                            ? { ...d, sub_title: newSubTitle }
+                            : d
+                        ));
+                      }
+                      setWorkExpViewIsEditing(false);
+                    }}>
                       저장
                     </button>
                   </>
@@ -5079,60 +5111,60 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </button>
               </div>
             </div>
-            <div className="work-view-fixed">
-              {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
-              <div className="work-view-header-row">
-                <div className="work-view-left">
-                  <div className="work-icon-box fruit">{selectedWorkExpCard.icon && <img src={selectedWorkExpCard.icon} alt={selectedWorkExpCard.badge} />}</div>
-                  <span className="category-title">{selectedWorkExpCard.badge}</span>
-                  <span className="code-badge">{selectedWorkExpCard.code}</span>
-                </div>
-                <div className="work-view-right">
-                  {(() => {
-                    const enhStatus = selectedWorkExpCard.enhancementStatus;
-                    const statusLabels: Record<string, string> = {
-                      success: "강화성공",
-                      waiting: "강화대기",
-                      failed: "강화실패",
-                      not_applicable: "해당없음",
-                    };
-                    const statusImages: Record<string, string> = {
-                      success: "/images/0/cluster4/icon/5 강화 성공.png",
-                      waiting: "/images/0/cluster4/icon/6 강화 대기.png",
-                      failed: "/images/0/cluster4/icon/7 강화 실패.png",
-                      not_applicable: "/images/0/cluster4/icon/8 해당 없음.png",
-                    };
-                    return (
-                      <div className={`status-badge ${enhStatus}`}>
-                        <img src={statusImages[enhStatus]} alt={statusLabels[enhStatus]} />
-                        <span>{statusLabels[enhStatus]}</span>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Main Title + 별점 + Content */}
-              <div className="work-view-title-section">
-                <div className="main-title-row">
-                  <div className="main-title">Main Title</div>
-                  <div className="rating-row">
-                    <div className="stars">{renderStars(selectedWorkExpCard.rating)}</div>
-                    <span className="rating-count">{selectedWorkExpCard.ratingCount}</span>
+            <div className="section-modal-body">
+              <div className="work-view-fixed">
+                <div className="date-badge">{weekDateRange}</div>
+                {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+                <div className="work-view-header-row">
+                  <div className="work-view-left">
+                    <div className="work-icon-box fruit">{selectedWorkExpCard.icon && <img src={selectedWorkExpCard.icon} alt={selectedWorkExpCard.badge} />}</div>
+                    <span className="category-title">{selectedWorkExpCard.badge}</span>
+                    <span className="code-badge">{selectedWorkExpCard.code}</span>
+                  </div>
+                  <div className="work-view-right">
+                    {(() => {
+                      const enhStatus = selectedWorkExpCard.enhancementStatus;
+                      const statusLabels: Record<string, string> = {
+                        success: "강화성공",
+                        waiting: "강화대기",
+                        failed: "강화실패",
+                        not_applicable: "해당없음",
+                      };
+                      const statusImages: Record<string, string> = {
+                        success: "/images/0/cluster4/icon/5 강화 성공.png",
+                        waiting: "/images/0/cluster4/icon/6 강화 대기.png",
+                        failed: "/images/0/cluster4/icon/7 강화 실패.png",
+                        not_applicable: "/images/0/cluster4/icon/8 해당 없음.png",
+                      };
+                      return (
+                        <div className={`status-badge ${enhStatus}`}>
+                          <img src={statusImages[enhStatus]} alt={statusLabels[enhStatus]} />
+                          <span>{statusLabels[enhStatus]}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
-                <div className="content-text">{selectedWorkExpCard.title}</div>
-                <div className="date-badge">{weekDateRange}</div>
+
+                {/* Main Title + 별점 + Content */}
+                <div className="work-view-title-section">
+                  <div className="main-title-row">
+                    <div className="main-title">Main Title</div>
+                    <div className="rating-row">
+                      <div className="stars">{renderStars(selectedWorkExpCard.rating)}</div>
+                      <span className="rating-count">{selectedWorkExpCard.ratingCount}</span>
+                    </div>
+                  </div>
+                  <div className={`content-text ${workExpViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workExpViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkExpCard.title}</div>
+                </div>
+
+                {/* Sub Title */}
+                <div className="work-view-section">
+                  <div className="section-label">Sub Title</div>
+                  <div className={`section-content ${workExpViewIsEditing ? "editing" : ""}`} contentEditable={workExpViewIsEditing} suppressContentEditableWarning>{weekActivityDetails.find((d) => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || "-"}</div>
+                </div>
               </div>
 
-              {/* Sub Title */}
-              <div className="work-view-section">
-                <div className="section-label">Sub Title</div>
-                <div className="section-content">{weekActivityDetails.find((d) => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || "-"}</div>
-              </div>
-            </div>
-
-            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -5146,7 +5178,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     return [0, 1, 2, 3, 4].map((idx) => {
                       const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
                       const hasLink = link?.url && link.url.trim() !== "";
-                      return (
+                      const prevLink = idx > 0 ? (adminLinks[idx - 1]?.url ? adminLinks[idx - 1] : userLinks[idx - 1]) : null;
+                      const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
+                      const isDisabled = !prevHasLink;
+                      return workExpViewIsEditing ? (
+                        <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
+                          <span className="link-num">{idx + 1}</span>
+                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
+                          <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                        </div>
+                      ) : (
                         <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
                           <span className="link-num">{idx + 1}</span>
                           <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>
@@ -5198,7 +5239,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <button className="cancel-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
                           취소
                         </button>
-                        <button className="save-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
+                        <button className="save-edit-btn" onClick={() => {
+                          const modal = document.querySelector('.section-modal-overlay:last-of-type');
+                          if (modal && displayActivity?.activity_type_id) {
+                            const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
+                            const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                            setWeekActivityDetails(prev => prev.map(d =>
+                              d.activity_type_id === displayActivity.activity_type_id
+                                ? { ...d, sub_title: newSubTitle }
+                                : d
+                            ));
+                          }
+                          setWorkAbilityViewIsEditing(false);
+                        }}>
                           저장
                         </button>
                       </>
@@ -5214,39 +5267,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </button>
                   </div>
                 </div>
-                <div className="work-view-fixed">
-                  {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
-                  <div className="work-view-header-row">
-                    <div className="work-view-left">
-                      <div className="work-icon-box fruit">
-                        <img src={displayActivity ? getCompetencyIconPath(displayActivity.activity_type_id) : "/images/0/cluster4/icon/실무 역량/실무 역량 - default.png"} alt="실무 역량" />
-                      </div>
-                      <span className="category-title">{activityTypeInfo?.name || "-"}</span>
-                      <span className="code-badge">{activityTypeInfo?.line_code || "-"}</span>
-                    </div>
-                    <div className="work-view-right">
-                      <div className={`status-badge ${enhancementStatus}`}>
-                        <img src={statusImages[enhancementStatus]} alt={statusLabels[enhancementStatus]} />
-                        <span>{statusLabels[enhancementStatus]}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Main Title + Content */}
-                  <div className="work-view-title-section">
-                    <div className="main-title">Main Title</div>
-                    <div className="content-text">{displayActivity?.title || "-"}</div>
-                    <div className="date-badge">{weekDateRange}</div>
-                  </div>
-
-                  {/* Sub Title */}
-                  <div className="work-view-section">
-                    <div className="section-label">Sub Title</div>
-                    <div className="section-content">{weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}</div>
-                  </div>
-                </div>
-
                 <div className="section-modal-body">
+                  <div className="work-view-fixed">
+                    <div className="date-badge">{weekDateRange}</div>
+                    {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+                    <div className="work-view-header-row">
+                      <div className="work-view-left">
+                        <div className="work-icon-box fruit">
+                          <img src={displayActivity ? getCompetencyIconPath(displayActivity.activity_type_id) : "/images/0/cluster4/icon/실무 역량/실무 역량 - default.png"} alt="실무 역량" />
+                        </div>
+                        <span className="category-title">{activityTypeInfo?.name || "-"}</span>
+                        <span className="code-badge">{activityTypeInfo?.line_code || "-"}</span>
+                      </div>
+                      <div className="work-view-right">
+                        <div className={`status-badge ${enhancementStatus}`}>
+                          <img src={statusImages[enhancementStatus]} alt={statusLabels[enhancementStatus]} />
+                          <span>{statusLabels[enhancementStatus]}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Main Title + Content */}
+                    <div className="work-view-title-section">
+                      <div className="main-title">Main Title</div>
+                      <div className={`content-text ${workAbilityViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing && isAdmin} suppressContentEditableWarning>{displayActivity?.title || "-"}</div>
+                    </div>
+
+                    {/* Sub Title */}
+                    <div className="work-view-section">
+                      <div className="section-label">Sub Title</div>
+                      <div className={`section-content ${workAbilityViewIsEditing ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing} suppressContentEditableWarning>{weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}</div>
+                    </div>
+                  </div>
+
                   {/* Output Link */}
                   <div className="work-view-section">
                     <div className="section-label">Output Link</div>
@@ -5260,7 +5313,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         return [0, 1, 2, 3, 4].map((idx) => {
                           const link = adminLinks[idx]?.url ? adminLinks[idx] : userLinks[idx];
                           const hasLink = link?.url && link.url.trim() !== "";
-                          return (
+                          const prevLink = idx > 0 ? (adminLinks[idx - 1]?.url ? adminLinks[idx - 1] : userLinks[idx - 1]) : null;
+                          const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
+                          const isDisabled = !prevHasLink;
+                          return workAbilityViewIsEditing ? (
+                            <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
+                              <span className="link-num">{idx + 1}</span>
+                              <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
+                              <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                            </div>
+                          ) : (
                             <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
                               <span className="link-num">{idx + 1}</span>
                               <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>
@@ -5292,7 +5354,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
+                    <button className="save-edit-btn" onClick={() => {
+                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
+                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                      if (modal && activityType) {
+                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails(prev => prev.map(d =>
+                          d.activity_type_id === activityType
+                            ? { ...d, sub_title: newSubTitle }
+                            : d
+                        ));
+                      }
+                      setWorkCareerViewIsEditing(false);
+                    }}>
                       저장
                     </button>
                   </>
@@ -5308,58 +5383,58 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </button>
               </div>
             </div>
-            <div className="work-view-fixed">
-              {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
-              <div className="work-view-header-row">
-                <div className="work-view-left">
-                  <div className="work-icon-box fruit">{selectedWorkCareerCard.icon && <img src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge} />}</div>
-                  <span className="category-title">{selectedWorkCareerCard.badge}</span>
-                  <span className="code-badge">{selectedWorkCareerCard.code}</span>
-                </div>
-                <div className="work-view-right">
-                  {selectedWorkCareerCard.statusBadge &&
-                    (() => {
-                      const statusText = selectedWorkCareerCard.verified ? "강화성공" : selectedWorkCareerCard.isFailed ? "강화실패" : selectedWorkCareerCard.isNotApplicable ? "해당없음" : "강화대기";
-                      const statusClass = selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not-applicable" : "pending";
-                      return (
-                        <div className={`status-badge ${statusClass}`}>
-                          <img src={selectedWorkCareerCard.statusBadge} alt="상태" />
-                          <span>{statusText}</span>
-                        </div>
-                      );
-                    })()}
-                </div>
-              </div>
-
-              {/* Main Title + 등급 + Content */}
-              <div className="work-view-title-section">
-                <div className="main-title-row">
-                  <div className="main-title">Main Title</div>
-                  <div className="grade-row">
-                    <span className={`grade ${selectedWorkCareerCard.grade === "S" ? "active" : ""}`}>S</span>
-                    <span className={`grade ${selectedWorkCareerCard.grade === "A" ? "active" : ""}`}>A</span>
-                    <span className={`grade ${selectedWorkCareerCard.grade === "B" ? "active" : ""}`}>B</span>
-                    <span className={`grade ${selectedWorkCareerCard.grade === "C" ? "active" : ""}`}>C</span>
-                    <span className={`grade ${selectedWorkCareerCard.grade === "D" ? "active" : ""}`}>D</span>
+            <div className="section-modal-body">
+              <div className="work-view-fixed">
+                <div className="date-badge">{weekDateRange}</div>
+                {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
+                <div className="work-view-header-row">
+                  <div className="work-view-left">
+                    <div className="work-icon-box fruit">{selectedWorkCareerCard.icon && <img src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge} />}</div>
+                    <span className="category-title">{selectedWorkCareerCard.badge}</span>
+                    <span className="code-badge">{selectedWorkCareerCard.code}</span>
+                  </div>
+                  <div className="work-view-right">
+                    {selectedWorkCareerCard.statusBadge &&
+                      (() => {
+                        const statusText = selectedWorkCareerCard.verified ? "강화성공" : selectedWorkCareerCard.isFailed ? "강화실패" : selectedWorkCareerCard.isNotApplicable ? "해당없음" : "강화대기";
+                        const statusClass = selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not-applicable" : "pending";
+                        return (
+                          <div className={`status-badge ${statusClass}`}>
+                            <img src={selectedWorkCareerCard.statusBadge} alt="상태" />
+                            <span>{statusText}</span>
+                          </div>
+                        );
+                      })()}
                   </div>
                 </div>
-                <div className="content-text">{selectedWorkCareerCard.title}</div>
-                <div className="date-badge">{weekDateRange}</div>
-              </div>
 
-              {/* Sub Title */}
-              <div className="work-view-section">
-                <div className="section-label">Sub Title</div>
-                <div className="section-content">
-                  {(() => {
-                    const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                    return weekActivityDetails.find((d) => d.activity_type_id === activityType)?.sub_title || "-";
-                  })()}
+                {/* Main Title + 등급 + Content */}
+                <div className="work-view-title-section">
+                  <div className="main-title-row">
+                    <div className="main-title">Main Title</div>
+                    <div className="grade-row">
+                      <span className={`grade ${selectedWorkCareerCard.grade === "S" ? "active" : ""}`}>S</span>
+                      <span className={`grade ${selectedWorkCareerCard.grade === "A" ? "active" : ""}`}>A</span>
+                      <span className={`grade ${selectedWorkCareerCard.grade === "B" ? "active" : ""}`}>B</span>
+                      <span className={`grade ${selectedWorkCareerCard.grade === "C" ? "active" : ""}`}>C</span>
+                      <span className={`grade ${selectedWorkCareerCard.grade === "D" ? "active" : ""}`}>D</span>
+                    </div>
+                  </div>
+                  <div className={`content-text ${workCareerViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workCareerViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkCareerCard.title}</div>
+                </div>
+
+                {/* Sub Title */}
+                <div className="work-view-section">
+                  <div className="section-label">Sub Title</div>
+                  <div className={`section-content ${workCareerViewIsEditing ? "editing" : ""}`} contentEditable={workCareerViewIsEditing} suppressContentEditableWarning>
+                    {(() => {
+                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                      return weekActivityDetails.find((d) => d.activity_type_id === activityType)?.sub_title || "-";
+                    })()}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="section-modal-body">
               {/* Output Link */}
               <div className="work-view-section">
                 <div className="section-label">Output Link</div>
@@ -5374,7 +5449,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     return [0, 1, 2, 3, 4].map((idx) => {
                       const link = idx < adminCount ? adminLinks[idx] : userLinks[idx - adminCount];
                       const hasLink = link?.url && link.url.trim() !== "";
-                      return (
+                      const prevLink = idx > 0 ? (idx - 1 < adminCount ? adminLinks[idx - 1] : userLinks[idx - 1 - adminCount]) : null;
+                      const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
+                      const isDisabled = !prevHasLink;
+                      return workCareerViewIsEditing ? (
+                        <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
+                          <span className="link-num">{idx + 1}</span>
+                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
+                          <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                        </div>
+                      ) : (
                         <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
                           <span className="link-num">{idx + 1}</span>
                           <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>

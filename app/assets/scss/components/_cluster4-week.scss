@@ -2815,6 +2815,7 @@
                 text-align: left;
                 flex: 1;
                 margin: 0;
+                margin-top: 6px;
                 margin-left: 8px;
                 display: -webkit-box !important;
                 -webkit-line-clamp: 2 !important;
@@ -4576,9 +4577,23 @@
     background: #0d1117;
     border: 1px solid #faab07;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
+
+    .content-text.editing,
+    .section-content.editing {
+      border: 1px solid rgba(255, 165, 0, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 6px;
+      outline: none;
+      cursor: text;
+
+      &:focus {
+        border-color: #ffa500;
+      }
+    }
 
     &.section-modal-wide {
       width: 700px;
@@ -4791,8 +4806,30 @@
 
     .section-modal-body {
       flex: 1;
-      overflow-y: auto;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      min-height: 0;
+      -webkit-overflow-scrolling: touch;
       padding: 16px 24px;
+
+      p,
+      span,
+      div,
+      label,
+      input,
+      textarea,
+      td,
+      th,
+      li,
+      a,
+      h4,
+      h5,
+      h6 {
+        font-size: 18px !important;
+      }
+      h3 {
+        font-size: 24px !important;
+      }
 
       &::-webkit-scrollbar {
         width: 3px;
@@ -4810,6 +4847,17 @@
       }
       scrollbar-width: thin;
       scrollbar-color: #ffa500 #252836;
+
+      .output-links-view,
+      .work-view-section,
+      .section-content {
+        &::-webkit-scrollbar { width: 3px; }
+        &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+        &::-webkit-scrollbar-thumb { background: #ffa500; border-radius: 2px; }
+        &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+        scrollbar-width: thin;
+        scrollbar-color: #ffa500 #252836;
+      }
 
       .modal-card-item {
         margin-bottom: 24px;
@@ -6214,6 +6262,17 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
+
+        p,
+        span,
+        div,
+        label,
+        a {
+          font-size: 18px !important;
+        }
+        h3 {
+          font-size: 24px !important;
+        }
       }
 
       .section-modal-header {
