@@ -1791,7 +1791,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               team: reviewer?.teamName || "-",
               part: reviewer?.partName || "-",
               nickname: reviewer?.vision || "-",
-              role: reviewer?.role ? (roleLabels[reviewer.role] || reviewer.role) : "일반",
+              role: reviewer?.role ? roleLabels[reviewer.role] || reviewer.role : "일반",
               rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
               ratingCount: `${rep.rating} / 10`,
               description: rep.content || "-",
@@ -2767,13 +2767,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="header-info-row2" style={{ gap: "11px" }}>
               <div className="info-group left" style={{ flexShrink: 0 }}>
                 <span className="info-item team" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif" }}>
-                  <strong>[팀]</strong> <span className="text-gray">{isOnboardingWeek ? "클럽 온보딩" : teamName === "운영진" && generation ? `운영진(${generation}기)` : (teamName || "-").length > 6 ? (teamName || "-").slice(0, 6) + ".." : teamName || "-"}</span>
+                  <strong>[팀]&nbsp;</strong>
+                  <span className="text-gray">{isOnboardingWeek ? "클럽 온보딩" : teamName === "운영진" && generation ? `운영진(${generation}기)` : (teamName || "-").length > 6 ? (teamName || "-").slice(0, 6) + ".." : teamName || "-"}</span>
                 </span>
                 <span className="info-divider" style={{ marginLeft: "-68px" }}>
                   |
                 </span>
                 <span className="info-item part" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-4px" }}>
-                  <strong>[파트]</strong>{" "}
+                  <strong>[파트]&nbsp;</strong>
                   <span className="text-gray">
                     {isOnboardingWeek
                       ? "신입OT"
@@ -2787,7 +2788,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </span>
                 </span>
               </div>
-              <div className="info-group right" style={{ gap: "8px", fontSize: "17px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-24px" }}>
+              <div className="info-group right" style={{ gap: "8px", fontSize: "20px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-72px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   단감
@@ -2802,7 +2803,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                    {weekPoints.shield - weekPoints.lightning}
+                    {Math.abs(weekPoints.shield - weekPoints.lightning)}
                   </strong>
                   <span className="unit-text">개</span>
                 </span>
@@ -2929,10 +2930,35 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 </span>
                               </div>
                               <div className="detail-line" style={{ display: "flex", alignItems: "center" }}>
-                                <span className="badge-status yellow" style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 7.5, paddingBottom: 9.5, background: "#FAAB07", borderRadius: 9999, backdropFilter: "blur(1px)", display: "inline-flex", justifyContent: "center", alignItems: "center", fontSize: 12, fontFamily: "Pretendard", fontWeight: "600", lineHeight: "9px", color: "#000", width: "fit-content", whiteSpace: "nowrap", flexShrink: 0 }}>
-                                  {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                                <span style={{ flex: 1, display: "flex", justifyContent: "flex-end", overflow: "hidden", textOverflow: "clip", whiteSpace: "nowrap" }}>
+                                  <span
+                                    className="badge-status yellow"
+                                    style={{
+                                      paddingLeft: 10,
+                                      paddingRight: 10,
+                                      paddingTop: 7.5,
+                                      paddingBottom: 9.5,
+                                      background: "#FAAB07",
+                                      borderRadius: 9999,
+                                      backdropFilter: "blur(1px)",
+                                      display: "inline-flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      fontSize: 12,
+                                      fontFamily: "Pretendard",
+                                      fontWeight: "600",
+                                      lineHeight: "9px",
+                                      color: "#000",
+                                      width: "fit-content",
+                                      whiteSpace: "nowrap",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                                  </span>
                                 </span>
-                                <span className="nickname" style={{ fontSize: "16px", marginLeft: "auto", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
+                                <span style={{ width: "3px", flexShrink: 0 }}></span>
+                                <span className="nickname" style={{ flex: 1, fontSize: "16px", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
                                   {(user.nickname || "-").length > 8 ? (user.nickname || "-").slice(0, 8) + ".." : user.nickname || "-"}
                                 </span>
                               </div>
@@ -3038,7 +3064,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </div>
                           <div className="date-view">
                             {!isEmpty && (
-                              <span className="badge-status yellow" style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 7.5, paddingBottom: 9.5, background: "#FAAB07", borderRadius: 9999, backdropFilter: "blur(1px)", display: "inline-flex", justifyContent: "center", alignItems: "center", fontSize: 12, fontFamily: "Pretendard", fontWeight: "600", lineHeight: "9px", color: "#000", width: "fit-content", whiteSpace: "nowrap", flexShrink: 0, marginRight: "8px" }}>
+                              <span
+                                className="badge-status yellow"
+                                style={{
+                                  paddingLeft: 10,
+                                  paddingRight: 10,
+                                  paddingTop: 7.5,
+                                  paddingBottom: 9.5,
+                                  background: "#FAAB07",
+                                  borderRadius: 9999,
+                                  backdropFilter: "blur(1px)",
+                                  display: "inline-flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  fontSize: 12,
+                                  fontFamily: "Pretendard",
+                                  fontWeight: "600",
+                                  lineHeight: "9px",
+                                  color: "#000",
+                                  width: "fit-content",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
+                                  marginRight: "8px",
+                                }}
+                              >
                                 {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
                               </span>
                             )}
@@ -4979,20 +5028,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => {
-                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
-                      if (modal && selectedWorkInfoCard?.activityType) {
-                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
-                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                        setWeekActivityDetails(prev => prev.map(d =>
-                          d.activity_type_id === selectedWorkInfoCard.activityType
-                            ? { ...d, sub_title: newSubTitle }
-                            : d
-                        ));
-                        setSelectedWorkInfoCard((prev: any) => prev ? { ...prev, subTitle: newSubTitle || "" } : prev);
-                      }
-                      setWorkInfoViewIsEditing(false);
-                    }}>
+                    <button
+                      className="save-edit-btn"
+                      onClick={() => {
+                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                        if (modal && selectedWorkInfoCard?.activityType) {
+                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle } : d)));
+                          setSelectedWorkInfoCard((prev: any) => (prev ? { ...prev, subTitle: newSubTitle || "" } : prev));
+                        }
+                        setWorkInfoViewIsEditing(false);
+                      }}
+                    >
                       저장
                     </button>
                   </>
@@ -5048,13 +5096,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* Main Title + Content */}
                 <div className="work-view-title-section">
                   <div className="main-title">Main Title</div>
-                  <div className={`content-text ${workInfoViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workInfoViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkInfoCard.title}</div>
+                  <div className={`content-text ${workInfoViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workInfoViewIsEditing && isAdmin} suppressContentEditableWarning>
+                    {selectedWorkInfoCard.title}
+                  </div>
                 </div>
 
                 {/* Sub Title */}
                 <div className="work-view-section">
                   <div className="section-label">Sub Title</div>
-                  <div className={`section-content ${workInfoViewIsEditing ? "editing" : ""}`} contentEditable={workInfoViewIsEditing} suppressContentEditableWarning>{selectedWorkInfoCard.subTitle || "-"}</div>
+                  <div className={`section-content ${workInfoViewIsEditing ? "editing" : ""}`} contentEditable={workInfoViewIsEditing} suppressContentEditableWarning>
+                    {selectedWorkInfoCard.subTitle || "-"}
+                  </div>
                 </div>
               </div>
 
@@ -5071,8 +5123,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     return workInfoViewIsEditing ? (
                       <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
                         <span className="link-num">{idx + 1}</span>
-                        <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
-                        <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                        <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
+                          {hasLink ? link.desc || "링크" : "-"}
+                        </span>
+                        <input
+                          className="link-url-edit"
+                          defaultValue={hasLink ? link.url : ""}
+                          placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
+                          disabled={isDisabled}
+                          style={{
+                            border: "1px solid rgba(255,165,0,0.5)",
+                            background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            color: "inherit",
+                            fontSize: "inherit",
+                            outline: "none",
+                            width: "100%",
+                            marginTop: "4px",
+                            cursor: isDisabled ? "not-allowed" : "text",
+                          }}
+                        />
                       </div>
                     ) : (
                       <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
@@ -5104,19 +5175,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => {
-                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
-                      if (modal && selectedWorkExpCard?.activityTypeId) {
-                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
-                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                        setWeekActivityDetails(prev => prev.map(d =>
-                          d.activity_type_id === selectedWorkExpCard.activityTypeId
-                            ? { ...d, sub_title: newSubTitle }
-                            : d
-                        ));
-                      }
-                      setWorkExpViewIsEditing(false);
-                    }}>
+                    <button
+                      className="save-edit-btn"
+                      onClick={() => {
+                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                        if (modal && selectedWorkExpCard?.activityTypeId) {
+                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkExpCard.activityTypeId ? { ...d, sub_title: newSubTitle } : d)));
+                        }
+                        setWorkExpViewIsEditing(false);
+                      }}
+                    >
                       저장
                     </button>
                   </>
@@ -5176,13 +5246,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="rating-count">{selectedWorkExpCard.ratingCount}</span>
                     </div>
                   </div>
-                  <div className={`content-text ${workExpViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workExpViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkExpCard.title}</div>
+                  <div className={`content-text ${workExpViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workExpViewIsEditing && isAdmin} suppressContentEditableWarning>
+                    {selectedWorkExpCard.title}
+                  </div>
                 </div>
 
                 {/* Sub Title */}
                 <div className="work-view-section">
                   <div className="section-label">Sub Title</div>
-                  <div className={`section-content ${workExpViewIsEditing ? "editing" : ""}`} contentEditable={workExpViewIsEditing} suppressContentEditableWarning>{weekActivityDetails.find((d) => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || "-"}</div>
+                  <div className={`section-content ${workExpViewIsEditing ? "editing" : ""}`} contentEditable={workExpViewIsEditing} suppressContentEditableWarning>
+                    {weekActivityDetails.find((d) => d.activity_type_id === selectedWorkExpCard.activityTypeId)?.sub_title || "-"}
+                  </div>
                 </div>
               </div>
 
@@ -5205,8 +5279,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       return workExpViewIsEditing ? (
                         <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
                           <span className="link-num">{idx + 1}</span>
-                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
-                          <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
+                            {hasLink ? link.desc || "링크" : "-"}
+                          </span>
+                          <input
+                            className="link-url-edit"
+                            defaultValue={hasLink ? link.url : ""}
+                            placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
+                            disabled={isDisabled}
+                            style={{
+                              border: "1px solid rgba(255,165,0,0.5)",
+                              background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
+                              padding: "4px 8px",
+                              borderRadius: "6px",
+                              color: "inherit",
+                              fontSize: "inherit",
+                              outline: "none",
+                              width: "100%",
+                              marginTop: "4px",
+                              cursor: isDisabled ? "not-allowed" : "text",
+                            }}
+                          />
                         </div>
                       ) : (
                         <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
@@ -5260,19 +5353,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <button className="cancel-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
                           취소
                         </button>
-                        <button className="save-edit-btn" onClick={() => {
-                          const modal = document.querySelector('.section-modal-overlay:last-of-type');
-                          if (modal && displayActivity?.activity_type_id) {
-                            const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
-                            const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                            setWeekActivityDetails(prev => prev.map(d =>
-                              d.activity_type_id === displayActivity.activity_type_id
-                                ? { ...d, sub_title: newSubTitle }
-                                : d
-                            ));
-                          }
-                          setWorkAbilityViewIsEditing(false);
-                        }}>
+                        <button
+                          className="save-edit-btn"
+                          onClick={() => {
+                            const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                            if (modal && displayActivity?.activity_type_id) {
+                              const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                              const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                              setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === displayActivity.activity_type_id ? { ...d, sub_title: newSubTitle } : d)));
+                            }
+                            setWorkAbilityViewIsEditing(false);
+                          }}
+                        >
                           저장
                         </button>
                       </>
@@ -5311,13 +5403,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {/* Main Title + Content */}
                     <div className="work-view-title-section">
                       <div className="main-title">Main Title</div>
-                      <div className={`content-text ${workAbilityViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing && isAdmin} suppressContentEditableWarning>{displayActivity?.title || "-"}</div>
+                      <div className={`content-text ${workAbilityViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing && isAdmin} suppressContentEditableWarning>
+                        {displayActivity?.title || "-"}
+                      </div>
                     </div>
 
                     {/* Sub Title */}
                     <div className="work-view-section">
                       <div className="section-label">Sub Title</div>
-                      <div className={`section-content ${workAbilityViewIsEditing ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing} suppressContentEditableWarning>{weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}</div>
+                      <div className={`section-content ${workAbilityViewIsEditing ? "editing" : ""}`} contentEditable={workAbilityViewIsEditing} suppressContentEditableWarning>
+                        {weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}
+                      </div>
                     </div>
                   </div>
 
@@ -5340,8 +5436,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           return workAbilityViewIsEditing ? (
                             <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
                               <span className="link-num">{idx + 1}</span>
-                              <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
-                              <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                              <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
+                                {hasLink ? link.desc || "링크" : "-"}
+                              </span>
+                              <input
+                                className="link-url-edit"
+                                defaultValue={hasLink ? link.url : ""}
+                                placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
+                                disabled={isDisabled}
+                                style={{
+                                  border: "1px solid rgba(255,165,0,0.5)",
+                                  background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
+                                  padding: "4px 8px",
+                                  borderRadius: "6px",
+                                  color: "inherit",
+                                  fontSize: "inherit",
+                                  outline: "none",
+                                  width: "100%",
+                                  marginTop: "4px",
+                                  cursor: isDisabled ? "not-allowed" : "text",
+                                }}
+                              />
                             </div>
                           ) : (
                             <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
@@ -5375,20 +5490,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button className="cancel-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
                       취소
                     </button>
-                    <button className="save-edit-btn" onClick={() => {
-                      const modal = document.querySelector('.section-modal-overlay:last-of-type');
-                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                      if (modal && activityType) {
-                        const subTitleEl = modal.querySelector('.work-view-fixed .section-content[contenteditable]');
-                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                        setWeekActivityDetails(prev => prev.map(d =>
-                          d.activity_type_id === activityType
-                            ? { ...d, sub_title: newSubTitle }
-                            : d
-                        ));
-                      }
-                      setWorkCareerViewIsEditing(false);
-                    }}>
+                    <button
+                      className="save-edit-btn"
+                      onClick={() => {
+                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                        const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                        if (modal && activityType) {
+                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle } : d)));
+                        }
+                        setWorkCareerViewIsEditing(false);
+                      }}
+                    >
                       저장
                     </button>
                   </>
@@ -5441,7 +5555,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className={`grade ${selectedWorkCareerCard.grade === "D" ? "active" : ""}`}>D</span>
                     </div>
                   </div>
-                  <div className={`content-text ${workCareerViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workCareerViewIsEditing && isAdmin} suppressContentEditableWarning>{selectedWorkCareerCard.title}</div>
+                  <div className={`content-text ${workCareerViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workCareerViewIsEditing && isAdmin} suppressContentEditableWarning>
+                    {selectedWorkCareerCard.title}
+                  </div>
                 </div>
 
                 {/* Sub Title */}
@@ -5476,8 +5592,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       return workCareerViewIsEditing ? (
                         <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
                           <span className="link-num">{idx + 1}</span>
-                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>{hasLink ? link.desc || "링크" : "-"}</span>
-                          <input className="link-url-edit" defaultValue={hasLink ? link.url : ""} placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"} disabled={isDisabled} style={{ border: "1px solid rgba(255,165,0,0.5)", background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "6px", color: "inherit", fontSize: "inherit", outline: "none", width: "100%", marginTop: "4px", cursor: isDisabled ? "not-allowed" : "text" }} />
+                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
+                            {hasLink ? link.desc || "링크" : "-"}
+                          </span>
+                          <input
+                            className="link-url-edit"
+                            defaultValue={hasLink ? link.url : ""}
+                            placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
+                            disabled={isDisabled}
+                            style={{
+                              border: "1px solid rgba(255,165,0,0.5)",
+                              background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
+                              padding: "4px 8px",
+                              borderRadius: "6px",
+                              color: "inherit",
+                              fontSize: "inherit",
+                              outline: "none",
+                              width: "100%",
+                              marginTop: "4px",
+                              cursor: isDisabled ? "not-allowed" : "text",
+                            }}
+                          />
                         </div>
                       ) : (
                         <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
