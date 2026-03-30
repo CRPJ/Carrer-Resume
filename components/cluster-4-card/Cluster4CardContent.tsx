@@ -39,6 +39,7 @@ interface SelectedColleague {
   team: string;
   part: string;
   nickname: string;
+  role?: string;
   rank: number;
   message: string;
   createdAt?: string;
@@ -1154,6 +1155,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             team: item.colleague?.team || "-",
             part: item.colleague?.part || "-",
             nickname: item.colleague?.nickname || "-",
+            role: item.colleague?.role || "",
             rank: item.rank,
             message: item.message || "",
             createdAt: item.created_at || "",
@@ -1300,6 +1302,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             team: item.colleague?.team || "-",
             part: item.colleague?.part || "-",
             nickname: item.colleague?.nickname || "-",
+            role: item.colleague?.role || "",
             rank: item.rank,
             message: item.message || "",
             createdAt: item.created_at || "",
@@ -1709,6 +1712,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       team: "기획",
       part: "전략",
       nickname: "짧음",
+      role: "심화",
       rating: 0.5,
       ratingCount: "1 / 10",
       description: "짧은코멘트",
@@ -1728,6 +1732,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       team: "마케팅전략",
       part: "브랜드콘텐츠",
       nickname: "중간닉네임임",
+      role: "운영진(앰배서더)",
       rating: 3,
       ratingCount: "6 / 10",
       description: "중간길이의코멘트입니다이번주",
@@ -1747,6 +1752,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       team: "엔터테인먼트사업",
       part: "글로벌마케팅전략",
       nickname: "엔비디아구글테슬라쿵",
+      role: "일반(정규)",
       rating: 5,
       ratingCount: "10 / 10",
       description: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
@@ -1785,6 +1791,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               team: reviewer?.teamName || "-",
               part: reviewer?.partName || "-",
               nickname: reviewer?.vision || "-",
+              role: reviewer?.role ? (roleLabels[reviewer.role] || reviewer.role) : "일반",
               rating: rep.rating / 2, // 10점 만점 → 5점 만점 변환 (별 표시용)
               ratingCount: `${rep.rating} / 10`,
               description: rep.content || "-",
@@ -1810,6 +1817,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         team: "",
         part: "",
         nickname: "",
+        role: "",
         rating: 0,
         ratingCount: "- / 10",
         description: "-",
@@ -1834,7 +1842,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyColleagues = [
-    { id: "dummy-col-1", name: "윤아", gender: "여", age: "21", profileImg: "/images/0/crew profile/여 3.jpg", university: "한대", major: "경영", team: "기획", part: "전략", nickname: "윤아", date: "2026 - 03 - 01 (토)", message: "좋은 동료", isEmpty: false },
+    { id: "dummy-col-1", name: "윤아", gender: "여", age: "21", profileImg: "/images/0/crew profile/여 3.jpg", university: "한대", major: "경영", team: "기획", part: "전략", nickname: "윤아", role: "심화", date: "2026 - 03 - 01 (토)", message: "좋은 동료", isEmpty: false },
     {
       id: "dummy-col-2",
       name: "박진우",
@@ -1846,6 +1854,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       team: "마케팅전략",
       part: "브랜드콘텐츠",
       nickname: "마케팅장인",
+      role: "운영진(앰배서더)",
       date: "2026 - 03 - 02 (일)",
       message: "기술적인 부분에서 큰 도움을 받았고 앞으로도 함께 성장하고 싶습니다",
       isEmpty: false,
@@ -1861,6 +1870,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       team: "엔터테인먼트사업",
       part: "글로벌마케팅전략",
       nickname: "글로벌마케터의꿈나무",
+      role: "일반(정규)",
       date: "2026 - 03 - 03 (월)",
       message: "다양한 관점에서 프로젝트를 바라보는 시각이 인상적이었고 특히 글로벌 마케팅 전략 수립 과정에서 보여준 리더십과 커뮤니케이션 능력이 뛰어났습니다",
       isEmpty: false,
@@ -1882,6 +1892,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         team: "-",
         part: "-",
         nickname: "-",
+        role: "",
         date: "-",
         message: "",
         isEmpty: true,
@@ -1902,6 +1913,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             team: c.team || "-",
             part: c.part || "-",
             nickname: c.nickname || "-",
+            role: c.role || "일반",
             date: c.createdAt ? formatDate(c.createdAt) : "-",
             message: c.message || "",
             isEmpty: false,
@@ -1922,6 +1934,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         team: "-",
         part: "-",
         nickname: "-",
+        role: "",
         date: "-",
         message: "",
         isEmpty: true,
@@ -2915,9 +2928,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   파트
                                 </span>
                               </div>
-                              <div className="detail-line">
-                                <span className="nickname" style={{ fontSize: "16px" }}>
-                                  {user.nickname}
+                              <div className="detail-line" style={{ display: "flex", alignItems: "center" }}>
+                                <span className="badge-status yellow" style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 7.5, paddingBottom: 9.5, background: "#FAAB07", borderRadius: 9999, backdropFilter: "blur(1px)", display: "inline-flex", justifyContent: "center", alignItems: "center", fontSize: 12, fontFamily: "Pretendard", fontWeight: "600", lineHeight: "9px", color: "#000", width: "fit-content", whiteSpace: "nowrap", flexShrink: 0 }}>
+                                  {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                                </span>
+                                <span className="nickname" style={{ fontSize: "16px", marginLeft: "auto", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
+                                  {(user.nickname || "-").length > 8 ? (user.nickname || "-").slice(0, 8) + ".." : user.nickname || "-"}
                                 </span>
                               </div>
                             </>
@@ -3021,6 +3037,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             )}
                           </div>
                           <div className="date-view">
+                            {!isEmpty && (
+                              <span className="badge-status yellow" style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 7.5, paddingBottom: 9.5, background: "#FAAB07", borderRadius: 9999, backdropFilter: "blur(1px)", display: "inline-flex", justifyContent: "center", alignItems: "center", fontSize: 12, fontFamily: "Pretendard", fontWeight: "600", lineHeight: "9px", color: "#000", width: "fit-content", whiteSpace: "nowrap", flexShrink: 0, marginRight: "8px" }}>
+                                {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                              </span>
+                            )}
                             <span className="date">{isEmpty ? "0000 - 00 - 00 (일)" : user.date}</span>
                             <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
                           </div>

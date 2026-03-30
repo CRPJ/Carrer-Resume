@@ -4599,6 +4599,27 @@
       width: 700px;
     }
 
+    // reputation/colleague 모달은 원래 font-size 유지
+    &.reputation-view-modal,
+    &.colleague-view-modal {
+      .section-modal-body {
+        p, span, div, label, input, textarea, td, th, li, a, h4, h5, h6 {
+          font-size: unset !important;
+        }
+        h3 {
+          font-size: unset !important;
+        }
+      }
+      .work-view-fixed {
+        p, span, div, label, a {
+          font-size: unset !important;
+        }
+        h3 {
+          font-size: unset !important;
+        }
+      }
+    }
+
     &.section-modal-work-edit {
       width: 520px;
       height: 690px;
