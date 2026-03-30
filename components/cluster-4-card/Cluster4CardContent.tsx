@@ -2452,6 +2452,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const ratingScore = activityRatings.get(activityTypeId) || 0;
       const rating = ratingScore / 2; // 별 표시용 (0~5)
 
+      // Fix C-1: 4번째 카드(index 3)는 보이드/빈 카드로 대체
+      if (index === 3) {
+        return {
+          id: index + 1,
+          activityTypeId: "",
+          code: "-",
+          badge: "-",
+          title: "-",
+          verified: false,
+          rating: 0,
+          ratingCount: "- / 10",
+          hasWeb: false,
+          icon: "",
+          isEmpty: true,
+          enhancementStatus: "not_applicable" as EnhancementStatus,
+          hasActivity: false,
+        };
+      }
+
       return {
         id: index + 1,
         activityTypeId,
@@ -3282,11 +3301,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span>개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span>{" "}개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {infoStats.success}
               </span>
-              개
+              {" "}개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3374,11 +3393,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span>개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span>{" "}개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {experienceStats.success}
               </span>
-              개
+              {" "}개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3516,11 +3535,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span>개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span>{" "}개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {competencyStats.success}
               </span>
-              개
+              {" "}개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3579,7 +3598,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </>
                     )}
                   </div>
-                  <p className="main-desc" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                  <p className="main-desc">
                     {!hasActivity
                       ? "-"
                       : (() => {
@@ -3643,11 +3662,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span>개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span>{" "}개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {careerStats.success}
               </span>
-              개
+              {" "}개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3698,7 +3717,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                         <span className="card-title">Main Title</span>
                       </div>
-                      <p className="main-desc-white" style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                      <p className="main-desc-white">
                         {isEmpty
                           ? "-"
                           : (() => {

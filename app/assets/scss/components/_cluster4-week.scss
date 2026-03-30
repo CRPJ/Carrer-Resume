@@ -3267,6 +3267,8 @@
             overflow: hidden;
             min-height: 42px;
             max-height: 42px;
+            max-width: none !important;
+            width: 100% !important;
           }
 
           .sub-title-row {
@@ -3296,10 +3298,14 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 400;
-            display: block;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
             min-height: 42px;
             max-height: 42px;
+            max-width: none !important;
+            width: 100% !important;
             position: relative;
             padding-right: 24px;
 
@@ -3744,6 +3750,9 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 0;
+            flex-wrap: wrap;
+            max-height: 32px;
+            overflow: hidden;
 
             .title-icon {
               width: 16px;
@@ -3783,11 +3792,12 @@
             font-weight: 500;
             margin: 0;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            min-height: 63px;
-            max-height: 63px;
+            min-height: 42px;
+            max-height: 42px;
+            max-width: none !important;
           }
 
           .sub-title-row {
@@ -3818,16 +3828,16 @@
             font-family: "Pretendard", sans-serif;
             font-weight: 400;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            min-height: 84px;
-            max-height: 84px;
+            min-height: 42px;
+            max-height: 42px;
             position: relative;
             padding-right: 24px;
             box-sizing: border-box;
             width: 100%;
-            max-width: 100%;
+            max-width: none !important;
 
             .card-arrow {
               position: absolute;
@@ -3929,6 +3939,17 @@
           }
         }
 
+        // Fix A: card-overlay.failed — absolute 배치로 flex flow에서 제거
+        .card-overlay.failed {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 5;
+        }
+
         .card-top-row {
           display: flex;
           flex-direction: row;
@@ -3936,16 +3957,22 @@
           overflow: hidden;
 
           .card-icon-area {
-            width: 70px;
-            height: 70px;
+            width: 70px !important;
+            height: 70px !important;
+            min-width: 70px;
+            min-height: 70px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(100, 100, 200, 0.15);
+            border: 1px dashed rgba(100, 100, 200, 0.3);
 
             img {
-              width: 70px;
-              height: 70px;
+              max-width: 70px !important;
+              max-height: 70px !important;
+              width: auto !important;
+              height: auto !important;
               object-fit: contain;
             }
 
@@ -4012,6 +4039,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-top: 32px;
             margin-bottom: 8px;
 
             .title-icon {
@@ -4058,12 +4086,14 @@
             overflow: hidden;
             min-height: 42px;
             max-height: 42px;
+            max-width: none !important;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
             gap: 6px;
+            margin-top: 6px;
             margin-bottom: 8px;
 
             .sub-icon {
@@ -4087,17 +4117,17 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 400;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
             position: relative;
             padding-right: 24px;
             box-sizing: border-box;
             width: 100%;
-            max-width: 100%;
+            max-width: none !important;
 
             .card-arrow {
               position: absolute;
@@ -4143,6 +4173,7 @@
         .grade-row {
           display: flex;
           gap: 5px;
+          margin-top: 8px;
           margin-bottom: 10px;
 
           .grade {
@@ -4192,17 +4223,17 @@
 
         .main-desc-white {
           width: 100%;
-          max-width: 100%;
+          max-width: none !important;
           font-size: 14px;
           color: #fff;
           line-height: 21px;
           font-family: "Pretendard", sans-serif;
           font-weight: 500;
           margin: 0 0 12px 0;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+          display: -webkit-box !important;
+          -webkit-line-clamp: 2 !important;
+          -webkit-box-orient: vertical !important;
+          overflow: hidden !important;
           min-height: 42px;
           max-height: 42px;
         }
