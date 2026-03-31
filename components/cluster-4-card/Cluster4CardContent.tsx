@@ -398,7 +398,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       case 0:
         return [];
       case 1:
-        return [makeDemoCareer(1, "네이버", "enhanced", "S", true), makeDemoCareer(2, "카카오", "enhanced", "A", true), makeDemoCareer(3, "라인", "not_applicable", "", false), makeDemoCareer(4, "쿠팡", "not_applicable", "", false)];
+        return [makeDemoCareer(1, "네이버", "enhanced", "S", true), makeDemoCareer(2, "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", "enhanced", "A", true), makeDemoCareer(3, "라인", "not_applicable", "", false), makeDemoCareer(4, "쿠팡", "not_applicable", "", false)];
       case 2:
         return [
           makeDemoCareer(1, "삼성전자", "not_applicable", "", false),
@@ -3757,7 +3757,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     </div>
                     <div className="card-bottom-area">
-                      <p className="category-text">{isEmpty ? "-" : (() => { const t = card.badge.replace("|", " - "); return t.length > 29 ? t.slice(0, 29) + ".." : t; })()}</p>
+                      <p className="category-text">
+                        {isEmpty
+                          ? "-"
+                          : (() => {
+                              const t = card.badge.replace("|", " - ");
+                              return t.length > 29 ? t.slice(0, 29) + ".." : t;
+                            })()}
+                      </p>
                       <div className="card-title-row">
                         <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                         <span className="card-title">Main Title</span>
