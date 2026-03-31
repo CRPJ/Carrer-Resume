@@ -3837,7 +3837,7 @@
             padding-right: 24px;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 60px) !important;
+            max-width: calc(100% - 51px) !important;
 
             .card-arrow {
               position: absolute;
@@ -4636,7 +4636,19 @@
     &.reputation-view-modal,
     &.colleague-view-modal {
       .section-modal-body {
-        p, span, div, label, input, textarea, td, th, li, a, h4, h5, h6 {
+        p,
+        span,
+        div,
+        label,
+        input,
+        textarea,
+        td,
+        th,
+        li,
+        a,
+        h4,
+        h5,
+        h6 {
           font-size: unset !important;
         }
         h3 {
@@ -4644,7 +4656,11 @@
         }
       }
       .work-view-fixed {
-        p, span, div, label, a {
+        p,
+        span,
+        div,
+        label,
+        a {
           font-size: unset !important;
         }
         h3 {
@@ -4905,10 +4921,20 @@
       .output-links-view,
       .work-view-section,
       .section-content {
-        &::-webkit-scrollbar { width: 3px; }
-        &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
-        &::-webkit-scrollbar-thumb { background: #ffa500; border-radius: 2px; }
-        &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+        &::-webkit-scrollbar {
+          width: 3px;
+        }
+        &::-webkit-scrollbar-track {
+          background: #252836;
+          border-radius: 2px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: #ffa500;
+          border-radius: 2px;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+          background: #22c55e;
+        }
         scrollbar-width: thin;
         scrollbar-color: #ffa500 #252836;
       }
