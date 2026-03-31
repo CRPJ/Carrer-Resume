@@ -2832,10 +2832,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <strong>[팀]&nbsp;</strong>
                   <span className="text-gray">{isOnboardingWeek ? "클럽 온보딩" : teamName === "운영진" && generation ? `운영진(${generation}기)` : (teamName || "-").length > 6 ? (teamName || "-").slice(0, 6) + ".." : teamName || "-"}</span>
                 </span>
-                <span className="info-divider" style={{ marginLeft: "-68px" }}>
+                <span className="info-divider" style={{ marginLeft: "-76px" }}>
                   |
                 </span>
-                <span className="info-item part" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-4px" }}>
+                <span className="info-item part" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-12px" }}>
                   <strong>[파트]&nbsp;</strong>
                   <span className="text-gray">
                     {isOnboardingWeek
