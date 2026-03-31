@@ -3685,7 +3685,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   >
                     {card.isFailed && <div className="card-overlay failed"></div>}
                     <div className="card-top-row">
-                      <div className="card-icon-area">{!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} /> : <div className="icon-placeholder"></div>}</div>
+                      <div className="card-icon-area" style={{ position: "relative" }}>
+                        {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.isFailed ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
+                        {!isEmpty && card.isFailed && (
+                          <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
+                            <span className="failed-emoji">😿</span>
+                          </div>
+                        )}
+                      </div>
                       <div className="card-header-area">
                         <div className="card-header-row">
                           <img src="/images/0/cluster4/icon/icon - 10 - clock.png" alt="verified" className="verified-icon" />

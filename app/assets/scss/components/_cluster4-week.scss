@@ -3967,8 +3967,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(100, 100, 200, 0.15);
-            border: 1px dashed rgba(100, 100, 200, 0.3);
+            position: relative;
+            background: rgba(150, 150, 200, 0.25) !important;
+            border: 1.5px solid rgba(150, 150, 200, 0.4) !important;
+            border-radius: 0;
 
             img {
               max-width: 70px !important;
@@ -4029,6 +4031,7 @@
           overflow: hidden;
           min-width: 0;
           position: relative;
+          margin-top: -15px !important;
 
           > .card-arrow {
             position: absolute;
@@ -4041,7 +4044,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 32px;
+            margin-top: 9px;
             margin-bottom: 8px;
 
             .title-icon {
@@ -4129,7 +4132,7 @@
             padding-right: 24px;
             box-sizing: border-box;
             width: 100%;
-            max-width: none !important;
+            max-width: calc(100% - 28px) !important;
 
             .card-arrow {
               position: absolute;
@@ -4175,7 +4178,7 @@
         .grade-row {
           display: flex;
           gap: 5px;
-          margin-top: 8px;
+          margin-top: 16px;
           margin-bottom: 10px;
 
           .grade {
@@ -4225,7 +4228,7 @@
 
         .main-desc-white {
           width: 100%;
-          max-width: none !important;
+          max-width: calc(100% - 28px) !important;
           font-size: 14px;
           color: #fff;
           line-height: 21px;
