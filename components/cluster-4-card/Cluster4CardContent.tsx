@@ -155,7 +155,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     {
       id: "wa-5",
       activity_type_id: "forum",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
+      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
@@ -165,17 +165,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     {
       id: "wa-8",
       activity_type_id: "comp-1",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
+      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십가나다라마바사아자차카타파하",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
     },
+    { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-comp-4", activity_type_id: "comp-4", title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-9", activity_type_id: "exp-1", title: "커리어 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-11",
       activity_type_id: "exp-3",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
+      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
@@ -217,6 +220,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     { week_id: "dummy-1", activity_type_id: "session", is_completed: false },
     { week_id: "dummy-1", activity_type_id: "practical_lecture", is_completed: true },
     { week_id: "dummy-1", activity_type_id: "comp-1", is_completed: true },
+    { week_id: "dummy-1", activity_type_id: "comp-2", is_completed: true },
+    { week_id: "dummy-1", activity_type_id: "comp-3", is_completed: true },
+    { week_id: "dummy-1", activity_type_id: "comp-4", is_completed: true },
     { week_id: "dummy-1", activity_type_id: "exp-1", is_completed: true },
     { week_id: "dummy-1", activity_type_id: "exp-2", is_completed: true },
     { week_id: "dummy-1", activity_type_id: "exp-1", is_completed: true },
@@ -245,6 +251,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
       output_links: [],
     },
+    { week_id: "dummy-1", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
     {
@@ -278,14 +287,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(
     new Map([
-      ["comp-1", { id: "comp-1", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
+      ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
+      ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
+      ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
+      ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
+      ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
       ["exp-1", { id: "exp-1", name: "[커리어]마케터 Launch", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
       ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
       ["exp-3", { id: "exp-3", name: "[콘텐츠]마케팅 실무", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
       ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
     ]),
   );
-  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(["comp-1"]);
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(["comp-1", "comp-2", "comp-3", "comp-4", "comp-5"]);
   const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>(["exp-1", "exp-2", "exp-3", "exp-4"]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
@@ -443,7 +456,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       if ([6].includes(caseNum)) return false; // 참여했지만 강화 실패
       return true;
     })();
-    const compRecord: ActivityRecord = { week_id: wId, activity_type_id: "comp-1", is_completed: compCompleted };
+    const compRecords: ActivityRecord[] = ["comp-1", "comp-2", "comp-3", "comp-4"].map((t) => ({
+      week_id: wId,
+      activity_type_id: t,
+      is_completed: compCompleted,
+    }));
+    // comp-5는 보이드 (레코드 없음)
 
     // 실무 경험 — 주차별 분기
     const expStatuses: boolean[] = (() => {
@@ -458,7 +476,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       is_completed: expStatuses[i] ?? true,
     }));
 
-    return [...infoRecords, compRecord, ...expRecords];
+    return [...infoRecords, ...compRecords, ...expRecords];
   };
 
   const [careerRecords, setCareerRecords] = useState<CareerRecord[]>([
@@ -703,6 +721,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       if (weekIndex >= 0) {
         if (weekIndex > 0) setNextWeekId(DUMMY_WEEKLY_LIST[weekIndex - 1].id);
         if (weekIndex < DUMMY_WEEKLY_LIST.length - 1) setPrevWeekId(DUMMY_WEEKLY_LIST[weekIndex + 1].id);
+      }
+
+      // 데모 모드: urlUserId → API로 이름 조회 → 이름별 고정 competency 매핑
+      if (urlUserId) {
+        (async () => {
+          try {
+            const res = await fetch(`/api/profile/?userId=${urlUserId}`);
+            const json = await res.json();
+            const name = json.data?.display_name || null;
+            const compMap: Record<string, string[]> = {
+              윤재윤: ["comp-3"],
+              전민경: ["comp-2"],
+              곽예원: ["comp-5"],
+              안지혜: ["comp-4"],
+              김의환: ["comp-1"],
+            };
+            // 이름에서 매칭 (부분 일치도 허용)
+            const matched = Object.entries(compMap).find(([key]) => name?.includes(key));
+            if (matched) {
+              setCompetencyTypeIds(matched[1]);
+            }
+          } catch (e) {
+            // API 실패 시 기본값 유지
+          }
+        })();
       }
 
       return;
@@ -3301,11 +3344,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span>{" "}개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {infoStats.success}
-              </span>
-              {" "}개
+              </span>{" "}
+              개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3345,7 +3388,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {!isEmpty && card.icon ? <img src={card.icon} alt={card.category} style={{ opacity: card.status === "failed" || card.status === "not_applicable" ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
                         {!isEmpty && card.isFailed && (
                           <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
+                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>
+                              강화 실패
+                            </span>
                             <span className="failed-emoji">😿</span>
                           </div>
                         )}
@@ -3393,11 +3438,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span>{" "}개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {experienceStats.success}
-              </span>
-              {" "}개
+              </span>{" "}
+              개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3430,7 +3475,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.enhancementStatus === "failed" ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
                       {!isRestMode && !isEmpty && (!card.hasActivity || card.enhancementStatus === "failed") && (
                         <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                          <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
+                          <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>
+                            강화 실패
+                          </span>
                           <span className="failed-emoji">😿</span>
                         </div>
                       )}
@@ -3438,7 +3485,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="card-header-area">
                       <div className="card-header-row">
                         <span className="code-tag">{isEmpty ? "-" : card.code}</span>
-                        <span className="badge-tag">{isEmpty ? "-" : card.badge}</span>
+                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 25) + ".." : card.badge}</span>
                       </div>
                       <div className="card-rating-row">
                         <div className="stars">
@@ -3535,11 +3582,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span>{" "}개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {competencyStats.success}
-              </span>
-              {" "}개
+              </span>{" "}
+              개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3576,7 +3623,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {!hasActivity && <div className="icon-placeholder"></div>}
                   {!isRestMode && (enhancementStatus === "failed" || !hasActivity) && (
                     <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
+                      <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>
+                        강화 실패
+                      </span>
                       <span className="failed-emoji">😿</span>
                     </div>
                   )}
@@ -3594,20 +3643,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {hasActivity && activityTypeInfo && (
                       <>
                         <span className="code-tag">{activityTypeInfo.line_code}</span>
-                        <span className="info-tag">{activityTypeInfo.name}</span>
+                        <span className="info-tag">{activityTypeInfo.name.length > 39 ? activityTypeInfo.name.slice(0, 39) + ".." : activityTypeInfo.name}</span>
                       </>
                     )}
                   </div>
-                  <p className="main-desc">
-                    {!hasActivity ? "-" : displayActivity?.title || "-"}
-                  </p>
+                  <p className="main-desc">{!hasActivity ? "-" : displayActivity?.title || "-"}</p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
-                  <span className="sub-desc">
-                    {!hasActivity ? "-" : weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}
-                  </span>
+                  <span className="sub-desc">{!hasActivity ? "-" : weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}</span>
                   {hasActivity && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
                 <div className="status-badge">
@@ -3652,11 +3697,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span>{" "}개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
                 {careerStats.success}
-              </span>
-              {" "}개
+              </span>{" "}
+              개
             </span>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
@@ -3689,7 +3734,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.isFailed ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
                         {!isEmpty && card.isFailed && (
                           <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
+                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>
+                              강화 실패
+                            </span>
                             <span className="failed-emoji">😿</span>
                           </div>
                         )}
@@ -3710,7 +3757,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     </div>
                     <div className="card-bottom-area">
-                      <p className="category-text">{isEmpty ? "-" : card.badge.replace("|", " - ")}</p>
+                      <p className="category-text">{isEmpty ? "-" : (() => { const t = card.badge.replace("|", " - "); return t.length > 29 ? t.slice(0, 29) + ".." : t; })()}</p>
                       <div className="card-title-row">
                         <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="title-icon" />
                         <span className="card-title">Main Title</span>
