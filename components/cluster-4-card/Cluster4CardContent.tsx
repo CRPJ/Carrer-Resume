@@ -3344,8 +3344,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className={`card-icon-area ${!isEmpty && card.isFruit ? "fruit" : ""} ${!isEmpty && card.isFailed ? "failed" : ""}`}>
                         {!isEmpty && card.icon ? <img src={card.icon} alt={card.category} style={{ opacity: card.status === "failed" || card.status === "not_applicable" ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
                         {!isEmpty && card.isFailed && (
-                          <div className="failed-overlay">
-                            <span className="failed-text">강화 실패</span>
+                          <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                            <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
                             <span className="failed-emoji">😿</span>
                           </div>
                         )}
@@ -3429,8 +3429,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className={`card-icon-area ${!isEmpty && card.enhancementStatus === "failed" ? "failed" : ""}`}>
                       {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.enhancementStatus === "failed" ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
                       {!isRestMode && !isEmpty && (!card.hasActivity || card.enhancementStatus === "failed") && (
-                        <div className="failed-overlay">
-                          <span className="failed-text">강화 실패</span>
+                        <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                          <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
                           <span className="failed-emoji">😿</span>
                         </div>
                       )}
@@ -3575,8 +3575,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {hasActivity && displayActivity && <img src={getCompetencyIconPath(displayActivity.activity_type_id)} alt="실무 역량" style={{ opacity: enhancementStatus === "failed" ? 0.3 : 1 }} />}
                   {!hasActivity && <div className="icon-placeholder"></div>}
                   {!isRestMode && (enhancementStatus === "failed" || !hasActivity) && (
-                    <div className="failed-overlay">
-                      <span className="failed-text">강화 실패</span>
+                    <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                      <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>강화 실패</span>
                       <span className="failed-emoji">😿</span>
                     </div>
                   )}
@@ -3599,24 +3599,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     )}
                   </div>
                   <p className="main-desc">
-                    {!hasActivity
-                      ? "-"
-                      : (() => {
-                          const text = displayActivity?.title || "-";
-                          return text.length > 80 ? text.slice(0, 80) + "..." : text;
-                        })()}
+                    {!hasActivity ? "-" : displayActivity?.title || "-"}
                   </p>
                   <div className="sub-title-row">
                     <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                     <span className="sub-label">Sub Title</span>
                   </div>
                   <span className="sub-desc">
-                    {!hasActivity
-                      ? "-"
-                      : (() => {
-                          const text = weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-";
-                          return text.length > 79 ? text.slice(0, 79) + "..." : text;
-                        })()}
+                    {!hasActivity ? "-" : weekActivityDetails.find((d) => d.activity_type_id === displayActivity?.activity_type_id)?.sub_title || "-"}
                   </span>
                   {hasActivity && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                 </div>
