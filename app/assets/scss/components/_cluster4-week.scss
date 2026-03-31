@@ -3797,7 +3797,8 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 51px) !important;
+            max-width: 100% !important;
+            width: 100% !important;
           }
 
           .sub-title-row {
@@ -3837,7 +3838,8 @@
             padding-right: 24px;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 51px) !important;
+            max-width: 100% !important;
+            width: 100% !important;
 
             .card-arrow {
               position: absolute;
