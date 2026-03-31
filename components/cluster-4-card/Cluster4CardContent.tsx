@@ -287,7 +287,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(
     new Map([
-      ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
+      ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
       ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
       ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
       ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
@@ -3643,7 +3643,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {hasActivity && activityTypeInfo && (
                       <>
                         <span className="code-tag">{activityTypeInfo.line_code}</span>
-                        <span className="info-tag">{activityTypeInfo.name.length > 39 ? activityTypeInfo.name.slice(0, 39) + ".." : activityTypeInfo.name}</span>
+                        <span className="info-tag">{activityTypeInfo.name.length > 35 ? activityTypeInfo.name.slice(0, 35) + ".." : activityTypeInfo.name}</span>
                       </>
                     )}
                   </div>
@@ -3762,7 +3762,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ? "-"
                           : (() => {
                               const t = card.badge.replace("|", " - ");
-                              return t.length > 29 ? t.slice(0, 29) + ".." : t;
+                              return t.length > 25 ? t.slice(0, 25) + ".." : t;
                             })()}
                       </p>
                       <div className="card-title-row">
