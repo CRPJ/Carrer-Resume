@@ -1535,6 +1535,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 저장 함수
   const saveWeeklyColleagues = async () => {
+    if (selectedColleagues.length === 0) {
+      const el = document.querySelector(".selected-colleagues, .add-colleague-card");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      return;
+    }
     if (isDemoMode) {
       console.log("Demo: 연계 동료 저장", selectedColleagues);
       alert("저장되었습니다.");
@@ -1600,17 +1605,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     if (reputationEditData.rating === 0) {
-      alert("평점을 입력해주세요.");
+      const el = document.querySelector(".reputation-form .form-field:nth-child(1)");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
     if (!reputationEditData.content.trim()) {
-      alert("내용을 입력해주세요.");
+      const el = document.querySelector(".reputation-form .form-field:nth-child(2)");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
     if (!reputationEditData.keyword) {
-      alert("키워드를 선택해주세요.");
+      const el = document.querySelector(".reputation-form .form-field:nth-child(3)");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
@@ -5089,43 +5097,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 정보</h3>
-              <div className="header-right">
-                {!workInfoViewIsEditing ? (
-                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkInfoViewIsEditing(true)}>
-                    <i className="ti ti-pencil"></i> 수정
-                  </button>
-                ) : (
-                  <>
-                    <button className="cancel-edit-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
-                      취소
-                    </button>
-                    <button
-                      className="save-edit-btn"
-                      onClick={() => {
-                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                        if (modal && selectedWorkInfoCard?.activityType) {
-                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle } : d)));
-                          setSelectedWorkInfoCard((prev: any) => (prev ? { ...prev, subTitle: newSubTitle || "" } : prev));
-                        }
-                        setWorkInfoViewIsEditing(false);
-                      }}
-                    >
-                      저장
-                    </button>
-                  </>
-                )}
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    setWorkInfoViewModalOpen(false);
-                    setWorkInfoViewIsEditing(false);
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
-              </div>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  setWorkInfoViewModalOpen(false);
+                  setWorkInfoViewIsEditing(false);
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
             </div>
             <div className="section-modal-body">
               <div className="work-view-fixed">
@@ -5226,6 +5206,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
+            <div className="section-modal-footer">
+              {!workInfoViewIsEditing ? (
+                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>수정</button>
+              ) : (
+                <>
+                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>취소</button>
+                  <button
+                    className="save-btn"
+                    onClick={() => {
+                      const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                      if (modal && selectedWorkInfoCard?.activityType) {
+                        const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle } : d)));
+                        setSelectedWorkInfoCard((prev: any) => (prev ? { ...prev, subTitle: newSubTitle || "" } : prev));
+                      }
+                      setWorkInfoViewIsEditing(false);
+                    }}
+                  >
+                    저장
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -5236,42 +5240,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경험</h3>
-              <div className="header-right">
-                {!workExpViewIsEditing ? (
-                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkExpViewIsEditing(true)}>
-                    <i className="ti ti-pencil"></i> 수정
-                  </button>
-                ) : (
-                  <>
-                    <button className="cancel-edit-btn" onClick={() => setWorkExpViewIsEditing(false)}>
-                      취소
-                    </button>
-                    <button
-                      className="save-edit-btn"
-                      onClick={() => {
-                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                        if (modal && selectedWorkExpCard?.activityTypeId) {
-                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkExpCard.activityTypeId ? { ...d, sub_title: newSubTitle } : d)));
-                        }
-                        setWorkExpViewIsEditing(false);
-                      }}
-                    >
-                      저장
-                    </button>
-                  </>
-                )}
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    setWorkExpViewModalOpen(false);
-                    setWorkExpViewIsEditing(false);
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
-              </div>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  setWorkExpViewModalOpen(false);
+                  setWorkExpViewIsEditing(false);
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
             </div>
             <div className="section-modal-body">
               <div className="work-view-fixed">
@@ -5383,6 +5360,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
+            <div className="section-modal-footer">
+              {!workExpViewIsEditing ? (
+                <button className="save-btn" onClick={() => setWorkExpViewIsEditing(true)}>수정</button>
+              ) : (
+                <>
+                  <button className="cancel-btn" onClick={() => setWorkExpViewIsEditing(false)}>취소</button>
+                  <button
+                    className="save-btn"
+                    onClick={() => {
+                      const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                      if (modal && selectedWorkExpCard?.activityTypeId) {
+                        const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkExpCard.activityTypeId ? { ...d, sub_title: newSubTitle } : d)));
+                      }
+                      setWorkExpViewIsEditing(false);
+                    }}
+                  >
+                    저장
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -5414,42 +5414,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="section-modal work-view-modal">
                 <div className="section-modal-header">
                   <h3>실무 역량</h3>
-                  <div className="header-right">
-                    {!workAbilityViewIsEditing ? (
-                      <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkAbilityViewIsEditing(true)}>
-                        <i className="ti ti-pencil"></i> 수정
-                      </button>
-                    ) : (
-                      <>
-                        <button className="cancel-edit-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
-                          취소
-                        </button>
-                        <button
-                          className="save-edit-btn"
-                          onClick={() => {
-                            const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                            if (modal && displayActivity?.activity_type_id) {
-                              const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                              const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                              setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === displayActivity.activity_type_id ? { ...d, sub_title: newSubTitle } : d)));
-                            }
-                            setWorkAbilityViewIsEditing(false);
-                          }}
-                        >
-                          저장
-                        </button>
-                      </>
-                    )}
-                    <button
-                      className="modal-close-btn"
-                      onClick={() => {
-                        setWorkAbilityViewModalOpen(false);
-                        setWorkAbilityViewIsEditing(false);
-                      }}
-                    >
-                      <i className="ti ti-x"></i>
-                    </button>
-                  </div>
+                  <button
+                    className="modal-close-btn"
+                    onClick={() => {
+                      setWorkAbilityViewModalOpen(false);
+                      setWorkAbilityViewIsEditing(false);
+                    }}
+                  >
+                    <i className="ti ti-x"></i>
+                  </button>
                 </div>
                 <div className="section-modal-body">
                   <div className="work-view-fixed">
@@ -5540,6 +5513,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                   </div>
                 </div>
+                <div className="section-modal-footer">
+                  {!workAbilityViewIsEditing ? (
+                    <button className="save-btn" onClick={() => setWorkAbilityViewIsEditing(true)}>수정</button>
+                  ) : (
+                    <>
+                      <button className="cancel-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>취소</button>
+                      <button
+                        className="save-btn"
+                        onClick={() => {
+                          const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                          if (modal && displayActivity?.activity_type_id) {
+                            const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                            const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                            setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === displayActivity.activity_type_id ? { ...d, sub_title: newSubTitle } : d)));
+                          }
+                          setWorkAbilityViewIsEditing(false);
+                        }}
+                      >
+                        저장
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -5551,43 +5547,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="section-modal work-view-modal">
             <div className="section-modal-header">
               <h3>실무 경력</h3>
-              <div className="header-right">
-                {!workCareerViewIsEditing ? (
-                  <button className="intro-edit-btn" aria-label="수정" onClick={() => setWorkCareerViewIsEditing(true)}>
-                    <i className="ti ti-pencil"></i> 수정
-                  </button>
-                ) : (
-                  <>
-                    <button className="cancel-edit-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
-                      취소
-                    </button>
-                    <button
-                      className="save-edit-btn"
-                      onClick={() => {
-                        const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                        const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                        if (modal && activityType) {
-                          const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                          const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                          setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle } : d)));
-                        }
-                        setWorkCareerViewIsEditing(false);
-                      }}
-                    >
-                      저장
-                    </button>
-                  </>
-                )}
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    setWorkCareerViewModalOpen(false);
-                    setWorkCareerViewIsEditing(false);
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
-              </div>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  setWorkCareerViewModalOpen(false);
+                  setWorkCareerViewIsEditing(false);
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
             </div>
             <div className="section-modal-body">
               <div className="work-view-fixed">
@@ -5695,6 +5663,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   })()}
                 </div>
               </div>
+            </div>
+            <div className="section-modal-footer">
+              {!workCareerViewIsEditing ? (
+                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>수정</button>
+              ) : (
+                <>
+                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>취소</button>
+                  <button
+                    className="save-btn"
+                    onClick={() => {
+                      const modal = document.querySelector(".section-modal-overlay:last-of-type");
+                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
+                      if (modal && activityType) {
+                        const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
+                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
+                        setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle } : d)));
+                      }
+                      setWorkCareerViewIsEditing(false);
+                    }}
+                  >
+                    저장
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

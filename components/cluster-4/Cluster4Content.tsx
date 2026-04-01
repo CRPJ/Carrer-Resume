@@ -1528,6 +1528,18 @@ const Cluster4Content = () => {
       return;
     }
 
+    if (seasonReputationEditData.content.trim() === "") {
+      const el = document.querySelector(".edit-modal-content textarea");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      return;
+    }
+
+    if (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") {
+      const el = document.querySelector(".edit-modal-content input[placeholder='키워드를 입력하세요']");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      return;
+    }
+
     setSeasonReputationSaving(true);
     setSeasonReputationError(null);
 
@@ -1605,17 +1617,20 @@ const Cluster4Content = () => {
     }
 
     if (!seasonReviewEditData.review.trim()) {
-      alert("리뷰를 입력해주세요.");
+      const el = document.querySelector(".edit-modal-content textarea");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
     if (seasonReviewEditData.review.length > 24) {
-      alert("리뷰는 24자 이내로 작성해주세요.");
+      const el = document.querySelector(".edit-modal-content textarea");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
     if (!seasonReviewEditData.link.trim()) {
-      alert("링크를 입력해주세요.");
+      const el = document.querySelector(".edit-modal-content input[type='url']");
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
@@ -2645,7 +2660,6 @@ const Cluster4Content = () => {
                   background: "transparent",
                   color: "rgba(255,255,255,0.7)",
                   fontSize: "14px",
-                  borderRadius: "6px",
                   cursor: seasonReputationSaving ? "not-allowed" : "pointer",
                   opacity: seasonReputationSaving ? 0.5 : 1,
                 }}
@@ -2662,7 +2676,6 @@ const Cluster4Content = () => {
                   color: "#000",
                   fontSize: "14px",
                   fontWeight: 600,
-                  borderRadius: "6px",
                   cursor: seasonReputationSaving || seasonReputationSuccess || seasonReputationEditData.content.trim() === "" || (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") ? "not-allowed" : "pointer",
                   opacity: seasonReputationSaving || seasonReputationSuccess || seasonReputationEditData.content.trim() === "" || (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") ? 0.5 : 1,
                   display: "flex",
@@ -2954,7 +2967,7 @@ const Cluster4Content = () => {
               <button
                 onClick={() => setSeasonReviewModalOpen(false)}
                 disabled={seasonReviewSaving}
-                style={{ padding: "10px 24px", border: "1px solid rgba(255,255,255,0.3)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: "14px", borderRadius: "6px", cursor: seasonReviewSaving ? "not-allowed" : "pointer", opacity: seasonReviewSaving ? 0.5 : 1 }}
+                style={{ padding: "10px 24px", border: "1px solid rgba(255,255,255,0.3)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: "14px", cursor: seasonReviewSaving ? "not-allowed" : "pointer", opacity: seasonReviewSaving ? 0.5 : 1 }}
               >
                 취소
               </button>
@@ -2968,7 +2981,6 @@ const Cluster4Content = () => {
                   color: "#fff",
                   fontSize: "14px",
                   fontWeight: 600,
-                  borderRadius: "6px",
                   cursor: seasonReviewSaving || seasonReviewSuccess || !seasonReviewEditData.review.trim() || !seasonReviewEditData.link.trim() ? "not-allowed" : "pointer",
                 }}
               >
