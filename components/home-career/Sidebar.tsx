@@ -1621,17 +1621,13 @@ const Sidebar = () => {
               <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#000" }}></i>
             </button> */}
           <div
-            className="edit-icon search-icon"
             onMouseEnter={() => setShowSearchTooltip(true)}
             onMouseLeave={() => setShowSearchTooltip(false)}
-            style={{ position: "absolute", top: "6px", right: "18px", width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "rgba(255, 255, 255, 0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 20, boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)" }}
+            style={{ position: "absolute", top: "6px", right: "18px", width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "rgba(255, 255, 255, 0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 20, boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)", overflow: "visible", transition: "all 0.3s ease" }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" style={{ width: "14px", height: "14px" }}>
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="M21 21l-4.35-4.35"></path>
-            </svg>
+            <i className="ti ti-search" style={{ fontSize: "11px", color: "#000" }}></i>
             {showSearchTooltip && (
-              <div style={{ position: "absolute", top: "-32px", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0, 0, 0, 0.85)", color: "#fff", fontSize: "11px", padding: "5px 10px", borderRadius: "4px", whiteSpace: "nowrap", zIndex: 30, pointerEvents: "none" }}>
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: "0", background: "#222", color: "#fff", fontFamily: "'Pretendard', sans-serif", fontSize: "12px", fontWeight: 400, padding: "8px 12px", borderRadius: "8px", whiteSpace: "nowrap" as const, zIndex: 1000, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)", pointerEvents: "none" as const }}>
                 등록된 도움말이 없습니다
               </div>
             )}
