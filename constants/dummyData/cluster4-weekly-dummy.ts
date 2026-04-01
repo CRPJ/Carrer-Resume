@@ -123,7 +123,7 @@ export const DUMMY_WEEK_EXTRA: Record<
   "dw-05": {
     // 성공
     points: { star: 150, shield: 133, lightning: 45 },
-    teamPart: { teamName: "미디어", partName: "웹툰드라마" },
+    teamPart: { teamName: "미디어일이삼사오육칠팔구십", partName: "웹툰드라마일이삼사오육칠팔구십" },
     roleLabel: "팀장(미디어 팀)",
     growthRate: { rate: 95, count: 62, total: 67 },
     infoRate: { rate: 96, count: 24, total: 25 },
