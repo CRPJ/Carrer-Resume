@@ -235,6 +235,42 @@ const Cluster3Content = () => {
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
   const [section5ModalOpen, setSection5ModalOpen] = useState(false);
 
+  // 모달 body refs (체크3: 필수 미입력 시 스크롤 이동)
+  const section3ModalBodyRef = useRef<HTMLDivElement>(null);
+  const section4ModalBodyRef = useRef<HTMLDivElement>(null);
+  const section5ModalBodyRef = useRef<HTMLDivElement>(null);
+
+  // 필수 미입력 시 스크롤 이동 + 하이라이트
+  const validateAndScrollToEmpty = (
+    bodyRef: React.RefObject<HTMLDivElement | null>,
+    links: string[],
+    channels: string[]
+  ): boolean => {
+    if (!bodyRef.current) return true;
+    const items = bodyRef.current.querySelectorAll('.link-edit-item:not(.disabled)');
+    let firstInvalid: Element | null = null;
+
+    items.forEach((item, idx) => {
+      const input = item.querySelector('input');
+      const linkVal = links[idx]?.trim() || '';
+      const channelVal = channels[idx] || '';
+      const isIncomplete = (linkVal && !channelVal) || (!linkVal && channelVal);
+
+      if (isIncomplete) {
+        (item as HTMLElement).style.border = '1px solid #ff4444';
+        if (!firstInvalid) firstInvalid = item;
+      } else {
+        (item as HTMLElement).style.border = '';
+      }
+    });
+
+    if (firstInvalid) {
+      (firstInvalid as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
+  };
+
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
     const anyOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
@@ -1431,7 +1467,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <div className="section-modal-body" ref={section3ModalBodyRef}>
               {editingSection3Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection3Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1486,6 +1522,7 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingArchives}
                 onClick={async () => {
+                  if (!validateAndScrollToEmpty(section3ModalBodyRef, editingSection3Links, editingArchiveChannels)) return;
                   const success = await savePortfolioArchives(editingSection3Links, editingArchiveChannels);
                   if (success) {
                     setSection3ModalOpen(false);
@@ -1510,7 +1547,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <div className="section-modal-body" ref={section4ModalBodyRef}>
               {editingSection4Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection4Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1564,6 +1601,7 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingOutputs}
                 onClick={async () => {
+                  if (!validateAndScrollToEmpty(section4ModalBodyRef, editingSection4Links, editingOutputChannels)) return;
                   const success = await savePortfolioOutputs(editingSection4Links, editingOutputChannels);
                   if (success) {
                     setSection4Links([...editingSection4Links]);
@@ -1598,7 +1636,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
+            <div className="section-modal-body" ref={section5ModalBodyRef}>
               {editingSection5Links.map((link, index) => {
                 const prevFilled = index === 0 || editingSection5Links[index - 1]?.trim();
                 const isDisabled = !prevFilled;
@@ -1652,6 +1690,7 @@ const Cluster3Content = () => {
                 className="save-btn"
                 disabled={isSavingDetails}
                 onClick={async () => {
+                  if (!validateAndScrollToEmpty(section5ModalBodyRef, editingSection5Links, editingDetailChannels)) return;
                   const success = await savePortfolioDetails(editingSection5Links, editingDetailChannels);
                   if (success) {
                     setSection5Links([...editingSection5Links]);

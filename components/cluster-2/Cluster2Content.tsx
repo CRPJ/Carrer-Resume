@@ -2595,50 +2595,6 @@ const Cluster2Content = () => {
                 <h3>{introCards[selectedIntroCard].title}</h3>
               </div>
               <div className="header-right">
-                {!isEditingIntro && (
-                  <button
-                    className="intro-edit-btn"
-                    aria-label="수정"
-                    onClick={() =>
-                      handleEditClick(() => {
-                        setEditingIntroData({
-                          content: introCards[selectedIntroCard].content,
-                        });
-                        setIsEditingIntro(true);
-                      })
-                    }
-                  >
-                    <i className="ti ti-pencil"></i> 수정
-                  </button>
-                )}
-                {isEditingIntro && (
-                  <>
-                    <button
-                      className="cancel-edit-btn"
-                      onClick={() => {
-                        if (editingIntroData.content !== introCards[selectedIntroCard].content) {
-                          if (!confirm('변경사항이 저장되지 않았습니다. 정말 취소하시겠습니까?')) {
-                            return;
-                          }
-                        }
-                        setIsEditingIntro(false);
-                      }}
-                    >
-                      취소
-                    </button>
-                    <button
-                      className="save-edit-btn"
-                      disabled={introSaving}
-                      onClick={() => {
-                        if (selectedIntroCard !== null) {
-                          handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
-                        }
-                      }}
-                    >
-                      {introSaving ? '저장 중...' : '저장'}
-                    </button>
-                  </>
-                )}
                 <button className="modal-close-btn" onClick={() => {
                   if (isEditingIntro && editingIntroData.content !== introCards[selectedIntroCard].content) {
                     if (!confirm('변경사항이 저장되지 않았습니다. 정말 닫으시겠습니까?')) {
@@ -2677,6 +2633,51 @@ const Cluster2Content = () => {
                 )}
               </div>
             </div>
+            <div className="intro-modal-footer">
+              {isEditingIntro ? (
+                <>
+                  <button
+                    className="cancel-btn"
+                    onClick={() => {
+                      if (editingIntroData.content !== introCards[selectedIntroCard].content) {
+                        if (!confirm('변경사항이 저장되지 않았습니다. 정말 취소하시겠습니까?')) {
+                          return;
+                        }
+                      }
+                      setIsEditingIntro(false);
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="save-btn"
+                    disabled={introSaving}
+                    onClick={() => {
+                      if (selectedIntroCard !== null) {
+                        handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
+                      }
+                    }}
+                  >
+                    {introSaving ? '저장 중...' : '저장'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="intro-edit-btn"
+                  aria-label="수정"
+                  onClick={() =>
+                    handleEditClick(() => {
+                      setEditingIntroData({
+                        content: introCards[selectedIntroCard].content,
+                      });
+                      setIsEditingIntro(true);
+                    })
+                  }
+                >
+                  <i className="ti ti-pencil"></i> 수정
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -2711,24 +2712,38 @@ const Cluster2Content = () => {
                 />
               </div>
               {/* 3~27 weeks */}
-              {[3, 6, 9, 12, 15, 18, 21, 24, 27].map((weeks, index) => (
-                <div key={weeks} className="link-edit-item">
-                  <div className="link-item-header">
-                    <img src={`/images/0/cluster 2/icon/medal ${weeks}.png`} alt="" className="link-medal" />
-                    <span className="link-label">{weeks} weeks</span>
+              {[3, 6, 9, 12, 15, 18, 21, 24, 27].map((weeks, index) => {
+                const linkIndex = index + 1;
+                const isDisabled = linkIndex > 0 && !editingReviewLinks[linkIndex - 1]?.trim();
+                return (
+                  <div key={weeks} className={`link-edit-item${isDisabled ? ' disabled' : ''}`}>
+                    <div className="link-item-header">
+                      <img src={`/images/0/cluster 2/icon/medal ${weeks}.png`} alt="" className="link-medal" />
+                      <span className="link-label">{weeks} weeks</span>
+                    </div>
+                    <input
+                      type="url"
+                      placeholder={isDisabled ? '이전 링크를 먼저 입력하세요' : '링크를 입력하세요 (https://...)'}
+                      value={editingReviewLinks[linkIndex]}
+                      disabled={isDisabled}
+                      onChange={(e) => {
+                        const newLinks = [...editingReviewLinks];
+                        newLinks[linkIndex] = e.target.value;
+                        if (!e.target.value.trim()) {
+                          for (let i = linkIndex + 1; i < newLinks.length; i++) {
+                            newLinks[i] = '';
+                          }
+                        }
+                        setEditingReviewLinks(newLinks);
+                      }}
+                      style={{
+                        opacity: isDisabled ? 0.4 : 1,
+                        cursor: isDisabled ? 'not-allowed' : 'text'
+                      }}
+                    />
                   </div>
-                  <input
-                    type="url"
-                    placeholder="(입력해도 저장되지 않습니다. 곧 도입될 예정입니다.)"
-                    value={editingReviewLinks[index + 1]}
-                    onChange={(e) => {
-                      const newLinks = [...editingReviewLinks];
-                      newLinks[index + 1] = e.target.value;
-                      setEditingReviewLinks(newLinks);
-                    }}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="section4-modal-footer">
               <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)} disabled={reviewLinkSaving}>취소</button>

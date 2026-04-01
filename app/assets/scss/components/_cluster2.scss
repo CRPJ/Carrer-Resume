@@ -3730,6 +3730,86 @@
         }
       }
     }
+
+    .intro-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 20px 28px;
+      border-top: 1px solid rgba(255, 165, 0, 0.2);
+      flex-shrink: 0;
+
+      .cancel-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #888;
+        padding: 12px 32px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.4);
+          color: #fff;
+        }
+      }
+
+      .save-btn {
+        background: #ffa500;
+        border: 1px solid #ffa500;
+        color: #000;
+        padding: 12px 32px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #ffb733;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+
+      .intro-edit-btn {
+        padding: 8px 16px;
+        padding-top: 10px;
+        border: none;
+        border-radius: 0;
+        background: #faab07;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #000;
+        transition:
+          transform 0.15s ease,
+          filter 0.15s ease;
+
+        i {
+          font-size: 0.875rem;
+          color: #000;
+        }
+
+        &:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.05);
+        }
+      }
+    }
   }
 
   // 빈 카드 스타일
