@@ -3307,7 +3307,7 @@
             max-width: calc(100% - 28px) !important;
             width: 100% !important;
             position: relative;
-            padding-right: 24px;
+            padding-right: 0 !important;
 
             .card-arrow {
               position: absolute;
@@ -3835,7 +3835,7 @@
             min-height: 42px;
             max-height: 42px;
             position: relative;
-            padding-right: 24px;
+            padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
             max-width: calc(100% - 28px) !important;
@@ -4129,7 +4129,7 @@
             min-height: 42px;
             max-height: 42px;
             position: relative;
-            padding-right: 24px;
+            padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
             max-width: calc(100% - 28px) !important;
