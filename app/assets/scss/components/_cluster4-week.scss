@@ -1092,7 +1092,7 @@
 
     // 주차 평판 남기기 floating-icons
     > .floating-icons {
-      top: 195px;
+      top: 233px;
       right: 19px;
     }
 
@@ -1104,7 +1104,7 @@
       .main-image-container {
         position: relative;
         width: 540px;
-        height: 1098px;
+        height: 1136px;
         border-radius: 15px;
         overflow: hidden;
 
@@ -1318,10 +1318,10 @@
 
         .header-info-row2 {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: flex-start;
-          flex-direction: row;
-          gap: 25px;
+          flex-direction: column;
+          gap: 8px;
           flex-wrap: nowrap;
           margin-top: 13px;
 

@@ -2828,29 +2828,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
             <div className="header-info-row2" style={{ gap: "11px" }}>
               <div className="info-group left" style={{ flexShrink: 0 }}>
-                <span className="info-item team" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif" }}>
+                <span className="info-item team" style={{ display: "inline-flex", minWidth: "245px", maxWidth: "245px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif" }}>
                   <strong>[팀]&nbsp;</strong>
-                  <span className="text-gray">{isOnboardingWeek ? "클럽 온보딩" : teamName === "운영진" && generation ? `운영진(${generation}기)` : (teamName || "-").length > 6 ? (teamName || "-").slice(0, 6) + ".." : teamName || "-"}</span>
+                  <span className="text-gray">{isOnboardingWeek ? "클럽 온보딩" : teamName === "운영진" && generation ? `운영진(${generation}기)` : (teamName || "-").length > 10 ? (teamName || "-").slice(0, 10) + ".." : teamName || "-"}</span>
                 </span>
-                <span className="info-divider" style={{ marginLeft: "-68px" }}>
+                <span className="info-divider" style={{ marginLeft: "-63px" }}>
                   |
                 </span>
-                <span className="info-item part" style={{ display: "inline-flex", minWidth: "189px", maxWidth: "189px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-4px" }}>
+                <span className="info-item part" style={{ display: "inline-flex", minWidth: "245px", maxWidth: "245px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-4px" }}>
                   <strong>[파트]&nbsp;</strong>
                   <span className="text-gray">
                     {isOnboardingWeek
                       ? "신입OT"
                       : teamName === "운영진" && partName === "팀장" && managedTeamName
-                        ? `팀장(${managedTeamName})`.length > 6
-                          ? `팀장(${managedTeamName})`.slice(0, 6) + ".."
+                        ? `팀장(${managedTeamName})`.length > 10
+                          ? `팀장(${managedTeamName})`.slice(0, 10) + ".."
                           : `팀장(${managedTeamName})`
-                        : (partName || "-").length > 6
-                          ? (partName || "-").slice(0, 6) + ".."
+                        : (partName || "-").length > 10
+                          ? (partName || "-").slice(0, 10) + ".."
                           : partName || "-"}
                   </span>
                 </span>
               </div>
-              <div className="info-group right" style={{ gap: "8px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "-72px" }}>
+              <div className="info-group right" style={{ gap: "8px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "0px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
                   단감
