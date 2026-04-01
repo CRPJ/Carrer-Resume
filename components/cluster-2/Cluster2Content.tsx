@@ -2220,6 +2220,8 @@ const Cluster2Content = () => {
                           ...editingSloganData,
                           slogan1: { ...editingSloganData.slogan1, content: e.target.value }
                         });
+                      } else {
+                        alert('최대 86자까지 입력할 수 있습니다.');
                       }
                     }}
                     maxLength={86}
@@ -2324,6 +2326,8 @@ const Cluster2Content = () => {
                           ...editingSloganData,
                           slogan2: { ...editingSloganData.slogan2, content: e.target.value }
                         });
+                      } else {
+                        alert('최대 86자까지 입력할 수 있습니다.');
                       }
                     }}
                     maxLength={86}
@@ -2428,6 +2432,8 @@ const Cluster2Content = () => {
                           ...editingSloganData,
                           slogan3: { ...editingSloganData.slogan3, content: e.target.value }
                         });
+                      } else {
+                        alert('최대 86자까지 입력할 수 있습니다.');
                       }
                     }}
                     maxLength={86}
@@ -2621,6 +2627,8 @@ const Cluster2Content = () => {
                       onChange={(e) => {
                         if (e.target.value.length <= 1000) {
                           setEditingIntroData({ ...editingIntroData, content: e.target.value });
+                        } else {
+                          alert('최대 1000자까지 입력할 수 있습니다.');
                         }
                       }}
                       placeholder="내용을 입력하세요 (최대 1,000자)"
@@ -3455,6 +3463,8 @@ const Cluster2Content = () => {
                                 const newData = [...editingEduData];
                                 newData[index].gradeValue = e.target.value;
                                 setEditingEduData(newData);
+                              } else {
+                                alert('최대 5자까지 입력할 수 있습니다.');
                               }
                             }}
                             placeholder="성적 입력 (최대 5자)"
@@ -3476,6 +3486,8 @@ const Cluster2Content = () => {
                                   const newData = [...editingEduData];
                                   newData[index].gradeMax = e.target.value || '기타';
                                   setEditingEduData(newData);
+                                } else {
+                                  alert('최대 5자까지 입력할 수 있습니다.');
                                 }
                               }}
                               placeholder="총점 입력 (최대 5자)"
@@ -3542,6 +3554,8 @@ const Cluster2Content = () => {
                                 const newData = [...editingEduData];
                                 newData[index].description = e.target.value;
                                 setEditingEduData(newData);
+                              } else {
+                                alert('최대 100자까지 입력할 수 있습니다.');
                               }
                             }}
                             placeholder="추가 설명 (최대 100자)"

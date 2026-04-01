@@ -2545,7 +2545,12 @@ const Cluster4Content = () => {
                     maxLength={100}
                     rows={4}
                     value={seasonReputationEditData.content}
-                    onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, content: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value.length >= 100) {
+                        alert('최대 100자까지 입력할 수 있습니다.');
+                      }
+                      setSeasonReputationEditData((prev) => ({ ...prev, content: e.target.value }));
+                    }}
                     style={{
                       width: "100%",
                       padding: "12px 14px",
@@ -2577,7 +2582,12 @@ const Cluster4Content = () => {
                       placeholder="키워드를 입력하세요"
                       maxLength={7}
                       value={seasonReputationEditData.keyword1}
-                      onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword1: e.target.value }))}
+                      onChange={(e) => {
+                        if (e.target.value.length >= 7) {
+                          alert('최대 7자까지 입력할 수 있습니다.');
+                        }
+                        setSeasonReputationEditData((prev) => ({ ...prev, keyword1: e.target.value }));
+                      }}
                       style={{
                         display: "block",
                         width: "100%",
@@ -2599,7 +2609,12 @@ const Cluster4Content = () => {
                       placeholder="키워드를 입력하세요"
                       maxLength={7}
                       value={seasonReputationEditData.keyword2}
-                      onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }))}
+                      onChange={(e) => {
+                        if (e.target.value.length >= 7) {
+                          alert('최대 7자까지 입력할 수 있습니다.');
+                        }
+                        setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }));
+                      }}
                       style={{
                         display: "block",
                         width: "100%",
@@ -2621,7 +2636,12 @@ const Cluster4Content = () => {
                       placeholder="키워드를 입력하세요"
                       maxLength={7}
                       value={seasonReputationEditData.keyword3}
-                      onChange={(e) => setSeasonReputationEditData((prev) => ({ ...prev, keyword3: e.target.value }))}
+                      onChange={(e) => {
+                        if (e.target.value.length >= 7) {
+                          alert('최대 7자까지 입력할 수 있습니다.');
+                        }
+                        setSeasonReputationEditData((prev) => ({ ...prev, keyword3: e.target.value }));
+                      }}
                       style={{
                         display: "block",
                         width: "100%",
@@ -2911,7 +2931,12 @@ const Cluster4Content = () => {
                     placeholder="이번 시즌은 어땠나요? (30자 이내)"
                     maxLength={30}
                     value={seasonReviewEditData.review}
-                    onChange={(e) => setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }))}
+                    onChange={(e) => {
+                      if (e.target.value.length >= 30) {
+                        alert('최대 30자까지 입력할 수 있습니다.');
+                      }
+                      setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }));
+                    }}
                     style={{
                       width: "100%",
                       height: "56px",

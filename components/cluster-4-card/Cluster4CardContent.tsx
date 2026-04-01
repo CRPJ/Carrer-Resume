@@ -3951,15 +3951,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                         <textarea
                           value={editingDetails[card.activityType]?.subTitle || ""}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            if (e.target.value.length >= 150) {
+                              alert('최대 150자까지 입력할 수 있습니다.');
+                            }
                             setEditingDetails((prev) => ({
                               ...prev,
                               [card.activityType]: {
                                 ...prev[card.activityType],
                                 subTitle: e.target.value,
                               },
-                            }))
-                          }
+                            }));
+                          }}
                           placeholder={isActivityActive(card.activityType) ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
                           rows={3}
                           maxLength={150}
@@ -3996,7 +3999,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   value={link.desc}
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    if (e.target.value.length >= 20) {
+                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                    }
                                     !isDisabled &&
                                     setEditingDetails((prev) => {
                                       const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
@@ -4008,8 +4014,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                           outputLinks: currentLinks,
                                         },
                                       };
-                                    })
-                                  }
+                                    });
+                                  }}
                                 />
                                 <input
                                   type="url"
@@ -4151,6 +4157,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           maxLength={150}
                           value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ""}
                           onChange={(e) => {
+                            if (e.target.value.length >= 150) {
+                              alert('최대 150자까지 입력할 수 있습니다.');
+                            }
                             const actType = getActiveAbilityActivityType();
                             setEditingDetails((prev) => ({
                               ...prev,
@@ -4189,14 +4198,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   value={link.desc}
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    if (e.target.value.length >= 20) {
+                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                    }
                                     !isDisabled &&
                                     setEditingDetails((prev) => {
                                       const newLinks = [...prev[actType].outputLinks];
                                       newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
                                       return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
-                                    })
-                                  }
+                                    });
+                                  }}
                                 />
                                 <input
                                   type="url"
@@ -4358,12 +4370,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 rows={3}
                                 maxLength={150}
                                 value={editingDetails[activityType]?.subTitle || ""}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  if (e.target.value.length >= 150) {
+                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                  }
                                   setEditingDetails((prev) => ({
                                     ...prev,
                                     [activityType]: { ...prev[activityType], subTitle: e.target.value },
-                                  }))
-                                }
+                                  }));
+                                }}
                                 disabled={!isActive}
                                 style={!isActive ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                               ></textarea>
@@ -4395,14 +4410,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                         value={link.desc}
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                          if (e.target.value.length >= 20) {
+                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                          }
                                           !isDisabled &&
                                           setEditingDetails((prev) => {
                                             const newLinks = [...prev[activityType].outputLinks];
                                             newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
                                             return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
-                                          })
-                                        }
+                                          });
+                                        }}
                                       />
                                       <input
                                         type="url"
@@ -4558,15 +4576,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               </div>
                               <textarea
                                 value={editingDetails[activityType]?.subTitle || ""}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                  if (e.target.value.length >= 150) {
+                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                  }
                                   setEditingDetails((prev) => ({
                                     ...prev,
                                     [activityType]: {
                                       ...prev[activityType],
                                       subTitle: e.target.value,
                                     },
-                                  }))
-                                }
+                                  }));
+                                }}
                                 placeholder={isEditable ? "메인 타이틀 내용에 대한 본인의 의견을 서브 타이틀 내용으로 입력해주세요 :)" : ""}
                                 rows={3}
                                 maxLength={150}
@@ -4609,7 +4630,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                         value={link.desc}
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                          if (e.target.value.length >= 20) {
+                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                          }
                                           !isDisabled &&
                                           setEditingDetails((prev) => {
                                             const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
@@ -4621,8 +4645,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                                 outputLinks: currentLinks,
                                               },
                                             };
-                                          })
-                                        }
+                                          });
+                                        }}
                                       />
                                       <input
                                         type="url"
@@ -4748,7 +4772,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             Thank you message <span className="char-limit">(최대 100자)</span>
                           </label>
                           <div className="message-input-wrapper">
-                            <textarea placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)" maxLength={100} rows={1} value={colleague.message} onChange={(e) => updateColleagueMessage(colleague.id, e.target.value)}></textarea>
+                            <textarea placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)" maxLength={100} rows={1} value={colleague.message} onChange={(e) => {
+                              if (e.target.value.length >= 100) {
+                                alert('최대 100자까지 입력할 수 있습니다.');
+                              }
+                              updateColleagueMessage(colleague.id, e.target.value);
+                            }}></textarea>
                             <span className="char-counter">{colleague.message.length} / 100</span>
                           </div>
                         </div>
@@ -4914,7 +4943,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       내용 <span className="char-limit">(최대 100자)</span>
                     </label>
                     <div className="textarea-wrapper">
-                      <textarea placeholder="해당 크루에 대한 평가 내용을 작성해주세요..." maxLength={100} rows={3} value={reputationEditData.content} onChange={(e) => setReputationEditData((prev) => ({ ...prev, content: e.target.value }))}></textarea>
+                      <textarea placeholder="해당 크루에 대한 평가 내용을 작성해주세요..." maxLength={100} rows={3} value={reputationEditData.content} onChange={(e) => {
+                        if (e.target.value.length >= 100) {
+                          alert('최대 100자까지 입력할 수 있습니다.');
+                        }
+                        setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
+                      }}></textarea>
                       <span className="char-counter">{reputationEditData.content.length} / 100</span>
                     </div>
                   </div>
@@ -4931,7 +4965,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         placeholder="키워드를 입력하세요"
                         maxLength={10}
                         value={reputationEditData.keyword}
-                        onChange={(e) => setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }))}
+                        onChange={(e) => {
+                          if (e.target.value.length >= 10) {
+                            alert('최대 10자까지 입력할 수 있습니다.');
+                          }
+                          setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
+                        }}
                         style={{
                           display: "block",
                           width: "100%",

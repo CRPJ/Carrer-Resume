@@ -953,6 +953,8 @@ const Sidebar = () => {
       } else {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
+    } else {
+      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
@@ -970,6 +972,8 @@ const Sidebar = () => {
       } else {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
+    } else {
+      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
@@ -3051,7 +3055,11 @@ const Sidebar = () => {
                             data-nav-index={11}
                             value={phoneMid}
                             onChange={(e) => {
-                              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                              const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+                              const value = digitsOnly.slice(0, 4);
+                              if (digitsOnly.length > 4) {
+                                alert('최대 4자까지 입력할 수 있습니다.');
+                              }
                               setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
                             }}
                             onKeyDown={handleEnterKeyNavigation}
@@ -3079,7 +3087,11 @@ const Sidebar = () => {
                             data-nav-index={12}
                             value={phoneLast}
                             onChange={(e) => {
-                              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                              const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+                              const value = digitsOnly.slice(0, 4);
+                              if (digitsOnly.length > 4) {
+                                alert('최대 4자까지 입력할 수 있습니다.');
+                              }
                               setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
                             }}
                             onKeyDown={handleEnterKeyNavigation}
@@ -3326,6 +3338,8 @@ const Sidebar = () => {
                       onChange={(e) => {
                         if (e.target.value.length <= 10) {
                           setFormData((prev) => ({ ...prev, vision: e.target.value }));
+                        } else {
+                          alert('최대 10자까지 입력할 수 있습니다.');
                         }
                       }}
                       onKeyDown={handleEnterKeyNavigation}
@@ -3586,6 +3600,8 @@ const Sidebar = () => {
                 onChange={(e) => {
                   if (e.target.value.length <= 70) {
                     setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
+                  } else {
+                    alert('최대 70자까지 입력할 수 있습니다.');
                   }
                 }}
                 placeholder="내용을 작성해 주세요."
