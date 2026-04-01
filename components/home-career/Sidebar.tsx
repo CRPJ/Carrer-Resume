@@ -328,7 +328,8 @@ const Sidebar = () => {
         };
 
         const demoStats: Record<string, { reliability: number; completion: number; stars: number; lightnings: number; shields: number; info: number; competency: number; experience: number; career: number; status: "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge" }> = {
-          전민경: { reliability: 85, completion: 93, stars: 150, lightnings: 45, shields: 88, info: 15, competency: 120, experience: 500, career: 8, status: "Complete" },
+          전민경: { reliability: 85, completion: 93, stars: 150, lightnings: 99999, shields: 88, info: 15, competency: 120, experience: 500, career: 8, status: "Running" },
+          안지혜: { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: "Recharging" },
           곽예원: { reliability: 42, completion: 67, stars: 50, lightnings: 200, shields: 0, info: 8, competency: 45, experience: 120, career: 3, status: "On Rest" },
           김의환: { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: "Next Challenge" },
         };
@@ -1623,11 +1624,44 @@ const Sidebar = () => {
           <div
             onMouseEnter={() => setShowSearchTooltip(true)}
             onMouseLeave={() => setShowSearchTooltip(false)}
-            style={{ position: "absolute", top: "6px", right: "18px", width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "rgba(255, 255, 255, 0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 20, boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)", overflow: "visible", transition: "all 0.3s ease" }}
+            style={{
+              position: "absolute",
+              top: "6px",
+              right: "18px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 20,
+              boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
+              overflow: "visible",
+              transition: "all 0.3s ease",
+            }}
           >
             <i className="ti ti-search" style={{ fontSize: "11px", color: "#000" }}></i>
             {showSearchTooltip && (
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: "0", background: "#222", color: "#fff", fontFamily: "'Pretendard', sans-serif", fontSize: "12px", fontWeight: 400, padding: "8px 12px", borderRadius: "8px", whiteSpace: "nowrap" as const, zIndex: 1000, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)", pointerEvents: "none" as const }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: "0",
+                  background: "#222",
+                  color: "#fff",
+                  fontFamily: "'Pretendard', sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  whiteSpace: "nowrap" as const,
+                  zIndex: 1000,
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                  pointerEvents: "none" as const,
+                }}
+              >
                 등록된 도움말이 없습니다
               </div>
             )}
@@ -1973,7 +2007,9 @@ const Sidebar = () => {
                 <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={512} height={512} />
                 <span className="medal-week-num">{demoMode ? 12 : 0}</span>
               </div>
-              <div className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""}`}>
+              <div
+                className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""} ${crewStatus === "Complete" ? "medal-complete" : crewStatus === "Running" ? "medal-running" : crewStatus === "On Rest" ? "medal-onrest" : crewStatus === "Recharging" ? "medal-recharging" : crewStatus === "Next Challenge" ? "medal-next" : ""}`}
+              >
                 <span className="medal-text-inner">{crewStatus}</span>
               </div>
             </div>
@@ -3070,7 +3106,7 @@ const Sidebar = () => {
                               const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
                               const value = digitsOnly.slice(0, 4);
                               if (digitsOnly.length > 4) {
-                                alert('최대 4자까지 입력할 수 있습니다.');
+                                alert("최대 4자까지 입력할 수 있습니다.");
                               }
                               setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
                             }}
@@ -3102,7 +3138,7 @@ const Sidebar = () => {
                               const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
                               const value = digitsOnly.slice(0, 4);
                               if (digitsOnly.length > 4) {
-                                alert('최대 4자까지 입력할 수 있습니다.');
+                                alert("최대 4자까지 입력할 수 있습니다.");
                               }
                               setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
                             }}
@@ -3351,7 +3387,7 @@ const Sidebar = () => {
                         if (e.target.value.length <= 10) {
                           setFormData((prev) => ({ ...prev, vision: e.target.value }));
                         } else {
-                          alert('최대 10자까지 입력할 수 있습니다.');
+                          alert("최대 10자까지 입력할 수 있습니다.");
                         }
                       }}
                       onKeyDown={handleEnterKeyNavigation}
@@ -3568,7 +3604,9 @@ const Sidebar = () => {
               </div>
               <div>
                 <h3 style={{ margin: 0, lineHeight: 1.4, wordBreak: "keep-all" as const }}>연락이 가능한 시간대와 코멘트를 작성해 주세요 :)</h3>
-                <p className="modal-subtitle" style={{ margin: "2px 0 0 0" }}>최대 70자까지 작성 가능합니다</p>
+                <p className="modal-subtitle" style={{ margin: "2px 0 0 0" }}>
+                  최대 70자까지 작성 가능합니다
+                </p>
               </div>
               <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)} style={{ position: "absolute", top: 18, right: 20 }}>
                 ✕
@@ -3586,7 +3624,7 @@ const Sidebar = () => {
                   if (e.target.value.length <= 70) {
                     setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
                   } else {
-                    alert('최대 70자까지 입력할 수 있습니다.');
+                    alert("최대 70자까지 입력할 수 있습니다.");
                   }
                 }}
                 placeholder="내용을 작성해 주세요."
@@ -3597,7 +3635,25 @@ const Sidebar = () => {
 
             {/* 푸터 — 고정 */}
             <div className="edit-modal-footer" style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end", gap: "8px", padding: "16px 28px" }}>
-              <button type="button" onClick={() => setIsPhoneCommentModalOpen(false)} style={{ width: "80px", padding: "10px 0", backgroundColor: "transparent", border: "1px solid rgba(255, 165, 0, 0.5)", color: "#FFA500", fontSize: "14px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cafe24Ohsquare', sans-serif", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <button
+                type="button"
+                onClick={() => setIsPhoneCommentModalOpen(false)}
+                style={{
+                  width: "80px",
+                  padding: "10px 0",
+                  backgroundColor: "transparent",
+                  border: "1px solid rgba(255, 165, 0, 0.5)",
+                  color: "#FFA500",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "'Cafe24Ohsquare', sans-serif",
+                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 취소
               </button>
               <button
@@ -3621,7 +3677,21 @@ const Sidebar = () => {
                     alert("저장 중 오류가 발생했습니다.");
                   }
                 }}
-                style={{ width: "80px", padding: "10px 0", backgroundColor: "#FFA500", border: "none", color: "#000", fontSize: "14px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cafe24Ohsquare', sans-serif", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
+                style={{
+                  width: "80px",
+                  padding: "10px 0",
+                  backgroundColor: "#FFA500",
+                  border: "none",
+                  color: "#000",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "'Cafe24Ohsquare', sans-serif",
+                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
                 저장
               </button>
