@@ -955,7 +955,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      // PNG가 이미 회전된 리본 형태이므로 CSS rotate 불필요
       background-image: url("/images/0/cluster 1/ribon box.png");
       background-size: 100% 100%;
       background-repeat: no-repeat;
@@ -966,6 +965,7 @@
       .medal-text-inner {
         transform: rotate(-13.5deg);
         display: inline-block;
+        white-space: nowrap;
       }
 
       // 짧은-중간 길이 (Complete)
@@ -988,35 +988,25 @@
         font-size: 0.75rem;
       }
 
-      // 텍스트별 색상 분기
+      // 텍스트별 색상 분기 — CSS filter로 리본 PNG + 텍스트 동시 변경
       &.medal-complete {
-        color: #ffec8f;
-        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))
-                drop-shadow(0 0 16px rgba(255, 165, 0, 0.6));
+        // 원본 금색 유지 — filter 없음
       }
 
       &.medal-running {
-        color: #FFA500 !important;
-        filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.9))
-                drop-shadow(0 0 16px rgba(255, 165, 0, 0.6)) !important;
+        filter: hue-rotate(-10deg) saturate(2) !important;
       }
 
       &.medal-onrest {
-        color: #65e3ff !important;
-        filter: drop-shadow(0 0 8px rgba(101, 227, 255, 0.9))
-                drop-shadow(0 0 16px rgba(101, 227, 255, 0.6)) !important;
+        filter: hue-rotate(120deg) saturate(1.5) !important;
       }
 
       &.medal-recharging {
-        color: #ff6b6b !important;
-        filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.9))
-                drop-shadow(0 0 16px rgba(255, 107, 107, 0.6)) !important;
+        filter: hue-rotate(-30deg) saturate(3) brightness(0.8) !important;
       }
 
       &.medal-next {
-        color: #999999 !important;
-        filter: drop-shadow(0 0 8px rgba(153, 153, 153, 0.9))
-                drop-shadow(0 0 16px rgba(153, 153, 153, 0.6)) !important;
+        filter: grayscale(1) brightness(0.6) !important;
       }
     }
 
