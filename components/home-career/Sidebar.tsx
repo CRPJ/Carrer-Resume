@@ -565,6 +565,7 @@ const Sidebar = () => {
   });
   const [isCustomEmailDomain, setIsCustomEmailDomain] = useState(false);
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
+  const [isPhoneEditing, setIsPhoneEditing] = useState(false);
   const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
@@ -1808,7 +1809,7 @@ const Sidebar = () => {
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || "") + " " + (currentProfile.district || ""))}
                       </span>
                     </div>
-                    <div className="detail-row">
+                    <div className="detail-row" style={{ overflow: "hidden" }}>
                       <Image
                         src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"}
                         alt=""
@@ -1817,7 +1818,11 @@ const Sidebar = () => {
                         className="detail-icon"
                       />
                       <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.phone}
+                        <span style={{ color: currentProfile.lightColor, flexShrink: 0 }}>·</span>
+                        {(() => {
+                          const fullText = `${currentProfile.phone}${formData.phoneComment ? ` ${formData.phoneComment}` : ""}`;
+                          return fullText.length > 17 ? fullText.slice(0, 17) + ".." : fullText;
+                        })()}
                         {isOwner && (
                           <span
                             onClick={async () => {
@@ -1835,6 +1840,7 @@ const Sidebar = () => {
                                 console.error("연락처 코멘트 로드 오류:", error);
                               }
                               setIsPhoneCommentModalOpen(true);
+                              setIsPhoneEditing(false);
                             }}
                             style={{
                               color: currentProfile.accentColor,
@@ -1842,6 +1848,7 @@ const Sidebar = () => {
                               fontWeight: "400",
                               lineHeight: "1",
                               cursor: "pointer",
+                              flexShrink: 0,
                             }}
                           >
                             +
@@ -3618,88 +3625,82 @@ const Sidebar = () => {
               </button>
             </div>
 
-            {/* 본문 — 스크롤 */}
+            {/* 본문 */}
             <div className="edit-modal-body" style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
-              <style dangerouslySetInnerHTML={{ __html: `.phone-comment-input::placeholder { color: #999; }` }} />
-              <input
-                className="phone-comment-input"
-                type="text"
-                value={formData.phoneComment}
-                onChange={(e) => {
-                  if (e.target.value.length <= 70) {
-                    setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
-                  } else {
-                    alert("최대 70자까지 입력할 수 있습니다.");
-                  }
-                }}
-                placeholder="내용을 작성해 주세요."
-                maxLength={70}
-                style={{ width: "100%", padding: "16px", backgroundColor: "#252836", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "14px", outline: "none", boxSizing: "border-box" as const }}
-              />
+              {isPhoneEditing ? (
+                <div>
+                  <style dangerouslySetInnerHTML={{ __html: `.phone-comment-input::placeholder { color: #999; }` }} />
+                  <input
+                    className="phone-comment-input"
+                    type="text"
+                    value={formData.phoneComment}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 70) {
+                        setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
+                      } else {
+                        alert("최대 70자까지 입력할 수 있습니다.");
+                      }
+                    }}
+                    placeholder="내용을 작성해 주세요."
+                    maxLength={70}
+                    style={{ width: "100%", padding: "16px", backgroundColor: "#252836", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "14px", outline: "none", boxSizing: "border-box" as const }}
+                  />
+                  <div style={{ marginTop: "8px", fontSize: "12px", color: formData.phoneComment.length > 70 ? "#ff4444" : "#999", textAlign: "right" }}>
+                    {formData.phoneComment.length} / 70
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: "16px", backgroundColor: "#252836", borderRadius: "8px", color: "#fff", fontSize: "14px", minHeight: "50px" }}>
+                  {formData.phoneComment || "등록된 코멘트가 없습니다."}
+                </div>
+              )}
             </div>
 
-            {/* 푸터 — 고정 */}
+            {/* 푸터 */}
             <div className="edit-modal-footer" style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end", gap: "8px", padding: "16px 28px" }}>
-              <button
-                type="button"
-                onClick={() => setIsPhoneCommentModalOpen(false)}
-                style={{
-                  width: "80px",
-                  padding: "10px 0",
-                  backgroundColor: "transparent",
-                  border: "1px solid rgba(255, 165, 0, 0.5)",
-                  color: "#FFA500",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  fontFamily: "'Cafe24Ohsquare', sans-serif",
-                  textAlign: "center",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                className="phone-modal-btn"
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/profile/", {
-                      method: "PUT",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ contact_available: formData.phoneComment || null }),
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                      setIsPhoneCommentModalOpen(false);
-                    } else {
-                      alert("저장 실패: " + (result.error || "알 수 없는 오류"));
-                    }
-                  } catch (error) {
-                    console.error("연락처 코멘트 저장 오류:", error);
-                    alert("저장 중 오류가 발생했습니다.");
-                  }
-                }}
-                style={{
-                  width: "80px",
-                  padding: "10px 0",
-                  backgroundColor: "#FFA500",
-                  border: "none",
-                  color: "#000",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  fontFamily: "'Cafe24Ohsquare', sans-serif",
-                  textAlign: "center",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                저장
-              </button>
+              {isPhoneEditing ? (
+                <>
+                  <button type="button" onClick={() => setIsPhoneEditing(false)} style={{ width: "80px", padding: "10px 0", backgroundColor: "transparent", border: "1px solid rgba(255, 165, 0, 0.5)", color: "#FFA500", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (demoMode) {
+                        setIsPhoneEditing(false);
+                        setIsPhoneCommentModalOpen(false);
+                        return;
+                      }
+                      try {
+                        const response = await fetch("/api/profile/", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ contact_available: formData.phoneComment || null }),
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                          setIsPhoneEditing(false);
+                          setIsPhoneCommentModalOpen(false);
+                        } else {
+                          alert("저장 실패: " + (result.error || "알 수 없는 오류"));
+                        }
+                      } catch (error) {
+                        console.error("연락처 코멘트 저장 오류:", error);
+                        alert("저장 중 오류가 발생했습니다.");
+                      }
+                    }}
+                    style={{ width: "80px", padding: "10px 0", backgroundColor: "#FFA500", border: "none", color: "#000", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}
+                  >
+                    저장
+                  </button>
+                </>
+              ) : (
+                (isOwner || demoMode) && (
+                  <button type="button" onClick={() => setIsPhoneEditing(true)} style={{ width: "80px", padding: "10px 0", backgroundColor: "#FFA500", border: "none", color: "#000", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    수정
+                  </button>
+                )
+              )}
             </div>
           </div>
         </div>

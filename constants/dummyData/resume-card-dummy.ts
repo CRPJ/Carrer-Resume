@@ -11,7 +11,7 @@ export const DUMMY_USER_PROFILE = {
   birthDate: "1900.01.01",
   city: "서울시",
   district: "송파구",
-  phone: "010-2345-6789", // 마스킹 해제
+  phone: "010-2345-6789 연락 가능한 시간대를 기재할게요 ", // 마스킹 해제
   email: "encre.jjang@gmail.com",
   school: "한국외국어대학교",
   major: "스페인어과",

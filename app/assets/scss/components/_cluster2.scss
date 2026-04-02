@@ -4126,7 +4126,7 @@
             label {
               display: block;
               color: #94a3b8;
-              font-size: 0.75rem;
+              font-size: 15px;
               margin-bottom: 6px;
             }
 
@@ -4151,7 +4151,7 @@
 
               &::placeholder {
                 color: #444;
-                font-size: 0.75rem;
+                font-size: 15px;
               }
             }
           }
@@ -4162,7 +4162,7 @@
             label {
               display: block;
               color: #94a3b8;
-              font-size: 0.75rem;
+              font-size: 15px;
               margin-bottom: 6px;
             }
 
@@ -4434,7 +4434,7 @@
               align-items: center;
               gap: 8px;
               color: #ffa500;
-              font-size: 0.75rem;
+              font-size: 15px;
               text-align: center;
               padding: 10px;
 
@@ -5081,7 +5081,7 @@
           }
 
           .slogan-rating-value {
-            font-size: 0.75rem;
+            font-size: 15px;
             font-weight: 600;
             color: #ffa500;
             font-family: "Pretendard", sans-serif;
@@ -5450,13 +5450,13 @@
             border-radius: 16px;
             color: #666;
             font-family: "Pretendard", sans-serif;
-            font-size: 0.75rem;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
 
             i {
-              font-size: 0.75rem;
+              font-size: 15px;
               color: #666;
               transition: all 0.2s;
             }
@@ -5692,7 +5692,7 @@
                         &::before {
                           content: "✓";
                           margin-right: 8px;
-                          font-size: 0.75rem;
+                          font-size: 15px;
                         }
                       }
 
@@ -5751,7 +5751,7 @@
             .major-hint {
               grid-column: 1 / -1;
               font-family: "Pretendard", sans-serif;
-              font-size: 0.75rem;
+              font-size: 15px;
               color: #888;
               margin: -8px 0 0 0;
             }
@@ -6122,7 +6122,7 @@
                     &::before {
                       content: "✓";
                       margin-right: 8px;
-                      font-size: 0.75rem;
+                      font-size: 15px;
                     }
                   }
                 }
@@ -6234,7 +6234,7 @@
                 text-align: right;
                 margin-top: 6px;
                 font-family: "Pretendard", sans-serif;
-                font-size: 0.75rem;
+                font-size: 15px;
                 color: #666;
               }
             }
