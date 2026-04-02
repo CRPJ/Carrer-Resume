@@ -508,9 +508,10 @@ const Sidebar = () => {
       let scale = Math.min(1.25, scaleByHeight);
       scale = Math.max(0.55, scale);
 
-      // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.25 적용
+      // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
+      // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
       if (window.innerWidth > 1920) {
-        scale = 1.25;
+        scale = 1.31;
       }
 
       setCardScale(scale);
