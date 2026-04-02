@@ -2000,7 +2000,7 @@ const Cluster4Content = () => {
             {/* 중앙 열 (영역 4, 5, 6, 7) */}
             <div className={`center-column ${isTextFading ? "fading" : ""}`}>
               {/* 영역 4: 통계 바 */}
-              <div className="area-4-stats" style={{ transform: "translateX(26px)" }}>
+              <div className="area-4-stats" style={{ transform: "translateX(44px)" }}>
                 <span className="stat">
                   단감 <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">{Math.abs(currentSeason.stats.dangam)}</strong>
                   <span className="unit">개</span>

@@ -3004,27 +3004,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   <span
                                     className="badge-status yellow"
                                     style={{
-                                      paddingLeft: 10,
-                                      paddingRight: 10,
-                                      paddingTop: 7.5,
-                                      paddingBottom: 9.5,
-                                      background: "#FAAB07",
-                                      borderRadius: 9999,
-                                      backdropFilter: "blur(1px)",
-                                      display: "inline-flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      fontSize: 12,
-                                      fontFamily: "Pretendard",
-                                      fontWeight: "600",
-                                      lineHeight: "9px",
-                                      color: "#000",
-                                      width: "fit-content",
+                                      padding: "4px 7.2px",
+                                      background: "rgba(250, 171, 7, 0.1)",
+                                      borderRadius: 4,
+                                      fontSize: 15,
+                                      fontFamily: "'Pretendard', sans-serif",
+                                      fontWeight: 600,
+                                      lineHeight: "15px",
+                                      color: "#faab07",
                                       whiteSpace: "nowrap",
                                       flexShrink: 0,
                                     }}
                                   >
-                                    {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                                    {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
                                   </span>
                                 </span>
                                 <span style={{ width: "3px", flexShrink: 0 }}></span>
@@ -3137,28 +3129,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span
                                 className="badge-status yellow"
                                 style={{
-                                  paddingLeft: 10,
-                                  paddingRight: 10,
-                                  paddingTop: 7.5,
-                                  paddingBottom: 9.5,
-                                  background: "#FAAB07",
-                                  borderRadius: 9999,
-                                  backdropFilter: "blur(1px)",
-                                  display: "inline-flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                  fontSize: 12,
-                                  fontFamily: "Pretendard",
-                                  fontWeight: "600",
-                                  lineHeight: "9px",
-                                  color: "#000",
-                                  width: "fit-content",
+                                  padding: "4px 7.2px",
+                                  background: "rgba(250, 171, 7, 0.1)",
+                                  borderRadius: 4,
+                                  fontSize: 15,
+                                  fontFamily: "'Pretendard', sans-serif",
+                                  fontWeight: 600,
+                                  lineHeight: "15px",
+                                  color: "#faab07",
                                   whiteSpace: "nowrap",
                                   flexShrink: 0,
                                   marginRight: "8px",
                                 }}
                               >
-                                {(user.role || "일반").length > 8 ? (user.role || "일반").slice(0, 8) + ".." : user.role || "일반"}
+                                {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
                               </span>
                             )}
                             <span className="date">{isEmpty ? "0000 - 00 - 00 (일)" : user.date}</span>
