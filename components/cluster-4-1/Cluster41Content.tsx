@@ -2122,12 +2122,12 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.teamName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'clip', whiteSpace: 'nowrap' }}>{(teamPart.teamName || '-').length > 6 ? (teamPart.teamName || '-').slice(0, 6) + '..' : teamPart.teamName || '-'}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{teamPart.partName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'clip', whiteSpace: 'nowrap' }}>{(teamPart.partName || '-').length > 6 ? (teamPart.partName || '-').slice(0, 6) + '..' : teamPart.partName || '-'}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}

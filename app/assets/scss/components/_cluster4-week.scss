@@ -3342,6 +3342,7 @@
         position: absolute;
         top: 0;
         right: 0;
+        pointer-events: none !important;
         width: 326px;
         min-width: 326px;
         max-width: 326px;
@@ -8438,6 +8439,39 @@
           color: #444;
         }
       }
+    }
+  }
+}
+
+// season-badge hover — cluster4 (weekly)
+.season-badge {
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+
+  * {
+    transition: all 0.1s ease !important;
+  }
+
+  .badge-text {
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  &:hover {
+    .badge-text {
+      color: #FFFFFF !important;
+      text-shadow: 0 0 6px rgba(221, 242, 71, 0.6) !important;
+    }
+
+    .badge-border {
+      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8))
+              drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
+    }
+
+    .badge-outline {
+      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8)) !important;
     }
   }
 }
