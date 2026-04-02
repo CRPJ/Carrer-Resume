@@ -1971,7 +1971,7 @@ const Cluster41Content = () => {
                       className="weekly-card-main"
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
                         <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                         <div className="image-badges">
                           <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
@@ -2071,12 +2071,18 @@ const Cluster41Content = () => {
               return (
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
-                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
                     <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
                         <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
                         <span className="rest-text-line">쉬었나요..?</span>
+                      </div>
+                    )}
+                    {week.growthStatus === '실패' && (
+                      <div className="rest-message">
+                        <span className="rest-text-line">값진 실패는 <span className="rest-emoji">😎</span></span>
+                        <span className="rest-text-line">훌륭한 스승님!</span>
                       </div>
                     )}
                     <div className="image-badges">
