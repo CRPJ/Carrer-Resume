@@ -479,6 +479,7 @@ const Cluster2Content = () => {
   const handleSaveSlogans = async () => {
     if (isDemoMode) {
       setSloganData(editingSloganData);
+      window.dispatchEvent(new CustomEvent('sloganUpdated', { detail: editingSloganData }));
       alert('저장되었습니다.');
       setSection2ModalOpen(false);
       return;

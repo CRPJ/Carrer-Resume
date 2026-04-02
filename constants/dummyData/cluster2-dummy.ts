@@ -6,8 +6,8 @@ export const CLUSTER2_DUMMY_PHOTOS = {
 export const CLUSTER2_DUMMY_SLOGANS = {
   engName: "YUN JAEYUN",
   slogan1: { option: "Dreamer", content: "고객의 마음을 읽는 데이터 기반 마케터", rating: 8 },
-  slogan2: { option: "Pioneer", content: "매일 1%씩 성장하는 것이 나의 철학입니다 고객의 마음을 읽는 데이터 기반 마케터 매일 1%씩 성장하는 것이 나의 철학입니다 고객의 마음을 읽는 데이터 기반 마케터", rating: 9 },
-  slogan3: { option: "Warrior", content: "함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다", rating: 7 },
+  slogan2: { option: "Pioneer", content: "매일 1%씩 성장하는 것이 나의 철학입니다 고객의 마음을 읽는 데이터 기반 마케터 매일 1%씩 성장하는 것이 나의", rating: 9 },
+  slogan3: { option: "Warrior", content: "함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 더 멀리 갈 수 있다고 믿습니다 함께 가면 ", rating: 7 },
 };
 
 export const CLUSTER2_DUMMY_VIDEOS = {

@@ -1819,10 +1819,7 @@ const Sidebar = () => {
                       />
                       <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <span style={{ color: currentProfile.lightColor, flexShrink: 0 }}>·</span>
-                        {(() => {
-                          const fullText = `${currentProfile.phone}${formData.phoneComment ? ` ${formData.phoneComment}` : ""}`;
-                          return fullText.length > 17 ? fullText.slice(0, 17) + ".." : fullText;
-                        })()}
+                        {currentProfile.phone}
                         {isOwner && (
                           <span
                             onClick={async () => {
@@ -3571,9 +3568,7 @@ const Sidebar = () => {
               }}
             >
               <p style={{ color: "#ffffff", fontSize: "16px", margin: 0, lineHeight: 1.6, fontFamily: "Pretendard, sans-serif", wordBreak: "keep-all" }}>
-                저는 평일 9~23시까지 언제든 연락이 가능합니다 :)
-                <br />
-                주말에는 10~24시까지 연락이 가능합니다. 수요일 5시는 어려워요!
+                {formData.phoneComment || "등록된 코멘트가 없습니다."}
               </p>
             </div>
           </div>
