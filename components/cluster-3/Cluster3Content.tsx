@@ -4,6 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import {
+  CLUSTER3_DUMMY_PROFILE,
+  CLUSTER3_DUMMY_ARCHIVES,
+  CLUSTER3_DUMMY_ARCHIVE_CHANNELS,
+  CLUSTER3_DUMMY_OUTPUTS,
+  CLUSTER3_DUMMY_OUTPUT_CHANNELS,
+  CLUSTER3_DUMMY_DETAILS,
+  CLUSTER3_DUMMY_DETAIL_CHANNELS,
+} from "@/constants/dummyData";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -333,6 +342,18 @@ const Cluster3Content = () => {
   // 포트폴리오 아카이빙 데이터 가져오기
   useEffect(() => {
     const fetchPortfolioArchives = async () => {
+      if (isDemoMode) {
+        setPortfolioArchives(CLUSTER3_DUMMY_ARCHIVES);
+        setPortfolioArchiveChannels(CLUSTER3_DUMMY_ARCHIVE_CHANNELS);
+        const updatedCards = channelCards.map((card, index) => {
+          if (index < 10 && CLUSTER3_DUMMY_ARCHIVES[index]) {
+            return { ...card, link: CLUSTER3_DUMMY_ARCHIVES[index] };
+          }
+          return card;
+        });
+        setChannelCards(updatedCards);
+        return;
+      }
       if (!session?.user?.email) return;
 
       try {
@@ -409,6 +430,18 @@ const Cluster3Content = () => {
   // 포트폴리오 Output 데이터 가져오기
   useEffect(() => {
     const fetchPortfolioOutputs = async () => {
+      if (isDemoMode) {
+        setPortfolioOutputs(CLUSTER3_DUMMY_OUTPUTS);
+        setPortfolioOutputChannels(CLUSTER3_DUMMY_OUTPUT_CHANNELS);
+        const updatedSlides = topWorksSlides.map((slide, index) => {
+          if (CLUSTER3_DUMMY_OUTPUTS[index]) {
+            return { ...slide, link: CLUSTER3_DUMMY_OUTPUTS[index] };
+          }
+          return slide;
+        });
+        setTopWorksSlides(updatedSlides);
+        return;
+      }
       if (!session?.user?.email) return;
 
       try {
@@ -484,6 +517,18 @@ const Cluster3Content = () => {
   // Detail 10 데이터 가져오기
   useEffect(() => {
     const fetchPortfolioDetails = async () => {
+      if (isDemoMode) {
+        setPortfolioDetails(CLUSTER3_DUMMY_DETAILS);
+        setPortfolioDetailChannels(CLUSTER3_DUMMY_DETAIL_CHANNELS);
+        const updatedThumbnails = detailThumbnails.map((thumb, index) => {
+          if (CLUSTER3_DUMMY_DETAILS[index]) {
+            return { ...thumb, link: CLUSTER3_DUMMY_DETAILS[index] };
+          }
+          return thumb;
+        });
+        setDetailThumbnails(updatedThumbnails);
+        return;
+      }
       if (!session?.user?.email) return;
 
       try {
@@ -559,6 +604,16 @@ const Cluster3Content = () => {
   // API에서 일정 신뢰도 데이터 가져오기
   useEffect(() => {
     const fetchReliabilityRate = async () => {
+      if (isDemoMode) {
+        setReliabilityRate(CLUSTER3_DUMMY_PROFILE.reliabilityRate);
+        setHasReliabilityData(true);
+        setEngName(CLUSTER3_DUMMY_PROFILE.engName);
+        setPointsData(CLUSTER3_DUMMY_PROFILE.pointsData);
+        setGradeStats(CLUSTER3_DUMMY_PROFILE.gradeStats);
+        setTopPercent(CLUSTER3_DUMMY_PROFILE.gradeStats.avgPercentile);
+        setGrowthPeriodStats(CLUSTER3_DUMMY_PROFILE.growthPeriodStats);
+        return;
+      }
       if (!session?.user?.email && !urlUserId) {
         setHasReliabilityData(false);
         return;

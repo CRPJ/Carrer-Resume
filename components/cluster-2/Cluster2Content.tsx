@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO } from "@/constants/dummyData";
 
 // 학력 데이터 타입
 interface EduData {
@@ -217,6 +218,11 @@ const Cluster2Content = () => {
 
   // DB에서 사진 로드
   const fetchPhotos = async () => {
+    if (isDemoMode) {
+      setMainPhoto(CLUSTER2_DUMMY_PHOTOS.mainPhoto);
+      setSubPhotos(CLUSTER2_DUMMY_PHOTOS.subPhotos);
+      return;
+    }
     setPhotoLoading(true);
     try {
       // 비소유자인 경우 userId 쿼리 파라미터로 조회
@@ -411,6 +417,17 @@ const Cluster2Content = () => {
 
   // DB에서 슬로건 로드
   const fetchSlogans = async () => {
+    if (isDemoMode) {
+      const newSloganData = {
+        slogan1: { option: CLUSTER2_DUMMY_SLOGANS.slogan1.option, content: CLUSTER2_DUMMY_SLOGANS.slogan1.content, rating: CLUSTER2_DUMMY_SLOGANS.slogan1.rating },
+        slogan2: { option: CLUSTER2_DUMMY_SLOGANS.slogan2.option, content: CLUSTER2_DUMMY_SLOGANS.slogan2.content, rating: CLUSTER2_DUMMY_SLOGANS.slogan2.rating },
+        slogan3: { option: CLUSTER2_DUMMY_SLOGANS.slogan3.option, content: CLUSTER2_DUMMY_SLOGANS.slogan3.content, rating: CLUSTER2_DUMMY_SLOGANS.slogan3.rating },
+      };
+      setSloganData(newSloganData);
+      setEditingSloganData(newSloganData);
+      setSloganAuthorName(CLUSTER2_DUMMY_SLOGANS.engName);
+      return;
+    }
     try {
       const url = urlUserId && !isOwner
         ? `/api/slogans?userId=${urlUserId}`
@@ -561,6 +578,28 @@ const Cluster2Content = () => {
 
   // DB에서 영상 URL 로드
   const fetchVideos = async () => {
+    if (isDemoMode) {
+      setVideoData(prev => {
+        const newData = [...prev];
+        newData.forEach(video => {
+          video.author = CLUSTER2_DUMMY_SLOGANS.engName;
+        });
+        if (CLUSTER2_DUMMY_VIDEOS.videoUrl1) {
+          newData[0].videoUrl = CLUSTER2_DUMMY_VIDEOS.videoUrl1;
+          newData[0].thumbnail = getYouTubeThumbnail(CLUSTER2_DUMMY_VIDEOS.videoUrl1);
+        }
+        if (CLUSTER2_DUMMY_VIDEOS.videoUrl2) {
+          newData[1].videoUrl = CLUSTER2_DUMMY_VIDEOS.videoUrl2;
+          newData[1].thumbnail = getYouTubeThumbnail(CLUSTER2_DUMMY_VIDEOS.videoUrl2);
+        }
+        if (CLUSTER2_DUMMY_VIDEOS.videoUrl3) {
+          newData[2].videoUrl = CLUSTER2_DUMMY_VIDEOS.videoUrl3;
+          newData[2].thumbnail = getYouTubeThumbnail(CLUSTER2_DUMMY_VIDEOS.videoUrl3);
+        }
+        return newData;
+      });
+      return;
+    }
     try {
       const url = urlUserId && !isOwner
         ? `/api/videos?userId=${urlUserId}`
@@ -704,6 +743,11 @@ const Cluster2Content = () => {
 
   // 학력 데이터 로드
   const fetchEducations = async () => {
+    if (isDemoMode) {
+      setEducationData(CLUSTER2_DUMMY_EDUCATIONS);
+      setEditingEduData(CLUSTER2_DUMMY_EDUCATIONS);
+      return;
+    }
     try {
       const url = urlUserId && !isOwner
         ? `/api/educations?userId=${urlUserId}`
@@ -845,6 +889,17 @@ const Cluster2Content = () => {
 
   // DB에서 리뷰 링크 로드
   const fetchReviewLink = async () => {
+    if (isDemoMode) {
+      setReviewLinks(prev => {
+        const newLinks = [...prev];
+        newLinks[0] = CLUSTER2_DUMMY_REVIEWS.cluvingReviewLink;
+        CLUSTER2_DUMMY_REVIEWS.reviewLinks.forEach((link, index) => {
+          newLinks[index + 1] = link;
+        });
+        return newLinks;
+      });
+      return;
+    }
     try {
       const url = urlUserId && !isOwner
         ? `/api/review-link?userId=${urlUserId}`
@@ -877,6 +932,23 @@ const Cluster2Content = () => {
 
   // DB에서 자기소개서 로드
   const fetchIntroductions = async () => {
+    if (isDemoMode) {
+      const dbFieldOrder = ['growthStory', 'socialExperience', 'careerDirection', 'workStyle', 'personalStory'] as const;
+      setIntroCards(prev => {
+        const newCards = [...prev];
+        dbFieldOrder.forEach((dbField, index) => {
+          const dbValue = CLUSTER2_DUMMY_INTRO[dbField];
+          if (dbValue) {
+            newCards[index] = {
+              ...newCards[index],
+              content: dbValue
+            };
+          }
+        });
+        return newCards;
+      });
+      return;
+    }
     try {
       const url = urlUserId && !isOwner
         ? `/api/introductions?userId=${urlUserId}`
