@@ -744,9 +744,10 @@
           left: 45%;
           transform: translate(-50%, -50%);
           font-family: "Pretendard", sans-serif;
-          font-size: 0.875rem;
+          font-size: 18px !important;
           font-weight: 700;
           color: #000;
+          white-space: nowrap;
         }
 
         &:hover {

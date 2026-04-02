@@ -1309,7 +1309,7 @@ const Cluster3Content = () => {
         </div>
         <div className="section4-header">
           <h2 className="section4-title">World Of Top Works</h2>
-          <p className="section4-desc">*본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다. 전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.</p>
+          <p className="section4-desc">*본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다.<br />전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.</p>
         </div>
 
         <div className="section4-tabs">

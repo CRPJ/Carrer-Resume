@@ -1005,10 +1005,22 @@
 
       &.medal-recharging {
         filter: hue-rotate(-30deg) saturate(3) brightness(0.8) !important;
+
+        .medal-text-inner {
+          position: relative;
+          top: 0px;
+          font-size: 14px !important;
+        }
       }
 
       &.medal-next {
         filter: grayscale(1) brightness(0.6) !important;
+
+        .medal-text-inner {
+          position: relative;
+          top: 0px;
+          font-size: 15px !important;
+        }
       }
     }
 

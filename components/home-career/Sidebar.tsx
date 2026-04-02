@@ -508,6 +508,11 @@ const Sidebar = () => {
       let scale = Math.min(1.25, scaleByHeight);
       scale = Math.max(0.55, scale);
 
+      // 1920 초과: 검증된 고정값 사용
+      if (window.innerWidth > 1920) {
+        scale = 1.1288;
+      }
+
       setCardScale(scale);
 
       // 사이드바 폭을 스케일에 맞게 조정

@@ -1342,7 +1342,7 @@ const Cluster2Content = () => {
           <span className="progress-value">99.9%</span>
           <button className={`with-us-btn ${isWiggling ? 'wiggle' : ''}`} onClick={handleWithUsClick}>
             <img src="/images/0/cluster 2/button box.png" alt="" />
-            <span>With us</span>
+            <span>WITH ME</span>
           </button>
         </div>
       </div>
