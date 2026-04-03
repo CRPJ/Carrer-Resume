@@ -88,6 +88,16 @@
 // tabler icons
 @import "@tabler/icons-webfont/dist/tabler-icons.min.css";
 
+// tabler icons font-display 오버라이드 — 로딩 전 'X' 깜빡임(FOMI) 방지
+@font-face {
+  font-family: "tabler-icons";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("~@tabler/icons-webfont/dist/fonts/tabler-icons.woff2") format("woff2"),
+       url("~@tabler/icons-webfont/dist/fonts/tabler-icons.woff") format("woff");
+}
+
 // ui range slider
 @import "@yaireo/ui-range/ui-range.css";
 // nice select
