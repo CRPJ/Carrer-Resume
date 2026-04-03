@@ -214,6 +214,7 @@ const Header = () => {
       setActiveParent(parent.id);
     }
   }, [pathName]);
+
   return (
     <>
       <header className="header">
