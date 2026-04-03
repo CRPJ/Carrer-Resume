@@ -68,7 +68,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const isDemoMode = checkDemoMode();
-  const NICKNAME_COLORS = ["#87CEEB", "#8B2252", "#3EB489", "#FFF44F"];
+  const NICKNAME_COLORS = ["rgba(101, 227, 255, 1)", "rgba(255, 97, 97, 1)", "rgba(157, 250, 7, 1)", "rgba(255, 234, 72, 1)"];
+const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
   const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
     const t = text || "-";
@@ -3022,7 +3023,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   </span>
                                 </span>
                                 <span style={{ width: "3px", flexShrink: 0 }}></span>
-                                <span className="nickname" style={{ flex: 1, fontSize: "16px", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap", color: NICKNAME_COLORS[index % 4] }}>
+                                <span className="nickname" style={{ flex: 1, fontSize: "16px", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
                                   {(user.nickname || "-").length > 8 ? (user.nickname || "-").slice(0, 8) + ".." : user.nickname || "-"}
                                 </span>
                               </div>
@@ -3226,7 +3227,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span className="profile-divider" style={{ margin: "0 4px" }}>
                                 |
                               </span>
-                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto", color: NICKNAME_COLORS[index % 4] }}>
+                              <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
                                 {truncate(user.nickname, 4)}
                               </span>
                             </>
