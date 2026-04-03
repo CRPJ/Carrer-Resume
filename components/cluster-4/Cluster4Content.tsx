@@ -1511,7 +1511,34 @@ const Cluster4Content = () => {
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
     if (isDemoMode) {
-      console.log("Demo: 시즌 평판 저장", seasonReputationEditData);
+      // seasonReputations에 새 평판 추가 (UI 즉시 반영)
+      setSeasonReputations((prev) => [
+        ...prev,
+        {
+          id: `demo-${Date.now()}`,
+          reviewer_id: session?.user?.id || "demo-user",
+          target_user_id: urlUserId || "",
+          season_history_id: selectedSeasonId || "",
+          rating: seasonReputationEditData.rating,
+          content: seasonReputationEditData.content.trim(),
+          keyword_1: seasonReputationEditData.keyword1.trim() || null,
+          keyword_2: seasonReputationEditData.keyword2.trim() || null,
+          keyword_3: seasonReputationEditData.keyword3.trim() || null,
+          created_at: new Date().toISOString(),
+          reviewer: {
+            id: session?.user?.id || "demo-user",
+            display_name: session?.user?.name || "데모 유저",
+            gender: "-",
+            birth_date: null,
+            university: "-",
+            major_first: null,
+            profile_photo_url: session?.user?.image || null,
+            teamName: null,
+            partName: null,
+            vision: null,
+          },
+        },
+      ]);
       alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
       setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
@@ -1599,7 +1626,10 @@ const Cluster4Content = () => {
   // 시즌 리뷰 저장
   const handleSaveSeasonReview = async () => {
     if (isDemoMode) {
-      console.log("Demo: 시즌 리뷰 저장", seasonReviewEditData);
+      // seasonHistories 업데이트 (UI 즉시 반영 — 현재 페이지 인덱스로 매칭)
+      setSeasonHistories((prev) =>
+        prev.map((season, idx) => (idx === section3Page ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() } : season)),
+      );
       alert("저장되었습니다.");
       setSeasonReviewModalOpen(false);
       return;
@@ -2546,8 +2576,9 @@ const Cluster4Content = () => {
                     rows={4}
                     value={seasonReputationEditData.content}
                     onChange={(e) => {
-                      if (e.target.value.length >= 100) {
+                      if (e.target.value.length > 100) {
                         alert('최대 100자까지 입력할 수 있습니다.');
+                        return;
                       }
                       setSeasonReputationEditData((prev) => ({ ...prev, content: e.target.value }));
                     }}
@@ -2583,8 +2614,9 @@ const Cluster4Content = () => {
                       maxLength={7}
                       value={seasonReputationEditData.keyword1}
                       onChange={(e) => {
-                        if (e.target.value.length >= 7) {
+                        if (e.target.value.length > 7) {
                           alert('최대 7자까지 입력할 수 있습니다.');
+                          return;
                         }
                         setSeasonReputationEditData((prev) => ({ ...prev, keyword1: e.target.value }));
                       }}
@@ -2610,8 +2642,9 @@ const Cluster4Content = () => {
                       maxLength={7}
                       value={seasonReputationEditData.keyword2}
                       onChange={(e) => {
-                        if (e.target.value.length >= 7) {
+                        if (e.target.value.length > 7) {
                           alert('최대 7자까지 입력할 수 있습니다.');
+                          return;
                         }
                         setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }));
                       }}
@@ -2637,8 +2670,9 @@ const Cluster4Content = () => {
                       maxLength={7}
                       value={seasonReputationEditData.keyword3}
                       onChange={(e) => {
-                        if (e.target.value.length >= 7) {
+                        if (e.target.value.length > 7) {
                           alert('최대 7자까지 입력할 수 있습니다.');
+                          return;
                         }
                         setSeasonReputationEditData((prev) => ({ ...prev, keyword3: e.target.value }));
                       }}
@@ -2932,8 +2966,9 @@ const Cluster4Content = () => {
                     maxLength={30}
                     value={seasonReviewEditData.review}
                     onChange={(e) => {
-                      if (e.target.value.length >= 30) {
+                      if (e.target.value.length > 30) {
                         alert('최대 30자까지 입력할 수 있습니다.');
+                        return;
                       }
                       setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }));
                     }}
