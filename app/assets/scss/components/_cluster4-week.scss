@@ -6354,7 +6354,6 @@
       max-height: calc(100vh - 40px);
 
       .work-view-fixed {
-        flex-shrink: 0;
         padding: 24px;
         display: flex;
         flex-direction: column;
@@ -6369,6 +6368,11 @@
         }
         h3 {
           font-size: 24px !important;
+        }
+
+        .content-text,
+        .section-content {
+          font-size: 16px !important;
         }
       }
 
@@ -6466,6 +6470,12 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
+
+        // Output Link label + links — Main Title과 x좌표 맞춤
+        > .work-view-section {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
       }
 
       // 헤더 row: 아이콘 + 태그 + 코드 | 강화상태
@@ -6686,6 +6696,10 @@
 
       // 섹션 (Sub Title, Output Link)
       .work-view-section {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        flex-shrink: 0;
         .section-label {
           font-size: 0.875rem;
           font-weight: 600;
@@ -6709,6 +6723,9 @@
           display: flex;
           flex-direction: column;
           gap: 10px;
+          overflow-y: visible !important;
+          max-height: none !important;
+          height: auto !important;
 
           .output-link-item {
             display: flex;

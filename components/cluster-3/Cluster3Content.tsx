@@ -1697,7 +1697,7 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>The Detail 10 링크 편집</h3>
-              <p className="modal-subtitle">위 대표 결과물 5개를 제외한, 클럽 활동 결과물 중 추가로 보여주고 싶은 결과물 링크를 등록해 주세요.</p>
+              <p className="modal-subtitle">위 대표 결과물 5개를 제외한 클럽 활동 결과물 중, 추가로 보여주고 싶은 결과물 링크를 등록해 주세요.</p>
               <button className="modal-close-btn" onClick={() => setSection5ModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
