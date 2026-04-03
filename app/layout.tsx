@@ -4,6 +4,7 @@ import SessionProvider from "@/components/providers/SessionProvider";
 import { ProfileProvider } from "@/contexts/ProfileContext";
 import ZoomPrevention from "@/components/shared/ZoomPrevention";
 import ResponsiveScale from "@/components/shared/ResponsiveScale";
+import MobileBlockScreen from "@/components/shared/MobileBlockScreen";
 import type { Metadata, Viewport } from "next";
 import { Khula, Black_Ops_One, Chakra_Petch, Lobster, Rajdhani } from "next/font/google";
 import "./assets/scss/main.scss";
@@ -42,6 +43,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet" />
       </head>
       <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
+        <MobileBlockScreen />
         <SessionProvider>
           <ProfileProvider>
             {/* <ZoomPrevention /> */}
