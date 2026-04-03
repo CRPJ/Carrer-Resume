@@ -36,6 +36,15 @@
   --tab-font-size: 14px;
 }
 
+// ===== 초기 로딩 flash 방지 =====
+.nftg-app {
+  opacity: 0;
+}
+.nftg-app.app-ready {
+  opacity: 1;
+  transition: opacity 0.12s ease-in;
+}
+
 // ===== 공통 레이아웃 스타일 =====
 
 html {

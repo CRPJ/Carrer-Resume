@@ -24,6 +24,11 @@ const ResponsiveScale = () => {
     window.addEventListener('load', updateHeaderDividerY);
     window.addEventListener('resize', updateHeaderDividerY);
 
+    // 레이아웃 계산 완료 후 페이지 표시 (헤더-사이드바 flash 방지)
+    requestAnimationFrame(() => {
+      document.querySelector('.nftg-app')?.classList.add('app-ready');
+    });
+
     return () => {
       window.removeEventListener('load', updateHeaderDividerY);
       window.removeEventListener('resize', updateHeaderDividerY);
