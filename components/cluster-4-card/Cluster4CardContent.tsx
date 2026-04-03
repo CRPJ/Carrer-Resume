@@ -1596,7 +1596,28 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
   // 주차 평판 저장 함수
   const saveWeeklyReputation = async () => {
     if (isDemoMode) {
-      console.log("Demo: 주차 평판 저장", reputationEditData);
+      // weeklyReputations에 새 평판 추가 (UI 즉시 반영)
+      setWeeklyReputations((prev) => [
+        ...prev,
+        {
+          id: `demo-${Date.now()}`,
+          rating: reputationEditData.rating,
+          content: reputationEditData.content.trim(),
+          keyword: reputationEditData.keyword,
+          reviewer: {
+            display_name: session?.user?.name || "데모 유저",
+            gender: "-",
+            birth_date: null,
+            profile_photo_url: session?.user?.image || "",
+            university: "-",
+            major_first: "-",
+            teamName: "-",
+            partName: "-",
+            vision: "-",
+            role: "",
+          },
+        },
+      ]);
       alert("저장되었습니다.");
       setHeaderModalOpen(false);
       setReputationEditData({ rating: 0, content: "", keyword: "" });
@@ -3939,8 +3960,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         <textarea
                           value={editingDetails[card.activityType]?.subTitle || ""}
                           onChange={(e) => {
-                            if (e.target.value.length >= 150) {
+                            if (e.target.value.length > 150) {
                               alert('최대 150자까지 입력할 수 있습니다.');
+                              return;
                             }
                             setEditingDetails((prev) => ({
                               ...prev,
@@ -3987,8 +4009,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
-                                    if (e.target.value.length >= 20) {
+                                    if (e.target.value.length > 20) {
                                       alert('최대 20자까지 입력할 수 있습니다.');
+                                      return;
                                     }
                                     !isDisabled &&
                                     setEditingDetails((prev) => {
@@ -4144,8 +4167,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           maxLength={150}
                           value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ""}
                           onChange={(e) => {
-                            if (e.target.value.length >= 150) {
+                            if (e.target.value.length > 150) {
                               alert('최대 150자까지 입력할 수 있습니다.');
+                              return;
                             }
                             const actType = getActiveAbilityActivityType();
                             setEditingDetails((prev) => ({
@@ -4186,8 +4210,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
-                                    if (e.target.value.length >= 20) {
+                                    if (e.target.value.length > 20) {
                                       alert('최대 20자까지 입력할 수 있습니다.');
+                                      return;
                                     }
                                     !isDisabled &&
                                     setEditingDetails((prev) => {
@@ -4358,8 +4383,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 maxLength={150}
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
-                                  if (e.target.value.length >= 150) {
+                                  if (e.target.value.length > 150) {
                                     alert('최대 150자까지 입력할 수 있습니다.');
+                                    return;
                                   }
                                   setEditingDetails((prev) => ({
                                     ...prev,
@@ -4398,8 +4424,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
-                                          if (e.target.value.length >= 20) {
+                                          if (e.target.value.length > 20) {
                                             alert('최대 20자까지 입력할 수 있습니다.');
+                                            return;
                                           }
                                           !isDisabled &&
                                           setEditingDetails((prev) => {
@@ -4564,8 +4591,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                               <textarea
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
-                                  if (e.target.value.length >= 150) {
+                                  if (e.target.value.length > 150) {
                                     alert('최대 150자까지 입력할 수 있습니다.');
+                                    return;
                                   }
                                   setEditingDetails((prev) => ({
                                     ...prev,
@@ -4618,8 +4646,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
-                                          if (e.target.value.length >= 20) {
+                                          if (e.target.value.length > 20) {
                                             alert('최대 20자까지 입력할 수 있습니다.');
+                                            return;
                                           }
                                           !isDisabled &&
                                           setEditingDetails((prev) => {
@@ -4760,8 +4789,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           </label>
                           <div className="message-input-wrapper">
                             <textarea placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)" maxLength={100} rows={1} value={colleague.message} onChange={(e) => {
-                              if (e.target.value.length >= 100) {
+                              if (e.target.value.length > 100) {
                                 alert('최대 100자까지 입력할 수 있습니다.');
+                                return;
                               }
                               updateColleagueMessage(colleague.id, e.target.value);
                             }}></textarea>
@@ -4931,8 +4961,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                     </label>
                     <div className="textarea-wrapper">
                       <textarea placeholder="해당 크루에 대한 평가 내용을 작성해주세요..." maxLength={100} rows={3} value={reputationEditData.content} onChange={(e) => {
-                        if (e.target.value.length >= 100) {
+                        if (e.target.value.length > 100) {
                           alert('최대 100자까지 입력할 수 있습니다.');
+                          return;
                         }
                         setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
                       }}></textarea>
@@ -4950,11 +4981,12 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                       <input
                         type="text"
                         placeholder="키워드를 입력하세요"
-                        maxLength={10}
+                        maxLength={7}
                         value={reputationEditData.keyword}
                         onChange={(e) => {
-                          if (e.target.value.length >= 10) {
-                            alert('최대 10자까지 입력할 수 있습니다.');
+                          if (e.target.value.length > 7) {
+                            alert('최대 7자까지 입력할 수 있습니다.');
+                            return;
                           }
                           setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
                         }}

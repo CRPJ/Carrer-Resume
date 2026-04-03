@@ -4,15 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
-import {
-  CLUSTER3_DUMMY_PROFILE,
-  CLUSTER3_DUMMY_ARCHIVES,
-  CLUSTER3_DUMMY_ARCHIVE_CHANNELS,
-  CLUSTER3_DUMMY_OUTPUTS,
-  CLUSTER3_DUMMY_OUTPUT_CHANNELS,
-  CLUSTER3_DUMMY_DETAILS,
-  CLUSTER3_DUMMY_DETAIL_CHANNELS,
-} from "@/constants/dummyData";
+import { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS } from "@/constants/dummyData";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -250,31 +242,27 @@ const Cluster3Content = () => {
   const section5ModalBodyRef = useRef<HTMLDivElement>(null);
 
   // 필수 미입력 시 스크롤 이동 + 하이라이트
-  const validateAndScrollToEmpty = (
-    bodyRef: React.RefObject<HTMLDivElement | null>,
-    links: string[],
-    channels: string[]
-  ): boolean => {
+  const validateAndScrollToEmpty = (bodyRef: React.RefObject<HTMLDivElement | null>, links: string[], channels: string[]): boolean => {
     if (!bodyRef.current) return true;
-    const items = bodyRef.current.querySelectorAll('.link-edit-item:not(.disabled)');
+    const items = bodyRef.current.querySelectorAll(".link-edit-item:not(.disabled)");
     let firstInvalid: Element | null = null;
 
     items.forEach((item, idx) => {
-      const input = item.querySelector('input');
-      const linkVal = links[idx]?.trim() || '';
-      const channelVal = channels[idx] || '';
+      const input = item.querySelector("input");
+      const linkVal = links[idx]?.trim() || "";
+      const channelVal = channels[idx] || "";
       const isIncomplete = (linkVal && !channelVal) || (!linkVal && channelVal);
 
       if (isIncomplete) {
-        (item as HTMLElement).style.border = '1px solid #ff4444';
+        (item as HTMLElement).style.border = "1px solid #ff4444";
         if (!firstInvalid) firstInvalid = item;
       } else {
-        (item as HTMLElement).style.border = '';
+        (item as HTMLElement).style.border = "";
       }
     });
 
     if (firstInvalid) {
-      (firstInvalid as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      (firstInvalid as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     return true;
@@ -284,11 +272,13 @@ const Cluster3Content = () => {
   useEffect(() => {
     const anyOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
     if (anyOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [section3ModalOpen, section4ModalOpen, section5ModalOpen]);
 
   // 링크 데이터 관리 (카드 데이터에서 초기화)
@@ -387,7 +377,15 @@ const Cluster3Content = () => {
     if (isDemoMode) {
       setPortfolioArchives(links);
       setPortfolioArchiveChannels(channels);
-      alert('저장되었습니다.');
+      // channelCards의 처음 10개 링크도 업데이트 (UI 즉시 반영)
+      const updatedCards = channelCards.map((card, index) => {
+        if (index < 10) {
+          return { ...card, link: links[index] || "" };
+        }
+        return card;
+      });
+      setChannelCards(updatedCards);
+      alert("저장되었습니다.");
       setSection3ModalOpen(false);
       return;
     }
@@ -476,7 +474,13 @@ const Cluster3Content = () => {
     if (isDemoMode) {
       setPortfolioOutputs(links);
       setPortfolioOutputChannels(channels);
-      alert('저장되었습니다.');
+      // topWorksSlides 링크도 업데이트 (UI 즉시 반영)
+      const updatedSlides = topWorksSlides.map((slide, index) => ({
+        ...slide,
+        link: links[index] || "",
+      }));
+      setTopWorksSlides(updatedSlides);
+      alert("저장되었습니다.");
       setSection4ModalOpen(false);
       return;
     }
@@ -563,7 +567,13 @@ const Cluster3Content = () => {
     if (isDemoMode) {
       setPortfolioDetails(links);
       setPortfolioDetailChannels(channels);
-      alert('저장되었습니다.');
+      // detailThumbnails 링크도 업데이트 (UI 즉시 반영)
+      const updatedThumbnails = detailThumbnails.map((thumb, index) => ({
+        ...thumb,
+        link: links[index] || "",
+      }));
+      setDetailThumbnails(updatedThumbnails);
+      alert("저장되었습니다.");
       setSection5ModalOpen(false);
       return;
     }
@@ -1206,16 +1216,16 @@ const Cluster3Content = () => {
         <div className="floating-icons" style={{ display: "flex" }}>
           <div
             className="edit-icon"
-            style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
+            style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
             onClick={
-              (isOwner || isDemoMode)
+              isOwner || isDemoMode
                 ? () => {
                     // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                     const paired = portfolioArchives.map((link, i) => ({ link, channel: portfolioArchiveChannels[i] || "" }));
-                    const filled = paired.filter(item => item.link?.trim());
+                    const filled = paired.filter((item) => item.link?.trim());
                     const total = portfolioArchives.length;
-                    setEditingSection3Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
-                    setEditingArchiveChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
+                    setEditingSection3Links([...filled.map((item) => item.link), ...Array(total - filled.length).fill("")]);
+                    setEditingArchiveChannels([...filled.map((item) => item.channel), ...Array(total - filled.length).fill("")]);
                     setSection3ModalOpen(true);
                   }
                 : undefined
@@ -1319,16 +1329,16 @@ const Cluster3Content = () => {
         <div className="floating-icons" style={{ display: "flex" }}>
           <div
             className="edit-icon"
-            style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
+            style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
             onClick={
-              (isOwner || isDemoMode)
+              isOwner || isDemoMode
                 ? () => {
                     // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                     const paired = portfolioOutputs.map((link, i) => ({ link, channel: portfolioOutputChannels[i] || "" }));
-                    const filled = paired.filter(item => item.link?.trim());
+                    const filled = paired.filter((item) => item.link?.trim());
                     const total = portfolioOutputs.length;
-                    setEditingSection4Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
-                    setEditingOutputChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
+                    setEditingSection4Links([...filled.map((item) => item.link), ...Array(total - filled.length).fill("")]);
+                    setEditingOutputChannels([...filled.map((item) => item.channel), ...Array(total - filled.length).fill("")]);
                     setSection4ModalOpen(true);
                   }
                 : undefined
@@ -1364,7 +1374,11 @@ const Cluster3Content = () => {
         </div>
         <div className="section4-header">
           <h2 className="section4-title">World Of Top Works</h2>
-          <p className="section4-desc">*본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다.<br />전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.</p>
+          <p className="section4-desc">
+            *본 섹션에서는, 클럽에서 쌓은 모든 활동 경험 중 커리어에서 가장 어필하고자 하는 최고 결과물 Top 5개 만을 선별하여 기재하였습니다.
+            <br />
+            전체적인 실무 경험, 실무 경력, 실무 역량, 실무 정보 등은 다른 탭, 섹션에서 확인해주세요.
+          </p>
         </div>
 
         <div className="section4-tabs">
@@ -1432,16 +1446,16 @@ const Cluster3Content = () => {
           <div className="floating-icons" style={{ display: "flex" }}>
             <div
               className="edit-icon"
-              style={{ cursor: (isOwner || isDemoMode) ? "pointer" : "not-allowed", opacity: (isOwner || isDemoMode) ? 1 : 0.4 }}
+              style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
               onClick={
-                (isOwner || isDemoMode)
+                isOwner || isDemoMode
                   ? () => {
                       // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
                       const paired = portfolioDetails.map((link, i) => ({ link, channel: portfolioDetailChannels[i] || "" }));
-                      const filled = paired.filter(item => item.link?.trim());
+                      const filled = paired.filter((item) => item.link?.trim());
                       const total = portfolioDetails.length;
-                      setEditingSection5Links([...filled.map(item => item.link), ...Array(total - filled.length).fill("")]);
-                      setEditingDetailChannels([...filled.map(item => item.channel), ...Array(total - filled.length).fill("")]);
+                      setEditingSection5Links([...filled.map((item) => item.link), ...Array(total - filled.length).fill("")]);
+                      setEditingDetailChannels([...filled.map((item) => item.channel), ...Array(total - filled.length).fill("")]);
                       setSection5ModalOpen(true);
                     }
                   : undefined
@@ -1683,10 +1697,7 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <h3>The Detail 10 링크 편집</h3>
-              <p className="modal-subtitle">
-                위 대표 결과물 5개를 제외한, 클럽 활동 결과물 중<br />
-                추가로 보여주고 싶은 결과물 링크를 등록해 주세요.
-              </p>
+              <p className="modal-subtitle">위 대표 결과물 5개를 제외한, 클럽 활동 결과물 중 추가로 보여주고 싶은 결과물 링크를 등록해 주세요.</p>
               <button className="modal-close-btn" onClick={() => setSection5ModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
