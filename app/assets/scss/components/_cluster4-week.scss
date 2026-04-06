@@ -2828,8 +2828,7 @@
                 -webkit-box-orient: vertical !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis;
-                word-break: keep-all;
-                overflow-wrap: break-word;
+                word-break: break-all;
                 min-height: calc(2 * 0.9375rem * 1.6);
                 max-height: calc(2 * 0.9375rem * 1.6) !important;
                 position: relative;
@@ -3206,7 +3205,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 9px;
+            margin-bottom: 11px;
             flex-wrap: wrap;
 
             .title-icon {
@@ -3265,7 +3264,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 500;
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
@@ -3282,7 +3281,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 11px;
 
             .sub-icon {
               width: 16px;
@@ -3896,7 +3895,7 @@
           z-index: 10;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-end;
 
           img {
             width: 53px;
@@ -4163,7 +4162,7 @@
           z-index: 10;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-end;
 
           img {
             width: 53px;

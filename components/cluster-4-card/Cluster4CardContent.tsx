@@ -3213,7 +3213,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           ) : (
                             <>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(formatSchool(mask.school(user.university)), 6)}
+                                {truncate(formatSchool(mask.school(user.university)), 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
@@ -3222,7 +3222,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(formatMajor(mask.major(user.major)), 6)}
+                                {truncate(formatMajor(mask.major(user.major)), 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
@@ -3231,7 +3231,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(user.team || "-", 6)}
+                                {truncate(user.team || "-", 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
@@ -3240,7 +3240,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(user.part || "-", 6)}
+                                {truncate(user.part || "-", 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 파트
@@ -3249,7 +3249,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
-                                {truncate(user.nickname, 8)}
+                                {truncate(user.nickname, 5)}
                               </span>
                             </>
                           )}
@@ -3818,19 +3818,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   "-"
                                 ) : (
                                   <>
-                                    <span style={{ display: "inline-block", minWidth: "6ch", maxWidth: "6ch", textAlign: "right", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "90px", maxWidth: "90px", textAlign: "right", overflow: "hidden" }}>
                                       <strong>{(card.supervisorName || "").length > 4 ? (card.supervisorName || "").slice(0, 4) + ".." : card.supervisorName}</strong>
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "9ch", maxWidth: "9ch", textAlign: "right", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "135px", maxWidth: "135px", textAlign: "right", overflow: "hidden" }}>
                                       {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "9ch", maxWidth: "9ch", textAlign: "right", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "135px", maxWidth: "135px", textAlign: "right", overflow: "hidden" }}>
                                       {(card.supervisorCompany || "-").length > 7 ? (card.supervisorCompany || "-").slice(0, 7) + ".." : card.supervisorCompany || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "4ch", maxWidth: "4ch", textAlign: "right", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "60px", maxWidth: "60px", textAlign: "right", overflow: "hidden" }}>
                                       {(card.supervisorPosition || "-").length > 2 ? (card.supervisorPosition || "-").slice(0, 2) + ".." : card.supervisorPosition || "-"}
                                     </span>
                                   </>
