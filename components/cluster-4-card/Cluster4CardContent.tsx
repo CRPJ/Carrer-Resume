@@ -3818,19 +3818,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   "-"
                                 ) : (
                                   <>
-                                    <span style={{ display: "inline-block", minWidth: "90px", maxWidth: "90px", textAlign: "right", overflow: "hidden" }}>
-                                      <strong>{(card.supervisorName || "").length > 4 ? (card.supervisorName || "").slice(0, 4) + ".." : card.supervisorName}</strong>
+                                    <span style={{ display: "inline-block", minWidth: "56px", maxWidth: "56px", textAlign: "left", overflow: "hidden" }}>
+                                      <strong>{(card.supervisorName || "").length > 3 ? (card.supervisorName || "").slice(0, 3) + ".." : card.supervisorName}</strong>
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "135px", maxWidth: "135px", textAlign: "right", overflow: "hidden" }}>
-                                      {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
+                                    <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorDept || "-").length > 6 ? (card.supervisorDept || "-").slice(0, 6) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "135px", maxWidth: "135px", textAlign: "right", overflow: "hidden" }}>
-                                      {(card.supervisorCompany || "-").length > 7 ? (card.supervisorCompany || "-").slice(0, 7) + ".." : card.supervisorCompany || "-"}
+                                    <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorCompany || "-").length > 6 ? (card.supervisorCompany || "-").slice(0, 6) + ".." : card.supervisorCompany || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "60px", maxWidth: "60px", textAlign: "right", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "39px", maxWidth: "39px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
                                       {(card.supervisorPosition || "-").length > 2 ? (card.supervisorPosition || "-").slice(0, 2) + ".." : card.supervisorPosition || "-"}
                                     </span>
                                   </>
