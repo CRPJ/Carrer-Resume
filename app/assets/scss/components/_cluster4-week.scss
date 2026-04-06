@@ -1822,7 +1822,7 @@
                 }
                 .label {
                   color: #a3a3a3;
-                  font-size: 0.875rem !important;
+                  font-size: 1rem !important;
                 }
 
                 .profile-name-row {
@@ -1870,7 +1870,7 @@
                 }
 
                 .profile-details {
-                  font-size: 0.875rem !important;
+                  font-size: 1rem !important;
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.2;
                   white-space: nowrap;
@@ -1880,7 +1880,7 @@
                   display: flex;
                   align-items: baseline;
                   .text {
-                    font-size: 0.875rem !important;
+                    font-size: 1rem !important;
                     min-width: 0 !important;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1891,7 +1891,7 @@
                   }
                   .nickname {
                     color: #f59e0b;
-                    font-size: 0.875rem !important;
+                    font-size: 1rem !important;
                     font-family: "Pretendard", sans-serif;
                     font-weight: 700;
                     flex-shrink: 0;
@@ -2698,7 +2698,7 @@
               }
 
               .card-title {
-                font-size: 0.875rem;
+                font-size: 1rem;
                 font-weight: 500;
                 color: #fef9c3;
                 font-family: "Manrope", sans-serif;
@@ -2828,7 +2828,8 @@
                 -webkit-box-orient: vertical !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis;
-                word-break: break-all;
+                word-break: keep-all;
+                overflow-wrap: break-word;
                 min-height: calc(2 * 0.9375rem * 1.6);
                 max-height: calc(2 * 0.9375rem * 1.6) !important;
                 position: relative;
@@ -3205,7 +3206,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 7px;
+            margin-bottom: 9px;
             flex-wrap: wrap;
 
             .title-icon {
@@ -3215,7 +3216,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3264,7 +3265,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 500;
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
@@ -3273,12 +3274,14 @@
             max-height: 42px;
             max-width: calc(100% - 28px) !important;
             width: 100% !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 8px;
 
             .sub-icon {
@@ -3288,7 +3291,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3766,7 +3769,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3804,12 +3807,14 @@
             max-height: 42px;
             max-width: calc(100% - 28px) !important;
             width: 100% !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             margin-bottom: 0;
 
             .sub-icon {
@@ -3819,7 +3824,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3907,7 +3912,6 @@
             line-height: 20px;
             font-family: "Pretendard", sans-serif;
             margin-top: 4px;
-            margin-right: 20px;
           }
         }
       }
@@ -4060,7 +4064,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -4097,12 +4101,14 @@
             min-height: 42px;
             max-height: 42px;
             max-width: none !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             margin-top: 6px;
             margin-bottom: 8px;
 
@@ -4113,7 +4119,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -4173,7 +4179,6 @@
             line-height: 20px;
             font-family: "Pretendard", sans-serif;
             margin-top: 4px;
-            margin-right: 20px;
           }
         }
       }
@@ -4246,6 +4251,8 @@
           overflow: hidden !important;
           min-height: 42px;
           max-height: 42px;
+          word-break: keep-all;
+          overflow-wrap: break-word;
         }
 
         .supervisor-section {

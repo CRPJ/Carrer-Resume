@@ -33,6 +33,10 @@ export default function ClusterLayout({
 
     let rafId: number | null = null;
     let isFixed = false;
+    let cachedLeft = 0;
+    let cachedWidth = 0;
+    let cachedTop = 0;
+    let lastUpdateTime = 0;
 
     // footer를 사이드바가 덮지 않도록 top을 동적으로 조정
     const computeTop = (zoom: number, height: number) => {
@@ -52,57 +56,57 @@ export default function ClusterLayout({
 
     const apply = () => {
       rafId = null;
-      // 고줌 모드: sticky 비활성화 (CSS가 레이아웃 제어)
-      if (document.documentElement.classList.contains('high-zoom')) {
-        if (isFixed) {
-          shell.style.width = '';
-          shell.style.height = '';
-          inner.style.position = 'relative';
-          inner.style.top = '0';
-          inner.style.left = '0';
-          inner.style.width = '';
-          inner.style.zIndex = '100';
-          isFixed = false;
-        }
-        return;
-      }
 
-      const zoom = 1;
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const shellRect = shell.getBoundingClientRect();
       const headerBottom = getHeaderBottom();
       const shouldFix = shellRect.top <= headerBottom;
 
-      // 고정 진입
+      // ── Case 1: relative → fixed (처음 전환) ──
       if (!isFixed && shouldFix) {
-        const width = shell.offsetWidth;
-        const height = inner.getBoundingClientRect().height;
-        const left = shellRect.left + window.scrollX;
-        const top = computeTop(zoom, height);
+        const height = Math.round(inner.getBoundingClientRect().height / zoom);
+        const top = Math.round(computeTop(zoom, height));
+        const left = Math.round(shellRect.left / zoom);
+        const width = Math.round(shellRect.width / zoom);
 
         shell.style.width = `${width}px`;
-        shell.style.height = `${inner.offsetHeight}px`;
+        shell.style.height = `${height}px`;
 
         inner.style.position = 'fixed';
         inner.style.top = `${top}px`;
-        inner.style.left = `${left - window.scrollX}px`;
+        inner.style.left = `${left}px`;
         inner.style.width = `${width}px`;
         inner.style.zIndex = '9999';
 
+        cachedLeft = left;
+        cachedWidth = width;
+        cachedTop = top;
         isFixed = true;
         return;
       }
 
-      // 고정 상태 유지 중에도 top/left를 갱신 (가로 스크롤 연동)
+      // ── Case 2: fixed 유지 중 (스크롤) — top만 업데이트 ──
       if (isFixed && shouldFix) {
-        const height = inner.getBoundingClientRect().height;
-        const top = computeTop(zoom, height);
-        const pageLeft = shell.getBoundingClientRect().left + window.scrollX;
-        inner.style.top = `${top}px`;
-        inner.style.left = `${pageLeft - window.scrollX}px`;
+        const height = Math.round(inner.getBoundingClientRect().height / zoom);
+        const newTop = Math.round(computeTop(zoom, height));
+        const diff = Math.abs(newTop - cachedTop);
+
+        // footer 근처 소폭 진동(1~9px)은 200ms 쓰로틀
+        if (diff > 0 && diff < 10) {
+          const now = Date.now();
+          if (now - lastUpdateTime < 200) return;
+        }
+
+        // 5px 이상 차이만 반영
+        if (diff >= 5) {
+          inner.style.top = `${newTop}px`;
+          cachedTop = newTop;
+          lastUpdateTime = Date.now();
+        }
         return;
       }
 
-      // 고정 해제
+      // ── Case 3: fixed → relative (해제) ──
       if (isFixed && !shouldFix) {
         shell.style.width = '';
         shell.style.height = '';
@@ -113,6 +117,9 @@ export default function ClusterLayout({
         inner.style.width = '';
         inner.style.zIndex = '100';
 
+        cachedLeft = 0;
+        cachedWidth = 0;
+        cachedTop = 0;
         isFixed = false;
       }
     };
@@ -124,6 +131,9 @@ export default function ClusterLayout({
 
     const handleResize = () => {
       isFixed = false;
+      cachedLeft = 0;
+      cachedWidth = 0;
+      cachedTop = 0;
 
       shell.style.width = '';
       shell.style.height = '';

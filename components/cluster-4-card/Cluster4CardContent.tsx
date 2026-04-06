@@ -3166,7 +3166,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   marginRight: "8px",
                                 }}
                               >
-                                {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
+                                {(user.role || "일반").length > 10 ? (user.role || "일반").slice(0, 10) + ".." : user.role || "일반"}
                               </span>
                             )}
                             <span className="date">{isEmpty ? "0000 - 00 - 00 (일)" : user.date}</span>
@@ -3249,7 +3249,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
-                                {truncate(user.nickname, 4)}
+                                {truncate(user.nickname, 8)}
                               </span>
                             </>
                           )}
@@ -3813,15 +3813,26 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                             <div className={`profile-avatar ${isEmpty ? "empty" : ""}`}>{!isEmpty && card.supervisorImg && <img src={card.supervisorImg} alt="supervisor" />}</div>
                             <div className="profile-text">
                               <span className="supervised-text">Supervised by:</span>
-                              <span className="profile-name">
+                              <span className="profile-name" style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
                                 {isEmpty ? (
                                   "-"
                                 ) : (
                                   <>
-                                    <strong>{card.supervisorName}</strong>
-                                    {card.supervisorDept && <> | {card.supervisorDept}</>}
-                                    {card.supervisorCompany && <> | {card.supervisorCompany}</>}
-                                    {card.supervisorPosition && <> | {card.supervisorPosition}</>}
+                                    <span style={{ display: "inline-block", minWidth: "6ch", maxWidth: "6ch", textAlign: "right", overflow: "hidden" }}>
+                                      <strong>{(card.supervisorName || "").length > 4 ? (card.supervisorName || "").slice(0, 4) + ".." : card.supervisorName}</strong>
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "9ch", maxWidth: "9ch", textAlign: "right", overflow: "hidden" }}>
+                                      {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "9ch", maxWidth: "9ch", textAlign: "right", overflow: "hidden" }}>
+                                      {(card.supervisorCompany || "-").length > 7 ? (card.supervisorCompany || "-").slice(0, 7) + ".." : card.supervisorCompany || "-"}
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "4ch", maxWidth: "4ch", textAlign: "right", overflow: "hidden" }}>
+                                      {(card.supervisorPosition || "-").length > 2 ? (card.supervisorPosition || "-").slice(0, 2) + ".." : card.supervisorPosition || "-"}
+                                    </span>
                                   </>
                                 )}
                               </span>
