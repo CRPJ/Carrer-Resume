@@ -3834,8 +3834,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                       <strong>{(card.supervisorName || "").length > 3 ? (card.supervisorName || "").slice(0, 3) + ".." : card.supervisorName}</strong>
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
-                                      {(card.supervisorDept || "-").length > 6 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
+                                    <span style={{ display: "inline-block", minWidth: "126px", maxWidth: "126px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
                                     <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
