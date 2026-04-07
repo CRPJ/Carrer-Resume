@@ -4,6 +4,8 @@ import Link from "next/link";
 import Animations from "@/components/shared/Animations";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DEMO_CREW_MEMBERS } from "@/constants/dummyData";
 
 interface Crew {
   id: string;
@@ -39,6 +41,14 @@ const ITEMS_PER_PAGE = 50;
 
 const page = () => {
   const { mask } = useDataMasking();
+  const [demoMode, setDemoMode] = useState(false);
+  useEffect(() => { setDemoMode(checkDemoMode()); }, []);
+  const resolveHref = (crew: Crew) => {
+    if (demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)) {
+      return `/cluster-4?userId=${crew.id}&demoName=${encodeURIComponent(crew.name)}`;
+    }
+    return `/cluster-4?userId=${crew.id}`;
+  };
   const [crews, setCrews] = useState<Crew[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -559,7 +569,7 @@ const page = () => {
                     {paginatedCrews.map((crew) => (
                       <div key={crew.id} className="trending__single" style={{ height: "100%" }}>
                         <div className="thumb">
-                          <Link href={`/cluster-4?userId=${crew.id}`} style={{ aspectRatio: "1", overflow: "hidden", maxHeight: "none" }}>
+                          <Link href={resolveHref(crew)} style={{ aspectRatio: "1", overflow: "hidden", maxHeight: "none" }}>
                             {crew.profileImg ? (
                               <img
                                 src={crew.profileImg}
@@ -585,7 +595,7 @@ const page = () => {
                         <div className="content-wrapper">
                           <div className="info">
                             <p className="text-sm fw-6">
-                              <Link href={`/cluster-4?userId=${crew.id}`} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
+                              <Link href={resolveHref(crew)} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
                             </p>
                             <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={`${mask.school(crew.university)} ${mask.major(crew.major)}`}>
                               <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
@@ -595,7 +605,7 @@ const page = () => {
                           <div className="trending__single-footer">
                             <div className="author">
                               <div className="author-meta">
-                                <Link href={`/cluster-4?userId=${crew.id}`} aria-label="view profile" title="view profile">
+                                <Link href={resolveHref(crew)} aria-label="view profile" title="view profile">
                                   <span className="hexagon-wrapper">
                                     {crew.profileImg ? (
                                       <img
@@ -623,7 +633,7 @@ const page = () => {
                                   {crew.totalStars.toLocaleString()}{" "}
                                   <span className="currency">단감</span>
                                 </p>
-                                <Link href={`/cluster-4?userId=${crew.id}`} className="btn--primary text-sm">
+                                <Link href={resolveHref(crew)} className="btn--primary text-sm">
                                   Car
                                   <i className="ti ti-arrow-narrow-right"></i>
                                 </Link>

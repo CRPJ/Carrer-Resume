@@ -6,6 +6,7 @@ const ClusterTabs = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId") || searchParams.get("userID");
+  const demoName = searchParams.get("demoName");
 
   const tabs = [
     { name: "PERSONAL PROFILE", path: "/cluster-2", cluster: 2 },
@@ -58,7 +59,9 @@ const ClusterTabs = () => {
   );
 
   const renderTab = (tab: typeof tabs[0], index: number) => {
-    const tabHref = tab.path && userId ? `${tab.path}?userId=${userId}` : tab.path;
+    const tabHref = tab.path && userId
+      ? `${tab.path}?userId=${userId}${demoName ? `&demoName=${encodeURIComponent(demoName)}` : ''}`
+      : tab.path;
     const active = tab.path ? isActive(tab.path) : false;
 
     if (tab.path) {

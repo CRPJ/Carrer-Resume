@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
-import { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS } from "@/constants/dummyData";
+import { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS, CLUSTER3_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -51,6 +51,8 @@ const Cluster3Content = () => {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
+  const demoNameParam = searchParams.get("demoName");
+  const demoLookupName = demoNameParam || urlUserId;
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
   const isDemoMode = checkDemoMode();
 
@@ -333,11 +335,13 @@ const Cluster3Content = () => {
   useEffect(() => {
     const fetchPortfolioArchives = async () => {
       if (isDemoMode) {
-        setPortfolioArchives(CLUSTER3_DUMMY_ARCHIVES);
-        setPortfolioArchiveChannels(CLUSTER3_DUMMY_ARCHIVE_CHANNELS);
+        const demoUser = demoLookupName || DEFAULT_DEMO_USER;
+        const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
+        setPortfolioArchives(userData.archives);
+        setPortfolioArchiveChannels(userData.archiveChannels);
         const updatedCards = channelCards.map((card, index) => {
-          if (index < 10 && CLUSTER3_DUMMY_ARCHIVES[index]) {
-            return { ...card, link: CLUSTER3_DUMMY_ARCHIVES[index] };
+          if (index < 10 && userData.archives[index]) {
+            return { ...card, link: userData.archives[index] };
           }
           return card;
         });
@@ -429,11 +433,13 @@ const Cluster3Content = () => {
   useEffect(() => {
     const fetchPortfolioOutputs = async () => {
       if (isDemoMode) {
-        setPortfolioOutputs(CLUSTER3_DUMMY_OUTPUTS);
-        setPortfolioOutputChannels(CLUSTER3_DUMMY_OUTPUT_CHANNELS);
+        const demoUser = demoLookupName || DEFAULT_DEMO_USER;
+        const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
+        setPortfolioOutputs(userData.outputs);
+        setPortfolioOutputChannels(userData.outputChannels);
         const updatedSlides = topWorksSlides.map((slide, index) => {
-          if (CLUSTER3_DUMMY_OUTPUTS[index]) {
-            return { ...slide, link: CLUSTER3_DUMMY_OUTPUTS[index] };
+          if (userData.outputs[index]) {
+            return { ...slide, link: userData.outputs[index] };
           }
           return slide;
         });
@@ -522,11 +528,13 @@ const Cluster3Content = () => {
   useEffect(() => {
     const fetchPortfolioDetails = async () => {
       if (isDemoMode) {
-        setPortfolioDetails(CLUSTER3_DUMMY_DETAILS);
-        setPortfolioDetailChannels(CLUSTER3_DUMMY_DETAIL_CHANNELS);
+        const demoUser = demoLookupName || DEFAULT_DEMO_USER;
+        const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
+        setPortfolioDetails(userData.details);
+        setPortfolioDetailChannels(userData.detailChannels);
         const updatedThumbnails = detailThumbnails.map((thumb, index) => {
-          if (CLUSTER3_DUMMY_DETAILS[index]) {
-            return { ...thumb, link: CLUSTER3_DUMMY_DETAILS[index] };
+          if (userData.details[index]) {
+            return { ...thumb, link: userData.details[index] };
           }
           return thumb;
         });
@@ -615,13 +623,15 @@ const Cluster3Content = () => {
   useEffect(() => {
     const fetchReliabilityRate = async () => {
       if (isDemoMode) {
-        setReliabilityRate(CLUSTER3_DUMMY_PROFILE.reliabilityRate);
+        const demoUser = demoLookupName || DEFAULT_DEMO_USER;
+        const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
+        setReliabilityRate(userData.profile.reliabilityRate);
         setHasReliabilityData(true);
-        setEngName(CLUSTER3_DUMMY_PROFILE.engName);
-        setPointsData(CLUSTER3_DUMMY_PROFILE.pointsData);
-        setGradeStats(CLUSTER3_DUMMY_PROFILE.gradeStats);
-        setTopPercent(CLUSTER3_DUMMY_PROFILE.gradeStats.avgPercentile);
-        setGrowthPeriodStats(CLUSTER3_DUMMY_PROFILE.growthPeriodStats);
+        setEngName(userData.profile.engName);
+        setPointsData(userData.profile.pointsData);
+        setGradeStats(userData.profile.gradeStats);
+        setTopPercent(userData.profile.gradeStats.avgPercentile);
+        setGrowthPeriodStats(userData.profile.growthPeriodStats);
         return;
       }
       if (!session?.user?.email && !urlUserId) {

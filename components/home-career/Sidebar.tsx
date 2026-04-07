@@ -252,18 +252,37 @@ const Sidebar = () => {
     photo: string;
   } | null>(null);
 
-  // 데모 모드 사용자별 sidebar 더미 데이터 분기
+  // 데모 모드 사용자별 sidebar 더미 데이터 분기 (targetUserId 없을 때만 적용)
   useEffect(() => {
     if (!demoMode || !targetUserId) return;
-    const fetchDemoName = async () => {
-      try {
-        const res = await fetch(`/api/profile/?userId=${targetUserId}`);
-        if (!res.ok) return;
-        const json = await res.json();
-        const name = json.data?.display_name || null;
-        if (!name) return;
+    // targetUserId가 있으면 sidebar는 실제 API 데이터를 표시 (cluster2/3 더미와 별개)
+    return;
+    const applyDemoByName = () => {
+      // 데모 모드에서는 URL의 userId를 이름으로 직접 사용
+      const name = decodeURIComponent(targetUserId);
 
         const demoProfiles: Record<string, typeof DUMMY_USER_PROFILE> = {
+          윤재윤: DUMMY_USER_PROFILE,
+          안지혜: {
+            name: "안지혜",
+            nameEng: "AN JIHYE",
+            gender: "여",
+            birthDate: "1999.07.10",
+            city: "대전광역시",
+            district: "유성구",
+            phone: "010-5555-6666",
+            email: "jihye.an@gmail.com",
+            school: "성균관대학교",
+            major: "소프트웨어학과",
+            major2: "",
+            major3: "",
+            enrollPeriod: "2018.03 - 2022.02",
+            graduationStatus: "졸업",
+            gpa: "4.4",
+            gpaMax: "4.5",
+            quote: "끊임없이 배우고 의심하는 것이 개발자의 기본 자세라 믿습니다",
+            photo: "/images/0/crew profile/여 1.jpg",
+          },
           전민경: {
             name: "전민경",
             nameEng: "JEON MINKYUNG",
@@ -327,8 +346,9 @@ const Sidebar = () => {
         };
 
         const demoStats: Record<string, { reliability: number; completion: number; stars: number; lightnings: number; shields: number; info: number; competency: number; experience: number; career: number; status: "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge" }> = {
+          윤재윤: { reliability: 87, completion: 90, stars: 25, lightnings: 8, shields: 12, info: 10, competency: 60, experience: 200, career: 4, status: "Running" },
+          안지혜: { reliability: 95, completion: 96, stars: 33, lightnings: 4, shields: 22, info: 18, competency: 130, experience: 450, career: 7, status: "Complete" },
           전민경: { reliability: 85, completion: 93, stars: 150, lightnings: 99999, shields: 88, info: 15, competency: 120, experience: 500, career: 8, status: "Running" },
-          안지혜: { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: "Recharging" },
           곽예원: { reliability: 42, completion: 67, stars: 50, lightnings: 200, shields: 0, info: 8, competency: 45, experience: 120, career: 3, status: "On Rest" },
           김의환: { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: "Next Challenge" },
         };
@@ -347,11 +367,8 @@ const Sidebar = () => {
           setPracticalCareer(s.career);
           setCrewStatus(s.status);
         }
-      } catch {
-        // API 실패 시 기존 윤재윤 더미 유지
-      }
     };
-    fetchDemoName();
+    applyDemoByName();
   }, [demoMode, targetUserId]);
 
   // Hydration 에러 방지를 위한 마운트 상태
@@ -363,8 +380,8 @@ const Sidebar = () => {
     const checked = checkDemoMode();
     setDemoMode(checked);
     setTabBg(IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
-    if (checked) {
-      // demo 모드면 더미 데이터 일괄 주입
+    if (checked && !targetUserId) {
+      // demo 모드 + 본인 프로필일 때만 더미 데이터 주입 (특정 크루 조회 시는 실제 API 사용)
       setReliabilityRate(DUMMY_SIDEBAR_EXTRA.reliabilityRate);
       setHasReliabilityData(true);
       setCompletionRate(DUMMY_SIDEBAR_EXTRA.completionRate);
