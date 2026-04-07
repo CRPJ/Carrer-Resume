@@ -8498,3 +8498,11 @@
     }
   }
 }
+
+// work-exp-section 전용 word-break override (work-ability/work-career에 영향 없음)
+.work-exp-section {
+  .main-desc,
+  .sub-desc {
+    word-break: break-all !important;
+  }
+}
