@@ -3689,6 +3689,8 @@
               display: flex;
               align-items: center;
               gap: 8px;
+              transform: scale(1.6);
+              transform-origin: left top;
 
               .stars {
                 display: flex;
