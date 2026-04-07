@@ -3205,7 +3205,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 11px;
+            margin-bottom: 7px;
             flex-wrap: wrap;
 
             .title-icon {
@@ -3264,7 +3264,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 500;
-            margin: 0 0 6px 0;
+            margin: 0 0 10px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
@@ -3281,7 +3281,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 11px;
+            margin-bottom: 7px;
 
             .sub-icon {
               width: 16px;
@@ -3797,7 +3797,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 500;
-            margin: 0;
+            margin: -4px 0 4px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
@@ -3837,6 +3837,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 400;
+            margin: -4px 0 4px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
