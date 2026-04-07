@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
-import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
+import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
 interface Cluster4CardContentProps {
   weekId: string;
@@ -67,9 +67,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
-  const isDemoMode = checkDemoMode();
+  // SSR/client hydration 일관성을 위해 stateful — 첫 렌더 SSR=client=false, 마운트 후 localStorage 값 반영
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  // NICKNAME_COLOR_OFFSET도 Math.random() 호출이 SSR/client 다른 값을 만들어 hydration mismatch 발생 → stateful
+  const [nicknameColorOffset, setNicknameColorOffset] = useState(0);
+  useEffect(() => {
+    setIsDemoMode(checkDemoMode());
+    setIsMounted(true);
+    setNicknameColorOffset(Math.floor(Math.random() * 4));
+  }, []);
   const NICKNAME_COLORS = ["rgba(101, 227, 255, 1)", "rgba(255, 97, 97, 1)", "rgba(157, 250, 7, 1)", "rgba(255, 234, 72, 1)"];
-  const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
+  const NICKNAME_COLOR_OFFSET = nicknameColorOffset;
 
   const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
     const t = text || "-";
@@ -122,7 +131,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // DB에서 가져온 주차 데이터 상태
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
-  const [isLoadingWeek, setIsLoadingWeek] = useState(!isDemoMode);
+  const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
   const [teamName, setTeamName] = useState<string | null>("미디어");
@@ -669,6 +678,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
+    // 마운트 전엔 isDemoMode가 확정되지 않았으므로 아무것도 안 함 (SSR/client hydration 일관성)
+    if (!isMounted) return;
     if (isDemoMode) {
       // weekId로 공유 더미 데이터 조회 (cluster-4 시즌 페이지와 동기화)
       const dummyWeek = DUMMY_WEEKLY_LIST.find((w) => w.id === weekId);
@@ -712,12 +723,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         setCumulativeInjeolmi(dummyExtra.points.shield);
       }
 
-      // 데모 모드 실무 경력 더미 데이터
-      setCareerRecords(getDemoCareerRecords(weekId));
+      // Phase 1 (dw-01 외부 파일 이관): DUMMY_WEEK_CARD에 해당 주차가 있으면 외부 데이터 사용.
+      // 없으면 기존 getDemoCareerRecords/getDemoActivityRecords로 fallback.
+      const cardData = DUMMY_WEEK_CARD[weekId];
+      if (cardData) {
+        setWeeklyActivities(cardData.weeklyActivities);
+        setWeekActivityDetails(cardData.weekActivityDetails);
+        setWeekActivityRecords(cardData.weekActivityRecords);
+        setCareerRecords(cardData.careerRecords);
+      } else {
+        // fallback: 기존 로직
+        setCareerRecords(getDemoCareerRecords(weekId));
+        setWeekActivityRecords(getDemoActivityRecords(weekId));
+      }
       setCareerPage(0);
-
-      // 데모 모드 활동 레코드 (역량/경험 강화실패 분산)
-      setWeekActivityRecords(getDemoActivityRecords(weekId));
 
       // 이전/다음 주차 ID 설정 (내림차순: index-1 = 더 최근(다음), index+1 = 더 과거(이전))
       const weekIndex = DUMMY_WEEKLY_LIST.findIndex((w) => w.id === weekId);
@@ -1216,7 +1235,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     fetchWeekData();
-  }, [weekId, urlUserId]);
+  }, [weekId, urlUserId, isDemoMode, isMounted]);
 
   // DB에서 실무 경력 데이터 가져오기
   // career-records는 urlUserId가 있으면 Stage 1에서 이미 로드됨 (earlyCareerResult)
@@ -3834,7 +3853,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                       {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "96px", maxWidth: "96px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                    <span style={{ display: "inline-block", minWidth: "100px", maxWidth: "100px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
                                       {(card.supervisorCompany || "-").length > 6 ? (card.supervisorCompany || "-").slice(0, 6) + ".." : card.supervisorCompany || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>

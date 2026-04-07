@@ -4262,7 +4262,7 @@
 
         .main-desc-white {
           width: 100%;
-          max-width: calc(100% - 28px) !important;
+          max-width: calc(100% - 16px) !important;
           font-size: 14px;
           color: #fff;
           line-height: 21px;
@@ -4275,7 +4275,7 @@
           overflow: hidden !important;
           min-height: 42px;
           max-height: 42px;
-          word-break: keep-all;
+          word-break: break-all;
           overflow-wrap: break-word;
         }
 

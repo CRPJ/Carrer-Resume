@@ -81,7 +81,7 @@ export const DUMMY_WEEK_EXTRA: Record<
   "dw-02": {
     // 실패
     points: { star: 999, shield: 999, lightning: 999 },
-    teamPart: { teamName: "콘텐츠", partName: "팬마케팅" },
+    teamPart: { teamName: "일이삼사오육칠팔구십", partName: "일이삼사오육칠팔구십" },
     roleLabel: "운영진(앰배서더)",
     growthRate: { rate: 15, count: 3, total: 20 },
     infoRate: { rate: 25, count: 1, total: 4 },

@@ -1,227 +1,458 @@
 // constants/dummyData/cluster4-card-dummy.ts
 // TODO: 더미 데이터 — 기획자 확인용, 실서버 노출 안 됨
+// Phase 1: dw-01 주차만 외부 파일로 이관. 나머지 주차는 Cluster4CardContent.tsx의
+// 기존 useState 초기값 + getDemoCareerRecords/getDemoActivityRecords로 fallback.
 
-import { randomCrewProfile } from "@/utils/randomImage";
+// ─────────────────────────────────────────────────────────────
+// 타입 정의 (Cluster4CardContent.tsx의 로컬 interface와 구조적 호환)
+// ─────────────────────────────────────────────────────────────
 
-export const DUMMY_WEEK_CARD_DATA = {
-  // === 상단: 주차 제목 + 배지 ===
-  title: "2025 여름 시즌, 3주차",
-  growthStatus: "성장(성공)",
-  date: "2025 - 03 - 23 (월) ~ 2025 - 03 - 30 (일)",
-  role: "운영진(앰배서더)",
-  weekNumber: 25,
-  totalWeeks: 30,
-  team: "미디어일이삼사오육칠팔",
-  part: "웹툰드라마일이삼사오육",
-  stats: { dangam: 25, injeolmi: 30, eoheung: 2 },
+export interface OutputLink {
+  desc: string;
+  url: string;
+}
 
-  // === 주차 평판 카드 (최소/중간/최대 글자수 혼합) ===
-  reputations: [
-    {
-      id: "rep-1",
-      name: "김아", // 최소 (2자)
-      gender: "여",
-      age: 24,
-      school: "한대", // 최소 (2자)
-      schoolSuffix: "학교",
-      major: "경영", // 최소 (2자)
-      majorSuffix: "학과",
-      team: "기획", // 최소 (2자)
-      teamSuffix: "팀",
-      part: "전략파", // 최소 (3자)
-      partSuffix: "트",
-      nickname: "별명짧", // 최소 (3자)
-      rating: 3,
-      ratingMax: 10,
-      comment: "짧은코멘트입니다", // 최소 (~10자)
-      fmScore: 1, // 1자리
-      tag: "#힘", // 최소 (2자)
-      tagColor: "#00FFBE",
-      profileImage: randomCrewProfile(),
-    },
-    {
-      id: "rep-2",
-      name: "박준혁", // 중간 (3자)
-      gender: "남",
-      age: 25,
-      school: "성균관", // 중간 (3자)
-      schoolSuffix: "대학교",
-      major: "컴퓨터공학", // 중간 (5자)
-      majorSuffix: "과",
-      team: "마케팅전략", // 중간 (4자)
-      teamSuffix: "팀",
-      part: "브랜드콘텐", // 중간 (4자)
-      partSuffix: "츠파트",
-      nickname: "디지털마케터", // 중간 (6자)
-      rating: 7,
-      ratingMax: 10,
-      comment: "이번시즌에서가장인상깊었던점은팀워크였습니다정말로", // 중간 (~30자)
-      fmScore: 42, // 2자리
-      tag: "#추진력있는사람", // 중간 (7자)
-      tagColor: "#EBF748",
-      profileImage: randomCrewProfile(),
-    },
-    {
-      id: "rep-3",
-      name: "알렉산더최", // 최대 (5자)
-      gender: "남",
-      age: 23,
-      school: "한국예술종합", // 최대 (6자)
-      schoolSuffix: "학교",
-      major: "미디어커뮤니케이션", // 최대 (9자)
-      majorSuffix: "학과",
-      team: "엔터테인먼트사업", // 최대 (7자)
-      teamSuffix: "팀",
-      part: "글로벌마케팅전", // 최대 (7자)
-      partSuffix: "략파트",
-      nickname: "엔비디아구글테슬라쿵", // 최대 (10자)
-      rating: 10,
-      ratingMax: 10,
-      comment: "이번시즌을통해서정말많은것을배웠고특히마케팅전략수립과실행그리고팀원들과의협업과정에서크게성장했다고생각합니다앞으로도계속해서노력", // 최대 (~80자)
-      fmScore: 999, // 3자리
-      tag: "#추진력추진력추진력력", // 최대 (10자)
-      tagColor: "#48F768",
-      profileImage: randomCrewProfile(),
-    },
-  ],
+export interface WeeklyActivity {
+  id: string;
+  activity_type_id: string;
+  title: string | null;
+  is_active: boolean;
+  opened_at: string | null;
+  output_links: OutputLink[] | null;
+}
 
-  // === 연계 동료 (최소/중간/최대 글자수 혼합) ===
-  colleagues: [
-    {
-      id: "col-1",
-      name: "이수", // 최소 (2자)
-      gender: "여",
-      age: 22,
-      school: "서대", // 최소 (2자)
-      schoolSuffix: "학교",
-      major: "사회", // 최소 (2자)
-      majorSuffix: "학과",
-      team: "기획", // 최소 (2자)
-      teamSuffix: "팀",
-      part: "전략파", // 최소 (3자)
-      partSuffix: "트",
-      nickname: "전략가", // 최소 (3자)
-      date: "2026-03-01 (토)",
-      profileImage: randomCrewProfile(),
-    },
-    {
-      id: "col-2",
-      name: "정민수", // 중간 (3자)
-      gender: "남",
-      age: 26,
-      school: "성균관", // 중간 (3자)
-      schoolSuffix: "대학교",
-      major: "컴퓨터공학", // 중간 (5자)
-      majorSuffix: "과",
-      team: "마케팅전략", // 중간 (4자)
-      teamSuffix: "팀",
-      part: "브랜드콘텐", // 중간 (4자)
-      partSuffix: "츠파트",
-      nickname: "코딩마스터", // 중간 (5자)
-      date: "2026-03-02 (일)",
-      profileImage: randomCrewProfile(),
-    },
-    {
-      id: "col-3",
-      name: "알렉산더최", // 최대 (5자)
-      gender: "여",
-      age: 24,
-      school: "한국예술종합", // 최대 (6자)
-      schoolSuffix: "학교",
-      major: "미디어커뮤니케이션", // 최대 (9자)
-      majorSuffix: "학과",
-      team: "엔터테인먼트사업", // 최대 (7자)
-      teamSuffix: "팀",
-      part: "글로벌마케팅전", // 최대 (7자)
-      partSuffix: "략파트",
-      nickname: "엔비디아구글테슬라쿵", // 최대 (10자)
-      date: "2026-03-03 (월)",
-      profileImage: randomCrewProfile(),
-    },
-  ],
+export interface ActivityDetail {
+  week_id: string;
+  activity_type_id: string;
+  sub_title: string | null;
+  output_links: OutputLink[] | null;
+}
 
-  // === 주차 성장률 ===
-  growthRate: {
-    total: 15,
-    completed: 9,
-    rate: 60,
+export interface ActivityRecord {
+  week_id: string;
+  activity_type_id: string;
+  is_completed: boolean;
+}
+
+export interface CareerRecord {
+  // 프로젝트 정보
+  id: string;
+  project_id: string;
+  week_id: string;
+  company_name: string;
+  company_logo_url: string | null;
+  job_position: string;
+  project_name: string | null;
+  project_description: string | null;
+  line_code: string | null;
+  line_name: string | null;
+  output_links: { desc: string; url: string }[] | null;
+  secondary_info_deadline: string | null;
+  created_at: string;
+  weeks?: {
+    id: string;
+    week_number: number;
+    start_date: string;
+    end_date: string;
+    season_id: string;
+    seasons?: {
+      id: string;
+      year: number;
+      name: string;
+    };
+  };
+  // 사용자 기록 상태
+  record_id: string | null;
+  user_id: string;
+  enhancement_status: "not_applicable" | "pending" | "enhanced" | "failed";
+  grade: string | null;
+  grade_points: number | null;
+  career_code: string | null;
+  // 감독자 정보
+  supervisor_name: string | null;
+  supervisor_position: string | null;
+  supervisor_department: string | null;
+  supervisor_company: string | null;
+  supervisor_profile_img: string | null;
+}
+
+// 주차별 카드 더미 데이터 컨테이너
+export interface WeekCardDummyData {
+  weeklyActivities: WeeklyActivity[];
+  weekActivityDetails: ActivityDetail[];
+  weekActivityRecords: ActivityRecord[];
+  careerRecords: CareerRecord[];
+}
+
+// ─────────────────────────────────────────────────────────────
+// 주차별 더미 데이터 (Phase 1: dw-01만 이관)
+// ─────────────────────────────────────────────────────────────
+
+export const DUMMY_WEEK_CARD: Record<string, WeekCardDummyData> = {
+  "dw-01": {
+    // ── weeklyActivities: 실무 정보/역량/경험 활동별 title (main-desc 원본) ──
+    weeklyActivities: [
+      { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-4", activity_type_id: "calendar", title: "일이삼사오육칠팔구십 일이삼사오육칠팔구십 일이삼사오육칠팔구십", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-5", activity_type_id: "forum", title: "짧은 글", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-7", activity_type_id: "practical_lecture", title: "우주는 얼마나 클까?", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      {
+        id: "wa-8",
+        activity_type_id: "comp-1",
+        title: "시간이 지나면 더 멀리 있는 우주에서 출발한 빛도 우리에게 올 수 있겠죠. 그래서 관측 가능한 우주는 앞으로 100억 년이 더 흐르면 당연히 더 커지겠죠. 지금은 관측 가능한 우주가 460억 광년 정도의 반지름을 갖습니다. 다시 말하면 현재 460억 광년 거리에 있는 우주는 관측이 가능합니다.",
+        is_active: true,
+        opened_at: "2025-01-01T00:00:00Z",
+        output_links: [],
+      },
+      { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-comp-4", activity_type_id: "comp-4", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-9", activity_type_id: "exp-1", title: "안타깝게도 아직 우주의 끝을 확인할 수 있는 기술은 존재하지 않습니다. 하지만 현재까지의 연구결과를 보면 우주는 무한할 것 같습니다. 지구라는 한정된 공간에서 평생을 살아가는", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-11", activity_type_id: "exp-3", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-12", activity_type_id: "exp-4", title: "퍼포먼스 마케팅 캠페인 ROAS 분석 및 예산 재배분 최적화 전략 수립", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    ],
+
+    // ── weekActivityDetails: 실무 역량/경험 활동별 sub_title (sub-desc 원본) ──
+    weekActivityDetails: [
+      {
+        week_id: "dw-01",
+        activity_type_id: "comp-1",
+        sub_title:
+          "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
+        output_links: [],
+      },
+      { week_id: "dw-01", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "comp-3", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "exp-1", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
+      {
+        week_id: "dw-01",
+        activity_type_id: "exp-3",
+        sub_title:
+          "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
+        output_links: [],
+      },
+      { week_id: "dw-01", activity_type_id: "exp-4", sub_title: "구글 애즈와 메타 광고 플랫폼을 활용한 퍼포먼스 마케팅 캠페인 최적화 실습 결과 보고서: ROAS 분석 포함", output_links: [] },
+    ],
+
+    // ── weekActivityRecords: getDemoActivityRecords("dw-01") 결과 반영 ──
+    // caseNum = 1 % 10 = 1 → comp 전부 true, exp 전부 true, info 전부 true (17개)
+    weekActivityRecords: [
+      { week_id: "dw-01", activity_type_id: "wisdom", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "essay", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "infodesk", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "calendar", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "forum", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "session", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "practical_lecture", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "community", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "etc_a", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "comp-1", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "comp-2", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "comp-3", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "comp-4", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "exp-1", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "exp-2", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "exp-3", is_completed: true },
+      { week_id: "dw-01", activity_type_id: "exp-4", is_completed: true },
+    ],
+
+    // ── careerRecords: getDemoCareerRecords("dw-01") 결과 반영 ──
+    // caseNum = 1 % 6 = 1 → 4개 카드 (네이버, 일이삼사..., 라인, 쿠팡)
+    // grade_points는 Math.random() 제거하고 고정값 사용
+    careerRecords: [
+      {
+        id: "cr-demo-1",
+        project_id: "p-demo-1",
+        week_id: "dw-01",
+        company_name: "네이버",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+        job_position: "네이버 마케팅",
+        project_name: "네이버 마케팅 캠페인 기획 및 실행 프로젝트 그리고 일이삼사오육칠팔구십 네이버 마케팅 캠페인 기획 및 실행 프로젝트 일이삼사오육칠팔구십",
+        project_description: "마케팅 캠페인 전략 가나다라마사 아자차카파타하 가나다라마바사 일이삼사오육칠팔구십 안녕하세요 감사해요 잘있어요 다시 만나요",
+        line_code: "BC11-10001",
+        line_name: "네이버 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-1",
+        user_id: "u1",
+        enhancement_status: "enhanced",
+        grade: "S",
+        grade_points: 85,
+        career_code: "BC11-10001",
+        supervisor_name: "박서연",
+        supervisor_position: "과장",
+        supervisor_department: "네이버 마케팅팀",
+        supervisor_company: "네이버",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+      },
+      {
+        id: "cr-demo-2",
+        project_id: "p-demo-2",
+        week_id: "dw-01",
+        company_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+        job_position: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅",
+        project_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅 캠페인 기획 및 실행 프로젝트",
+        project_description: "소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석",
+        line_code: "CD12-10002",
+        line_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-2",
+        user_id: "u1",
+        enhancement_status: "enhanced",
+        grade: "A",
+        grade_points: 72,
+        career_code: "CD12-10002",
+        supervisor_name: "조워싱턴",
+        supervisor_position: "팀장",
+        supervisor_department: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅팀",
+        supervisor_company: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+      },
+      {
+        id: "cr-demo-3",
+        project_id: "p-demo-3",
+        week_id: "dw-01",
+        company_name: "라인",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+        job_position: "라인 마케팅",
+        project_name: "라인 해당 프로젝트",
+        project_description: "짧게 짧게 가보자",
+        line_code: "DE13-10003",
+        line_name: "라인 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-3",
+        user_id: "u1",
+        enhancement_status: "not_applicable",
+        grade: null,
+        grade_points: 0,
+        career_code: "DE13-10003",
+        supervisor_name: "이지은",
+        supervisor_position: "차장",
+        supervisor_department: "라인 마케팅팀",
+        supervisor_company: "라인",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+      },
+      {
+        id: "cr-demo-4",
+        project_id: "p-demo-4",
+        week_id: "dw-01",
+        company_name: "쿠팡",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+        job_position: "쿠팡 마케팅",
+        project_name: "쿠팡 해당 프로젝트",
+        project_description: null,
+        line_code: "EF14-10004",
+        line_name: "쿠팡 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-4",
+        user_id: "u1",
+        enhancement_status: "not_applicable",
+        grade: null,
+        grade_points: 0,
+        career_code: "EF14-10004",
+        supervisor_name: "최수현",
+        supervisor_position: "부장",
+        supervisor_department: "쿠팡 마케팅팀",
+        supervisor_company: "쿠팡",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+      },
+    ],
   },
+  "dw-02": {
+    // ── weeklyActivities: 실무 정보/역량/경험 활동별 title (main-desc 원본) ──
+    weeklyActivities: [
+      { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-4", activity_type_id: "calendar", title: "일이삼사오육칠팔구십 일이삼사오육칠팔구십 일이삼사오육칠팔구십", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-5", activity_type_id: "forum", title: "짧은 글", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-7", activity_type_id: "practical_lecture", title: "우주는 얼마나 클까?", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      {
+        id: "wa-8",
+        activity_type_id: "comp-1",
+        title: "시간이 지나면 더 멀리 있는 우주에서 출발한 빛도 우리에게 올 수 있겠죠. 그래서 관측 가능한 우주는 앞으로 100억 년이 더 흐르면 당연히 더 커지겠죠. 지금은 관측 가능한 우주가 460억 광년 정도의 반지름을 갖습니다. 다시 말하면 현재 460억 광년 거리에 있는 우주는 관측이 가능합니다.",
+        is_active: true,
+        opened_at: "2025-01-01T00:00:00Z",
+        output_links: [],
+      },
+      { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-comp-4", activity_type_id: "comp-4", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-9", activity_type_id: "exp-1", title: "안타깝게도 아직 우주의 끝을 확인할 수 있는 기술은 존재하지 않습니다. 하지만 현재까지의 연구결과를 보면 우주는 무한할 것 같습니다. 지구라는 한정된 공간에서 평생을 살아가는", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-11", activity_type_id: "exp-3", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+      { id: "wa-12", activity_type_id: "exp-4", title: "퍼포먼스 마케팅 캠페인 ROAS 분석 및 예산 재배분 최적화 전략 수립", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    ],
 
-  // === 실무 4섹션 ===
-  workSections: {
-    info: {
-      total: 7,
-      completed: 5,
-      rate: 71,
-      cards: [
-        { category: "위즈덤", categoryColor: "#FF4A4A", status: "success", mainTitle: "Main Title", body: "CU의 무덤이 몽골에 이어 하와이까지 엽습하는 가운데, 한국 유통업계가 돌파해나가야 하는 코스피는 어디가 쌍봉 양대 산맥일지가 관건입니다. 80일이삼사오육칠팔구십" },
-        { category: "에세이", categoryColor: "#EBF748", status: "failed", mainTitle: "Main Title", body: "짧은 본문 텍스트입니다" },
-        { category: "인포데스크", categoryColor: "#8F00FF", status: "failed", mainTitle: "Main Title", body: "중간 길이의 본문 텍스트로 대략 서른자 정도 되는 분량을 채워봅니다" },
-        { category: "캘린더", categoryColor: "#00FFBE", status: "success", mainTitle: "Main Title", body: "최대 길이 테스트용 본문으로 가능한 한 많은 글자를 채워서 UI가 어디까지 버틸 수 있는지 확인하는 목적의 더미 텍스트이며 팔십자를 목표로 작성하고 있습니다" },
-        { category: "포럼", categoryColor: "#48F768", status: "success", mainTitle: "Main Title", body: "포럼 콘텐츠 본문 샘플" },
-        { category: "세션", categoryColor: "#48F7EE", status: "success", mainTitle: "Main Title", body: "세션 참여 후기 및 인사이트 공유 내용" },
-        { category: "기타a", categoryColor: "#FFFFFF", status: "success", mainTitle: "Main Title", body: "기타 활동 기록" },
-      ],
-    },
-    ability: {
-      total: 1,
-      completed: 1,
-      rate: 100,
-      cards: [
-        {
-          code: "CP09 - UN010",
-          category: "[실무 Info]인하우스 & 에이전시",
-          rating: 6,
-          mainBody: "[마케팅 실무] 현업에서 마케팅 업계를 구성하고 있는 인하우스 와 에이전시 의 개념, 그리고 내부 속성을 알아보자구!",
-          subBody: "실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력 매79..",
-        },
-      ],
-    },
-    experience: {
-      total: 3,
-      completed: 2,
-      rate: 67,
-      cards: [
-        {
-          code: "EX01 - SFA01",
-          category: "[커리어]마케터 Launch",
-          rating: 6,
-          mainBody: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"',
-          subBody: "실무 역량의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재가 매력적으로 보이나 보이지 않나 보일까 보이지 않을까 보이는가 안 보이는가 보여 93...",
-        },
-        { code: "EX02 - RUA99", category: "[생산성]상호 피드백", rating: 6, mainBody: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"', subBody: "짧은 서브 텍스트" },
-        { code: "EX03 - RUA99", category: "[콘텐츠]마케팅 실무", rating: 6, mainBody: "[콘텐츠 마케팅] \"어떤 제품/서비스더라도, 마케터가 제대로 '표현' 하지 못한다면, 그저 '낙서' 에 불과해.\"", subBody: "중간 길이의 서브타이틀 텍스트로 이 정도면 적당한 분량이 됩니다" },
-      ],
-    },
-    career: {
-      total: 5,
-      completed: 3,
-      rate: 60,
-      cards: [
-        { grade: "S", date: "2025-12-22 (월)", supervisorName: "김아", supervisorRole: "기획팀 | 네이버 | 사원", categoryTag: "마케팅(바이럴)", currentBid: "0,99", mainBody: "짧은 경력 메인 타이틀", subBody: "짧은 서브", profileImage: randomCrewProfile() },
-        {
-          grade: "A",
-          date: "2025-12-22 (월)",
-          supervisorName: "박준혁",
-          supervisorRole: "브랜드마케팅 | 에스엠엔터테인먼트 | 과장",
-          categoryTag: "마케팅(바이럴) 혹시 몰라",
-          currentBid: "0,99",
-          mainBody: "실무 역량의 메인타이틀이 브랜딩 입장에서 어디까지 소화되고 보여져야 UI상 문제가 없을지...",
-          subBody: "실무 경력의 서브타이틀이 50자면 어디까지 보일지 관건이고 이 사용자가 활용한 소재의 매력도가 보여지나",
-          profileImage: randomCrewProfile(),
-        },
-        {
-          grade: "D",
-          date: "2025-12-22 (월)",
-          supervisorName: "알렉산더워싱턴최",
-          supervisorRole: "글로벌마케팅전략사업부 | 에스엠엔터테인먼트코리아글로벌 | 수석매니저",
-          categoryTag: "콘텐츠마케팅(퍼포먼스바이럴) 혹시 모를 카테고리",
-          currentBid: "999,999",
-          mainBody: "최대길이메인타이틀로이정도면충분히길텍스트가될것이라고생각하며브랜딩관점에서어디까지소화가능한지확인하는목적으로작성합니다아마도이정도면충분할것",
-          subBody: "최대길이서브타이틀로가능한한많은글자를채워서어디까지보이는지확인하려는목적의텍스트이며구십삼자정도를목표로쓰고있습니다만약더필요하면더추가하겠습니다여기까지",
-          profileImage: randomCrewProfile(),
-        },
-      ],
-    },
+    // ── weekActivityDetails: 실무 역량/경험 활동별 sub_title (sub-desc 원본) ──
+    weekActivityDetails: [
+      {
+        week_id: "dw-02",
+        activity_type_id: "comp-1",
+        sub_title:
+          "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
+        output_links: [],
+      },
+      { week_id: "dw-01", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "comp-3", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "exp-1", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
+      { week_id: "dw-01", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
+      {
+        week_id: "dw-02",
+        activity_type_id: "exp-3",
+        sub_title:
+          "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
+        output_links: [],
+      },
+      { week_id: "dw-01", activity_type_id: "exp-4", sub_title: "구글 애즈와 메타 광고 플랫폼을 활용한 퍼포먼스 마케팅 캠페인 최적화 실습 결과 보고서: ROAS 분석 포함", output_links: [] },
+    ],
+
+    // ── weekActivityRecords: getDemoActivityRecords("dw-01") 결과 반영 ──
+    // caseNum = 1 % 10 = 1 → comp 전부 true, exp 전부 true, info 전부 true (17개)
+    weekActivityRecords: [
+      { week_id: "dw-02", activity_type_id: "wisdom", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "essay", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "infodesk", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "calendar", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "forum", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "session", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "practical_lecture", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "community", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "etc_a", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "comp-1", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "comp-2", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "comp-3", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "comp-4", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "exp-1", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "exp-2", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "exp-3", is_completed: true },
+      { week_id: "dw-02", activity_type_id: "exp-4", is_completed: true },
+    ],
+
+    // ── careerRecords: getDemoCareerRecords("dw-02") 결과 반영 ──
+    // caseNum = 1 % 6 = 1 → 4개 카드 (네이버, 일이삼사..., 라인, 쿠팡)
+    // grade_points는 Math.random() 제거하고 고정값 사용
+    careerRecords: [
+      {
+        id: "cr-demo-1",
+        project_id: "p-demo-1",
+        week_id: "dw-02",
+        company_name: "네이버",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+        job_position: "네이버 마케팅",
+        project_name: "네이버 마케팅 캠페인 기획 및 실행 프로젝트 그리고 일이삼사오육칠팔구십 네이버 마케팅 캠페인 기획 및 실행 프로젝트 일이삼사오육칠팔구십",
+        project_description: "마케팅 캠페인 전략 가나다라마사 아자차카파타하 가나다라마바사 일이삼사오육칠팔구십 안녕하세요 감사해요 잘있어요 다시 만나요",
+        line_code: "BC11-10001",
+        line_name: "네이버 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-1",
+        user_id: "u1",
+        enhancement_status: "enhanced",
+        grade: "S",
+        grade_points: 85,
+        career_code: "BC11-10001",
+        supervisor_name: "박서연",
+        supervisor_position: "과장",
+        supervisor_department: "네이버 마케팅팀",
+        supervisor_company: "네이버",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+      },
+      {
+        id: "cr-demo-2",
+        project_id: "p-demo-2",
+        week_id: "dw-02",
+        company_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+        job_position: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅",
+        project_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅 캠페인 기획 및 실행 프로젝트",
+        project_description: "소셜미디어 채널별 바이럴 콘텐츠 전략 수립 및 성과 분석",
+        line_code: "CD12-10002",
+        line_name: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-2",
+        user_id: "u1",
+        enhancement_status: "enhanced",
+        grade: "A",
+        grade_points: 72,
+        career_code: "CD12-10002",
+        supervisor_name: "조워싱턴",
+        supervisor_position: "팀장",
+        supervisor_department: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십 마케팅팀",
+        supervisor_company: "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+      },
+      {
+        id: "cr-demo-3",
+        project_id: "p-demo-3",
+        week_id: "dw-02",
+        company_name: "라인",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+        job_position: "라인 마케팅",
+        project_name: "라인 해당 프로젝트",
+        project_description: "짧게 짧게 가보자",
+        line_code: "DE13-10003",
+        line_name: "라인 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-3",
+        user_id: "u1",
+        enhancement_status: "not_applicable",
+        grade: null,
+        grade_points: 0,
+        career_code: "DE13-10003",
+        supervisor_name: "이지은",
+        supervisor_position: "차장",
+        supervisor_department: "라인 마케팅팀",
+        supervisor_company: "라인",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+      },
+      {
+        id: "cr-demo-4",
+        project_id: "p-demo-4",
+        week_id: "dw-02",
+        company_name: "쿠팡",
+        company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+        job_position: "쿠팡 마케팅",
+        project_name: "쿠팡 해당 프로젝트",
+        project_description: null,
+        line_code: "EF14-10004",
+        line_name: "쿠팡 마케팅",
+        output_links: [],
+        secondary_info_deadline: null,
+        created_at: "2025-12-22T00:00:00Z",
+        record_id: "r-demo-4",
+        user_id: "u1",
+        enhancement_status: "not_applicable",
+        grade: null,
+        grade_points: 0,
+        career_code: "EF14-10004",
+        supervisor_name: "최수현",
+        supervisor_position: "부장",
+        supervisor_department: "쿠팡 마케팅팀",
+        supervisor_company: "쿠팡",
+        supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+      },
+    ],
   },
 };
