@@ -3790,7 +3790,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ? "-"
                           : (() => {
                               const t = card.badge.replace("|", " - ");
-                              return t.length > 25 ? t.slice(0, 25) + ".." : t;
+                              return t.length > 22 ? t.slice(0, 22) + ".." : t;
                             })()}
                       </p>
                       <div className="card-title-row">
@@ -3830,7 +3830,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   "-"
                                 ) : (
                                   <>
-                                    <span style={{ display: "inline-block", minWidth: "48px", maxWidth: "48px", textAlign: "left", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "54px", maxWidth: "54px", textAlign: "left", overflow: "hidden" }}>
                                       <strong>{(card.supervisorName || "").length > 3 ? (card.supervisorName || "").slice(0, 3) + ".." : card.supervisorName}</strong>
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>

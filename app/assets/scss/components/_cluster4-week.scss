@@ -3340,6 +3340,17 @@
         }
       }
 
+      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지
+      .work-ability-card:not(.empty) {
+        .main-desc,
+        .main-desc-white {
+          max-width: calc(100% - 33px) !important;
+        }
+        .sub-desc {
+          max-width: calc(100% - 33px) !important;
+        }
+      }
+
       .character-image {
         position: absolute;
         top: 0;
@@ -3876,6 +3887,17 @@
             object-fit: contain;
             filter: drop-shadow(0 4px 10px rgba(255, 255, 255, 0.5));
           }
+        }
+      }
+
+      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
+      .work-exp-card:not(.empty) {
+        .main-desc,
+        .main-desc-white {
+          max-width: calc(100% - 33px) !important;
+        }
+        .sub-desc {
+          max-width: calc(100% - 33px) !important;
         }
       }
     }
@@ -8487,13 +8509,12 @@
 
   &:hover {
     .badge-text {
-      color: #FFFFFF !important;
+      color: #ffffff !important;
       text-shadow: 0 0 6px rgba(221, 242, 71, 0.6) !important;
     }
 
     .badge-border {
-      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8))
-              drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
+      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8)) drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
     }
 
     .badge-outline {
