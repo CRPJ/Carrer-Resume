@@ -1822,7 +1822,7 @@
                 }
                 .label {
                   color: #a3a3a3;
-                  font-size: 0.875rem !important;
+                  font-size: 1rem !important;
                 }
 
                 .profile-name-row {
@@ -1870,7 +1870,7 @@
                 }
 
                 .profile-details {
-                  font-size: 0.875rem !important;
+                  font-size: 1rem !important;
                   color: rgba(255, 255, 255, 0.5);
                   line-height: 1.2;
                   white-space: nowrap;
@@ -1880,7 +1880,7 @@
                   display: flex;
                   align-items: baseline;
                   .text {
-                    font-size: 0.875rem !important;
+                    font-size: 1rem !important;
                     min-width: 0 !important;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1891,7 +1891,7 @@
                   }
                   .nickname {
                     color: #f59e0b;
-                    font-size: 0.875rem !important;
+                    font-size: 1rem !important;
                     font-family: "Pretendard", sans-serif;
                     font-weight: 700;
                     flex-shrink: 0;
@@ -2698,7 +2698,7 @@
               }
 
               .card-title {
-                font-size: 0.875rem;
+                font-size: 1rem;
                 font-weight: 500;
                 color: #fef9c3;
                 font-family: "Manrope", sans-serif;
@@ -3215,7 +3215,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3271,15 +3271,17 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: calc(100% - 16px) !important;
             width: 100% !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 7px;
 
             .sub-icon {
               width: 16px;
@@ -3288,7 +3290,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3308,7 +3310,7 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: calc(100% - 16px) !important;
             width: 100% !important;
             position: relative;
             padding-right: 0 !important;
@@ -3335,6 +3337,17 @@
             height: 55px;
             object-fit: contain;
           }
+        }
+      }
+
+      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지
+      .work-ability-card:not(.empty) {
+        .main-desc,
+        .main-desc-white {
+          max-width: calc(100% - 33px) !important;
+        }
+        .sub-desc {
+          max-width: calc(100% - 33px) !important;
         }
       }
 
@@ -3687,6 +3700,8 @@
               display: flex;
               align-items: center;
               gap: 8px;
+              transform: scale(1.6);
+              transform-origin: left top;
 
               .stars {
                 display: flex;
@@ -3766,7 +3781,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3795,21 +3810,23 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 500;
-            margin: 0;
+            margin: -8px 0 8px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: calc(100% - 16px) !important;
             width: 100% !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             margin-bottom: 0;
 
             .sub-icon {
@@ -3819,7 +3836,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -3833,6 +3850,7 @@
             line-height: 21px;
             font-family: "Pretendard", sans-serif;
             font-weight: 400;
+            margin: -8px 0 8px 0;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
@@ -3843,7 +3861,7 @@
             padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 28px) !important;
+            max-width: calc(100% - 16px) !important;
             width: 100% !important;
 
             .card-arrow {
@@ -3871,6 +3889,17 @@
           }
         }
       }
+
+      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
+      .work-exp-card:not(.empty) {
+        .main-desc,
+        .main-desc-white {
+          max-width: calc(100% - 33px) !important;
+        }
+        .sub-desc {
+          max-width: calc(100% - 33px) !important;
+        }
+      }
     }
 
     .work-career-cards {
@@ -3891,7 +3920,7 @@
           z-index: 10;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-end;
 
           img {
             width: 53px;
@@ -3907,7 +3936,6 @@
             line-height: 20px;
             font-family: "Pretendard", sans-serif;
             margin-top: 4px;
-            margin-right: 20px;
           }
         }
       }
@@ -4060,7 +4088,7 @@
             }
 
             .card-title {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -4097,12 +4125,14 @@
             min-height: 42px;
             max-height: 42px;
             max-width: none !important;
+            word-break: keep-all;
+            overflow-wrap: break-word;
           }
 
           .sub-title-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             margin-top: 6px;
             margin-bottom: 8px;
 
@@ -4113,7 +4143,7 @@
             }
 
             .sub-label {
-              font-size: 14px;
+              font-size: 16px;
               font-weight: 500;
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
@@ -4137,7 +4167,7 @@
             padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 28px) !important;
+            max-width: calc(100% - 16px) !important;
 
             .card-arrow {
               position: absolute;
@@ -4157,7 +4187,7 @@
           z-index: 10;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-end;
 
           img {
             width: 53px;
@@ -4173,7 +4203,6 @@
             line-height: 20px;
             font-family: "Pretendard", sans-serif;
             margin-top: 4px;
-            margin-right: 20px;
           }
         }
       }
@@ -4233,7 +4262,7 @@
 
         .main-desc-white {
           width: 100%;
-          max-width: calc(100% - 28px) !important;
+          max-width: calc(100% - 16px) !important;
           font-size: 14px;
           color: #fff;
           line-height: 21px;
@@ -4246,6 +4275,8 @@
           overflow: hidden !important;
           min-height: 42px;
           max-height: 42px;
+          word-break: break-all;
+          overflow-wrap: break-word;
         }
 
         .supervisor-section {
@@ -8478,17 +8509,24 @@
 
   &:hover {
     .badge-text {
-      color: #FFFFFF !important;
+      color: #ffffff !important;
       text-shadow: 0 0 6px rgba(221, 242, 71, 0.6) !important;
     }
 
     .badge-border {
-      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8))
-              drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
+      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8)) drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
     }
 
     .badge-outline {
       filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8)) !important;
     }
+  }
+}
+
+// work-exp-section 전용 word-break override (work-ability/work-career에 영향 없음)
+.work-exp-section {
+  .main-desc,
+  .sub-desc {
+    word-break: break-all !important;
   }
 }

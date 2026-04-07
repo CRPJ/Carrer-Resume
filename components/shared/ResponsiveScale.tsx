@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 /**
  * 고정 너비 레이아웃 헬퍼
@@ -10,29 +10,34 @@ import { useEffect } from 'react';
 const ResponsiveScale = () => {
   useEffect(() => {
     const updateHeaderDividerY = () => {
-      const header = document.querySelector('.header') as HTMLElement | null;
+      const header = document.querySelector(".header") as HTMLElement | null;
       if (!header) {
-        document.documentElement.style.removeProperty('--header-divider-y');
+        document.documentElement.style.removeProperty("--header-divider-y");
         return;
       }
       const headerHeight = header.offsetHeight;
-      document.documentElement.style.setProperty('--header-divider-y', `${headerHeight}px`);
+      document.documentElement.style.setProperty("--header-divider-y", `${headerHeight}px`);
     };
+
+    // 1920px 초과 해상도에서만 10% 확대
+    if (screen.width > 1920) {
+      document.documentElement.style.zoom = "1.08";
+    }
 
     // 초기 측정 + 로드 후 재측정
     updateHeaderDividerY();
-    window.addEventListener('load', updateHeaderDividerY);
-    window.addEventListener('resize', updateHeaderDividerY);
+    window.addEventListener("load", updateHeaderDividerY);
+    window.addEventListener("resize", updateHeaderDividerY);
 
     // 레이아웃 계산 완료 후 페이지 표시 (헤더-사이드바 flash 방지)
     requestAnimationFrame(() => {
-      document.querySelector('.nftg-app')?.classList.add('app-ready');
+      document.querySelector(".nftg-app")?.classList.add("app-ready");
     });
 
     return () => {
-      window.removeEventListener('load', updateHeaderDividerY);
-      window.removeEventListener('resize', updateHeaderDividerY);
-      document.documentElement.style.removeProperty('--header-divider-y');
+      window.removeEventListener("load", updateHeaderDividerY);
+      window.removeEventListener("resize", updateHeaderDividerY);
+      document.documentElement.style.removeProperty("--header-divider-y");
     };
   }, []);
 

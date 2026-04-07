@@ -22,40 +22,39 @@ const IDENTITY_TAB_IMAGES = [
 ];
 
 const Sidebar = () => {
-  const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
+  // SSR-safe: 첫 렌더는 항상 [0], 마운트 후 useEffect에서 random 갱신
+  const [tabBg, setTabBg] = useState(IDENTITY_TAB_IMAGES[0]);
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
-  const demoMode = checkDemoMode();
+  // SSR-safe: localStorage를 render time에 읽으면 SSR(false)/client(true) 불일치 → stateful로 변환
+  const [demoMode, setDemoMode] = useState(false);
   const [isOwner, setIsOwner] = useState(true);
-  const [reliabilityRate, setReliabilityRate] = useState<number | null>(demoMode ? DUMMY_SIDEBAR_EXTRA.reliabilityRate : 100);
-  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(demoMode);
-  const [completionRate, setCompletionRate] = useState<number | null>(demoMode ? DUMMY_SIDEBAR_EXTRA.completionRate : 80);
-  const [hasCompletionData, setHasCompletionData] = useState<boolean>(demoMode);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalCompetency : 21); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalExperience : 21); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalInfo : 21); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(demoMode ? DUMMY_SIDEBAR_EXTRA.practicalCareer : 21); // 실무 경력 누적
-  const [hasActivityData, setHasActivityData] = useState<boolean>(demoMode);
+  // SSR-safe 기본값 (비-demo 기본값으로 통일). demo 모드일 때는 마운트 useEffect에서 덮어씀.
+  const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
+  const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
+  const [completionRate, setCompletionRate] = useState<number | null>(80);
+  const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
+  const [hasActivityData, setHasActivityData] = useState<boolean>(false);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
   const [badge2, setBadge2] = useState(0);
   const [badge3, setBadge3] = useState(0);
-  // 배지 데이터 상태 (user_cumulative_points 테이블)
-  const [badgeData, setBadgeData] = useState(
-    demoMode
-      ? DUMMY_SIDEBAR_EXTRA.badgeData
-      : {
-          stars: 99999, // 별
-          lightnings: 9999, // 번개
-          shields: 99999, // 방패
-        },
-  );
-  const [hasBadgeData, setHasBadgeData] = useState<boolean>(demoMode);
+  // 배지 데이터 상태 (user_cumulative_points 테이블) — SSR-safe 기본값
+  const [badgeData, setBadgeData] = useState({
+    stars: 99999, // 별
+    lightnings: 9999, // 번개
+    shields: 99999, // 방패
+  });
+  const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
 
   // 시즌 히스토리 데이터 상태 (user_season_histories + seasons)
   interface SeasonHistory {
@@ -146,7 +145,7 @@ const Sidebar = () => {
       seasons: { id: "s8", year: 2023, name: "winter", start_date: "2023-12-01" },
     },
   ]);
-  const [hasSeasonData, setHasSeasonData] = useState<boolean>(demoMode);
+  const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
 
   // 시즌 이름 한글 변환
   const seasonNameKorean: { [key: string]: string } = {
@@ -251,7 +250,7 @@ const Sidebar = () => {
     gpaMax: string;
     quote: string;
     photo: string;
-  } | null>(demoMode ? DUMMY_USER_PROFILE : null);
+  } | null>(null);
 
   // 데모 모드 사용자별 sidebar 더미 데이터 분기
   useEffect(() => {
@@ -357,9 +356,31 @@ const Sidebar = () => {
 
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
-  const [hasData, setHasData] = useState(demoMode); // 데이터 있음/없음 상태
+  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태 (SSR-safe 기본)
   useEffect(() => {
     setIsMounted(true);
+    // 마운트 후 demo 모드 확정 + tabBg random 갱신
+    const checked = checkDemoMode();
+    setDemoMode(checked);
+    setTabBg(IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
+    if (checked) {
+      // demo 모드면 더미 데이터 일괄 주입
+      setReliabilityRate(DUMMY_SIDEBAR_EXTRA.reliabilityRate);
+      setHasReliabilityData(true);
+      setCompletionRate(DUMMY_SIDEBAR_EXTRA.completionRate);
+      setHasCompletionData(true);
+      setPracticalCompetency(DUMMY_SIDEBAR_EXTRA.practicalCompetency);
+      setPracticalExperience(DUMMY_SIDEBAR_EXTRA.practicalExperience);
+      setPracticalInfo(DUMMY_SIDEBAR_EXTRA.practicalInfo);
+      setPracticalCareer(DUMMY_SIDEBAR_EXTRA.practicalCareer);
+      setHasActivityData(true);
+      setBadgeData(DUMMY_SIDEBAR_EXTRA.badgeData);
+      setHasBadgeData(true);
+      setHasSeasonData(true);
+      setUserProfile(DUMMY_USER_PROFILE);
+      setHasData(true);
+      setCrewStatus(DUMMY_SIDEBAR_EXTRA.crewStatus);
+    }
   }, []);
 
   // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
@@ -576,7 +597,7 @@ const Sidebar = () => {
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
   const [debugPanelType, setDebugPanelType] = useState<"OK" | "EC" | "PX">("OK");
-  const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">(demoMode ? DUMMY_SIDEBAR_EXTRA.crewStatus : "Running");
+  const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">("Running");
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });

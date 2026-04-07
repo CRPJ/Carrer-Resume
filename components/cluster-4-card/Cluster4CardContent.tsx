@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
-import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
+import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
 interface Cluster4CardContentProps {
   weekId: string;
@@ -67,9 +67,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
-  const isDemoMode = checkDemoMode();
+  // SSR/client hydration 일관성을 위해 stateful — 첫 렌더 SSR=client=false, 마운트 후 localStorage 값 반영
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  // NICKNAME_COLOR_OFFSET도 Math.random() 호출이 SSR/client 다른 값을 만들어 hydration mismatch 발생 → stateful
+  const [nicknameColorOffset, setNicknameColorOffset] = useState(0);
+  useEffect(() => {
+    setIsDemoMode(checkDemoMode());
+    setIsMounted(true);
+    setNicknameColorOffset(Math.floor(Math.random() * 4));
+  }, []);
   const NICKNAME_COLORS = ["rgba(101, 227, 255, 1)", "rgba(255, 97, 97, 1)", "rgba(157, 250, 7, 1)", "rgba(255, 234, 72, 1)"];
-const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
+  const NICKNAME_COLOR_OFFSET = nicknameColorOffset;
 
   const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
     const t = text || "-";
@@ -122,7 +131,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
   // DB에서 가져온 주차 데이터 상태
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
-  const [isLoadingWeek, setIsLoadingWeek] = useState(!isDemoMode);
+  const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
   const [teamName, setTeamName] = useState<string | null>("미디어");
@@ -151,37 +160,37 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
-    { id: "wa-1", activity_type_id: "wisdom", title: "글로벌 마케팅 트렌드 분석 리포트", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-2", activity_type_id: "essay", title: "브랜드 스토리텔링의 핵심 요소와 소비자 인식 변화에 대한 에세이 작성", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-4", activity_type_id: "calendar", title: "주간 마케팅 캘린더 일정 관리 및 팀 공유", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-4", activity_type_id: "calendar", title: "일이삼사오육칠팔구십 일이삼사오육칠팔구십 일이삼사오육칠팔구십", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-5",
       activity_type_id: "forum",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
+      title: "짧은 글",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
     },
     { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-7", activity_type_id: "practical_lecture", title: "크로스 펑셔널 협업 프로젝트: 제품팀과 마케팅팀의 Go-to-Market 전략 수립 워크숍 결과물 정리", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-7", activity_type_id: "practical_lecture", title: "우주는 얼마나 클까?", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-8",
       activity_type_id: "comp-1",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십가나다라마바사아자차카타파하",
+      title: "시간이 지나면 더 멀리 있는 우주에서 출발한 빛도 우리에게 올 수 있겠죠. 그래서 관측 가능한 우주는 앞으로 100억 년이 더 흐르면 당연히 더 커지겠죠. 지금은 관측 가능한 우주가 460억 광년 정도의 반지름을 갖습니다. 다시 말하면 현재 460억 광년 거리에 있는 우주는 관측이 가능합니다.",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
     },
     { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-comp-4", activity_type_id: "comp-4", title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-9", activity_type_id: "exp-1", title: "커리어 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-comp-4", activity_type_id: "comp-4", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-9", activity_type_id: "exp-1", title: "안타깝게도 아직 우주의 끝을 확인할 수 있는 기술은 존재하지 않습니다. 하지만 현재까지의 연구결과를 보면 우주는 무한할 것 같습니다. 지구라는 한정된 공간에서 평생을 살아가는", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-11",
       activity_type_id: "exp-3",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
+      title: "짧은 길이",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
@@ -255,9 +264,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
       output_links: [],
     },
     { week_id: "dummy-1", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
     {
       week_id: "dummy-1",
@@ -295,9 +304,9 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
       ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
       ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
       ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
-      ["exp-1", { id: "exp-1", name: "[커리어]마케터 Launch", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
+      ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
       ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
-      ["exp-3", { id: "exp-3", name: "[콘텐츠]마케팅 실무", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
+      ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
       ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
     ]),
   );
@@ -669,6 +678,8 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
+    // 마운트 전엔 isDemoMode가 확정되지 않았으므로 아무것도 안 함 (SSR/client hydration 일관성)
+    if (!isMounted) return;
     if (isDemoMode) {
       // weekId로 공유 더미 데이터 조회 (cluster-4 시즌 페이지와 동기화)
       const dummyWeek = DUMMY_WEEKLY_LIST.find((w) => w.id === weekId);
@@ -712,12 +723,20 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
         setCumulativeInjeolmi(dummyExtra.points.shield);
       }
 
-      // 데모 모드 실무 경력 더미 데이터
-      setCareerRecords(getDemoCareerRecords(weekId));
+      // Phase 1 (dw-01 외부 파일 이관): DUMMY_WEEK_CARD에 해당 주차가 있으면 외부 데이터 사용.
+      // 없으면 기존 getDemoCareerRecords/getDemoActivityRecords로 fallback.
+      const cardData = DUMMY_WEEK_CARD[weekId];
+      if (cardData) {
+        setWeeklyActivities(cardData.weeklyActivities);
+        setWeekActivityDetails(cardData.weekActivityDetails);
+        setWeekActivityRecords(cardData.weekActivityRecords);
+        setCareerRecords(cardData.careerRecords);
+      } else {
+        // fallback: 기존 로직
+        setCareerRecords(getDemoCareerRecords(weekId));
+        setWeekActivityRecords(getDemoActivityRecords(weekId));
+      }
       setCareerPage(0);
-
-      // 데모 모드 활동 레코드 (역량/경험 강화실패 분산)
-      setWeekActivityRecords(getDemoActivityRecords(weekId));
 
       // 이전/다음 주차 ID 설정 (내림차순: index-1 = 더 최근(다음), index+1 = 더 과거(이전))
       const weekIndex = DUMMY_WEEKLY_LIST.findIndex((w) => w.id === weekId);
@@ -1216,7 +1235,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
     };
 
     fetchWeekData();
-  }, [weekId, urlUserId]);
+  }, [weekId, urlUserId, isDemoMode, isMounted]);
 
   // DB에서 실무 경력 데이터 가져오기
   // career-records는 urlUserId가 있으면 Stage 1에서 이미 로드됨 (earlyCareerResult)
@@ -1540,7 +1559,10 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
   const saveWeeklyColleagues = async () => {
     if (selectedColleagues.length === 0) {
       const el = document.querySelector(".selected-colleagues, .add-colleague-card");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
     if (isDemoMode) {
@@ -1630,19 +1652,28 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
     if (reputationEditData.rating === 0) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(1)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (!reputationEditData.content.trim()) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(2)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (!reputationEditData.keyword) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(3)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -3166,7 +3197,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   marginRight: "8px",
                                 }}
                               >
-                                {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
+                                {(user.role || "일반").length > 10 ? (user.role || "일반").slice(0, 10) + ".." : user.role || "일반"}
                               </span>
                             )}
                             <span className="date">{isEmpty ? "0000 - 00 - 00 (일)" : user.date}</span>
@@ -3213,7 +3244,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           ) : (
                             <>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(formatSchool(mask.school(user.university)), 6)}
+                                {truncate(formatSchool(mask.school(user.university)), 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학교
@@ -3222,7 +3253,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(formatMajor(mask.major(user.major)), 6)}
+                                {truncate(formatMajor(mask.major(user.major)), 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 학과
@@ -3231,7 +3262,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(user.team || "-", 6)}
+                                {truncate(user.team || "-", 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 팀
@@ -3240,7 +3271,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="text" style={{ width: "88px", flexShrink: 0, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", display: "inline-block" }}>
-                                {truncate(user.part || "-", 6)}
+                                {truncate(user.part || "-", 5)}
                               </span>
                               <span className="label" style={{ fontSize: "16px" }}>
                                 파트
@@ -3249,7 +3280,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 |
                               </span>
                               <span className="nickname" style={{ fontSize: "16px", display: "inline-block", overflow: "hidden", whiteSpace: "nowrap", maxWidth: "120px", textAlign: "right", marginLeft: "auto", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
-                                {truncate(user.nickname, 4)}
+                                {truncate(user.nickname, 5)}
                               </span>
                             </>
                           )}
@@ -3501,14 +3532,10 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                     <div className="card-header-area">
                       <div className="card-header-row">
                         <span className="code-tag">{isEmpty ? "-" : card.code}</span>
-                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 25) + ".." : card.badge}</span>
+                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 22) + ".." : card.badge}</span>
                       </div>
                       <div className="card-rating-row">
-                        <div className="stars">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <img key={star} src={isEmpty || star > card.rating ? "/images/0/cluster4/icon/icon - empty star.png" : "/images/0/cluster4/icon/icon - star.png"} alt="star" className="star" />
-                          ))}
-                        </div>
+                        <div className="stars">{renderStars(isEmpty ? 0 : card.rating)}</div>
                         <span className="rating-count">{isEmpty ? "- / 10" : card.ratingCount}</span>
                       </div>
                     </div>
@@ -3529,7 +3556,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         ? "-"
                         : (() => {
                             const text = card.title || "-";
-                            return text.length > 80 ? text.slice(0, 80) + "..." : text;
+                            return text;
                           })()}
                     </p>
                     <div className="sub-title-row">
@@ -3541,7 +3568,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         ? "-"
                         : (() => {
                             const text = weekActivityDetails.find((d) => d.activity_type_id === card.activityTypeId)?.sub_title || "-";
-                            return text.length > 79 ? text.slice(0, 79) + "..." : text;
+                            return text;
                           })()}
                     </span>
                     {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
@@ -3778,7 +3805,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           ? "-"
                           : (() => {
                               const t = card.badge.replace("|", " - ");
-                              return t.length > 25 ? t.slice(0, 25) + ".." : t;
+                              return t.length > 22 ? t.slice(0, 22) + ".." : t;
                             })()}
                       </p>
                       <div className="card-title-row">
@@ -3790,7 +3817,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           ? "-"
                           : (() => {
                               const text = card.title || "-";
-                              return text.length > 100 ? text.slice(0, 100) + "..." : text;
+                              return text;
                             })()}
                       </p>
                       <div className="sub-title-row">
@@ -3813,15 +3840,26 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                             <div className={`profile-avatar ${isEmpty ? "empty" : ""}`}>{!isEmpty && card.supervisorImg && <img src={card.supervisorImg} alt="supervisor" />}</div>
                             <div className="profile-text">
                               <span className="supervised-text">Supervised by:</span>
-                              <span className="profile-name">
+                              <span className="profile-name" style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
                                 {isEmpty ? (
                                   "-"
                                 ) : (
                                   <>
-                                    <strong>{card.supervisorName}</strong>
-                                    {card.supervisorDept && <> | {card.supervisorDept}</>}
-                                    {card.supervisorCompany && <> | {card.supervisorCompany}</>}
-                                    {card.supervisorPosition && <> | {card.supervisorPosition}</>}
+                                    <span style={{ display: "inline-block", minWidth: "54px", maxWidth: "54px", textAlign: "left", overflow: "hidden" }}>
+                                      <strong>{(card.supervisorName || "").length > 3 ? (card.supervisorName || "").slice(0, 3) + ".." : card.supervisorName}</strong>
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "112px", maxWidth: "112px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "100px", maxWidth: "100px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorCompany || "-").length > 6 ? (card.supervisorCompany || "-").slice(0, 6) + ".." : card.supervisorCompany || "-"}
+                                    </span>
+                                    <span style={{ flexShrink: 0 }}> | </span>
+                                    <span style={{ display: "inline-block", minWidth: "32px", maxWidth: "32px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                      {(card.supervisorPosition || "-").length > 2 ? (card.supervisorPosition || "-").slice(0, 2) + ".." : card.supervisorPosition || "-"}
+                                    </span>
                                   </>
                                 )}
                               </span>
@@ -3961,7 +3999,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           value={editingDetails[card.activityType]?.subTitle || ""}
                           onChange={(e) => {
                             if (e.target.value.length > 150) {
-                              alert('최대 150자까지 입력할 수 있습니다.');
+                              alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             setEditingDetails((prev) => ({
@@ -4010,21 +4048,21 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
                                     if (e.target.value.length > 20) {
-                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                      alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
-                                    setEditingDetails((prev) => {
-                                      const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
-                                      currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
-                                      return {
-                                        ...prev,
-                                        [card.activityType]: {
-                                          ...prev[card.activityType],
-                                          outputLinks: currentLinks,
-                                        },
-                                      };
-                                    });
+                                      setEditingDetails((prev) => {
+                                        const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
+                                        currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                        return {
+                                          ...prev,
+                                          [card.activityType]: {
+                                            ...prev[card.activityType],
+                                            outputLinks: currentLinks,
+                                          },
+                                        };
+                                      });
                                   }}
                                 />
                                 <input
@@ -4168,7 +4206,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ""}
                           onChange={(e) => {
                             if (e.target.value.length > 150) {
-                              alert('최대 150자까지 입력할 수 있습니다.');
+                              alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             const actType = getActiveAbilityActivityType();
@@ -4211,15 +4249,15 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
                                     if (e.target.value.length > 20) {
-                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                      alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
-                                    setEditingDetails((prev) => {
-                                      const newLinks = [...prev[actType].outputLinks];
-                                      newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
-                                      return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
-                                    });
+                                      setEditingDetails((prev) => {
+                                        const newLinks = [...prev[actType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                        return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
+                                      });
                                   }}
                                 />
                                 <input
@@ -4333,9 +4371,24 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         <div className="main-title-row">
                           <div className="main-title">Main Title</div>
                           <div className="modal-rating">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <img key={star} src={star <= card.rating ? "/images/0/cluster4/icon/icon - star.png" : "/images/0/cluster4/icon/icon - empty star.png"} alt="star" className="modal-star" />
-                            ))}
+                            {(() => {
+                              const full = Math.floor(card.rating);
+                              const half = card.rating % 1 >= 0.5;
+                              return [0, 1, 2, 3, 4].map((i) => {
+                                if (i < full) {
+                                  return <img key={i} src="/images/0/cluster4/icon/icon - star.png" alt="star" className="modal-star" />;
+                                }
+                                if (i === full && half) {
+                                  return (
+                                    <span key={i} className="modal-star" style={{ position: "relative", display: "inline-block" }}>
+                                      <img src="/images/0/cluster4/icon/icon - star.png" alt="star" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 50% 0 0)", zIndex: 2 }} />
+                                      <img src="/images/0/cluster4/icon/icon - empty star.png" alt="star" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", zIndex: 1 }} />
+                                    </span>
+                                  );
+                                }
+                                return <img key={i} src="/images/0/cluster4/icon/icon - empty star.png" alt="star" className="modal-star" />;
+                              });
+                            })()}
                             <span className="rating-count">{card.ratingCount}</span>
                           </div>
                         </div>
@@ -4384,7 +4437,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
                                   if (e.target.value.length > 150) {
-                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                    alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -4425,15 +4478,15 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
                                           if (e.target.value.length > 20) {
-                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                            alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
-                                          setEditingDetails((prev) => {
-                                            const newLinks = [...prev[activityType].outputLinks];
-                                            newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
-                                            return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
-                                          });
+                                            setEditingDetails((prev) => {
+                                              const newLinks = [...prev[activityType].outputLinks];
+                                              newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                              return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                            });
                                         }}
                                       />
                                       <input
@@ -4592,7 +4645,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
                                   if (e.target.value.length > 150) {
-                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                    alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -4647,21 +4700,21 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
                                           if (e.target.value.length > 20) {
-                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                            alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
-                                          setEditingDetails((prev) => {
-                                            const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
-                                            currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
-                                            return {
-                                              ...prev,
-                                              [activityType]: {
-                                                ...prev[activityType],
-                                                outputLinks: currentLinks,
-                                              },
-                                            };
-                                          });
+                                            setEditingDetails((prev) => {
+                                              const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
+                                              currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                              return {
+                                                ...prev,
+                                                [activityType]: {
+                                                  ...prev[activityType],
+                                                  outputLinks: currentLinks,
+                                                },
+                                              };
+                                            });
                                         }}
                                       />
                                       <input
@@ -4788,13 +4841,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                             Thank you message <span className="char-limit">(최대 100자)</span>
                           </label>
                           <div className="message-input-wrapper">
-                            <textarea placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)" maxLength={100} rows={1} value={colleague.message} onChange={(e) => {
-                              if (e.target.value.length > 100) {
-                                alert('최대 100자까지 입력할 수 있습니다.');
-                                return;
-                              }
-                              updateColleagueMessage(colleague.id, e.target.value);
-                            }}></textarea>
+                            <textarea
+                              placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
+                              maxLength={100}
+                              rows={1}
+                              value={colleague.message}
+                              onChange={(e) => {
+                                if (e.target.value.length > 100) {
+                                  alert("최대 100자까지 입력할 수 있습니다.");
+                                  return;
+                                }
+                                updateColleagueMessage(colleague.id, e.target.value);
+                              }}
+                            ></textarea>
                             <span className="char-counter">{colleague.message.length} / 100</span>
                           </div>
                         </div>
@@ -4960,13 +5019,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                       내용 <span className="char-limit">(최대 100자)</span>
                     </label>
                     <div className="textarea-wrapper">
-                      <textarea placeholder="해당 크루에 대한 평가 내용을 작성해주세요..." maxLength={100} rows={3} value={reputationEditData.content} onChange={(e) => {
-                        if (e.target.value.length > 100) {
-                          alert('최대 100자까지 입력할 수 있습니다.');
-                          return;
-                        }
-                        setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
-                      }}></textarea>
+                      <textarea
+                        placeholder="해당 크루에 대한 평가 내용을 작성해주세요..."
+                        maxLength={100}
+                        rows={3}
+                        value={reputationEditData.content}
+                        onChange={(e) => {
+                          if (e.target.value.length > 100) {
+                            alert("최대 100자까지 입력할 수 있습니다.");
+                            return;
+                          }
+                          setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
+                        }}
+                      ></textarea>
                       <span className="char-counter">{reputationEditData.content.length} / 100</span>
                     </div>
                   </div>
@@ -4985,7 +5050,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         value={reputationEditData.keyword}
                         onChange={(e) => {
                           if (e.target.value.length > 7) {
-                            alert('최대 7자까지 입력할 수 있습니다.');
+                            alert("최대 7자까지 입력할 수 있습니다.");
                             return;
                           }
                           setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
@@ -5266,10 +5331,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workInfoViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {
@@ -5420,10 +5489,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workExpViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkExpViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkExpViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkExpViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkExpViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {
@@ -5573,10 +5646,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                 </div>
                 <div className="section-modal-footer">
                   {!workAbilityViewIsEditing ? (
-                    <button className="save-btn" onClick={() => setWorkAbilityViewIsEditing(true)}>수정</button>
+                    <button className="save-btn" onClick={() => setWorkAbilityViewIsEditing(true)}>
+                      수정
+                    </button>
                   ) : (
                     <>
-                      <button className="cancel-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>취소</button>
+                      <button className="cancel-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
+                        취소
+                      </button>
                       <button
                         className="save-btn"
                         onClick={() => {
@@ -5724,10 +5801,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workCareerViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {

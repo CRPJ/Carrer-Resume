@@ -2617,6 +2617,13 @@
               white-space: nowrap;
               position: relative;
               left: -8px;
+              // 모든 statusClass(in-progress/completed/resting/suspended)에 outline 적용
+              // text-stroke는 glyph 안쪽까지 침범해 뭉개지므로 text-shadow 4방향 outline 사용
+              text-shadow:
+                -1px -1px 0 #1b1b1b,
+                1px -1px 0 #1b1b1b,
+                -1px 1px 0 #1b1b1b,
+                1px 1px 0 #1b1b1b;
             }
           }
         }

@@ -1,6 +1,7 @@
 export { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES } from './cluster4-season-dummy';
 export { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from './cluster4-weekly-dummy';
-export { DUMMY_WEEK_CARD_DATA } from './cluster4-card-dummy';
+export { DUMMY_WEEK_CARD } from './cluster4-card-dummy';
+export type { WeeklyActivity, ActivityDetail, ActivityRecord, CareerRecord, OutputLink, WeekCardDummyData } from './cluster4-card-dummy';
 export { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from './resume-card-dummy';
 export { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS } from './cluster3-dummy';
 export { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO } from './cluster2-dummy';

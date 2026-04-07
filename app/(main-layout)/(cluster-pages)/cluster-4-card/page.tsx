@@ -10,6 +10,13 @@ const Cluster4CardPage = () => {
 
   // 현재 주차로 리다이렉트
   useEffect(() => {
+    // ?admin=true이면 dw-01 더미 카드로 직행 (파라미터 유지로 DemoToggle 활성화도 그대로 작동)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true') {
+      router.replace('/cluster-4-card/dw-01?admin=true');
+      return;
+    }
+
     const fetchCurrentWeekAndRedirect = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
