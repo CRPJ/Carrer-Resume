@@ -151,37 +151,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
-    { id: "wa-1", activity_type_id: "wisdom", title: "글로벌 마케팅 트렌드 분석 리포트", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-2", activity_type_id: "essay", title: "브랜드 스토리텔링의 핵심 요소와 소비자 인식 변화에 대한 에세이 작성", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-4", activity_type_id: "calendar", title: "주간 마케팅 캘린더 일정 관리 및 팀 공유", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-4", activity_type_id: "calendar", title: "일이삼사오육칠팔구십 일이삼사오육칠팔구십 일이삼사오육칠팔구십", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-5",
       activity_type_id: "forum",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
+      title: "짧은 글",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
     },
     { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-7", activity_type_id: "practical_lecture", title: "크로스 펑셔널 협업 프로젝트: 제품팀과 마케팅팀의 Go-to-Market 전략 수립 워크숍 결과물 정리", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-7", activity_type_id: "practical_lecture", title: "우주는 얼마나 클까?", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-8",
       activity_type_id: "comp-1",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십가나다라마바사아자차카타파하",
+      title: "시간이 지나면 더 멀리 있는 우주에서 출발한 빛도 우리에게 올 수 있겠죠. 그래서 관측 가능한 우주는 앞으로 100억 년이 더 흐르면 당연히 더 커지겠죠. 지금은 관측 가능한 우주가 460억 광년 정도의 반지름을 갖습니다. 다시 말하면 현재 460억 광년 거리에 있는 우주는 관측이 가능합니다.",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
     },
     { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-comp-4", activity_type_id: "comp-4", title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-9", activity_type_id: "exp-1", title: "커리어 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-comp-4", activity_type_id: "comp-4", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+    { id: "wa-9", activity_type_id: "exp-1", title: "안타깝게도 아직 우주의 끝을 확인할 수 있는 기술은 존재하지 않습니다. 하지만 현재까지의 연구결과를 보면 우주는 무한할 것 같습니다. 지구라는 한정된 공간에서 평생을 살아가는", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
     {
       id: "wa-11",
       activity_type_id: "exp-3",
-      title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이삼사오육칠팔구십일이삼사오육칠팔구십",
+      title: "짧은 길이",
       is_active: true,
       opened_at: "2025-01-01T00:00:00Z",
       output_links: [],
@@ -255,9 +255,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       output_links: [],
     },
     { week_id: "dummy-1", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "마케터 역량 진단 결과 요약 및 성장 로드맵", output_links: [] },
+    { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
     { week_id: "dummy-1", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
     {
       week_id: "dummy-1",
@@ -295,9 +295,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
       ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
       ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
-      ["exp-1", { id: "exp-1", name: "[커리어]마케터 Launch", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
+      ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
       ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
-      ["exp-3", { id: "exp-3", name: "[콘텐츠]마케팅 실무", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
+      ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
       ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
     ]),
   );
@@ -3513,14 +3513,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="card-header-area">
                       <div className="card-header-row">
                         <span className="code-tag">{isEmpty ? "-" : card.code}</span>
-                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 25) + ".." : card.badge}</span>
+                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 22) + ".." : card.badge}</span>
                       </div>
                       <div className="card-rating-row">
-                        <div className="stars">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <img key={star} src={isEmpty || star > card.rating ? "/images/0/cluster4/icon/icon - empty star.png" : "/images/0/cluster4/icon/icon - star.png"} alt="star" className="star" />
-                          ))}
-                        </div>
+                        <div className="stars">{renderStars(isEmpty ? 0 : card.rating)}</div>
                         <span className="rating-count">{isEmpty ? "- / 10" : card.ratingCount}</span>
                       </div>
                     </div>
@@ -3541,7 +3537,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         ? "-"
                         : (() => {
                             const text = card.title || "-";
-                            return text.length > 80 ? text.slice(0, 80) + "..." : text;
+                            return text;
                           })()}
                     </p>
                     <div className="sub-title-row">
@@ -3553,7 +3549,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         ? "-"
                         : (() => {
                             const text = weekActivityDetails.find((d) => d.activity_type_id === card.activityTypeId)?.sub_title || "-";
-                            return text.length > 79 ? text.slice(0, 79) + "..." : text;
+                            return text;
                           })()}
                     </span>
                     {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
@@ -3802,7 +3798,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ? "-"
                           : (() => {
                               const text = card.title || "-";
-                              return text.length > 100 ? text.slice(0, 100) + "..." : text;
+                              return text;
                             })()}
                       </p>
                       <div className="sub-title-row">
@@ -4356,9 +4352,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <div className="main-title-row">
                           <div className="main-title">Main Title</div>
                           <div className="modal-rating">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <img key={star} src={star <= card.rating ? "/images/0/cluster4/icon/icon - star.png" : "/images/0/cluster4/icon/icon - empty star.png"} alt="star" className="modal-star" />
-                            ))}
+                            {(() => {
+                              const full = Math.floor(card.rating);
+                              const half = card.rating % 1 >= 0.5;
+                              return [0, 1, 2, 3, 4].map((i) => {
+                                if (i < full) {
+                                  return <img key={i} src="/images/0/cluster4/icon/icon - star.png" alt="star" className="modal-star" />;
+                                }
+                                if (i === full && half) {
+                                  return (
+                                    <span key={i} className="modal-star" style={{ position: "relative", display: "inline-block" }}>
+                                      <img src="/images/0/cluster4/icon/icon - star.png" alt="star" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 50% 0 0)", zIndex: 2 }} />
+                                      <img src="/images/0/cluster4/icon/icon - empty star.png" alt="star" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", zIndex: 1 }} />
+                                    </span>
+                                  );
+                                }
+                                return <img key={i} src="/images/0/cluster4/icon/icon - empty star.png" alt="star" className="modal-star" />;
+                              });
+                            })()}
                             <span className="rating-count">{card.ratingCount}</span>
                           </div>
                         </div>

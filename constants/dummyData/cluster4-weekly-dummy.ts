@@ -66,8 +66,8 @@ export const DUMMY_WEEK_EXTRA: Record<
 > = {
   "dw-01": {
     // 휴식(개인) — 모두 0
-    points: { star: 0, shield: 0, lightning: 0 },
-    teamPart: { teamName: "엔터테인먼트라구", partName: "팬마케팅이라구" },
+    points: { star: 400, shield: 10, lightning: 1 },
+    teamPart: { teamName: "엔터테인먼트팀입니다일", partName: "일이삼사오육칠팔구십일" },
     roleLabel: "일반",
     growthRate: { rate: 0, count: 0, total: 1 },
     infoRate: { rate: 0, count: 0, total: 0 },
@@ -80,9 +80,9 @@ export const DUMMY_WEEK_EXTRA: Record<
   },
   "dw-02": {
     // 실패
-    points: { star: 5, shield: 4, lightning: 1 },
-    teamPart: { teamName: null, partName: null },
-    roleLabel: "일반",
+    points: { star: 999, shield: 999, lightning: 999 },
+    teamPart: { teamName: "콘텐츠", partName: "팬마케팅" },
+    roleLabel: "운영진(앰배서더)",
     growthRate: { rate: 15, count: 3, total: 20 },
     infoRate: { rate: 25, count: 1, total: 4 },
     competencyRate: { rate: 0, count: 0, total: 1 },
@@ -94,9 +94,9 @@ export const DUMMY_WEEK_EXTRA: Record<
   },
   "dw-03": {
     // 성공
-    points: { star: 25, shield: 20, lightning: 8 },
+    points: { star: 25, shield: 20, lightning: 105 },
     teamPart: { teamName: "마케팅전략", partName: "브랜드콘텐츠" },
-    roleLabel: "심화",
+    roleLabel: "심화(파트장)",
     growthRate: { rate: 60, count: 8, total: 13 },
     infoRate: { rate: 50, count: 3, total: 6 },
     competencyRate: { rate: 100, count: 1, total: 1 },
