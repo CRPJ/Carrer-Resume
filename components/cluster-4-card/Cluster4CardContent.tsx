@@ -3830,19 +3830,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   "-"
                                 ) : (
                                   <>
-                                    <span style={{ display: "inline-block", minWidth: "56px", maxWidth: "56px", textAlign: "left", overflow: "hidden" }}>
+                                    <span style={{ display: "inline-block", minWidth: "48px", maxWidth: "48px", textAlign: "left", overflow: "hidden" }}>
                                       <strong>{(card.supervisorName || "").length > 3 ? (card.supervisorName || "").slice(0, 3) + ".." : card.supervisorName}</strong>
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "116px", maxWidth: "116px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                    <span style={{ display: "inline-block", minWidth: "112px", maxWidth: "112px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
                                       {(card.supervisorDept || "-").length > 7 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                    <span style={{ display: "inline-block", minWidth: "96px", maxWidth: "96px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
                                       {(card.supervisorCompany || "-").length > 6 ? (card.supervisorCompany || "-").slice(0, 6) + ".." : card.supervisorCompany || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
-                                    <span style={{ display: "inline-block", minWidth: "39px", maxWidth: "39px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
+                                    <span style={{ display: "inline-block", minWidth: "32px", maxWidth: "32px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
                                       {(card.supervisorPosition || "-").length > 2 ? (card.supervisorPosition || "-").slice(0, 2) + ".." : card.supervisorPosition || "-"}
                                     </span>
                                   </>
