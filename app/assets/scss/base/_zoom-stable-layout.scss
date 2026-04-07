@@ -312,6 +312,10 @@ body {
 
 // ===== 2560px 이상 대응 =====
 @media (min-width: 1921px) {
+  :root {
+    --sidebar-width: 651px;
+  }
+
   body {
     max-width: 2072px !important;
     width: 2072px !important;

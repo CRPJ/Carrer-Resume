@@ -542,9 +542,12 @@ const Sidebar = () => {
 
       setCardScale(scale);
 
-      // 사이드바 폭을 스케일에 맞게 조정
-      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
-      document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
+      // 사이드바 폭: 1920 이하만 JS로 동적 설정
+      // 1921px+ 는 SCSS @media (min-width: 1921px)에서 --sidebar-width: 651px 고정
+      if (originalWidth <= 1920) {
+        const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
+        document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
+      }
     };
 
     calculateScale();
