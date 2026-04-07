@@ -69,7 +69,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const isDemoMode = checkDemoMode();
   const NICKNAME_COLORS = ["rgba(101, 227, 255, 1)", "rgba(255, 97, 97, 1)", "rgba(157, 250, 7, 1)", "rgba(255, 234, 72, 1)"];
-const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
+  const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
   const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
     const t = text || "-";
@@ -1540,7 +1540,10 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
   const saveWeeklyColleagues = async () => {
     if (selectedColleagues.length === 0) {
       const el = document.querySelector(".selected-colleagues, .add-colleague-card");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
     if (isDemoMode) {
@@ -1630,19 +1633,28 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
 
     if (reputationEditData.rating === 0) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(1)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (!reputationEditData.content.trim()) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(2)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (!reputationEditData.keyword) {
       const el = document.querySelector(".reputation-form .form-field:nth-child(3)");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -3823,7 +3835,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
                                     <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
-                                      {(card.supervisorDept || "-").length > 6 ? (card.supervisorDept || "-").slice(0, 6) + ".." : card.supervisorDept || "-"}
+                                      {(card.supervisorDept || "-").length > 6 ? (card.supervisorDept || "-").slice(0, 7) + ".." : card.supervisorDept || "-"}
                                     </span>
                                     <span style={{ flexShrink: 0 }}> | </span>
                                     <span style={{ display: "inline-block", minWidth: "98px", maxWidth: "98px", textAlign: "left", overflow: "hidden", paddingLeft: "4px", boxSizing: "border-box" }}>
@@ -3972,7 +3984,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           value={editingDetails[card.activityType]?.subTitle || ""}
                           onChange={(e) => {
                             if (e.target.value.length > 150) {
-                              alert('최대 150자까지 입력할 수 있습니다.');
+                              alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             setEditingDetails((prev) => ({
@@ -4021,21 +4033,21 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
                                     if (e.target.value.length > 20) {
-                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                      alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
-                                    setEditingDetails((prev) => {
-                                      const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
-                                      currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
-                                      return {
-                                        ...prev,
-                                        [card.activityType]: {
-                                          ...prev[card.activityType],
-                                          outputLinks: currentLinks,
-                                        },
-                                      };
-                                    });
+                                      setEditingDetails((prev) => {
+                                        const currentLinks = [...(prev[card.activityType]?.outputLinks || createEmptyOutputLinks())];
+                                        currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                        return {
+                                          ...prev,
+                                          [card.activityType]: {
+                                            ...prev[card.activityType],
+                                            outputLinks: currentLinks,
+                                          },
+                                        };
+                                      });
                                   }}
                                 />
                                 <input
@@ -4179,7 +4191,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                           value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ""}
                           onChange={(e) => {
                             if (e.target.value.length > 150) {
-                              alert('최대 150자까지 입력할 수 있습니다.');
+                              alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             const actType = getActiveAbilityActivityType();
@@ -4222,15 +4234,15 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                   onChange={(e) => {
                                     if (e.target.value.length > 20) {
-                                      alert('최대 20자까지 입력할 수 있습니다.');
+                                      alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
-                                    setEditingDetails((prev) => {
-                                      const newLinks = [...prev[actType].outputLinks];
-                                      newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
-                                      return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
-                                    });
+                                      setEditingDetails((prev) => {
+                                        const newLinks = [...prev[actType].outputLinks];
+                                        newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                        return { ...prev, [actType]: { ...prev[actType], outputLinks: newLinks } };
+                                      });
                                   }}
                                 />
                                 <input
@@ -4395,7 +4407,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
                                   if (e.target.value.length > 150) {
-                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                    alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -4436,15 +4448,15 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
                                           if (e.target.value.length > 20) {
-                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                            alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
-                                          setEditingDetails((prev) => {
-                                            const newLinks = [...prev[activityType].outputLinks];
-                                            newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
-                                            return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
-                                          });
+                                            setEditingDetails((prev) => {
+                                              const newLinks = [...prev[activityType].outputLinks];
+                                              newLinks[linkIndex] = { ...newLinks[linkIndex], desc: e.target.value };
+                                              return { ...prev, [activityType]: { ...prev[activityType], outputLinks: newLinks } };
+                                            });
                                         }}
                                       />
                                       <input
@@ -4603,7 +4615,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                 value={editingDetails[activityType]?.subTitle || ""}
                                 onChange={(e) => {
                                   if (e.target.value.length > 150) {
-                                    alert('최대 150자까지 입력할 수 있습니다.');
+                                    alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -4658,21 +4670,21 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
                                         onChange={(e) => {
                                           if (e.target.value.length > 20) {
-                                            alert('최대 20자까지 입력할 수 있습니다.');
+                                            alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
-                                          setEditingDetails((prev) => {
-                                            const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
-                                            currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
-                                            return {
-                                              ...prev,
-                                              [activityType]: {
-                                                ...prev[activityType],
-                                                outputLinks: currentLinks,
-                                              },
-                                            };
-                                          });
+                                            setEditingDetails((prev) => {
+                                              const currentLinks = [...(prev[activityType]?.outputLinks || createEmptyOutputLinks())];
+                                              currentLinks[idx] = { ...currentLinks[idx], desc: e.target.value };
+                                              return {
+                                                ...prev,
+                                                [activityType]: {
+                                                  ...prev[activityType],
+                                                  outputLinks: currentLinks,
+                                                },
+                                              };
+                                            });
                                         }}
                                       />
                                       <input
@@ -4799,13 +4811,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                             Thank you message <span className="char-limit">(최대 100자)</span>
                           </label>
                           <div className="message-input-wrapper">
-                            <textarea placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)" maxLength={100} rows={1} value={colleague.message} onChange={(e) => {
-                              if (e.target.value.length > 100) {
-                                alert('최대 100자까지 입력할 수 있습니다.');
-                                return;
-                              }
-                              updateColleagueMessage(colleague.id, e.target.value);
-                            }}></textarea>
+                            <textarea
+                              placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
+                              maxLength={100}
+                              rows={1}
+                              value={colleague.message}
+                              onChange={(e) => {
+                                if (e.target.value.length > 100) {
+                                  alert("최대 100자까지 입력할 수 있습니다.");
+                                  return;
+                                }
+                                updateColleagueMessage(colleague.id, e.target.value);
+                              }}
+                            ></textarea>
                             <span className="char-counter">{colleague.message.length} / 100</span>
                           </div>
                         </div>
@@ -4971,13 +4989,19 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                       내용 <span className="char-limit">(최대 100자)</span>
                     </label>
                     <div className="textarea-wrapper">
-                      <textarea placeholder="해당 크루에 대한 평가 내용을 작성해주세요..." maxLength={100} rows={3} value={reputationEditData.content} onChange={(e) => {
-                        if (e.target.value.length > 100) {
-                          alert('최대 100자까지 입력할 수 있습니다.');
-                          return;
-                        }
-                        setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
-                      }}></textarea>
+                      <textarea
+                        placeholder="해당 크루에 대한 평가 내용을 작성해주세요..."
+                        maxLength={100}
+                        rows={3}
+                        value={reputationEditData.content}
+                        onChange={(e) => {
+                          if (e.target.value.length > 100) {
+                            alert("최대 100자까지 입력할 수 있습니다.");
+                            return;
+                          }
+                          setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
+                        }}
+                      ></textarea>
                       <span className="char-counter">{reputationEditData.content.length} / 100</span>
                     </div>
                   </div>
@@ -4996,7 +5020,7 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                         value={reputationEditData.keyword}
                         onChange={(e) => {
                           if (e.target.value.length > 7) {
-                            alert('최대 7자까지 입력할 수 있습니다.');
+                            alert("최대 7자까지 입력할 수 있습니다.");
                             return;
                           }
                           setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
@@ -5277,10 +5301,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workInfoViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {
@@ -5431,10 +5459,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workExpViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkExpViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkExpViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkExpViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkExpViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {
@@ -5584,10 +5616,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
                 </div>
                 <div className="section-modal-footer">
                   {!workAbilityViewIsEditing ? (
-                    <button className="save-btn" onClick={() => setWorkAbilityViewIsEditing(true)}>수정</button>
+                    <button className="save-btn" onClick={() => setWorkAbilityViewIsEditing(true)}>
+                      수정
+                    </button>
                   ) : (
                     <>
-                      <button className="cancel-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>취소</button>
+                      <button className="cancel-btn" onClick={() => setWorkAbilityViewIsEditing(false)}>
+                        취소
+                      </button>
                       <button
                         className="save-btn"
                         onClick={() => {
@@ -5735,10 +5771,14 @@ const NICKNAME_COLOR_OFFSET = Math.floor(Math.random() * 4);
             </div>
             <div className="section-modal-footer">
               {!workCareerViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>수정</button>
+                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>
+                  수정
+                </button>
               ) : (
                 <>
-                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>취소</button>
+                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
+                    취소
+                  </button>
                   <button
                     className="save-btn"
                     onClick={() => {

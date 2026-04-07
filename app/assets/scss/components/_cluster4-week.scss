@@ -3271,7 +3271,7 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: 100% !important;
             width: 100% !important;
             word-break: keep-all;
             overflow-wrap: break-word;
@@ -3310,7 +3310,7 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: 100% !important;
             width: 100% !important;
             position: relative;
             padding-right: 0 !important;
@@ -3804,7 +3804,7 @@
             overflow: hidden !important;
             min-height: 42px;
             max-height: 42px;
-            max-width: calc(100% - 28px) !important;
+            max-width: 100% !important;
             width: 100% !important;
             word-break: keep-all;
             overflow-wrap: break-word;
@@ -3847,7 +3847,7 @@
             padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 28px) !important;
+            max-width: 100% !important;
             width: 100% !important;
 
             .card-arrow {
@@ -4142,7 +4142,7 @@
             padding-right: 0 !important;
             box-sizing: border-box;
             width: 100%;
-            max-width: calc(100% - 28px) !important;
+            max-width: 100% !important;
 
             .card-arrow {
               position: absolute;
