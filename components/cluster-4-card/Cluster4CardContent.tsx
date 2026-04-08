@@ -301,7 +301,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     new Map([
       ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
       ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
-      ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
+      ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
       ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
       ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
       ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],

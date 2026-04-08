@@ -328,7 +328,15 @@ const SHARED_CAREER_RECORDS: CareerRecord[] = [
 const COMP_ACTIVITIES_DW01: WeeklyActivity[] = [
   { id: "wa-comp-1", activity_type_id: "comp-1", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
   { id: "wa-comp-2", activity_type_id: "comp-2", title: "진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
-  { id: "wa-comp-3", activity_type_id: "comp-3", title: "커리어 역량 진단 결과 요약 및 성장 로드맵", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
+  {
+    id: "wa-comp-3",
+    activity_type_id: "comp-3",
+    title:
+      "커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵 커리어 역량 진단 결과 요약 및 성장 로드맵",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: null,
+  },
   { id: "wa-comp-4", activity_type_id: "comp-4", title: null, is_active: false, opened_at: null, output_links: null },
 ];
 
