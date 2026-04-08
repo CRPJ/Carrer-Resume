@@ -3805,7 +3805,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ? "-"
                           : (() => {
                               const t = card.badge.replace("|", " - ");
-                              return t.length > 22 ? t.slice(0, 22) + ".." : t;
+                              return t;
                             })()}
                       </p>
                       <div className="card-title-row">
@@ -3829,7 +3829,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ? "-"
                           : (() => {
                               const text = card.projectDescription || "-";
-                              return text.length > 70 ? text.slice(0, 70) + "..." : text;
+                              return text;
                             })()}
                       </span>
                       {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}

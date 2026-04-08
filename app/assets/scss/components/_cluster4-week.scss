@@ -3206,12 +3206,13 @@
             align-items: center;
             gap: 12px;
             margin-bottom: 7px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
 
             .title-icon {
               width: 16px;
               height: 16px;
               object-fit: contain;
+              flex-shrink: 0;
             }
 
             .card-title {
@@ -3220,6 +3221,7 @@
               color: #ffec8f;
               font-family: "Manrope", sans-serif;
               line-height: 16px;
+              flex-shrink: 0;
             }
 
             .verified-icon {
@@ -3227,6 +3229,7 @@
               height: 16px;
               object-fit: contain;
               margin-left: 4px;
+              flex-shrink: 0;
             }
 
             .verified-text {
@@ -3235,6 +3238,7 @@
               color: #fff;
               font-family: "Manrope", sans-serif;
               line-height: 16px;
+              flex-shrink: 0;
             }
 
             .code-tag {
@@ -3243,6 +3247,7 @@
               color: #ffec8f;
               font-family: "Pretendard", sans-serif;
               line-height: 16px;
+              flex-shrink: 0;
             }
 
             .info-tag {
@@ -3255,6 +3260,10 @@
               font-weight: 600;
               white-space: nowrap;
               line-height: 15px;
+              min-width: 0;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              flex: 0 1 auto;
             }
           }
 
@@ -4168,6 +4177,7 @@
             box-sizing: border-box;
             width: 100%;
             max-width: calc(100% - 16px) !important;
+            word-break: break-all;
 
             .card-arrow {
               position: absolute;
@@ -4248,6 +4258,7 @@
         .category-text {
           display: inline-block !important;
           width: fit-content;
+          max-width: calc(100% - 60px);
           font-size: 15px;
           color: #faab07;
           background: rgba(250, 171, 7, 0.1);
@@ -4256,6 +4267,8 @@
           font-family: "Rajdhani", sans-serif;
           font-weight: 500;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           line-height: 15px;
           margin: 0 0 10px 0;
         }
@@ -4425,6 +4438,16 @@
               object-fit: contain;
             }
           }
+        }
+      }
+
+      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
+      .work-career-card:not(.empty) {
+        .main-desc-white {
+          max-width: calc(100% - 63px) !important;
+        }
+        .sub-desc {
+          max-width: calc(100% - 63px) !important;
         }
       }
 

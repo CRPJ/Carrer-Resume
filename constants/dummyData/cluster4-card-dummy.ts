@@ -94,19 +94,43 @@ export interface WeekCardDummyData {
 // forum Minimal / session Normal / practical_lecture Overflow / community Empty
 const SHARED_INFO_ACTIVITIES: WeeklyActivity[] = [
   { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 우리나라 만세 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-  { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니다 지구라는 한정된 공간에서 평생을 살아가는 우리에게 무한이라는 개념은 실제로 체감하기 어려운 추상적인 개념으로만 느껴지며 매일 보는 하늘이 사실 끝없이 펼쳐진 시공간의 한 단면일 뿐이라는 사실을 떠올리면 신비로움이 더해지고 우주의 광활함을 깊이 사색하게 됩니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+  {
+    id: "wa-2",
+    activity_type_id: "essay",
+    title:
+      "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니다 지구라는 한정된 공간에서 평생을 살아가는 우리에게 무한이라는 개념은 실제로 체감하기 어려운 추상적인 개념으로만 느껴지며 매일 보는 하늘이 사실 끝없이 펼쳐진 시공간의 한 단면일 뿐이라는 사실을 떠올리면 신비로움이 더해지고 우주의 광활함을 깊이 사색하게 됩니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: [],
+  },
   { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 SNS 마케팅 채널별 성과 지표 비교 분석 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
   { id: "wa-4", activity_type_id: "calendar", title: null, is_active: false, opened_at: null, output_links: null },
   { id: "wa-5", activity_type_id: "forum", title: "토론", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
   { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-  { id: "wa-7", activity_type_id: "practical_lecture", title: "디지털 마케팅 실무에서 활용되는 구글 애널리틱스와 메타 비즈니스 스위트를 활용한 캠페인 성과 측정 방법론을 학습하고 실제 데이터를 기반으로 마케팅 퍼널 각 단계별 전환율을 최적화하는 전략을 수립하며 A/B 테스트 설계와 결과 해석 능력을 키우는 실전형 워크샵으로 현업 마케터가 반드시 갖춰야 할 핵심 역량을 압축적으로 전달합니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+  {
+    id: "wa-7",
+    activity_type_id: "practical_lecture",
+    title:
+      "디지털 마케팅 실무에서 활용되는 구글 애널리틱스와 메타 비즈니스 스위트를 활용한 캠페인 성과 측정 방법론을 학습하고 실제 데이터를 기반으로 마케팅 퍼널 각 단계별 전환율을 최적화하는 전략을 수립하며 A/B 테스트 설계와 결과 해석 능력을 키우는 실전형 워크샵으로 현업 마케터가 반드시 갖춰야 할 핵심 역량을 압축적으로 전달합니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: [],
+  },
   { id: "wa-13", activity_type_id: "community", title: null, is_active: false, opened_at: null, output_links: null },
 ];
 
 // ── exp 4개 — 전 주차 공통 ──
 // exp-1 Overflow / exp-2 Normal / exp-3 Minimal / exp-4 Empty
 const SHARED_EXP_ACTIVITIES: WeeklyActivity[] = [
-  { id: "wa-9", activity_type_id: "exp-1", title: "고객 인터뷰를 통해 발견한 페르소나별 핵심 니즈를 정리하고 이를 바탕으로 신규 마케팅 캠페인 전략을 수립하며 다양한 채널에서 실제 사용자 반응을 측정한 후 데이터 분석 결과를 종합하여 다음 분기 마케팅 로드맵을 설계하는 실무 프로젝트로 구성된 종합 실습 과정에서 협업과 커뮤니케이션 역량까지 함께 키울 수 있는 통합 워크샵입니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
+  {
+    id: "wa-9",
+    activity_type_id: "exp-1",
+    title:
+      "고객 인터뷰를 통해 발견한 페르소나별 핵심 니즈를 정리하고 이를 바탕으로 신규 마케팅 캠페인 전략을 수립하며 다양한 채널에서 실제 사용자 반응을 측정한 후 데이터 분석 결과를 종합하여 다음 분기 마케팅 로드맵을 설계하는 실무 프로젝트로 구성된 종합 실습 과정에서 협업과 커뮤니케이션 역량까지 함께 키울 수 있는 통합 워크샵입니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: [],
+  },
   { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 마케팅 포트폴리오 상호 피드백 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
   { id: "wa-11", activity_type_id: "exp-3", title: "실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
   { id: "wa-12", activity_type_id: "exp-4", title: null, is_active: false, opened_at: null, output_links: null },
@@ -114,7 +138,12 @@ const SHARED_EXP_ACTIVITIES: WeeklyActivity[] = [
 
 // ── exp details — 전 주차 공통 ──
 const SHARED_EXP_DETAILS: ActivityDetail[] = [
-  { week_id: "dw-01", activity_type_id: "exp-1", sub_title: "프로젝트 성과 분석 결과 핵심 KPI 지표는 목표 대비 평균 120퍼센트를 달성하였으며 특히 신규 사용자 유입과 리텐션 측면에서 의미있는 성과를 보였습니다 다만 중장기 커뮤니케이션 전략과 콘텐츠 다양성 측면에서는 개선이 필요한 영역이 식별되어 다음 분기 추진 방향에 반영하였습니다", output_links: [] },
+  {
+    week_id: "dw-01",
+    activity_type_id: "exp-1",
+    sub_title: "프로젝트 성과 분석 결과 핵심 KPI 지표는 목표 대비 평균 120퍼센트를 달성하였으며 특히 신규 사용자 유입과 리텐션 측면에서 의미있는 성과를 보였습니다 다만 중장기 커뮤니케이션 전략과 콘텐츠 다양성 측면에서는 개선이 필요한 영역이 식별되어 다음 분기 추진 방향에 반영하였습니다",
+    output_links: [],
+  },
   { week_id: "dw-01", activity_type_id: "exp-2", sub_title: "피드백을 통해 발견한 강점 3가지와 액션 플랜", output_links: [] },
   { week_id: "dw-01", activity_type_id: "exp-3", sub_title: null, output_links: null },
   { week_id: "dw-01", activity_type_id: "exp-4", sub_title: "분석", output_links: [] },
@@ -133,7 +162,7 @@ const SHARED_CAREER_RECORDS: CareerRecord[] = [
     project_id: "p-demo-1",
     week_id: "dw-01",
     company_name: "네이버",
-    company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+    company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자3.png",
     job_position: "네이버 마케팅",
     project_name: "네이버 브랜드 캠페인 기획 및 실행 프로젝트",
     project_description: "타겟 페르소나 분석부터 캠페인 실행까지 전 과정 참여",
@@ -152,7 +181,7 @@ const SHARED_CAREER_RECORDS: CareerRecord[] = [
     supervisor_position: "과장",
     supervisor_department: "네이버 마케팅팀",
     supervisor_company: "네이버",
-    supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자2.png",
+    supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자3.png",
   },
   // 카드 2 — Overflow
   {
@@ -241,7 +270,7 @@ const SHARED_CAREER_RECORDS: CareerRecord[] = [
     project_id: "p-sparse-1",
     week_id: "dw-01",
     company_name: "스타트업비밀",
-    company_logo_url: null,
+    company_logo_url: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
     job_position: "-",
     project_name: null,
     project_description: null,
@@ -260,7 +289,7 @@ const SHARED_CAREER_RECORDS: CareerRecord[] = [
     supervisor_position: null,
     supervisor_department: null,
     supervisor_company: null,
-    supervisor_profile_img: null,
+    supervisor_profile_img: "/images/0/cluster4/icon/실무 경력/감독자.jpg",
   },
   // 카드 6 — Normal
   {
@@ -313,10 +342,38 @@ const COMP_ACTIVITIES_DW02: WeeklyActivity[] = [
 
 // dw-03 — 전부 🔴Overflow (150자+) : 각 comp별로 다른 역량 주제 (디지털/소셜/브랜드/프로젝트)
 const COMP_ACTIVITIES_DW03: WeeklyActivity[] = [
-  { id: "wa-comp-1", activity_type_id: "comp-1", title: "마케팅 커뮤니케이션 역량 진단을 통해 브랜드 메시지 전달력과 타겟 오디언스 분석 능력을 종합적으로 평가하고 디지털 채널별 콘텐츠 기획 및 퍼포먼스 마케팅 실행 역량을 데이터 기반으로 측정하여 개인별 맞춤 성장 로드맵을 수립하는 체계적인 역량 진단 프로그램입니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
-  { id: "wa-comp-2", activity_type_id: "comp-2", title: "소비자 행동 분석과 시장 조사 방법론에 대한 이해도를 평가하고 정량적 데이터와 정성적 인사이트를 결합한 마케팅 전략 수립 능력을 진단하며 경쟁사 벤치마킹과 포지셔닝 전략 도출 과정에서의 분석적 사고력을 종합적으로 측정하는 역량 평가입니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
-  { id: "wa-comp-3", activity_type_id: "comp-3", title: "디지털 광고 플랫폼 운영 능력과 캠페인 최적화 역량을 구글 애즈 메타 비즈니스 스위트 네이버 검색광고 등 주요 플랫폼별로 세분화하여 진단하고 ROAS 개선을 위한 A/B 테스트 설계 및 결과 해석 능력까지 포괄적으로 평가하는 실무 역량 진단입니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
-  { id: "wa-comp-4", activity_type_id: "comp-4", title: "콘텐츠 마케팅 전략 수립부터 실행까지의 전 과정에서 요구되는 핵심 역량을 진단하며 SEO 최적화 소셜미디어 콘텐츠 기획 영상 콘텐츠 제작 디렉션 인플루언서 협업 관리 등 다양한 콘텐츠 채널별 실무 수행 능력을 체계적으로 평가합니다", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: null },
+  {
+    id: "wa-comp-1",
+    activity_type_id: "comp-1",
+    title: "마케팅 커뮤니케이션 역량 진단을 통해 브랜드 메시지 전달력과 타겟 오디언스 분석 능력을 종합적으로 평가하고 디지털 채널별 콘텐츠 기획 및 퍼포먼스 마케팅 실행 역량을 데이터 기반으로 측정하여 개인별 맞춤 성장 로드맵을 수립하는 체계적인 역량 진단 프로그램입니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: null,
+  },
+  {
+    id: "wa-comp-2",
+    activity_type_id: "comp-2",
+    title: "소비자 행동 분석과 시장 조사 방법론에 대한 이해도를 평가하고 정량적 데이터와 정성적 인사이트를 결합한 마케팅 전략 수립 능력을 진단하며 경쟁사 벤치마킹과 포지셔닝 전략 도출 과정에서의 분석적 사고력을 종합적으로 측정하는 역량 평가입니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: null,
+  },
+  {
+    id: "wa-comp-3",
+    activity_type_id: "comp-3",
+    title: "디지털 광고 플랫폼 운영 능력과 캠페인 최적화 역량을 구글 애즈 메타 비즈니스 스위트 네이버 검색광고 등 주요 플랫폼별로 세분화하여 진단하고 ROAS 개선을 위한 A/B 테스트 설계 및 결과 해석 능력까지 포괄적으로 평가하는 실무 역량 진단입니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: null,
+  },
+  {
+    id: "wa-comp-4",
+    activity_type_id: "comp-4",
+    title: "콘텐츠 마케팅 전략 수립부터 실행까지의 전 과정에서 요구되는 핵심 역량을 진단하며 SEO 최적화 소셜미디어 콘텐츠 기획 영상 콘텐츠 제작 디렉션 인플루언서 협업 관리 등 다양한 콘텐츠 채널별 실무 수행 능력을 체계적으로 평가합니다",
+    is_active: true,
+    opened_at: "2025-01-01T00:00:00Z",
+    output_links: null,
+  },
 ];
 
 // dw-04 — 전부 🔵Minimal (1~3자)
@@ -343,7 +400,12 @@ const COMP_ACTIVITIES_DW05: WeeklyActivity[] = [
 const COMP_DETAILS_DW01: ActivityDetail[] = [
   { week_id: "dw-01", activity_type_id: "comp-1", sub_title: "주요 성과 지표와 개선 우선순위를 정리한 진단 결과", output_links: [] },
   { week_id: "dw-01", activity_type_id: "comp-2", sub_title: null, output_links: null },
-  { week_id: "dw-01", activity_type_id: "comp-3", sub_title: "마케터 직무 역량 진단 테스트는 브랜드 전략, 콘텐츠 기획, 데이터 분석, 광고 운영, 고객 커뮤니케이션 등 마케팅 핵심 영역 전반에 대한 이해도와 실무 적용 능력을 종합적으로 측정하여 강점과 약점을 파악하고 이를 기반으로 맞춤형 학습 로드맵을 제시하는 종합 진단 리포트로 마무리됩니다", output_links: [] },
+  {
+    week_id: "dw-01",
+    activity_type_id: "comp-3",
+    sub_title: "마케터 직무 역량 진단 테스트는 브랜드 전략, 콘텐츠 기획, 데이터 분석, 광고 운영, 고객 커뮤니케이션 등 마케팅 핵심 영역 전반에 대한 이해도와 실무 적용 능력을 종합적으로 측정하여 강점과 약점을 파악하고 이를 기반으로 맞춤형 학습 로드맵을 제시하는 종합 진단 리포트로 마무리됩니다",
+    output_links: [],
+  },
   { week_id: "dw-01", activity_type_id: "comp-4", sub_title: "결과", output_links: [] },
 ];
 
@@ -495,23 +557,23 @@ export const DUMMY_WEEK_CARD: Record<string, WeekCardDummyData> = {
     weeklyActivities: [...SHARED_INFO_ACTIVITIES, ...COMP_ACTIVITIES_DW05, ...SHARED_EXP_ACTIVITIES],
     weekActivityDetails: [...COMP_DETAILS_DW05, ...SHARED_EXP_DETAILS],
     weekActivityRecords: [
-      { week_id: "dw-05", activity_type_id: "wisdom", is_completed: true },           // idx 0
-      { week_id: "dw-05", activity_type_id: "essay", is_completed: false },           // idx 1
-      { week_id: "dw-05", activity_type_id: "infodesk", is_completed: true },         // idx 2
-      { week_id: "dw-05", activity_type_id: "calendar", is_completed: false },        // idx 3
-      { week_id: "dw-05", activity_type_id: "forum", is_completed: true },            // idx 4
-      { week_id: "dw-05", activity_type_id: "session", is_completed: false },         // idx 5
-      { week_id: "dw-05", activity_type_id: "practical_lecture", is_completed: true },// idx 6
-      { week_id: "dw-05", activity_type_id: "community", is_completed: false },       // idx 7
-      { week_id: "dw-05", activity_type_id: "etc_a", is_completed: true },            // idx 8
-      { week_id: "dw-05", activity_type_id: "comp-1", is_completed: false },          // idx 9
-      { week_id: "dw-05", activity_type_id: "comp-2", is_completed: true },           // idx 10
-      { week_id: "dw-05", activity_type_id: "comp-3", is_completed: false },          // idx 11
-      { week_id: "dw-05", activity_type_id: "comp-4", is_completed: true },           // idx 12
-      { week_id: "dw-05", activity_type_id: "exp-1", is_completed: false },           // idx 13
-      { week_id: "dw-05", activity_type_id: "exp-2", is_completed: true },            // idx 14
-      { week_id: "dw-05", activity_type_id: "exp-3", is_completed: false },           // idx 15
-      { week_id: "dw-05", activity_type_id: "exp-4", is_completed: true },            // idx 16
+      { week_id: "dw-05", activity_type_id: "wisdom", is_completed: true }, // idx 0
+      { week_id: "dw-05", activity_type_id: "essay", is_completed: false }, // idx 1
+      { week_id: "dw-05", activity_type_id: "infodesk", is_completed: true }, // idx 2
+      { week_id: "dw-05", activity_type_id: "calendar", is_completed: false }, // idx 3
+      { week_id: "dw-05", activity_type_id: "forum", is_completed: true }, // idx 4
+      { week_id: "dw-05", activity_type_id: "session", is_completed: false }, // idx 5
+      { week_id: "dw-05", activity_type_id: "practical_lecture", is_completed: true }, // idx 6
+      { week_id: "dw-05", activity_type_id: "community", is_completed: false }, // idx 7
+      { week_id: "dw-05", activity_type_id: "etc_a", is_completed: true }, // idx 8
+      { week_id: "dw-05", activity_type_id: "comp-1", is_completed: false }, // idx 9
+      { week_id: "dw-05", activity_type_id: "comp-2", is_completed: true }, // idx 10
+      { week_id: "dw-05", activity_type_id: "comp-3", is_completed: false }, // idx 11
+      { week_id: "dw-05", activity_type_id: "comp-4", is_completed: true }, // idx 12
+      { week_id: "dw-05", activity_type_id: "exp-1", is_completed: false }, // idx 13
+      { week_id: "dw-05", activity_type_id: "exp-2", is_completed: true }, // idx 14
+      { week_id: "dw-05", activity_type_id: "exp-3", is_completed: false }, // idx 15
+      { week_id: "dw-05", activity_type_id: "exp-4", is_completed: true }, // idx 16
     ],
     careerRecords: SHARED_CAREER_RECORDS,
   },
