@@ -3043,6 +3043,8 @@
           font-weight: 700;
           color: #fff;
           margin: 0;
+          word-break: keep-all;
+          overflow-wrap: break-word;
         }
 
         .final-tag {
