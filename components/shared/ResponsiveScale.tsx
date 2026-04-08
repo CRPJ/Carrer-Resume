@@ -20,14 +20,20 @@ const ResponsiveScale = () => {
     };
 
     // 1920px 초과 해상도에서만 10% 확대
-    if (screen.width > 1920) {
-      document.documentElement.style.zoom = "1.08";
-    }
+    const applyZoom = () => {
+      if (screen.width > 1920) {
+        document.documentElement.style.zoom = "1.08";
+      } else {
+        document.documentElement.style.zoom = "";
+      }
+    };
+    applyZoom();
 
     // 초기 측정 + 로드 후 재측정
     updateHeaderDividerY();
     window.addEventListener("load", updateHeaderDividerY);
     window.addEventListener("resize", updateHeaderDividerY);
+    window.addEventListener("resize", applyZoom);
 
     // 레이아웃 계산 완료 후 페이지 표시 (헤더-사이드바 flash 방지)
     requestAnimationFrame(() => {
@@ -37,6 +43,7 @@ const ResponsiveScale = () => {
     return () => {
       window.removeEventListener("load", updateHeaderDividerY);
       window.removeEventListener("resize", updateHeaderDividerY);
+      window.removeEventListener("resize", applyZoom);
       document.documentElement.style.removeProperty("--header-divider-y");
     };
   }, []);

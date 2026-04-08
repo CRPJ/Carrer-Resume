@@ -552,7 +552,7 @@ const Sidebar = () => {
 
       // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
       // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
-      const originalWidth = window.innerWidth * browserZoom;
+      const originalWidth = screen.width;
       if (originalWidth > 1920) {
         scale = 1.31;
       }
