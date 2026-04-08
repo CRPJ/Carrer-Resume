@@ -1453,6 +1453,7 @@
                   gap: 0;
                   line-height: 1;
                   min-width: 150px;
+                  max-width: 185px;
                   flex-shrink: 0;
                   overflow: hidden;
                   text-overflow: ellipsis;
@@ -2000,6 +2001,7 @@
                 flex-direction: column;
                 gap: 0;
                 min-width: 150px;
+                max-width: 250px;
                 flex-shrink: 0;
                 overflow: hidden;
                 text-overflow: ellipsis;

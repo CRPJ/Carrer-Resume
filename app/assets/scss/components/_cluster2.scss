@@ -913,6 +913,8 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        max-width: 100%;
+        overflow: hidden;
 
         .quote-badge {
           display: inline-block;
@@ -948,6 +950,11 @@
           font-weight: 400;
           word-break: break-word;
           overflow-wrap: break-word;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          max-width: 100%;
         }
 
         .quote-footer {
@@ -956,12 +963,16 @@
           align-items: center;
           margin-top: auto;
           margin-bottom: 10px;
+          overflow: hidden;
         }
 
         .quote-author {
           display: flex;
           align-items: center;
           gap: 12px;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
 
           img {
             width: 50px;
@@ -975,6 +986,8 @@
             display: flex;
             flex-direction: column;
             gap: 0px;
+            max-width: 100%;
+            overflow: hidden;
 
             .author-name {
               font-family: "DM Sans", sans-serif;
@@ -985,6 +998,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+              max-width: 100%;
             }
 
             .author-role {
@@ -1005,6 +1019,7 @@
           flex-direction: column;
           align-items: flex-end;
           gap: 0px;
+          flex-shrink: 0;
 
           .score-label {
             font-family: "DM Sans", sans-serif;
@@ -1319,6 +1334,7 @@
               display: flex;
               flex-direction: column;
               gap: 2px;
+              min-width: 0;
 
               .video-title {
                 font-family: "Khula", sans-serif;
@@ -1815,9 +1831,12 @@
             position: relative;
             z-index: 1;
             left: 20px;
+            display: inline-block;
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            vertical-align: middle;
           }
         }
 
@@ -1865,6 +1884,7 @@
             font-weight: 600;
             line-height: 24px;
             min-width: 100px;
+            max-width: 165px;
             flex-shrink: 0;
             overflow: hidden;
             text-overflow: ellipsis;

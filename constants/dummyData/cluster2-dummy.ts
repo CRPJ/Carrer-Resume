@@ -1,5 +1,5 @@
-export const DEMO_CREW_MEMBERS = ['윤재윤', '전민경', '안지혜', '곽예원', '김의환'] as const;
-export const DEFAULT_DEMO_USER = '윤재윤';
+export const DEMO_CREW_MEMBERS = ["윤재윤", "전민경", "안지혜", "곽예원", "김의환"] as const;
+export const DEFAULT_DEMO_USER = "윤재윤";
 
 // 윤재윤 — TYPICAL (자연스러운 중간 값)
 export const CLUSTER2_DUMMY_PHOTOS = {
@@ -70,7 +70,7 @@ const OVERFLOW_SHORT = "사용자 입력 필드의 maxLength 제약을 초과하
 
 export const CLUSTER2_DUMMY_BY_USER: Record<string, Cluster2UserData> = {
   // 1) 윤재윤 — TYPICAL: 자연스러운 중간 값
-  "윤재윤": {
+  윤재윤: {
     photos: CLUSTER2_DUMMY_PHOTOS,
     slogans: CLUSTER2_DUMMY_SLOGANS,
     videos: CLUSTER2_DUMMY_VIDEOS,
@@ -80,7 +80,7 @@ export const CLUSTER2_DUMMY_BY_USER: Record<string, Cluster2UserData> = {
   },
 
   // 2) 전민경 — VOID: 모든 필드 비어있는 상태
-  "전민경": {
+  전민경: {
     photos: {
       mainPhoto: "",
       subPhotos: [null, null, null, null],
@@ -111,21 +111,16 @@ export const CLUSTER2_DUMMY_BY_USER: Record<string, Cluster2UserData> = {
   },
 
   // 3) 안지혜 — OVERFLOW: 최대 글자수 초과, 모든 슬롯 가득
-  "안지혜": {
+  안지혜: {
     photos: {
       mainPhoto: "/images/0/cluster 2/dummy/sub-photo-2.png",
-      subPhotos: [
-        "/images/0/cluster 2/dummy/sub-photo-1.png",
-        "/images/0/cluster 2/dummy/sub-photo-2.png",
-        "/images/0/cluster 2/dummy/sub-photo-3.png",
-        "/images/0/cluster 2/dummy/sub-photo-4.png",
-      ],
+      subPhotos: ["/images/0/cluster 2/dummy/sub-photo-1.png", "/images/0/cluster 2/dummy/sub-photo-2.png", "/images/0/cluster 2/dummy/sub-photo-3.png", "/images/0/cluster 2/dummy/sub-photo-4.png"],
     },
     slogans: {
       engName: "AHN JIHYE THE OVERFLOW QUEEN OF VERY VERY LONG ENGLISH NAME FOR TESTING",
-      slogan1: { option: "Dreamer", content: OVERFLOW_SHORT, rating: 10 },
-      slogan2: { option: "Pioneer", content: OVERFLOW_SHORT + " 추가 텍스트 추가 텍스트", rating: 10 },
-      slogan3: { option: "Warrior", content: OVERFLOW_SHORT + OVERFLOW_SHORT, rating: 10 },
+      slogan1: { option: "Dreamer", content: "사용자 입력 필드의 maxLength 제약 86자 이내 경계선에서 정확히 테스트하는 슬로건 최대 길이 케이스", rating: 10 },
+      slogan2: { option: "Pioneer", content: "브랜드 스토리텔링과 데이터 기반 퍼포먼스 마케팅의 절묘한 균형을 추구하며 매일 성장 중인 디지털 마케터", rating: 10 },
+      slogan3: { option: "Warrior", content: "고객 여정의 모든 터치포인트에서 의미있는 경험을 만들어가는 퍼포먼스 마케터로 성장하는 긴 여정 중", rating: 10 },
     },
     videos: {
       videoUrl1: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -228,15 +223,10 @@ export const CLUSTER2_DUMMY_BY_USER: Record<string, Cluster2UserData> = {
   },
 
   // 4) 곽예원 — PARTIAL: 순차 입력의 첫 1~2개만 채움
-  "곽예원": {
+  곽예원: {
     photos: {
       mainPhoto: "/images/0/cluster 2/dummy/sub-photo-3.png",
-      subPhotos: [
-        "/images/0/cluster 2/dummy/sub-photo-1.png",
-        "/images/0/cluster 2/dummy/sub-photo-2.png",
-        null,
-        null,
-      ],
+      subPhotos: ["/images/0/cluster 2/dummy/sub-photo-1.png", "/images/0/cluster 2/dummy/sub-photo-2.png", null, null],
     },
     slogans: {
       engName: "KWAK YEWON",
@@ -283,7 +273,7 @@ export const CLUSTER2_DUMMY_BY_USER: Record<string, Cluster2UserData> = {
   },
 
   // 5) 김의환 — MINIMAL: 1글자/단일 항목
-  "김의환": {
+  김의환: {
     photos: {
       mainPhoto: "/images/0/cluster 2/dummy/sub-photo-4.png",
       subPhotos: [null, null, null, null],
