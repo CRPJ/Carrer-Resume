@@ -4264,7 +4264,7 @@
         .category-text {
           display: inline-block !important;
           width: fit-content;
-          max-width: 269px;
+          max-width: calc(100% - 16px);
           font-size: 15px;
           color: #faab07;
           background: rgba(250, 171, 7, 0.1);
@@ -4450,10 +4450,10 @@
       // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
       .work-career-card:not(.empty) {
         .main-desc-white {
-          max-width: 269px !important;
+          max-width: calc(100% - 16px) !important;
         }
         .sub-desc {
-          max-width: 269px !important;
+          max-width: calc(100% - 16px) !important;
         }
       }
 
