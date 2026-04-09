@@ -542,7 +542,7 @@ const Sidebar = () => {
       const browserZoom = window.outerWidth / window.innerWidth || 1;
 
       // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
-      const viewportHeight = (window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
+      const viewportHeight = (screen.width < 1920 && window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 

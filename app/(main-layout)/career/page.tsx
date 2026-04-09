@@ -38,9 +38,9 @@ const HomePageTwo = () => {
       const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       if (zoom <= 1 && window.innerWidth < 1920) {
         setSidebarStyle({
-          position: 'absolute',
-          left: '110px',
-          top: '125px',
+          position: 'relative',
+          left: '',
+          top: '',
           overflow: 'visible',
           zIndex: 100,
         });
