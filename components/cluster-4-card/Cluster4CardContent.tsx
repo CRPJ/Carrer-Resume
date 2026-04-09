@@ -1599,7 +1599,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // 4. 2차 정보 미기입 시, 48시간 경과 여부 확인
     const openedAt = activity?.opened_at;
     if (!openedAt) {
-      // 개설 시각이 없으면 대기 상태로 처리
+      // 개설 시각이 없으면, 주차 종료일 기준 48시간 경과 여부로 판단
+      // (지나간 주차의 미기록 활동은 자동으로 강화 성공 처리)
+      if (weekData?.endDate) {
+        const weekEndTime = new Date(`${weekData.endDate}T23:59:59`).getTime();
+        if (Date.now() - weekEndTime >= 48 * 60 * 60 * 1000) {
+          return 'success';
+        }
+      }
       console.log(`[getEnhancementStatus] ${activityType}: no opened_at -> waiting`);
       return 'waiting';
     }
