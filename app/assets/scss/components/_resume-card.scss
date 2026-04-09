@@ -1542,6 +1542,14 @@
   }
 }
 
+// 1920 미만에서 sidebar shell이 카드(489px)보다 좁아지는 현상 방지
+// 1920×1080에서의 shell width(583px)를 최소값으로 고정
+@media (max-width: 1919px) {
+  .sidebar-card-shell {
+    min-width: 583px !important;
+  }
+}
+
 // PX Theme - Green color scheme
 .resume-card.px-theme {
   // Section 3 - intro border

@@ -542,7 +542,7 @@ const Sidebar = () => {
       const browserZoom = window.outerWidth / window.innerWidth || 1;
 
       // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
-      const viewportHeight = window.innerHeight * browserZoom;
+      const viewportHeight = (window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
@@ -1628,6 +1628,7 @@ const Sidebar = () => {
       />
       {/* 스케일된 카드 - 비율 유지하며 화면에 맞춤 */}
       <div
+        className="sidebar-card-shell"
         style={{
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
