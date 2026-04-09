@@ -3532,7 +3532,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="card-header-area">
                       <div className="card-header-row">
                         <span className="code-tag">{isEmpty ? "-" : card.code}</span>
-                        <span className="badge-tag">{isEmpty ? "-" : card.badge.length > 25 ? card.badge.slice(0, 22) + ".." : card.badge}</span>
+                        <span className="badge-tag">{isEmpty ? "-" : card.badge}</span>
                       </div>
                       <div className="card-rating-row">
                         <div className="stars">{renderStars(isEmpty ? 0 : card.rating)}</div>
@@ -3686,7 +3686,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {hasActivity && activityTypeInfo && (
                       <>
                         <span className="code-tag">{activityTypeInfo.line_code}</span>
-                        <span className="info-tag">{activityTypeInfo.name.length > 35 ? activityTypeInfo.name.slice(0, 35) + ".." : activityTypeInfo.name}</span>
+                        <span className="info-tag">{activityTypeInfo.name}</span>
                       </>
                     )}
                   </div>
