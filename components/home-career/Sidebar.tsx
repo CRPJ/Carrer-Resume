@@ -542,7 +542,14 @@ const Sidebar = () => {
       const browserZoom = window.outerWidth / window.innerWidth || 1;
 
       // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
-      const viewportHeight = (screen.width < 1920 && window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
+      const viewportHeight = (window.innerWidth < 1920 && window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
+      console.log('[calculateScale]', {
+        screenWidth: screen.width,
+        innerHeight: window.innerHeight,
+        browserZoom: window.outerWidth / window.innerWidth,
+        계산값: window.innerHeight * (window.outerWidth / window.innerWidth),
+        조건: screen.width < 1920 && window.innerHeight * (window.outerWidth / window.innerWidth) < 1080
+      });
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
@@ -558,6 +565,7 @@ const Sidebar = () => {
       }
 
       setCardScale(scale);
+      console.log('[setCardScale]', scale);
 
       // 사이드바 폭: 1920 이하만 JS로 동적 설정
       // 1921px+ 는 SCSS @media (min-width: 1921px)에서 --sidebar-width: 651px 고정
@@ -1651,6 +1659,7 @@ const Sidebar = () => {
             } as React.CSSProperties
           }
         >
+          {console.log('[render cardScale]', cardScale)}
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
           {/* <button
               onClick={isOwner || demoMode ? handleEditButtonClick : undefined}
