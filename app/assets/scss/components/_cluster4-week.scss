@@ -3355,10 +3355,10 @@
       .work-ability-card:not(.empty) {
         .main-desc,
         .main-desc-white {
-          max-width: calc(100% - 16px) !important;
+          max-width: 764px !important;
         }
         .sub-desc {
-          max-width: calc(100% - 16px) !important;
+          max-width: 764px !important;
         }
       }
 
@@ -3705,7 +3705,7 @@
                 white-space: nowrap;
                 line-height: 15px;
                 min-width: 0;
-                max-width: calc(100% - 16px);
+                max-width: 286px;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
@@ -3909,10 +3909,10 @@
       .work-exp-card:not(.empty) {
         .main-desc,
         .main-desc-white {
-          max-width: calc(100% - 16px) !important;
+          max-width: 460px !important;
         }
         .sub-desc {
-          max-width: calc(100% - 16px) !important;
+          max-width: 460px !important;
         }
       }
     }
@@ -4264,7 +4264,7 @@
         .category-text {
           display: inline-block !important;
           width: fit-content;
-          max-width: calc(100% - 16px);
+          max-width: 269px;
           font-size: 15px;
           color: #faab07;
           background: rgba(250, 171, 7, 0.1);
@@ -4450,10 +4450,10 @@
       // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
       .work-career-card:not(.empty) {
         .main-desc-white {
-          max-width: calc(100% - 16px) !important;
+          max-width: 269px !important;
         }
         .sub-desc {
-          max-width: calc(100% - 16px) !important;
+          max-width: 269px !important;
         }
       }
 
