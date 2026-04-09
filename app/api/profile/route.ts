@@ -384,7 +384,7 @@ export async function GET(request: NextRequest) {
       getCachedParts(),
 
       // user_weekly_growth (시즌별 성공 주차 실시간 계산용)
-      supabaseAdmin.from("user_weekly_growth").select("week_id, is_success, is_resting, weeks!inner(season_id)").eq("user_id", profile.id)
+      supabaseAdmin.from("user_weekly_growth").select("week_id, is_success, is_resting, weeks!inner(season_id, start_date)").eq("user_id", profile.id)
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -914,13 +914,14 @@ export async function GET(request: NextRequest) {
       });
 
     // 시즌별 휴식/성공 시즌 수 실시간 계산 (sortedSeasonHistories 기반)
+    // 현재 진행 중인 시즌(end_date >= today)은 제외 — UI에서 'in_progress'로 보정되므로 카운트에서도 빼야 일치함
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const restSeasonsCount = sortedSeasonHistories.filter((item: any) =>
-      item.progress_status === 'full_rest'
+      item.progress_status === 'full_rest' && !(item.seasons?.end_date >= today)
     ).length;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const approvedSeasonsCount = sortedSeasonHistories.filter((item: any) =>
-      item.progress_status === 'completed'
+      item.progress_status === 'completed' && !(item.seasons?.end_date >= today)
     ).length;
 
     // 클럽 온보딩 주차 반영: 온보딩 시즌의 approved_weeks에 +1
@@ -975,11 +976,14 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     userWeeklyGrowthData.forEach((wg: any) => {
       const seasonId = wg.weeks?.season_id;
+      const wgStartDate = wg.weeks?.start_date;
+      // 온보딩 주차 이전(=합류 전) 성장 기록은 카운트에서 제외
+      const isBeforeJoin = joinedWeekStartDate && wgStartDate && wgStartDate < joinedWeekStartDate;
 
-      if (wg.is_success && seasonId) {
+      if (wg.is_success && seasonId && !isBeforeJoin) {
         seasonSuccessWeeksMap.set(seasonId, (seasonSuccessWeeksMap.get(seasonId) || 0) + 1);
       }
-      if (wg.is_resting) {
+      if (wg.is_resting && !isBeforeJoin) {
         allRestingWeekIds.add(wg.week_id);
       }
     });
@@ -1181,7 +1185,7 @@ export async function GET(request: NextRequest) {
       badges: {
         stars: cumulativePoints?.total_stars || 0,
         lightnings: cumulativePoints?.total_lightnings || 0,
-        shields: cumulativePoints?.total_shields || 0,
+        shields: (cumulativePoints?.total_shields || 0) - (cumulativePoints?.total_lightnings || 0),
       },
       seasonHistories: finalSeasonHistoriesWithOnboarding,
       growthInfo: {

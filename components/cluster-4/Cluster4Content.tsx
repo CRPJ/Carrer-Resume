@@ -595,11 +595,13 @@ const Cluster4Content = () => {
         .select('week_id, weeks!inner(end_date)')
         .eq('user_id', targetUserId);
 
+      const userStartDateForCum = profileResult.growthInfo?.startDate || '1900-01-01';
       let currentCumulativeApproved = 0;
       if (successWeeksData && successWeeksData.length > 0) {
         currentCumulativeApproved = successWeeksData.filter((sw: any) => {
           const weekEndDate = sw.weeks?.end_date;
-          return weekEndDate && weekEndDate <= currentWeekData.end_date;
+          // 온보딩 주차 이전(=합류 전) 성공 주차는 제외
+          return weekEndDate && weekEndDate <= currentWeekData.end_date && weekEndDate >= userStartDateForCum;
         }).length;
       }
       // 온보딩 주차도 누적에 포함 (success_weeks에 없는 경우)
@@ -2041,15 +2043,7 @@ const Cluster4Content = () => {
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 상태.png" alt="시즌 상태" /> 시즌 상태</h4>
                 <div className="status-badges">
                   {(() => {
-                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                    const dbRoles = currentSeason.seasonRoles && currentSeason.seasonRoles.length > 0
-                      ? currentSeason.seasonRoles
-                      : [];
-                    const totalSlots = 3;
-                    // DB 데이터가 기준 미만이면 더미로 채움
-                    const roles = dbRoles.length >= totalSlots
-                      ? dbRoles.slice(0, totalSlots)
-                      : [...dbRoles, ...DUMMY_SEASON_ROLES.slice(dbRoles.length, totalSlots)];
+                    const roles = (currentSeason.seasonRoles || []).slice(0, 3);
                     return roles.map((roleItem, index) => (
                       <div className="badge-item" key={index}>
                         <div className="badge-icon">
@@ -2078,14 +2072,7 @@ const Cluster4Content = () => {
                 <h4 className="section-title"><img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판 <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>({seasonReputations.length}개)</span></h4>
                 <div className="profile-cards">
                   {(() => {
-                    // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
-                    const totalSlots = 3;
-                    const dbReputations = seasonReputations.slice(0, totalSlots);
-                    // DB 데이터가 기준 미만이면 더미로 채움
-                    const allReputations = dbReputations.length >= totalSlots
-                      ? dbReputations
-                      : [...dbReputations, ...DUMMY_SEASON_REPUTATIONS.slice(dbReputations.length, totalSlots)];
-
+                    const allReputations = seasonReputations.slice(0, 3);
                     return allReputations.map((reputation: any) => {
                       const reviewer = reputation.reviewer;
                       const currentYear = new Date().getFullYear();

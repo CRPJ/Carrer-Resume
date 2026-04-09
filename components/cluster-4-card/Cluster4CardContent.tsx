@@ -574,9 +574,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         // 누적 성공 주차 수 계산
         let currentApprovedCount = 0;
         if (successWeeksData.length > 0) {
+          // 온보딩 주차 이전의 성공 주차는 제외 (크루가 합류하기 전 주차)
           currentApprovedCount = successWeeksData.filter((sw: any) => {
             const weekEndDate = sw.weeks?.end_date;
-            return weekEndDate && weekEndDate <= currentWeek.end_date;
+            return weekEndDate && weekEndDate <= currentWeek.end_date && weekEndDate >= userStartDate;
           }).length;
         }
 
@@ -1550,6 +1551,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = 'success' | 'waiting' | 'failed' | 'not_applicable';
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
+    // 온보딩 주차(무적 주차)는 모든 활동이 해당 없음
+    if (isOnboardingWeek) {
+      return 'not_applicable';
+    }
+
     // 실무 경험 활동의 eligible 조건 체크
     const expInfo = experienceTypeInfos.find(info => info.id === activityType);
     if (expInfo) {
