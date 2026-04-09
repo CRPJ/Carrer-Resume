@@ -3262,7 +3262,7 @@
               white-space: nowrap;
               line-height: 15px;
               min-width: 0;
-              max-width: 453px;
+              max-width: 480px;
               overflow: hidden;
               text-overflow: ellipsis;
               flex: 0 1 auto;
@@ -3355,10 +3355,10 @@
       .work-ability-card:not(.empty) {
         .main-desc,
         .main-desc-white {
-          max-width: 764px !important;
+          max-width: 800px !important;
         }
         .sub-desc {
-          max-width: 764px !important;
+          max-width: 800px !important;
         }
       }
 
@@ -3705,7 +3705,7 @@
                 white-space: nowrap;
                 line-height: 15px;
                 min-width: 0;
-                max-width: 286px;
+                max-width: 310px;
                 overflow: hidden;
                 text-overflow: ellipsis;
               }
@@ -3909,10 +3909,10 @@
       .work-exp-card:not(.empty) {
         .main-desc,
         .main-desc-white {
-          max-width: 460px !important;
+          max-width: 490px !important;
         }
         .sub-desc {
-          max-width: 460px !important;
+          max-width: 490px !important;
         }
       }
     }
