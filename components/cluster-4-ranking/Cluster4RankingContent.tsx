@@ -65,6 +65,12 @@ interface TeamStats {
   restCount: number;
 }
 
+// 글자수 기반 말줄임 (info-badge role 8자 초과 시 "..")
+const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
+  const t = text || "-";
+  return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
+};
+
 const Cluster4RankingContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
@@ -1298,7 +1304,7 @@ const Cluster4RankingContent = () => {
                     <div className="info-group">
                       <span className="info-badge role">
                         <img src="/images/0/cluster4/icon/icon - 8.png" alt="role" className="role-icon" />
-                        <span>{user.roleLabel}</span>
+                        <span>{truncate(user.roleLabel, 8)}</span>
                       </span>
                     </div>
                     <div className="info-group items">

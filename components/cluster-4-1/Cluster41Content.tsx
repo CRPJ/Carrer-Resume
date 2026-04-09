@@ -7,6 +7,12 @@ import { supabase } from "@/lib/supabase";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
 
+// 글자수 기반 말줄임 (info-badge role 8자 초과 시 "..")
+const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
+  const t = text || "-";
+  return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
+};
+
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
@@ -2134,7 +2140,7 @@ const Cluster41Content = () => {
                             <div className="info-group">
                               <span className="info-badge role">
                                 <img src="/images/0/cluster4/icon/icon - 8.png" alt="role" className="role-icon" />
-                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{roleInfo?.roleLabel || '-'}</span>
+                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{truncate(roleInfo?.roleLabel, 8)}</span>
                               </span>
                             </div>
                           </>
