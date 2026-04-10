@@ -1806,7 +1806,21 @@ const Sidebar = () => {
               </button>
 
               <button
-                onClick={() => iconLink3 && window.open(iconLink3, "_blank")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const targetPath = '/cluster-3';
+                  const targetSection = 'cluster3-section3';
+                  // 이미 해당 페이지에 있고 section이 DOM에 있으면 바로 스크롤
+                  const section = document.querySelector('.' + targetSection);
+                  if (section) {
+                    const offset = 120;
+                    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+                    return;
+                  }
+                  // 다른 페이지에 있으면 /cluster-3으로 이동 후 스크롤
+                  window.location.href = targetPath + '?scrollTo=' + targetSection;
+                }}
                 style={{
                   width: "24px",
                   height: "24px",

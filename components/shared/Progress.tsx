@@ -37,15 +37,9 @@ const Progress = () => {
       const handleScroll = () => {
         const currentScroll = window.scrollY;
 
-        if (Math.abs(lastScrollTop - currentScroll) <= delta) return;
-
-        if (currentScroll > lastScrollTop) {
-          progressWrap.classList.remove("active-progress");
-        } else {
+        if (currentScroll > 0) {
           progressWrap.classList.add("active-progress");
-        }
-
-        if (currentScroll === 0) {
+        } else {
           progressWrap.classList.remove("active-progress");
         }
 

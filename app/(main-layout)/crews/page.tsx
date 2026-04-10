@@ -501,47 +501,44 @@ const page = () => {
             <div className="col-12">
               <div className="trending-slider-wrapper">
                 {loading ? (
-                  <>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 'calc(100vh - 200px)',
+                  }}>
+                    <img
+                      src="/images/0/금장_OK.png"
+                      alt="로딩 중"
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        animation: 'crewsLively 2s ease-in-out infinite',
+                      }}
+                    />
+                    <p style={{
+                      marginTop: '16px',
+                      fontSize: '16px',
+                      fontWeight: 500,
+                      color: '#fff',
+                      fontFamily: "'Pretendard', sans-serif",
+                      animation: 'crewsPulse 1.5s ease-in-out infinite',
+                    }}>
+                      데이터를 열심히 불러오고 있어요…
+                    </p>
                     <style>{`
-                      @keyframes skeletonPulse {
-                        0%, 100% { opacity: 0.4; }
-                        50% { opacity: 0.8; }
+                      @keyframes crewsLively {
+                        0%, 100% { transform: translateY(0) scale(1); }
+                        50% { transform: translateY(-10px) scale(1.05); }
                       }
-                      .skeleton-card {
-                        border-radius: 12px;
-                        overflow: hidden;
-                        background: #1c242f;
-                        animation: skeletonPulse 1.4s ease-in-out infinite;
-                      }
-                      .skeleton-thumb {
-                        width: 100%;
-                        aspect-ratio: 1;
-                        background: linear-gradient(135deg, #1c242f 0%, #263040 50%, #1c242f 100%);
-                      }
-                      .skeleton-body { padding: 12px; }
-                      .skeleton-line {
-                        height: 12px;
-                        border-radius: 6px;
-                        background: #263040;
-                        margin-bottom: 8px;
+                      @keyframes crewsPulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.4; }
                       }
                     `}</style>
-                    <div
-                      style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}
-                      className="crews-grid"
-                    >
-                      {Array.from({ length: 12 }).map((_, i) => (
-                        <div key={i} className="skeleton-card" style={{ animationDelay: `${i * 0.08}s` }}>
-                          <div className="skeleton-thumb" />
-                          <div className="skeleton-body">
-                            <div className="skeleton-line" style={{ width: '60%' }} />
-                            <div className="skeleton-line" style={{ width: '40%' }} />
-                            <div className="skeleton-line" style={{ width: '50%' }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </>
+                  </div>
                 ) : filteredCrews.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa" }}>
                     조건에 맞는 크루가 없습니다.

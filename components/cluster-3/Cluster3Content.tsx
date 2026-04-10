@@ -56,6 +56,22 @@ const Cluster3Content = () => {
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
   const isDemoMode = checkDemoMode();
 
+  // scrollTo query parameter 처리 (Sidebar hex3에서 이동 시)
+  useEffect(() => {
+    const scrollTarget = searchParams.get('scrollTo');
+    if (scrollTarget) {
+      const timer = setTimeout(() => {
+        const section = document.querySelector('.' + scrollTarget);
+        if (section) {
+          const offset = 120;
+          window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+        }
+        window.history.replaceState({}, '', window.location.pathname);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
     if (!session) return false;
