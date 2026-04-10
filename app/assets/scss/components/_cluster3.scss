@@ -1,13 +1,14 @@
 // Cluster 3 - Club Final Index Styles
 
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=block');
 
-@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=Black+Ops+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=Black+Ops+One&display=block');
 
 @font-face {
   font-family: 'Cafe24Ohsquare';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }
@@ -16,28 +17,28 @@
   font-family: 'HappinessGoheung';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/행복고흥L.woff') format('woff');
   font-weight: 300;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
   font-family: 'HappinessGoheung';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/행복고흥M.woff') format('woff');
   font-weight: 500;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
   font-family: 'HappinessGoheung';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/행복고흥B.woff') format('woff');
   font-weight: 700;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {
   font-family: 'HSBombaram3_Regular';
   src: url('https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.1/HSBombaram3_Regular.woff') format('woff');
   font-weight: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 @keyframes spin {

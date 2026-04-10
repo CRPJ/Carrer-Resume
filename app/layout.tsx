@@ -5,6 +5,7 @@ import { ProfileProvider } from "@/contexts/ProfileContext";
 import ZoomPrevention from "@/components/shared/ZoomPrevention";
 import ResponsiveScale from "@/components/shared/ResponsiveScale";
 import MobileBlockScreen from "@/components/shared/MobileBlockScreen";
+import PageReveal from "@/components/shared/PageReveal";
 import type { Metadata, Viewport } from "next";
 import { Khula, Black_Ops_One, Chakra_Petch, Lobster, Rajdhani } from "next/font/google";
 import "./assets/scss/main.scss";
@@ -40,9 +41,9 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
+      <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`} style={{ opacity: 0 }}>
+        <PageReveal />
         <MobileBlockScreen />
         <SessionProvider>
           <ProfileProvider>

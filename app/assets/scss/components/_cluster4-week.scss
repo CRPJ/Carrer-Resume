@@ -1,10 +1,11 @@
 // Cluster 4 - Club Challenge Growth Styles
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Azeret+Mono:wght@400&family=Poppins:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Azeret+Mono:wght@400&family=Poppins:wght@400;700&display=block");
 
 @font-face {
   font-family: "Cafe24Ohsquare";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff") format("woff");
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }
@@ -12,6 +13,7 @@
 @font-face {
   font-family: "HakgyoansimTuho";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimTuhoR.woff2") format("woff2");
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }
@@ -19,6 +21,7 @@
 @font-face {
   font-family: "CafeAnemone";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2309@1.0/CafeAnemone.woff2") format("woff2");
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }
