@@ -571,6 +571,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           setWeekPoints({ star, lightning, shield });
         }
 
+        // 누적 인절미 계산 (현재 시즌 내, 현재 주차까지의 shield 합계 - lightning 합계)
+        const currentSeasonId = seasonData?.id;
+        const seasonWeekIds = new Set(
+          allWeeksForCumulative
+            .filter((w: any) => w.season_id === currentSeasonId)
+            .map((w: any) => w.id)
+        );
+        const seasonPointsData = allPointsData.filter((p: any) => seasonWeekIds.has(p.week_id));
+        const totalShields = seasonPointsData.filter((p: any) => p.point_type === 'shield').reduce((sum: number, p: any) => sum + p.points, 0);
+        const totalLightnings = seasonPointsData.filter((p: any) => p.point_type === 'lightning').reduce((sum: number, p: any) => sum + p.points, 0);
+        setCumulativeInjeolmi(totalShields - totalLightnings);
+
         // 누적 성공 주차 수 계산
         let currentApprovedCount = 0;
         if (successWeeksData.length > 0) {
@@ -749,12 +761,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
             // 3. 48시간 경과 여부 확인
             const activity = activitiesData.find(a => a.activity_type_id === activityTypeId);
-            if (!activity?.opened_at) return false;
+            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+            if (!activity?.opened_at) {
+              // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
+              if (currentWeek?.end_date) {
+                const weekEndTime = new Date(`${currentWeek.end_date}T23:59:59`).getTime();
+                if (Date.now() - weekEndTime >= deadline) return true;
+              }
+              return false;
+            }
 
             const openedTime = new Date(activity.opened_at).getTime();
-            const now = Date.now();
-            const elapsed = now - openedTime;
-            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+            const elapsed = Date.now() - openedTime;
 
             return elapsed >= deadline;
           };
@@ -783,9 +802,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const experienceSuccess = eligibleExperienceTypes.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
-          setInfoStats({ total: infoTotal, success: infoSuccess });
-          setCompetencyStats({ total: competencyTotal, success: competencySuccess });
-          setExperienceStats({ total: experienceTotal, success: experienceSuccess });
+          // 휴식 주차(공식/개인)는 모든 통계를 0으로 설정
+          const isRestWeek = growthStatus?.includes('휴식') || false;
+          if (isRestWeek) {
+            setInfoStats({ total: 0, success: 0 });
+            setCompetencyStats({ total: 0, success: 0 });
+            setExperienceStats({ total: 0, success: 0 });
+          } else {
+            setInfoStats({ total: infoTotal, success: infoSuccess });
+            setCompetencyStats({ total: competencyTotal, success: competencySuccess });
+            setExperienceStats({ total: experienceTotal, success: experienceSuccess });
+          }
           // careerStats는 career_records useEffect에서 설정됨
         }
 
@@ -857,6 +884,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
+    // 휴식 주차(공식/개인)는 경력 통계도 0으로 설정
+    const restMode = weekData?.growthStatus?.includes('휴식') || false;
+    if (restMode) {
+      setCareerStats({ total: 0, success: 0 });
+      return;
+    }
     // 전체 프로젝트 수 (최대 5개)
     const rawTotal = careerRecords.length;
     const total = Math.min(rawTotal, 5);
@@ -879,7 +912,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }).length;
     const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
-  }, [careerRecords, weekActivityDetails]);
+  }, [careerRecords, weekActivityDetails, weekData]);
 
   // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchKeywordsIfNeeded = async () => {
@@ -1556,6 +1589,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return 'not_applicable';
     }
 
+    // 휴식 주차(공식/개인)는 모든 활동이 해당 없음
+    if (isRestMode) {
+      return 'not_applicable';
+    }
+
     // 실무 경험 활동의 eligible 조건 체크
     const expInfo = experienceTypeInfos.find(info => info.id === activityType);
     if (expInfo) {
@@ -1864,8 +1902,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
-    // 온보딩 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
-    if (isOnboardingWeek) {
+    // 온보딩 주차 또는 휴식 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
+    if (isOnboardingWeek || isRestMode) {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
@@ -2302,7 +2340,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="info-item with-icon">
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                  <strong className="number-value">{weekPoints.shield - weekPoints.lightning}</strong>
+                  <strong className="number-value">{cumulativeInjeolmi}</strong>
                   개
                 </span>
                 <span className="info-divider">·</span>

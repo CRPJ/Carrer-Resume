@@ -1182,11 +1182,22 @@ export async function GET(request: NextRequest) {
       practicalCounts,
       reliabilityRate: finalGrowthPeriodStats.reliabilityRate,
       completionRate,
-      badges: {
-        stars: cumulativePoints?.total_stars || 0,
-        lightnings: cumulativePoints?.total_lightnings || 0,
-        shields: (cumulativePoints?.total_shields || 0) - (cumulativePoints?.total_lightnings || 0),
-      },
+      badges: (() => {
+        // 가입 이후 주차의 포인트만 합산 (user_cumulative_points는 가입 전 포인트도 포함할 수 있음)
+        const validWeekIds = new Set(passedWeeksForUser.map((w: any) => w.id));
+        let totalStars = 0, totalLightnings = 0, totalShields = 0;
+        seasonPointsData.forEach((p: any) => {
+          if (!validWeekIds.has(p.week_id)) return;
+          if (p.point_type === 'star') totalStars += p.points || 0;
+          else if (p.point_type === 'lightning') totalLightnings += p.points || 0;
+          else if (p.point_type === 'shield') totalShields += p.points || 0;
+        });
+        return {
+          stars: totalStars,
+          lightnings: totalLightnings,
+          shields: totalShields - totalLightnings,
+        };
+      })(),
       seasonHistories: finalSeasonHistoriesWithOnboarding,
       growthInfo: {
         status: profile.status,

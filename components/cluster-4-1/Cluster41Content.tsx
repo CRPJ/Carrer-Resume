@@ -334,6 +334,8 @@ const Cluster41Content = () => {
     weeks?: any;
   }
   const [userCareerRecords, setUserCareerRecords] = useState<CareerRecordData[]>([]);
+  // 주차별 경력 프로젝트 수 (career_projects 기반 - total 계산용)
+  const [careerProjectsByWeek, setCareerProjectsByWeek] = useState<Map<string, number>>(new Map());
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
@@ -477,12 +479,15 @@ const Cluster41Content = () => {
     return { star, lightning, shield };
   };
 
-  // 누적 인절미 계산 (특정 주차까지의 누적 shield - lightning)
-  const getCumulativeInjeolmi = (weekEndDate: string) => {
+  // 누적 인절미 계산 (현재 시즌 내, 특정 주차까지의 누적 shield - lightning)
+  const getCumulativeInjeolmi = (weekId: string) => {
     if (dbWeeklyData[0]?.id.startsWith('dummy')) return 30;
-    // 해당 주차 종료일까지의 모든 포인트
+    const currentWeek = dbWeeklyData.find(w => w.id === weekId);
+    if (!currentWeek) return 0;
+
+    // 같은 시즌 내, 해당 주차까지의 week ID만 필터
     const relevantWeekIds = dbWeeklyData
-      .filter(w => w.endDate <= weekEndDate)
+      .filter(w => w.seasonYear === currentWeek.seasonYear && w.seasonName === currentWeek.seasonName && w.endDate <= currentWeek.endDate)
       .map(w => w.id);
 
     const relevantPoints = userPoints.filter(p => relevantWeekIds.includes(p.week_id));
@@ -537,12 +542,20 @@ const Cluster41Content = () => {
     const activity = weeklyActivities.find(wa =>
       wa.week_id === weekId && wa.activity_type_id === activityTypeId
     );
-    if (!activity?.opened_at) return false;
+    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+    if (!activity?.opened_at) {
+      // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
+      const week = dbWeeklyData.find(w => w.id === weekId);
+      if (week?.endDate) {
+        const weekEndTime = new Date(`${week.endDate}T23:59:59`).getTime();
+        if (Date.now() - weekEndTime >= deadline) return true;
+      }
+      return false;
+    }
 
     const openedTime = new Date(activity.opened_at).getTime();
-    const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+    const elapsed = Date.now() - openedTime;
 
     return elapsed >= deadline;
   };
@@ -635,9 +648,9 @@ const Cluster41Content = () => {
     };
   };
 
-  // 주차별 실무 경력 강화율 (career) - career_records 기반, 최대 5개 제한
-  // P(분모) = 해당 주차에 진행 중인 경력 프로젝트 수 (참여한 것 - pending/enhanced)
-  // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수
+  // 주차별 실무 경력 강화율 (career) - career_projects 기반, 최대 5개 제한
+  // P(분모) = 해당 주차에 개설된 경력 프로젝트 수 (career_projects)
+  // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수 (career_records)
   const getWeeklyCareerRate = (weekId: string) => {
     if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 5 };
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
@@ -645,14 +658,12 @@ const Cluster41Content = () => {
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
     // 온보딩 주차도 강화율 정상 계산
 
-    // 해당 주차에 참여한 경력 기록 (pending 또는 enhanced 상태)
-    const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
-
-    // P(분모) = 해당 주차 경력 프로젝트 수 (최대 5개)
-    const rawTotal = weekCareerRecords.length;
+    // P(분모) = 해당 주차 경력 프로젝트 수 (career_projects 기반, 최대 5개)
+    const rawTotal = careerProjectsByWeek.get(weekId) || 0;
     const total = Math.min(rawTotal, 5);
 
     // R(분자) = enhanced 상태인 경력 프로젝트 수 (최대 P개)
+    const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
     const enhancedCount = weekCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
     const count = Math.min(enhancedCount, total);
 
@@ -903,7 +914,8 @@ const Cluster41Content = () => {
             userActivitiesResult,
             activityTypesResult,
             careerRecordsResult,
-            weeklyActivitiesResult
+            weeklyActivitiesResult,
+            careerProjectsResult
           ] = await Promise.all([
             // user_weekly_growth
             supabase.from('user_weekly_growth').select('week_id, is_success, is_resting, is_club_break').eq('user_id', userId),
@@ -918,6 +930,10 @@ const Cluster41Content = () => {
             // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회) + opened_at 추가
             userWeekIds.length > 0
               ? supabase.from('weekly_activities').select('week_id, activity_type_id, is_active, opened_at').in('week_id', userWeekIds)
+              : Promise.resolve({ data: [], error: null }),
+            // career_projects - 주차별 프로젝트 수 (total 계산용)
+            userWeekIds.length > 0
+              ? supabase.from('career_projects').select('id, week_id').eq('is_active', true).in('week_id', userWeekIds)
               : Promise.resolve({ data: [], error: null })
           ]);
 
@@ -939,6 +955,14 @@ const Cluster41Content = () => {
           if (apiActivityDetails.length > 0) setActivityDetails(apiActivityDetails);
           if (careerRecordsResult.data) {
             setUserCareerRecords(careerRecordsResult.data as CareerRecordData[]);
+          }
+          // career_projects → 주차별 프로젝트 수 맵 생성
+          if (careerProjectsResult.data) {
+            const projectMap = new Map<string, number>();
+            careerProjectsResult.data.forEach((p: { week_id: string }) => {
+              projectMap.set(p.week_id, (projectMap.get(p.week_id) || 0) + 1);
+            });
+            setCareerProjectsByWeek(projectMap);
           }
 
           // activity_types에서 클러스터별 ID 분류
@@ -1894,7 +1918,7 @@ const Cluster41Content = () => {
                           const experienceRate = getWeeklyExperienceRate(week.id);
                           const careerRate = getWeeklyCareerRate(week.id);
                           const weekPoints = getPointsForWeek(week.id);
-                          const injeolmi = weekPoints.shield - weekPoints.lightning;
+                          const injeolmi = getCumulativeInjeolmi(week.id);
                           const teamPart = getFormattedTeamPart(week.startDate, week);
                           const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
 
@@ -2010,7 +2034,7 @@ const Cluster41Content = () => {
                       {/* 그룹 3: 아이템들 */}
                       {(() => {
                         const weekPoints = getPointsForWeek(week.id);
-                        const injeolmi = weekPoints.shield - weekPoints.lightning;
+                        const injeolmi = getCumulativeInjeolmi(week.id);
                         return (
                           <div className="info-group items">
                             <span className="info-divider">·</span>
@@ -2058,7 +2082,7 @@ const Cluster41Content = () => {
                             </div>
                             <span className="total-count">
                               <img src="/images/0/cluster4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
-                              총 {growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
+                              총 {isRest ? 0 : growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
                             </span>
                           </div>
 

@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
       return {
         id: week.id,
         weekNumber: week.week_number,
+        seasonId: seasonData?.id || null,
         seasonYear: seasonData?.year || 0,
         seasonName: displayName,
         rawSeasonName: rawSeasonName,
@@ -156,6 +157,13 @@ export async function GET(request: NextRequest) {
       .filter(w => w.end_date <= selectedWeekEndDate)
       .map(w => w.id);
 
+    // 현재 시즌 내, 선택 주차까지의 week ID (누적 인절미 계산용)
+    const selectedSeasonId = selectedWeek.seasonId;
+    const seasonRelevantWeekIdArray = (allWeeks || [])
+      .filter((w: any) => w.seasons?.id === selectedSeasonId && w.end_date <= selectedWeekEndDate)
+      .map((w: any) => w.id);
+    const seasonRelevantWeekIds = new Set(seasonRelevantWeekIdArray);
+
     // ============ 모든 독립적인 쿼리를 병렬로 실행 ============
     const [
       weeklyGrowthResult,
@@ -188,13 +196,12 @@ export async function GET(request: NextRequest) {
         .from('points')
         .select('user_id, point_type, points')
         .eq('week_id', weekId),
-      // 누적 인절미 계산용 포인트 — 선택 주차 이전까지로 제한
+      // 누적 인절미 계산용 포인트 — 현재 시즌 내 주차로 제한
       supabaseAdmin
         .from('points')
         .select('user_id, week_id, point_type, points')
-        .in('user_id', userIdArray)
-        .in('week_id', relevantWeekIds)
-        .limit(10000),
+        .in('week_id', seasonRelevantWeekIdArray)
+        .in('point_type', ['shield', 'lightning']),
       // 팀 정보
       supabaseAdmin.from('teams').select('id, name'),
       // 파트 정보
@@ -390,12 +397,11 @@ export async function GET(request: NextRequest) {
         else if (p.point_type === 'shield') shield += p.points;
       }
 
-      // 누적 인절미 계산 (Map 사용 - O(1) 조회 후 필터)
+      // 누적 인절미 계산 (현재 시즌 내, 선택 주차까지의 shield - lightning)
       const userAllPoints = userAllPointsMap.get(userId) || [];
       let cumulativeShield = 0, cumulativeLightning = 0;
       for (const p of userAllPoints) {
-        const pointWeekEndDate = weekEndDateMap.get(p.week_id);
-        if (pointWeekEndDate && pointWeekEndDate <= selectedWeekEndDate) {
+        if (seasonRelevantWeekIds.has(p.week_id)) {
           if (p.point_type === 'shield') cumulativeShield += p.points;
           else if (p.point_type === 'lightning') cumulativeLightning += p.points;
         }
@@ -410,17 +416,22 @@ export async function GET(request: NextRequest) {
       const weeklyGrowth = userGrowthMap.get(userId);
       let growthStatus = '실패';
 
-      // 전환 주차(break 시즌)인 경우 특별 처리
-      if (selectedWeek.isBreakSeason) {
-        if (isOnboardingWeek) {
-          growthStatus = '성공'; // 전환 주차에 온보딩 했으면 성공
-        } else {
-          growthStatus = '휴식(공식)'; // 전환 주차는 기본적으로 휴식(공식)
-        }
+      // 성장 상태 결정 (cluster-4-card와 동일한 로직)
+      if (isOnboardingWeek) {
+        growthStatus = '성공';
       } else if (weeklyGrowth) {
-        if (weeklyGrowth.is_club_break) growthStatus = '휴식(공식)';
-        else if (weeklyGrowth.is_resting) growthStatus = '휴식(개인)';
-        else if (weeklyGrowth.is_success) growthStatus = '성공';
+        if (weeklyGrowth.is_club_break || selectedWeek.isBreakSeason) {
+          growthStatus = '휴식(공식)';
+        } else if (weeklyGrowth.is_resting) {
+          growthStatus = '휴식(개인)';
+        } else if (weeklyGrowth.is_success) {
+          growthStatus = '성공';
+        }
+      } else {
+        // weeklyGrowth 레코드 없는 경우
+        if (selectedWeek.isClubBreak || selectedWeek.isBreakSeason) {
+          growthStatus = '휴식(공식)';
+        }
       }
 
       // 팀/파트 정보 (filter 대신 find 사용 - 첫 번째 매칭만 필요)
@@ -480,17 +491,20 @@ export async function GET(request: NextRequest) {
         return elapsed >= deadline;
       };
 
+      // ===== 휴식 주차 체크 =====
+      const isRestWeek = growthStatus?.includes('휴식') || false;
+
       // ===== 실무 정보 (info) - cluster-4-card와 동일: 강화 성공 기준 =====
-      const infoTotal = isOnboardingWeek ? 0 : activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
-      const infoCount = isOnboardingWeek ? 0 : infoTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
+      const infoTotal = (isOnboardingWeek || isRestWeek) ? 0 : activeActivities.filter(a => infoTypeIds.includes(a.activity_type_id)).length;
+      const infoCount = (isOnboardingWeek || isRestWeek) ? 0 : infoTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
 
       // ===== 실무 역량 (competency) - cluster-4-card와 동일: 강화 성공 기준, total=1 =====
-      const competencyTotal = isOnboardingWeek ? 0 : 1;
-      const competencyCount = isOnboardingWeek ? 0 : (competencyTypeIds.some(typeId => isEnhancementSuccess(typeId)) ? 1 : 0);
+      const competencyTotal = (isOnboardingWeek || isRestWeek) ? 0 : 1;
+      const competencyCount = (isOnboardingWeek || isRestWeek) ? 0 : (competencyTypeIds.some(typeId => isEnhancementSuccess(typeId)) ? 1 : 0);
 
       // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + 강화 성공 기준 =====
       let experienceTotal = 0;
-      if (!isOnboardingWeek) {
+      if (!isOnboardingWeek && !isRestWeek) {
         const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
 
         experienceActivities.forEach(a => {
@@ -522,15 +536,15 @@ export async function GET(request: NextRequest) {
           }
         });
       }
-      const experienceCount = isOnboardingWeek ? 0 : experienceTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
+      const experienceCount = (isOnboardingWeek || isRestWeek) ? 0 : experienceTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
 
       // ===== 실무 경력 (career) - career_records 기반 (Map 사용) =====
       // total: pending 또는 enhanced 상태인 프로젝트 수 (최대 5개)
       // count: enhanced 상태인 프로젝트 수 (최대 total개)
       const userCareerRecords = userCareerMap.get(userId) || [];
-      const careerRawTotal = userCareerRecords.length;
+      const careerRawTotal = (isOnboardingWeek || isRestWeek) ? 0 : userCareerRecords.length;
       const careerTotal = Math.min(careerRawTotal, 5);
-      const careerEnhancedCount = userCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
+      const careerEnhancedCount = (isOnboardingWeek || isRestWeek) ? 0 : userCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
       const careerCount = Math.min(careerEnhancedCount, careerTotal);
 
       const totalActivities = infoTotal + competencyTotal + experienceTotal + careerTotal;
@@ -552,7 +566,7 @@ export async function GET(request: NextRequest) {
         star,
         lightning,
         shield,
-        injeolmi: shield,
+        injeolmi: cumulativeInjeolmi,
         growthStatus,
         cumulativeApprovedWeeks,
         growthRate: {

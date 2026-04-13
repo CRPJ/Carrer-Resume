@@ -368,7 +368,7 @@ export async function GET(request: NextRequest) {
       badges: {
         stars: cumulativePoints?.total_stars || 0,
         lightnings: cumulativePoints?.total_lightnings || 0,
-        shields: cumulativePoints?.total_shields || 0,
+        shields: (cumulativePoints?.total_shields || 0) - (cumulativePoints?.total_lightnings || 0),
       },
       seasonHistories: finalSeasonHistories,
     });
