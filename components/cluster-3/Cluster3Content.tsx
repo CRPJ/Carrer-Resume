@@ -920,7 +920,7 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: "flex" }}>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
@@ -1151,7 +1151,7 @@ const Cluster3Content = () => {
         {/* 플로팅 아이콘 */}
         <div className="floating-icons" style={{ display: "flex" }}>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
@@ -1245,10 +1245,10 @@ const Cluster3Content = () => {
                 : undefined
             }
           >
-            <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+            <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
           </div>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
@@ -1358,10 +1358,10 @@ const Cluster3Content = () => {
                 : undefined
             }
           >
-            <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+            <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
           </div>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
@@ -1475,10 +1475,10 @@ const Cluster3Content = () => {
                   : undefined
               }
             >
-              <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>

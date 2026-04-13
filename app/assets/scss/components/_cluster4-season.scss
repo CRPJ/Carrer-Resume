@@ -5213,9 +5213,9 @@
 }
 
 // ============================================
-// 시즌 평판 모달 스타일 (Portal로 body에 렌더링됨)
+// 시즌 평판 모달 스타일 (cluster4-card-content 스코프)
 // ============================================
-.section-modal-overlay {
+.cluster4-card-content .section-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -5230,7 +5230,7 @@
   padding: 40px 0;
   padding-left: 73px;
 }
-.section-modal {
+.cluster4-card-content .section-modal {
   width: 504px;
   height: 606px;
   max-width: none;

@@ -1584,10 +1584,11 @@ svg {
   }
 }
 
-// 8. 모달 오버레이 투명도 통일
+// 8. 모달 오버레이 투명도 통일 (Sidebar edit-modal 기준: rgba(0,0,0,0.7), blur 없음)
 [class*="modal-overlay"] {
-  background: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* ====

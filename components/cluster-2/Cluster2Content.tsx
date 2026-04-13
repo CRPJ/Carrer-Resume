@@ -1335,15 +1335,15 @@ const Cluster2Content = () => {
             display: 'flex',
             position: 'absolute',
             top: '-78px',
-            right: '47px',
+            right: '28px',
             zIndex: 100,
-            gap: '5px'
+            gap: '15px'
           }}>
             <div className="edit-icon" style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }} onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
-                <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF', pointerEvents: 'none' }}></i>
+                <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a', pointerEvents: 'none' }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -1440,10 +1440,10 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
-              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -1551,10 +1551,10 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
-              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -1730,10 +1730,10 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
-              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -1832,10 +1832,10 @@ const Cluster2Content = () => {
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
             <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
-              <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#FFFFFF' }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -1993,7 +1993,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - search-icon은 항상 표시 */}
         <div className="floating-icons" style={{ display: 'flex' }}>
           <div className="edit-icon search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" style={{ width: '16px', height: '16px' }}>
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
