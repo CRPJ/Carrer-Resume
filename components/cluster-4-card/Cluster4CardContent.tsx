@@ -711,27 +711,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const competencyTotal = 1;
 
           // 실무 경험: eligible 조건 체크 (개설 여부와 무관하게 모든 experience 타입 대상)
+          // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
+          // 그 이전에는 모든 실무 경험 활동이 적격 (룰 없이 전부 카운트)
+          const isEligibilityRuleActive = seasonData && (
+            seasonData.year > 2026 ||
+            (seasonData.year === 2026 && seasonData.name !== 'spring') ||
+            (seasonData.year === 2026 && seasonData.name === 'spring' && currentWeek.week_number >= 9)
+          );
           let experienceTotal = 0;
           {
             experienceInfos.forEach(typeInfo => {
-              // eligible_min/max 체크 (null이면 제한 없음)
-              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+              if (isEligibilityRuleActive) {
+                // eligible_min/max 체크 (null이면 제한 없음)
+                const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+                const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-              // 누적 주차가 eligible 범위 내인지 확인
-              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
-                // count_once_in_total 체크 (1회만 가능한 활동)
-                if (typeInfo.count_once_in_total) {
-                  // 이미 이전 주차에서 완료했는지 확인
-                  const previouslyCompleted = allCompletedActivities.some(
-                    (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
-                  );
-                  if (!previouslyCompleted) {
+                // 누적 주차가 eligible 범위 내인지 확인
+                if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                  // count_once_in_total 체크 (1회만 가능한 활동)
+                  if (typeInfo.count_once_in_total) {
+                    // 이미 이전 주차에서 완료했는지 확인
+                    const previouslyCompleted = allCompletedActivities.some(
+                      (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
+                    );
+                    if (!previouslyCompleted) {
+                      experienceTotal++;
+                    }
+                  } else {
                     experienceTotal++;
                   }
-                } else {
-                  experienceTotal++;
                 }
+              } else {
+                // 룰 적용 이전: 모든 실무 경험 활동 카운트
+                experienceTotal++;
               }
             });
           }
@@ -785,17 +797,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const eligibleExperienceTypes: string[] = [];
           {
             experienceInfos.forEach(typeInfo => {
-              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
-              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
-                if (typeInfo.count_once_in_total) {
-                  const previouslyCompleted = allCompletedActivities.some(
-                    (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
-                  );
-                  if (!previouslyCompleted) eligibleExperienceTypes.push(typeInfo.id);
-                } else {
-                  eligibleExperienceTypes.push(typeInfo.id);
+              if (isEligibilityRuleActive) {
+                const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+                const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+                if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                  if (typeInfo.count_once_in_total) {
+                    const previouslyCompleted = allCompletedActivities.some(
+                      (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === typeInfo.id && ca.week_id !== weekId
+                    );
+                    if (!previouslyCompleted) eligibleExperienceTypes.push(typeInfo.id);
+                  } else {
+                    eligibleExperienceTypes.push(typeInfo.id);
+                  }
                 }
+              } else {
+                // 룰 적용 이전: 모든 실무 경험 활동 카운트
+                eligibleExperienceTypes.push(typeInfo.id);
               }
             });
           }

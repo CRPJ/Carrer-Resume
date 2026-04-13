@@ -503,6 +503,12 @@ export async function GET(request: NextRequest) {
       const competencyCount = (isOnboardingWeek || isRestWeek) ? 0 : (competencyTypeIds.some(typeId => isEnhancementSuccess(typeId)) ? 1 : 0);
 
       // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + 강화 성공 기준 =====
+      // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
+      const isEligibilityRuleActive = (
+        selectedWeek.seasonYear > 2026 ||
+        (selectedWeek.seasonYear === 2026 && selectedWeek.rawSeasonName !== 'spring') ||
+        (selectedWeek.seasonYear === 2026 && selectedWeek.rawSeasonName === 'spring' && selectedWeek.weekNumber >= 9)
+      );
       let experienceTotal = 0;
       if (!isOnboardingWeek && !isRestWeek) {
         const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
@@ -515,24 +521,29 @@ export async function GET(request: NextRequest) {
             return;
           }
 
-          // eligible_min/max 체크 (null이면 제한 없음)
-          const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-          const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+          if (isEligibilityRuleActive) {
+            // eligible_min/max 체크 (null이면 제한 없음)
+            const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+            const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-          // 누적 주차가 eligible 범위 내인지 확인
-          if (cumulativeApprovedWeeks >= minWeek && cumulativeApprovedWeeks <= maxWeek) {
-            // count_once_in_total 체크 (1회만 가능한 활동)
-            if (typeInfo.count_once_in_total) {
-              // 이미 이전 주차에서 완료했는지 확인
-              const previouslyCompleted = userAllCompletedActivities.some(
-                ca => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
-              );
-              if (!previouslyCompleted) {
+            // 누적 주차가 eligible 범위 내인지 확인
+            if (cumulativeApprovedWeeks >= minWeek && cumulativeApprovedWeeks <= maxWeek) {
+              // count_once_in_total 체크 (1회만 가능한 활동)
+              if (typeInfo.count_once_in_total) {
+                // 이미 이전 주차에서 완료했는지 확인
+                const previouslyCompleted = userAllCompletedActivities.some(
+                  ca => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+                );
+                if (!previouslyCompleted) {
+                  experienceTotal++;
+                }
+              } else {
                 experienceTotal++;
               }
-            } else {
-              experienceTotal++;
             }
+          } else {
+            // 룰 적용 이전: 모든 실무 경험 활동 카운트
+            experienceTotal++;
           }
         });
       }

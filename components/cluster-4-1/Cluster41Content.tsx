@@ -612,26 +612,38 @@ const Cluster41Content = () => {
     const cumulativeApproved = getCumulativeApprovedWeeks(weekData.endDate);
 
     // 3. 모든 experience 타입 중 eligible한 것 필터링 (개설 여부와 무관)
+    // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
+    const isEligibilityRuleActive = weekData && (
+      weekData.seasonYear > 2026 ||
+      (weekData.seasonYear === 2026 && weekData.seasonName !== '봄') ||
+      (weekData.seasonYear === 2026 && weekData.seasonName === '봄' && weekData.weekNumber >= 9)
+    );
     let eligibleTotal = 0;
     const eligibleExperienceTypeIds: string[] = [];
     experienceTypeInfos.forEach(typeInfo => {
-      const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-      const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+      if (isEligibilityRuleActive) {
+        const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+        const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-      if (cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek) {
-        if (typeInfo.count_once_in_total) {
-          const previouslyCompleted = userActivities.some(a =>
-            a.activity_type_id === typeInfo.id &&
-            a.week_id !== weekId
-          );
-          if (!previouslyCompleted) {
+        if (cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek) {
+          if (typeInfo.count_once_in_total) {
+            const previouslyCompleted = userActivities.some(a =>
+              a.activity_type_id === typeInfo.id &&
+              a.week_id !== weekId
+            );
+            if (!previouslyCompleted) {
+              eligibleTotal++;
+              eligibleExperienceTypeIds.push(typeInfo.id);
+            }
+          } else {
             eligibleTotal++;
             eligibleExperienceTypeIds.push(typeInfo.id);
           }
-        } else {
-          eligibleTotal++;
-          eligibleExperienceTypeIds.push(typeInfo.id);
         }
+      } else {
+        // 룰 적용 이전: 모든 실무 경험 활동 카운트
+        eligibleTotal++;
+        eligibleExperienceTypeIds.push(typeInfo.id);
       }
     });
 
