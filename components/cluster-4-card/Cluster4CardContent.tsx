@@ -134,14 +134,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
   // 팀/파트/역할/포인트 데이터 상태
-  const [teamName, setTeamName] = useState<string | null>("미디어");
-  const [partName, setPartName] = useState<string | null>("웹툰드라마");
-  const [generation, setGeneration] = useState<number | null>(3);
+  const [teamName, setTeamName] = useState<string | null>(null);
+  const [partName, setPartName] = useState<string | null>(null);
+  const [generation, setGeneration] = useState<number | null>(null);
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
-  const [roleLabel, setRoleLabel] = useState<string | null>("운영진(앰배서더)");
-  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 25, lightning: 30, shield: -2 });
-  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(30);
-  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(25);
+  const [roleLabel, setRoleLabel] = useState<string | null>(null);
+  const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
+  const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
+  const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
 
   // 이전/다음 주차 ID
   const [prevWeekId, setPrevWeekId] = useState<string | null>(null);
@@ -159,44 +159,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     opened_at: string | null; // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
   }
-  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([
-    { id: "wa-1", activity_type_id: "wisdom", title: "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-2", activity_type_id: "essay", title: "우주는 무한하다고 하는데 사실 끝이 없는 공간이라는 개념이 잘 이해가 가지 않습니", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-3", activity_type_id: "infodesk", title: "MZ세대 타겟 SNS 마케팅 채널별 성과 지표 비교 분석 및 최적 채널 믹스 전략 도출 과제", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-4", activity_type_id: "calendar", title: "일이삼사오육칠팔구십 일이삼사오육칠팔구십 일이삼사오육칠팔구십", is_active: true, opened_at: "2099-01-01T00:00:00Z", output_links: [] },
-    {
-      id: "wa-5",
-      activity_type_id: "forum",
-      title: "짧은 글",
-      is_active: true,
-      opened_at: "2025-01-01T00:00:00Z",
-      output_links: [],
-    },
-    { id: "wa-6", activity_type_id: "session", title: "데이터 기반 의사결정을 위한 마케팅 분석 프레임워크 세션", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-7", activity_type_id: "practical_lecture", title: "우주는 얼마나 클까?", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    {
-      id: "wa-8",
-      activity_type_id: "comp-1",
-      title: "시간이 지나면 더 멀리 있는 우주에서 출발한 빛도 우리에게 올 수 있겠죠. 그래서 관측 가능한 우주는 앞으로 100억 년이 더 흐르면 당연히 더 커지겠죠. 지금은 관측 가능한 우주가 460억 광년 정도의 반지름을 갖습니다. 다시 말하면 현재 460억 광년 거리에 있는 우주는 관측이 가능합니다.",
-      is_active: true,
-      opened_at: "2025-01-01T00:00:00Z",
-      output_links: [],
-    },
-    { id: "wa-comp-2", activity_type_id: "comp-2", title: "역량 진단", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-comp-3", activity_type_id: "comp-3", title: "마케터 역량 진단 테스트 결과", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-comp-4", activity_type_id: "comp-4", title: "짧은 길이", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-9", activity_type_id: "exp-1", title: "안타깝게도 아직 우주의 끝을 확인할 수 있는 기술은 존재하지 않습니다. 하지만 현재까지의 연구결과를 보면 우주는 무한할 것 같습니다. 지구라는 한정된 공간에서 평생을 살아가는", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    { id: "wa-10", activity_type_id: "exp-2", title: "동료 크루 3인의 마케팅 포트폴리오를 상호 피드백하며 각자의 강점과 개선점을 발견하는 실습", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-    {
-      id: "wa-11",
-      activity_type_id: "exp-3",
-      title: "짧은 길이",
-      is_active: true,
-      opened_at: "2025-01-01T00:00:00Z",
-      output_links: [],
-    },
-    { id: "wa-12", activity_type_id: "exp-4", title: "퍼포먼스 마케팅 캠페인 ROAS 분석 및 예산 재배분 최적화 전략 수립", is_active: true, opened_at: "2025-01-01T00:00:00Z", output_links: [] },
-  ]);
+  const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
 
   // 유저 활동 데이터 (강화 성공 집계용)
   interface UserActivity {
@@ -212,10 +175,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     total: number; // P
     success: number; // R
   }
-  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 8, success: 5 });
-  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 1, success: 1 });
-  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 4, success: 4 });
-  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 5, success: 3 });
+  const [infoStats, setInfoStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [competencyStats, setCompetencyStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [experienceStats, setExperienceStats] = useState<PracticalStats>({ total: 0, success: 0 });
+  const [careerStats, setCareerStats] = useState<PracticalStats>({ total: 0, success: 0 });
 
   // 강화 상태 판단용 (해당 주차 데이터)
   interface ActivityRecord {
@@ -223,25 +186,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     activity_type_id: string;
     is_completed: boolean;
   }
-  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([
-    { week_id: "dummy-1", activity_type_id: "wisdom", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "essay", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "infodesk", is_completed: false },
-    { week_id: "dummy-1", activity_type_id: "calendar", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "forum", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "session", is_completed: false },
-    { week_id: "dummy-1", activity_type_id: "practical_lecture", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "comp-1", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "comp-2", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "comp-3", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "comp-4", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-1", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-2", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-1", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-2", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-3", is_completed: true },
-    { week_id: "dummy-1", activity_type_id: "exp-4", is_completed: true }, // TODO: 더미 데이터 — DB 연동 후 제거
-  ]);
+  const [weekActivityRecords, setWeekActivityRecords] = useState<ActivityRecord[]>([]);
   const [weekApprovedTypes, setWeekApprovedTypes] = useState<Set<string>>(new Set());
 
   // 2차 정보 (서브타이틀, 아웃풋링크) - 해당 주차 데이터
@@ -255,39 +200,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     sub_title: string | null;
     output_links: OutputLink[] | null;
   }
-  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([
-    {
-      week_id: "dummy-1",
-      activity_type_id: "comp-1",
-      sub_title:
-        "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
-      output_links: [],
-    },
-    { week_id: "dummy-1", activity_type_id: "comp-2", sub_title: "진단 결과", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "comp-3", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "comp-4", sub_title: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "exp-1", sub_title: "지구상에서는 한 방향으로 계속해서 가다 보면 모든 공간의 끝이 나오는 게 당연하니까요. 우주 공간에는 인간의 단위로는 측량하기 힘들 정도로 많은 물질이 있고 우주 공간 자체는 빛보다 빠른 속도로 지금도 팽창", output_links: [] },
-    { week_id: "dummy-1", activity_type_id: "exp-2", sub_title: "동료 피드백을 통해 발견한 강점 3가지와 보완이 필요한 영역 2가지를 정리한 액션 플랜", output_links: [] },
-    {
-      week_id: "dummy-1",
-      activity_type_id: "exp-3",
-      sub_title:
-        "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아일이삼사오",
-      output_links: [],
-    },
-    { week_id: "dummy-1", activity_type_id: "exp-4", sub_title: "구글 애즈와 메타 광고 플랫폼을 활용한 퍼포먼스 마케팅 캠페인 최적화 실습 결과 보고서: ROAS 분석 포함", output_links: [] },
-  ]);
+  const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
 
   // 활동별 평점 (activity_type_id → points)
-  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(
-    new Map([
-      ["comp-1", 6],
-      ["exp-1", 3],
-      ["exp-2", 6],
-      ["exp-3", 10],
-      ["exp-4", 8],
-    ]),
-  );
+  const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
 
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
@@ -297,21 +213,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     cluster_id: string;
     description: string | null;
   }
-  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(
-    new Map([
-      ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
-      ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
-      ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
-      ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
-      ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
-      ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
-      ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
-      ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
-      ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
-    ]),
-  );
-  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>(["comp-1", "comp-2", "comp-3", "comp-4", "comp-5"]);
-  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>(["exp-1", "exp-2", "exp-3", "exp-4"]);
+  const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map());
+  const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
+  const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
   // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함) - cluster-4-1과 동일

@@ -38,10 +38,10 @@ const Sidebar = () => {
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
   const [completionRate, setCompletionRate] = useState<number | null>(80);
   const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(0); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(0); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(0); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(0); // 실무 경력 누적
   const [hasActivityData, setHasActivityData] = useState<boolean>(false);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
@@ -50,9 +50,9 @@ const Sidebar = () => {
   const [badge3, setBadge3] = useState(0);
   // 배지 데이터 상태 (user_cumulative_points 테이블) — SSR-safe 기본값
   const [badgeData, setBadgeData] = useState({
-    stars: 99999, // 별
-    lightnings: 9999, // 번개
-    shields: 99999, // 방패
+    stars: 0, // 별
+    lightnings: 0, // 번개
+    shields: 0, // 방패
   });
   const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
 
@@ -71,80 +71,7 @@ const Sidebar = () => {
       start_date: string;
     };
   }
-  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([
-    {
-      id: "dummy-1",
-      role_in_season: "crew_regular",
-      approved_weeks: 3,
-      total_weeks: 8,
-      progress_status: "in_progress",
-      review_status: "reviewing",
-      seasons: { id: "s1", year: 2026, name: "winter", start_date: "2026-01-01" },
-    },
-    {
-      id: "dummy-2",
-      role_in_season: "admin",
-      approved_weeks: 8,
-      total_weeks: 8,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s2", year: 2025, name: "summer", start_date: "2025-06-01" },
-    },
-    {
-      id: "dummy-3",
-      role_in_season: "crew_advanced",
-      approved_weeks: 6,
-      total_weeks: 10,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s3", year: 2025, name: "spring", start_date: "2025-03-01" },
-    },
-    {
-      id: "dummy-4",
-      role_in_season: "crew_regular",
-      approved_weeks: 10,
-      total_weeks: 10,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s4", year: 2024, name: "winter", start_date: "2024-12-01" },
-    },
-    {
-      id: "dummy-5",
-      role_in_season: "crew_regular",
-      approved_weeks: 5,
-      total_weeks: 8,
-      progress_status: "full_rest",
-      review_status: "approved",
-      seasons: { id: "s5", year: 2024, name: "fall", start_date: "2024-09-01" },
-    },
-    {
-      id: "dummy-6",
-      role_in_season: "crew_advanced",
-      approved_weeks: 8,
-      total_weeks: 8,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s6", year: 2024, name: "summer", start_date: "2024-06-01" },
-    },
-    {
-      id: "dummy-7",
-      role_in_season: "crew_regular",
-      approved_weeks: 7,
-      total_weeks: 10,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s7", year: 2024, name: "spring", start_date: "2024-03-01" },
-    },
-    {
-      id: "dummy-8",
-      role_in_season: "admin",
-      approved_weeks: 10,
-      total_weeks: 10,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s8", year: 2023, name: "winter", start_date: "2023-12-01" },
-    },
-  ]);
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
   const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
 
   // 시즌 이름 한글 변환

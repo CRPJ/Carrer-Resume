@@ -142,7 +142,7 @@ const Cluster3Content = () => {
     injeolmi: number; // 인절미 (shield - lightning)
     eoheung: number; // 어흥 (lightning)
   }
-  const [pointsData, setPointsData] = useState<PointsData>({ dangam: 99999, injeolmi: 99999, eoheung: 99999 });
+  const [pointsData, setPointsData] = useState<PointsData>({ dangam: 0, injeolmi: 0, eoheung: 0 });
 
   // 품계 데이터 (user_grade_stats)
   interface GradeStats {
@@ -150,11 +150,7 @@ const Cluster3Content = () => {
     grade: number; // 품계 숫자 (1=정승, 2=정1품, ... 10=정9품)
     gradeLabel: string; // 품계 라벨 (정 7품 등)
   }
-  const [gradeStats, setGradeStats] = useState<GradeStats | null>({
-    avgPercentile: 30,
-    grade: 3,
-    gradeLabel: "정 2품",
-  });
+  const [gradeStats, setGradeStats] = useState<GradeStats | null>(null);
 
   // 성장 기간 집계 데이터 (user_growth_stats)
   interface GrowthPeriodStats {
@@ -166,15 +162,7 @@ const Cluster3Content = () => {
     restSeasons: number; // 성장 휴식 시즌
     approvedSeasons: number; // 성장(성공) 시즌
   }
-  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>({
-    approvedWeeks: 999,
-    unapprovedWeeks: 999,
-    restWeeks: 999,
-    clubBreakWeeks: 999,
-    availableWeeks: 999,
-    restSeasons: 999,
-    approvedSeasons: 999,
-  });
+  const [growthPeriodStats, setGrowthPeriodStats] = useState<GrowthPeriodStats | null>(null);
 
   // 성장 상태 표시 (DB에 저장된 값 그대로 또는 영문값 변환)
   const getGrowthStatusText = (status: string, growthStatus: string): string => {
