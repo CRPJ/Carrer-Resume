@@ -894,7 +894,22 @@ const Cluster2Content = () => {
 
   // 섹션 4 모달 (바로가기 링크 편집)
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
-  const [section4Dirty, setSection4Dirty] = useState(false);
+  const [reviewSnapshot, setReviewSnapshot] = useState<string[]>(['', '', '', '', '', '', '', '', '', '']);
+  const isSection4Dirty = () => JSON.stringify(editingReviewLinks) !== JSON.stringify(reviewSnapshot);
+
+  // 수정_허가 데이터 (데모용 하드코딩, 추후 DB 연동)
+  const reviewPermissions = [
+    { label: 'Total Complete', isOpen: true },
+    { label: '3 weeks', isOpen: true },
+    { label: '6 weeks', isOpen: true },
+    { label: '9 weeks', isOpen: false },
+    { label: '12 weeks', isOpen: false },
+    { label: '15 weeks', isOpen: false },
+    { label: '18 weeks', isOpen: false },
+    { label: '21 weeks', isOpen: false },
+    { label: '24 weeks', isOpen: false },
+    { label: '27 weeks', isOpen: false },
+  ];
 
   // 섹션 5 - 자기소개서 카드 데이터
   const defaultIntroContent = '카드를 클릭하여 자기소개서를 작성해주세요';
@@ -982,12 +997,10 @@ const Cluster2Content = () => {
   const [reviewLinkSaving, setReviewLinkSaving] = useState(false);
 
   // dirty 추적: 편집 데이터 변경 감지 (초기 설정 시 skip)
-  const section4MountRef = useRef(false);
   const introMountRef = useRef(false);
 
   useEffect(() => { if (photos[0] && photos[1] && footerNotice === 'error') setFooterNotice('default'); }, [photos, footerNotice]);
   useEffect(() => { if (editingSloganData.slogan1.content && editingSloganData.slogan1.option && editingSloganData.slogan1.rating > 0 && section2FooterNotice === 'error') setSection2FooterNotice('default'); }, [editingSloganData, section2FooterNotice]);
-  useEffect(() => { if (!section4ModalOpen) { section4MountRef.current = false; return; } if (!section4MountRef.current) { section4MountRef.current = true; return; } setSection4Dirty(true); }, [editingReviewLinks]);
   useEffect(() => { if (!introModalOpen || !isEditingIntro) { introMountRef.current = false; return; } if (!introMountRef.current) { introMountRef.current = true; return; } setIntroDirty(true); }, [editingIntroData]);
 
   // DB에서 리뷰 링크 로드
@@ -1931,7 +1944,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setInitialReviewLinksData([...reviewLinks]); setSection4Dirty(false); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setInitialReviewLinksData([...reviewLinks]); setReviewSnapshot([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -2979,11 +2992,11 @@ const Cluster2Content = () => {
             <div className="section4-modal-header">
               <div className="modal-header-top">
                 <span style={{ fontSize: '20px' }}>✍️</span>
-                <h3>클럽 리뷰 링크 편집</h3>
+                <h3>성장 기록 / 리뷰 작성</h3>
                 <button className="modal-close-btn" onClick={() => {
-                  if (section4Dirty) {
+                  if (isSection4Dirty()) {
                     if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
-                      setSection4Dirty(false);
+                      setEditingReviewLinks([...reviewSnapshot]);
                       setSection4ModalOpen(false);
                     }
                   } else {
@@ -2993,54 +3006,29 @@ const Cluster2Content = () => {
                   <i className="ti ti-x"></i>
                 </button>
               </div>
-              <p className="modal-subtitle">본인이 작성한 클럽 주차 리뷰 링크를 등록해주세요 😊</p>
+              <p className="modal-subtitle">내가 어떻게 성장해왔는지 돌아보고, 나의 성장 기록을 남겨보세요!<br />나의 성장 과정을 돌아보고 이전의 나와 지금의 나를 비교해보며 더 좋은 성장의 발판으로 삼아보자구요 😊</p>
             </div>
             <div className="section4-modal-body">
-              {/* Total Complete */}
-              <div className="link-edit-item total">
-                <div className="link-item-header">
-                  <img src="/images/0/cluster 2/icon/medal 30.png" alt="" className="link-medal" />
-                  <span className="link-label">Total Complete</span>
-                </div>
-                <input
-                  type="url"
-                  placeholder="링크를 입력하세요 (https://...)"
-                  value={editingReviewLinks[0]}
-                  onChange={(e) => {
-                    const newLinks = [...editingReviewLinks];
-                    newLinks[0] = e.target.value;
-                    setEditingReviewLinks(newLinks);
-                  }}
-                />
-              </div>
-              {/* 3~27 weeks */}
-              {[3, 6, 9, 12, 15, 18, 21, 24, 27].map((weeks, index) => {
-                const linkIndex = index + 1;
-                const isDisabled = linkIndex > 0 && !editingReviewLinks[linkIndex - 1]?.trim();
+              {reviewPermissions.map((perm, index) => {
+                const hasContent = editingReviewLinks[index]?.trim().length > 0;
+                const medalWeeks = index === 0 ? 30 : [3, 6, 9, 12, 15, 18, 21, 24, 27][index - 1];
                 return (
-                  <div key={weeks} className={`link-edit-item${isDisabled ? ' disabled' : ''}`}>
+                  <div key={index} className={`link-edit-item${!perm.isOpen ? ' slot-disabled' : ''}${hasContent ? ' slot-filled' : ''}`}>
                     <div className="link-item-header">
-                      <img src={`/images/0/cluster 2/icon/medal ${weeks}.png`} alt="" className="link-medal" />
-                      <span className="link-label">{weeks} weeks</span>
+                      <img src={`/images/0/cluster 2/icon/medal ${medalWeeks}.png`} alt="" className="link-medal" />
+                      <span className="link-label">{perm.label}</span>
                     </div>
                     <input
                       type="url"
-                      placeholder={isDisabled ? '이전 링크를 먼저 입력하세요' : '링크를 입력하세요 (https://...)'}
-                      value={editingReviewLinks[linkIndex]}
-                      disabled={isDisabled}
+                      placeholder={perm.isOpen ? '링크를 입력하세요 (https://...)' : '비활성화'}
+                      value={editingReviewLinks[index]}
+                      disabled={!perm.isOpen}
                       onChange={(e) => {
-                        const newLinks = [...editingReviewLinks];
-                        newLinks[linkIndex] = e.target.value;
-                        if (!e.target.value.trim()) {
-                          for (let i = linkIndex + 1; i < newLinks.length; i++) {
-                            newLinks[i] = '';
-                          }
+                        if (perm.isOpen) {
+                          const newLinks = [...editingReviewLinks];
+                          newLinks[index] = e.target.value;
+                          setEditingReviewLinks(newLinks);
                         }
-                        setEditingReviewLinks(newLinks);
-                      }}
-                      style={{
-                        opacity: isDisabled ? 0.4 : 1,
-                        cursor: isDisabled ? 'not-allowed' : 'text'
                       }}
                     />
                   </div>
@@ -3055,7 +3043,7 @@ const Cluster2Content = () => {
               <div className="modal-footer-right">
                 <button className="modal-reset-btn" onClick={() => {
                   if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingReviewLinks([...initialReviewLinksData]);
+                    setEditingReviewLinks(['', '', '', '', '', '', '', '', '', '']);
                   }
                 }}>초기화</button>
                 <button
