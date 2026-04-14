@@ -1009,7 +1009,7 @@
   .floating-icons {
     display: flex;
     position: absolute;
-    top: 14px;
+    top: 3px;
     right: 35px;
     z-index: 100;
     gap: 15px;
@@ -1102,7 +1102,7 @@
 
     // 주차 평판 남기기 floating-icons
     > .floating-icons {
-      top: 233px;
+      top: 222px;
       right: 19px;
     }
 
@@ -1743,7 +1743,7 @@
 
         > .floating-icons {
           position: absolute;
-          top: 0;
+          top: -11px;
           right: -21px;
           z-index: 100;
         }
@@ -2341,7 +2341,7 @@
     overflow: visible;
 
     .floating-icons {
-      top: 14px;
+      top: 3px;
       right: 35px;
     }
 
@@ -2920,7 +2920,7 @@
     position: relative;
 
     .floating-icons {
-      top: 14px;
+      top: 3px;
       right: 35px;
     }
 
@@ -3583,7 +3583,7 @@
   .work-exp-section,
   .work-career-section {
     .floating-icons {
-      top: 14px;
+      top: 3px;
       right: 35px;
     }
 
