@@ -186,6 +186,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }
   const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
 
+  // 어드민 개별 권한 부여 (secondary_info_grants)
+  interface SecondaryInfoGrant { activity_type_id: string; deadline: string; }
+  const [secondaryInfoGrants, setSecondaryInfoGrants] = useState<SecondaryInfoGrant[]>([]);
+
   // 활동별 평점 (activity_type_id → points)
   const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
 
@@ -675,6 +679,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             (ad: { week_id: string }) => ad.week_id === weekId
           );
           setWeekActivityDetails(filteredActivityDetails);
+
+          // 12-1. 어드민 개별 권한 (secondary_info_grants)
+          if (wb.secondaryInfoGrants) {
+            setSecondaryInfoGrants(wb.secondaryInfoGrants);
+          }
 
           // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
           const ratingsMap = new Map<string, number>();
@@ -1706,18 +1715,34 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return elapsed < deadline;
   };
 
-  // 활동이 개설되었고 48시간 이내인지 확인 (운영진이 개설해야만 + 48시간 이내에만 사용자가 2차 정보 입력 가능)
+  // 어드민 개별 권한(grant)이 활성 상태인지 확인
+  const hasActiveGrant = (activityType: string): boolean => {
+    const grant = secondaryInfoGrants.find(g => g.activity_type_id === activityType);
+    if (!grant) return false;
+    return new Date(grant.deadline).getTime() > Date.now();
+  };
+
+  // 활동이 개설되었고 48시간 이내인지 확인, 또는 어드민 개별 grant가 있는지 확인
   const isActivityActive = (activityType: string): boolean => {
+    // Path 1: 기존 플로우 — 파트 개설 + 48시간 이내
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-    if (!activity?.is_active) return false;
-    // 48시간 이내인지 확인
-    return isWithin48Hours(activity.opened_at);
+    if (activity?.is_active && isWithin48Hours(activity.opened_at)) return true;
+    // Path 2: 어드민 개별 권한 부여 (예외 메커니즘)
+    if (hasActiveGrant(activityType)) return true;
+    return false;
   };
 
   // 활동이 개설되었지만 48시간이 지났는지 확인 (마감 표시용)
   const isActivityExpired = (activityType: string): boolean => {
+    // 어드민 grant가 활성이면 만료 아님
+    if (hasActiveGrant(activityType)) return false;
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-    if (!activity?.is_active) return false;
+    if (!activity?.is_active) {
+      // 파트 개설 안 됐지만, 만료된 grant가 있으면 만료로 표시
+      const grant = secondaryInfoGrants.find(g => g.activity_type_id === activityType);
+      if (grant && new Date(grant.deadline).getTime() <= Date.now()) return true;
+      return false;
+    }
     // 개설은 되었지만 48시간이 지남
     return !isWithin48Hours(activity.opened_at);
   };
@@ -1746,20 +1771,34 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 남은 시간 계산 (표시용)
   const getRemainingTime = (activityType: string): { hours: number; minutes: number } | null => {
-    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-    if (!activity?.is_active || !activity.opened_at) return null;
-
-    const openedTime = new Date(activity.opened_at).getTime();
     const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000;
-    const remaining = deadline - elapsed;
 
-    if (remaining <= 0) return null;
+    // 기존 48시간 윈도우 확인
+    const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
+    if (activity?.is_active && activity.opened_at) {
+      const openedTime = new Date(activity.opened_at).getTime();
+      const remaining48h = (openedTime + 48 * 60 * 60 * 1000) - now;
+      if (remaining48h > 0) {
+        return {
+          hours: Math.floor(remaining48h / (60 * 60 * 1000)),
+          minutes: Math.floor((remaining48h % (60 * 60 * 1000)) / (60 * 1000)),
+        };
+      }
+    }
 
-    const hours = Math.floor(remaining / (60 * 60 * 1000));
-    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-    return { hours, minutes };
+    // 어드민 grant deadline 확인
+    const grant = secondaryInfoGrants.find(g => g.activity_type_id === activityType);
+    if (grant) {
+      const remaining = new Date(grant.deadline).getTime() - now;
+      if (remaining > 0) {
+        return {
+          hours: Math.floor(remaining / (60 * 60 * 1000)),
+          minutes: Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)),
+        };
+      }
+    }
+
+    return null;
   };
 
   // 특정 activity types 중 하나라도 개설되었는지 확인
@@ -1842,7 +1881,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setEditingDetails(newEditingDetails);
   };
 
-  // 2차 정보 저장 (운영진 링크 제외, 사용자 링크만 저장)
+  // 2차 정보 저장 (운영진 링크 제외, 사용자 링크만 저장 — 변경된 항목만)
   const saveActivityDetail = async (activityType: string) => {
     if (!currentUserId || !weekId) return;
 
@@ -1857,6 +1896,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 운영진 링크 이후의 사용자 링크만 필터링 (빈 링크 제외)
       const userLinks = detail.outputLinks.slice(adminCount).filter(link => link.url.trim() !== '');
 
+      // 기존 DB 데이터와 비교하여 변경이 없으면 스킵
+      const existing = getActivityDetail(activityType);
+      const newSubTitle = detail.subTitle || null;
+      const newOutputLinks = userLinks.length > 0 ? userLinks : null;
+      const existingSubTitle = existing?.sub_title || null;
+      const existingOutputLinks = existing?.output_links && existing.output_links.length > 0 ? existing.output_links : null;
+
+      if (newSubTitle === existingSubTitle &&
+          JSON.stringify(newOutputLinks) === JSON.stringify(existingOutputLinks)) {
+        return; // 변경 없음 — API 호출 스킵
+      }
+
       const response = await fetch(apiUrl('/api/activity-details'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1864,8 +1915,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           user_id: currentUserId,
           week_id: weekId,
           activity_type_id: activityType,
-          sub_title: detail.subTitle || null,
-          output_links: userLinks.length > 0 ? userLinks : null,
+          sub_title: newSubTitle,
+          output_links: newOutputLinks,
         }),
       });
 

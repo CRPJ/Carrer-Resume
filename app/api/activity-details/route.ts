@@ -95,6 +95,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 권한 체크: 48시간 윈도우 OR 어드민 개별 grant
+    const [weeklyActivityResult, grantResult] = await Promise.all([
+      supabaseAdmin
+        .from('weekly_activities')
+        .select('is_active, opened_at')
+        .eq('week_id', week_id)
+        .eq('activity_type_id', activity_type_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from('secondary_info_grants')
+        .select('deadline')
+        .eq('user_id', user_id)
+        .eq('week_id', week_id)
+        .eq('activity_type_id', activity_type_id)
+        .maybeSingle(),
+    ])
+
+    const wa = weeklyActivityResult.data
+    const isWithin48h = wa?.is_active && wa?.opened_at &&
+      (Date.now() - new Date(wa.opened_at).getTime()) < 48 * 60 * 60 * 1000
+
+    const grant = grantResult.data
+    const hasActiveGrant = grant && new Date(grant.deadline).getTime() > Date.now()
+
+    if (!isWithin48h && !hasActiveGrant) {
+      return NextResponse.json(
+        { error: '2차 정보 입력 권한이 없습니다. (48시간 경과 또는 권한 미부여)' },
+        { status: 403 }
+      )
+    }
+
     // Upsert (있으면 업데이트, 없으면 삽입)
     const { data, error } = await supabaseAdmin
       .from('user_activity_details')

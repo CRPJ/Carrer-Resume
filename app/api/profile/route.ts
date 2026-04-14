@@ -198,6 +198,11 @@ export async function GET(request: NextRequest) {
           .select("week_id, weeks!inner(end_date)")
           .eq("user_id", profile.id)
           .eq("is_success", true),
+        // [17] secondary_info_grants for this user+week (어드민 개별 권한 부여)
+        supabaseAdmin.from("secondary_info_grants")
+          .select("activity_type_id, deadline")
+          .eq("user_id", profile.id)
+          .eq("week_id", weekId),
       ] as const : [];
 
       const [
@@ -233,7 +238,7 @@ export async function GET(request: NextRequest) {
       const completedActivities = activityRecordsData.filter((ar: any) => ar.is_completed);
 
       // weekId가 있으면 주차 번들 데이터 포함
-      const weekBundle = weekId && weekResults.length === 7 ? {
+      const weekBundle = weekId && weekResults.length === 8 ? {
         activityTypes: weekResults[0]?.data || [],
         currentWeek: weekResults[1]?.data || null,
         allWeeks: weekResults[2]?.data || [],
@@ -241,6 +246,7 @@ export async function GET(request: NextRequest) {
         weeklyGrowth: weekResults[4]?.data || null,
         allPoints: weekResults[5]?.data || [],
         successWeeks: weekResults[6]?.data || [],
+        secondaryInfoGrants: weekResults[7]?.data || [],
       } : null;
 
       return NextResponse.json({
@@ -1359,14 +1365,18 @@ export async function PUT(request: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    // 필드 매핑
-    if (body.display_name !== undefined) updateData.display_name = body.display_name;
-    if (body.eng_name !== undefined) updateData.eng_name = body.eng_name;
-    if (body.gender !== undefined) updateData.gender = body.gender;
-    if (body.birth_date !== undefined) updateData.birth_date = body.birth_date || null;
-    if (body.address !== undefined) updateData.address = body.address;
-    if (body.phone !== undefined) updateData.phone = body.phone;
-    if (body.email !== undefined) updateData.email = body.email;
+    // 마스킹된 값 판별 (****가 포함된 값은 무시)
+    const isMasked = (value: unknown): boolean =>
+      typeof value === 'string' && value.includes('****');
+
+    // 필드 매핑 (마스킹된 값은 업데이트에서 제외)
+    if (body.display_name !== undefined && !isMasked(body.display_name)) updateData.display_name = body.display_name;
+    if (body.eng_name !== undefined && !isMasked(body.eng_name)) updateData.eng_name = body.eng_name;
+    if (body.gender !== undefined && !isMasked(body.gender)) updateData.gender = body.gender;
+    if (body.birth_date !== undefined && !isMasked(body.birth_date)) updateData.birth_date = body.birth_date || null;
+    if (body.address !== undefined && !isMasked(body.address)) updateData.address = body.address;
+    if (body.phone !== undefined && !isMasked(body.phone)) updateData.phone = body.phone;
+    if (body.email !== undefined && !isMasked(body.email)) updateData.email = body.email;
     if (body.bio !== undefined) updateData.bio = body.bio;
     if (body.vision !== undefined) updateData.vision = body.vision;
     if (body.profile_photo_url !== undefined) updateData.profile_photo_url = body.profile_photo_url;
