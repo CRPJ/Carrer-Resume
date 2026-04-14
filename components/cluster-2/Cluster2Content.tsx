@@ -9,6 +9,7 @@ import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO, CLUSTER2_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 import { SECTION1_PHOTO_DEFAULTS } from "@/constants/dummyData/cluster2-section1-default";
+import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
 
 // 학력 데이터 타입
 interface EduData {
@@ -136,7 +137,7 @@ const Cluster2Content = () => {
   const [starredPhoto, setStarredPhoto] = useState<number | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
   const [photoSaving, setPhotoSaving] = useState(false);
-  const [section1Dirty, setSection1Dirty] = useState(false);
+  const isSection1Dirty = () => JSON.stringify(photos) !== JSON.stringify(photosSnapshot);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   const [photosSnapshot, setPhotosSnapshot] = useState<(string | null)[]>([null, null, null, null, null, null]);
   const [footerNotice, setFooterNotice] = useState<'default' | 'error'>('default');
@@ -163,7 +164,6 @@ const Cluster2Content = () => {
         newPhotos[index] = previewUrl;
         return newPhotos;
       });
-      setSection1Dirty(true);
     }
     e.target.value = '';
   };
@@ -178,7 +178,6 @@ const Cluster2Content = () => {
       newPhotos[index] = null;
       return newPhotos;
     });
-    setSection1Dirty(true);
   };
 
   // 이미지 압축 함수 (2MB 이하로)
@@ -328,15 +327,13 @@ const Cluster2Content = () => {
       window.dispatchEvent(new CustomEvent('photoUpdated', { detail: { photo: reordered[0] } }));
     }
 
-    // 4. 스냅샷 업데이트 + dirty useEffect skip 방지
+    // 4. 스냅샷 업데이트 (저장 후 dirty 비교 기준 갱신)
     setPhotosSnapshot([...reordered]);
-    section1MountRef.current = false;
 
     // 5. API 호출 (데모 모드 분기)
     if (isDemoMode) {
       console.log('TODO: 저장 API 호출', reordered);
       window.alert('저장되었어요!');
-      setSection1Dirty(false);
       setSection1ModalOpen(false);
       return;
     }
@@ -354,7 +351,6 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         window.alert('저장되었어요!');
-        setSection1Dirty(false);
         setSection1ModalOpen(false);
       } else {
         alert(result.error || '사진 저장에 실패했습니다.');
@@ -485,7 +481,9 @@ const Cluster2Content = () => {
   const [dropdown2Open, setDropdown2Open] = useState(false);
   const [dropdown3Open, setDropdown3Open] = useState(false);
   const [sloganSaving, setSloganSaving] = useState(false);
-  const [section2Dirty, setSection2Dirty] = useState(false);
+  const [sloganSnapshot, setSloganSnapshot] = useState(sloganData);
+  const isSection2Dirty = () => JSON.stringify(editingSloganData) !== JSON.stringify(sloganSnapshot);
+  const [section2FooterNotice, setSection2FooterNotice] = useState<'default' | 'error'>('default');
   const [sloganAuthorName, setSloganAuthorName] = useState("");
 
   // DB에서 슬로건 로드
@@ -649,7 +647,8 @@ const Cluster2Content = () => {
   ]);
   const [editingVideoData, setEditingVideoData] = useState(videoData);
   const [videoSaving, setVideoSaving] = useState(false);
-  const [section21Dirty, setSection21Dirty] = useState(false);
+  const [videoSnapshot, setVideoSnapshot] = useState(videoData);
+  const isSection21Dirty = () => JSON.stringify(editingVideoData) !== JSON.stringify(videoSnapshot);
   const [videoPage, setVideoPage] = useState(0);
   const VIDEOS_PER_PAGE = 3;
 
@@ -983,16 +982,11 @@ const Cluster2Content = () => {
   const [reviewLinkSaving, setReviewLinkSaving] = useState(false);
 
   // dirty 추적: 편집 데이터 변경 감지 (초기 설정 시 skip)
-  const section1MountRef = useRef(false);
-  const section2MountRef = useRef(false);
-  const section21MountRef = useRef(false);
   const section4MountRef = useRef(false);
   const introMountRef = useRef(false);
 
-  useEffect(() => { if (!section1ModalOpen) { section1MountRef.current = false; return; } if (!section1MountRef.current) { section1MountRef.current = true; return; } setSection1Dirty(true); }, [photos]);
   useEffect(() => { if (photos[0] && photos[1] && footerNotice === 'error') setFooterNotice('default'); }, [photos, footerNotice]);
-  useEffect(() => { if (!section2ModalOpen) { section2MountRef.current = false; return; } if (!section2MountRef.current) { section2MountRef.current = true; return; } setSection2Dirty(true); }, [editingSloganData]);
-  useEffect(() => { if (!section21ModalOpen) { section21MountRef.current = false; return; } if (!section21MountRef.current) { section21MountRef.current = true; return; } setSection21Dirty(true); }, [editingVideoData]);
+  useEffect(() => { if (editingSloganData.slogan1.content && editingSloganData.slogan1.option && editingSloganData.slogan1.rating > 0 && section2FooterNotice === 'error') setSection2FooterNotice('default'); }, [editingSloganData, section2FooterNotice]);
   useEffect(() => { if (!section4ModalOpen) { section4MountRef.current = false; return; } if (!section4MountRef.current) { section4MountRef.current = true; return; } setSection4Dirty(true); }, [editingReviewLinks]);
   useEffect(() => { if (!introModalOpen || !isEditingIntro) { introMountRef.current = false; return; } if (!introMountRef.current) { introMountRef.current = true; return; } setIntroDirty(true); }, [editingIntroData]);
 
@@ -1444,7 +1438,6 @@ const Cluster2Content = () => {
                   : [...SECTION1_PHOTO_DEFAULTS.photos];
                 setPhotos(openPhotos);
                 setPhotosSnapshot([...openPhotos]);
-                setSection1Dirty(false);
                 setSection1ModalOpen(true);
               }) : undefined}>
                 <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a', pointerEvents: 'none' }}></i>
@@ -1546,7 +1539,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setInitialVideoData([...videoData]); setSection21Dirty(false); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setInitialVideoData([...videoData]); setVideoSnapshot([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1657,7 +1650,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setInitialSloganData(sloganData); setSection2Dirty(false); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setInitialSloganData(sloganData); setSloganSnapshot(sloganData); setSection2FooterNotice('default'); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -2237,10 +2230,9 @@ const Cluster2Content = () => {
                 <span style={{ fontSize: '20px' }}>✍️</span>
                 <h3>프로필 사진</h3>
                 <button className="modal-close-btn" onClick={() => {
-                  if (section1Dirty) {
+                  if (isSection1Dirty()) {
                     if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
                       setPhotos([...photosSnapshot]);
-                      setSection1Dirty(false);
                       setFooterNotice('default');
                       setSection1ModalOpen(false);
                     }
@@ -2345,7 +2337,6 @@ const Cluster2Content = () => {
                 <button className="modal-reset-btn" onClick={() => {
                   if (window.confirm('내용을 모두 초기화하시겠어요?')) {
                     setPhotos([...SECTION1_PHOTO_DEFAULTS.photos]);
-                    setSection1Dirty(true);
                     setFooterNotice('default');
                   }
                 }}>초기화</button>
@@ -2355,8 +2346,13 @@ const Cluster2Content = () => {
                   if (!photos[1]) missingFields.push(1);
                   if (missingFields.length > 0) {
                     setFooterNotice('error');
-                    const targetSlot = document.querySelectorAll('.photo-slot')[missingFields[0]];
+                    const slots = document.querySelectorAll('.photo-slot');
+                    missingFields.forEach(i => slots[i]?.classList.add('field-missing'));
+                    const targetSlot = slots[missingFields[0]];
                     if (targetSlot) targetSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                      missingFields.forEach(i => slots[i]?.classList.remove('field-missing'));
+                    }, 900);
                     return;
                   }
                   if (window.confirm('저장하시겠습니까?')) {
@@ -2378,11 +2374,12 @@ const Cluster2Content = () => {
             <div className="section2-modal-header">
               <div className="modal-header-top">
                 <span style={{ fontSize: '20px' }}>✍️</span>
-                <h3>슬로건 편집</h3>
+                <h3>캐치프레이즈/슬로건 작성</h3>
                 <button className="modal-close-btn" onClick={() => {
-                  if (section2Dirty) {
+                  if (isSection2Dirty()) {
                     if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
-                      setSection2Dirty(false);
+                      setEditingSloganData({...sloganSnapshot});
+                      setSection2FooterNotice('default');
                       setSection2ModalOpen(false);
                     }
                   } else {
@@ -2392,14 +2389,14 @@ const Cluster2Content = () => {
                   <i className="ti ti-x"></i>
                 </button>
               </div>
-              <p className="modal-subtitle">본인을 나타내는 나만의 슬로건을 입력해주세요 😊</p>
+              <p className="modal-subtitle">나의 매력과 가치를 드러낼 수 있는 슬로건, 캐치프레이즈를 작성해주세요. 😊<br />내가 어필하고자 하는 생각, 세상을 보는 관점, 의지, 다짐, 비전 등을 총 3개까지 등록할 수 있습니다.</p>
             </div>
             <div className="section2-modal-body">
               {/* 슬로건 1 */}
               <div className="slogan-edit-item">
-                <span className="slogan-label">슬로건 1</span>
-                <span style={{ fontSize: '11px', color: '#888', marginLeft: '8px', fontWeight: 400 }}>
-                  슬로건 1에 작성되는 내용은, 좌측에 있는 &apos;Identity - Core&apos; 칸의 슬로건에 명시됩니다.
+                <span className="slogan-label">슬로건 1</span><span style={{ color: '#FAAB07', fontSize: '14px', marginLeft: '4px' }}>*</span>
+                <span style={{ fontSize: '17px', color: '#888', marginLeft: '8px', fontWeight: 400 }}>
+                  슬로건 1은, 커리어레쥬메 좌측에 보여지는 &apos;Identity-Core&apos; 의 메인 슬로건 자리에 나타납니다.
                 </span>
                 <div className="slogan-dropdown-wrapper">
                   <button
@@ -2448,7 +2445,7 @@ const Cluster2Content = () => {
                   <span className="char-count">{editingSloganData.slogan1.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
-                  <label className="slogan-rating-label">평점</label>
+                  <label className="slogan-rating-label">셀프 이행 평가</label>
                   <div className="slogan-star-rating">
                     {[1, 2, 3, 4, 5].map((starIndex) => {
                       const fullValue = starIndex * 2;
@@ -2554,7 +2551,7 @@ const Cluster2Content = () => {
                   <span className="char-count">{editingSloganData.slogan2.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
-                  <label className="slogan-rating-label">평점</label>
+                  <label className="slogan-rating-label">셀프 이행 평가</label>
                   <div className="slogan-star-rating">
                     {[1, 2, 3, 4, 5].map((starIndex) => {
                       const fullValue = starIndex * 2;
@@ -2660,7 +2657,7 @@ const Cluster2Content = () => {
                   <span className="char-count">{editingSloganData.slogan3.content.length.toLocaleString()}/86</span>
                 </div>
                 <div className="slogan-rating-row">
-                  <label className="slogan-rating-label">평점</label>
+                  <label className="slogan-rating-label">셀프 이행 평가</label>
                   <div className="slogan-star-rating">
                     {[1, 2, 3, 4, 5].map((starIndex) => {
                       const fullValue = starIndex * 2;
@@ -2719,17 +2716,42 @@ const Cluster2Content = () => {
             <div className="section2-modal-footer">
               <div className="modal-footer-left">
                 <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
-                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+                <p className={`modal-footer-notice ${section2FooterNotice === 'error' ? 'notice-error' : ''}`}>
+                  {section2FooterNotice === 'error'
+                    ? '필수 사항이 누락되었어요! 확인 부탁드려요! 😊'
+                    : '내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊'
+                  }
+                </p>
               </div>
               <div className="modal-footer-right">
                 <button className="modal-reset-btn" onClick={() => {
                   if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingSloganData({...initialSloganData});
+                    setEditingSloganData({
+                      slogan1: { option: SECTION2_SLOGAN_DEFAULTS.slogans[0].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[0].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[0].rating },
+                      slogan2: { option: SECTION2_SLOGAN_DEFAULTS.slogans[1].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[1].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[1].rating },
+                      slogan3: { option: SECTION2_SLOGAN_DEFAULTS.slogans[2].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[2].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[2].rating },
+                    });
+                    setSection2FooterNotice('default');
                   }
                 }}>초기화</button>
                 <button
                   className="modal-save-btn"
                   onClick={() => {
+                    const s1 = editingSloganData.slogan1;
+                    const missing: string[] = [];
+                    if (!s1.content) missing.push('slogan1-text');
+                    if (!s1.option) missing.push('slogan1-dropdown');
+                    if (!s1.rating || s1.rating === 0) missing.push('slogan1-rating');
+                    if (missing.length > 0) {
+                      setSection2FooterNotice('error');
+                      const targetEl = document.querySelector('.slogan-edit-item');
+                      if (targetEl) {
+                        targetEl.classList.add('field-missing');
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => targetEl.classList.remove('field-missing'), 900);
+                      }
+                      return;
+                    }
                     if (window.confirm('저장하시겠습니까?')) {
                       handleSaveSlogans();
                     }
@@ -2751,11 +2773,11 @@ const Cluster2Content = () => {
             <div className="section21-modal-header">
               <div className="modal-header-top">
                 <span style={{ fontSize: '20px' }}>✍️</span>
-                <h3>영상 편집</h3>
+                <h3>프로필 동영상</h3>
                 <button className="modal-close-btn" onClick={() => {
-                  if (section21Dirty) {
+                  if (isSection21Dirty()) {
                     if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
-                      setSection21Dirty(false);
+                      setEditingVideoData([...videoSnapshot]);
                       setSection21ModalOpen(false);
                     }
                   } else {
@@ -2765,13 +2787,13 @@ const Cluster2Content = () => {
                   <i className="ti ti-x"></i>
                 </button>
               </div>
-              <p className="modal-subtitle">본인이 활동 했거나, 본인을 나타내는 영상 링크를 추가해주세요 😊</p>
+              <p className="modal-subtitle">나를 나타내거나, 활동했던 영상의 링크를 등록해주세요. 총 3개를 업로드할 수 있으며, 유튜브 링크를 권장합니다. 😊</p>
             </div>
             <div className="section21-modal-body">
               {editingVideoData.map((video, index) => (
                 <div key={video.id} className="video-edit-item">
                   <div className="video-edit-header">
-                    <h4>영상 {index + 1}</h4>
+                    <h4>Appealing MV {String(index + 1).padStart(2, '0')}</h4>
                     <div className="bookmark-icon">
                       <i className="ti ti-bookmark-filled"></i>
                     </div>
@@ -2829,7 +2851,7 @@ const Cluster2Content = () => {
               <div className="modal-footer-right">
                 <button className="modal-reset-btn" onClick={() => {
                   if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingVideoData([...initialVideoData]);
+                    setEditingVideoData(editingVideoData.map(v => ({ ...v, videoUrl: '', thumbnail: '' })));
                   }
                 }}>초기화</button>
                 <button
