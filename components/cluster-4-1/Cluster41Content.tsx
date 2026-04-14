@@ -507,16 +507,12 @@ const Cluster41Content = () => {
   const getCumulativeApprovedWeeks = (weekEndDate: string) => {
     if (dbWeeklyData[0]?.id.startsWith('dummy')) return 25;
     // 해당 주차까지의 전체 승인된(성공) 주차 수 (모든 시즌 통틀어)
-    const approvedCount = dbWeeklyData
+    // 표시되는 주차는 모두 완료된 과거 주차(end_date < today)이므로 성공 주차만 카운트
+    return dbWeeklyData
       .filter(w =>
         w.endDate <= weekEndDate &&
         w.growthStatus === '성공'
       ).length;
-    // 현재 주차가 활동 주차(성공/미인정/대기)이면 eligible 체크에 포함
-    const currentWeek = dbWeeklyData.find(w => w.endDate === weekEndDate);
-    const isCurrentWeekActive = currentWeek && !['공식 휴식', '시즌 휴식', '활동 휴식'].includes(currentWeek.growthStatus);
-    const alreadyCounted = currentWeek?.growthStatus === '성공';
-    return approvedCount + (isCurrentWeekActive && !alreadyCounted ? 1 : 0);
   };
 
   // 주차별 실무 강화율 계산 함수들 (소수점 올림 처리)
@@ -691,6 +687,11 @@ const Cluster41Content = () => {
     if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 7 };
     if (weekId.startsWith('dummy-') && ['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 50, count: 7, total: 13 };
     if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 0 };
+
+    // 온보딩 주차는 무조건 성장(성공) → 100%
+    if (onboardingWeekId && weekId === onboardingWeekId) {
+      return { count: 0, total: 0, rate: 100 };
+    }
 
     const info = getWeeklyInfoRate(weekId);
     const competency = getWeeklyCompetencyRate(weekId);
@@ -1867,6 +1868,7 @@ const Cluster41Content = () => {
               const weekHref = `/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`;
               const isExpanded = expandedWeekId === week.id;
               const isRest = week.growthStatus.includes('휴식');
+              const isOnboarding = !!(onboardingWeekId && week.id === onboardingWeekId);
               const growthRate = getWeeklyGrowthRate(week.id);
 
               if (isMobile) {
@@ -1933,7 +1935,6 @@ const Cluster41Content = () => {
                           const injeolmi = getCumulativeInjeolmi(week.id);
                           const teamPart = getFormattedTeamPart(week.startDate, week);
                           const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
-
                           return (
                             <>
                               <div className="weekly-card-details-top">
@@ -1945,19 +1946,19 @@ const Cluster41Content = () => {
                               <div className="weekly-card-details-grid">
                                 <div className="detail-row">
                                   <span className="k">정보 강화율</span>
-                                  <span className="v">{isRest ? "-" : `${infoRate.rate}%`} <span className="sub">({isRest ? "-" : infoRate.count}/{infoRate.total})</span></span>
+                                  <span className="v">{(isRest || isOnboarding) ? "-" : `${infoRate.rate}%`} <span className="sub">({(isRest || isOnboarding) ? "-" : infoRate.count}/{(isOnboarding) ? "-" : infoRate.total})</span></span>
                                 </div>
                                 <div className="detail-row">
                                   <span className="k">역량 강화율</span>
-                                  <span className="v">{isRest ? "-" : `${competencyRate.rate}%`} <span className="sub">({isRest ? "-" : competencyRate.count}/{competencyRate.total})</span></span>
+                                  <span className="v">{(isRest || isOnboarding) ? "-" : `${competencyRate.rate}%`} <span className="sub">({(isRest || isOnboarding) ? "-" : competencyRate.count}/{(isOnboarding) ? "-" : competencyRate.total})</span></span>
                                 </div>
                                 <div className="detail-row">
                                   <span className="k">경험 강화율</span>
-                                  <span className="v">{isRest ? "-" : `${experienceRate.rate}%`} <span className="sub">({isRest ? "-" : experienceRate.count}/{experienceRate.total})</span></span>
+                                  <span className="v">{(isRest || isOnboarding) ? "-" : `${experienceRate.rate}%`} <span className="sub">({(isRest || isOnboarding) ? "-" : experienceRate.count}/{(isOnboarding) ? "-" : experienceRate.total})</span></span>
                                 </div>
                                 <div className="detail-row">
                                   <span className="k">경력 강화율</span>
-                                  <span className="v">{isRest ? "-" : `${careerRate.rate}%`} <span className="sub">({isRest ? "-" : careerRate.count}/{careerRate.total})</span></span>
+                                  <span className="v">{(isRest || isOnboarding) ? "-" : `${careerRate.rate}%`} <span className="sub">({(isRest || isOnboarding) ? "-" : careerRate.count}/{(isOnboarding) ? "-" : careerRate.total})</span></span>
                                 </div>
                               </div>
 
@@ -2094,17 +2095,17 @@ const Cluster41Content = () => {
                             </div>
                             <span className="total-count">
                               <img src="/images/0/cluster4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
-                              총 {isRest ? 0 : growthRate.total} 개 중 <strong>{isRest ? '-' : growthRate.count}</strong> 개
+                              총 {(isRest || isOnboarding) ? '-' : growthRate.total} 개 중 <strong>{(isRest || isOnboarding) ? '-' : growthRate.count}</strong> 개
                             </span>
                           </div>
 
                           {/* 네 번째, 다섯 번째 줄: 스탯들 */}
                           <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
                             <div className="weekly-card-stats">
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{isRest ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : infoRate.count}</span>/{infoRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : competencyRate.count}</span>/{competencyRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{isRest ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : experienceRate.count}</span>/{experienceRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : careerRate.count}</span>/{careerRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{(isRest || isOnboarding) ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{(isRest || isOnboarding) ? '-' : infoRate.count}</span>/{isOnboarding ? '-' : infoRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{(isRest || isOnboarding) ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{(isRest || isOnboarding) ? '-' : competencyRate.count}</span>/{isOnboarding ? '-' : competencyRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{(isRest || isOnboarding) ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{(isRest || isOnboarding) ? '-' : experienceRate.count}</span>/{isOnboarding ? '-' : experienceRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{(isRest || isOnboarding) ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{(isRest || isOnboarding) ? '-' : careerRate.count}</span>/{isOnboarding ? '-' : careerRate.total})</span></span>
                             </div>
                             <div className="weekly-card-extra-stats">
                               <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>

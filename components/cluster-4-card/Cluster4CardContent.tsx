@@ -2492,7 +2492,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-left">
             <div className="progress-header">
               <span className="growth-title">주차 성장률</span>
-              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total} 개 중 <span className="highlight">{infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}</span>개</span>
+              <span className="growth-count"><img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총 {isOnboardingWeek ? '-' : (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)} 개 중 <span className="highlight">{isOnboardingWeek ? '-' : (infoStats.success + competencyStats.success + experienceStats.success + careerStats.success)}</span>개</span>
             </div>
             <div className="progress-bar-container">
               <div className="progress-bar" style={{ width: `${(infoStats.total + competencyStats.total + experienceStats.total + careerStats.total) > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : (isOnboardingWeek ? 100 : 0)}%` }}></div>
@@ -2536,11 +2536,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="실무 정보" className="section-icon" />
               <span className="section-name">실무 정보</span>
-              <span className="section-count">총 {infoStats.total}개 중 <span className="highlight">{infoStats.success}</span>개</span>
+              <span className="section-count">총 {isOnboardingWeek ? '-' : infoStats.total}개 중 <span className="highlight">{isOnboardingWeek ? '-' : infoStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isOnboardingWeek ? '-' : (infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-info-cards">
@@ -2622,11 +2622,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/2 실무 역량.png" alt="실무 역량" className="section-icon" />
               <span className="section-name">실무 역량</span>
-              <span className="section-count">총 {competencyStats.total}개 중 <span className="highlight">{competencyStats.success}</span>개</span>
+              <span className="section-count">총 {isOnboardingWeek ? '-' : competencyStats.total}개 중 <span className="highlight">{isOnboardingWeek ? '-' : competencyStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isOnboardingWeek ? '-' : (competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           {(() => {
@@ -2736,11 +2736,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/3 실무 경험.png" alt="실무 경험" className="section-icon" />
               <span className="section-name">실무 경험</span>
-              <span className="section-count">총 {experienceStats.total}개 중 <span className="highlight">{experienceStats.success}</span>개</span>
+              <span className="section-count">총 {isOnboardingWeek ? '-' : experienceStats.total}개 중 <span className="highlight">{isOnboardingWeek ? '-' : experienceStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isOnboardingWeek ? '-' : (experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-exp-cards">
@@ -2854,11 +2854,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-title-left">
               <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="실무 경력" className="section-icon" />
               <span className="section-name">실무 경력</span>
-              <span className="section-count">총 {careerStats.total}개 중 <span className="highlight">{careerStats.success}</span>개</span>
+              <span className="section-count">총 {isOnboardingWeek ? '-' : careerStats.total}개 중 <span className="highlight">{isOnboardingWeek ? '-' : careerStats.success}</span>개</span>
             </div>
             <div className="section-title-right">
               <span className="rate-label">파트 강화율</span>
-              <span className="rate-value"><span className="highlight">{careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}</span>%</span>
+              <span className="rate-value"><span className="highlight">{isOnboardingWeek ? '-' : (careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0)}</span>%</span>
             </div>
           </div>
           <div className="work-career-cards">
