@@ -99,7 +99,8 @@
       "Bash(npm list:*)",
       "Bash(npm root:*)",
       "Bash(npm ls:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

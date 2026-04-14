@@ -640,6 +640,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         setCareerRecords(getDemoCareerRecords(weekId));
         setWeekActivityRecords(getDemoActivityRecords(weekId));
       }
+
+      // 데모 모드: activity_types 관련 state (DB 경로에서만 조회되므로 데모 모드에서 수동 세팅)
+      setCompetencyTypeIds(["comp-1", "comp-2", "comp-3", "comp-4", "comp-5"]);
+      setExperienceTypeIds(["exp-1", "exp-2", "exp-3", "exp-4"]);
+      setActivityTypesMap(new Map<string, ActivityTypeInfo>([
+        ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
+        ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
+        ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
+        ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
+        ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
+        ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
+        ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
+        ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
+        ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
+      ]));
+      setExperienceTypeInfos([
+        { id: "exp-1", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
+        { id: "exp-2", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
+        { id: "exp-3", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
+        { id: "exp-4", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
+      ]);
+
       setCareerPage(0);
 
       // 이전/다음 주차 ID 설정 (내림차순: index-1 = 더 최근(다음), index+1 = 더 과거(이전))
