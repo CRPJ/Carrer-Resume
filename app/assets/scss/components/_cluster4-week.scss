@@ -1103,7 +1103,7 @@
     // 주차 평판 남기기 floating-icons
     > .floating-icons {
       top: 222px;
-      right: 19px;
+      right: 35px;
     }
 
     // 왼쪽: 큰 주차 이미지
@@ -1744,7 +1744,7 @@
         > .floating-icons {
           position: absolute;
           top: -11px;
-          right: -21px;
+          right: 0px;
           z-index: 100;
         }
 
@@ -4692,7 +4692,7 @@
     max-width: none;
     max-height: calc(100vh - 80px);
     background: #0d1117;
-    border: 1px solid #FFA500;
+    border: 1px solid #ffa500;
     border-radius: 0;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
     overflow: visible;
@@ -4709,8 +4709,16 @@
       border-color: #ffa500;
       border-style: solid;
     }
-    &::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-    &::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
 
     .content-text.editing,
     .section-content.editing {
