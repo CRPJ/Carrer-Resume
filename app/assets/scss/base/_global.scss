@@ -1502,6 +1502,12 @@ svg {
   }
 }
 
+// 4-1. 전역 속성 셀렉터가 내부 자식에 border를 적용하는 것 방지
+.modal-header-top { border-bottom: none !important; }
+.modal-footer-left { border-top: none !important; }
+.modal-footer-right { border-top: none !important; }
+.modal-footer-notice { border-top: none !important; }
+
 // 5. Edit Modal (.resume-card) — 헤더/푸터 고정 + 본문 스크롤 레이아웃
 .edit-modal-content {
   display: flex !important;

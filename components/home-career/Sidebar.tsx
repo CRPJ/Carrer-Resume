@@ -912,6 +912,18 @@ const Sidebar = () => {
     return () => window.removeEventListener("educationUpdated", handleEducationUpdated);
   }, []);
 
+  // 프로필 사진 변경 이벤트 수신 → Sidebar 즉시 반영
+  useEffect(() => {
+    const handlePhotoUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.photo) {
+        setUserProfile(prev => prev ? { ...prev, photo: detail.photo } : prev);
+      }
+    };
+    window.addEventListener("photoUpdated", handlePhotoUpdated);
+    return () => window.removeEventListener("photoUpdated", handlePhotoUpdated);
+  }, []);
+
   // Error state for validation
   const [errors, setErrors] = useState({
     lastName: "",

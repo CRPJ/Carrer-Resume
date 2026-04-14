@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO, CLUSTER2_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
+import { SECTION1_PHOTO_DEFAULTS } from "@/constants/dummyData/cluster2-section1-default";
 
 // 학력 데이터 타입
 interface EduData {
@@ -129,11 +130,56 @@ const Cluster2Content = () => {
 
   // 섹션 1 모달 (프로필 사진 수정)
   const [section1ModalOpen, setSection1ModalOpen] = useState(false);
+  const [photos, setPhotos] = useState<(string | null)[]>([...SECTION1_PHOTO_DEFAULTS.photos]);
   const [mainPhoto, setMainPhoto] = useState<string | null>(null);
   const [subPhotos, setSubPhotos] = useState<(string | null)[]>([null, null, null, null]);
   const [starredPhoto, setStarredPhoto] = useState<number | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
   const [photoSaving, setPhotoSaving] = useState(false);
+  const [section1Dirty, setSection1Dirty] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
+  const [photosSnapshot, setPhotosSnapshot] = useState<(string | null)[]>([null, null, null, null, null, null]);
+  const [footerNotice, setFooterNotice] = useState<'default' | 'error'>('default');
+  const photoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // 사진 슬롯 활성화 판단
+  const isSlotEnabled = (index: number): boolean => {
+    if (index === 0) return true;
+    return photos[index - 1] !== null;
+  };
+
+  // 사진 업로드 클릭
+  const handlePhotoUploadClick = (index: number) => {
+    photoFileInputRefs.current[index]?.click();
+  };
+
+  // 파일 선택 완료
+  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPhotos(prev => {
+        const newPhotos = [...prev];
+        newPhotos[index] = previewUrl;
+        return newPhotos;
+      });
+      setSection1Dirty(true);
+    }
+    e.target.value = '';
+  };
+
+  // 사진 삭제
+  const handlePhotoDelete = (index: number) => {
+    setPhotos(prev => {
+      const newPhotos = [...prev];
+      if (newPhotos[index]) {
+        URL.revokeObjectURL(newPhotos[index]!);
+      }
+      newPhotos[index] = null;
+      return newPhotos;
+    });
+    setSection1Dirty(true);
+  };
 
   // 이미지 압축 함수 (2MB 이하로)
   const compressImage = async (file: File, maxSizeMB: number = 2): Promise<File> => {
@@ -268,8 +314,29 @@ const Cluster2Content = () => {
 
   // 사진 저장 함수
   const handleSavePhotos = async () => {
+    // 1. 빈자리 재정렬
+    const compacted = photos.filter(p => p !== null);
+    const reordered = [...compacted, ...Array(6 - compacted.length).fill(null)] as (string | null)[];
+    setPhotos(reordered);
+
+    // 2. 기존 mainPhoto/subPhotos에 연동
+    setMainPhoto(reordered[1]); // 사진[2] → 메인 큰 사진
+    setSubPhotos([reordered[2], reordered[3], reordered[4], reordered[5]]); // 사진[3~6] → 육각형
+
+    // 3. Sidebar 프로필 사진 연동 (사진[1] → Sidebar)
+    if (reordered[0]) {
+      window.dispatchEvent(new CustomEvent('photoUpdated', { detail: { photo: reordered[0] } }));
+    }
+
+    // 4. 스냅샷 업데이트 + dirty useEffect skip 방지
+    setPhotosSnapshot([...reordered]);
+    section1MountRef.current = false;
+
+    // 5. API 호출 (데모 모드 분기)
     if (isDemoMode) {
-      alert('저장되었습니다.');
+      console.log('TODO: 저장 API 호출', reordered);
+      window.alert('저장되었어요!');
+      setSection1Dirty(false);
       setSection1ModalOpen(false);
       return;
     }
@@ -279,14 +346,15 @@ const Cluster2Content = () => {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mainPhoto,
-          subPhotos,
+          mainPhoto: reordered[1],
+          subPhotos: [reordered[2], reordered[3], reordered[4], reordered[5]],
         }),
       });
 
       const result = await response.json();
       if (result.success) {
-        alert('저장되었습니다.');
+        window.alert('저장되었어요!');
+        setSection1Dirty(false);
         setSection1ModalOpen(false);
       } else {
         alert(result.error || '사진 저장에 실패했습니다.');
@@ -417,6 +485,7 @@ const Cluster2Content = () => {
   const [dropdown2Open, setDropdown2Open] = useState(false);
   const [dropdown3Open, setDropdown3Open] = useState(false);
   const [sloganSaving, setSloganSaving] = useState(false);
+  const [section2Dirty, setSection2Dirty] = useState(false);
   const [sloganAuthorName, setSloganAuthorName] = useState("");
 
   // DB에서 슬로건 로드
@@ -580,6 +649,7 @@ const Cluster2Content = () => {
   ]);
   const [editingVideoData, setEditingVideoData] = useState(videoData);
   const [videoSaving, setVideoSaving] = useState(false);
+  const [section21Dirty, setSection21Dirty] = useState(false);
   const [videoPage, setVideoPage] = useState(0);
   const VIDEOS_PER_PAGE = 3;
 
@@ -825,6 +895,7 @@ const Cluster2Content = () => {
 
   // 섹션 4 모달 (바로가기 링크 편집)
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
+  const [section4Dirty, setSection4Dirty] = useState(false);
 
   // 섹션 5 - 자기소개서 카드 데이터
   const defaultIntroContent = '카드를 클릭하여 자기소개서를 작성해주세요';
@@ -870,6 +941,18 @@ const Cluster2Content = () => {
   const [isEditingIntro, setIsEditingIntro] = useState(false);
   const [editingIntroData, setEditingIntroData] = useState({ content: '' });
   const [introSaving, setIntroSaving] = useState(false);
+  const [introDirty, setIntroDirty] = useState(false);
+
+  // 도움말 모달
+  const [showHelpModal, setShowHelpModal] = useState(false);
+
+  // 초기화용 초기 데이터 저장
+  const [initialPhotos, setInitialPhotos] = useState<{ main: string | null; sub: (string | null)[] }>({ main: null, sub: [null, null, null, null] });
+  const [initialSloganData, setInitialSloganData] = useState(sloganData);
+  const [initialVideoData, setInitialVideoData] = useState(videoData);
+  const [initialEduDataSnapshot, setInitialEduDataSnapshot] = useState<EduData[]>(initialEducationData);
+  const [initialReviewLinksData, setInitialReviewLinksData] = useState<string[]>(['', '', '', '', '', '', '', '', '', '']);
+  const [initialIntroContent, setInitialIntroContent] = useState('');
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
@@ -881,6 +964,7 @@ const Cluster2Content = () => {
     }
     return () => { document.body.style.overflow = ''; };
   }, [section1ModalOpen, section2ModalOpen, section21ModalOpen, section3ModalOpen, section4ModalOpen, introModalOpen]);
+
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     '', // Total Complete (cluving_review_link)
     '', // 3 weeks
@@ -897,6 +981,20 @@ const Cluster2Content = () => {
     '', '', '', '', '', '', '', '', '', ''
   ]);
   const [reviewLinkSaving, setReviewLinkSaving] = useState(false);
+
+  // dirty 추적: 편집 데이터 변경 감지 (초기 설정 시 skip)
+  const section1MountRef = useRef(false);
+  const section2MountRef = useRef(false);
+  const section21MountRef = useRef(false);
+  const section4MountRef = useRef(false);
+  const introMountRef = useRef(false);
+
+  useEffect(() => { if (!section1ModalOpen) { section1MountRef.current = false; return; } if (!section1MountRef.current) { section1MountRef.current = true; return; } setSection1Dirty(true); }, [photos]);
+  useEffect(() => { if (photos[0] && photos[1] && footerNotice === 'error') setFooterNotice('default'); }, [photos, footerNotice]);
+  useEffect(() => { if (!section2ModalOpen) { section2MountRef.current = false; return; } if (!section2MountRef.current) { section2MountRef.current = true; return; } setSection2Dirty(true); }, [editingSloganData]);
+  useEffect(() => { if (!section21ModalOpen) { section21MountRef.current = false; return; } if (!section21MountRef.current) { section21MountRef.current = true; return; } setSection21Dirty(true); }, [editingVideoData]);
+  useEffect(() => { if (!section4ModalOpen) { section4MountRef.current = false; return; } if (!section4MountRef.current) { section4MountRef.current = true; return; } setSection4Dirty(true); }, [editingReviewLinks]);
+  useEffect(() => { if (!introModalOpen || !isEditingIntro) { introMountRef.current = false; return; } if (!introMountRef.current) { introMountRef.current = true; return; } setIntroDirty(true); }, [editingIntroData]);
 
   // DB에서 리뷰 링크 로드
   const fetchReviewLink = async () => {
@@ -1338,7 +1436,17 @@ const Cluster2Content = () => {
             zIndex: 100,
             gap: '15px'
           }}>
-            <div className="edit-icon" style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }} onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => setSection1ModalOpen(true)) : undefined}>
+            <div className="edit-icon" style={{ cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed', opacity: (isOwner || isDemoMode) ? 1 : 0.4 }} onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => {
+                setInitialPhotos({ main: mainPhoto, sub: [...subPhotos] });
+                const existing = [mainPhoto, ...(subPhotos || [])].filter(p => p !== null);
+                const openPhotos = existing.length > 0
+                  ? [...existing, ...Array(6 - existing.length).fill(null)] as (string | null)[]
+                  : [...SECTION1_PHOTO_DEFAULTS.photos];
+                setPhotos(openPhotos);
+                setPhotosSnapshot([...openPhotos]);
+                setSection1Dirty(false);
+                setSection1ModalOpen(true);
+              }) : undefined}>
                 <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a', pointerEvents: 'none' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1438,7 +1546,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingVideoData([...videoData]); setInitialVideoData([...videoData]); setSection21Dirty(false); setSection21ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1549,7 +1657,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingSloganData(sloganData); setInitialSloganData(sloganData); setSection2Dirty(false); setSection2ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1728,7 +1836,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingEduData([...educationData]); setSection3ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingEduData([...educationData]); setInitialEduDataSnapshot([...educationData]); setHasEduChanges(false); setSection3ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -1830,7 +1938,7 @@ const Cluster2Content = () => {
         {/* Floating Icons - 로그인한 본인만 표시 */}
         {(
           <div className="floating-icons" style={{ display: 'flex' }}>
-            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
+            <div className="edit-icon" onClick={(isOwner || isDemoMode) ? () => handleEditClick(() => { setEditingReviewLinks([...reviewLinks]); setInitialReviewLinksData([...reviewLinks]); setSection4Dirty(false); setSection4ModalOpen(true); }) : undefined} style={{ opacity: (isOwner || isDemoMode) ? 1 : 0.4, cursor: (isOwner || isDemoMode) ? 'pointer' : 'not-allowed' }}>
               <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }}></i>
             </div>
             <div className="edit-icon search-icon">
@@ -2027,6 +2135,8 @@ const Cluster2Content = () => {
                 onClick={() => {
                   setSelectedIntroCard(index);
                   setIsEditingIntro(false);
+                  setInitialIntroContent(introCards[index].content);
+                  setIntroDirty(false);
                   setIntroModalOpen(true);
                 }}
                 style={{ cursor: 'pointer' }}
@@ -2057,6 +2167,8 @@ const Cluster2Content = () => {
                 onClick={() => {
                   setSelectedIntroCard(index + 3);
                   setIsEditingIntro(false);
+                  setInitialIntroContent(introCards[index + 3].content);
+                  setIntroDirty(false);
                   setIntroModalOpen(true);
                 }}
                 style={{ cursor: 'pointer' }}
@@ -2101,6 +2213,7 @@ const Cluster2Content = () => {
             </button>
             <div className="modal-header">
               <div className="modal-school-info">
+                <span style={{ fontSize: '20px' }}>✍️</span>
                 <h2>{mask.school(selectedEdu.school)}</h2>
                 {selectedEdu.isFinal && <span className="final-tag">FINAL</span>}
               </div>
@@ -2120,132 +2233,139 @@ const Cluster2Content = () => {
         <div className="section1-modal-overlay">
           <div className="section1-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section1-modal-header">
-              <h3>프로필 사진 수정</h3>
-              <p className="modal-subtitle">본인을 대표하는 사진을 등록해주세요😊</p>
-              <button className="modal-close-btn" onClick={() => setSection1ModalOpen(false)}>
-                <i className="ti ti-x"></i>
-              </button>
-            </div>
-            <div className="section1-modal-body" style={{ position: 'relative' }}>
-              {/* 로딩 오버레이 */}
-              {photoLoading && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'rgba(0, 0, 0, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 10,
-                  borderRadius: '8px',
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
+                <h3>프로필 사진</h3>
+                <button className="modal-close-btn" onClick={() => {
+                  if (section1Dirty) {
+                    if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                      setPhotos([...photosSnapshot]);
+                      setSection1Dirty(false);
+                      setFooterNotice('default');
+                      setSection1ModalOpen(false);
+                    }
+                  } else {
+                    setSection1ModalOpen(false);
+                  }
                 }}>
-                  <span style={{ color: '#fff', fontSize: '14px' }}>업로드 중...</span>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
+              <p className="modal-subtitle">나를 어필하는 프로필 사진을 등록해주세요. 총 5개를 업로드할 수 있으며, 정해진 규격이 권장됩니다. 😊</p>
+            </div>
+            <div className="section1-modal-body">
+              <div className="photo-grid">
+                {photos.map((photo, index) => {
+                  const slotNumber = index + 1;
+                  const isDisabled = !isSlotEnabled(index);
+
+                  return (
+                    <div className={`photo-slot ${isDisabled ? 'disabled' : ''}`} key={index}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={el => { photoFileInputRefs.current[index] = el; }}
+                        style={{ display: 'none' }}
+                        onChange={(e) => handlePhotoFileChange(e, index)}
+                      />
+                      <div className="photo-slot-label">
+                        사진 [{slotNumber}]
+                        {slotNumber <= 2 && <span style={{ color: '#FAAB07' }}> *</span>}
+                      </div>
+                      <div className="photo-slot-content">
+                        <div className="photo-preview" onClick={() => { if (photo) setPreviewPhoto(photo); }}>
+                          {photo ? (
+                            <img src={photo} alt={`사진 ${slotNumber}`} style={{ cursor: 'pointer' }} />
+                          ) : (
+                            <i className="ti ti-photo-plus" style={{ fontSize: '32px', color: 'rgba(255, 165, 0, 0.5)' }}></i>
+                          )}
+                        </div>
+                        <div className="photo-actions">
+                          <button
+                            className={`photo-action-btn ${isDisabled ? 'disabled' : ''}`}
+                            onClick={() => {
+                              if (!isDisabled) handlePhotoUploadClick(index);
+                            }}
+                          >
+                            <i className="ti ti-upload"></i>
+                          </button>
+                          <button
+                            className={`photo-action-btn ${isDisabled || !photo ? 'disabled' : ''}`}
+                            onClick={() => {
+                              if (!isDisabled && photo) handlePhotoDelete(index);
+                            }}
+                          >
+                            <i className="ti ti-trash"></i>
+                          </button>
+                          {/* 메인 사진 설정 — 추후 활성화 예정
+                          <button
+                            className={`photo-action-btn ${isDisabled || !photo ? 'disabled' : ''}`}
+                            onClick={() => {
+                              if (!isDisabled && photo) {
+                                console.log(`사진 ${slotNumber} 메인 설정`);
+                              }
+                            }}
+                          >
+                            <i className="ti ti-star-filled"></i>
+                          </button>
+                          */}
+                        </div>
+                      </div>
+                      {slotNumber === 1 && (
+                        <p className="photo-slot-description">
+                          사진 [1] 은 커리어레쥬메의 좌측<br />&apos;Identity - Core&apos; 에 삽입되는 대표 이미지입니다.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {previewPhoto && (
+                <div className="photo-preview-overlay" onClick={() => setPreviewPhoto(null)}>
+                  <div className="photo-preview-modal" onClick={(e) => e.stopPropagation()}>
+                    <button className="modal-close-btn" onClick={() => setPreviewPhoto(null)}>
+                      <i className="ti ti-x"></i>
+                    </button>
+                    <img src={previewPhoto} alt="확대 보기" />
+                  </div>
                 </div>
               )}
-              {/* 숨겨진 파일 input들 */}
-              <input
-                type="file"
-                ref={mainPhotoInputRef}
-                onChange={handleMainPhotoChange}
-                accept="image/*"
-                style={{ display: 'none' }}
-              />
-              <input
-                type="file"
-                ref={subPhotoInputRef}
-                onChange={handleSubPhotoUpload}
-                accept="image/*"
-                style={{ display: 'none' }}
-              />
-
-              {/* 메인 사진 */}
-              <div className="main-photo-section">
-                <span className="section-label">메인 사진</span>
-                <div className="main-photo-box">
-                  <div className="main-photo-preview">
-                    {mainPhoto ? (
-                      <img src={mainPhoto} alt="메인 사진" />
-                    ) : (
-                      <div className="empty-photo">
-                        <i className="ti ti-photo-plus"></i>
-                      </div>
-                    )}
-                  </div>
-                  <div className="main-photo-buttons">
-                    <button
-                      className="change-photo-btn"
-                      onClick={() => mainPhotoInputRef.current?.click()}
-                    >
-                      <i className="ti ti-upload"></i>
-                      <span>사진 변경</span>
-                    </button>
-                    {mainPhoto && (
-                      <button
-                        className="delete-photo-btn"
-                        onClick={handleMainPhotoDelete}
-                      >
-                        <i className="ti ti-trash"></i>
-                        <span>삭제</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* 서브 사진 */}
-              <div className="sub-photo-section">
-                <span className="section-label">서브 사진</span>
-                <div className="sub-photo-grid">
-                  {[0, 1, 2, 3].map((index) => (
-                    <div key={index} className="sub-photo-item">
-                      <div className="sub-photo-preview">
-                        {subPhotos[index] ? (
-                          <img src={subPhotos[index]!} alt={`서브 사진 ${index + 1}`} />
-                        ) : (
-                          <div className="empty-photo">
-                            <i className="ti ti-photo-plus"></i>
-                          </div>
-                        )}
-                      </div>
-                      <div className="sub-photo-actions">
-                        <button
-                          className="action-btn upload"
-                          data-tooltip="사진 업로드"
-                          onClick={() => {
-                            setCurrentSubIndex(index);
-                            subPhotoInputRef.current?.click();
-                          }}
-                        >
-                          <i className="ti ti-upload"></i>
-                        </button>
-                        <button
-                          className={`action-btn delete ${!subPhotos[index] ? 'disabled' : ''}`}
-                          data-tooltip="사진 삭제"
-                          onClick={() => subPhotos[index] && handleSubPhotoDelete(index)}
-                        >
-                          <i className="ti ti-trash"></i>
-                        </button>
-                        <button
-                          className={`action-btn star ${!subPhotos[index] ? 'disabled' : ''}`}
-                          onClick={() => handleSetStarred(index)}
-                          data-tooltip={subPhotos[index] ? "메인 사진으로 설정" : "사진을 먼저 등록하세요"}
-                        >
-                          <i className="ti ti-star"></i>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
             <div className="section1-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection1ModalOpen(false)} disabled={photoSaving}>취소</button>
-              <button className="save-btn" onClick={handleSavePhotos} disabled={photoSaving || photoLoading}>
-                {photoSaving ? '저장 중...' : '저장'}
-              </button>
+              <div className="modal-footer-left">
+                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                <p className={`modal-footer-notice ${footerNotice === 'error' ? 'notice-error' : ''}`}>
+                  {footerNotice === 'error'
+                    ? '필수 사항이 누락되었어요! 확인 부탁드려요! 😊'
+                    : '내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊'
+                  }
+                </p>
+              </div>
+              <div className="modal-footer-right">
+                <button className="modal-reset-btn" onClick={() => {
+                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                    setPhotos([...SECTION1_PHOTO_DEFAULTS.photos]);
+                    setSection1Dirty(true);
+                    setFooterNotice('default');
+                  }
+                }}>초기화</button>
+                <button className="modal-save-btn" onClick={() => {
+                  const missingFields: number[] = [];
+                  if (!photos[0]) missingFields.push(0);
+                  if (!photos[1]) missingFields.push(1);
+                  if (missingFields.length > 0) {
+                    setFooterNotice('error');
+                    const targetSlot = document.querySelectorAll('.photo-slot')[missingFields[0]];
+                    if (targetSlot) targetSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                  }
+                  if (window.confirm('저장하시겠습니까?')) {
+                    handleSavePhotos();
+                  }
+                }} disabled={photoSaving || photoLoading}>
+                  {photoSaving ? '저장 중...' : '저장'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2256,11 +2376,23 @@ const Cluster2Content = () => {
         <div className="section2-modal-overlay">
           <div className="section2-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section2-modal-header">
-              <h3>슬로건 편집</h3>
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
+                <h3>슬로건 편집</h3>
+                <button className="modal-close-btn" onClick={() => {
+                  if (section2Dirty) {
+                    if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                      setSection2Dirty(false);
+                      setSection2ModalOpen(false);
+                    }
+                  } else {
+                    setSection2ModalOpen(false);
+                  }
+                }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
               <p className="modal-subtitle">본인을 나타내는 나만의 슬로건을 입력해주세요 😊</p>
-              <button className="modal-close-btn" onClick={() => setSection2ModalOpen(false)}>
-                <i className="ti ti-x"></i>
-              </button>
             </div>
             <div className="section2-modal-body">
               {/* 슬로건 1 */}
@@ -2585,14 +2717,28 @@ const Cluster2Content = () => {
               </div>
             </div>
             <div className="section2-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection2ModalOpen(false)} disabled={sloganSaving}>취소</button>
-              <button
-                className="save-btn"
-                onClick={handleSaveSlogans}
-                disabled={sloganSaving}
-              >
-                {sloganSaving ? '저장 중...' : '저장'}
-              </button>
+              <div className="modal-footer-left">
+                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+              </div>
+              <div className="modal-footer-right">
+                <button className="modal-reset-btn" onClick={() => {
+                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                    setEditingSloganData({...initialSloganData});
+                  }
+                }}>초기화</button>
+                <button
+                  className="modal-save-btn"
+                  onClick={() => {
+                    if (window.confirm('저장하시겠습니까?')) {
+                      handleSaveSlogans();
+                    }
+                  }}
+                  disabled={sloganSaving}
+                >
+                  {sloganSaving ? '저장 중...' : '저장'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2603,11 +2749,23 @@ const Cluster2Content = () => {
         <div className="section21-modal-overlay">
           <div className="section21-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section21-modal-header">
-              <h3>영상 편집</h3>
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
+                <h3>영상 편집</h3>
+                <button className="modal-close-btn" onClick={() => {
+                  if (section21Dirty) {
+                    if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                      setSection21Dirty(false);
+                      setSection21ModalOpen(false);
+                    }
+                  } else {
+                    setSection21ModalOpen(false);
+                  }
+                }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
               <p className="modal-subtitle">본인이 활동 했거나, 본인을 나타내는 영상 링크를 추가해주세요 😊</p>
-              <button className="modal-close-btn" onClick={() => setSection21ModalOpen(false)}>
-                <i className="ti ti-x"></i>
-              </button>
             </div>
             <div className="section21-modal-body">
               {editingVideoData.map((video, index) => (
@@ -2664,14 +2822,28 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section21-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection21ModalOpen(false)} disabled={videoSaving}>취소</button>
-              <button
-                className="save-btn"
-                onClick={handleSaveVideos}
-                disabled={videoSaving}
-              >
-                {videoSaving ? '저장 중...' : '저장'}
-              </button>
+              <div className="modal-footer-left">
+                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+              </div>
+              <div className="modal-footer-right">
+                <button className="modal-reset-btn" onClick={() => {
+                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                    setEditingVideoData([...initialVideoData]);
+                  }
+                }}>초기화</button>
+                <button
+                  className="modal-save-btn"
+                  onClick={() => {
+                    if (window.confirm('저장하시겠습니까?')) {
+                      handleSaveVideos();
+                    }
+                  }}
+                  disabled={videoSaving}
+                >
+                  {videoSaving ? '저장 중...' : '저장'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2682,19 +2854,20 @@ const Cluster2Content = () => {
         <div className="intro-modal-overlay">
           <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
             <div className="intro-modal-header">
-              <div className="header-left">
-                <img src={introCards[selectedIntroCard].icon} alt="" className="modal-icon" />
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
                 <h3>{introCards[selectedIntroCard].title}</h3>
-              </div>
-              <div className="header-right">
                 <button className="modal-close-btn" onClick={() => {
-                  if (isEditingIntro && editingIntroData.content !== introCards[selectedIntroCard].content) {
-                    if (!confirm('변경사항이 저장되지 않았습니다. 정말 닫으시겠습니까?')) {
-                      return;
+                  if (introDirty) {
+                    if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                      setIntroDirty(false);
+                      setIsEditingIntro(false);
+                      setIntroModalOpen(false);
                     }
+                  } else {
                     setIsEditingIntro(false);
+                    setIntroModalOpen(false);
                   }
-                  setIntroModalOpen(false);
                 }}>
                   <i className="ti ti-x"></i>
                 </button>
@@ -2730,30 +2903,30 @@ const Cluster2Content = () => {
             <div className="intro-modal-footer">
               {isEditingIntro ? (
                 <>
-                  <button
-                    className="cancel-btn"
-                    onClick={() => {
-                      if (editingIntroData.content !== introCards[selectedIntroCard].content) {
-                        if (!confirm('변경사항이 저장되지 않았습니다. 정말 취소하시겠습니까?')) {
-                          return;
+                  <div className="modal-footer-left">
+                    <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                    <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+                  </div>
+                  <div className="modal-footer-right">
+                    <button className="modal-reset-btn" onClick={() => {
+                      if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                        setEditingIntroData({ content: initialIntroContent });
+                      }
+                    }}>초기화</button>
+                    <button
+                      className="modal-save-btn"
+                      disabled={introSaving}
+                      onClick={() => {
+                        if (window.confirm('저장하시겠습니까?')) {
+                          if (selectedIntroCard !== null) {
+                            handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
+                          }
                         }
-                      }
-                      setIsEditingIntro(false);
-                    }}
-                  >
-                    취소
-                  </button>
-                  <button
-                    className="save-btn"
-                    disabled={introSaving}
-                    onClick={() => {
-                      if (selectedIntroCard !== null) {
-                        handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
-                      }
-                    }}
-                  >
-                    {introSaving ? '저장 중...' : '저장'}
-                  </button>
+                      }}
+                    >
+                      {introSaving ? '저장 중...' : '저장'}
+                    </button>
+                  </div>
                 </>
               ) : (
                 <button
@@ -2764,6 +2937,7 @@ const Cluster2Content = () => {
                       setEditingIntroData({
                         content: introCards[selectedIntroCard].content,
                       });
+                      setInitialIntroContent(introCards[selectedIntroCard].content);
                       setIsEditingIntro(true);
                     })
                   }
@@ -2781,11 +2955,23 @@ const Cluster2Content = () => {
         <div className="section4-modal-overlay">
           <div className="section4-modal">
             <div className="section4-modal-header">
-              <h3>클럽 리뷰 링크 편집</h3>
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
+                <h3>클럽 리뷰 링크 편집</h3>
+                <button className="modal-close-btn" onClick={() => {
+                  if (section4Dirty) {
+                    if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                      setSection4Dirty(false);
+                      setSection4ModalOpen(false);
+                    }
+                  } else {
+                    setSection4ModalOpen(false);
+                  }
+                }}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
               <p className="modal-subtitle">본인이 작성한 클럽 주차 리뷰 링크를 등록해주세요 😊</p>
-              <button className="modal-close-btn" onClick={() => setSection4ModalOpen(false)}>
-                <i className="ti ti-x"></i>
-              </button>
             </div>
             <div className="section4-modal-body">
               {/* Total Complete */}
@@ -2840,14 +3026,28 @@ const Cluster2Content = () => {
               })}
             </div>
             <div className="section4-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection4ModalOpen(false)} disabled={reviewLinkSaving}>취소</button>
-              <button
-                className="save-btn"
-                onClick={handleSaveReviewLinks}
-                disabled={reviewLinkSaving}
-              >
-                {reviewLinkSaving ? '저장 중...' : '저장'}
-              </button>
+              <div className="modal-footer-left">
+                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+              </div>
+              <div className="modal-footer-right">
+                <button className="modal-reset-btn" onClick={() => {
+                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                    setEditingReviewLinks([...initialReviewLinksData]);
+                  }
+                }}>초기화</button>
+                <button
+                  className="modal-save-btn"
+                  onClick={() => {
+                    if (window.confirm('저장하시겠습니까?')) {
+                      handleSaveReviewLinks();
+                    }
+                  }}
+                  disabled={reviewLinkSaving}
+                >
+                  {reviewLinkSaving ? '저장 중...' : '저장'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2858,60 +3058,65 @@ const Cluster2Content = () => {
         <div className="section3-modal-overlay">
           <div className="section3-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section3-modal-header">
-              <h3>학력 편집</h3>
-              <p className="modal-subtitle">본인의 학력 사항을 입력해주세요 😊</p>
-              <div className="header-actions">
-                <button
-                  className="add-edu-btn"
-                  disabled={editingEduData.length >= 10}
-                  onClick={() => {
-                    if (editingEduData.length >= 10) {
-                      alert('학력은 최대 10개까지 추가할 수 있습니다.');
-                      return;
-                    }
-                    const newEdu: EduData = {
-                      eduLevel: "",
-                      school: "",
-                      status: "",
-                      category: "",
-                      major1: "",
-                      major2: "",
-                      major3: "",
-                      period: "",
-                      startYear: "",
-                      startMonth: "",
-                      endYear: "",
-                      endMonth: "",
-                      gradeMax: "",
-                      gradeValue: "",
-                      description: "",
-                      isFinal: false
-                    };
-                    setEditingEduData([...editingEduData, newEdu]);
-                    // 새로 추가된 카드의 상단으로 스크롤 (모달 내부 스크롤 컨테이너 사용)
-                    setTimeout(() => {
-                      const container = modalBodyRef.current;
-                      const cards = container?.querySelectorAll('.edu-edit-card');
-                      if (container && cards && cards.length > 0) {
-                        const lastCard = cards[cards.length - 1] as HTMLElement;
-                        container.scrollTo({ top: lastCard.offsetTop - container.offsetTop, behavior: 'smooth' });
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>✍️</span>
+                <h3>학력 편집</h3>
+                <div className="header-actions">
+                  <button
+                    className="add-edu-btn"
+                    disabled={editingEduData.length >= 10}
+                    onClick={() => {
+                      if (editingEduData.length >= 10) {
+                        alert('학력은 최대 10개까지 추가할 수 있습니다.');
+                        return;
                       }
-                    }, 100);
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                  학력 추가하기
-                </button>
-                <button className="modal-close-btn" onClick={() => {
+                      const newEdu: EduData = {
+                        eduLevel: "",
+                        school: "",
+                        status: "",
+                        category: "",
+                        major1: "",
+                        major2: "",
+                        major3: "",
+                        period: "",
+                        startYear: "",
+                        startMonth: "",
+                        endYear: "",
+                        endMonth: "",
+                        gradeMax: "",
+                        gradeValue: "",
+                        description: "",
+                        isFinal: false
+                      };
+                      setEditingEduData([...editingEduData, newEdu]);
+                      setTimeout(() => {
+                        const container = modalBodyRef.current;
+                        const cards = container?.querySelectorAll('.edu-edit-card');
+                        if (container && cards && cards.length > 0) {
+                          const lastCard = cards[cards.length - 1] as HTMLElement;
+                          container.scrollTo({ top: lastCard.offsetTop - container.offsetTop, behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    학력 추가하기
+                  </button>
+                  <button className="modal-close-btn" onClick={() => {
                     if (hasEduChanges) {
-                      alert('변경사항이 있습니다. 저장 버튼을 눌러 저장해주세요.');
-                      return;
+                      if (window.confirm('입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?')) {
+                        setHasEduChanges(false);
+                        setSection3ModalOpen(false);
+                      }
+                    } else {
+                      setSection3ModalOpen(false);
                     }
-                    setSection3ModalOpen(false);
                   }}>
-                  <i className="ti ti-x"></i>
-                </button>
+                    <i className="ti ti-x"></i>
+                  </button>
+                </div>
               </div>
+              <p className="modal-subtitle">본인의 학력 사항을 입력해주세요 😊</p>
             </div>
             <div className="section3-modal-body" ref={modalBodyRef}>
               {editingEduData.map((edu, index) => (
@@ -3657,98 +3862,128 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section3-modal-footer">
-              <button
-                className="save-btn"
-                disabled={eduSaving}
-                onClick={() => {
-                  // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학시기, 성적
-                  const newErrors: { [key: string]: boolean } = {};
-                  const invalidCards = editingEduData.map((edu, index) => {
-                    const missing: string[] = [];
-                    if (!edu.school || edu.school === '-') { missing.push('학교'); newErrors[`${index}_school`] = true; }
-                    if (!edu.status || edu.status === '-') { missing.push('상태'); newErrors[`${index}_status`] = true; }
-                    if (!edu.category) { missing.push('계열'); newErrors[`${index}_category`] = true; }
-                    if (!edu.major1) { missing.push('전공 1'); newErrors[`${index}_major1`] = true; }
-                    if (!edu.startYear) { missing.push('입학시기'); newErrors[`${index}_startYear`] = true; }
-                    if (edu.startYear && !edu.startMonth) { missing.push('입학월'); newErrors[`${index}_startMonth`] = true; }
-                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) { missing.push('졸업시기'); newErrors[`${index}_endYear`] = true; }
-                    if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) { missing.push('졸업월'); newErrors[`${index}_endMonth`] = true; }
-                    if (!edu.gradeValue) { missing.push('성적'); newErrors[`${index}_gradeValue`] = true; }
-                    return { index: index + 1, missing };
-                  }).filter(item => item.missing.length > 0);
-
-                  setEduValidationErrors(newErrors);
-
-                  if (invalidCards.length > 0) {
-                    alert('입력되지 않은 필수 항목이 있습니다.');
-                    // 첫 번째 에러 필드로 스크롤
-                    setTimeout(() => {
-                      const container = modalBodyRef.current;
-                      if (!container) return;
-                      const firstErrorKey = Object.keys(newErrors)[0];
-                      if (!firstErrorKey) return;
-                      const cardIndex = parseInt(firstErrorKey.split('_')[0]);
-                      const cards = container.querySelectorAll('.edu-edit-card');
-                      if (!cards || !cards[cardIndex]) return;
-                      const card = cards[cardIndex] as HTMLElement;
-                      // 카드 내 첫 번째 에러 라벨의 부모 필드로 스크롤
-                      const labels = card.querySelectorAll('.edu-edit-field label');
-                      let targetField: HTMLElement | null = null;
-                      for (let i = 0; i < labels.length; i++) {
-                        if ((labels[i] as HTMLElement).style.color) {
-                          targetField = (labels[i] as HTMLElement).closest('.edu-edit-field') as HTMLElement;
-                          break;
-                        }
-                      }
-                      if (targetField) {
-                        container.scrollTop = targetField.offsetTop - container.offsetTop;
-                      } else {
-                        container.scrollTop = card.offsetTop - container.offsetTop;
-                      }
-                    }, 100);
-                    return;
+              <div className="modal-footer-left">
+                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+              </div>
+              <div className="modal-footer-right">
+                <button className="modal-reset-btn" onClick={() => {
+                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                    setEditingEduData([...initialEduDataSnapshot]);
+                    setHasEduChanges(false);
+                    setEduValidationErrors({});
                   }
+                }}>초기화</button>
+                <button
+                  className="modal-save-btn"
+                  disabled={eduSaving}
+                  onClick={() => {
+                    if (!window.confirm('저장하시겠습니까?')) return;
+                    // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학시기, 성적
+                    const newErrors: { [key: string]: boolean } = {};
+                    const invalidCards = editingEduData.map((edu, index) => {
+                      const missing: string[] = [];
+                      if (!edu.school || edu.school === '-') { missing.push('학교'); newErrors[`${index}_school`] = true; }
+                      if (!edu.status || edu.status === '-') { missing.push('상태'); newErrors[`${index}_status`] = true; }
+                      if (!edu.category) { missing.push('계열'); newErrors[`${index}_category`] = true; }
+                      if (!edu.major1) { missing.push('전공 1'); newErrors[`${index}_major1`] = true; }
+                      if (!edu.startYear) { missing.push('입학시기'); newErrors[`${index}_startYear`] = true; }
+                      if (edu.startYear && !edu.startMonth) { missing.push('입학월'); newErrors[`${index}_startMonth`] = true; }
+                      if (['졸업', '중퇴', '자퇴'].includes(edu.status) && !edu.endYear) { missing.push('졸업시기'); newErrors[`${index}_endYear`] = true; }
+                      if (['졸업', '중퇴', '자퇴'].includes(edu.status) && edu.endYear && !edu.endMonth) { missing.push('졸업월'); newErrors[`${index}_endMonth`] = true; }
+                      if (!edu.gradeValue) { missing.push('성적'); newErrors[`${index}_gradeValue`] = true; }
+                      return { index: index + 1, missing };
+                    }).filter(item => item.missing.length > 0);
 
-                  // 저장 로직 - 빈 전공 필드를 "-"로 변환 + period 계산 후 저장
-                  const processedData = editingEduData.map(edu => {
-                    // period 계산: startYear/startMonth, endYear/endMonth, status 기반
-                    const startStr = edu.startYear && edu.startMonth
-                      ? `${edu.startYear}.${edu.startMonth}`
-                      : edu.startYear || "";
-                    const endStr = edu.endYear && edu.endMonth
-                      ? `${edu.endYear}.${edu.endMonth}`
-                      : edu.endYear || "";
-                    const isOngoing = ['재학', '졸예', '졸업예정', '휴학'].includes(edu.status);
+                    setEduValidationErrors(newErrors);
 
-                    let period = "";
-                    if (startStr) {
-                      if (isOngoing) {
-                        period = `${startStr} - ~ing`;
-                      } else if (endStr) {
-                        period = `${startStr} - ${endStr}`;
-                      } else {
-                        period = `${startStr} -`;
-                      }
+                    if (invalidCards.length > 0) {
+                      alert('입력되지 않은 필수 항목이 있습니다.');
+                      setTimeout(() => {
+                        const container = modalBodyRef.current;
+                        if (!container) return;
+                        const firstErrorKey = Object.keys(newErrors)[0];
+                        if (!firstErrorKey) return;
+                        const cardIndex = parseInt(firstErrorKey.split('_')[0]);
+                        const cards = container.querySelectorAll('.edu-edit-card');
+                        if (!cards || !cards[cardIndex]) return;
+                        const card = cards[cardIndex] as HTMLElement;
+                        const labels = card.querySelectorAll('.edu-edit-field label');
+                        let targetField: HTMLElement | null = null;
+                        for (let i = 0; i < labels.length; i++) {
+                          if ((labels[i] as HTMLElement).style.color) {
+                            targetField = (labels[i] as HTMLElement).closest('.edu-edit-field') as HTMLElement;
+                            break;
+                          }
+                        }
+                        if (targetField) {
+                          container.scrollTop = targetField.offsetTop - container.offsetTop;
+                        } else {
+                          container.scrollTop = card.offsetTop - container.offsetTop;
+                        }
+                      }, 100);
+                      return;
                     }
 
-                    return {
-                      ...edu,
-                      period,
-                      major1: edu.major1.trim() === '' ? '-' : edu.major1,
-                      major2: edu.major2.trim() === '' ? '-' : edu.major2,
-                      major3: edu.major3.trim() === '' ? '-' : edu.major3,
-                    };
-                  });
-                  handleSaveEducations(processedData);
-                }}
-              >
-                {eduSaving ? '저장 중...' : '저장'}
-              </button>
+                    const processedData = editingEduData.map(edu => {
+                      const startStr = edu.startYear && edu.startMonth
+                        ? `${edu.startYear}.${edu.startMonth}`
+                        : edu.startYear || "";
+                      const endStr = edu.endYear && edu.endMonth
+                        ? `${edu.endYear}.${edu.endMonth}`
+                        : edu.endYear || "";
+                      const isOngoing = ['재학', '졸예', '졸업예정', '휴학'].includes(edu.status);
+
+                      let period = "";
+                      if (startStr) {
+                        if (isOngoing) {
+                          period = `${startStr} - ~ing`;
+                        } else if (endStr) {
+                          period = `${startStr} - ${endStr}`;
+                        } else {
+                          period = `${startStr} -`;
+                        }
+                      }
+
+                      return {
+                        ...edu,
+                        period,
+                        major1: edu.major1.trim() === '' ? '-' : edu.major1,
+                        major2: edu.major2.trim() === '' ? '-' : edu.major2,
+                        major3: edu.major3.trim() === '' ? '-' : edu.major3,
+                      };
+                    });
+                    handleSaveEducations(processedData);
+                  }}
+                >
+                  {eduSaving ? '저장 중...' : '저장'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
+
+      {/* 도움말 모달 */}
+      {showHelpModal && (
+        <div className="help-modal-overlay" onClick={() => setShowHelpModal(false)}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="help-modal-header">
+              <div className="modal-header-top">
+                <span style={{ fontSize: '20px' }}>🔎</span>
+                <h3>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setShowHelpModal(false)}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
+            </div>
+            <div className="help-modal-body">
+              {/* 빈 콘텐츠 — 추후 추가 */}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 링크 없음 툴팁 */}
       {noLinkTooltip.visible && (
