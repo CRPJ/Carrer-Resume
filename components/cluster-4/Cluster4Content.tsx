@@ -1868,7 +1868,7 @@ const Cluster4Content = () => {
           {/* Floating Icons - 다른 사용자 프로필 볼 때만 표시 (다른 사람에게 평판 남기기) */}
           <div className="floating-icons" style={{ display: "flex" }}>
             <div className="edit-icon search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -2014,7 +2014,7 @@ const Cluster4Content = () => {
                         }}
                         style={{ cursor: "pointer" }}
                       >
-                        <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                        <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#fff" }}></i>
                       </div>
                     </div>
                   </div>
@@ -2212,7 +2212,7 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', width: '100%', position: 'relative' }}>
                   <h4 className="section-title">
                     <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판{" "}
                     <span className="count-label">
@@ -2234,7 +2234,7 @@ const Cluster4Content = () => {
                       }
                     }}
                   >
-                    <i className="ti ti-pencil" style={{ fontSize: '11px', color: '#fff' }} />
+                    <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }} />
                   </div>
                 </div>
                 <div style={{ position: "relative" }}>
@@ -2401,43 +2401,10 @@ const Cluster4Content = () => {
       {/* ========== 시즌 평판 모달 ========== */}
 
       {seasonReputationModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.85)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 99999,
-            backdropFilter: "blur(5px)",
-          }}
-        >
-          <div
-            className="edit-modal-content"
-            style={{
-              width: "500px",
-              maxWidth: "90vw",
-              height: "620px",
-              maxHeight: "calc(100vh - 80px)",
-              background: "#0d1117",
-              border: "1px solid #FAAB07",
-            }}
-          >
+        <div className="season-reputation-edit-overlay">
+          <div className="edit-modal-content season-reputation-edit-modal">
             {/* Header */}
-            <div
-              className="edit-modal-header"
-              style={{
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                background: "rgba(0,0,0,0.2)",
-              }}
-            >
+            <div className="edit-modal-header">
               <div>
                 <h3 style={{ margin: 0 }}>✦ 시즌 평판</h3>
                 <span className="modal-subtitle" style={{ display: "block", marginTop: "8px" }}>
@@ -2450,7 +2417,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Body */}
-            <div className="edit-modal-body" style={{ padding: "20px 24px" }}>
+            <div className="edit-modal-body">
               {/* 평점 */}
               <div style={{ marginBottom: "24px" }}>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>평점</label>
@@ -2622,16 +2589,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Footer */}
-            <div
-              className="edit-modal-footer"
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                padding: "16px 24px",
-                background: "rgba(0,0,0,0.2)",
-              }}
-            >
+            <div className="edit-modal-footer">
               <button
                 onClick={() => setSeasonReputationModalOpen(false)}
                 disabled={seasonReputationSaving}
@@ -2686,43 +2644,10 @@ const Cluster4Content = () => {
           const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
           return (
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(0, 0, 0, 0.85)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 99999,
-                backdropFilter: "blur(5px)",
-              }}
-            >
-              <div
-                className="edit-modal-content"
-                style={{
-                  width: "500px",
-                  maxHeight: "80vh",
-                  background: "linear-gradient(145deg, #1a1d2e 0%, #0d0f1a 100%)",
-                  border: "1px solid rgba(255, 165, 0, 0.3)",
-                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.1)",
-                  overflow: "hidden",
-                }}
-              >
+            <div className="season-reputation-view-overlay">
+              <div className="edit-modal-content season-reputation-view-modal">
                 {/* Header */}
-                <div
-                  className="edit-modal-header"
-                  style={{
-                    padding: "20px 24px",
-                    borderBottom: "1px solid rgba(255, 165, 0, 0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+                <div className="edit-modal-header">
                   <h3 style={{ margin: 0, color: "#FAAB07", fontSize: "18px", fontWeight: 600 }}>시즌 평판 상세</h3>
                   <button className="modal-close-btn" onClick={() => setReputationDetailModalOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: "24px", cursor: "pointer", padding: "4px" }}>
                     ×
@@ -2730,7 +2655,7 @@ const Cluster4Content = () => {
                 </div>
 
                 {/* Body */}
-                <div className="edit-modal-body" style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(80vh - 80px)" }}>
+                <div className="edit-modal-body">
                   {/* Reviewer Info */}
                   <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
                     <img src={reviewer?.profile_photo_url || "/images/avatar/avatar.png"} alt="profile" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255, 165, 0, 0.3)" }} />
@@ -2798,40 +2723,10 @@ const Cluster4Content = () => {
 
       {/* ========== 시즌 리뷰 모달 ========== */}
       {seasonReviewModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.85)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 99999,
-            backdropFilter: "blur(5px)",
-          }}
-        >
-          <div
-            className="edit-modal-content"
-            style={{
-              width: "450px",
-              maxWidth: "90vw",
-              background: "linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)",
-              border: "1px solid #FAAB07",
-              overflow: "hidden",
-            }}
-          >
+        <div className="season-review-overlay">
+          <div className="edit-modal-content season-review-modal">
             {/* Header */}
-            <div
-              className="edit-modal-header"
-              style={{
-                padding: "20px 24px",
-                borderBottom: "1px solid rgba(255, 165, 0, 0.2)",
-                background: "rgba(255, 165, 0, 0.05)",
-              }}
-            >
+            <div className="edit-modal-header">
               <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "#FAAB07" }}>✦ 시즌 리뷰</h3>
               <span className="modal-subtitle" style={{ color: "#999", fontSize: "14px" }}>
                 이번 시즌에 대한 나의 평가를 남겨주세요
@@ -2839,7 +2734,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Body */}
-            <div className="edit-modal-body" style={{ padding: "20px 24px" }}>
+            <div className="edit-modal-body">
               {/* 평점 선택 */}
               <div className="slogan-rating-row" style={{ marginBottom: "20px" }}>
                 <label className="slogan-rating-label" style={{ color: "#FAAB07", fontSize: "14px", fontWeight: 600 }}>
@@ -2950,7 +2845,7 @@ const Cluster4Content = () => {
             </div>
 
             {/* Footer */}
-            <div className="edit-modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "12px", padding: "16px 24px", borderTop: "1px solid rgba(250, 171, 7, 0.2)", background: "rgba(0,0,0,0.2)" }}>
+            <div className="edit-modal-footer">
               <button
                 onClick={() => setSeasonReviewModalOpen(false)}
                 disabled={seasonReviewSaving}

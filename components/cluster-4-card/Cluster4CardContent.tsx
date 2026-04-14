@@ -2763,7 +2763,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               style={{ cursor: "pointer" }}
               title="주차 평판 남기기"
             >
-              <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+              <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
             </div>
           </div>
         }
@@ -3061,7 +3061,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   }}
                   style={{ cursor: "pointer", marginTop: "8px" }}
                 >
-                  <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                  <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
                 </div>
               </div>
             }
@@ -3298,10 +3298,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 className="edit-icon"
                 style={{ cursor: "default", opacity: 0.4 }}
               >
-                <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
               </div> */}
               <div className="edit-icon search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
@@ -3392,10 +3392,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 className="edit-icon"
                 style={{ cursor: "default", opacity: 0.4 }}
               >
-                <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
               </div> */}
               <div className="edit-icon search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
@@ -3532,10 +3532,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 className="edit-icon"
                 style={{ cursor: "default", opacity: 0.4 }}
               >
-                <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
               </div> */}
               <div className="edit-icon search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
                   <path d="M21 21l-4.35-4.35" />
                 </svg>
@@ -3647,10 +3647,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 className="edit-icon"
                 style={{ cursor: "default", opacity: 0.4 }}
               >
-                <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#FFFFFF" }}></i>
+                <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
               </div> */}
               <div className="edit-icon search-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
                   <circle cx="11" cy="11" r="8" />
                   <path d="M21 21l-4.35-4.35" />
                 </svg>

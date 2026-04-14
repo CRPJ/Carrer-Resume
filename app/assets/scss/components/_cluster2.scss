@@ -50,7 +50,7 @@
     display: none;
     position: absolute;
     top: 40px;
-    right: 28px; // 전 섹션 통일: 그룹 끝 x좌표 19px 우측 이동 (47→28)
+    right: 35px; // 전 섹션 통일: 그룹 끝 x좌표 19px 우측 이동 (47→28)
     z-index: 100;
     gap: 15px;
     align-items: center;
@@ -4192,7 +4192,7 @@
         .modal-close-btn {
           position: absolute;
           top: 20px;
-          right: 28px;
+          right: 35px;
           background: none;
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: #999;
@@ -4499,7 +4499,7 @@
       .modal-close-btn {
         position: absolute;
         top: 20px;
-        right: 28px;
+        right: 35px;
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
@@ -5001,7 +5001,7 @@
       .modal-close-btn {
         position: absolute;
         top: 24px;
-        right: 28px;
+        right: 35px;
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
@@ -5423,7 +5423,7 @@
       .header-actions {
         position: absolute;
         top: 20px;
-        right: 28px;
+        right: 35px;
         display: flex;
         align-items: center;
         gap: 12px;
