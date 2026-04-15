@@ -1373,7 +1373,10 @@ export async function PUT(request: Request) {
     if (body.display_name !== undefined && !isMasked(body.display_name)) updateData.display_name = body.display_name;
     if (body.eng_name !== undefined && !isMasked(body.eng_name)) updateData.eng_name = body.eng_name;
     if (body.gender !== undefined && !isMasked(body.gender)) updateData.gender = body.gender;
-    if (body.birth_date !== undefined && !isMasked(body.birth_date)) updateData.birth_date = body.birth_date || null;
+    if (body.birth_date !== undefined && !isMasked(body.birth_date)) {
+      const dateStr = body.birth_date;
+      updateData.birth_date = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) ? dateStr : null;
+    }
     if (body.address !== undefined && !isMasked(body.address)) updateData.address = body.address;
     if (body.phone !== undefined && !isMasked(body.phone)) updateData.phone = body.phone;
     if (body.email !== undefined && !isMasked(body.email)) updateData.email = body.email;

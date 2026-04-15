@@ -29,6 +29,7 @@ const statusToDb: { [key: string]: string } = {
 
 const categoryToDb: { [key: string]: string } = {
   '인문': 'humanities',
+  '어문': 'linguistics',
   '사회': 'social_science',
   '자연': 'natural_science',
   '공학': 'engineering',
@@ -67,6 +68,7 @@ const statusFromDb: { [key: string]: string } = {
 
 const categoryFromDb: { [key: string]: string } = {
   'humanities': '인문',
+  'linguistics': '어문',
   'social_science': '사회',
   'natural_science': '자연',
   'engineering': '공학',
