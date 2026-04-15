@@ -5204,31 +5204,7 @@
         gap: 12px;
       }
 
-      .add-edu-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: #ffa500;
-        border: none;
-        border-radius: 0;
-        color: #000;
-        font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        svg {
-          flex-shrink: 0;
-        }
-
-        &:hover {
-          background: #ffb820;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
-        }
-      }
+      // .add-edu-btn은 .section3-modal-body 하위로 이동됨
 
       .modal-close-btn {
         background: none;
@@ -5269,6 +5245,40 @@
       overscroll-behavior: contain;
       max-height: calc(min(85vh, 750px) - 160px);
 
+      .add-edu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 20px;
+        margin-top: 16px;
+        background: transparent;
+        border: 1px dashed rgba(255, 165, 0, 0.4);
+        border-radius: 0;
+        color: #FAAB07;
+        font-family: "Pretendard", sans-serif;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        svg {
+          flex-shrink: 0;
+          stroke: #FAAB07;
+        }
+
+        &:hover {
+          background: rgba(255, 165, 0, 0.08);
+          border-color: #ffa500;
+          color: #ffa500;
+
+          svg {
+            stroke: #ffa500;
+          }
+        }
+      }
+
       &::-webkit-scrollbar { width: 3px; }
       &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
       &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
@@ -5285,6 +5295,23 @@
 
         &:last-child {
           margin-bottom: 0;
+        }
+
+        // 1번 카드 수정 잠금 (관리자 승인 전)
+        &.primary-locked {
+          input, textarea, select {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+          }
+          .edu-custom-dropdown {
+            opacity: 0.6;
+            pointer-events: none;
+          }
+          .delete-edu-btn, .final-edu-btn {
+            opacity: 0.3;
+            pointer-events: none;
+          }
         }
 
         // 대표학력 카드 스타일
