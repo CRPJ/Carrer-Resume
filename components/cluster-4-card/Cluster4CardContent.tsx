@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useModalScroll } from "@/utils/useModalScroll";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
@@ -1404,17 +1405,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workCareerViewIsEditing, setWorkCareerViewIsEditing] = useState(false);
 
   // 모달 열릴 때 배경 스크롤 잠금
-  useEffect(() => {
-    const anyOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
-    if (anyOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [workInfoModalOpen, workAbilityModalOpen, workExpModalOpen, workCareerModalOpen, headerModalOpen, reputationViewModalOpen, colleagueViewModalOpen, workInfoViewModalOpen, workAbilityViewModalOpen, workExpViewModalOpen, workCareerViewModalOpen]);
+  const anyModalOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
+  useModalScroll(anyModalOpen);
 
   // card-desc의 … → .. 교체 (line-clamp 렌더링 완료 후)
   useEffect(() => {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useModalScroll } from "@/utils/useModalScroll";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
@@ -319,15 +320,8 @@ const Cluster4Content = () => {
   const [seasonReviewSuccess, setSeasonReviewSuccess] = useState(false);
 
   // 모달 열릴 때 배경 스크롤 잠금
-  useEffect(() => {
-    const anyOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen;
-    if (anyOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [seasonReputationModalOpen, reputationDetailModalOpen, seasonReviewModalOpen]);
+  const anyModalOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen;
+  useModalScroll(anyModalOpen);
 
   // 활동 통계 (주차 성장률)
   const [activityStats, setActivityStats] = useState<{

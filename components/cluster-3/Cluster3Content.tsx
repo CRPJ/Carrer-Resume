@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { useModalScroll } from "@/utils/useModalScroll";
 import { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS, CLUSTER3_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
@@ -275,17 +276,8 @@ const Cluster3Content = () => {
   };
 
   // 모달 열릴 때 배경 스크롤 잠금
-  useEffect(() => {
-    const anyOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
-    if (anyOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [section3ModalOpen, section4ModalOpen, section5ModalOpen]);
+  const anyModalOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
+  useModalScroll(anyModalOpen);
 
   // 링크 데이터 관리 (카드 데이터에서 초기화)
   const [section3Links, setSection3Links] = useState<string[]>([]);

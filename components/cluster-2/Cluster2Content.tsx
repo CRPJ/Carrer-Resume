@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { useModalScroll } from "@/utils/useModalScroll";
 import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO, CLUSTER2_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 import { SECTION1_PHOTO_DEFAULTS } from "@/constants/dummyData/cluster2-section1-default";
 import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
@@ -969,15 +970,8 @@ const Cluster2Content = () => {
   const [initialIntroContent, setInitialIntroContent] = useState('');
 
   // 모달 열릴 때 배경 스크롤 잠금
-  useEffect(() => {
-    const anyOpen = section1ModalOpen || section2ModalOpen || section21ModalOpen || section3ModalOpen || section4ModalOpen || introModalOpen;
-    if (anyOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [section1ModalOpen, section2ModalOpen, section21ModalOpen, section3ModalOpen, section4ModalOpen, introModalOpen]);
+  const anyModalOpen = section1ModalOpen || section2ModalOpen || section21ModalOpen || section3ModalOpen || section4ModalOpen || introModalOpen;
+  useModalScroll(anyModalOpen);
 
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     '', // Total Complete (cluving_review_link)
@@ -2337,43 +2331,45 @@ const Cluster2Content = () => {
               )}
             </div>
             <div className="section1-modal-footer">
-              <div className="modal-footer-left">
-                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                <div className="modal-footer-right">
+                  <button className="modal-reset-btn" onClick={() => {
+                    if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                      setPhotos([...SECTION1_PHOTO_DEFAULTS.photos]);
+                      setFooterNotice('default');
+                    }
+                  }}>초기화</button>
+                  <button className="modal-save-btn" onClick={() => {
+                    const missingFields: number[] = [];
+                    if (!photos[0]) missingFields.push(0);
+                    if (!photos[1]) missingFields.push(1);
+                    if (missingFields.length > 0) {
+                      setFooterNotice('error');
+                      const slots = document.querySelectorAll('.photo-slot');
+                      missingFields.forEach(i => slots[i]?.classList.add('field-missing'));
+                      const targetSlot = slots[missingFields[0]];
+                      if (targetSlot) targetSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setTimeout(() => {
+                        missingFields.forEach(i => slots[i]?.classList.remove('field-missing'));
+                      }, 900);
+                      return;
+                    }
+                    if (window.confirm('저장하시겠습니까?')) {
+                      handleSavePhotos();
+                    }
+                  }} disabled={photoSaving || photoLoading}>
+                    {photoSaving ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
                 <p className={`modal-footer-notice ${footerNotice === 'error' ? 'notice-error' : ''}`}>
                   {footerNotice === 'error'
                     ? '필수 사항이 누락되었어요! 확인 부탁드려요! 😊'
                     : '내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊'
                   }
                 </p>
-              </div>
-              <div className="modal-footer-right">
-                <button className="modal-reset-btn" onClick={() => {
-                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setPhotos([...SECTION1_PHOTO_DEFAULTS.photos]);
-                    setFooterNotice('default');
-                  }
-                }}>초기화</button>
-                <button className="modal-save-btn" onClick={() => {
-                  const missingFields: number[] = [];
-                  if (!photos[0]) missingFields.push(0);
-                  if (!photos[1]) missingFields.push(1);
-                  if (missingFields.length > 0) {
-                    setFooterNotice('error');
-                    const slots = document.querySelectorAll('.photo-slot');
-                    missingFields.forEach(i => slots[i]?.classList.add('field-missing'));
-                    const targetSlot = slots[missingFields[0]];
-                    if (targetSlot) targetSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setTimeout(() => {
-                      missingFields.forEach(i => slots[i]?.classList.remove('field-missing'));
-                    }, 900);
-                    return;
-                  }
-                  if (window.confirm('저장하시겠습니까?')) {
-                    handleSavePhotos();
-                  }
-                }} disabled={photoSaving || photoLoading}>
-                  {photoSaving ? '저장 중...' : '저장'}
-                </button>
               </div>
             </div>
           </div>
@@ -2727,52 +2723,54 @@ const Cluster2Content = () => {
               </div>
             </div>
             <div className="section2-modal-footer">
-              <div className="modal-footer-left">
-                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                <div className="modal-footer-right">
+                  <button className="modal-reset-btn" onClick={() => {
+                    if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                      setEditingSloganData({
+                        slogan1: { option: SECTION2_SLOGAN_DEFAULTS.slogans[0].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[0].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[0].rating },
+                        slogan2: { option: SECTION2_SLOGAN_DEFAULTS.slogans[1].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[1].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[1].rating },
+                        slogan3: { option: SECTION2_SLOGAN_DEFAULTS.slogans[2].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[2].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[2].rating },
+                      });
+                      setSection2FooterNotice('default');
+                    }
+                  }}>초기화</button>
+                  <button
+                    className="modal-save-btn"
+                    onClick={() => {
+                      const s1 = editingSloganData.slogan1;
+                      const missing: string[] = [];
+                      if (!s1.content) missing.push('slogan1-text');
+                      if (!s1.option) missing.push('slogan1-dropdown');
+                      if (!s1.rating || s1.rating === 0) missing.push('slogan1-rating');
+                      if (missing.length > 0) {
+                        setSection2FooterNotice('error');
+                        const targetEl = document.querySelector('.slogan-edit-item');
+                        if (targetEl) {
+                          targetEl.classList.add('field-missing');
+                          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          setTimeout(() => targetEl.classList.remove('field-missing'), 900);
+                        }
+                        return;
+                      }
+                      if (window.confirm('저장하시겠습니까?')) {
+                        handleSaveSlogans();
+                      }
+                    }}
+                    disabled={sloganSaving}
+                  >
+                    {sloganSaving ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
                 <p className={`modal-footer-notice ${section2FooterNotice === 'error' ? 'notice-error' : ''}`}>
                   {section2FooterNotice === 'error'
                     ? '필수 사항이 누락되었어요! 확인 부탁드려요! 😊'
                     : '내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊'
                   }
                 </p>
-              </div>
-              <div className="modal-footer-right">
-                <button className="modal-reset-btn" onClick={() => {
-                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingSloganData({
-                      slogan1: { option: SECTION2_SLOGAN_DEFAULTS.slogans[0].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[0].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[0].rating },
-                      slogan2: { option: SECTION2_SLOGAN_DEFAULTS.slogans[1].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[1].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[1].rating },
-                      slogan3: { option: SECTION2_SLOGAN_DEFAULTS.slogans[2].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[2].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[2].rating },
-                    });
-                    setSection2FooterNotice('default');
-                  }
-                }}>초기화</button>
-                <button
-                  className="modal-save-btn"
-                  onClick={() => {
-                    const s1 = editingSloganData.slogan1;
-                    const missing: string[] = [];
-                    if (!s1.content) missing.push('slogan1-text');
-                    if (!s1.option) missing.push('slogan1-dropdown');
-                    if (!s1.rating || s1.rating === 0) missing.push('slogan1-rating');
-                    if (missing.length > 0) {
-                      setSection2FooterNotice('error');
-                      const targetEl = document.querySelector('.slogan-edit-item');
-                      if (targetEl) {
-                        targetEl.classList.add('field-missing');
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        setTimeout(() => targetEl.classList.remove('field-missing'), 900);
-                      }
-                      return;
-                    }
-                    if (window.confirm('저장하시겠습니까?')) {
-                      handleSaveSlogans();
-                    }
-                  }}
-                  disabled={sloganSaving}
-                >
-                  {sloganSaving ? '저장 중...' : '저장'}
-                </button>
               </div>
             </div>
           </div>
@@ -2857,27 +2855,29 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section21-modal-footer">
-              <div className="modal-footer-left">
-                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
-                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
-              </div>
-              <div className="modal-footer-right">
-                <button className="modal-reset-btn" onClick={() => {
-                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingVideoData(editingVideoData.map(v => ({ ...v, videoUrl: '', thumbnail: '' })));
-                  }
-                }}>초기화</button>
-                <button
-                  className="modal-save-btn"
-                  onClick={() => {
-                    if (window.confirm('저장하시겠습니까?')) {
-                      handleSaveVideos();
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                <div className="modal-footer-right">
+                  <button className="modal-reset-btn" onClick={() => {
+                    if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                      setEditingVideoData(editingVideoData.map(v => ({ ...v, videoUrl: '', thumbnail: '' })));
                     }
-                  }}
-                  disabled={videoSaving}
-                >
-                  {videoSaving ? '저장 중...' : '저장'}
-                </button>
+                  }}>초기화</button>
+                  <button
+                    className="modal-save-btn"
+                    onClick={() => {
+                      if (window.confirm('저장하시겠습니까?')) {
+                        handleSaveVideos();
+                      }
+                    }}
+                    disabled={videoSaving}
+                  >
+                    {videoSaving ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
               </div>
             </div>
           </div>
@@ -2938,29 +2938,31 @@ const Cluster2Content = () => {
             <div className="intro-modal-footer">
               {isEditingIntro ? (
                 <>
-                  <div className="modal-footer-left">
-                    <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
-                    <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
-                  </div>
-                  <div className="modal-footer-right">
-                    <button className="modal-reset-btn" onClick={() => {
-                      if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                        setEditingIntroData({ content: initialIntroContent });
-                      }
-                    }}>초기화</button>
-                    <button
-                      className="modal-save-btn"
-                      disabled={introSaving}
-                      onClick={() => {
-                        if (window.confirm('저장하시겠습니까?')) {
-                          if (selectedIntroCard !== null) {
-                            handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
-                          }
+                  <div className="modal-footer-top">
+                    <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                    <div className="modal-footer-right">
+                      <button className="modal-reset-btn" onClick={() => {
+                        if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                          setEditingIntroData({ content: initialIntroContent });
                         }
-                      }}
-                    >
-                      {introSaving ? '저장 중...' : '저장'}
-                    </button>
+                      }}>초기화</button>
+                      <button
+                        className="modal-save-btn"
+                        disabled={introSaving}
+                        onClick={() => {
+                          if (window.confirm('저장하시겠습니까?')) {
+                            if (selectedIntroCard !== null) {
+                              handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
+                            }
+                          }
+                        }}
+                      >
+                        {introSaving ? '저장 중...' : '저장'}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="modal-footer-bottom">
+                    <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
                   </div>
                 </>
               ) : (
@@ -3036,27 +3038,29 @@ const Cluster2Content = () => {
               })}
             </div>
             <div className="section4-modal-footer">
-              <div className="modal-footer-left">
-                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
-                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
-              </div>
-              <div className="modal-footer-right">
-                <button className="modal-reset-btn" onClick={() => {
-                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingReviewLinks(['', '', '', '', '', '', '', '', '', '']);
-                  }
-                }}>초기화</button>
-                <button
-                  className="modal-save-btn"
-                  onClick={() => {
-                    if (window.confirm('저장하시겠습니까?')) {
-                      handleSaveReviewLinks();
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                <div className="modal-footer-right">
+                  <button className="modal-reset-btn" onClick={() => {
+                    if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                      setEditingReviewLinks(['', '', '', '', '', '', '', '', '', '']);
                     }
-                  }}
-                  disabled={reviewLinkSaving}
-                >
-                  {reviewLinkSaving ? '저장 중...' : '저장'}
-                </button>
+                  }}>초기화</button>
+                  <button
+                    className="modal-save-btn"
+                    onClick={() => {
+                      if (window.confirm('저장하시겠습니까?')) {
+                        handleSaveReviewLinks();
+                      }
+                    }}
+                    disabled={reviewLinkSaving}
+                  >
+                    {reviewLinkSaving ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
               </div>
             </div>
           </div>
@@ -3872,21 +3876,19 @@ const Cluster2Content = () => {
               ))}
             </div>
             <div className="section3-modal-footer">
-              <div className="modal-footer-left">
-                <span style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => setShowHelpModal(true)}>🔎</span>
-                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
-              </div>
-              <div className="modal-footer-right">
-                <button className="modal-reset-btn" onClick={() => {
-                  if (window.confirm('내용을 모두 초기화하시겠어요?')) {
-                    setEditingEduData([...initialEduDataSnapshot]);
-                    setHasEduChanges(false);
-                    setEduValidationErrors({});
-                  }
-                }}>초기화</button>
-                <button
-                  className="modal-save-btn"
-                  disabled={eduSaving}
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)}>🔎</span>
+                <div className="modal-footer-right">
+                  <button className="modal-reset-btn" onClick={() => {
+                    if (window.confirm('내용을 모두 초기화하시겠어요?')) {
+                      setEditingEduData([...initialEduDataSnapshot]);
+                      setHasEduChanges(false);
+                      setEduValidationErrors({});
+                    }
+                  }}>초기화</button>
+                  <button
+                    className="modal-save-btn"
+                    disabled={eduSaving}
                   onClick={() => {
                     if (!window.confirm('저장하시겠습니까?')) return;
                     // 필수 입력 검증: 학교, 상태, 계열, 전공1, 입학시기, 성적
@@ -3966,8 +3968,12 @@ const Cluster2Content = () => {
                     handleSaveEducations(processedData);
                   }}
                 >
-                  {eduSaving ? '저장 중...' : '저장'}
-                </button>
+                    {eduSaving ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
               </div>
             </div>
           </div>
