@@ -10,9 +10,11 @@ import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
+import { useModalScroll } from "@/utils/useModalScroll";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
+const DEFAULT_PHONE_COMMENT = "평일 오전 10시 ~ 오후 20시 사이에 언제든지 연락가능합니다. 주말은 문자나 텍스트로만 부탁드려요! 😊";
 
 const IDENTITY_TAB_IMAGES = [
   { src: "/images/0/cluster 1/identity-tab-bg-1.png", overlay: 0.45 },
@@ -522,7 +524,7 @@ const Sidebar = () => {
     addressDistrict: "",
     customAddress: "",
     phone: "",
-    phoneComment: "",
+    phoneComment: DEFAULT_PHONE_COMMENT,
     emailId: "",
     emailDomain: "",
     customEmailDomain: "",
@@ -548,6 +550,7 @@ const Sidebar = () => {
   const [isCustomEmailDomain, setIsCustomEmailDomain] = useState(false);
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
   const [isPhoneEditing, setIsPhoneEditing] = useState(false);
+  const [isPhoneHelpModalOpen, setIsPhoneHelpModalOpen] = useState(false);
   const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
@@ -556,6 +559,17 @@ const Sidebar = () => {
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  // Sidebar 모달 배경 스크롤 차단
+  const isSidebarModalOpen = isEditModalOpen || isPhoneCommentModalOpen || isPhoneHelpModalOpen;
+  useModalScroll(isSidebarModalOpen);
+
+  // 연락 가능 시간대 모달: 열릴 때 읽기전용 모드로 초기화
+  useEffect(() => {
+    if (isPhoneCommentModalOpen) {
+      setIsPhoneEditing(false);
+    }
+  }, [isPhoneCommentModalOpen]);
 
   // 전공 툴팁 외부 클릭시 닫기
   useEffect(() => {
@@ -1094,7 +1108,7 @@ const Sidebar = () => {
           emailId,
           emailDomain,
           vision: profile.vision || "",
-          phoneComment: profile.contact_available || "",
+          phoneComment: profile.contact_available || DEFAULT_PHONE_COMMENT,
         }));
       }
     } catch (error) {
@@ -1840,7 +1854,7 @@ const Sidebar = () => {
                                 if (result.success && result.data) {
                                   setFormData((prev) => ({
                                     ...prev,
-                                    phoneComment: result.data.contact_available || "",
+                                    phoneComment: result.data.contact_available || DEFAULT_PHONE_COMMENT,
                                   }));
                                 }
                               } catch (error) {
@@ -2279,7 +2293,6 @@ const Sidebar = () => {
             <div
               className="edit-modal-content"
               style={{
-                backgroundColor: "#1a1d29",
                 border: "1px solid #FFA500",
                 boxShadow: "0 0 10px rgba(255, 165, 0, 0.15)",
                 width: "580px",
@@ -3525,7 +3538,6 @@ const Sidebar = () => {
             className="edit-modal-content"
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: "#1a1d29",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
@@ -3602,27 +3614,28 @@ const Sidebar = () => {
         >
           <div
             className="edit-modal-content"
+            data-modal="phone-comment"
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: "#1a1d29",
-              width: "90%",
-              maxWidth: "480px",
+              width: "764px",
+              maxWidth: "764px",
+              height: "449px",
+              maxHeight: "449px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
               border: "1px solid #FFA500",
               display: "flex",
               flexDirection: "column" as const,
-              maxHeight: "85vh",
             }}
           >
-            {/* 헤더 — 고정 */}
+            {/* 헤더 */}
             <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "20px 28px", position: "relative", flexShrink: 0 }}>
               <div style={{ width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Image src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
               </div>
               <div>
-                <h3 style={{ margin: 0, lineHeight: 1.4, wordBreak: "keep-all" as const }}>연락이 가능한 시간대와 코멘트를 작성해 주세요 :)</h3>
+                <h3 style={{ margin: 0, lineHeight: 1.4, wordBreak: "keep-all" as const }}>연락 가능 시간대</h3>
                 <p className="modal-subtitle" style={{ margin: "2px 0 0 0" }}>
-                  최대 70자까지 작성 가능합니다
+                  연락이 용이한 시간대 및 코멘트를 남겨주세요 😊
                 </p>
               </div>
               <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)} style={{ position: "absolute", top: 18, right: 20 }}>
@@ -3631,82 +3644,170 @@ const Sidebar = () => {
             </div>
 
             {/* 본문 */}
-            <div className="edit-modal-body" style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+            <div className="edit-modal-body" style={{ flex: 1, overflowY: "auto", padding: "20px 28px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)", boxSizing: "border-box" as const }}>
               {isPhoneEditing ? (
-                <div>
+                <>
                   <style dangerouslySetInnerHTML={{ __html: `.phone-comment-input::placeholder { color: #999; }` }} />
-                  <input
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "0 0 8px 0", fontSize: "12px" }}>
+                    <span style={{ color: "#999" }}>최대 150자까지 작성 가능합니다.</span>
+                    <span style={{ color: formData.phoneComment.length > 150 ? "#ff4444" : "#999" }}>
+                      {formData.phoneComment.length} / 150
+                    </span>
+                  </div>
+                  <textarea
                     className="phone-comment-input"
-                    type="text"
                     value={formData.phoneComment}
                     onChange={(e) => {
-                      if (e.target.value.length <= 70) {
+                      if (e.target.value.length <= 150) {
                         setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
-                      } else {
-                        alert("최대 70자까지 입력할 수 있습니다.");
                       }
                     }}
                     placeholder="내용을 작성해 주세요."
-                    maxLength={70}
-                    style={{ width: "100%", padding: "16px", backgroundColor: "#252836", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "14px", outline: "none", boxSizing: "border-box" as const }}
+                    maxLength={150}
+                    rows={4}
+                    style={{
+                      width: "100%",
+                      padding: "16px",
+                      backgroundColor: "#252836",
+                      border: "1px solid #333",
+                      borderRadius: "8px",
+                      color: "#fff",
+                      fontSize: "14px",
+                      outline: "none",
+                      boxSizing: "border-box" as const,
+                      resize: "none" as const,
+                      fontFamily: "inherit",
+                    }}
                   />
-                  <div style={{ marginTop: "8px", fontSize: "12px", color: formData.phoneComment.length > 70 ? "#ff4444" : "#999", textAlign: "right" }}>
-                    {formData.phoneComment.length} / 70
-                  </div>
-                </div>
+                </>
               ) : (
-                <div style={{ padding: "16px", backgroundColor: "#252836", borderRadius: "8px", color: "#fff", fontSize: "14px", minHeight: "50px" }}>
-                  {formData.phoneComment || "등록된 코멘트가 없습니다."}
-                </div>
+                <p style={{ fontSize: "0.9375rem", lineHeight: 1.9, color: "#ddd", margin: 0, padding: "20px 24px", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 0, whiteSpace: "pre-wrap" as const }}>
+                  {formData.phoneComment || "등록된 내용이 없습니다."}
+                </p>
               )}
             </div>
 
             {/* 푸터 */}
-            <div className="edit-modal-footer" style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end", gap: "8px", padding: "16px 28px" }}>
-              {isPhoneEditing ? (
-                <>
-                  <button type="button" onClick={() => setIsPhoneEditing(false)} style={{ width: "80px", padding: "10px 0", backgroundColor: "transparent", border: "1px solid rgba(255, 165, 0, 0.5)", color: "#FFA500", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    취소
-                  </button>
+            <div className="edit-modal-footer" style={{ flexShrink: 0, display: "flex", flexDirection: "column" as const, gap: "8px", padding: "16px 28px", height: "118px", boxSizing: "border-box" as const }}>
+              {/* 1행 */}
+              <div className="modal-footer-top" style={{ display: "flex", alignItems: "center", justifyContent: isPhoneEditing ? "space-between" : "flex-end" }}>
+                {isPhoneEditing && (
                   <button
                     type="button"
-                    onClick={async () => {
-                      if (demoMode) {
-                        setIsPhoneEditing(false);
-                        setIsPhoneCommentModalOpen(false);
-                        return;
-                      }
-                      try {
-                        const response = await fetch("/api/profile/", {
-                          method: "PUT",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ contact_available: formData.phoneComment || null }),
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                          setIsPhoneEditing(false);
-                          setIsPhoneCommentModalOpen(false);
-                        } else {
-                          alert("저장 실패: " + (result.error || "알 수 없는 오류"));
-                        }
-                      } catch (error) {
-                        console.error("연락처 코멘트 저장 오류:", error);
-                        alert("저장 중 오류가 발생했습니다.");
-                      }
-                    }}
-                    style={{ width: "80px", padding: "10px 0", backgroundColor: "#FFA500", border: "none", color: "#000", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}
+                    onClick={() => setIsPhoneHelpModalOpen(true)}
+                    style={{ fontSize: "30px", width: "57px", height: "57px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+                    aria-label="도움말"
                   >
-                    저장
+                    🔎
                   </button>
-                </>
-              ) : (
-                (isOwner || demoMode) && (
-                  <button type="button" onClick={() => setIsPhoneEditing(true)} style={{ width: "80px", padding: "10px 0", backgroundColor: "#FFA500", border: "none", color: "#000", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    수정
-                  </button>
-                )
+                )}
+                <div className="modal-footer-right" style={{ display: "flex", gap: "8px" }}>
+                  {isPhoneEditing ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("입력한 내용을 초기화하시겠습니까?")) {
+                            setFormData((prev) => ({ ...prev, phoneComment: DEFAULT_PHONE_COMMENT }));
+                          }
+                        }}
+                        style={{
+                          padding: "8px 20px",
+                          border: "1px solid #4CAF50",
+                          background: "transparent",
+                          color: "#4CAF50",
+                          borderRadius: 0,
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        초기화
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!window.confirm("저장하시겠습니까?")) return;
+                          if (demoMode) {
+                            setIsPhoneEditing(false);
+                            setIsPhoneCommentModalOpen(false);
+                            return;
+                          }
+                          try {
+                            const response = await fetch("/api/profile/", {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ contact_available: formData.phoneComment || null }),
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                              setIsPhoneEditing(false);
+                              setIsPhoneCommentModalOpen(false);
+                            } else {
+                              alert("저장 실패: " + (result.error || "알 수 없는 오류"));
+                            }
+                          } catch (error) {
+                            console.error("연락처 코멘트 저장 오류:", error);
+                            alert("저장 중 오류가 발생했습니다.");
+                          }
+                        }}
+                        style={{
+                          padding: "8px 20px",
+                          border: "1px solid transparent",
+                          background: "#FAAB07",
+                          color: "#1a1a1a",
+                          borderRadius: 0,
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        저장
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsPhoneEditing(true)}
+                      style={{
+                        padding: "8px 20px",
+                        border: "1px solid transparent",
+                        background: "#FAAB07",
+                        color: "#1a1a1a",
+                        borderRadius: 0,
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      수정
+                    </button>
+                  )}
+                </div>
+              </div>
+              {isPhoneEditing && (
+                <div className="modal-footer-bottom" style={{ textAlign: "right" as const, fontSize: "15px", color: "#999" }}>
+                  내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊
+                </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {/* 연락 가능 시간대 도움말 모달 */}
+      {isPhoneHelpModalOpen && (
+        <div className="help-modal-overlay" onClick={() => setIsPhoneHelpModalOpen(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100vh", background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2001 }}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", maxWidth: "1020px", height: "794px", maxHeight: "794px", border: "1px solid #ffa500", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
+            <div className="help-modal-header" style={{ height: "153px", minHeight: "153px", maxHeight: "153px", flexShrink: 0, boxSizing: "border-box" as const, display: "flex", flexDirection: "column" as const, padding: "20px 24px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)" }}>
+              <div className="modal-header-top" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                <span style={{ fontSize: "20px" }}>🔎</span>
+                <h3 style={{ margin: 0, color: "#ffa500", fontSize: "2.0625rem", fontWeight: 700, flex: 1, marginLeft: "10px" }}>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setIsPhoneHelpModalOpen(false)} style={{ background: "transparent", border: "none", color: "#ffa500", fontSize: "20px", cursor: "pointer" }}>
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="help-modal-body" style={{ flex: 1, padding: "24px", overflowY: "auto" }}>{/* 빈 콘텐츠 — 추후 추가 */}</div>
           </div>
         </div>
       )}

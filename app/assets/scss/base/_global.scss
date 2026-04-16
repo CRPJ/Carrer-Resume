@@ -1432,6 +1432,25 @@ svg {
  Based on section1-modal reference (cluster2)
  ==== */
 
+// 0. 전역 모달 배경 공식 (intro-modal 기준)
+.intro-modal,
+.section1-modal,
+.section2-modal,
+.section21-modal,
+.section3-modal,
+.section4-modal,
+.edu-modal,
+.delete-confirm-modal,
+.help-modal,
+.section-modal,
+.season-reputation-edit-modal,
+.season-reputation-view-modal,
+.season-review-modal,
+.edit-modal-content {
+  background-color: rgba(0, 0, 0, 0) !important;
+  background-image: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%) !important;
+}
+
 // 1. Modal Container — border-radius: 0 (sharp corners)
 .section1-modal,
 .section-modal,
@@ -1507,6 +1526,13 @@ svg {
 .modal-footer-left { border-top: none !important; }
 .modal-footer-right { border-top: none !important; }
 .modal-footer-notice { border-top: none !important; }
+
+// 4-2. 연락 가능 시간대 모달 — 미드-푸터 경계 + 푸터 내부(1행-2행) 구분선 제거
+.edit-modal-content[data-modal="phone-comment"] {
+  .edit-modal-footer { border-top: none !important; }
+  .modal-footer-top { border-top: none !important; border-bottom: none !important; }
+  .modal-footer-bottom { border-top: none !important; border-bottom: none !important; }
+}
 
 // 5. Edit Modal (.resume-card) — 헤더/푸터 고정 + 본문 스크롤 레이아웃
 .edit-modal-content {
