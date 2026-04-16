@@ -847,14 +847,50 @@ const Cluster3Content = () => {
   const makeDefaultCard = (id: number) => ({
     id, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s",
     link: "", channelName: "", platform: "", management: "", startYear: "" as string, startMonth: "" as string, startDay: "" as string, rating: "" as string, status: "",
+    images: [null, null, null, null, null] as (string | null)[],
+    insight: "", experience: "", metrics: "",
   });
 
   const [channelCards, setChannelCards] = useState(
     Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
   );
 
-  const handleCardChange = (field: string, value: string) => {
+  const handleCardChange = (field: string, value: any) => {
     setChannelCards((prev) => prev.map((card, i) => (i === currentCardIndex ? { ...card, [field]: value } : card)));
+  };
+
+  const imageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const isSlotEnabled = (slotIndex: number): boolean => {
+    if (slotIndex === 0) return true;
+    const card = channelCards[currentCardIndex];
+    return !!card?.images[slotIndex - 1];
+  };
+
+  const handleImageUploadClick = (slotIndex: number) => {
+    imageInputRefs.current[slotIndex]?.click();
+  };
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      const card = channelCards[currentCardIndex];
+      const newImages = [...card.images];
+      newImages[slotIndex] = previewUrl;
+      handleCardChange("images", newImages);
+    }
+    e.target.value = "";
+  };
+
+  const handleImageDelete = (slotIndex: number) => {
+    const card = channelCards[currentCardIndex];
+    const img = card.images[slotIndex];
+    if (img) URL.revokeObjectURL(img);
+    const newImages = [...card.images];
+    newImages[slotIndex] = null;
+    handleCardChange("images", newImages);
   };
 
   const StarRating = ({ rating }: { rating: number }) => {
@@ -1662,10 +1698,58 @@ const Cluster3Content = () => {
                     ));
                   })()}
                 </div>
-                {/* 우상단(대표 이미지)은 4단계에서 구현 */}
-                <div className="channel-images-section" style={{ flex: 1 }} />
+                <div className="channel-images-section">
+                  {channelCards[currentCardIndex]?.images.map((img, slotIndex) => (
+                    <div key={slotIndex} className={`image-slot${!isSlotEnabled(slotIndex) ? " disabled" : ""}`}>
+                      <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
+                        {img ? (
+                          <img src={img} alt={`대표 이미지 ${slotIndex + 1}`} />
+                        ) : (
+                          <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>
+                        )}
+                      </div>
+                      {isEditMode && (
+                        <div className="image-actions">
+                          <button className="image-action-btn upload" onClick={() => handleImageUploadClick(slotIndex)} disabled={!isSlotEnabled(slotIndex)}><i className="ti ti-upload"></i></button>
+                          <button className="image-action-btn delete" onClick={() => handleImageDelete(slotIndex)} disabled={!isSlotEnabled(slotIndex) || !img}><i className="ti ti-trash"></i></button>
+                        </div>
+                      )}
+                      <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[slotIndex] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, slotIndex)} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              {/* 하단(기획방향/경험활동/정량지표)은 5단계에서 구현 */}
+              <div className="channel-bottom-section">
+                {([
+                  { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 200자)" },
+                  { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 200자)" },
+                  { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 200자)" },
+                ] as const).map((box) => {
+                  const card = channelCards[currentCardIndex];
+                  const val = (card as any)[box.key] || "";
+                  return (
+                    <div key={box.key} className="channel-textarea-box">
+                      <h5 className="textarea-title">{box.title}</h5>
+                      <div className="textarea-wrapper">
+                        {isEditMode ? (
+                          <>
+                            <textarea
+                              value={val}
+                              onChange={(e) => { if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value); }}
+                              maxLength={200}
+                              placeholder={box.placeholder}
+                              rows={6}
+                            />
+                            <span className="char-count">{val.length}/200</span>
+                          </>
+                        ) : (
+                          <div className="textarea-readonly">{val || "-"}</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div className="section-modal-footer">
               <div className="modal-footer-top">
@@ -1728,6 +1812,14 @@ const Cluster3Content = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {/* 이미지 확대 모달 */}
+      {previewImage && (
+        <div className="image-preview-overlay" onClick={() => setPreviewImage(null)}>
+          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()}>
+            <img src={previewImage} alt="확대 보기" />
           </div>
         </div>
       )}
