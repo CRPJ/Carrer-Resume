@@ -7,37 +7,31 @@ export function useModalScroll(isOpen: boolean) {
     let lastTouchY = 0;
 
     const preventWheelScroll = (e: WheelEvent) => {
-      // target부터 부모를 타고 올라가면서 실제 스크롤 가능한 요소 찾기
       let el: HTMLElement | null = e.target as HTMLElement;
 
       while (el) {
-        // html, body는 스크롤 가능 판정에서 제외
-        if (el === document.body || el === document.documentElement) {
-          break;
-        }
+        if (el === document.body || el === document.documentElement) break;
 
         const style = getComputedStyle(el);
-        const isScrollable =
-          (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-          el.scrollHeight > el.clientHeight;
+        const hasScrollOverflow =
+          style.overflowY === 'auto' || style.overflowY === 'scroll';
 
-        if (isScrollable) {
-          // 실제 스크롤 가능한 요소 발견
-          // 스크롤 끝에 도달했으면 배경 전파 방지
-          const atTop = el.scrollTop === 0 && e.deltaY < 0;
-          const atBottom =
-            el.scrollTop + el.clientHeight >= el.scrollHeight && e.deltaY > 0;
+        if (hasScrollOverflow) {
+          const remainingDown = el.scrollHeight - el.clientHeight - el.scrollTop;
+          const remainingUp = el.scrollTop;
+          const absDelta = Math.abs(e.deltaY);
 
-          if (atTop || atBottom) {
-            e.preventDefault(); // 끝에 도달 → 차단
+          const canScrollDown = e.deltaY > 0 && remainingDown >= absDelta;
+          const canScrollUp = e.deltaY < 0 && remainingUp >= absDelta;
+
+          if (canScrollDown || canScrollUp) {
+            return;
           }
-          return; // 스크롤 가능 → 허용
         }
 
         el = el.parentElement;
       }
 
-      // 스크롤 가능한 부모가 없음 → 배경 스크롤 차단
       e.preventDefault();
     };
 
@@ -51,25 +45,23 @@ export function useModalScroll(isOpen: boolean) {
       let el: HTMLElement | null = e.target as HTMLElement;
 
       while (el) {
-        // html, body는 스크롤 가능 판정에서 제외
-        if (el === document.body || el === document.documentElement) {
-          break;
-        }
+        if (el === document.body || el === document.documentElement) break;
 
         const style = getComputedStyle(el);
-        const isScrollable =
-          (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-          el.scrollHeight > el.clientHeight;
+        const hasScrollOverflow =
+          style.overflowY === 'auto' || style.overflowY === 'scroll';
 
-        if (isScrollable) {
-          const atTop = el.scrollTop === 0 && deltaY < 0;
-          const atBottom =
-            el.scrollTop + el.clientHeight >= el.scrollHeight && deltaY > 0;
+        if (hasScrollOverflow) {
+          const remainingDown = el.scrollHeight - el.clientHeight - el.scrollTop;
+          const remainingUp = el.scrollTop;
+          const absDelta = Math.abs(deltaY);
 
-          if (atTop || atBottom) {
-            e.preventDefault();
+          const canScrollDown = deltaY > 0 && remainingDown >= absDelta;
+          const canScrollUp = deltaY < 0 && remainingUp >= absDelta;
+
+          if (canScrollDown || canScrollUp) {
+            return;
           }
-          return;
         }
 
         el = el.parentElement;

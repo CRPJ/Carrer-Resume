@@ -577,6 +577,7 @@ const Cluster2Content = () => {
 
   // 섹션 2-1 모달 (비디오 편집)
   const [section21ModalOpen, setSection21ModalOpen] = useState(false);
+  const section21OverlayRef = useRef<HTMLDivElement>(null);
   // YouTube 비디오 ID 추출 함수
   const extractYouTubeId = (url: string): string | null => {
     if (!url) return null;
@@ -1018,6 +1019,29 @@ const Cluster2Content = () => {
   // 모달 열릴 때 배경 스크롤 잠금
   const anyModalOpen = section1ModalOpen || section2ModalOpen || section21ModalOpen || section3ModalOpen || section4ModalOpen || introModalOpen;
   useModalScroll(anyModalOpen);
+
+  // section21 모달 배경 스크롤 차단 (native listener — passive: false 필수)
+  useEffect(() => {
+    if (!section21ModalOpen) return;
+    const overlay = section21OverlayRef.current;
+    if (!overlay) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const body = overlay.querySelector(".section21-modal-body") as HTMLElement | null;
+      if (!body) { e.preventDefault(); return; }
+      const insideBody = body.contains(e.target as Node);
+      if (!insideBody) { e.preventDefault(); return; }
+      const remainingDown = body.scrollHeight - body.clientHeight - body.scrollTop;
+      const remainingUp = body.scrollTop;
+      const absDelta = Math.abs(e.deltaY);
+      const canScrollDown = e.deltaY > 0 && remainingDown >= absDelta;
+      const canScrollUp = e.deltaY < 0 && remainingUp >= absDelta;
+      if (!canScrollDown && !canScrollUp) e.preventDefault();
+    };
+
+    overlay.addEventListener("wheel", handleWheel, { passive: false });
+    return () => overlay.removeEventListener("wheel", handleWheel);
+  }, [section21ModalOpen]);
 
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     "", // Total Complete (cluving_review_link)
@@ -2926,7 +2950,7 @@ const Cluster2Content = () => {
       )}
       {/* 섹션 2-1 모달 - 영상 편집 */}
       {section21ModalOpen && (
-        <div className="section21-modal-overlay">
+        <div className="section21-modal-overlay" ref={section21OverlayRef}>
           <div className="section21-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section21-modal-header">
               <div className="modal-header-top">

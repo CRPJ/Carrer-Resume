@@ -2966,10 +2966,10 @@
 
   .edu-modal {
     position: relative;
-    width: 562px;
-    max-width: 90vw;
-    height: 826px;
-    max-height: 826px;
+    width: 1020px;
+    max-width: 1020px;
+    height: 794px;
+    max-height: 794px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -3162,7 +3162,7 @@
 
     // 비고 내용만 표시하는 모달 스타일
     &.description-only {
-      width: 500px;
+      width: 1020px;
 
       .modal-header {
         padding: 20px 40px 15px;
@@ -6461,6 +6461,16 @@
       stroke: var(--quaternary-color);
     }
   }
+  // ===== 공통 모달 body scroll chaining 차단 =====
+  .section1-modal-body,
+  .section2-modal-body,
+  .section21-modal-body,
+  .section3-modal-body,
+  .section4-modal-body,
+  .intro-modal-body {
+    overscroll-behavior: contain;
+  }
+
   // ===== 공통 모달 푸터 스타일 =====
   .section1-modal-footer,
   .section2-modal-footer,
@@ -6617,9 +6627,9 @@
     }
 
     .help-modal-header {
-      height: 126px;
-      min-height: 126px;
-      max-height: 126px;
+      height: 153px;
+      min-height: 153px;
+      max-height: 153px;
       flex-shrink: 0;
       box-sizing: border-box;
       display: flex;
