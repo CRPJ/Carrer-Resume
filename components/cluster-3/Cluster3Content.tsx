@@ -291,11 +291,21 @@ const Cluster3Content = () => {
     }
   }, [section3ModalOpen]);
 
+  const CARDS_PER_PAGE = 8;
+
   const handlePrevCard = () => {
-    if (currentCardIndex > 0) setCurrentCardIndex((prev) => prev - 1);
+    if (isEditMode || currentCardIndex <= 0) return;
+    const newIndex = currentCardIndex - 1;
+    setCurrentCardIndex(newIndex);
+    const newPage = Math.floor(newIndex / CARDS_PER_PAGE);
+    if (newPage !== section3Page) setSection3Page(newPage);
   };
   const handleNextCard = () => {
-    if (currentCardIndex < MAX_CARDS - 1) setCurrentCardIndex((prev) => prev + 1);
+    if (isEditMode || currentCardIndex >= MAX_CARDS - 1) return;
+    const newIndex = currentCardIndex + 1;
+    setCurrentCardIndex(newIndex);
+    const newPage = Math.floor(newIndex / CARDS_PER_PAGE);
+    if (newPage !== section3Page) setSection3Page(newPage);
   };
 
   // 링크 데이터 관리 (카드 데이터에서 초기화)
@@ -855,6 +865,9 @@ const Cluster3Content = () => {
     Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
   );
 
+  // 2페이지 동적 노출 — 채널명이 있는 카드가 8개 이상이면 표시 (8단계에서 isCardComplete로 교체)
+  const showPage2 = channelCards.filter((c) => c.channelName?.trim()).length >= CARDS_PER_PAGE;
+
   const handleCardChange = (field: string, value: any) => {
     setChannelCards((prev) => prev.map((card, i) => (i === currentCardIndex ? { ...card, [field]: value } : card)));
   };
@@ -1388,11 +1401,10 @@ const Cluster3Content = () => {
 
         {/* 섹션 3 페이지네이션 */}
         <div className="section3-pagination">
-          {[1, 2].map((num) => (
-            <span key={num} className={`page-num ${section3Page === num - 1 ? "active" : ""} ${num === 2 ? "last" : ""}`} onClick={() => setSection3Page(num - 1)}>
-              {num}
-            </span>
-          ))}
+          <span className={`page-num ${section3Page === 0 ? "active" : ""}`} onClick={() => setSection3Page(0)}>1</span>
+          {showPage2 && (
+            <span className={`page-num ${section3Page === 1 ? "active" : ""} last`} onClick={() => setSection3Page(1)}>2</span>
+          )}
         </div>
       </section>
 
@@ -1742,10 +1754,10 @@ const Cluster3Content = () => {
                   🔎
                 </span>
                 <div className="modal-footer-nav">
-                  <button className="nav-btn prev" onClick={() => !isEditMode && handlePrevCard()} disabled={isEditMode || currentCardIndex === 0}>
+                  <button className="nav-btn prev" onClick={handlePrevCard} disabled={isEditMode || currentCardIndex === 0} title={isEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-left"></i>
                   </button>
-                  <button className="nav-btn next" onClick={() => !isEditMode && handleNextCard()} disabled={isEditMode || currentCardIndex === MAX_CARDS - 1}>
+                  <button className="nav-btn next" onClick={handleNextCard} disabled={isEditMode || currentCardIndex >= MAX_CARDS - 1} title={isEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-right"></i>
                   </button>
                 </div>
