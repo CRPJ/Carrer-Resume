@@ -3111,7 +3111,7 @@ const Cluster2Content = () => {
                         className="modal-reset-btn"
                         onClick={() => {
                           if (window.confirm("내용을 모두 초기화하시겠어요?")) {
-                            setEditingIntroData({ content: initialIntroContent });
+                            setEditingIntroData({ content: defaultIntroContent });
                           }
                         }}
                       >

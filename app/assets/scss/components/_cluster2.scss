@@ -3505,11 +3505,11 @@
   }
 
   .intro-modal {
-    width: 979px;
-    max-width: 95vw;
-    height: 570px;
-    min-height: 570px;
-    max-height: 570px;
+    width: 1214px;
+    max-width: 1214px;
+    height: 742px;
+    min-height: 742px;
+    max-height: 742px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -3645,9 +3645,9 @@
       display: flex;
       flex-direction: column;
 
-      &::-webkit-scrollbar { width: 6px; display: block; }
-      &::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
-      &::-webkit-scrollbar-thumb { background: rgba(250, 171, 7, 0.3); border-radius: 3px; &:hover { background: rgba(250, 171, 7, 0.5); } }
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
       &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
       scrollbar-width: thin;
       scrollbar-color: #FFA500 #252836;
