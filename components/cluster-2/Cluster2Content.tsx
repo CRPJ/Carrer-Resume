@@ -952,7 +952,14 @@ const Cluster2Content = () => {
   ];
 
   // 섹션 5 - 자기소개서 카드 데이터
-  const defaultIntroContent = "카드를 클릭하여 자기소개서를 작성해주세요";
+  const defaultIntroContent = "-";
+  const introComments: Record<string, string> = {
+    "성장 과정": "본인이 어떤 환경과 과정을 통해 성장하였으며, 그것이 본인을 만들어가는 데에 있어 어떤 영향을 끼쳤는지 보여주세요. 😊",
+    "사회 경험": "본인이 사회 속에서 겪은 활동, 경험들을 어필하고, 그 안에서 어떤 인사이트를 통해 어떤 성장을 이루었는지를 보여주세요. 😊",
+    "커리어 방향": "본인이 나아가고자 하는 직무와 커리어에 어떤 것인지, 그리고 그것을 위해 어떤 준비와 경험을 쌓아왔는지를 보여주세요. 😊",
+    "실무 스타일": "본인이 회사와 조직, 사업과 고객 속에서 어떤 방식으로 일을 처리하며, 그것을 실제로 느낄 수 있는 경험들을 보여주세요. 😊",
+    "퍼스널 스토리": "업무와 별개로, 본인이 어떤 성격과 캐릭터, 개인적 경험 등을 가지고 있는 지를 바탕으로, 동료/구성원으로서의 매력을 보여주세요. 😊",
+  };
   const [introCards, setIntroCards] = useState([
     {
       id: 1,
@@ -3044,8 +3051,10 @@ const Cluster2Content = () => {
                 <button
                   className="modal-close-btn"
                   onClick={() => {
-                    if (introDirty) {
+                    const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
+                    if (isDirty) {
                       if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        setEditingIntroData({ content: initialIntroContent });
                         setIntroDirty(false);
                         setIsEditingIntro(false);
                         setIntroModalOpen(false);
@@ -3059,10 +3068,13 @@ const Cluster2Content = () => {
                   <i className="ti ti-x"></i>
                 </button>
               </div>
+              <p className="modal-subtitle">{introComments[introCards[selectedIntroCard].title] || ""}</p>
             </div>
             <div className="intro-modal-body">
               <div className="subtitle-section">
-                <p className="subtitle-text">{introCards[selectedIntroCard].subtitle}</p>
+                <p className="subtitle-text">
+                  {introCards[selectedIntroCard].subtitle.replace(" 😊", "")} <span style={{ fontStyle: "normal" }}>😊</span>
+                </p>
               </div>
               <div className="content-section">
                 {isEditingIntro ? (
@@ -3125,21 +3137,24 @@ const Cluster2Content = () => {
                   </div>
                 </>
               ) : (
-                <button
-                  className="intro-edit-btn"
-                  aria-label="수정"
-                  onClick={() =>
-                    handleEditClick(() => {
-                      setEditingIntroData({
-                        content: introCards[selectedIntroCard].content,
-                      });
-                      setInitialIntroContent(introCards[selectedIntroCard].content);
-                      setIsEditingIntro(true);
-                    })
-                  }
-                >
-                  <i className="ti ti-pencil"></i> 수정
-                </button>
+                <div className="modal-footer-top" style={{ justifyContent: "flex-end" }}>
+                  <div className="modal-footer-right">
+                    <button
+                      className="modal-save-btn"
+                      onClick={() =>
+                        handleEditClick(() => {
+                          setEditingIntroData({
+                            content: introCards[selectedIntroCard].content,
+                          });
+                          setInitialIntroContent(introCards[selectedIntroCard].content);
+                          setIsEditingIntro(true);
+                        })
+                      }
+                    >
+                      수정
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -3273,7 +3288,7 @@ const Cluster2Content = () => {
                   <div className="edu-edit-header">
                     <span className="edu-edit-number">{index + 1}</span>
                     <div className={`edu-custom-dropdown edu-level-dropdown ${eduDropdowns[`${index}_eduLevel`] ? "open" : ""}`}>
-                      <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_eduLevel`]: !prev[`${index}_eduLevel`] }))}>
+                      <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_eduLevel`] ? {} : { [`${index}_eduLevel`]: true }))}>
                         <span>{edu.eduLevel || "학력 선택"}</span>
                         <i className="ti ti-chevron-down"></i>
                       </div>
@@ -3484,7 +3499,7 @@ const Cluster2Content = () => {
                       <div className="edu-edit-field full-width">
                         <label style={eduValidationErrors[`${index}_status`] ? { color: "#ff4444" } : {}}>상태{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_status`] ? "open" : ""}`}>
-                          <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_status`]: !prev[`${index}_status`] }))}>
+                          <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_status`] ? {} : { [`${index}_status`]: true }))}>
                             <span>{edu.status || "선택"}</span>
                             <i className="ti ti-chevron-down"></i>
                           </div>
@@ -3528,7 +3543,7 @@ const Cluster2Content = () => {
                       <div className="edu-edit-field full-width">
                         <label style={eduValidationErrors[`${index}_category`] ? { color: "#ff4444" } : {}}>계열{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_category`] ? "open" : ""}`}>
-                          <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_category`]: !prev[`${index}_category`] }))}>
+                          <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_category`] ? {} : { [`${index}_category`]: true }))}>
                             <span>{edu.category || "선택"}</span>
                             <i className="ti ti-chevron-down"></i>
                           </div>
@@ -3618,7 +3633,7 @@ const Cluster2Content = () => {
                         <label style={eduValidationErrors[`${index}_startYear`] || eduValidationErrors[`${index}_startMonth`] ? { color: "#ff4444" } : {}}>입학시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
                         <div className="date-picker-row">
                           <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_startYear`] ? "open" : ""}`}>
-                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_startYear`]: !prev[`${index}_startYear`] }))}>
+                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_startYear`] ? {} : { [`${index}_startYear`]: true }))}>
                               <span>{edu.startYear || "년도"}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
@@ -3642,7 +3657,7 @@ const Cluster2Content = () => {
                             )}
                           </div>
                           <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_startMonth`] ? "open" : ""}`}>
-                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_startMonth`]: !prev[`${index}_startMonth`] }))}>
+                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_startMonth`] ? {} : { [`${index}_startMonth`]: true }))}>
                               <span>{edu.startMonth || "월"}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
@@ -3671,21 +3686,23 @@ const Cluster2Content = () => {
                         {edu.status === "중퇴" ? (
                           <>
                             <label style={eduValidationErrors[`${index}_endYear`] ? { color: "#ff4444" } : {}}>중퇴시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
-                            <input
-                              type="text"
-                              value={edu.endYear || ""}
-                              onChange={(e) => {
-                                if (e.target.value.length <= 15) {
-                                  const newData = [...editingEduData];
-                                  newData[index].endYear = e.target.value;
-                                  newData[index].endMonth = "";
-                                  setEditingEduData(newData);
-                                }
-                              }}
-                              maxLength={15}
-                              placeholder="중퇴 시기를 입력해주세요"
-                              style={{ width: "100%", padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontFamily: '"Pretendard", sans-serif', fontSize: "0.875rem" }}
-                            />
+                            <div className="textarea-wrapper">
+                              <input
+                                type="text"
+                                value={edu.endYear || ""}
+                                onChange={(e) => {
+                                  if (e.target.value.length <= 15) {
+                                    const newData = [...editingEduData];
+                                    newData[index].endYear = e.target.value;
+                                    newData[index].endMonth = "";
+                                    setEditingEduData(newData);
+                                  }
+                                }}
+                                maxLength={15}
+                                placeholder="중퇴시기 입력 (최대 15자)"
+                              />
+                              <span className="char-count">{(edu.endYear || "").length}/15</span>
+                            </div>
                           </>
                         ) : ["재학", "졸예", "휴학"].includes(edu.status) ? (
                           <>
@@ -3703,7 +3720,7 @@ const Cluster2Content = () => {
                             <label style={eduValidationErrors[`${index}_endYear`] || eduValidationErrors[`${index}_endMonth`] ? { color: "#ff4444" } : {}}>졸업시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
                             <div className="date-picker-row">
                               <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_endYear`] ? "open" : ""}`}>
-                                <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_endYear`]: !prev[`${index}_endYear`] }))}>
+                                <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_endYear`] ? {} : { [`${index}_endYear`]: true }))}>
                                   <span>{edu.endYear || "년도"}</span>
                                   <i className="ti ti-chevron-down"></i>
                                 </div>
@@ -3727,7 +3744,7 @@ const Cluster2Content = () => {
                                 )}
                               </div>
                               <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_endMonth`] ? "open" : ""}`}>
-                                <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_endMonth`]: !prev[`${index}_endMonth`] }))}>
+                                <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_endMonth`] ? {} : { [`${index}_endMonth`]: true }))}>
                                   <span>{edu.endMonth || "월"}</span>
                                   <i className="ti ti-chevron-down"></i>
                                 </div>
@@ -3779,7 +3796,7 @@ const Cluster2Content = () => {
                           <div className="grade-dropdown-row">
                             {/* 정수 부분 (0-4) */}
                             <div className={`edu-custom-dropdown grade-int ${eduDropdowns[`${index}_gradeInt`] ? "open" : ""}`}>
-                              <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_gradeInt`]: !prev[`${index}_gradeInt`] }))}>
+                              <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_gradeInt`] ? {} : { [`${index}_gradeInt`]: true }))}>
                                 <span>{edu.gradeValue ? edu.gradeValue.split(".")[0] : "0"}</span>
                                 <i className="ti ti-chevron-down"></i>
                               </div>
@@ -3814,7 +3831,7 @@ const Cluster2Content = () => {
                             <span className="grade-dot">.</span>
                             {/* 소수 부분 (00-99) */}
                             <div className={`edu-custom-dropdown grade-decimal ${eduDropdowns[`${index}_gradeDecimal`] ? "open" : ""}`}>
-                              <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_gradeDecimal`]: !prev[`${index}_gradeDecimal`] }))}>
+                              <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_gradeDecimal`] ? {} : { [`${index}_gradeDecimal`]: true }))}>
                                 <span>{edu.gradeValue?.split(".")[1] || "00"}</span>
                                 <i className="ti ti-chevron-down"></i>
                               </div>
@@ -3848,7 +3865,7 @@ const Cluster2Content = () => {
                         ) : edu.gradeMax === "100%" ? (
                           // 100%: 100~0 드롭다운
                           <div className={`edu-custom-dropdown grade-percent ${eduDropdowns[`${index}_gradePercent`] ? "open" : ""}`}>
-                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_gradePercent`]: !prev[`${index}_gradePercent`] }))}>
+                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_gradePercent`] ? {} : { [`${index}_gradePercent`]: true }))}>
                               <span>{edu.gradeValue || "선택"}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
@@ -3874,7 +3891,7 @@ const Cluster2Content = () => {
                         ) : edu.gradeMax === "9등급" ? (
                           // 9등급: 1~9 드롭다운
                           <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_gradeValue`] ? "open" : ""}`}>
-                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_gradeValue`]: !prev[`${index}_gradeValue`] }))}>
+                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_gradeValue`] ? {} : { [`${index}_gradeValue`]: true }))}>
                               <span>{edu.gradeValue === "-" ? "-" : edu.gradeValue ? `${edu.gradeValue}등급` : "성적 선택"}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
@@ -3953,7 +3970,7 @@ const Cluster2Content = () => {
                           </div>
                         ) : (
                           <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_gradeMax`] ? "open" : ""}`}>
-                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => ({ ...prev, [`${index}_gradeMax`]: !prev[`${index}_gradeMax`] }))}>
+                            <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_gradeMax`] ? {} : { [`${index}_gradeMax`]: true }))}>
                               <span>{edu.gradeMax || "총점 선택"}</span>
                               <i className="ti ti-chevron-down"></i>
                             </div>
