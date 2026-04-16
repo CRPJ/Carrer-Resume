@@ -865,8 +865,26 @@ const Cluster3Content = () => {
     Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
   );
 
-  // 임시 isCardComplete (8단계에서 필수필드 기반으로 교체)
-  const isCardComplete = (card: typeof channelCards[0]) => !!card.channelName?.trim();
+  const isCardComplete = (card: typeof channelCards[0]): boolean => {
+    if (!card.channelName?.trim()) return false;
+    if (!card.platform) return false;
+    if (!card.management) return false;
+    if (!card.startYear || !card.startMonth || !card.startDay) return false;
+    if (!card.rating || Number(card.rating) < 1 || Number(card.rating) > 10) return false;
+    if (!card.status) return false;
+    if (!card.link?.trim()) return false;
+    if ((card.images || []).filter((img) => img !== null).length < 3) return false;
+    if (!card.insight?.trim()) return false;
+    if (!card.experience?.trim()) return false;
+    if (!card.metrics?.trim()) return false;
+    return true;
+  };
+
+  // 안내문 자동 복원
+  useEffect(() => {
+    if (!isEditMode || section3FooterNotice !== "error") return;
+    if (isCardComplete(channelCards[currentCardIndex])) setSection3FooterNotice("default");
+  }, [channelCards, currentCardIndex, isEditMode, section3FooterNotice]);
 
   // 순차 입력: 연속으로 완성된 카드 수 + 1 = 입력 가능 카드 수
   const unlockedCardCount = (() => {
@@ -1667,7 +1685,7 @@ const Cluster3Content = () => {
                     ];
                     return fields.map((f) => (
                       <div key={f.key} className="channel-info-field">
-                        <label>{f.label}</label>
+                        <label>{f.label}{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}</label>
                         {f.type === "text" && (
                           isEditMode ? (
                             <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} />
@@ -1734,6 +1752,12 @@ const Cluster3Content = () => {
                   })()}
                 </div>
                 <div className="channel-images-section">
+                  <h4 className="channel-images-title">
+                    대표 이미지 (최소 3장 필수){isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                    <span className="image-count" style={{ marginLeft: "8px", fontSize: "12px", color: "#999" }}>
+                      {(channelCards[currentCardIndex]?.images || []).filter((img) => img !== null).length} / 5
+                    </span>
+                  </h4>
                   {channelCards[currentCardIndex]?.images.map((img, si) => (
                     <div key={si} className={`image-slot${!isSlotEnabled(si) ? " disabled" : ""}`}>
                       <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
@@ -1760,7 +1784,7 @@ const Cluster3Content = () => {
                   const val = (card as any)[box.key] || "";
                   return (
                     <div key={box.key} className="channel-textarea-box">
-                      <h5 className="textarea-title">{box.title}</h5>
+                      <h5 className="textarea-title">{box.title}{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}</h5>
                       <div className="textarea-wrapper">
                         {isEditMode ? (
                           <>
@@ -1813,17 +1837,38 @@ const Cluster3Content = () => {
                       </button>
                       <button
                         className="modal-save-btn"
-                        disabled={isSavingArchives}
-                        onClick={async () => {
-                          if (!validateAndScrollToEmpty(section3ModalBodyRef, editingSection3Links, editingArchiveChannels)) return;
-                          const success = await savePortfolioArchives(editingSection3Links, editingArchiveChannels);
-                          if (success) {
-                            setIsEditMode(false);
-                            setSection3ModalOpen(false);
+                        onClick={() => {
+                          const card = channelCards[currentCardIndex];
+                          const missing: string[] = [];
+                          if (!card.channelName?.trim()) missing.push("channelName");
+                          if (!card.platform) missing.push("platform");
+                          if (!card.management) missing.push("management");
+                          if (!card.startYear || !card.startMonth || !card.startDay) missing.push("startDate");
+                          if (!card.rating || Number(card.rating) < 1) missing.push("rating");
+                          if (!card.status) missing.push("status");
+                          if (!card.link?.trim()) missing.push("link");
+                          if ((card.images || []).filter((img) => img !== null).length < 3) missing.push("images");
+                          if (!card.insight?.trim()) missing.push("insight");
+                          if (!card.experience?.trim()) missing.push("experience");
+                          if (!card.metrics?.trim()) missing.push("metrics");
+
+                          if (missing.length > 0) {
+                            setSection3FooterNotice("error");
+                            return;
                           }
+
+                          if (!window.confirm("저장하시겠습니까?")) return;
+                          const compactImages = (card.images || []).filter((img) => img !== null);
+                          const reorderedImages = [...compactImages, ...Array(5 - compactImages.length).fill(null)];
+                          const updated = [...channelCards];
+                          updated[currentCardIndex] = { ...card, images: reorderedImages };
+                          setChannelCards(updated);
+                          alert("저장되었어요!");
+                          setIsEditMode(false);
+                          setSection3FooterNotice("default");
                         }}
                       >
-                        {isSavingArchives ? "저장 중..." : "저장"}
+                        저장
                       </button>
                     </>
                   )}

@@ -2492,6 +2492,19 @@
     }
   }
 
+  // 필수필드 미입력 깜빡임
+  .field-missing input,
+  .field-missing textarea,
+  .field-missing select,
+  .field-missing .image-preview {
+    border: 2px solid #ff4444 !important;
+    animation: field-blink 0.3s ease-in-out 3;
+  }
+  @keyframes field-blink {
+    0%, 100% { border-color: transparent; }
+    50% { border-color: #ff4444; }
+  }
+
   // 링크 없는 카드에 반투명 오버레이 (섹션 3, 4, 5 공통)
   .channel-card:not(.has-link)::before {
     content: '';
