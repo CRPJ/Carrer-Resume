@@ -301,7 +301,7 @@ const Cluster3Content = () => {
     if (newPage !== section3Page) setSection3Page(newPage);
   };
   const handleNextCard = () => {
-    if (isEditMode || currentCardIndex >= MAX_CARDS - 1) return;
+    if (isEditMode || currentCardIndex >= unlockedCardCount - 1 || currentCardIndex >= MAX_CARDS - 1) return;
     const newIndex = currentCardIndex + 1;
     setCurrentCardIndex(newIndex);
     const newPage = Math.floor(newIndex / CARDS_PER_PAGE);
@@ -865,8 +865,24 @@ const Cluster3Content = () => {
     Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
   );
 
-  // 2페이지 동적 노출 — 채널명이 있는 카드가 8개 이상이면 표시 (8단계에서 isCardComplete로 교체)
-  const showPage2 = channelCards.filter((c) => c.channelName?.trim()).length >= CARDS_PER_PAGE;
+  // 임시 isCardComplete (8단계에서 필수필드 기반으로 교체)
+  const isCardComplete = (card: typeof channelCards[0]) => !!card.channelName?.trim();
+
+  // 순차 입력: 연속으로 완성된 카드 수 + 1 = 입력 가능 카드 수
+  const unlockedCardCount = (() => {
+    let count = 1;
+    for (let i = 0; i < channelCards.length; i++) {
+      if (isCardComplete(channelCards[i])) {
+        count = Math.max(count, i + 2);
+      } else {
+        break;
+      }
+    }
+    return Math.min(count, MAX_CARDS);
+  })();
+
+  // 2페이지 동적 노출
+  const showPage2 = channelCards.filter((c) => isCardComplete(c)).length >= CARDS_PER_PAGE;
 
   const handleCardChange = (field: string, value: any) => {
     setChannelCards((prev) => prev.map((card, i) => (i === currentCardIndex ? { ...card, [field]: value } : card)));
@@ -1312,6 +1328,7 @@ const Cluster3Content = () => {
                     const total = portfolioArchives.length;
                     setEditingSection3Links([...filled.map((item) => item.link), ...Array(total - filled.length).fill("")]);
                     setEditingArchiveChannels([...filled.map((item) => item.channel), ...Array(total - filled.length).fill("")]);
+                    setCurrentCardIndex(0);
                     setSection3ModalOpen(true);
                   }
                 : undefined
@@ -1350,6 +1367,7 @@ const Cluster3Content = () => {
         <div className="channel-cards">
           {channelCards.slice(section3Page * 8, section3Page * 8 + 8).map((card, index) => {
             const actualIndex = section3Page * 8 + index;
+            const isUnlocked = actualIndex < unlockedCardCount;
             // DB 연동 카드(1~10)는 드롭다운 선택 채널 아이콘 사용, 나머지는 기존 고정 아이콘
             const cardIndex = card.id - 1;
             let snsImage: string;
@@ -1361,6 +1379,16 @@ const Cluster3Content = () => {
               snsImage = snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
             }
             const isEtcIcon = snsImage.includes("etc");
+            if (!isUnlocked) {
+              return (
+                <div key={card.id} className="channel-card locked">
+                  <div className="card-locked-placeholder">
+                    <i className="ti ti-lock"></i>
+                    <span>이전 카드를 먼저 완성해주세요</span>
+                  </div>
+                </div>
+              );
+            }
             return (
               <div key={card.id} className={`channel-card${card.link ? " has-link" : ""}`} onClick={() => card.link && window.open(ensureProtocol(card.link), "_blank")}>
                 <div className="card-image">
@@ -1757,7 +1785,7 @@ const Cluster3Content = () => {
                   <button className="nav-btn prev" onClick={handlePrevCard} disabled={isEditMode || currentCardIndex === 0} title={isEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-left"></i>
                   </button>
-                  <button className="nav-btn next" onClick={handleNextCard} disabled={isEditMode || currentCardIndex >= MAX_CARDS - 1} title={isEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
+                  <button className="nav-btn next" onClick={handleNextCard} disabled={isEditMode || currentCardIndex >= unlockedCardCount - 1 || currentCardIndex >= MAX_CARDS - 1} title={isEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-right"></i>
                   </button>
                 </div>
