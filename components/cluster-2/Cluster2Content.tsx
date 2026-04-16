@@ -805,33 +805,28 @@ const Cluster2Content = () => {
     if (changed) setEduValidationErrors(updatedErrors);
   }, [editingEduData]);
 
-  // 1번 카드 필수필드 충족 시 안내문 자동 복원
+  // 모든 카드 필수필드 충족 시 안내문 자동 복원
   useEffect(() => {
     if (section3FooterNotice !== "error") return;
-    const primary = editingEduData[0];
-    if (!primary) return;
-    const filled =
-      primary.school &&
-      primary.school !== "-" &&
-      primary.status &&
-      primary.status !== "-" &&
-      primary.category &&
-      primary.category !== "-" &&
-      primary.major1 &&
-      primary.major1 !== "-" &&
-      primary.startYear &&
-      primary.startMonth &&
-      primary.gradeValue &&
-      primary.gradeValue !== "-" &&
-      primary.description &&
-      primary.description.trim() !== "" &&
-      (primary.status !== "졸업" || (primary.endYear && primary.endMonth)) &&
-      (primary.status !== "중퇴" || (primary.endYear && primary.endYear.trim() !== ""));
-    if (filled) {
+    const allFilled = editingEduData.every((edu, index) => {
+      if (index === 0 && !canChangePrimary) return true;
+      return (
+        edu.school && edu.school !== "-" &&
+        edu.status && edu.status !== "-" &&
+        edu.category && edu.category !== "-" &&
+        edu.major1 && edu.major1 !== "-" &&
+        edu.startYear && edu.startMonth &&
+        edu.gradeValue && edu.gradeValue !== "-" &&
+        edu.description && edu.description.trim() !== "" &&
+        (edu.status !== "졸업" || (edu.endYear && edu.endMonth)) &&
+        (edu.status !== "중퇴" || (edu.endYear && edu.endYear.trim() !== ""))
+      );
+    });
+    if (allFilled) {
       setSection3FooterNotice("default");
       setEduValidationErrors({});
     }
-  }, [editingEduData, section3FooterNotice]);
+  }, [editingEduData, section3FooterNotice, canChangePrimary]);
 
   // 학력 페이지네이션: 컨테이너 vs 카드 전체 폭 비교하여 동적 계산
   useEffect(() => {
@@ -3391,7 +3386,7 @@ const Cluster2Content = () => {
                     {/* 행 1: 학교 선택 - 자동완성 검색 (전체 너비) */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label style={eduValidationErrors[`${index}_school`] ? { color: "#ff4444" } : {}}>학교{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_school`] ? { color: "#ff4444" } : {}}>학교<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <div className="school-autocomplete">
                           {schoolCustomInput[`${index}_school`] ? (
                             /* 직접 입력 모드 */
@@ -3521,7 +3516,7 @@ const Cluster2Content = () => {
                     {/* 행 2: 상태 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label style={eduValidationErrors[`${index}_status`] ? { color: "#ff4444" } : {}}>상태{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_status`] ? { color: "#ff4444" } : {}}>상태<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_status`] ? "open" : ""}`}>
                           <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_status`] ? {} : { [`${index}_status`]: true }))}>
                             <span>{edu.status || "선택"}</span>
@@ -3565,7 +3560,7 @@ const Cluster2Content = () => {
                     {/* 행 3: 계열 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label style={eduValidationErrors[`${index}_category`] ? { color: "#ff4444" } : {}}>계열{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_category`] ? { color: "#ff4444" } : {}}>계열<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <div className={`edu-custom-dropdown ${eduDropdowns[`${index}_category`] ? "open" : ""}`}>
                           <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_category`] ? {} : { [`${index}_category`]: true }))}>
                             <span>{edu.category || "선택"}</span>
@@ -3597,7 +3592,7 @@ const Cluster2Content = () => {
                     {/* 행 4: 전공 1 / 전공 2 / 전공 3 */}
                     <div className="edu-edit-row three-cols">
                       <div className="edu-edit-field">
-                        <label style={eduValidationErrors[`${index}_major1`] ? { color: "#ff4444" } : {}}>전공 1{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_major1`] ? { color: "#ff4444" } : {}}>전공 1<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <input
                           type="text"
                           value={edu.major1}
@@ -3654,7 +3649,7 @@ const Cluster2Content = () => {
                     {/* 행 5: 입학 / 졸업 */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field">
-                        <label style={eduValidationErrors[`${index}_startYear`] || eduValidationErrors[`${index}_startMonth`] ? { color: "#ff4444" } : {}}>입학시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_startYear`] || eduValidationErrors[`${index}_startMonth`] ? { color: "#ff4444" } : {}}>입학시기<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <div className="date-picker-row">
                           <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_startYear`] ? "open" : ""}`}>
                             <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_startYear`] ? {} : { [`${index}_startYear`]: true }))}>
@@ -3709,7 +3704,7 @@ const Cluster2Content = () => {
                       <div className="edu-edit-field">
                         {edu.status === "중퇴" ? (
                           <>
-                            <label style={eduValidationErrors[`${index}_endYear`] ? { color: "#ff4444" } : {}}>중퇴시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                            <label style={eduValidationErrors[`${index}_endYear`] ? { color: "#ff4444" } : {}}>중퇴시기<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                             <div className="textarea-wrapper">
                               <input
                                 type="text"
@@ -3741,7 +3736,7 @@ const Cluster2Content = () => {
                           </>
                         ) : edu.status === "졸업" ? (
                           <>
-                            <label style={eduValidationErrors[`${index}_endYear`] || eduValidationErrors[`${index}_endMonth`] ? { color: "#ff4444" } : {}}>졸업시기{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                            <label style={eduValidationErrors[`${index}_endYear`] || eduValidationErrors[`${index}_endMonth`] ? { color: "#ff4444" } : {}}>졸업시기<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                             <div className="date-picker-row">
                               <div className={`edu-custom-dropdown small ${eduDropdowns[`${index}_endYear`] ? "open" : ""}`}>
                                 <div className="dropdown-selected" onClick={() => setEduDropdowns((prev) => (prev[`${index}_endYear`] ? {} : { [`${index}_endYear`]: true }))}>
@@ -3810,7 +3805,7 @@ const Cluster2Content = () => {
                     {/* 행 6: 성적 (달성치 / 최대치) */}
                     <div className="edu-edit-row grade-row">
                       <div className="edu-edit-field">
-                        <label style={eduValidationErrors[`${index}_gradeValue`] ? { color: "#ff4444" } : {}}>성적{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_gradeValue`] ? { color: "#ff4444" } : {}}>성적<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         {/* 최대치에 따라 달성치 입력 방식 변경 */}
                         {edu.gradeMax === "-" ? (
                           // '-' 선택 시: 비활성화된 입력창에 '-' 표시
@@ -4027,7 +4022,7 @@ const Cluster2Content = () => {
                     {/* 행 6: 비고 (전체 너비) */}
                     <div className="edu-edit-row">
                       <div className="edu-edit-field full-width">
-                        <label style={eduValidationErrors[`${index}_description`] ? { color: "#ff4444" } : {}}>학교 생활{index === 0 && <span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span>}</label>
+                        <label style={eduValidationErrors[`${index}_description`] ? { color: "#ff4444" } : {}}>학교 생활<span style={{ color: "#FAAB07", marginLeft: "2px", fontWeight: 600 }}>*</span></label>
                         <div className="textarea-wrapper">
                           <textarea
                             value={edu.description}
@@ -4133,53 +4128,59 @@ const Cluster2Content = () => {
                     className="modal-save-btn"
                     disabled={eduSaving}
                     onClick={() => {
-                      // 1번 카드(대표학력) 필수필드 검증 — 관리자 승인 시에만
-                      if (canChangePrimary) {
-                        const primary = editingEduData[0];
-                        const newErrors: { [key: string]: boolean } = {};
-                        if (!primary.school || primary.school === "-") newErrors["0_school"] = true;
-                        if (!primary.status || primary.status === "-") newErrors["0_status"] = true;
-                        if (!primary.category || primary.category === "-") newErrors["0_category"] = true;
-                        if (!primary.major1 || primary.major1 === "-") newErrors["0_major1"] = true;
-                        if (!primary.startYear) newErrors["0_startYear"] = true;
-                        if (primary.startYear && !primary.startMonth) newErrors["0_startMonth"] = true;
-                        if (!primary.gradeValue || primary.gradeValue === "-") newErrors["0_gradeValue"] = true;
-                        if (!primary.description || primary.description.trim() === "") newErrors["0_description"] = true;
-                        if (primary.status === "졸업") {
-                          if (!primary.endYear) newErrors["0_endYear"] = true;
-                          if (primary.endYear && !primary.endMonth) newErrors["0_endMonth"] = true;
-                        }
-                        if (primary.status === "중퇴") {
-                          if (!primary.endYear || primary.endYear.trim() === "") newErrors["0_endYear"] = true;
-                        }
+                      // 모든 카드 필수필드 검증
+                      const newErrors: { [key: string]: boolean } = {};
+                      editingEduData.forEach((edu, idx) => {
+                        // 1번 카드는 canChangePrimary=true일 때만 체크
+                        if (idx === 0 && !canChangePrimary) return;
 
-                        setEduValidationErrors(newErrors);
-
-                        if (Object.keys(newErrors).length > 0) {
-                          setSection3FooterNotice("error");
-                          setTimeout(() => {
-                            const container = modalBodyRef.current;
-                            if (!container) return;
-                            const firstCard = container.querySelector(".edu-edit-card") as HTMLElement;
-                            if (!firstCard) return;
-                            const labels = firstCard.querySelectorAll(".edu-edit-field label");
-                            let targetField: HTMLElement | null = null;
-                            for (let i = 0; i < labels.length; i++) {
-                              if ((labels[i] as HTMLElement).style.color === "rgb(255, 68, 68)") {
-                                targetField = (labels[i] as HTMLElement).closest(".edu-edit-field") as HTMLElement;
-                                break;
-                              }
-                            }
-                            if (targetField) {
-                              targetField.classList.add("field-missing");
-                              container.scrollTop = targetField.offsetTop - container.offsetTop;
-                              setTimeout(() => targetField?.classList.remove("field-missing"), 900);
-                            } else {
-                              container.scrollTop = firstCard.offsetTop - container.offsetTop;
-                            }
-                          }, 100);
-                          return;
+                        if (!edu.school || edu.school === "-") newErrors[`${idx}_school`] = true;
+                        if (!edu.status || edu.status === "-") newErrors[`${idx}_status`] = true;
+                        if (!edu.category || edu.category === "-") newErrors[`${idx}_category`] = true;
+                        if (!edu.major1 || edu.major1 === "-") newErrors[`${idx}_major1`] = true;
+                        if (!edu.startYear) newErrors[`${idx}_startYear`] = true;
+                        if (edu.startYear && !edu.startMonth) newErrors[`${idx}_startMonth`] = true;
+                        if (!edu.gradeValue || edu.gradeValue === "-") newErrors[`${idx}_gradeValue`] = true;
+                        if (!edu.description || edu.description.trim() === "") newErrors[`${idx}_description`] = true;
+                        if (edu.status === "졸업") {
+                          if (!edu.endYear) newErrors[`${idx}_endYear`] = true;
+                          if (edu.endYear && !edu.endMonth) newErrors[`${idx}_endMonth`] = true;
                         }
+                        if (edu.status === "중퇴") {
+                          if (!edu.endYear || edu.endYear.trim() === "") newErrors[`${idx}_endYear`] = true;
+                        }
+                      });
+
+                      setEduValidationErrors(newErrors);
+
+                      if (Object.keys(newErrors).length > 0) {
+                        setSection3FooterNotice("error");
+                        setTimeout(() => {
+                          const container = modalBodyRef.current;
+                          if (!container) return;
+                          const cards = container.querySelectorAll(".edu-edit-card");
+                          // 첫 번째 에러가 있는 카드 찾기
+                          const firstErrorKey = Object.keys(newErrors)[0];
+                          const firstCardIdx = parseInt(firstErrorKey.split("_")[0]);
+                          const targetCard = cards[firstCardIdx] as HTMLElement;
+                          if (!targetCard) return;
+                          const labels = targetCard.querySelectorAll(".edu-edit-field label");
+                          let targetField: HTMLElement | null = null;
+                          for (let i = 0; i < labels.length; i++) {
+                            if ((labels[i] as HTMLElement).style.color === "rgb(255, 68, 68)") {
+                              targetField = (labels[i] as HTMLElement).closest(".edu-edit-field") as HTMLElement;
+                              break;
+                            }
+                          }
+                          if (targetField) {
+                            targetField.classList.add("field-missing");
+                            container.scrollTop = targetField.offsetTop - container.offsetTop;
+                            setTimeout(() => targetField?.classList.remove("field-missing"), 900);
+                          } else {
+                            container.scrollTop = targetCard.offsetTop - container.offsetTop;
+                          }
+                        }, 100);
+                        return;
                       }
 
                       if (!window.confirm("저장하시겠습니까?")) return;
