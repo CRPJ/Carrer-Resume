@@ -864,31 +864,26 @@ const Cluster3Content = () => {
 
   const isSlotEnabled = (slotIndex: number): boolean => {
     if (slotIndex === 0) return true;
-    const card = channelCards[currentCardIndex];
-    return !!card?.images[slotIndex - 1];
+    return !!channelCards[currentCardIndex]?.images[slotIndex - 1];
   };
 
-  const handleImageUploadClick = (slotIndex: number) => {
-    imageInputRefs.current[slotIndex]?.click();
-  };
+  const handleImageUploadClick = (slotIndex: number) => imageInputRefs.current[slotIndex]?.click();
 
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
     const file = e.target.files?.[0];
     if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      const card = channelCards[currentCardIndex];
-      const newImages = [...card.images];
-      newImages[slotIndex] = previewUrl;
+      const url = URL.createObjectURL(file);
+      const newImages = [...channelCards[currentCardIndex].images];
+      newImages[slotIndex] = url;
       handleCardChange("images", newImages);
     }
     e.target.value = "";
   };
 
   const handleImageDelete = (slotIndex: number) => {
-    const card = channelCards[currentCardIndex];
-    const img = card.images[slotIndex];
+    const img = channelCards[currentCardIndex].images[slotIndex];
     if (img) URL.revokeObjectURL(img);
-    const newImages = [...card.images];
+    const newImages = [...channelCards[currentCardIndex].images];
     newImages[slotIndex] = null;
     handleCardChange("images", newImages);
   };
@@ -1699,22 +1694,18 @@ const Cluster3Content = () => {
                   })()}
                 </div>
                 <div className="channel-images-section">
-                  {channelCards[currentCardIndex]?.images.map((img, slotIndex) => (
-                    <div key={slotIndex} className={`image-slot${!isSlotEnabled(slotIndex) ? " disabled" : ""}`}>
+                  {channelCards[currentCardIndex]?.images.map((img, si) => (
+                    <div key={si} className={`image-slot${!isSlotEnabled(si) ? " disabled" : ""}`}>
                       <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
-                        {img ? (
-                          <img src={img} alt={`대표 이미지 ${slotIndex + 1}`} />
-                        ) : (
-                          <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>
-                        )}
+                        {img ? <img src={img} alt={`대표 이미지 ${si + 1}`} /> : <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>}
                       </div>
                       {isEditMode && (
                         <div className="image-actions">
-                          <button className="image-action-btn upload" onClick={() => handleImageUploadClick(slotIndex)} disabled={!isSlotEnabled(slotIndex)}><i className="ti ti-upload"></i></button>
-                          <button className="image-action-btn delete" onClick={() => handleImageDelete(slotIndex)} disabled={!isSlotEnabled(slotIndex) || !img}><i className="ti ti-trash"></i></button>
+                          <button className="image-action-btn" onClick={() => handleImageUploadClick(si)} disabled={!isSlotEnabled(si)}><i className="ti ti-upload"></i></button>
+                          <button className="image-action-btn" onClick={() => handleImageDelete(si)} disabled={!isSlotEnabled(si) || !img}><i className="ti ti-trash"></i></button>
                         </div>
                       )}
-                      <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[slotIndex] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, slotIndex)} />
+                      <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[si] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, si)} />
                     </div>
                   ))}
                 </div>
@@ -1733,13 +1724,7 @@ const Cluster3Content = () => {
                       <div className="textarea-wrapper">
                         {isEditMode ? (
                           <>
-                            <textarea
-                              value={val}
-                              onChange={(e) => { if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value); }}
-                              maxLength={200}
-                              placeholder={box.placeholder}
-                              rows={6}
-                            />
+                            <textarea value={val} onChange={(e) => { if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value); }} maxLength={200} placeholder={box.placeholder} rows={6} />
                             <span className="char-count">{val.length}/200</span>
                           </>
                         ) : (
@@ -1815,11 +1800,10 @@ const Cluster3Content = () => {
           </div>
         </div>
       )}
-      {/* 이미지 확대 모달 */}
       {previewImage && (
-        <div className="image-preview-overlay" onClick={() => setPreviewImage(null)}>
-          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()}>
-            <img src={previewImage} alt="확대 보기" />
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
+          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
         </div>
       )}
