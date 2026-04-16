@@ -2525,10 +2525,10 @@
   }
 
   .section-modal {
-    width: 562px;
-    height: 826px;
-    max-width: 95vw;
-    max-height: 826px;
+    width: 1214px;
+    height: 742px;
+    max-width: 1214px;
+    max-height: 742px;
     border: 1px solid #FFA500 !important;
     border-radius: 0 !important;
     border-image: none !important;
@@ -2638,7 +2638,99 @@
       flex: 1;
       overflow-y: auto;
       min-height: 0;
-      padding: 24px 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .modal-top-row {
+        display: flex;
+        gap: 20px;
+        flex: 1;
+      }
+
+      .channel-info-section {
+        width: 40%;
+        flex-shrink: 0;
+
+        .channel-info-title {
+          color: #FAAB07;
+          font-size: 16px;
+          font-weight: 700;
+          margin-bottom: 16px;
+          .user-name { color: #fff; }
+        }
+
+        .channel-info-field {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 8px;
+
+          label {
+            width: 100px;
+            color: #fff;
+            font-size: 14px;
+            flex-shrink: 0;
+          }
+
+          .field-value {
+            color: #ccc;
+            font-size: 14px;
+          }
+
+          input, select {
+            flex: 1;
+            background: transparent;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 14px;
+            font-family: 'Pretendard', sans-serif;
+          }
+
+          .date-picker-row {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            select { flex: 1; }
+          }
+        }
+
+        .link-field {
+          display: flex;
+          gap: 4px;
+          flex: 1;
+
+          input { flex: 1; }
+
+          .link-open-btn {
+            width: 36px;
+            height: 28px;
+            background: #FAAB07;
+            border: none;
+            color: #1a1a1a;
+            font-weight: 600;
+            cursor: pointer;
+            &:disabled { opacity: 0.3; cursor: not-allowed; }
+          }
+        }
+
+        .star-rating {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          i { color: #FAAB07; font-size: 16px; }
+          .rating-text {
+            margin-left: 8px;
+            background: #FAAB07;
+            color: #1a1a1a;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: 600;
+          }
+        }
+      }
 
       &::-webkit-scrollbar { width: 3px; }
       &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
@@ -2796,9 +2888,10 @@
 
     .section-modal-footer {
       display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      padding: 24px 28px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 28px;
       border-top: none;
       background: transparent;
       height: 118px;
@@ -2806,6 +2899,59 @@
       max-height: 118px;
       flex-shrink: 0;
       box-sizing: border-box;
+
+      .modal-footer-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .modal-footer-bottom {
+        width: 100%;
+        text-align: right;
+      }
+
+      .modal-footer-nav {
+        display: flex;
+        gap: 8px;
+
+        .nav-btn {
+          width: 36px;
+          height: 36px;
+          background: transparent;
+          border: 1px solid #FFA500;
+          color: #FFA500;
+          border-radius: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          &:hover:not(:disabled) {
+            background: rgba(255, 165, 0, 0.1);
+          }
+
+          &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+          }
+        }
+      }
+
+      .modal-edit-btn {
+        padding: 8px 20px;
+        background: #FAAB07;
+        border: 1px solid transparent;
+        color: #1a1a1a;
+        border-radius: 0;
+        font-weight: 600;
+        font-size: 14px;
+        font-family: Pretendard;
+        cursor: pointer;
+
+        &:hover { background: #FFB820; }
+      }
     
       button {
         font-family: 'Pretendard', sans-serif;

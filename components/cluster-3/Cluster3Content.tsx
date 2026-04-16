@@ -242,6 +242,10 @@ const Cluster3Content = () => {
   const [section3ModalOpen, setSection3ModalOpen] = useState(false);
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
   const [section5ModalOpen, setSection5ModalOpen] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [section3FooterNotice, setSection3FooterNotice] = useState<"default" | "error">("default");
+  const MAX_CARDS = 16;
 
   // 모달 body refs (체크3: 필수 미입력 시 스크롤 이동)
   const section3ModalBodyRef = useRef<HTMLDivElement>(null);
@@ -278,6 +282,21 @@ const Cluster3Content = () => {
   // 모달 열릴 때 배경 스크롤 잠금
   const anyModalOpen = section3ModalOpen || section4ModalOpen || section5ModalOpen;
   useModalScroll(anyModalOpen);
+
+  // section3 모달 열 때 보기 모드로 초기화
+  useEffect(() => {
+    if (section3ModalOpen) {
+      setIsEditMode(false);
+      setSection3FooterNotice("default");
+    }
+  }, [section3ModalOpen]);
+
+  const handlePrevCard = () => {
+    if (currentCardIndex > 0) setCurrentCardIndex((prev) => prev - 1);
+  };
+  const handleNextCard = () => {
+    if (currentCardIndex < MAX_CARDS - 1) setCurrentCardIndex((prev) => prev + 1);
+  };
 
   // 링크 데이터 관리 (카드 데이터에서 초기화)
   const [section3Links, setSection3Links] = useState<string[]>([]);
@@ -821,25 +840,42 @@ const Cluster3Content = () => {
     "/images/0/cluster 3/icon/etc 3.png",
   ];
 
-  const [channelCards, setChannelCards] = useState([
-    { id: 1, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 2, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 3, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 4, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 5, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 6, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 7, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 8, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 9, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 10, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    // 11-16번은 샘플 데이터 (DB 저장 안 함)
-    { id: 11, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    // { id: 12, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    // { id: 13, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    // { id: 14, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    // { id: 15, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-    { id: 16, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s", link: "" },
-  ]);
+  const PLATFORM_OPTIONS = ["유튜브", "인스타그램", "블로그(네이버)", "티스토리", "X(트위터)", "스레드(메타)", "카카오스토리", "핀터레스트", "틱톡", "비핸스", "노션"];
+  const MANAGEMENT_OPTIONS = ["개인 소유 관리", "팀 소속 협업", "기타 진행"];
+  const STATUS_OPTIONS = ["운영 중", "운영 중단", "운영 보류"];
+
+  const makeDefaultCard = (id: number) => ({
+    id, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s",
+    link: "", channelName: "", platform: "", management: "", startYear: "" as string, startMonth: "" as string, startDay: "" as string, rating: "" as string, status: "",
+  });
+
+  const [channelCards, setChannelCards] = useState(
+    Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
+  );
+
+  const handleCardChange = (field: string, value: string) => {
+    setChannelCards((prev) => prev.map((card, i) => (i === currentCardIndex ? { ...card, [field]: value } : card)));
+  };
+
+  const StarRating = ({ rating }: { rating: number }) => {
+    const r = Number(rating) || 0;
+    const fullStars = Math.floor(r / 2);
+    const hasHalf = r % 2 === 1;
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+    return (
+      <span className="star-rating">
+        {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+        {hasHalf && <i className="ti ti-star-half-filled" />}
+        {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+        <span className="rating-text">{r}/10</span>
+      </span>
+    );
+  };
+
+  const formatDate = (y: string, m: string, d: string) => {
+    if (!y) return "-";
+    return `${y.slice(-2)}. ${m || "??"}. ${d || "??"}`;
+  };
 
   // Top Works 슬라이드 데이터 (5개)
   const [topWorksSlides, setTopWorksSlides] = useState([
@@ -1532,80 +1568,165 @@ const Cluster3Content = () => {
         <div className="section-modal-overlay">
           <div className="section-modal">
             <div className="section-modal-header">
-              <h3>포트폴리오 아카이빙 channel 링크 편집</h3>
-              <p className="modal-subtitle">
-                클럽 활동 중 자신의 결과물을 업로드 한 SNS 채널 링크를 등록해주세요
-                <br />
-                <span className="subtitle-gray">(인스타, 유튜브, 블로그, 티스토리, 트위터, 쓰레드, 틱톡, 비핸스, 기타)</span>
-              </p>
-              <button className="modal-close-btn" onClick={() => setSection3ModalOpen(false)}>
-                <i className="ti ti-x"></i>
-              </button>
+              <div className="modal-header-top">
+                <span style={{ fontSize: "20px" }}>✍️</span>
+                <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
+                <button className="modal-close-btn" onClick={() => setSection3ModalOpen(false)}>
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
             </div>
             <div className="section-modal-body" ref={section3ModalBodyRef}>
-              {editingSection3Links.map((link, index) => {
-                const prevFilled = index === 0 || editingSection3Links[index - 1]?.trim();
-                const isDisabled = !prevFilled;
-                return (
-                  <div key={index} className={`link-edit-item${isDisabled ? " disabled" : ""}`}>
-                    <div className="link-item-header">
-                      <span className="link-label">Channel {index + 1}</span>
-                    </div>
-                    <p style={{ color: "#FFC107", fontSize: "16px", margin: "0 0 8px 0" }}>채널 선택:</p>
-                    <CustomSelect
-                      className="channel-select"
-                      style={{ display: "block", marginBottom: "8px", pointerEvents: isDisabled ? "none" : "auto", opacity: isDisabled ? 0.4 : 1 }}
-                      value={link?.trim() ? editingArchiveChannels[index] || "" : ""}
-                      onChange={(val) => {
-                        const newChannels = [...editingArchiveChannels];
-                        newChannels[index] = val;
-                        setEditingArchiveChannels(newChannels);
-                      }}
-                      options={channelOptions}
-                    />
-                    <input
-                      type="url"
-                      placeholder="링크를 입력하세요 (https://...)"
-                      value={link}
-                      disabled={isDisabled}
-                      onChange={(e) => {
-                        const newLinks = [...editingSection3Links];
-                        newLinks[index] = e.target.value;
-                        // 링크를 비우면 하위 항목 초기화
-                        if (!e.target.value.trim()) {
-                          for (let i = index + 1; i < newLinks.length; i++) {
-                            newLinks[i] = "";
-                          }
-                          const newChannels = [...editingArchiveChannels];
-                          for (let i = index + 1; i < newChannels.length; i++) {
-                            newChannels[i] = "";
-                          }
-                          setEditingArchiveChannels(newChannels);
-                        }
-                        setEditingSection3Links(newLinks);
-                      }}
-                    />
-                  </div>
-                );
-              })}
+              <div className="modal-top-row">
+                <div className="channel-info-section">
+                  <h4 className="channel-info-title">
+                    <span className="user-name">{engName || "홍길동"}</span> 님의 Portfolio Channel
+                  </h4>
+                  {(() => {
+                    const card = channelCards[currentCardIndex];
+                    if (!card) return null;
+                    const fields = [
+                      { label: "채널명", key: "channelName", type: "text", placeholder: "@채널명을 입력하세요" },
+                      { label: "채널 플랫폼", key: "platform", type: "select", options: PLATFORM_OPTIONS },
+                      { label: "채널 관리", key: "management", type: "select", options: MANAGEMENT_OPTIONS },
+                      { label: "채널 시작", key: "date", type: "date" },
+                      { label: "채널 평가", key: "rating", type: "rating" },
+                      { label: "운영 현황", key: "status", type: "select", options: STATUS_OPTIONS },
+                      { label: "채널 살펴보기", key: "link", type: "link" },
+                    ];
+                    return fields.map((f) => (
+                      <div key={f.key} className="channel-info-field">
+                        <label>{f.label}</label>
+                        {f.type === "text" && (
+                          isEditMode ? (
+                            <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} />
+                          ) : (
+                            <span className="field-value">{(card as any)[f.key] || "-"}</span>
+                          )
+                        )}
+                        {f.type === "select" && (
+                          isEditMode ? (
+                            <select value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)}>
+                              <option value="">선택하세요</option>
+                              {f.options!.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                            </select>
+                          ) : (
+                            <span className="field-value">{(card as any)[f.key] || "-"}</span>
+                          )
+                        )}
+                        {f.type === "date" && (
+                          isEditMode ? (
+                            <div className="date-picker-row">
+                              <select value={card.startYear || ""} onChange={(e) => handleCardChange("startYear", e.target.value)}>
+                                <option value="">년</option>
+                                {Array.from({ length: 36 }, (_, i) => 1990 + i).map((y) => <option key={y} value={String(y)}>{y}</option>)}
+                              </select>
+                              <select value={card.startMonth || ""} onChange={(e) => handleCardChange("startMonth", e.target.value)}>
+                                <option value="">월</option>
+                                {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => <option key={m} value={m}>{m}</option>)}
+                              </select>
+                              <select value={card.startDay || ""} onChange={(e) => handleCardChange("startDay", e.target.value)}>
+                                <option value="">일</option>
+                                {Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0")).map((d) => <option key={d} value={d}>{d}</option>)}
+                              </select>
+                            </div>
+                          ) : (
+                            <span className="field-value">{formatDate(card.startYear, card.startMonth, card.startDay)}</span>
+                          )
+                        )}
+                        {f.type === "rating" && (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+                            {isEditMode ? (
+                              <select value={card.rating || ""} onChange={(e) => handleCardChange("rating", e.target.value)}>
+                                <option value="">선택</option>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => <option key={n} value={String(n)}>{n}</option>)}
+                              </select>
+                            ) : null}
+                            <StarRating rating={Number(card.rating) || 0} />
+                          </div>
+                        )}
+                        {f.type === "link" && (
+                          isEditMode ? (
+                            <div className="link-field">
+                              <input type="text" value={card.link || ""} onChange={(e) => handleCardChange("link", e.target.value)} placeholder="https://..." style={{ whiteSpace: "nowrap" as const, overflow: "auto" }} />
+                              <button className="link-open-btn" onClick={() => { if (card.link) window.open(card.link, "_blank"); }} disabled={!card.link}>V</button>
+                            </div>
+                          ) : (
+                            <div className="link-field">
+                              <span className="field-value" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{card.link || "-"}</span>
+                              {card.link && <button className="link-open-btn" onClick={() => window.open(card.link, "_blank")}>V</button>}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ));
+                  })()}
+                </div>
+                {/* 우상단(대표 이미지)은 4단계에서 구현 */}
+                <div className="channel-images-section" style={{ flex: 1 }} />
+              </div>
+              {/* 하단(기획방향/경험활동/정량지표)은 5단계에서 구현 */}
             </div>
             <div className="section-modal-footer">
-              <button className="cancel-btn" onClick={() => setSection3ModalOpen(false)}>
-                취소
-              </button>
-              <button
-                className="save-btn"
-                disabled={isSavingArchives}
-                onClick={async () => {
-                  if (!validateAndScrollToEmpty(section3ModalBodyRef, editingSection3Links, editingArchiveChannels)) return;
-                  const success = await savePortfolioArchives(editingSection3Links, editingArchiveChannels);
-                  if (success) {
-                    setSection3ModalOpen(false);
-                  }
-                }}
-              >
-                {isSavingArchives ? "저장 중..." : "저장"}
-              </button>
+              <div className="modal-footer-top">
+                <span className="modal-help-icon" style={{ cursor: "pointer" }}>
+                  🔎
+                </span>
+                <div className="modal-footer-nav">
+                  <button className="nav-btn prev" onClick={() => !isEditMode && handlePrevCard()} disabled={isEditMode || currentCardIndex === 0}>
+                    <i className="ti ti-chevron-left"></i>
+                  </button>
+                  <button className="nav-btn next" onClick={() => !isEditMode && handleNextCard()} disabled={isEditMode || currentCardIndex === MAX_CARDS - 1}>
+                    <i className="ti ti-chevron-right"></i>
+                  </button>
+                </div>
+                <div className="modal-footer-right">
+                  {!isEditMode ? (
+                    <button className="modal-edit-btn" onClick={() => setIsEditMode(true)}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="modal-reset-btn"
+                        onClick={() => {
+                          if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                            const newLinks = [...editingSection3Links];
+                            newLinks[currentCardIndex] = "";
+                            setEditingSection3Links(newLinks);
+                            const newChannels = [...editingArchiveChannels];
+                            newChannels[currentCardIndex] = "";
+                            setEditingArchiveChannels(newChannels);
+                          }
+                        }}
+                      >
+                        초기화
+                      </button>
+                      <button
+                        className="modal-save-btn"
+                        disabled={isSavingArchives}
+                        onClick={async () => {
+                          if (!validateAndScrollToEmpty(section3ModalBodyRef, editingSection3Links, editingArchiveChannels)) return;
+                          const success = await savePortfolioArchives(editingSection3Links, editingArchiveChannels);
+                          if (success) {
+                            setIsEditMode(false);
+                            setSection3ModalOpen(false);
+                          }
+                        }}
+                      >
+                        {isSavingArchives ? "저장 중..." : "저장"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+              {isEditMode && (
+                <div className="modal-footer-bottom">
+                  <p className={`modal-footer-notice ${section3FooterNotice === "error" ? "notice-error" : ""}`}>
+                    {section3FooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
