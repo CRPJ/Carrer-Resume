@@ -253,6 +253,8 @@ const Cluster3Content = () => {
   const section4ModalBodyRef = useRef<HTMLDivElement>(null);
   const section5ModalBodyRef = useRef<HTMLDivElement>(null);
 
+  const [showHelpModal, setShowHelpModal] = useState(false);
+
   // 필수 미입력 시 스크롤 이동 + 하이라이트
   const validateAndScrollToEmpty = (bodyRef: React.RefObject<HTMLDivElement | null>, links: string[], channels: string[]): boolean => {
     if (!bodyRef.current) return true;
@@ -1862,7 +1864,7 @@ const Cluster3Content = () => {
             </div>
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <span className="modal-help-icon" style={{ cursor: "pointer" }}>
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
                   🔎
                 </span>
                 <div className="modal-footer-nav">
@@ -1951,6 +1953,22 @@ const Cluster3Content = () => {
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
           <div className="image-preview-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+          </div>
+        </div>
+      )}
+
+      {/* 도움말 모달 */}
+      {showHelpModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100001 }} onClick={() => setShowHelpModal(false)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
+            <div style={{ height: "153px", minHeight: "153px", flexShrink: 0, display: "flex", flexDirection: "column" as const, padding: "20px 24px", boxSizing: "border-box" as const }}>
+              <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                <span style={{ fontSize: "20px" }}>🔎</span>
+                <h3 style={{ margin: 0, color: "#ffa500", fontSize: "2.0625rem", fontWeight: 700, flex: 1, marginLeft: "10px" }}>도움말</h3>
+                <button onClick={() => setShowHelpModal(false)} style={{ background: "transparent", border: "none", color: "#ffa500", fontSize: "20px", cursor: "pointer" }}>✕</button>
+              </div>
+            </div>
+            <div style={{ flex: 1, padding: "24px", overflowY: "auto" }}>{/* 빈 콘텐츠 */}</div>
           </div>
         </div>
       )}
