@@ -1760,7 +1760,7 @@ const Cluster3Content = () => {
                         {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
                         {f.type === "channelNameInput" && (isEditMode ? (
                           <div className="channel-name-input-wrapper">
-                            <span className="at-prefix">@ </span>
+                            <span className="at-prefix">@&nbsp;</span>
                             <input type="text" value={(card.channelName || "").replace(/^@\s*/, "")} onChange={(e) => handleCardChange("channelName", "@ " + e.target.value)} placeholder="채널명을 입력하세요" />
                           </div>
                         ) : (
@@ -1885,9 +1885,9 @@ const Cluster3Content = () => {
               <div className="channel-bottom-section">
                 {(
                   [
-                    { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 400자)" },
-                    { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 400자)" },
-                    { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 400자)" },
+                    { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 200자)" },
+                    { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 200자)" },
+                    { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 200자)" },
                   ] as const
                 ).map((box) => {
                   const card = channelCards[currentCardIndex];
@@ -1904,13 +1904,13 @@ const Cluster3Content = () => {
                             <textarea
                               value={val}
                               onChange={(e) => {
-                                if (e.target.value.length <= 400) handleCardChange(box.key, e.target.value);
+                                if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value);
                               }}
-                              maxLength={400}
+                              maxLength={200}
                               placeholder={box.placeholder}
                               rows={6}
                             />
-                            <span className="char-count">{val.length}/400</span>
+                            <span className="char-count">{val.length}/200</span>
                           </>
                         ) : (
                           <div className="textarea-readonly">{val || "-"}</div>
