@@ -860,11 +860,11 @@ const Cluster3Content = () => {
     "티스토리": "/images/0/cluster 3/icon/Tstory.png",
     "X(트위터)": "/images/0/cluster 3/icon/X.png",
     "스레드(메타)": "/images/0/cluster 3/icon/Threads.png",
-    "카카오스토리": "",
-    "핀터레스트": "",
+    "카카오스토리": "/images/0/cluster 3/kakao story.svg",
+    "핀터레스트": "/images/0/cluster 3/pinterest.png",
     "틱톡": "/images/0/cluster 3/icon/TikTok.png",
     "비핸스": "/images/0/cluster 3/icon/Behance.png",
-    "노션": "",
+    "노션": "/images/0/cluster 3/notion.png",
   };
   const PLATFORM_OPTIONS = Object.keys(PLATFORM_ICONS);
   const MANAGEMENT_OPTIONS = ["개인 소유 관리", "팀 소속 협업", "기타 진행"];
