@@ -5,7 +5,7 @@ export const CLUSTER3_CHANNEL_DEFAULTS = {
     badge: "D",
     price: "4.89",
     tag: "09h 99m 99s",
-    channelName: "@Discovery_Korea",
+    channelName: "@ Discovery_Korea",
     platform: "유튜브",
     management: "개인 소유 관리",
     startYear: "2019",

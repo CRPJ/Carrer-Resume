@@ -1406,11 +1406,12 @@ const Cluster3Content = () => {
 
       {/* Section 3: 포트폴리오 마케팅 Channel */}
       <section className="cluster3-section3">
-        {/* 플로팅 아이콘 — 주석 처리 (channel-card 클릭으로 대체)
         <div className="floating-icons" style={{ display: "flex" }}>
+          {/* edit-icon 주석 처리 유지
           <div className="edit-icon" style={{ cursor: "pointer" }} onClick={() => { setCurrentCardIndex(0); setSection3ModalOpen(true); }}>
             <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
           </div>
+          */}
           <div className="edit-icon search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
@@ -1418,7 +1419,6 @@ const Cluster3Content = () => {
             </svg>
           </div>
         </div>
-        */}
         {/* 배경 이미지 */}
         <div className="section3-bg">
           <img src="/images/0/cluster 3/bg3.png" alt="Background" />
@@ -1475,20 +1475,18 @@ const Cluster3Content = () => {
                 }}
               >
                 <div className="card-image">
-                  <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
-                  <div className="card-tag">{card.tag}</div>
-                  <div className="card-like">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
+                  <img src={card.images?.[0] || `/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
+                  <div className="card-tag">{card.startYear && card.startMonth && card.startDay ? `${card.startYear}년 ${String(card.startMonth).padStart(2, "0")}월 ${String(card.startDay).padStart(2, "0")}일` : card.tag}</div>
+                  <div className="card-like" style={{ backgroundColor: card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : undefined }}>
+                    {card.status || <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>}
                   </div>
                 </div>
                 <div className="card-content">
-                  <p className="card-title">{card.title}</p>
+                  <p className="card-title">{card.channelName ? <><span className="at-symbol">@</span> {card.channelName.replace(/^@\s*/, "")}</> : card.title}</p>
                   <div className="card-info">
                     <div className="info-row">
                       <div className="info-author">
-                        <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? " sns-icon-etc" : ""}`} />
+                        {card.platform && PLATFORM_ICONS[card.platform] ? <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className={`sns-icon`} /> : <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? " sns-icon-etc" : ""}`} />}
                         <div className="author-text">
                           <span className="info-label">Created by:</span>
                           <span className="author-name">{engName || "Unknown"}</span>
@@ -1497,10 +1495,10 @@ const Cluster3Content = () => {
                     </div>
                     <div className="card-divider"></div>
                     <div className="info-row growth-row">
-                      <span className="info-label">Growth Bid</span>
+                      {card.management ? <span className={`management-tag ${card.management === "개인 소유 관리" ? "tag--yellow" : card.management === "팀 소속 협업" ? "tag--red" : "tag--blue"}`}>#{card.management}</span> : <span className="info-label">Growth Bid</span>}
                       <div className="info-price">
                         <img src="/images/0/cluster 3/icon/dia.png" alt="dia" className="dia-icon" />
-                        <span className="price-value">0.99</span>
+                        <span className="price-value">{card.rating ? `${card.rating}/10` : "0.99"}</span>
                       </div>
                     </div>
                   </div>
@@ -1727,7 +1725,7 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
+                <img src="/images/0/write.png" alt="write" style={{ width: "24px", height: "24px", objectFit: "contain" }} />
                 <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
                 <button className="modal-close-btn" onClick={handleCloseModal}>
                   <i className="ti ti-x"></i>
@@ -1738,13 +1736,14 @@ const Cluster3Content = () => {
               <div className="modal-top-row">
                 <div className="channel-info-section">
                   <h4 className="channel-info-title">
+                    <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
                     <span className="user-name">윤재윤 님</span><span className="channel-title-text">의 Portfolio Channel</span>
                   </h4>
                   {(() => {
                     const card = channelCards[currentCardIndex];
                     if (!card) return null;
                     const fields = [
-                      { label: "채널명", key: "channelName", type: "text", placeholder: "@채널명을 입력하세요" },
+                      { label: "채널명", key: "channelName", type: "text", placeholder: "@ 채널명을 입력하세요" },
                       { label: "채널 플랫폼", key: "platform", type: "platformDropdown" },
                       { label: "채널 관리", key: "management", type: "select", options: MANAGEMENT_OPTIONS },
                       { label: "채널 시작", key: "date", type: "date" },
@@ -2035,7 +2034,7 @@ const Cluster3Content = () => {
           <div
             className="image-preview-modal"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "0.5px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
           >
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
