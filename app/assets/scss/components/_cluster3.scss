@@ -2540,10 +2540,23 @@
   .field-missing input,
   .field-missing textarea,
   .field-missing select,
-  .field-missing .image-preview {
-  border: 2px solid #ff4444 !important;
-  animation: field-blink 0.3s ease-in-out 3;
-}
+  .field-missing .image-preview,
+  .field-missing .dropdown-selected,
+  .field-missing .platform-selected,
+  .field-missing .channel-date-input {
+    border: 2px solid #ff4444 !important;
+    animation: field-blink 0.3s ease-in-out 3;
+  }
+
+  .channel-images-section.field-missing {
+    border: 2px solid #ff4444 !important;
+    animation: field-blink 0.3s ease-in-out 3;
+  }
+
+  .channel-textarea-box.field-missing .textarea-wrapper {
+    border: 2px solid #ff4444 !important;
+    animation: field-blink 0.3s ease-in-out 3;
+  }
 @keyframes field-blink {
   0%,
   100% {

@@ -1753,7 +1753,7 @@ const Cluster3Content = () => {
                       { label: "채널 살펴보기", key: "link", type: "link" },
                     ];
                     return fields.map((f) => (
-                      <div key={f.key} className="channel-info-field">
+                      <div key={f.key} className="channel-info-field" data-field={f.key === "date" ? "startDate" : f.key === "platformDropdown" ? "platform" : f.key}>
                         <label>
                           {f.label}
                           {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
@@ -1853,7 +1853,7 @@ const Cluster3Content = () => {
                     ));
                   })()}
                 </div>
-                <div className="channel-images-section">
+                <div className="channel-images-section" data-field="images">
                   <h4 className="channel-images-title">
                     대표 이미지 <span style={{ whiteSpace: "nowrap" }}>(최소 3장 필수)</span>
                     {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
@@ -1911,7 +1911,7 @@ const Cluster3Content = () => {
                   const card = channelCards[currentCardIndex];
                   const val = (card as any)[box.key] || "";
                   return (
-                    <div key={box.key} className="channel-textarea-box">
+                    <div key={box.key} className="channel-textarea-box" data-field={box.key}>
                       <h5 className="textarea-title">
                         {box.title}
                         {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
@@ -1992,6 +1992,13 @@ const Cluster3Content = () => {
 
                           if (missing.length > 0) {
                             setSection3FooterNotice("error");
+                            const modalBody = document.querySelector(".section-modal-body");
+                            const targetEl = modalBody?.querySelector(`[data-field="${missing[0]}"]`);
+                            if (targetEl) {
+                              targetEl.classList.add("field-missing");
+                              targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                              setTimeout(() => targetEl.classList.remove("field-missing"), 900);
+                            }
                             return;
                           }
 
