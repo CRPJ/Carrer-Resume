@@ -1725,7 +1725,7 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <div className="modal-header-top">
-                <img src="/images/0/write.png" alt="write" style={{ width: "36px", height: "36px", objectFit: "contain" }} />
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
                 <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
                 <button className="modal-close-btn" onClick={handleCloseModal}>
                   <i className="ti ti-x"></i>
