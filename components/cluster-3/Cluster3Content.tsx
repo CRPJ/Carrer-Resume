@@ -1995,11 +1995,9 @@ const Cluster3Content = () => {
                   )}
                 </div>
               </div>
-              {isEditMode && (
-                <div className="modal-footer-bottom">
-                  <p className={`modal-footer-notice ${section3FooterNotice === "error" ? "notice-error" : ""}`}>{section3FooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}</p>
-                </div>
-              )}
+              <div className="modal-footer-bottom" style={{ visibility: isEditMode ? "visible" : "hidden" }}>
+                <p className={`modal-footer-notice ${section3FooterNotice === "error" ? "notice-error" : ""}`}>{section3FooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}</p>
+              </div>
             </div>
           </div>
         </div>
