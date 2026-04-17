@@ -2966,8 +2966,8 @@
 
   .edu-modal {
     position: relative;
-    width: 1020px;
-    max-width: 1020px;
+    width: 1024px;
+    max-width: 1024px;
     height: 794px;
     max-height: 794px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
@@ -3030,9 +3030,9 @@
     .modal-header {
       position: relative;
       padding: 40px 40px 30px;
-      height: 153px;
-      min-height: 153px;
-      max-height: 153px;
+      height: 100px;
+      min-height: 100px;
+      max-height: 100px;
       flex-shrink: 0;
       box-sizing: border-box;
       background: linear-gradient(180deg, rgba(255, 165, 0, 0.1) 0%, transparent 100%);
@@ -3162,7 +3162,7 @@
 
     // 비고 내용만 표시하는 모달 스타일
     &.description-only {
-      width: 1020px;
+      width: 1024px;
 
       .modal-header {
         padding: 20px 40px 15px;
@@ -3233,10 +3233,10 @@
   }
 
   .section4-modal {
-    width: 641px;
-    height: 764px;
+    width: 540px;
+    height: 640px;
     max-width: 95vw;
-    max-height: 764px;
+    max-height: 640px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -3504,11 +3504,11 @@
   }
 
   .intro-modal {
-    width: 1214px;
-    max-width: 1214px;
-    height: 742px;
-    min-height: 742px;
-    max-height: 742px;
+    width: 1468px;
+    max-width: 1468px;
+    height: 855px;
+    min-height: 855px;
+    max-height: 855px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -3544,9 +3544,9 @@
       flex-direction: column;
       position: relative;
       padding: 20px 24px;
-      height: 153px;
-      min-height: 153px;
-      max-height: 153px;
+      height: 100px;
+      min-height: 100px;
+      max-height: 100px;
       flex-shrink: 0;
       box-sizing: border-box;
       border-bottom: none;
@@ -4020,10 +4020,10 @@
 
     .section21-modal {
       border: 1px solid #ffa500;
-      width: 1214px;
+      width: 1468px;
       max-width: 95vw;
-      height: 742px;
-      max-height: 742px;
+      height: 855px;
+      max-height: 855px;
       border-radius: 0;
       overflow: hidden;
       display: flex;
@@ -4057,9 +4057,9 @@
         flex-direction: column;
         position: relative;
         padding: 24px 32px;
-        height: 153px;
-        min-height: 153px;
-        max-height: 153px;
+        height: 100px;
+        min-height: 100px;
+        max-height: 100px;
         flex-shrink: 0;
         box-sizing: border-box;
         background: rgba(255, 165, 0, 0.05);
@@ -4320,10 +4320,10 @@
   .section1-modal {
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 1214px;
+    width: 1468px;
     max-width: 95vw;
-    height: 742px;
-    max-height: 742px;
+    height: 855px;
+    max-height: 855px;
     margin: 0;
     overflow: hidden;
     position: relative;
@@ -4357,9 +4357,9 @@
       display: flex;
       flex-direction: column;
       padding: 20px 28px;
-      height: 153px;
-      min-height: 153px;
-      max-height: 153px;
+      height: 100px;
+      min-height: 100px;
+      max-height: 100px;
       flex-shrink: 0;
       box-sizing: border-box;
       border-bottom: none;
@@ -6583,7 +6583,7 @@
   }
 
   .help-modal {
-    width: 1020px;
+    width: 1024px;
     height: 794px;
     background: var(--template-bg, #1a1a2e);
     border: 1px solid #FFA500;

@@ -2635,10 +2635,10 @@
 }
 
 .section-modal {
-  width: 1214px;
-  height: 742px;
-  max-width: 1214px;
-  max-height: 742px;
+  width: 1468px;
+  height: 855px;
+  max-width: 1468px;
+  max-height: 855px;
   border: 1px solid #ffa500 !important;
   border-radius: 0 !important;
   border-image: none !important;
@@ -2684,9 +2684,9 @@
       gap: 8px;
       width: 100%;
     }
-    height: 153px;
-    min-height: 153px;
-    max-height: 153px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
     flex-shrink: 0;
     box-sizing: border-box;
     overflow: hidden;
@@ -3578,7 +3578,7 @@
 
 // 도움말 모달
 .help-modal {
-  width: 1020px;
+  width: 1024px;
   height: 794px;
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
   border: 1px solid #ffa500;

@@ -5789,9 +5789,9 @@
 
 // ── 모달 1: 시즌 평판 작성/수정 ──
 .season-reputation-edit-modal {
-  width: 641px;
-  height: 764px;
-  max-height: 764px;
+  width: 540px;
+  height: 640px;
+  max-height: 640px;
   border: 1px solid #FFA500;
   box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
   position: relative;
@@ -5842,7 +5842,7 @@
 
 // ── 모달 2: 시즌 평판 상세 보기 ──
 .season-reputation-view-modal {
-  width: 764px;
+  width: 570px;
   height: 449px;
   max-height: 449px;
   border: 1px solid #FFA500;
@@ -5868,9 +5868,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 153px;
-    min-height: 153px;
-    max-height: 153px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
     flex-shrink: 0;
     box-sizing: border-box;
   }
@@ -5886,7 +5886,7 @@
 
 // ── 모달 3: 시즌 리뷰 (자기평가) ──
 .season-review-modal {
-  width: 764px;
+  width: 570px;
   height: 449px;
   max-height: 449px;
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
@@ -5911,9 +5911,9 @@
     padding: 20px 24px;
     border-bottom: 1px solid rgba(255, 165, 0, 0.2);
     background: rgba(255, 165, 0, 0.05);
-    height: 153px;
-    min-height: 153px;
-    max-height: 153px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
     flex-shrink: 0;
     box-sizing: border-box;
   }

@@ -3617,8 +3617,8 @@ const Sidebar = () => {
             data-modal="phone-comment"
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: "764px",
-              maxWidth: "764px",
+              width: "570px",
+              maxWidth: "570px",
               height: "449px",
               maxHeight: "449px",
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
@@ -3797,7 +3797,7 @@ const Sidebar = () => {
       {/* 연락 가능 시간대 도움말 모달 */}
       {isPhoneHelpModalOpen && (
         <div className="help-modal-overlay" onClick={() => setIsPhoneHelpModalOpen(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100vh", background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2001 }}>
-          <div className="help-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", maxWidth: "1020px", height: "794px", maxHeight: "794px", border: "1px solid #ffa500", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1024px", maxWidth: "1024px", height: "794px", maxHeight: "794px", border: "1px solid #ffa500", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
             <div className="help-modal-header" style={{ height: "153px", minHeight: "153px", maxHeight: "153px", flexShrink: 0, boxSizing: "border-box" as const, display: "flex", flexDirection: "column" as const, padding: "20px 24px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)" }}>
               <div className="modal-header-top" style={{ display: "flex", alignItems: "center", width: "100%" }}>
                 <span style={{ fontSize: "20px" }}>🔎</span>
