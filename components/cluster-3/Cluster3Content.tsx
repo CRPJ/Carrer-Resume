@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { CLUSTER3_DUMMY_PROFILE, CLUSTER3_DUMMY_ARCHIVES, CLUSTER3_DUMMY_ARCHIVE_CHANNELS, CLUSTER3_DUMMY_OUTPUTS, CLUSTER3_DUMMY_OUTPUT_CHANNELS, CLUSTER3_DUMMY_DETAILS, CLUSTER3_DUMMY_DETAIL_CHANNELS, CLUSTER3_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
+import { CLUSTER3_CHANNEL_DEFAULTS, createInitialChannelCards } from "@/constants/dummyData/cluster3-section-default";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -854,16 +855,8 @@ const Cluster3Content = () => {
   const MANAGEMENT_OPTIONS = ["개인 소유 관리", "팀 소속 협업", "기타 진행"];
   const STATUS_OPTIONS = ["운영 중", "운영 중단", "운영 보류"];
 
-  const makeDefaultCard = (id: number) => ({
-    id, title: "Career Exp Channel", badge: "D", price: "4.89", tag: "09h 99m 99s",
-    link: "", channelName: "", platform: "", management: "", startYear: "" as string, startMonth: "" as string, startDay: "" as string, rating: "" as string, status: "",
-    images: [null, null, null, null, null] as (string | null)[],
-    insight: "", experience: "", metrics: "",
-  });
-
-  const [channelCards, setChannelCards] = useState(
-    Array.from({ length: 16 }, (_, i) => makeDefaultCard(i + 1))
-  );
+  const [channelCards, setChannelCards] = useState(createInitialChannelCards());
+  const [cardSnapshot, setCardSnapshot] = useState<any>(null);
 
   const isCardComplete = (card: typeof channelCards[0]): boolean => {
     if (!card.channelName?.trim()) return false;
@@ -878,6 +871,34 @@ const Cluster3Content = () => {
     if (!card.experience?.trim()) return false;
     if (!card.metrics?.trim()) return false;
     return true;
+  };
+
+  // 편집 모드 진입 시 스냅샷 저장
+  useEffect(() => {
+    if (isEditMode && section3ModalOpen) {
+      setCardSnapshot(JSON.parse(JSON.stringify(channelCards[currentCardIndex])));
+    }
+  }, [isEditMode, section3ModalOpen, currentCardIndex]);
+
+  const isCardDirty = () => {
+    if (!cardSnapshot) return false;
+    return JSON.stringify(channelCards[currentCardIndex]) !== JSON.stringify(cardSnapshot);
+  };
+
+  const handleCloseModal = () => {
+    if (isEditMode && isCardDirty()) {
+      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+        const restored = [...channelCards];
+        restored[currentCardIndex] = JSON.parse(JSON.stringify(cardSnapshot));
+        setChannelCards(restored);
+        setSection3ModalOpen(false);
+        setIsEditMode(false);
+        setSection3FooterNotice("default");
+      }
+    } else {
+      setSection3ModalOpen(false);
+      setIsEditMode(false);
+    }
   };
 
   // 안내문 자동 복원
@@ -1660,7 +1681,7 @@ const Cluster3Content = () => {
               <div className="modal-header-top">
                 <span style={{ fontSize: "20px" }}>✍️</span>
                 <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
-                <button className="modal-close-btn" onClick={() => setSection3ModalOpen(false)}>
+                <button className="modal-close-btn" onClick={handleCloseModal}>
                   <i className="ti ti-x"></i>
                 </button>
               </div>
@@ -1824,12 +1845,13 @@ const Cluster3Content = () => {
                         className="modal-reset-btn"
                         onClick={() => {
                           if (window.confirm("내용을 모두 초기화하시겠어요?")) {
-                            const newLinks = [...editingSection3Links];
-                            newLinks[currentCardIndex] = "";
-                            setEditingSection3Links(newLinks);
-                            const newChannels = [...editingArchiveChannels];
-                            newChannels[currentCardIndex] = "";
-                            setEditingArchiveChannels(newChannels);
+                            const resetCard = currentCardIndex === 0
+                              ? { ...CLUSTER3_CHANNEL_DEFAULTS.firstCard }
+                              : { id: currentCardIndex + 1, ...CLUSTER3_CHANNEL_DEFAULTS.emptyCard };
+                            const updated = [...channelCards];
+                            updated[currentCardIndex] = resetCard;
+                            setChannelCards(updated);
+                            setSection3FooterNotice("default");
                           }
                         }}
                       >
@@ -1864,6 +1886,7 @@ const Cluster3Content = () => {
                           updated[currentCardIndex] = { ...card, images: reorderedImages };
                           setChannelCards(updated);
                           alert("저장되었어요!");
+                          setCardSnapshot(JSON.parse(JSON.stringify(updated[currentCardIndex])));
                           setIsEditMode(false);
                           setSection3FooterNotice("default");
                         }}
