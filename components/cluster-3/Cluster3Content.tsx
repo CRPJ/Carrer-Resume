@@ -892,6 +892,10 @@ const Cluster3Content = () => {
     const handler = (e: MouseEvent) => {
       const fixed = document.querySelector(".dropdown-options-fixed");
       if (fixed?.contains(e.target as Node)) return;
+      const allSelected = document.querySelectorAll(".dropdown-selected, .platform-selected");
+      for (const sel of allSelected) {
+        if (sel.contains(e.target as Node)) return;
+      }
       setOpenDropdownId(null);
       setDropdownPosition(null);
     };
