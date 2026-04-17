@@ -1862,7 +1862,7 @@ const Cluster3Content = () => {
                       <div key={si} className={`image-slot${si === 0 ? " large" : " small"}${!isSlotEnabled(si) ? " disabled" : ""}`}>
                         <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
                           {img ? <img src={img} alt={`대표 이미지 ${si + 1}`} /> : <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>}
-                          {si <= 2 && !img && <span className="image-required">*</span>}
+                          {isEditMode && si <= 2 && !img && <span className="image-required">*</span>}
                           {isEditMode && (
                             <div className="image-actions-overlay">
                               <button className="image-action-btn" onClick={(e) => { e.stopPropagation(); handleImageUploadClick(si); }} disabled={!isSlotEnabled(si)}><i className="ti ti-upload"></i></button>
