@@ -1844,7 +1844,7 @@ const Cluster3Content = () => {
                               </span>
                               {card.link && (
                                 <button className="link-open-btn" onClick={() => window.open(card.link, "_blank")}>
-                                  V
+                                  <i className="ti ti-arrow-up-right"></i>
                                 </button>
                               )}
                             </div>
