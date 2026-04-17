@@ -2702,7 +2702,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    padding: 24px 24px 16px;
+    padding: 8px 24px 16px;
 
     .modal-header-top {
       display: flex;
@@ -2782,14 +2782,14 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    padding: 20px;
+    padding: 31px 40px 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 
     .modal-top-row {
       display: flex;
-      gap: 16px;
+      gap: 24px;
       flex-shrink: 0;
       overflow: visible !important;
       margin-bottom: 0;
@@ -2797,9 +2797,9 @@
     }
 
     .channel-info-section {
-      width: 35%;
+      width: 32%;
       flex-shrink: 0;
-      padding-left: 19px;
+      margin-top: 1px;
 
       .channel-info-title {
         color: #faab07;
@@ -2807,7 +2807,7 @@
         font-weight: 700;
         margin-top: 8px;
         margin-bottom: 17px;
-        margin-left: 49px;
+        margin-left: -15px;
         line-height: 1.2;
         display: flex;
         align-items: center;
@@ -2837,17 +2837,29 @@
         align-items: center;
         gap: 12px;
         margin-bottom: 8px;
-        margin-left: 65px;
 
         input,
         .custom-dropdown,
         .platform-dropdown,
         .channel-date-input,
-        .link-field,
         .channel-name-input-wrapper {
           width: 252px;
           max-width: 252px;
           flex: none;
+        }
+        .link-field {
+          width: auto;
+          max-width: none;
+          flex: none;
+          input, .field-value {
+            width: 252px;
+            max-width: 252px;
+            flex: none;
+          }
+          .link-open-btn {
+            flex-shrink: 0;
+            margin-left: 4px;
+          }
         }
         .rating-field {
           width: 252px;
@@ -2859,14 +2871,16 @@
             max-width: auto;
             min-width: 60px;
             flex: none;
-            margin-left: 46px;
+            margin-left: 30px;
           }
         }
 
         label {
           width: 110px;
+          min-width: 110px;
           color: #fff;
-          font-size: 15px;
+          font-size: 15px !important;
+          font-family: Pretendard, sans-serif !important;
           flex-shrink: 0;
           display: flex;
           align-items: center;
@@ -2879,13 +2893,27 @@
           }
         }
 
-        .field-value {
+        .field-value,
+        .platform-display {
           color: #ccc;
-          font-size: 15px;
+          font-size: 15px !important;
+          font-family: Pretendard, sans-serif !important;
           display: flex;
           align-items: center;
+          margin-left: 0;
+          padding-left: 0;
           width: 252px;
           max-width: 252px;
+          height: 36px;
+          min-height: 36px;
+          box-sizing: border-box;
+          padding: 6px 10px;
+
+          .platform-icon {
+            width: 16px !important;
+            height: 16px !important;
+            margin-right: 4px;
+          }
         }
 
         input,
@@ -2897,7 +2925,7 @@
           max-height: 36px;
           box-sizing: border-box;
           font-family: Pretendard, sans-serif !important;
-          font-size: 14px;
+          font-size: 15px !important;
         }
 
         input,
@@ -3133,6 +3161,11 @@
         display: flex;
         align-items: center;
         gap: 2px;
+        font-family: Pretendard, sans-serif !important;
+        padding-left: 8px;
+        height: 36px;
+        min-height: 36px;
+        box-sizing: border-box;
         i {
           color: #faab07;
           font-size: 16px;
@@ -3140,7 +3173,8 @@
         .rating-text {
           margin-left: 6px;
           color: #faab07;
-          font-size: 13px;
+          font-size: 15px !important;
+          font-family: Pretendard, sans-serif !important;
           font-weight: 600;
           background: none;
           padding: 0;
@@ -3268,7 +3302,8 @@
         font-size: 14px;
         font-weight: 600;
         text-align: center;
-        padding: 8px 0;
+        padding: 8px 0 4px 0;
+        line-height: 1.2;
         margin: 0;
         border: 1px solid rgba(178, 255, 143, 0.3);
         border-bottom: none;
