@@ -1916,7 +1916,7 @@ const Cluster3Content = () => {
             </div>
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                <span className="modal-help-icon" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer", visibility: "visible" }}>
                   🔎
                 </span>
                 <div className="modal-footer-nav">
