@@ -3389,6 +3389,27 @@
       justify-content: space-between;
       width: 100%;
       border: none !important;
+      position: relative;
+
+      .modal-help-icon {
+        flex-shrink: 0;
+        width: 57px;
+      }
+
+      .modal-footer-nav {
+        flex-shrink: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .modal-footer-right {
+        flex-shrink: 0;
+        min-width: 160px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
     }
 
     .modal-footer-bottom {
