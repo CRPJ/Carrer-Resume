@@ -1738,7 +1738,7 @@ const Cluster3Content = () => {
               <div className="modal-top-row">
                 <div className="channel-info-section">
                   <h4 className="channel-info-title">
-                    <span className="user-name">{engName || "홍길동"}</span> 님의 Portfolio Channel
+                    <span className="user-name">윤재윤</span> 님의 Portfolio Channel
                   </h4>
                   {(() => {
                     const card = channelCards[currentCardIndex];
@@ -1834,7 +1834,7 @@ const Cluster3Content = () => {
                                 }}
                                 disabled={!card.link}
                               >
-                                V
+                                <i className="ti ti-arrow-up-right"></i>
                               </button>
                             </div>
                           ) : (

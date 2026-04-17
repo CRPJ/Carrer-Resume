@@ -2516,6 +2516,7 @@
     background: #1a1a2e;
     border: 1px solid #FFA500;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-family: Pretendard, sans-serif;
     max-height: 200px;
     overflow-y: auto;
     &::-webkit-scrollbar { width: 4px; }
@@ -2782,6 +2783,8 @@
           min-height: 36px;
           max-height: 36px;
           box-sizing: border-box;
+          font-family: Pretendard, sans-serif !important;
+          font-size: 14px;
         }
 
         input,
