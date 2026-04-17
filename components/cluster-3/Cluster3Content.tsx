@@ -1854,50 +1854,26 @@ const Cluster3Content = () => {
                   })()}
                 </div>
                 <div className="channel-images-section" data-field="images">
-                  <h4 className="channel-images-title">
-                    대표 이미지 <span style={{ whiteSpace: "nowrap" }}>(최소 3장 필수)</span>
-                    {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
-                    <span className="image-count" style={{ marginLeft: "8px", fontSize: "12px", color: "#999" }}>
-                      {(channelCards[currentCardIndex]?.images || []).filter((img) => img !== null).length} / 5
-                    </span>
-                  </h4>
-                  {channelCards[currentCardIndex]?.images.map((img, si) => (
-                    <div key={si} className={`image-slot${!isSlotEnabled(si) ? " disabled" : ""}`}>
-                      <div
-                        className="image-preview"
-                        onClick={() => {
-                          if (img) setPreviewImage(img);
-                        }}
-                      >
-                        {img ? (
-                          <img src={img} alt={`대표 이미지 ${si + 1}`} />
-                        ) : (
-                          <div className="empty-slot">
-                            <i className="ti ti-photo-plus"></i>
-                          </div>
-                        )}
-                      </div>
-                      {isEditMode && (
-                        <div className="image-actions">
-                          <button className="image-action-btn" onClick={() => handleImageUploadClick(si)} disabled={!isSlotEnabled(si)}>
-                            <i className="ti ti-upload"></i>
-                          </button>
-                          <button className="image-action-btn" onClick={() => handleImageDelete(si)} disabled={!isSlotEnabled(si) || !img}>
-                            <i className="ti ti-trash"></i>
-                          </button>
+                  {/* 대표 이미지 타이틀 — 주석 처리
+                  <h4 className="channel-images-title">대표 이미지 (최소 3장 필수)</h4>
+                  */}
+                  <div className="images-grid">
+                    {channelCards[currentCardIndex]?.images.map((img, si) => (
+                      <div key={si} className={`image-slot${si === 0 ? " large" : " small"}${!isSlotEnabled(si) ? " disabled" : ""}`}>
+                        <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
+                          {img ? <img src={img} alt={`대표 이미지 ${si + 1}`} /> : <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>}
+                          {si <= 2 && <span className="image-required">*</span>}
+                          {isEditMode && (
+                            <div className="image-actions-overlay">
+                              <button className="image-action-btn" onClick={(e) => { e.stopPropagation(); handleImageUploadClick(si); }} disabled={!isSlotEnabled(si)}><i className="ti ti-upload"></i></button>
+                              <button className="image-action-btn" onClick={(e) => { e.stopPropagation(); handleImageDelete(si); }} disabled={!isSlotEnabled(si) || !img}><i className="ti ti-trash"></i></button>
+                            </div>
+                          )}
                         </div>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={(el) => {
-                          imageInputRefs.current[si] = el;
-                        }}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleImageFileChange(e, si)}
-                      />
-                    </div>
-                  ))}
+                        <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[si] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, si)} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="channel-bottom-section">
