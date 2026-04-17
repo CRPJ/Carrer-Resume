@@ -873,16 +873,16 @@ const Cluster3Content = () => {
   const [channelCards, setChannelCards] = useState(createInitialChannelCards());
   const [cardSnapshot, setCardSnapshot] = useState<any>(null);
 
-  const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
-  const platformDropdownRef = useRef<HTMLDivElement>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!platformDropdownOpen) return;
+    if (!openDropdownId) return;
     const handler = (e: MouseEvent) => {
-      if (platformDropdownRef.current && !platformDropdownRef.current.contains(e.target as Node)) setPlatformDropdownOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpenDropdownId(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [platformDropdownOpen]);
+  }, [openDropdownId]);
 
   const isCardComplete = (card: typeof channelCards[0]): boolean => {
     if (!card.channelName?.trim()) return false;
@@ -1725,18 +1725,27 @@ const Cluster3Content = () => {
                         )}
                         {f.type === "select" && (
                           isEditMode ? (
-                            <select value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)}>
-                              <option value="">선택하세요</option>
-                              {f.options!.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-                            </select>
+                            <div className="custom-dropdown" ref={openDropdownId === f.key ? dropdownRef : undefined}>
+                              <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === f.key ? null : f.key)}>
+                                <span>{(card as any)[f.key] || "선택하세요"}</span>
+                                <i className="ti ti-chevron-down"></i>
+                              </div>
+                              {openDropdownId === f.key && (
+                                <div className="dropdown-options">
+                                  {f.options!.map((opt) => (
+                                    <div key={opt} className={`dropdown-option${(card as any)[f.key] === opt ? " selected" : ""}`} onClick={() => { handleCardChange(f.key, opt); setOpenDropdownId(null); }}>{opt}</div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <span className="field-value">{(card as any)[f.key] || "-"}</span>
                           )
                         )}
                         {f.type === "platformDropdown" && (
                           isEditMode ? (
-                            <div className="platform-dropdown" ref={platformDropdownRef}>
-                              <div className="platform-selected" onClick={() => setPlatformDropdownOpen(!platformDropdownOpen)}>
+                            <div className="platform-dropdown" ref={openDropdownId === "platform" ? dropdownRef : undefined}>
+                              <div className="platform-selected" onClick={() => setOpenDropdownId(openDropdownId === "platform" ? null : "platform")}>
                                 {card.platform ? (
                                   <>
                                     {PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className="platform-icon" />}
@@ -1747,10 +1756,10 @@ const Cluster3Content = () => {
                                 )}
                                 <i className="ti ti-chevron-down"></i>
                               </div>
-                              {platformDropdownOpen && (
+                              {openDropdownId === "platform" && (
                                 <div className="platform-dropdown-options">
                                   {PLATFORM_OPTIONS.map((p) => (
-                                    <div key={p} className={`platform-option${card.platform === p ? " selected" : ""}`} onClick={() => { handleCardChange("platform", p); setPlatformDropdownOpen(false); }}>
+                                    <div key={p} className={`platform-option${card.platform === p ? " selected" : ""}`} onClick={() => { handleCardChange("platform", p); setOpenDropdownId(null); }}>
                                       {PLATFORM_ICONS[p] ? <img src={PLATFORM_ICONS[p]} alt={p} className="platform-icon" /> : <span className="platform-icon-placeholder" />}
                                       <span>{p}</span>
                                     </div>
@@ -1768,32 +1777,48 @@ const Cluster3Content = () => {
                         {f.type === "date" && (
                           isEditMode ? (
                             <div className="date-picker-row">
-                              <select value={card.startYear || ""} onChange={(e) => handleCardChange("startYear", e.target.value)}>
-                                <option value="">년</option>
-                                {Array.from({ length: 36 }, (_, i) => 1990 + i).map((y) => <option key={y} value={String(y)}>{y}</option>)}
-                              </select>
-                              <select value={card.startMonth || ""} onChange={(e) => handleCardChange("startMonth", e.target.value)}>
-                                <option value="">월</option>
-                                {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => <option key={m} value={m}>{m}</option>)}
-                              </select>
-                              <select value={card.startDay || ""} onChange={(e) => handleCardChange("startDay", e.target.value)}>
-                                <option value="">일</option>
-                                {Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0")).map((d) => <option key={d} value={d}>{d}</option>)}
-                              </select>
+                              {(["startYear", "startMonth", "startDay"] as const).map((dk, di) => (
+                                <React.Fragment key={dk}>
+                                  {di > 0 && <span className="date-separator">.</span>}
+                                  <div className="custom-dropdown small" ref={openDropdownId === dk ? dropdownRef : undefined}>
+                                    <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === dk ? null : dk)}>
+                                      <span>{(card as any)[dk] || (dk === "startYear" ? "년" : dk === "startMonth" ? "월" : "일")}</span>
+                                      <i className="ti ti-chevron-down"></i>
+                                    </div>
+                                    {openDropdownId === dk && (
+                                      <div className="dropdown-options">
+                                        {(dk === "startYear" ? Array.from({ length: 37 }, (_, i) => String(2026 - i)) : dk === "startMonth" ? Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")) : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"))).map((v) => (
+                                          <div key={v} className={`dropdown-option${(card as any)[dk] === v ? " selected" : ""}`} onClick={() => { handleCardChange(dk, v); setOpenDropdownId(null); }}>{v}</div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </React.Fragment>
+                              ))}
                             </div>
                           ) : (
                             <span className="field-value">{formatDate(card.startYear, card.startMonth, card.startDay)}</span>
                           )
                         )}
                         {f.type === "rating" && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-                            {isEditMode ? (
-                              <select value={card.rating || ""} onChange={(e) => handleCardChange("rating", e.target.value)}>
-                                <option value="">선택</option>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => <option key={n} value={String(n)}>{n}</option>)}
-                              </select>
-                            ) : null}
+                          <div className="rating-field" style={{ flex: 1 }}>
                             <StarRating rating={Number(card.rating) || 0} />
+                            {isEditMode && (
+                              <div className="custom-dropdown small" ref={openDropdownId === "rating" ? dropdownRef : undefined}>
+                                <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === "rating" ? null : "rating")}>
+                                  <span>{card.rating || "선택"}</span>
+                                  <i className="ti ti-chevron-down"></i>
+                                </div>
+                                {openDropdownId === "rating" && (
+                                  <div className="dropdown-options">
+                                    {[1,2,3,4,5,6,7,8,9,10].map((n) => (
+                                      <div key={n} className={`dropdown-option${String(card.rating) === String(n) ? " selected" : ""}`} onClick={() => { handleCardChange("rating", String(n)); setOpenDropdownId(null); }}>{n}</div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>/ 10</span>
                           </div>
                         )}
                         {f.type === "link" && (
@@ -1959,16 +1984,18 @@ const Cluster3Content = () => {
 
       {/* 도움말 모달 */}
       {showHelpModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100001 }} onClick={() => setShowHelpModal(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", background: "linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
-            <div style={{ height: "153px", minHeight: "153px", flexShrink: 0, display: "flex", flexDirection: "column" as const, padding: "20px 24px", boxSizing: "border-box" as const }}>
-              <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <div className="help-modal-overlay" onClick={() => setShowHelpModal(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100001 }}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="help-modal-header">
+              <div className="modal-header-top">
                 <span style={{ fontSize: "20px" }}>🔎</span>
-                <h3 style={{ margin: 0, color: "#ffa500", fontSize: "2.0625rem", fontWeight: 700, flex: 1, marginLeft: "10px" }}>도움말</h3>
-                <button onClick={() => setShowHelpModal(false)} style={{ background: "transparent", border: "none", color: "#ffa500", fontSize: "20px", cursor: "pointer" }}>✕</button>
+                <h3>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setShowHelpModal(false)}>
+                  <i className="ti ti-x"></i>
+                </button>
               </div>
             </div>
-            <div style={{ flex: 1, padding: "24px", overflowY: "auto" }}>{/* 빈 콘텐츠 */}</div>
+            <div className="help-modal-body">{/* 빈 콘텐츠 */}</div>
           </div>
         </div>
       )}
