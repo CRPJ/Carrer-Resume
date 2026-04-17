@@ -851,12 +851,36 @@ const Cluster3Content = () => {
     "/images/0/cluster 3/icon/etc 3.png",
   ];
 
-  const PLATFORM_OPTIONS = ["유튜브", "인스타그램", "블로그(네이버)", "티스토리", "X(트위터)", "스레드(메타)", "카카오스토리", "핀터레스트", "틱톡", "비핸스", "노션"];
+  const PLATFORM_ICONS: Record<string, string> = {
+    "유튜브": "/images/0/cluster 3/icon/Youtube.png",
+    "인스타그램": "/images/0/cluster 3/icon/Instagram.png",
+    "블로그(네이버)": "/images/0/cluster 3/icon/Naver Blog.png",
+    "티스토리": "/images/0/cluster 3/icon/Tstory.png",
+    "X(트위터)": "/images/0/cluster 3/icon/X.png",
+    "스레드(메타)": "/images/0/cluster 3/icon/Threads.png",
+    "카카오스토리": "",
+    "핀터레스트": "",
+    "틱톡": "/images/0/cluster 3/icon/TikTok.png",
+    "비핸스": "/images/0/cluster 3/icon/Behance.png",
+    "노션": "",
+  };
+  const PLATFORM_OPTIONS = Object.keys(PLATFORM_ICONS);
   const MANAGEMENT_OPTIONS = ["개인 소유 관리", "팀 소속 협업", "기타 진행"];
   const STATUS_OPTIONS = ["운영 중", "운영 중단", "운영 보류"];
 
   const [channelCards, setChannelCards] = useState(createInitialChannelCards());
   const [cardSnapshot, setCardSnapshot] = useState<any>(null);
+
+  const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
+  const platformDropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!platformDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (platformDropdownRef.current && !platformDropdownRef.current.contains(e.target as Node)) setPlatformDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [platformDropdownOpen]);
 
   const isCardComplete = (card: typeof channelCards[0]): boolean => {
     if (!card.channelName?.trim()) return false;
@@ -1697,7 +1721,7 @@ const Cluster3Content = () => {
                     if (!card) return null;
                     const fields = [
                       { label: "채널명", key: "channelName", type: "text", placeholder: "@채널명을 입력하세요" },
-                      { label: "채널 플랫폼", key: "platform", type: "select", options: PLATFORM_OPTIONS },
+                      { label: "채널 플랫폼", key: "platform", type: "platformDropdown" },
                       { label: "채널 관리", key: "management", type: "select", options: MANAGEMENT_OPTIONS },
                       { label: "채널 시작", key: "date", type: "date" },
                       { label: "채널 평가", key: "rating", type: "rating" },
@@ -1722,6 +1746,38 @@ const Cluster3Content = () => {
                             </select>
                           ) : (
                             <span className="field-value">{(card as any)[f.key] || "-"}</span>
+                          )
+                        )}
+                        {f.type === "platformDropdown" && (
+                          isEditMode ? (
+                            <div className="platform-dropdown" ref={platformDropdownRef}>
+                              <div className="platform-selected" onClick={() => setPlatformDropdownOpen(!platformDropdownOpen)}>
+                                {card.platform ? (
+                                  <>
+                                    {PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className="platform-icon" />}
+                                    <span>{card.platform}</span>
+                                  </>
+                                ) : (
+                                  <span className="placeholder">선택하세요</span>
+                                )}
+                                <i className="ti ti-chevron-down"></i>
+                              </div>
+                              {platformDropdownOpen && (
+                                <div className="platform-dropdown-options">
+                                  {PLATFORM_OPTIONS.map((p) => (
+                                    <div key={p} className={`platform-option${card.platform === p ? " selected" : ""}`} onClick={() => { handleCardChange("platform", p); setPlatformDropdownOpen(false); }}>
+                                      {PLATFORM_ICONS[p] ? <img src={PLATFORM_ICONS[p]} alt={p} className="platform-icon" /> : <span className="platform-icon-placeholder" />}
+                                      <span>{p}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="platform-display" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              {PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className="platform-icon" style={{ width: "20px", height: "20px", objectFit: "contain" }} />}
+                              <span className="field-value">{card.platform || "-"}</span>
+                            </div>
                           )
                         )}
                         {f.type === "date" && (

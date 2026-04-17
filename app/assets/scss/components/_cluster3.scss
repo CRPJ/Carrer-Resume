@@ -2734,6 +2734,54 @@
           }
         }
 
+        .platform-dropdown {
+          position: relative;
+          flex: 1;
+
+          .platform-selected {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: transparent;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            .placeholder { color: rgba(255, 255, 255, 0.5); }
+            .ti-chevron-down { margin-left: auto; }
+            &:hover { border-color: #FAAB07; }
+          }
+
+          .platform-icon { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
+          .platform-icon-placeholder { display: inline-block; width: 20px; height: 20px; }
+
+          .platform-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border: 1px solid #FFA500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+
+            .platform-option {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 10px;
+              color: #fff;
+              font-size: 14px;
+              cursor: pointer;
+              &:hover { background: rgba(250, 171, 7, 0.15); }
+              &.selected { background: rgba(250, 171, 7, 0.25); color: #FAAB07; }
+            }
+          }
+        }
+
         .link-field {
           display: flex;
           gap: 4px;
