@@ -1951,7 +1951,7 @@ const Cluster3Content = () => {
       )}
       {previewImage && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
-          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
         </div>
@@ -1960,7 +1960,7 @@ const Cluster3Content = () => {
       {/* 도움말 모달 */}
       {showHelpModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100001 }} onClick={() => setShowHelpModal(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", background: "linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%)", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
             <div style={{ height: "153px", minHeight: "153px", flexShrink: 0, display: "flex", flexDirection: "column" as const, padding: "20px 24px", boxSizing: "border-box" as const }}>
               <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                 <span style={{ fontSize: "20px" }}>🔎</span>
