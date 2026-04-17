@@ -1820,7 +1820,6 @@ const Cluster3Content = () => {
                                 </div>
                               </div>
                             )}
-                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>/ 10</span>
                           </div>
                         )}
                         {f.type === "link" &&
