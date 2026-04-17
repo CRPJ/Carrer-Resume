@@ -2691,6 +2691,7 @@
         gap: 20px;
         flex-shrink: 0;
         overflow: visible !important;
+        margin-bottom: 24px;
       }
 
       .channel-info-section {
@@ -2982,7 +2983,7 @@
             font-size: 13px;
             font-family: Pretendard;
             resize: none;
-            min-height: 360px;
+            min-height: 265px;
             &:focus { outline: none; }
           }
 
@@ -2991,7 +2992,7 @@
             padding: 10px;
             color: #fff;
             font-size: 13px;
-            min-height: 360px;
+            min-height: 265px;
             white-space: pre-wrap;
             overflow-y: auto;
           }

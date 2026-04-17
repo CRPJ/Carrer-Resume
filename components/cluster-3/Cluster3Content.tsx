@@ -60,15 +60,15 @@ const Cluster3Content = () => {
 
   // scrollTo query parameter 처리 (Sidebar hex3에서 이동 시)
   useEffect(() => {
-    const scrollTarget = searchParams.get('scrollTo');
+    const scrollTarget = searchParams.get("scrollTo");
     if (scrollTarget) {
       const timer = setTimeout(() => {
-        const section = document.querySelector('.' + scrollTarget);
+        const section = document.querySelector("." + scrollTarget);
         if (section) {
           const offset = 120;
-          window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+          window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: "smooth" });
         }
-        window.history.replaceState({}, '', window.location.pathname);
+        window.history.replaceState({}, "", window.location.pathname);
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -350,7 +350,7 @@ const Cluster3Content = () => {
     { value: "", label: "채널 선택", icon: "" },
     { value: "instagram", label: "인스타그램", icon: "/images/0/cluster 3/icon/Instagram.png" },
     { value: "youtube", label: "유튜브", icon: "/images/0/cluster 3/icon/Youtube.png" },
-    { value: "blog", label: "블로그", icon: "/images/0/cluster 3/icon/Naver Blog.png" },
+    { value: "blog", label: "블로그", icon: "/images/0/cluster 3/icon/naver blog.png" },
     { value: "tistory", label: "티스토리", icon: "/images/0/cluster 3/icon/Tstory.png" },
     { value: "twitter", label: "X(트위터)", icon: "/images/0/cluster 3/icon/X.png" },
     { value: "threads", label: "쓰레드", icon: "/images/0/cluster 3/icon/Threads.png" },
@@ -854,17 +854,17 @@ const Cluster3Content = () => {
   ];
 
   const PLATFORM_ICONS: Record<string, string> = {
-    "유튜브": "/images/0/cluster 3/icon/Youtube.png",
-    "인스타그램": "/images/0/cluster 3/icon/Instagram.png",
+    유튜브: "/images/0/cluster 3/icon/Youtube.png",
+    인스타그램: "/images/0/cluster 3/icon/Instagram.png",
     "블로그(네이버)": "/images/0/cluster 3/icon/Naver Blog.png",
-    "티스토리": "/images/0/cluster 3/icon/Tstory.png",
+    티스토리: "/images/0/cluster 3/icon/Tstory.png",
     "X(트위터)": "/images/0/cluster 3/icon/X.png",
     "스레드(메타)": "/images/0/cluster 3/icon/Threads.png",
-    "카카오스토리": "/images/0/cluster 3/kakao story.svg",
-    "핀터레스트": "/images/0/cluster 3/pinterest.png",
-    "틱톡": "/images/0/cluster 3/icon/TikTok.png",
-    "비핸스": "/images/0/cluster 3/icon/Behance.png",
-    "노션": "/images/0/cluster 3/notion.png",
+    카카오스토리: "/images/0/cluster 3/story.png",
+    핀터레스트: "/images/0/cluster 3/pinterest.png",
+    틱톡: "/images/0/cluster 3/icon/TikTok.png",
+    비핸스: "/images/0/cluster 3/icon/Behance.png",
+    노션: "/images/0/cluster 3/notion.png",
   };
   const PLATFORM_OPTIONS = Object.keys(PLATFORM_ICONS);
   const MANAGEMENT_OPTIONS = ["개인 소유 관리", "팀 소속 협업", "기타 진행"];
@@ -884,7 +884,7 @@ const Cluster3Content = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, [openDropdownId]);
 
-  const isCardComplete = (card: typeof channelCards[0]): boolean => {
+  const isCardComplete = (card: (typeof channelCards)[0]): boolean => {
     if (!card.channelName?.trim()) return false;
     if (!card.platform) return false;
     if (!card.management) return false;
@@ -989,9 +989,17 @@ const Cluster3Content = () => {
     const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
     return (
       <span className="star-rating">
-        {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+        {Array(fullStars)
+          .fill(0)
+          .map((_, i) => (
+            <i key={`f${i}`} className="ti ti-star-filled" />
+          ))}
         {hasHalf && <i className="ti ti-star-half-filled" />}
-        {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+        {Array(emptyStars)
+          .fill(0)
+          .map((_, i) => (
+            <i key={`e${i}`} className="ti ti-star" />
+          ))}
         <span className="rating-text">{r}/10</span>
       </span>
     );
@@ -1438,7 +1446,15 @@ const Cluster3Content = () => {
               );
             }
             return (
-              <div key={card.id} className={`channel-card${card.link ? " has-link" : ""}`} style={{ cursor: "pointer" }} onClick={() => { setCurrentCardIndex(actualIndex); setSection3ModalOpen(true); }}>
+              <div
+                key={card.id}
+                className={`channel-card${card.link ? " has-link" : ""}`}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setCurrentCardIndex(actualIndex);
+                  setSection3ModalOpen(true);
+                }}
+              >
                 <div className="card-image">
                   <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.tag}</div>
@@ -1477,9 +1493,13 @@ const Cluster3Content = () => {
 
         {/* 섹션 3 페이지네이션 */}
         <div className="section3-pagination">
-          <span className={`page-num ${section3Page === 0 ? "active" : ""}`} onClick={() => setSection3Page(0)}>1</span>
+          <span className={`page-num ${section3Page === 0 ? "active" : ""}`} onClick={() => setSection3Page(0)}>
+            1
+          </span>
           {showPage2 && (
-            <span className={`page-num ${section3Page === 1 ? "active" : ""} last`} onClick={() => setSection3Page(1)}>2</span>
+            <span className={`page-num ${section3Page === 1 ? "active" : ""} last`} onClick={() => setSection3Page(1)}>
+              2
+            </span>
           )}
         </div>
       </section>
@@ -1715,16 +1735,13 @@ const Cluster3Content = () => {
                     ];
                     return fields.map((f) => (
                       <div key={f.key} className="channel-info-field">
-                        <label>{f.label}{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}</label>
-                        {f.type === "text" && (
-                          isEditMode ? (
-                            <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} />
-                          ) : (
-                            <span className="field-value">{(card as any)[f.key] || "-"}</span>
-                          )
-                        )}
-                        {f.type === "select" && (
-                          isEditMode ? (
+                        <label>
+                          {f.label}
+                          {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                        </label>
+                        {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
+                        {f.type === "select" &&
+                          (isEditMode ? (
                             <div className="custom-dropdown" ref={openDropdownId === f.key ? dropdownRef : undefined}>
                               <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === f.key ? null : f.key)}>
                                 <span>{(card as any)[f.key] || "선택하세요"}</span>
@@ -1733,17 +1750,25 @@ const Cluster3Content = () => {
                               {openDropdownId === f.key && (
                                 <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                   {f.options!.map((opt) => (
-                                    <div key={opt} className={`dropdown-option${(card as any)[f.key] === opt ? " selected" : ""}`} onClick={() => { handleCardChange(f.key, opt); setOpenDropdownId(null); }}>{opt}</div>
+                                    <div
+                                      key={opt}
+                                      className={`dropdown-option${(card as any)[f.key] === opt ? " selected" : ""}`}
+                                      onClick={() => {
+                                        handleCardChange(f.key, opt);
+                                        setOpenDropdownId(null);
+                                      }}
+                                    >
+                                      {opt}
+                                    </div>
                                   ))}
                                 </div>
                               )}
                             </div>
                           ) : (
                             <span className="field-value">{(card as any)[f.key] || "-"}</span>
-                          )
-                        )}
-                        {f.type === "platformDropdown" && (
-                          isEditMode ? (
+                          ))}
+                        {f.type === "platformDropdown" &&
+                          (isEditMode ? (
                             <div className="platform-dropdown" ref={openDropdownId === "platform" ? dropdownRef : undefined}>
                               <div className="platform-selected" onClick={() => setOpenDropdownId(openDropdownId === "platform" ? null : "platform")}>
                                 {card.platform ? (
@@ -1759,7 +1784,14 @@ const Cluster3Content = () => {
                               {openDropdownId === "platform" && (
                                 <div className="platform-dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                   {PLATFORM_OPTIONS.map((p) => (
-                                    <div key={p} className={`platform-option${card.platform === p ? " selected" : ""}`} onClick={() => { handleCardChange("platform", p); setOpenDropdownId(null); }}>
+                                    <div
+                                      key={p}
+                                      className={`platform-option${card.platform === p ? " selected" : ""}`}
+                                      onClick={() => {
+                                        handleCardChange("platform", p);
+                                        setOpenDropdownId(null);
+                                      }}
+                                    >
                                       {PLATFORM_ICONS[p] ? <img src={PLATFORM_ICONS[p]} alt={p} className="platform-icon" /> : <span className="platform-icon-placeholder" />}
                                       <span>{p}</span>
                                     </div>
@@ -1772,10 +1804,9 @@ const Cluster3Content = () => {
                               {PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className="platform-icon" style={{ width: "20px", height: "20px", objectFit: "contain" }} />}
                               <span className="field-value">{card.platform || "-"}</span>
                             </div>
-                          )
-                        )}
-                        {f.type === "date" && (
-                          isEditMode ? (
+                          ))}
+                        {f.type === "date" &&
+                          (isEditMode ? (
                             <div className="date-picker-row">
                               {(["startYear", "startMonth", "startDay"] as const).map((dk, di) => (
                                 <React.Fragment key={dk}>
@@ -1788,7 +1819,16 @@ const Cluster3Content = () => {
                                     {openDropdownId === dk && (
                                       <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                         {(dk === "startYear" ? Array.from({ length: 37 }, (_, i) => String(2026 - i)) : dk === "startMonth" ? Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")) : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"))).map((v) => (
-                                          <div key={v} className={`dropdown-option${(card as any)[dk] === v ? " selected" : ""}`} onClick={() => { handleCardChange(dk, v); setOpenDropdownId(null); }}>{v}</div>
+                                          <div
+                                            key={v}
+                                            className={`dropdown-option${(card as any)[dk] === v ? " selected" : ""}`}
+                                            onClick={() => {
+                                              handleCardChange(dk, v);
+                                              setOpenDropdownId(null);
+                                            }}
+                                          >
+                                            {v}
+                                          </div>
                                         ))}
                                       </div>
                                     )}
@@ -1798,8 +1838,7 @@ const Cluster3Content = () => {
                             </div>
                           ) : (
                             <span className="field-value">{formatDate(card.startYear, card.startMonth, card.startDay)}</span>
-                          )
-                        )}
+                          ))}
                         {f.type === "rating" && (
                           <div className="rating-field" style={{ flex: 1 }}>
                             <StarRating rating={Number(card.rating) || 0} />
@@ -1811,71 +1850,132 @@ const Cluster3Content = () => {
                                 </div>
                                 {openDropdownId === "rating" && (
                                   <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
-                                    {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-                                      <div key={n} className={`dropdown-option${String(card.rating) === String(n) ? " selected" : ""}`} onClick={() => { handleCardChange("rating", String(n)); setOpenDropdownId(null); }}>{n}</div>
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                      <div
+                                        key={n}
+                                        className={`dropdown-option${String(card.rating) === String(n) ? " selected" : ""}`}
+                                        onClick={() => {
+                                          handleCardChange("rating", String(n));
+                                          setOpenDropdownId(null);
+                                        }}
+                                      >
+                                        {n}
+                                      </div>
                                     ))}
                                   </div>
                                 )}
                               </div>
                             )}
-                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>/ 10</span>
+                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>
+                              / 10
+                            </span>
                           </div>
                         )}
-                        {f.type === "link" && (
-                          isEditMode ? (
+                        {f.type === "link" &&
+                          (isEditMode ? (
                             <div className="link-field">
                               <input type="text" value={card.link || ""} onChange={(e) => handleCardChange("link", e.target.value)} placeholder="https://..." style={{ whiteSpace: "nowrap" as const, overflow: "auto" }} />
-                              <button className="link-open-btn" onClick={() => { if (card.link) window.open(card.link, "_blank"); }} disabled={!card.link}>V</button>
+                              <button
+                                className="link-open-btn"
+                                onClick={() => {
+                                  if (card.link) window.open(card.link, "_blank");
+                                }}
+                                disabled={!card.link}
+                              >
+                                V
+                              </button>
                             </div>
                           ) : (
                             <div className="link-field">
-                              <span className="field-value" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{card.link || "-"}</span>
-                              {card.link && <button className="link-open-btn" onClick={() => window.open(card.link, "_blank")}>V</button>}
+                              <span className="field-value" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+                                {card.link || "-"}
+                              </span>
+                              {card.link && (
+                                <button className="link-open-btn" onClick={() => window.open(card.link, "_blank")}>
+                                  V
+                                </button>
+                              )}
                             </div>
-                          )
-                        )}
+                          ))}
                       </div>
                     ));
                   })()}
                 </div>
                 <div className="channel-images-section">
                   <h4 className="channel-images-title">
-                    대표 이미지 <span style={{ whiteSpace: "nowrap" }}>(최소 3장 필수)</span>{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                    대표 이미지 <span style={{ whiteSpace: "nowrap" }}>(최소 3장 필수)</span>
+                    {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
                     <span className="image-count" style={{ marginLeft: "8px", fontSize: "12px", color: "#999" }}>
                       {(channelCards[currentCardIndex]?.images || []).filter((img) => img !== null).length} / 5
                     </span>
                   </h4>
                   {channelCards[currentCardIndex]?.images.map((img, si) => (
                     <div key={si} className={`image-slot${!isSlotEnabled(si) ? " disabled" : ""}`}>
-                      <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
-                        {img ? <img src={img} alt={`대표 이미지 ${si + 1}`} /> : <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>}
+                      <div
+                        className="image-preview"
+                        onClick={() => {
+                          if (img) setPreviewImage(img);
+                        }}
+                      >
+                        {img ? (
+                          <img src={img} alt={`대표 이미지 ${si + 1}`} />
+                        ) : (
+                          <div className="empty-slot">
+                            <i className="ti ti-photo-plus"></i>
+                          </div>
+                        )}
                       </div>
                       {isEditMode && (
                         <div className="image-actions">
-                          <button className="image-action-btn" onClick={() => handleImageUploadClick(si)} disabled={!isSlotEnabled(si)}><i className="ti ti-upload"></i></button>
-                          <button className="image-action-btn" onClick={() => handleImageDelete(si)} disabled={!isSlotEnabled(si) || !img}><i className="ti ti-trash"></i></button>
+                          <button className="image-action-btn" onClick={() => handleImageUploadClick(si)} disabled={!isSlotEnabled(si)}>
+                            <i className="ti ti-upload"></i>
+                          </button>
+                          <button className="image-action-btn" onClick={() => handleImageDelete(si)} disabled={!isSlotEnabled(si) || !img}>
+                            <i className="ti ti-trash"></i>
+                          </button>
                         </div>
                       )}
-                      <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[si] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, si)} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={(el) => {
+                          imageInputRefs.current[si] = el;
+                        }}
+                        style={{ display: "none" }}
+                        onChange={(e) => handleImageFileChange(e, si)}
+                      />
                     </div>
                   ))}
                 </div>
               </div>
               <div className="channel-bottom-section">
-                {([
-                  { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 400자)" },
-                  { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 400자)" },
-                  { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 400자)" },
-                ] as const).map((box) => {
+                {(
+                  [
+                    { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 400자)" },
+                    { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 400자)" },
+                    { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 400자)" },
+                  ] as const
+                ).map((box) => {
                   const card = channelCards[currentCardIndex];
                   const val = (card as any)[box.key] || "";
                   return (
                     <div key={box.key} className="channel-textarea-box">
-                      <h5 className="textarea-title">{box.title}{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}</h5>
+                      <h5 className="textarea-title">
+                        {box.title}
+                        {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                      </h5>
                       <div className="textarea-wrapper">
                         {isEditMode ? (
                           <>
-                            <textarea value={val} onChange={(e) => { if (e.target.value.length <= 400) handleCardChange(box.key, e.target.value); }} maxLength={400} placeholder={box.placeholder} rows={6} />
+                            <textarea
+                              value={val}
+                              onChange={(e) => {
+                                if (e.target.value.length <= 400) handleCardChange(box.key, e.target.value);
+                              }}
+                              maxLength={400}
+                              placeholder={box.placeholder}
+                              rows={6}
+                            />
                             <span className="char-count">{val.length}/400</span>
                           </>
                         ) : (
@@ -1911,9 +2011,7 @@ const Cluster3Content = () => {
                         className="modal-reset-btn"
                         onClick={() => {
                           if (window.confirm("내용을 모두 초기화하시겠어요?")) {
-                            const resetCard = currentCardIndex === 0
-                              ? { ...CLUSTER3_CHANNEL_DEFAULTS.firstCard }
-                              : { id: currentCardIndex + 1, ...CLUSTER3_CHANNEL_DEFAULTS.emptyCard };
+                            const resetCard = currentCardIndex === 0 ? { ...CLUSTER3_CHANNEL_DEFAULTS.firstCard } : { id: currentCardIndex + 1, ...CLUSTER3_CHANNEL_DEFAULTS.emptyCard };
                             const updated = [...channelCards];
                             updated[currentCardIndex] = resetCard;
                             setChannelCards(updated);
@@ -1965,9 +2063,7 @@ const Cluster3Content = () => {
               </div>
               {isEditMode && (
                 <div className="modal-footer-bottom">
-                  <p className={`modal-footer-notice ${section3FooterNotice === "error" ? "notice-error" : ""}`}>
-                    {section3FooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
-                  </p>
+                  <p className={`modal-footer-notice ${section3FooterNotice === "error" ? "notice-error" : ""}`}>{section3FooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}</p>
                 </div>
               )}
             </div>
@@ -1976,7 +2072,11 @@ const Cluster3Content = () => {
       )}
       {previewImage && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
-          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <div
+            className="image-preview-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+          >
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
         </div>
