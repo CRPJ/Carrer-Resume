@@ -2790,13 +2790,20 @@
           input { flex: 1; }
 
           .link-open-btn {
-            width: 36px;
-            height: 28px;
+            min-width: 32px;
+            height: 32px;
             background: #FAAB07;
             border: none;
+            border-radius: 0;
             color: #1a1a1a;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            &:hover:not(:disabled) { background: #FFB820; }
             &:disabled { opacity: 0.3; cursor: not-allowed; }
           }
         }
@@ -2807,12 +2814,12 @@
           gap: 2px;
           i { color: #FAAB07; font-size: 16px; }
           .rating-text {
-            margin-left: 8px;
-            background: #FAAB07;
-            color: #1a1a1a;
-            padding: 2px 6px;
-            font-size: 12px;
+            margin-left: 6px;
+            color: #FAAB07;
+            font-size: 13px;
             font-weight: 600;
+            background: none;
+            padding: 0;
           }
         }
       }
@@ -2938,10 +2945,11 @@
         }
       }
 
-      &::-webkit-scrollbar { width: 3px; }
-      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
-      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
-      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      overflow-y: scroll !important;
+      &::-webkit-scrollbar { width: 6px !important; display: block !important; }
+      &::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05) !important; border-radius: 3px !important; }
+      &::-webkit-scrollbar-thumb { background: rgba(250, 171, 7, 0.3) !important; border-radius: 3px !important; }
+      &::-webkit-scrollbar-thumb:hover { background: rgba(250, 171, 7, 0.5) !important; }
       scrollbar-width: thin;
       scrollbar-color: #FFA500 #252836;
 
@@ -3111,11 +3119,60 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
+        border: none !important;
       }
 
       .modal-footer-bottom {
         width: 100%;
-        text-align: right;
+        text-align: right !important;
+        border: none !important;
+
+        .modal-footer-notice {
+          text-align: right !important;
+          font-size: 15px;
+          color: #FAAB07;
+          &.notice-error { color: #ff4444 !important; }
+        }
+      }
+
+      .modal-footer-right {
+        border: none !important;
+      }
+
+      .modal-help-icon {
+        font-size: 30px;
+        width: 57px;
+        height: 57px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .modal-reset-btn {
+        padding: 8px 20px;
+        border: 1px solid #4CAF50;
+        background: transparent;
+        color: #4CAF50;
+        border-radius: 0;
+        font-size: 14px;
+        font-family: Pretendard;
+        cursor: pointer;
+        &:hover { background: rgba(76, 175, 80, 0.1); }
+      }
+
+      .modal-save-btn {
+        padding: 8px 20px;
+        border: 1px solid transparent;
+        background: #FAAB07;
+        color: #1a1a1a;
+        border-radius: 0;
+        font-weight: 600;
+        font-size: 14px;
+        font-family: Pretendard;
+        cursor: pointer;
+        &:hover { background: #FFB820; }
       }
 
       .modal-footer-nav {

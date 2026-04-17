@@ -1377,26 +1377,9 @@ const Cluster3Content = () => {
 
       {/* Section 3: 포트폴리오 마케팅 Channel */}
       <section className="cluster3-section3">
-        {/* 플로팅 아이콘 */}
+        {/* 플로팅 아이콘 — 주석 처리 (channel-card 클릭으로 대체)
         <div className="floating-icons" style={{ display: "flex" }}>
-          <div
-            className="edit-icon"
-            style={{ cursor: isOwner || isDemoMode ? "pointer" : "not-allowed", opacity: isOwner || isDemoMode ? 1 : 0.4 }}
-            onClick={
-              isOwner || isDemoMode
-                ? () => {
-                    // 강제 정렬(compaction): 값이 있는 항목을 앞으로 밀착
-                    const paired = portfolioArchives.map((link, i) => ({ link, channel: portfolioArchiveChannels[i] || "" }));
-                    const filled = paired.filter((item) => item.link?.trim());
-                    const total = portfolioArchives.length;
-                    setEditingSection3Links([...filled.map((item) => item.link), ...Array(total - filled.length).fill("")]);
-                    setEditingArchiveChannels([...filled.map((item) => item.channel), ...Array(total - filled.length).fill("")]);
-                    setCurrentCardIndex(0);
-                    setSection3ModalOpen(true);
-                  }
-                : undefined
-            }
-          >
+          <div className="edit-icon" style={{ cursor: "pointer" }} onClick={() => { setCurrentCardIndex(0); setSection3ModalOpen(true); }}>
             <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }}></i>
           </div>
           <div className="edit-icon search-icon">
@@ -1404,9 +1387,9 @@ const Cluster3Content = () => {
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
-            <div className="tooltip">등록된 도움말이 없습니다</div>
           </div>
         </div>
+        */}
         {/* 배경 이미지 */}
         <div className="section3-bg">
           <img src="/images/0/cluster 3/bg3.png" alt="Background" />
@@ -1453,7 +1436,7 @@ const Cluster3Content = () => {
               );
             }
             return (
-              <div key={card.id} className={`channel-card${card.link ? " has-link" : ""}`} onClick={() => card.link && window.open(ensureProtocol(card.link), "_blank")}>
+              <div key={card.id} className={`channel-card${card.link ? " has-link" : ""}`} style={{ cursor: "pointer" }} onClick={() => { setCurrentCardIndex(actualIndex); setSection3ModalOpen(true); }}>
                 <div className="card-image">
                   <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.tag}</div>
@@ -1830,7 +1813,7 @@ const Cluster3Content = () => {
                 </div>
                 <div className="channel-images-section">
                   <h4 className="channel-images-title">
-                    대표 이미지 (최소 3장 필수){isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                    대표 이미지 <span style={{ whiteSpace: "nowrap" }}>(최소 3장 필수)</span>{isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
                     <span className="image-count" style={{ marginLeft: "8px", fontSize: "12px", color: "#999" }}>
                       {(channelCards[currentCardIndex]?.images || []).filter((img) => img !== null).length} / 5
                     </span>
