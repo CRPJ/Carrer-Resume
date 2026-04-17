@@ -874,11 +874,26 @@ const Cluster3Content = () => {
   const [cardSnapshot, setCardSnapshot] = useState<any>(null);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const toggleDropdown = (id: string, e: React.MouseEvent) => {
+    if (openDropdownId === id) {
+      setOpenDropdownId(null);
+      setDropdownPosition(null);
+    } else {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setOpenDropdownId(id);
+      setDropdownPosition({ top: rect.bottom, left: rect.left, width: rect.width });
+    }
+  };
+
   useEffect(() => {
     if (!openDropdownId) return;
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpenDropdownId(null);
+      const fixed = document.querySelector(".dropdown-options-fixed");
+      if (fixed?.contains(e.target as Node)) return;
+      setOpenDropdownId(null);
+      setDropdownPosition(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -1742,35 +1757,19 @@ const Cluster3Content = () => {
                         {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
                         {f.type === "select" &&
                           (isEditMode ? (
-                            <div className="custom-dropdown" ref={openDropdownId === f.key ? dropdownRef : undefined}>
-                              <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === f.key ? null : f.key)}>
+                            <div className="custom-dropdown">
+                              <div className="dropdown-selected" onClick={(e) => toggleDropdown(f.key, e)}>
                                 <span>{(card as any)[f.key] || "선택하세요"}</span>
                                 <i className="ti ti-chevron-down"></i>
                               </div>
-                              {openDropdownId === f.key && (
-                                <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
-                                  {f.options!.map((opt) => (
-                                    <div
-                                      key={opt}
-                                      className={`dropdown-option${(card as any)[f.key] === opt ? " selected" : ""}`}
-                                      onClick={() => {
-                                        handleCardChange(f.key, opt);
-                                        setOpenDropdownId(null);
-                                      }}
-                                    >
-                                      {opt}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
                             </div>
                           ) : (
                             <span className="field-value">{(card as any)[f.key] || "-"}</span>
                           ))}
                         {f.type === "platformDropdown" &&
                           (isEditMode ? (
-                            <div className="platform-dropdown" ref={openDropdownId === "platform" ? dropdownRef : undefined}>
-                              <div className="platform-selected" onClick={() => setOpenDropdownId(openDropdownId === "platform" ? null : "platform")}>
+                            <div className="platform-dropdown">
+                              <div className="platform-selected" onClick={(e) => toggleDropdown("platform", e)}>
                                 {card.platform ? (
                                   <>
                                     {PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className="platform-icon" />}
@@ -1781,23 +1780,6 @@ const Cluster3Content = () => {
                                 )}
                                 <i className="ti ti-chevron-down"></i>
                               </div>
-                              {openDropdownId === "platform" && (
-                                <div className="platform-dropdown-options" onWheel={(e) => e.stopPropagation()}>
-                                  {PLATFORM_OPTIONS.map((p) => (
-                                    <div
-                                      key={p}
-                                      className={`platform-option${card.platform === p ? " selected" : ""}`}
-                                      onClick={() => {
-                                        handleCardChange("platform", p);
-                                        setOpenDropdownId(null);
-                                      }}
-                                    >
-                                      {PLATFORM_ICONS[p] ? <img src={PLATFORM_ICONS[p]} alt={p} className="platform-icon" /> : <span className="platform-icon-placeholder" />}
-                                      <span>{p}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
                             </div>
                           ) : (
                             <div className="platform-display" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1827,32 +1809,14 @@ const Cluster3Content = () => {
                           <div className="rating-field" style={{ flex: 1 }}>
                             <StarRating rating={Number(card.rating) || 0} />
                             {isEditMode && (
-                              <div className="custom-dropdown small" ref={openDropdownId === "rating" ? dropdownRef : undefined}>
-                                <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === "rating" ? null : "rating")}>
+                              <div className="custom-dropdown small">
+                                <div className="dropdown-selected" onClick={(e) => toggleDropdown("rating", e)}>
                                   <span>{card.rating || "선택"}</span>
                                   <i className="ti ti-chevron-down"></i>
                                 </div>
-                                {openDropdownId === "rating" && (
-                                  <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                                      <div
-                                        key={n}
-                                        className={`dropdown-option${String(card.rating) === String(n) ? " selected" : ""}`}
-                                        onClick={() => {
-                                          handleCardChange("rating", String(n));
-                                          setOpenDropdownId(null);
-                                        }}
-                                      >
-                                        {n}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
                               </div>
                             )}
-                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>
-                              / 10
-                            </span>
+                            <span className="rating-max" style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>/ 10</span>
                           </div>
                         )}
                         {f.type === "link" &&
@@ -2054,6 +2018,34 @@ const Cluster3Content = () => {
           </div>
         </div>
       )}
+      {/* fixed 드롭다운 옵션 (overflow 잘림 방지) */}
+      {openDropdownId && dropdownPosition && (() => {
+        const card = channelCards[currentCardIndex];
+        if (!card) return null;
+        let options: { key: string; label: string; icon?: string }[] = [];
+        if (openDropdownId === "platform") {
+          options = PLATFORM_OPTIONS.map((p) => ({ key: p, label: p, icon: PLATFORM_ICONS[p] || "" }));
+        } else if (openDropdownId === "management") {
+          options = MANAGEMENT_OPTIONS.map((o) => ({ key: o, label: o }));
+        } else if (openDropdownId === "status") {
+          options = STATUS_OPTIONS.map((o) => ({ key: o, label: o }));
+        } else if (openDropdownId === "rating") {
+          options = [1,2,3,4,5,6,7,8,9,10].map((n) => ({ key: String(n), label: String(n) }));
+        }
+        if (options.length === 0) return null;
+        const currentVal = openDropdownId === "rating" ? String(card.rating) : (card as any)[openDropdownId] || "";
+        return (
+          <div className="dropdown-options-fixed" style={{ position: "fixed", top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width, zIndex: 100010 }} onWheel={(e) => e.stopPropagation()}>
+            {options.map((opt) => (
+              <div key={opt.key} className={`dropdown-option${currentVal === opt.key ? " selected" : ""}`} onClick={() => { handleCardChange(openDropdownId === "rating" ? "rating" : openDropdownId, opt.key); setOpenDropdownId(null); setDropdownPosition(null); }}>
+                {opt.icon && <img src={opt.icon} alt={opt.label} className="platform-icon" />}
+                {opt.icon === "" && openDropdownId === "platform" && <span className="platform-icon-placeholder" />}
+                <span>{opt.label}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
       {previewImage && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
           <div

@@ -2511,10 +2511,36 @@
 }
 
 // 필수필드 미입력 깜빡임
-.field-missing input,
-.field-missing textarea,
-.field-missing select,
-.field-missing .image-preview {
+  // fixed 드롭다운 옵션 (overflow 잘림 방지)
+  .dropdown-options-fixed {
+    background: #1a1a2e;
+    border: 1px solid #FFA500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    max-height: 200px;
+    overflow-y: auto;
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(250, 171, 7, 0.3); border-radius: 2px; }
+
+    .dropdown-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover { background: rgba(250, 171, 7, 0.15); }
+      &.selected { background: rgba(250, 171, 7, 0.25); color: #FAAB07; }
+
+      .platform-icon { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
+      .platform-icon-placeholder { display: inline-block; width: 20px; height: 20px; }
+    }
+  }
+
+  .field-missing input,
+  .field-missing textarea,
+  .field-missing select,
+  .field-missing .image-preview {
   border: 2px solid #ff4444 !important;
   animation: field-blink 0.3s ease-in-out 3;
 }
