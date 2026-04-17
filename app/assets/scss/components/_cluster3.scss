@@ -2855,7 +2855,8 @@
           width: auto;
           max-width: none;
           flex: none;
-          input, .field-value {
+          input,
+          .field-value {
             width: 252px;
             max-width: 252px;
             flex: none;
@@ -2871,11 +2872,16 @@
           flex: none;
 
           .custom-dropdown {
-            width: auto;
-            max-width: auto;
-            min-width: 60px;
+            width: 55px;
+            min-width: 55px;
+            max-width: 55px;
             flex: none;
-            margin-left: 30px;
+            margin-left: 68px;
+
+            .dropdown-selected {
+              width: 55px;
+              min-width: 55px;
+            }
           }
         }
 
@@ -3170,6 +3176,9 @@
         height: 36px;
         min-height: 36px;
         box-sizing: border-box;
+        flex-shrink: 0;
+        min-width: 120px;
+        width: 120px;
         i {
           color: #faab07;
           font-size: 16px;
@@ -3546,8 +3555,29 @@
 
       .modal-help-icon {
         flex-shrink: 0;
-        width: 57px;
+        width: 40px;
+        height: 36px;
+        font-size: 20px;
         visibility: visible !important;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 46px;
+          height: 46px;
+          background: rgba(0, 0, 0, 0.6);
+          border: none;
+          border-radius: 0;
+          z-index: -1;
+        }
       }
 
       .modal-footer-nav {
