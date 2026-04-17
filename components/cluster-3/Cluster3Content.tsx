@@ -1731,7 +1731,7 @@ const Cluster3Content = () => {
                                 <i className="ti ti-chevron-down"></i>
                               </div>
                               {openDropdownId === f.key && (
-                                <div className="dropdown-options">
+                                <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                   {f.options!.map((opt) => (
                                     <div key={opt} className={`dropdown-option${(card as any)[f.key] === opt ? " selected" : ""}`} onClick={() => { handleCardChange(f.key, opt); setOpenDropdownId(null); }}>{opt}</div>
                                   ))}
@@ -1757,7 +1757,7 @@ const Cluster3Content = () => {
                                 <i className="ti ti-chevron-down"></i>
                               </div>
                               {openDropdownId === "platform" && (
-                                <div className="platform-dropdown-options">
+                                <div className="platform-dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                   {PLATFORM_OPTIONS.map((p) => (
                                     <div key={p} className={`platform-option${card.platform === p ? " selected" : ""}`} onClick={() => { handleCardChange("platform", p); setOpenDropdownId(null); }}>
                                       {PLATFORM_ICONS[p] ? <img src={PLATFORM_ICONS[p]} alt={p} className="platform-icon" /> : <span className="platform-icon-placeholder" />}
@@ -1786,7 +1786,7 @@ const Cluster3Content = () => {
                                       <i className="ti ti-chevron-down"></i>
                                     </div>
                                     {openDropdownId === dk && (
-                                      <div className="dropdown-options">
+                                      <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                         {(dk === "startYear" ? Array.from({ length: 37 }, (_, i) => String(2026 - i)) : dk === "startMonth" ? Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")) : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"))).map((v) => (
                                           <div key={v} className={`dropdown-option${(card as any)[dk] === v ? " selected" : ""}`} onClick={() => { handleCardChange(dk, v); setOpenDropdownId(null); }}>{v}</div>
                                         ))}
@@ -1810,7 +1810,7 @@ const Cluster3Content = () => {
                                   <i className="ti ti-chevron-down"></i>
                                 </div>
                                 {openDropdownId === "rating" && (
-                                  <div className="dropdown-options">
+                                  <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
                                     {[1,2,3,4,5,6,7,8,9,10].map((n) => (
                                       <div key={n} className={`dropdown-option${String(card.rating) === String(n) ? " selected" : ""}`} onClick={() => { handleCardChange("rating", String(n)); setOpenDropdownId(null); }}>{n}</div>
                                     ))}
@@ -1863,9 +1863,9 @@ const Cluster3Content = () => {
               </div>
               <div className="channel-bottom-section">
                 {([
-                  { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 200자)" },
-                  { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 200자)" },
-                  { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 200자)" },
+                  { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 400자)" },
+                  { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 400자)" },
+                  { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 400자)" },
                 ] as const).map((box) => {
                   const card = channelCards[currentCardIndex];
                   const val = (card as any)[box.key] || "";
@@ -1875,8 +1875,8 @@ const Cluster3Content = () => {
                       <div className="textarea-wrapper">
                         {isEditMode ? (
                           <>
-                            <textarea value={val} onChange={(e) => { if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value); }} maxLength={200} placeholder={box.placeholder} rows={6} />
-                            <span className="char-count">{val.length}/200</span>
+                            <textarea value={val} onChange={(e) => { if (e.target.value.length <= 400) handleCardChange(box.key, e.target.value); }} maxLength={400} placeholder={box.placeholder} rows={6} />
+                            <span className="char-count">{val.length}/400</span>
                           </>
                         ) : (
                           <div className="textarea-readonly">{val || "-"}</div>
