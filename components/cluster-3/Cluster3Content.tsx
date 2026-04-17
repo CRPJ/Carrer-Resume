@@ -1477,8 +1477,8 @@ const Cluster3Content = () => {
                 <div className="card-image">
                   <img src={card.images?.[0] || `/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.startYear && card.startMonth && card.startDay ? `${card.startYear}년 ${String(card.startMonth).padStart(2, "0")}월 ${String(card.startDay).padStart(2, "0")}일` : card.tag}</div>
-                  <div className="card-like" style={{ backgroundColor: card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : undefined }}>
-                    {card.status || <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>}
+                  <div className="card-like">
+                    <svg viewBox="0 0 24 24" fill={card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : "none"} stroke={card.status ? "none" : "currentColor"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                   </div>
                 </div>
                 <div className="card-content">
@@ -1725,7 +1725,7 @@ const Cluster3Content = () => {
           <div className="section-modal">
             <div className="section-modal-header">
               <div className="modal-header-top">
-                <img src="/images/0/write.png" alt="write" style={{ width: "24px", height: "24px", objectFit: "contain" }} />
+                <img src="/images/0/write.png" alt="write" style={{ width: "36px", height: "36px", objectFit: "contain" }} />
                 <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
                 <button className="modal-close-btn" onClick={handleCloseModal}>
                   <i className="ti ti-x"></i>
@@ -1743,7 +1743,7 @@ const Cluster3Content = () => {
                     const card = channelCards[currentCardIndex];
                     if (!card) return null;
                     const fields = [
-                      { label: "채널명", key: "channelName", type: "text", placeholder: "@ 채널명을 입력하세요" },
+                      { label: "채널명", key: "channelName", type: "channelNameInput" },
                       { label: "채널 플랫폼", key: "platform", type: "platformDropdown" },
                       { label: "채널 관리", key: "management", type: "select", options: MANAGEMENT_OPTIONS },
                       { label: "채널 시작", key: "date", type: "date" },
@@ -1758,6 +1758,14 @@ const Cluster3Content = () => {
                           {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
                         </label>
                         {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
+                        {f.type === "channelNameInput" && (isEditMode ? (
+                          <div className="channel-name-input-wrapper">
+                            <span className="at-prefix">@ </span>
+                            <input type="text" value={(card.channelName || "").replace(/^@\s*/, "")} onChange={(e) => handleCardChange("channelName", "@ " + e.target.value)} placeholder="채널명을 입력하세요" />
+                          </div>
+                        ) : (
+                          <span className="field-value">@ {(card.channelName || "-").replace(/^@\s*/, "")}</span>
+                        ))}
                         {f.type === "select" &&
                           (isEditMode ? (
                             <div className="custom-dropdown">
@@ -1838,7 +1846,7 @@ const Cluster3Content = () => {
                           ) : (
                             <div className="link-field">
                               <span className="field-value" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
-                                {card.link || "-"}
+                                {card.link ? (card.link.length > 20 ? card.link.substring(0, 20) + ".." : card.link) : "-"}
                               </span>
                               {card.link && (
                                 <button className="link-open-btn" onClick={() => window.open(card.link, "_blank")}>
