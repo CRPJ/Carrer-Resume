@@ -1475,14 +1475,24 @@ const Cluster3Content = () => {
                 }}
               >
                 <div className="card-image">
-                  <img src={card.images?.[0] || `/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
+                  <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.startYear && card.startMonth && card.startDay ? `${card.startYear}년 ${String(card.startMonth).padStart(2, "0")}월 ${String(card.startDay).padStart(2, "0")}일` : card.tag}</div>
                   <div className="card-like">
-                    <svg viewBox="0 0 24 24" fill={card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : "none"} stroke={card.status ? "none" : "currentColor"} strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+                    <svg viewBox="0 0 24 24" fill={card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : "none"} stroke={card.status ? "none" : "currentColor"} strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
                   </div>
                 </div>
                 <div className="card-content">
-                  <p className="card-title">{card.channelName ? <><span className="at-symbol">@</span> {card.channelName.replace(/^@\s*/, "")}</> : card.title}</p>
+                  <p className="card-title">
+                    {card.channelName ? (
+                      <>
+                        <span className="at-symbol">@</span> {card.channelName.replace(/^@\s*/, "")}
+                      </>
+                    ) : (
+                      card.title
+                    )}
+                  </p>
                   <div className="card-info">
                     <div className="info-row">
                       <div className="info-author">
@@ -1737,7 +1747,8 @@ const Cluster3Content = () => {
                 <div className="channel-info-section">
                   <h4 className="channel-info-title">
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
-                    <span className="user-name">윤재윤 님</span><span className="channel-title-text">의 Portfolio Channel</span>
+                    <span className="user-name">윤재윤 님</span>
+                    <span className="channel-title-text">의 Portfolio Channel</span>
                   </h4>
                   {(() => {
                     const card = channelCards[currentCardIndex];
@@ -1758,14 +1769,15 @@ const Cluster3Content = () => {
                           {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
                         </label>
                         {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
-                        {f.type === "channelNameInput" && (isEditMode ? (
-                          <div className="channel-name-input-wrapper">
-                            <span className="at-prefix">@&nbsp;</span>
-                            <input type="text" value={(card.channelName || "").replace(/^@\s*/, "")} onChange={(e) => handleCardChange("channelName", "@ " + e.target.value)} placeholder="채널명을 입력하세요" />
-                          </div>
-                        ) : (
-                          <span className="field-value">@ {(card.channelName || "-").replace(/^@\s*/, "")}</span>
-                        ))}
+                        {f.type === "channelNameInput" &&
+                          (isEditMode ? (
+                            <div className="channel-name-input-wrapper">
+                              <span className="at-prefix">@&nbsp;</span>
+                              <input type="text" value={(card.channelName || "").replace(/^@\s*/, "")} onChange={(e) => handleCardChange("channelName", "@ " + e.target.value)} placeholder="채널명을 입력하세요" />
+                            </div>
+                          ) : (
+                            <span className="field-value">@ {(card.channelName || "-").replace(/^@\s*/, "")}</span>
+                          ))}
                         {f.type === "select" &&
                           (isEditMode ? (
                             <div className="custom-dropdown">
@@ -1866,17 +1878,54 @@ const Cluster3Content = () => {
                   <div className="images-grid">
                     {channelCards[currentCardIndex]?.images.map((img, si) => (
                       <div key={si} className={`image-slot${si === 0 ? " large" : " small"}${!isSlotEnabled(si) ? " disabled" : ""}`}>
-                        <div className="image-preview" onClick={() => { if (img) setPreviewImage(img); }}>
-                          {img ? <img src={img} alt={`대표 이미지 ${si + 1}`} /> : <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>}
+                        <div
+                          className="image-preview"
+                          onClick={() => {
+                            if (img) setPreviewImage(img);
+                          }}
+                        >
+                          {img ? (
+                            <img src={img} alt={`대표 이미지 ${si + 1}`} />
+                          ) : (
+                            <div className="empty-slot">
+                              <i className="ti ti-photo-plus"></i>
+                            </div>
+                          )}
                           {isEditMode && si <= 2 && !img && <span className="image-required">*</span>}
                           {isEditMode && (
                             <div className="image-actions-overlay">
-                              <button className="image-action-btn" onClick={(e) => { e.stopPropagation(); handleImageUploadClick(si); }} disabled={!isSlotEnabled(si)}><i className="ti ti-upload"></i></button>
-                              <button className="image-action-btn" onClick={(e) => { e.stopPropagation(); handleImageDelete(si); }} disabled={!isSlotEnabled(si) || !img}><i className="ti ti-trash"></i></button>
+                              <button
+                                className="image-action-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleImageUploadClick(si);
+                                }}
+                                disabled={!isSlotEnabled(si)}
+                              >
+                                <i className="ti ti-upload"></i>
+                              </button>
+                              <button
+                                className="image-action-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleImageDelete(si);
+                                }}
+                                disabled={!isSlotEnabled(si) || !img}
+                              >
+                                <i className="ti ti-trash"></i>
+                              </button>
                             </div>
                           )}
                         </div>
-                        <input type="file" accept="image/*" ref={(el) => { imageInputRefs.current[si] = el; }} style={{ display: "none" }} onChange={(e) => handleImageFileChange(e, si)} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          ref={(el) => {
+                            imageInputRefs.current[si] = el;
+                          }}
+                          style={{ display: "none" }}
+                          onChange={(e) => handleImageFileChange(e, si)}
+                        />
                       </div>
                     ))}
                   </div>
@@ -2010,39 +2059,49 @@ const Cluster3Content = () => {
         </div>
       )}
       {/* fixed 드롭다운 옵션 (overflow 잘림 방지) */}
-      {openDropdownId && dropdownPosition && (() => {
-        const card = channelCards[currentCardIndex];
-        if (!card) return null;
-        let options: { key: string; label: string; icon?: string }[] = [];
-        if (openDropdownId === "platform") {
-          options = PLATFORM_OPTIONS.map((p) => ({ key: p, label: p, icon: PLATFORM_ICONS[p] || "" }));
-        } else if (openDropdownId === "management") {
-          options = MANAGEMENT_OPTIONS.map((o) => ({ key: o, label: o }));
-        } else if (openDropdownId === "status") {
-          options = STATUS_OPTIONS.map((o) => ({ key: o, label: o }));
-        } else if (openDropdownId === "rating") {
-          options = [1,2,3,4,5,6,7,8,9,10].map((n) => ({ key: String(n), label: String(n) }));
-        }
-        if (options.length === 0) return null;
-        const currentVal = openDropdownId === "rating" ? String(card.rating) : (card as any)[openDropdownId] || "";
-        return (
-          <div className="dropdown-options-fixed" style={{ position: "fixed", top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width, zIndex: 100010 }} onWheel={(e) => e.stopPropagation()}>
-            {options.map((opt) => (
-              <div key={opt.key} className={`dropdown-option${currentVal === opt.key ? " selected" : ""}`} onClick={() => { handleCardChange(openDropdownId === "rating" ? "rating" : openDropdownId, opt.key); setOpenDropdownId(null); setDropdownPosition(null); }}>
-                {opt.icon && <img src={opt.icon} alt={opt.label} className="platform-icon" />}
-                {opt.icon === "" && openDropdownId === "platform" && <span className="platform-icon-placeholder" />}
-                <span>{opt.label}</span>
-              </div>
-            ))}
-          </div>
-        );
-      })()}
+      {openDropdownId &&
+        dropdownPosition &&
+        (() => {
+          const card = channelCards[currentCardIndex];
+          if (!card) return null;
+          let options: { key: string; label: string; icon?: string }[] = [];
+          if (openDropdownId === "platform") {
+            options = PLATFORM_OPTIONS.map((p) => ({ key: p, label: p, icon: PLATFORM_ICONS[p] || "" }));
+          } else if (openDropdownId === "management") {
+            options = MANAGEMENT_OPTIONS.map((o) => ({ key: o, label: o }));
+          } else if (openDropdownId === "status") {
+            options = STATUS_OPTIONS.map((o) => ({ key: o, label: o }));
+          } else if (openDropdownId === "rating") {
+            options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({ key: String(n), label: String(n) }));
+          }
+          if (options.length === 0) return null;
+          const currentVal = openDropdownId === "rating" ? String(card.rating) : (card as any)[openDropdownId] || "";
+          return (
+            <div className="dropdown-options-fixed" style={{ position: "fixed", top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width, zIndex: 100010 }} onWheel={(e) => e.stopPropagation()}>
+              {options.map((opt) => (
+                <div
+                  key={opt.key}
+                  className={`dropdown-option${currentVal === opt.key ? " selected" : ""}`}
+                  onClick={() => {
+                    handleCardChange(openDropdownId === "rating" ? "rating" : openDropdownId, opt.key);
+                    setOpenDropdownId(null);
+                    setDropdownPosition(null);
+                  }}
+                >
+                  {opt.icon && <img src={opt.icon} alt={opt.label} className="platform-icon" />}
+                  {opt.icon === "" && openDropdownId === "platform" && <span className="platform-icon-placeholder" />}
+                  <span>{opt.label}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       {previewImage && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
           <div
             className="image-preview-modal"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "0.5px solid #FFA500", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid rgba(255, 165, 0, 0.3)", padding: "0px", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
           >
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
