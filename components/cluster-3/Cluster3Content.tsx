@@ -1738,7 +1738,7 @@ const Cluster3Content = () => {
               <div className="modal-top-row">
                 <div className="channel-info-section">
                   <h4 className="channel-info-title">
-                    <span className="user-name">윤재윤 님</span>의 Portfolio Channel
+                    <span className="user-name">윤재윤 님</span><span className="channel-title-text">의 Portfolio Channel</span>
                   </h4>
                   {(() => {
                     const card = channelCards[currentCardIndex];
