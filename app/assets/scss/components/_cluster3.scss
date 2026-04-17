@@ -2543,28 +2543,14 @@
   .field-missing .image-preview,
   .field-missing .dropdown-selected,
   .field-missing .platform-selected,
-  .field-missing .channel-date-input {
-    border: 2px solid #ff4444 !important;
-    animation: field-blink 0.3s ease-in-out 3;
-  }
-
-  .channel-images-section.field-missing {
-    border: 2px solid #ff4444 !important;
-    animation: field-blink 0.3s ease-in-out 3;
-  }
-
+  .field-missing .channel-date-input,
+  .channel-images-section.field-missing,
   .channel-textarea-box.field-missing .textarea-wrapper {
-    border: 2px solid #ff4444 !important;
-    animation: field-blink 0.3s ease-in-out 3;
+    animation: border-blink 0.3s ease-in-out 3;
   }
-@keyframes field-blink {
-  0%,
-  100% {
-    border-color: transparent;
-  }
-  50% {
-    border-color: #ff4444;
-  }
+@keyframes border-blink {
+  0%, 100% { border-color: transparent; }
+  50% { border: 2px solid #ff4444; }
 }
 
 // 링크 없는 카드에 반투명 오버레이 (섹션 3, 4, 5 공통)
