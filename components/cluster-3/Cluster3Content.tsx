@@ -1807,35 +1807,19 @@ const Cluster3Content = () => {
                           ))}
                         {f.type === "date" &&
                           (isEditMode ? (
-                            <div className="date-picker-row">
-                              {(["startYear", "startMonth", "startDay"] as const).map((dk, di) => (
-                                <React.Fragment key={dk}>
-                                  {di > 0 && <span className="date-separator">.</span>}
-                                  <div className="custom-dropdown small" ref={openDropdownId === dk ? dropdownRef : undefined}>
-                                    <div className="dropdown-selected" onClick={() => setOpenDropdownId(openDropdownId === dk ? null : dk)}>
-                                      <span>{(card as any)[dk] || (dk === "startYear" ? "년" : dk === "startMonth" ? "월" : "일")}</span>
-                                      <i className="ti ti-chevron-down"></i>
-                                    </div>
-                                    {openDropdownId === dk && (
-                                      <div className="dropdown-options" onWheel={(e) => e.stopPropagation()}>
-                                        {(dk === "startYear" ? Array.from({ length: 37 }, (_, i) => String(2026 - i)) : dk === "startMonth" ? Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")) : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, "0"))).map((v) => (
-                                          <div
-                                            key={v}
-                                            className={`dropdown-option${(card as any)[dk] === v ? " selected" : ""}`}
-                                            onClick={() => {
-                                              handleCardChange(dk, v);
-                                              setOpenDropdownId(null);
-                                            }}
-                                          >
-                                            {v}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                </React.Fragment>
-                              ))}
-                            </div>
+                            <input
+                              type="date"
+                              className="channel-date-input"
+                              value={card.startYear && card.startMonth && card.startDay ? `${card.startYear}-${String(card.startMonth).padStart(2, "0")}-${String(card.startDay).padStart(2, "0")}` : ""}
+                              onChange={(e) => {
+                                const d = new Date(e.target.value);
+                                if (!isNaN(d.getTime())) {
+                                  handleCardChange("startYear", String(d.getFullYear()));
+                                  handleCardChange("startMonth", String(d.getMonth() + 1).padStart(2, "0"));
+                                  handleCardChange("startDay", String(d.getDate()).padStart(2, "0"));
+                                }
+                              }}
+                            />
                           ) : (
                             <span className="field-value">{formatDate(card.startYear, card.startMonth, card.startDay)}</span>
                           ))}
