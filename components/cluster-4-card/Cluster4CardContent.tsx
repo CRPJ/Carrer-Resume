@@ -719,17 +719,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 역량: 매주 최대 1개 선택 가능 (온보딩 주차도 정상 계산)
           const competencyTotal = 1;
 
-          // 실무 경험: eligible 조건 체크 (개설 여부와 무관하게 모든 experience 타입 대상)
+          // 실무 경험: 해당 주차에 개설된 experience 활동 중 eligible 조건 체크
           // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
-          // 그 이전에는 모든 실무 경험 활동이 적격 (룰 없이 전부 카운트)
+          // 그 이전에는 개설된 모든 실무 경험 활동이 적격 (룰 없이 전부 카운트)
           const isEligibilityRuleActive = seasonData && (
             seasonData.year > 2026 ||
             (seasonData.year === 2026 && seasonData.name !== 'spring') ||
             (seasonData.year === 2026 && seasonData.name === 'spring' && currentWeek.week_number >= 9)
           );
           let experienceTotal = 0;
+          // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
+          const activeExperienceActivities = activeActivities.filter(a => experienceTypesList.includes(a.activity_type_id));
           {
-            experienceInfos.forEach(typeInfo => {
+            activeExperienceActivities.forEach(a => {
+              const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
+
+              if (!typeInfo) {
+                experienceTotal++;
+                return;
+              }
+
               if (isEligibilityRuleActive) {
                 // eligible_min/max 체크 (null이면 제한 없음)
                 const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
@@ -751,7 +760,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   }
                 }
               } else {
-                // 룰 적용 이전: 모든 실무 경험 활동 카운트
+                // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
                 experienceTotal++;
               }
             });
@@ -802,10 +811,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 역량 success (온보딩 주차도 정상 계산)
           const competencySuccess = competencyTypesList.some(activityTypeId => isEnhancementSuccess(activityTypeId)) ? 1 : 0;
-          // 실무 경험 success: eligible한 모든 타입 중 강화 성공한 것만 카운트 (개설 여부 무관)
+          // 실무 경험 success: 개설된 활동 중 eligible한 타입의 강화 성공만 카운트
           const eligibleExperienceTypes: string[] = [];
           {
-            experienceInfos.forEach(typeInfo => {
+            activeExperienceActivities.forEach(a => {
+              const typeInfo = experienceInfos.find(info => info.id === a.activity_type_id);
+
+              if (!typeInfo) {
+                eligibleExperienceTypes.push(a.activity_type_id);
+                return;
+              }
+
               if (isEligibilityRuleActive) {
                 const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
                 const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
@@ -820,8 +836,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   }
                 }
               } else {
-                // 룰 적용 이전: 모든 실무 경험 활동 카운트
-                eligibleExperienceTypes.push(typeInfo.id);
+                // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
+                eligibleExperienceTypes.push(a.activity_type_id);
               }
             });
           }

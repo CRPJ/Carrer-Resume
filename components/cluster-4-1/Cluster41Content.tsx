@@ -607,7 +607,7 @@ const Cluster41Content = () => {
     // 2. 해당 주차까지의 누적 성공 주차 수 계산 (현재 주차 포함)
     const cumulativeApproved = getCumulativeApprovedWeeks(weekData.endDate);
 
-    // 3. 모든 experience 타입 중 eligible한 것 필터링 (개설 여부와 무관)
+    // 3. 해당 주차에 개설된 experience 활동 중 eligible한 것 필터링
     // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
     const isEligibilityRuleActive = weekData && (
       weekData.seasonYear > 2026 ||
@@ -616,7 +616,19 @@ const Cluster41Content = () => {
     );
     let eligibleTotal = 0;
     const eligibleExperienceTypeIds: string[] = [];
-    experienceTypeInfos.forEach(typeInfo => {
+    // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
+    const weekActiveExperienceActivities = weeklyActivities.filter(
+      wa => wa.week_id === weekId && wa.is_active && experienceTypeIds.includes(wa.activity_type_id)
+    );
+    weekActiveExperienceActivities.forEach(a => {
+      const typeInfo = experienceTypeInfos.find(info => info.id === a.activity_type_id);
+
+      if (!typeInfo) {
+        eligibleTotal++;
+        eligibleExperienceTypeIds.push(a.activity_type_id);
+        return;
+      }
+
       if (isEligibilityRuleActive) {
         const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
         const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
@@ -637,9 +649,9 @@ const Cluster41Content = () => {
           }
         }
       } else {
-        // 룰 적용 이전: 모든 실무 경험 활동 카운트
+        // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
         eligibleTotal++;
-        eligibleExperienceTypeIds.push(typeInfo.id);
+        eligibleExperienceTypeIds.push(a.activity_type_id);
       }
     });
 
