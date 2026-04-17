@@ -2705,8 +2705,16 @@
   .section-modal-header {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     position: relative;
-    padding: 8px 24px 16px;
+    padding: 16px 24px 4px;
+
+    .modal-close-btn {
+      position: absolute;
+      top: 40px;
+      right: 24px;
+      z-index: 2;
+    }
 
     .modal-header-top {
       display: flex;
@@ -2715,15 +2723,35 @@
       align-items: center;
       gap: 8px;
       width: 100%;
+      position: relative;
+      margin-top: 12px;
+
+      img[alt="write"] {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
     height: 110px;
     min-height: 110px;
     max-height: 110px;
     flex-shrink: 0;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
     border-bottom: none;
     background: transparent;
+
+    .modal-subtitle {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 400;
+      font-family: Pretendard, sans-serif;
+      margin: 4px 0 0 0;
+      padding-left: 95px;
+      padding-right: 67px;
+      text-align: left;
+    }
 
     h3 {
       margin: 0;
@@ -2732,6 +2760,7 @@
       font-weight: 700;
       color: #ffa500;
       flex: 1;
+      padding-left: 80px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -2743,7 +2772,8 @@
 
     .modal-subtitle {
       width: 100%;
-      margin: -2px 0 0 0;
+      padding-left: 80px;
+      margin: 0px 0 0 0;
       color: #fff;
       font-family: "Pretendard", sans-serif;
       font-size: 1.3125rem;
@@ -2756,9 +2786,7 @@
     }
 
     .modal-close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+      // top/right/z-index는 line 2712 블록에서 설정
       width: 28px;
       height: 28px;
       background: none;
@@ -2809,7 +2837,7 @@
         color: #faab07;
         font-size: 21px;
         font-weight: 700;
-        margin-top: 8px;
+        margin-top: 4px;
         margin-bottom: 17px;
         margin-left: -15px;
         line-height: 1.2;

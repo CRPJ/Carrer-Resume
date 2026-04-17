@@ -1734,13 +1734,18 @@ const Cluster3Content = () => {
         <div className="section-modal-overlay">
           <div className="section-modal">
             <div className="section-modal-header">
+              <button className="modal-close-btn" onClick={handleCloseModal}>
+                <i className="ti ti-x"></i>
+              </button>
               <div className="modal-header-top">
                 <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
                 <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
-                <button className="modal-close-btn" onClick={handleCloseModal}>
-                  <i className="ti ti-x"></i>
-                </button>
               </div>
+              {isEditMode && (
+                <p className="modal-subtitle">
+                  본인의 포트폴리오 채널의 성과와 관련 경험들을 기업/사회/커리어 측면에서 어필이 될 수 있도록 작성하세요.<span style={{ fontStyle: "normal" }}>😊</span>
+                </p>
+              )}
             </div>
             <div className="section-modal-body" ref={section3ModalBodyRef}>
               <div className="modal-top-row">
