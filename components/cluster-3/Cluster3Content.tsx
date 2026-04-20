@@ -1939,9 +1939,9 @@ const Cluster3Content = () => {
               <div className="channel-bottom-section">
                 {(
                   [
-                    { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 200자)" },
-                    { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 200자)" },
-                    { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 200자)" },
+                    { key: "insight", title: "기획 방향/인싸이트", placeholder: "기획 방향/인싸이트를 작성해주세요 (최대 250자)" },
+                    { key: "experience", title: "관련 주요 경험/활동", placeholder: "관련 주요 경험/활동을 작성해주세요 (최대 250자)" },
+                    { key: "metrics", title: "핵심 정량적 지표/수치", placeholder: "핵심 정량적 지표/수치를 작성해주세요 (최대 250자)" },
                   ] as const
                 ).map((box) => {
                   const card = channelCards[currentCardIndex];
@@ -1958,13 +1958,13 @@ const Cluster3Content = () => {
                             <textarea
                               value={val}
                               onChange={(e) => {
-                                if (e.target.value.length <= 200) handleCardChange(box.key, e.target.value);
+                                if (e.target.value.length <= 250) handleCardChange(box.key, e.target.value);
                               }}
-                              maxLength={200}
+                              maxLength={250}
                               placeholder={box.placeholder}
                               rows={6}
                             />
-                            <span className="char-count">{val.length}/200</span>
+                            <span className="char-count">{val.length}/250</span>
                           </>
                         ) : (
                           <div className="textarea-readonly">{val || "-"}</div>

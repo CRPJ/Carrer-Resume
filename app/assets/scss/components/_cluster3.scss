@@ -2835,7 +2835,7 @@
 
       .channel-info-title {
         color: #faab07;
-        font-size: 21px;
+        font-size: 23px;
         font-weight: 700;
         margin-top: 4px;
         margin-bottom: 17px;
@@ -2857,7 +2857,7 @@
         }
         .user-name {
           color: #fff;
-          font-size: 25px;
+          font-size: 27px;
         }
         .channel-title-text {
           margin-left: 4px;
@@ -2869,14 +2869,15 @@
         align-items: center;
         gap: 12px;
         margin-bottom: 8px;
+        margin-left: 38px;
 
         input,
         .custom-dropdown,
         .platform-dropdown,
         .channel-date-input,
         .channel-name-input-wrapper {
-          width: 252px;
-          max-width: 252px;
+          width: 233px;
+          max-width: 233px;
           flex: none;
         }
         .link-field {
@@ -2885,8 +2886,8 @@
           flex: none;
           input,
           .field-value {
-            width: 252px;
-            max-width: 252px;
+            width: 233px;
+            max-width: 233px;
             flex: none;
           }
           .link-open-btn {
@@ -2895,8 +2896,8 @@
           }
         }
         .rating-field {
-          width: 252px;
-          max-width: 252px;
+          width: 233px;
+          max-width: 233px;
           flex: none;
 
           .custom-dropdown {
@@ -2904,7 +2905,7 @@
             min-width: 55px;
             max-width: 55px;
             flex: none;
-            margin-left: 68px;
+            margin-left: 49px;
 
             .dropdown-selected {
               width: 55px;
@@ -2917,11 +2918,12 @@
           width: 110px;
           min-width: 110px;
           color: #fff;
-          font-size: 15px !important;
+          font-size: 16px !important;
           font-family: Pretendard, sans-serif !important;
           flex-shrink: 0;
           display: flex;
           align-items: center;
+          white-space: nowrap;
           &::before {
             content: "■";
             font-size: 8px;
@@ -2934,14 +2936,14 @@
         .field-value,
         .platform-display {
           color: #ccc;
-          font-size: 15px !important;
+          font-size: 16px !important;
           font-family: Pretendard, sans-serif !important;
           display: flex;
           align-items: center;
           margin-left: 0;
           padding-left: 0;
-          width: 252px;
-          max-width: 252px;
+          width: 233px;
+          max-width: 233px;
           height: 36px;
           min-height: 36px;
           box-sizing: border-box;
@@ -2963,7 +2965,7 @@
           max-height: 36px;
           box-sizing: border-box;
           font-family: Pretendard, sans-serif !important;
-          font-size: 15px !important;
+          font-size: 16px !important;
         }
 
         input,
@@ -3144,7 +3146,7 @@
         box-sizing: border-box;
         .at-prefix {
           color: #87ceeb;
-          font-size: 15px;
+          font-size: 16px;
           flex-shrink: 0;
         }
         input {
@@ -3214,7 +3216,7 @@
         .rating-text {
           margin-left: 6px;
           color: #faab07;
-          font-size: 15px !important;
+          font-size: 16px !important;
           font-family: Pretendard, sans-serif !important;
           font-weight: 600;
           background: none;
