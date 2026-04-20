@@ -6511,6 +6511,23 @@
       border: none !important;
     }
 
+    .modal-cancel-btn {
+      padding: 8px 20px;
+      border: 1px solid #888;
+      background: transparent;
+      color: #888;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(136, 136, 136, 0.1);
+        color: #aaa;
+      }
+    }
+
     .modal-reset-btn {
       padding: 8px 20px;
       border: 1px solid #4CAF50;

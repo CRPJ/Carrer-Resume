@@ -2483,6 +2483,22 @@ const Cluster2Content = () => {
                 </span>
                 <div className="modal-footer-right">
                   <button
+                    className="modal-cancel-btn"
+                    onClick={() => {
+                      if (isSection1Dirty()) {
+                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                          setPhotos([...photosSnapshot]);
+                          setFooterNotice("default");
+                          setSection1ModalOpen(false);
+                        }
+                      } else {
+                        setSection1ModalOpen(false);
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
                     className="modal-reset-btn"
                     onClick={() => {
                       if (window.confirm("내용을 모두 초기화하시겠어요?")) {
@@ -2894,6 +2910,22 @@ const Cluster2Content = () => {
                 </span>
                 <div className="modal-footer-right">
                   <button
+                    className="modal-cancel-btn"
+                    onClick={() => {
+                      if (isSection2Dirty()) {
+                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                          setEditingSloganData({ ...sloganSnapshot });
+                          setSection2FooterNotice("default");
+                          setSection2ModalOpen(false);
+                        }
+                      } else {
+                        setSection2ModalOpen(false);
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
                     className="modal-reset-btn"
                     onClick={() => {
                       if (window.confirm("내용을 모두 초기화하시겠어요?")) {
@@ -3030,6 +3062,21 @@ const Cluster2Content = () => {
                 </span>
                 <div className="modal-footer-right">
                   <button
+                    className="modal-cancel-btn"
+                    onClick={() => {
+                      if (isSection21Dirty()) {
+                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                          setEditingVideoData([...videoSnapshot]);
+                          setSection21ModalOpen(false);
+                        }
+                      } else {
+                        setSection21ModalOpen(false);
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
                     className="modal-reset-btn"
                     onClick={() => {
                       if (window.confirm("내용을 모두 초기화하시겠어요?")) {
@@ -3126,6 +3173,23 @@ const Cluster2Content = () => {
                       🔎
                     </span>
                     <div className="modal-footer-right">
+                      <button
+                        className="modal-cancel-btn"
+                        onClick={() => {
+                          const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
+                          if (isDirty) {
+                            if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                              setEditingIntroData({ content: initialIntroContent });
+                              setIntroDirty(false);
+                              setIsEditingIntro(false);
+                            }
+                          } else {
+                            setIsEditingIntro(false);
+                          }
+                        }}
+                      >
+                        취소
+                      </button>
                       <button
                         className="modal-reset-btn"
                         onClick={() => {
@@ -3242,6 +3306,21 @@ const Cluster2Content = () => {
                   🔎
                 </span>
                 <div className="modal-footer-right">
+                  <button
+                    className="modal-cancel-btn"
+                    onClick={() => {
+                      if (isSection4Dirty()) {
+                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                          setEditingReviewLinks([...reviewSnapshot]);
+                          setSection4ModalOpen(false);
+                        }
+                      } else {
+                        setSection4ModalOpen(false);
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
                   <button
                     className="modal-reset-btn"
                     onClick={() => {
@@ -4092,6 +4171,23 @@ const Cluster2Content = () => {
                   🔎
                 </span>
                 <div className="modal-footer-right">
+                  <button
+                    className="modal-cancel-btn"
+                    onClick={() => {
+                      if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
+                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                          setEditingEduData([...initialEduDataSnapshot]);
+                          setHasEduChanges(false);
+                          setEduValidationErrors({});
+                          setSection3ModalOpen(false);
+                        }
+                      } else {
+                        setSection3ModalOpen(false);
+                      }
+                    }}
+                  >
+                    취소
+                  </button>
                   <button
                     className="modal-reset-btn"
                     onClick={() => {
