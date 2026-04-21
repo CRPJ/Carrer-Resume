@@ -2391,6 +2391,7 @@ const Cluster2Content = () => {
       {/* 섹션 1 모달 - 프로필 사진 수정 */}
       {section1ModalOpen && (
         <div className="section1-modal-overlay">
+          <div className="modal-scroll-content">
           <div className="section1-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section1-modal-header">
               <button
@@ -2561,6 +2562,7 @@ const Cluster2Content = () => {
                 <p className={`modal-footer-notice ${footerNotice === "error" ? "notice-error" : ""}`}>{footerNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}</p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}
@@ -2999,6 +3001,7 @@ const Cluster2Content = () => {
       {/* 섹션 2-1 모달 - 영상 편집 */}
       {section21ModalOpen && (
         <div className="section21-modal-overlay" ref={section21OverlayRef}>
+          <div className="modal-scroll-content">
           <div className="section21-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section21-modal-header">
               <button
@@ -3125,11 +3128,13 @@ const Cluster2Content = () => {
               </div>
             </div>
           </div>
+          </div>
         </div>
       )}
       {/* 섹션 5 모달 - 자기소개서 카드 상세/편집 */}
       {introModalOpen && selectedIntroCard !== null && (
         <div className="intro-modal-overlay">
+          <div className="modal-scroll-content">
           <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
             <div className="intro-modal-header">
               <button
@@ -3266,6 +3271,7 @@ const Cluster2Content = () => {
                 </>
               )}
             </div>
+          </div>
           </div>
         </div>
       )}

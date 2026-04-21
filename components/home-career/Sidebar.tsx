@@ -550,6 +550,7 @@ const Sidebar = () => {
   const [isCustomEmailDomain, setIsCustomEmailDomain] = useState(false);
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
   const [isPhoneEditing, setIsPhoneEditing] = useState(false);
+  const phoneCommentSnapshot = useRef("");
   const [isPhoneHelpModalOpen, setIsPhoneHelpModalOpen] = useState(false);
   const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
@@ -3598,59 +3599,34 @@ const Sidebar = () => {
       )}
       {/* 핸드폰 코멘트 모달 - 본인 프로필용 (입력 폼) */}
       {isPhoneCommentModalOpen && debugProfileType === "본인" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 2000,
-          }}
-        >
+        <div className="phone-comment-modal-overlay">
           <div
             className="edit-modal-content"
             data-modal="phone-comment"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "570px",
-              maxWidth: "570px",
-              height: "449px",
-              maxHeight: "449px",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
-              border: "1px solid #FFA500",
-              display: "flex",
-              flexDirection: "column" as const,
-            }}
           >
             {/* 헤더 */}
-            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "20px 28px", position: "relative", flexShrink: 0 }}>
-              <div style={{ width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Image src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
-              </div>
-              <div>
-                <h3 style={{ margin: 0, lineHeight: 1.4, wordBreak: "keep-all" as const }}>연락 가능 시간대</h3>
-                <p className="modal-subtitle" style={{ margin: "2px 0 0 0" }}>
-                  연락이 용이한 시간대 및 코멘트를 남겨주세요 😊
-                </p>
-              </div>
-              <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)} style={{ position: "absolute", top: 18, right: 20 }}>
+            <div className="edit-modal-header">
+              <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)}>
                 ✕
               </button>
+
+              <div className="modal-header-top">
+                <Image className="modal-icon" src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
+                <h3>연락 가능 시간대</h3>
+              </div>
+
+              <p className="modal-subtitle">
+                연락이 용이한 시간대 및 코멘트를 남겨주세요
+              </p>
             </div>
 
-            {/* 본문 */}
-            <div className="edit-modal-body" style={{ flex: 1, overflowY: "auto", padding: "20px 28px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)", boxSizing: "border-box" as const }}>
+            <div className="edit-modal-body">
               {isPhoneEditing ? (
                 <>
-                  <style dangerouslySetInnerHTML={{ __html: `.phone-comment-input::placeholder { color: #999; }` }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "0 0 8px 0", fontSize: "12px" }}>
-                    <span style={{ color: "#999" }}>최대 150자까지 작성 가능합니다.</span>
-                    <span style={{ color: formData.phoneComment.length > 150 ? "#ff4444" : "#999" }}>
+                  <div className="phone-comment-counter">
+                    <span>최대 150자까지 작성 가능합니다.</span>
+                    <span className={formData.phoneComment.length > 150 ? "is-over-limit" : undefined}>
                       {formData.phoneComment.length} / 150
                     </span>
                   </div>
@@ -3665,67 +3641,67 @@ const Sidebar = () => {
                     placeholder="내용을 작성해 주세요."
                     maxLength={150}
                     rows={4}
-                    style={{
-                      width: "100%",
-                      padding: "16px",
-                      backgroundColor: "#252836",
-                      border: "1px solid #333",
-                      borderRadius: "8px",
-                      color: "#fff",
-                      fontSize: "14px",
-                      outline: "none",
-                      boxSizing: "border-box" as const,
-                      resize: "none" as const,
-                      fontFamily: "inherit",
-                    }}
                   />
                 </>
               ) : (
-                <p style={{ fontSize: "0.9375rem", lineHeight: 1.9, color: "#ddd", margin: 0, padding: "20px 24px", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 0, whiteSpace: "pre-wrap" as const }}>
+                <p className="modal-content-text">
                   {formData.phoneComment || "등록된 내용이 없습니다."}
                 </p>
               )}
             </div>
 
-            {/* 푸터 */}
-            <div className="edit-modal-footer" style={{ flexShrink: 0, display: "flex", flexDirection: "column" as const, gap: "8px", padding: "16px 28px", height: "118px", boxSizing: "border-box" as const }}>
-              {/* 1행 */}
-              <div className="modal-footer-top" style={{ display: "flex", alignItems: "center", justifyContent: isPhoneEditing ? "space-between" : "flex-end" }}>
-                {isPhoneEditing && (
-                  <button
-                    type="button"
-                    onClick={() => setIsPhoneHelpModalOpen(true)}
-                    style={{ fontSize: "30px", width: "57px", height: "57px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
-                    aria-label="도움말"
-                  >
-                    🔎
-                  </button>
-                )}
-                <div className="modal-footer-right" style={{ display: "flex", gap: "8px" }}>
-                  {isPhoneEditing ? (
+            {/* 푸터 — Type B (2-row: 🔎+버튼 동일 y좌표 고정 + 안내문 하단) */}
+            <div className="edit-modal-footer">
+              <div className="modal-footer-top">
+                {/* 좌측: 🔎 notice-stamp */}
+                <div
+                  className="notice-stamp"
+                  onClick={() => setIsPhoneHelpModalOpen(true)}
+                  role="button"
+                  aria-label="도움말"
+                >
+                  🔎
+                </div>
+
+                {/* 우측: 버튼 그룹 */}
+                <div className="modal-footer-right">
+                  {!isPhoneEditing ? (
+                    <button
+                      type="button"
+                      className="modal-edit-btn"
+                      onClick={() => {
+                        phoneCommentSnapshot.current = formData.phoneComment;
+                        setIsPhoneEditing(true);
+                      }}
+                    >
+                      수정
+                    </button>
+                  ) : (
                     <>
                       <button
                         type="button"
+                        className="modal-cancel-btn"
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, phoneComment: phoneCommentSnapshot.current }));
+                          setIsPhoneEditing(false);
+                        }}
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        className="modal-reset-btn"
                         onClick={() => {
                           if (window.confirm("입력한 내용을 초기화하시겠습니까?")) {
                             setFormData((prev) => ({ ...prev, phoneComment: DEFAULT_PHONE_COMMENT }));
                           }
-                        }}
-                        style={{
-                          padding: "8px 20px",
-                          border: "1px solid #4CAF50",
-                          background: "transparent",
-                          color: "#4CAF50",
-                          borderRadius: 0,
-                          fontSize: "14px",
-                          fontWeight: 600,
-                          cursor: "pointer",
                         }}
                       >
                         초기화
                       </button>
                       <button
                         type="button"
+                        className="modal-save-btn"
                         onClick={async () => {
                           if (!window.confirm("저장하시겠습니까?")) return;
                           if (demoMode) {
@@ -3751,45 +3727,23 @@ const Sidebar = () => {
                             alert("저장 중 오류가 발생했습니다.");
                           }
                         }}
-                        style={{
-                          padding: "8px 20px",
-                          border: "1px solid transparent",
-                          background: "#FAAB07",
-                          color: "#1a1a1a",
-                          borderRadius: 0,
-                          fontSize: "14px",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
                       >
                         저장
                       </button>
                     </>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsPhoneEditing(true)}
-                      style={{
-                        padding: "8px 20px",
-                        border: "1px solid transparent",
-                        background: "#FAAB07",
-                        color: "#1a1a1a",
-                        borderRadius: 0,
-                        fontSize: "14px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      수정
-                    </button>
                   )}
                 </div>
               </div>
-              {isPhoneEditing && (
-                <div className="modal-footer-bottom" style={{ textAlign: "right" as const, fontSize: "15px", color: "#999" }}>
+
+              {/* 하단 row: 안내문 — visibility 토글로 공간 유지 (🔎/버튼 y좌표 고정) */}
+              <div className="modal-footer-bottom">
+                <span
+                  className="modal-notice"
+                  style={{ visibility: isPhoneEditing ? "visible" : "hidden" }}
+                >
                   내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊
-                </div>
-              )}
+                </span>
+              </div>
             </div>
           </div>
         </div>

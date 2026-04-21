@@ -5665,3 +5665,34 @@
   flex: 1;
   padding: 20px;
 }
+
+// ===== Zone A (<1920): 모달 1920 baseline 고정 + 가로 스크롤 허용 =====
+// 페이지 본문과 별개 정책. viewport<1920 시 모달은 축소하지 않고 오버레이 내에서 스크롤.
+// Zone B(1920) / Zone C(>1920) 변화 없음.
+@media (max-width: 1919px) {
+  // Zone A에서 overlay를 block으로 전환 — flex의 "centered overflow 왼쪽 접근 불가" 버그를 근본 회피.
+  // help-modal-overlay는 JSX에 inline style이 있어 !important로 덮어쓰기.
+  .section-modal-overlay,
+  .output-modal-overlay,
+  .help-modal-overlay {
+    display: block !important;
+    overflow: auto !important;
+  }
+
+  // 스크롤 컨테이너: wrapper(1920) ≥ modal(1468)이라 wrapper 내부 flex center는 안전.
+  // overlay가 block이므로 wrapper가 x=0에서 시작 → 양방향 scroll 정상.
+  .modal-scroll-content {
+    min-width: 1920px;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  // 가로형_대(1468×855)
+  .section-modal,
+  .output-modal {
+    flex-shrink: 0;
+  }
+}

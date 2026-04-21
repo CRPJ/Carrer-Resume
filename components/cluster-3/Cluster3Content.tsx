@@ -22,6 +22,17 @@ import { CLUSTER3_CHANNEL_DEFAULTS, createInitialChannelCards } from "@/constant
 import { OUTPUT_CARD_1_DEFAULT } from "@/constants/dummyData/cluster3-output-default";
 import { DETAIL_CARD_1_DEFAULT, createInitialDetailCardsWithDefault } from "@/constants/dummyData/cluster3-detail-default";
 
+// Zone C(>1920px, ResponsiveScale.tsx에서 documentElement에 zoom:1.08 적용) 대응.
+// getBoundingClientRect는 zoom 적용 후 좌표를 반환하지만 position:fixed의 top/left는 CSS 픽셀 기준이라 좌표가 어긋난다.
+// zoom이 적용되지 않은 Zone A/B에서는 1을 반환해 기존 동작을 유지한다.
+const getDocumentZoom = (): number => {
+  if (typeof window === "undefined") return 1;
+  const z = getComputedStyle(document.documentElement).zoom;
+  if (!z || z === "1" || z === "normal") return 1;
+  const num = parseFloat(z);
+  return Number.isFinite(num) && num > 0 ? num : 1;
+};
+
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -1161,18 +1172,28 @@ const Cluster3Content = () => {
       setDropdownPosition(null);
     } else {
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const zoom = getDocumentZoom();
       setOpenDropdownId(id);
-      setDropdownPosition({ top: rect.bottom, left: rect.left, width: rect.width });
+      setDropdownPosition(
+        zoom === 1
+          ? { top: rect.bottom, left: rect.left, width: rect.width }
+          : { top: rect.bottom / zoom, left: rect.left / zoom, width: rect.width / zoom }
+      );
     }
   };
 
   const getCalendarPosition = (trigger: HTMLButtonElement | null): CalendarPosition | null => {
     if (!trigger) return null;
     const rect = trigger.getBoundingClientRect();
-    return {
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.right + window.scrollX - PERIOD_CALENDAR_WIDTH,
-    };
+    const zoom = getDocumentZoom();
+    const top = rect.bottom + window.scrollY + 8;
+    const left = rect.right + window.scrollX - PERIOD_CALENDAR_WIDTH;
+    // Zone C(zoom:1.08)에서 getBoundingClientRect/scrollY는 post-zoom 좌표,
+    // position:absolute의 top/left는 zoom된 좌표계에 CSS 픽셀로 적용되므로 zoom으로 나눠 보정.
+    // zoom === 1(Zone A/B)에서는 원본 식과 완전히 동일한 경로.
+    return zoom === 1
+      ? { top, left }
+      : { top: top / zoom, left: left / zoom };
   };
 
   const updateOutputCalendarPosition = () => {
@@ -2406,6 +2427,7 @@ const Cluster3Content = () => {
       {/* 섹션 3 모달 - 채널 링크 편집 */}
       {section3ModalOpen && (
         <div className="section-modal-overlay">
+          <div className="modal-scroll-content">
           <div className="section-modal">
             <div className="section-modal-header">
               <button className="modal-close-btn" onClick={handleCloseModal}>
@@ -2754,6 +2776,7 @@ const Cluster3Content = () => {
               </div>
             </div>
           </div>
+          </div>
         </div>
       )}
       {/* fixed 드롭다운 옵션 (overflow 잘림 방지) */}
@@ -3056,6 +3079,7 @@ const Cluster3Content = () => {
       {/* 섹션 4 모달 - Top Works 링크 편집 */}
       {section4ModalOpen && (
         <div className="output-modal-overlay">
+          <div className="modal-scroll-content">
           <div className="output-modal">
             <div className="output-modal-header">
               <button className="modal-close-btn" onClick={handleCloseOutputModal}>
@@ -3801,11 +3825,13 @@ const Cluster3Content = () => {
               </div>
             </div>
           </div>
+          </div>
         </div>
       )}
 
       {isDetailModalOpen && (
         <div className="output-modal-overlay">
+          <div className="modal-scroll-content">
           <div className="output-modal detail-modal-variant">
             <div className="output-modal-header">
               <button className="modal-close-btn" onClick={handleCloseDetailModal}>
@@ -4550,6 +4576,7 @@ const Cluster3Content = () => {
                 <p className={`modal-footer-notice ${detailFooterNotice === "error" ? "notice-error" : ""}`}>{detailFooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}</p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}
