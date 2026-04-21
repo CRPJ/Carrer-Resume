@@ -18,6 +18,7 @@ import {
   DEFAULT_DEMO_USER,
 } from "@/constants/dummyData";
 import { CLUSTER3_CHANNEL_DEFAULTS, createInitialChannelCards } from "@/constants/dummyData/cluster3-section-default";
+import { OUTPUT_CARD_1_DEFAULT } from "@/constants/dummyData/cluster3-output-default";
 
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
@@ -970,6 +971,7 @@ const Cluster3Content = () => {
   const [isOutputEditMode, setIsOutputEditMode] = useState(false);
   const [outputSnapshot, setOutputSnapshot] = useState<OutputCard | null>(null);
   const [outputFooterNotice, setOutputFooterNotice] = useState<"default" | "error">("default");
+  const [canEditOutput, setCanEditOutput] = useState<boolean>(isDemoMode);
   const [captionOpenIndex, setCaptionOpenIndex] = useState<number | null>(null);
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const subImageInputRefs = useRef<(HTMLInputElement | null)[]>([null, null]);
@@ -1110,16 +1112,73 @@ const Cluster3Content = () => {
   const handleResetOutput = () => {
     if (window.confirm("내용을 모두 초기화하시겠어요?")) {
       const updated = [...outputCards];
-      updated[currentOutputIndex] = emptyOutputCard(currentOutputIndex + 1);
+      updated[currentOutputIndex] =
+        currentOutputIndex === 0
+          ? ({ ...OUTPUT_CARD_1_DEFAULT } as OutputCard)
+          : emptyOutputCard(currentOutputIndex + 1);
       setOutputCards(updated);
       setOutputFooterNotice("default");
     }
   };
 
+  const validateOutputCard = (card: OutputCard): string[] => {
+    const errors: string[] = [];
+    if (!card.mainTitle?.trim()) errors.push("메인 제목");
+    if (!card.subTitle?.trim()) errors.push("서브 제목");
+    if (!card.contribution || card.contribution <= 0) errors.push("기여도");
+    if (!card.platform?.trim()) errors.push("플랫폼");
+    if (!card.roleDescription?.trim()) errors.push("역할 문구");
+    if (!card.roles || card.roles.length === 0) errors.push("역할 선택");
+    if (!card.tools || card.tools.length === 0) errors.push("사용 기술/도구");
+    if (!card.periodStartYear || !card.periodStartMonth || !card.periodStartDay) errors.push("시작일");
+    if (!card.periodEndYear || !card.periodEndMonth || !card.periodEndDay) errors.push("종료일");
+    if (!card.mainImage) errors.push("메인 이미지");
+    if (!card.subImages || card.subImages.some((img) => !img)) errors.push("서브 이미지");
+    const filledLinks = (card.links || []).filter((l) => l?.trim());
+    if (filledLinks.length === 0) errors.push("링크 (최소 1개)");
+    const metrics = card.metrics || [];
+    let hasCompleteMetric = false;
+    for (let i = 0; i < metrics.length; i += 2) {
+      if (metrics[i]?.trim() && metrics[i + 1]?.trim()) {
+        hasCompleteMetric = true;
+        break;
+      }
+    }
+    if (!hasCompleteMetric) errors.push("주요 정량 지표 (최소 1행)");
+    if (!card.report?.trim()) errors.push("Output Report");
+    if (!card.insight?.trim()) errors.push("Output Insight");
+    return errors;
+  };
+
+  const compactOutputCard = (card: OutputCard): OutputCard => {
+    const compactLinks = (card.links || []).filter((l) => l?.trim());
+    while (compactLinks.length < 3) compactLinks.push("");
+    const metrics = card.metrics || [];
+    const compactMetrics: string[] = [];
+    for (let i = 0; i < metrics.length; i += 2) {
+      const name = metrics[i]?.trim() || "";
+      const value = metrics[i + 1]?.trim() || "";
+      if (name || value) compactMetrics.push(name, value);
+    }
+    while (compactMetrics.length < 6) compactMetrics.push("");
+    return { ...card, links: compactLinks, metrics: compactMetrics };
+  };
+
   const handleSaveOutput = () => {
+    const current = outputCards[currentOutputIndex];
+    const errors = validateOutputCard(current);
+    if (errors.length > 0) {
+      setOutputFooterNotice("error");
+      alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
+      return;
+    }
     if (!window.confirm("저장하시겠습니까?")) return;
-    console.log("TODO: 저장 API 호출", outputCards);
-    setOutputSnapshot(JSON.parse(JSON.stringify(outputCards[currentOutputIndex])));
+    const compacted = compactOutputCard(current);
+    const updated = [...outputCards];
+    updated[currentOutputIndex] = compacted;
+    setOutputCards(updated);
+    console.log("TODO: 저장 API 호출", updated);
+    setOutputSnapshot(JSON.parse(JSON.stringify(compacted)));
     setIsOutputEditMode(false);
     setOutputFooterNotice("default");
   };
@@ -1809,18 +1868,19 @@ const Cluster3Content = () => {
             if (position > 2) position -= totalSlides;
             if (position < -2) position += totalSlides;
 
+            const isVoidCard = index >= 1 && !outputCards[index]?.mainTitle;
             return (
               <div
                 key={slide.id}
-                className={`slider-item position-${position}${slide.link ? " has-link" : ""}`}
+                className={`slider-item position-${position}${slide.link ? " has-link" : ""}${isVoidCard ? " void-card" : ""}`}
                 data-position={position}
                 onClick={() => {
-                  if (position === 0) {
-                    setCurrentOutputIndex(index);
-                    setSection4ModalOpen(true);
-                  }
+                  if (position !== 0) return;
+                  if (isVoidCard) return;
+                  setCurrentOutputIndex(index);
+                  setSection4ModalOpen(true);
                 }}
-                style={{ cursor: position === 0 ? "pointer" : "default" }}
+                style={{ cursor: position === 0 && !isVoidCard ? "pointer" : "default", opacity: isVoidCard ? 0.4 : 1 }}
               >
                 <img src={`/images/0/cluster 3/image/2-${slide.id}.png`} alt={`Work ${slide.id}`} />
                 <div className="card-overlay">
@@ -2533,6 +2593,7 @@ const Cluster3Content = () => {
                     </span>
                     <div className="output-period" data-field="period">
                       <div className="period-display-row">
+                        {isOutputEditMode && <span className="required-mark">*</span>}
                         <span className="period-value">
                           {outputCards[currentOutputIndex].periodStartYear
                             ? `${String(outputCards[currentOutputIndex].periodStartYear).slice(2)}. ${String(outputCards[currentOutputIndex].periodStartMonth || 0).padStart(2, "0")}. ${String(outputCards[currentOutputIndex].periodStartDay || 0).padStart(2, "0")}`
@@ -2613,6 +2674,7 @@ const Cluster3Content = () => {
                     </div>
                   </div>
                   <div className="output-main-title output-field-with-count" data-field="mainTitle">
+                    {isOutputEditMode && <span className="required-mark" style={{ position: "absolute", top: "4px", right: "6px", pointerEvents: "none", zIndex: 2 }}>*</span>}
                     {isOutputEditMode ? (
                       <input
                         type="text"
@@ -2630,6 +2692,7 @@ const Cluster3Content = () => {
                     {isOutputEditMode && <span className="char-count">{(outputCards[currentOutputIndex].mainTitle || "").length}/30</span>}
                   </div>
                   <div className="output-sub-title output-field-with-count" data-field="subTitle">
+                    {isOutputEditMode && <span className="required-mark" style={{ position: "absolute", top: "4px", right: "6px", pointerEvents: "none", zIndex: 2 }}>*</span>}
                     {isOutputEditMode ? (
                       <textarea
                         value={outputCards[currentOutputIndex].subTitle || ""}
@@ -2649,7 +2712,7 @@ const Cluster3Content = () => {
                   {/* (3) 기여도 + (4) 플랫폼 */}
                   <div className="output-meta-row">
                     <div className="output-contribution" data-field="contribution">
-                      <label>기여도</label>
+                      <label>기여도{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</label>
                       <div className="contribution-bar-wrapper">
                         <div className="contribution-bar">
                           <div className="contribution-fill" style={{ width: `${outputCards[currentOutputIndex].contribution || 0}%` }} />
@@ -2667,7 +2730,7 @@ const Cluster3Content = () => {
                       </div>
                     </div>
                     <div className="output-platform" data-field="platform">
-                      <label>플랫폼</label>
+                      <label>플랫폼{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</label>
                       {isOutputEditMode ? (
                         <div className="custom-dropdown output-platform-dropdown">
                           <div className="dropdown-selected" onClick={(e) => toggleDropdown("outputPlatform", e)}>
@@ -2695,7 +2758,7 @@ const Cluster3Content = () => {
                     <div className="output-role-column">
                       <div className="output-role-section" data-field="role">
                         <div className="output-role-header">
-                          <label>역할</label>
+                          <label>역할{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</label>
                           <div className="output-role-input-wrap" style={{ position: "relative", flex: 1 }}>
                             {isOutputEditMode ? (
                               <input
@@ -2753,8 +2816,9 @@ const Cluster3Content = () => {
                         const link = (outputCards[currentOutputIndex].links || ["", "", ""])[i];
                         const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07"][i];
                         return (
-                          <div className="output-link-row" key={i}>
+                          <div className="output-link-row" key={i} style={!isOutputEditMode ? { marginLeft: "9px" } : undefined}>
                             <span className="link-dot" style={{ backgroundColor: dotColor, marginLeft: "auto" }} />
+                            {isOutputEditMode && i === 0 && <span className="required-mark" style={{ position: "absolute", right: "266px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", zIndex: 2 }}>*</span>}
                             {isOutputEditMode ? (
                               <input
                                 type="text"
@@ -2766,10 +2830,10 @@ const Cluster3Content = () => {
                                 }}
                                 placeholder="https://..."
                                 className="output-link-input"
-                                style={{ maxWidth: "150px" }}
+                                style={{ maxWidth: "212px" }}
                               />
                             ) : (
-                              <span className="output-link-text" style={{ maxWidth: "150px" }}>
+                              <span className="output-link-text" style={{ maxWidth: "212px" }}>
                                 {link ? (link.length > 20 ? link.substring(0, 20) + ".." : link) : "-"}
                               </span>
                             )}
@@ -2793,6 +2857,7 @@ const Cluster3Content = () => {
                           <i className="ti ti-photo-plus"></i>
                         </div>
                       )}
+                      {isOutputEditMode && !outputCards[currentOutputIndex].mainImage && <span className="required-mark" style={{ position: "absolute", bottom: "4px", left: "6px" }}>*</span>}
                       {isOutputEditMode && captionOpenIndex === 0 && (
                         <div
                           className="image-caption-overlay"
@@ -2902,7 +2967,7 @@ const Cluster3Content = () => {
                 <div className="output-bottom-left">
                   <div className="output-tools-section" data-field="tools">
                     <div className="output-tools-header">
-                      <label>사용 기술/도구</label>
+                      <label>사용 기술/도구{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</label>
                       <div className="selected-tools">
                         {(() => {
                           const sortedSelected = TOOL_OPTIONS.filter((t) => (outputCards[currentOutputIndex].tools || []).includes(t.key));
@@ -2936,6 +3001,7 @@ const Cluster3Content = () => {
                                 <i className="ti ti-photo-plus"></i>
                               </div>
                             )}
+                            {isOutputEditMode && !img && <span className="required-mark" style={{ position: "absolute", bottom: "4px", left: "6px" }}>*</span>}
                             {isOutputEditMode && captionOpenIndex === slotIndex + 1 && (
                               <div
                                 className="image-caption-overlay"
@@ -3064,7 +3130,7 @@ const Cluster3Content = () => {
                 <div className="output-stats-column">
                   <div className="output-stats-top-row">
                     <div className="output-metrics-section" data-field="metrics">
-                      <h5 className="output-section-title">주요 정량 지표</h5>
+                      <h5 className="output-section-title">주요 정량 지표{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</h5>
                       <div className="output-metrics-rows">
                         {[0, 1, 2].map((rowIndex) => {
                           const col1Index = rowIndex * 2;
@@ -3125,7 +3191,7 @@ const Cluster3Content = () => {
                       </div>
                     </div>
                     <div className="output-report-section" data-field="report" style={{ position: "relative" }}>
-                      <h5 className="output-section-title">Output Report</h5>
+                      <h5 className="output-section-title">Output Report{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</h5>
                       <textarea
                         value={outputCards[currentOutputIndex].report || ""}
                         onChange={
@@ -3162,7 +3228,7 @@ const Cluster3Content = () => {
                     </div>
                   </div>
                   <div className="output-insight-section" data-field="insight">
-                    <h5 className="output-section-title">Output Insight</h5>
+                    <h5 className="output-section-title">Output Insight{isOutputEditMode && <span className="required-mark" style={{ marginLeft: "2px" }}>*</span>}</h5>
                     <div style={{ position: "relative" }}>
                       <textarea
                         value={outputCards[currentOutputIndex].insight || ""}
@@ -3206,7 +3272,16 @@ const Cluster3Content = () => {
                 </div>
                 <div className="modal-footer-right">
                   {!isOutputEditMode ? (
-                    <button className="modal-edit-btn" onClick={() => setIsOutputEditMode(true)}>
+                    <button
+                      className="modal-edit-btn"
+                      onClick={() => {
+                        if (!canEditOutput) {
+                          alert("관리자의 허가가 필요합니다.");
+                          return;
+                        }
+                        setIsOutputEditMode(true);
+                      }}
+                    >
                       수정
                     </button>
                   ) : (
