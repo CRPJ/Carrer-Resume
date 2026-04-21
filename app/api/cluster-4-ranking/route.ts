@@ -225,7 +225,7 @@ export async function GET(request: NextRequest) {
       // 해당 주차 열린 활동
       supabaseAdmin
         .from('weekly_activities')
-        .select('id, activity_type_id, is_active, opened_at')
+        .select('id, activity_type_id, is_active, opened_at, deadline')
         .eq('week_id', weekId)
         .eq('is_active', true),
       // 현재 주차의 완료된 활동 기록 (강화 성공 판정용 — 1000건 제한에 안전)
@@ -479,16 +479,16 @@ export async function GET(request: NextRequest) {
           if (hasSecondaryInfo) return true;
         }
 
-        // 3. 48시간 경과 여부 확인
+        // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
         const activity = activeActivities.find(a => a.activity_type_id === activityTypeId);
         if (!activity?.opened_at) return false;
 
+        if (activity.deadline) {
+          return Date.now() >= new Date(activity.deadline).getTime();
+        }
         const openedTime = new Date(activity.opened_at).getTime();
-        const now = Date.now();
-        const elapsed = now - openedTime;
-        const deadline = 48 * 60 * 60 * 1000; // 48시간
-
-        return elapsed >= deadline;
+        const elapsed = Date.now() - openedTime;
+        return elapsed >= 48 * 60 * 60 * 1000;
       };
 
       // ===== 휴식 주차 체크 =====

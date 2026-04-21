@@ -570,7 +570,7 @@ const Cluster4Content = () => {
       // 3. weekly_activities 가져오기 (열린 활동)
       const { data: activitiesData } = await supabase
         .from('weekly_activities')
-        .select('activity_type_id, is_active, opened_at')
+        .select('activity_type_id, is_active, opened_at, deadline')
         .eq('week_id', weekId);
 
       if (!activitiesData) return;
@@ -644,7 +644,6 @@ const Cluster4Content = () => {
       const calcStats = (typeIds: string[]) => {
         const total = activeActivities.filter(a => typeIds.includes(a.activity_type_id)).length;
         const now = Date.now();
-        const deadline = 48 * 60 * 60 * 1000; // 48시간
 
         const success = activeActivities.filter(a => {
           if (!typeIds.includes(a.activity_type_id)) return false;
@@ -661,10 +660,12 @@ const Cluster4Content = () => {
 
           if (hasSecondaryInfo) return true;
 
-          // 48시간 경과 확인
-          if (a.opened_at) {
+          // 마감 시간 경과 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
+          if (a.deadline) {
+            if (now >= new Date(a.deadline).getTime()) return true;
+          } else if (a.opened_at) {
             const openedTime = new Date(a.opened_at).getTime();
-            if (now - openedTime >= deadline) return true;
+            if (now - openedTime >= 48 * 60 * 60 * 1000) return true;
           }
 
           return false;
@@ -719,9 +720,8 @@ const Cluster4Content = () => {
           }
         });
 
-        // success 계산 (강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
+        // success 계산 (강화 성공 기준: is_completed + (마감 경과 OR 2차 정보 기입))
         const now = Date.now();
-        const deadline = 48 * 60 * 60 * 1000; // 48시간
 
         const experienceSuccess = experienceActivities.filter(a => {
           if (!approvedActivityTypes.has(a.activity_type_id)) return false;
@@ -737,10 +737,12 @@ const Cluster4Content = () => {
 
           if (hasSecondaryInfo) return true;
 
-          // 48시간 경과 확인
-          if (a.opened_at) {
+          // 마감 시간 경과 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
+          if (a.deadline) {
+            if (now >= new Date(a.deadline).getTime()) return true;
+          } else if (a.opened_at) {
             const openedTime = new Date(a.opened_at).getTime();
-            if (now - openedTime >= deadline) return true;
+            if (now - openedTime >= 48 * 60 * 60 * 1000) return true;
           }
 
           return false;

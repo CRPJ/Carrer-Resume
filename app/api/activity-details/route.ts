@@ -95,11 +95,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 권한 체크: 48시간 윈도우 OR 어드민 개별 grant
+    // 권한 체크: 마감 시간 이내 OR 어드민 개별 grant
     const [weeklyActivityResult, grantResult] = await Promise.all([
       supabaseAdmin
         .from('weekly_activities')
-        .select('is_active, opened_at')
+        .select('is_active, opened_at, deadline')
         .eq('week_id', week_id)
         .eq('activity_type_id', activity_type_id)
         .maybeSingle(),
@@ -113,15 +113,19 @@ export async function POST(request: NextRequest) {
     ])
 
     const wa = weeklyActivityResult.data
-    const isWithin48h = wa?.is_active && wa?.opened_at &&
-      (Date.now() - new Date(wa.opened_at).getTime()) < 48 * 60 * 60 * 1000
+    // deadline 컬럼 우선, 없으면 opened_at+48h 폴백
+    const isBeforeDeadline = wa?.is_active && (
+      wa?.deadline
+        ? Date.now() < new Date(wa.deadline).getTime()
+        : wa?.opened_at && (Date.now() - new Date(wa.opened_at).getTime()) < 48 * 60 * 60 * 1000
+    )
 
     const grant = grantResult.data
     const hasActiveGrant = grant && new Date(grant.deadline).getTime() > Date.now()
 
-    if (!isWithin48h && !hasActiveGrant) {
+    if (!isBeforeDeadline && !hasActiveGrant) {
       return NextResponse.json(
-        { error: '2차 정보 입력 권한이 없습니다. (48시간 경과 또는 권한 미부여)' },
+        { error: '2차 정보 입력 권한이 없습니다. (마감 시간 경과 또는 권한 미부여)' },
         { status: 403 }
       )
     }

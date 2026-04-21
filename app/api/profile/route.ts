@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
           .order("start_date", { ascending: false }),
         // [13] weekly_activities for this week
         supabaseAdmin.from("weekly_activities")
-          .select("id, activity_type_id, title, is_active, opened_at, output_links")
+          .select("id, activity_type_id, title, is_active, opened_at, deadline, output_links")
           .eq("week_id", weekId),
         // [14] user_weekly_growth for this week
         supabaseAdmin.from("user_weekly_growth")

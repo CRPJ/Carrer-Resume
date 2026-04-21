@@ -147,7 +147,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     activity_type_id: string;
     title: string | null;
     is_active: boolean;
-    opened_at: string | null;  // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
+    opened_at: string | null;
+    deadline: string | null;  // 마감 시각 (없으면 opened_at+48h 폴백)
     output_links: OutputLink[] | null;  // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
@@ -789,15 +790,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
             if (hasSecondaryInfo) return true;
 
-            // 3. 48시간 경과 여부 확인
+            // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
             const activity = activitiesData.find(a => a.activity_type_id === activityTypeId);
-            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+
+            if (activity?.deadline) {
+              return Date.now() >= new Date(activity.deadline).getTime();
+            }
+
+            const deadline48h = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
 
             if (!activity?.opened_at) {
               // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
               if (currentWeek?.end_date) {
                 const weekEndTime = new Date(`${currentWeek.end_date}T23:59:59`).getTime();
-                if (Date.now() - weekEndTime >= deadline) return true;
+                if (Date.now() - weekEndTime >= deadline48h) return true;
               }
               return false;
             }
@@ -805,7 +811,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             const openedTime = new Date(activity.opened_at).getTime();
             const elapsed = Date.now() - openedTime;
 
-            return elapsed >= deadline;
+            return elapsed >= deadline48h;
           };
 
           const infoSuccess = infoTypesList.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
@@ -1676,11 +1682,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return 'success';
     }
 
-    // 4. 2차 정보 미기입 시, 48시간 경과 여부 확인
+    // 4. 2차 정보 미기입 시, 마감 시간 경과 여부 확인 (deadline 컬럼 우선)
+    if (activity?.deadline) {
+      const isPastDeadline = Date.now() >= new Date(activity.deadline).getTime();
+      console.log(`[getEnhancementStatus] ${activityType}: deadline=${activity.deadline}, result=${isPastDeadline ? 'success' : 'waiting'}`);
+      return isPastDeadline ? 'success' : 'waiting';
+    }
+
     const openedAt = activity?.opened_at;
     if (!openedAt) {
       // 개설 시각이 없으면, 주차 종료일 기준 48시간 경과 여부로 판단
-      // (지나간 주차의 미기록 활동은 자동으로 강화 성공 처리)
       if (weekData?.endDate) {
         const weekEndTime = new Date(`${weekData.endDate}T23:59:59`).getTime();
         if (Date.now() - weekEndTime >= 48 * 60 * 60 * 1000) {
@@ -1694,16 +1705,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const openedTime = new Date(openedAt).getTime();
     const now = Date.now();
     const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+    const deadline48h = 48 * 60 * 60 * 1000;
     const hoursElapsed = Math.floor(elapsed / (60 * 60 * 1000));
 
-    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, deadline=48h, result=${elapsed >= deadline ? 'success' : 'waiting'}`);
+    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, result=${elapsed >= deadline48h ? 'success' : 'waiting'}`);
 
-    if (elapsed >= deadline) {
-      // 48시간 경과 → 강화 성공 (2차 정보 없이도 자동 성공)
+    if (elapsed >= deadline48h) {
       return 'success';
     } else {
-      // 48시간 미경과 + 2차 정보 미기입 → 강화 대기
       return 'waiting';
     }
   };
@@ -1721,14 +1730,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return weekActivityDetails.find(ad => ad.activity_type_id === activityType);
   };
 
-  // 48시간 이내인지 확인
-  const isWithin48Hours = (openedAt: string | null): boolean => {
-    if (!openedAt) return false;
-    const openedTime = new Date(openedAt).getTime();
-    const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-    return elapsed < deadline;
+  // 마감 시간 이내인지 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
+  const isBeforeDeadline = (activity: { opened_at: string | null; deadline?: string | null } | null): boolean => {
+    if (!activity) return false;
+    if (activity.deadline) {
+      return Date.now() < new Date(activity.deadline).getTime();
+    }
+    if (!activity.opened_at) return false;
+    const openedTime = new Date(activity.opened_at).getTime();
+    return (Date.now() - openedTime) < 48 * 60 * 60 * 1000;
   };
 
   // 어드민 개별 권한(grant)이 활성 상태인지 확인
@@ -1738,17 +1748,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return new Date(grant.deadline).getTime() > Date.now();
   };
 
-  // 활동이 개설되었고 48시간 이내인지 확인, 또는 어드민 개별 grant가 있는지 확인
+  // 활동이 개설되었고 마감 전인지 확인, 또는 어드민 개별 grant가 있는지 확인
   const isActivityActive = (activityType: string): boolean => {
-    // Path 1: 기존 플로우 — 파트 개설 + 48시간 이내
+    // Path 1: 기존 플로우 — 파트 개설 + 마감 전
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-    if (activity?.is_active && isWithin48Hours(activity.opened_at)) return true;
+    if (activity?.is_active && isBeforeDeadline(activity)) return true;
     // Path 2: 어드민 개별 권한 부여 (예외 메커니즘)
     if (hasActiveGrant(activityType)) return true;
     return false;
   };
 
-  // 활동이 개설되었지만 48시간이 지났는지 확인 (마감 표시용)
+  // 활동이 개설되었지만 마감 시간이 지났는지 확인 (마감 표시용)
   const isActivityExpired = (activityType: string): boolean => {
     // 어드민 grant가 활성이면 만료 아님
     if (hasActiveGrant(activityType)) return false;
@@ -1759,8 +1769,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       if (grant && new Date(grant.deadline).getTime() <= Date.now()) return true;
       return false;
     }
-    // 개설은 되었지만 48시간이 지남
-    return !isWithin48Hours(activity.opened_at);
+    // 개설은 되었지만 마감 시간이 지남
+    return !isBeforeDeadline(activity);
   };
 
   // 실무 역량: 아무 activity type이나 개설되었는지 확인
@@ -1785,20 +1795,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return openedType || workAbilityActivityTypes[0];
   };
 
-  // 남은 시간 계산 (표시용)
+  // 남은 시간 계산 (표시용) - deadline 컬럼 우선, 없으면 opened_at+48h 폴백
   const getRemainingTime = (activityType: string): { hours: number; minutes: number } | null => {
     const now = Date.now();
 
-    // 기존 48시간 윈도우 확인
     const activity = weeklyActivities.find(a => a.activity_type_id === activityType);
-    if (activity?.is_active && activity.opened_at) {
-      const openedTime = new Date(activity.opened_at).getTime();
-      const remaining48h = (openedTime + 48 * 60 * 60 * 1000) - now;
-      if (remaining48h > 0) {
-        return {
-          hours: Math.floor(remaining48h / (60 * 60 * 1000)),
-          minutes: Math.floor((remaining48h % (60 * 60 * 1000)) / (60 * 1000)),
-        };
+    if (activity?.is_active) {
+      let deadlineTime: number | null = null;
+      if (activity.deadline) {
+        deadlineTime = new Date(activity.deadline).getTime();
+      } else if (activity.opened_at) {
+        deadlineTime = new Date(activity.opened_at).getTime() + 48 * 60 * 60 * 1000;
+      }
+      if (deadlineTime) {
+        const remaining = deadlineTime - now;
+        if (remaining > 0) {
+          return {
+            hours: Math.floor(remaining / (60 * 60 * 1000)),
+            minutes: Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)),
+          };
+        }
       }
     }
 
@@ -1966,16 +1982,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
       if (hasSecondaryInfo) return true;
 
-      // 3. 48시간 경과 여부 확인
+      // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
       const activity = weeklyActivities.find(a => a.activity_type_id === activityTypeId);
+      if (activity?.deadline) {
+        return Date.now() >= new Date(activity.deadline).getTime();
+      }
       if (!activity?.opened_at) return false;
 
       const openedTime = new Date(activity.opened_at).getTime();
-      const now = Date.now();
-      const elapsed = now - openedTime;
-      const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-
-      return elapsed >= deadline;
+      return (Date.now() - openedTime) >= 48 * 60 * 60 * 1000;
     };
 
     const calcStats = (types: string[]) => {
