@@ -2826,7 +2826,7 @@ const Cluster3Content = () => {
                 <i className="ti ti-x"></i>
               </button>
               <div className="modal-header-top">
-                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <img src="/images/0/treasure.png" alt="treasure" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
                 <h3>Portfolio Output Top 5 [{currentOutputIndex + 1}]</h3>
               </div>
               <p className="modal-subtitle" style={{ visibility: isOutputEditMode ? "visible" : "hidden" }}>
@@ -3625,13 +3625,13 @@ const Cluster3Content = () => {
 
       {isDetailModalOpen && (
         <div className="output-modal-overlay">
-          <div className="output-modal detail-modal-variant" style={{ width: "1214px", height: "742px", maxWidth: "1214px", maxHeight: "742px" }}>
+          <div className="output-modal detail-modal-variant">
             <div className="output-modal-header">
               <button className="modal-close-btn" onClick={handleCloseDetailModal}>
                 <i className="ti ti-x"></i>
               </button>
               <div className="modal-header-top">
-                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <img src="/images/0/treasure.png" alt="treasure" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
                 <h3>Portfolio Output Detail 10 [{currentDetailIndex + 1}]</h3>
               </div>
               <p className="modal-subtitle" style={{ visibility: isDetailEditMode ? "visible" : "hidden" }}>
