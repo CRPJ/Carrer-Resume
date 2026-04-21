@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
@@ -57,6 +58,128 @@ const CustomSelect = ({ value, onChange, options, className, style }: { value: s
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+type PeriodDateRange = {
+  startDate: Date | null;
+  endDate: Date | null;
+};
+
+type CalendarPosition = {
+  top: number;
+  left: number;
+};
+
+const PERIOD_WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const PERIOD_CALENDAR_WIDTH = 286;
+
+const toDateOnly = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const isSameDate = (a: Date | null, b: Date | null) => {
+  if (!a || !b) return false;
+  return toDateOnly(a).getTime() === toDateOnly(b).getTime();
+};
+
+const isDateBetween = (date: Date, startDate: Date | null, endDate: Date | null) => {
+  if (!startDate || !endDate) return false;
+  const current = toDateOnly(date).getTime();
+  return current > toDateOnly(startDate).getTime() && current < toDateOnly(endDate).getTime();
+};
+
+const formatPeriodDateWithWeekday = (year: number | null, month: number | null, day: number | null) => {
+  if (!year || !month || !day) return "00. 00. 00 (0)";
+
+  const date = new Date(year, month - 1, day);
+  const yy = String(year).slice(-2);
+  const mm = String(month).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
+  const wd = PERIOD_WEEKDAYS[date.getDay()];
+
+  return `${yy}. ${mm}. ${dd} (${wd})`;
+};
+
+const PeriodRangePicker = ({
+  range,
+  month,
+  onMonthChange,
+  onSelect,
+  onToday,
+  onClear,
+  position,
+}: {
+  range: PeriodDateRange;
+  month: Date;
+  onMonthChange: (date: Date) => void;
+  onSelect: (date: Date) => void;
+  onToday: () => void;
+  onClear: () => void;
+  position: CalendarPosition;
+}) => {
+  const monthStart = new Date(month.getFullYear(), month.getMonth(), 1);
+  const calendarStart = new Date(monthStart);
+  calendarStart.setDate(calendarStart.getDate() - monthStart.getDay());
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(calendarStart);
+    date.setDate(calendarStart.getDate() + index);
+    return date;
+  });
+  const today = toDateOnly(new Date());
+  const helperText = range.startDate && !range.endDate ? "종료일을 선택해주세요" : "시작일과 종료일을 선택해주세요";
+
+  return (
+    <div className="period-range-panel calendar-popup" style={{ top: position.top, left: position.left }}>
+      <div className="period-range-helper">{helperText}</div>
+      <div className="period-range-header">
+        <button type="button" className="period-month-btn" onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() - 1, 1))}>
+          &lt;
+        </button>
+        <span className="period-month-title">
+          {month.getFullYear()}. {String(month.getMonth() + 1).padStart(2, "0")}
+        </span>
+        <button type="button" className="period-month-btn" onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() + 1, 1))}>
+          &gt;
+        </button>
+      </div>
+      <div className="period-weekdays">
+        {PERIOD_WEEKDAYS.map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
+      <div className="period-calendar-grid">
+        {days.map((date) => {
+          const outsideMonth = date.getMonth() !== month.getMonth();
+          const selectedStart = isSameDate(date, range.startDate);
+          const selectedEnd = isSameDate(date, range.endDate);
+          const inRange = isDateBetween(date, range.startDate, range.endDate);
+          const isToday = isSameDate(date, today);
+          const className = [
+            "period-day-btn",
+            outsideMonth ? "outside-month" : "",
+            selectedStart ? "range-start" : "",
+            selectedEnd ? "range-end" : "",
+            inRange ? "in-range" : "",
+            isToday ? "today" : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
+
+          return (
+            <button key={date.toISOString()} type="button" className={className} onClick={() => onSelect(date)}>
+              {date.getDate()}
+            </button>
+          );
+        })}
+      </div>
+      <div className="period-range-actions">
+        <button type="button" onClick={onToday}>
+          오늘
+        </button>
+        <button type="button" onClick={onClear}>
+          초기화
+        </button>
+      </div>
     </div>
   );
 };
@@ -976,9 +1099,12 @@ const Cluster3Content = () => {
   const [captionOpenIndex, setCaptionOpenIndex] = useState<number | null>(null);
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const subImageInputRefs = useRef<(HTMLInputElement | null)[]>([null, null]);
-  const periodStartInputRef = useRef<HTMLInputElement>(null);
-  const periodEndInputRef = useRef<HTMLInputElement>(null);
-  const [periodPickerOpen, setPeriodPickerOpen] = useState<"start" | "end" | null>(null);
+  const outputPeriodPickerRef = useRef<HTMLDivElement>(null);
+  const outputPeriodTriggerRef = useRef<HTMLButtonElement>(null);
+  const [outputDateRange, setOutputDateRange] = useState<PeriodDateRange>({ startDate: null, endDate: null });
+  const [outputRangePickerOpen, setOutputRangePickerOpen] = useState(false);
+  const [outputRangeMonth, setOutputRangeMonth] = useState(() => new Date());
+  const [outputCalendarPosition, setOutputCalendarPosition] = useState<CalendarPosition | null>(null);
 
   // ===== Detail-10 modal state =====
   const MAX_DETAIL_CARDS = 10;
@@ -1019,9 +1145,12 @@ const Cluster3Content = () => {
   const [detailCaptionOpenIndex, setDetailCaptionOpenIndex] = useState<number | null>(null);
   const detailMainImageInputRef = useRef<HTMLInputElement>(null);
   const detailSubImageInputRefs = useRef<(HTMLInputElement | null)[]>([null, null]);
-  const detailPeriodStartInputRef = useRef<HTMLInputElement>(null);
-  const detailPeriodEndInputRef = useRef<HTMLInputElement>(null);
-  const [detailPeriodPickerOpen, setDetailPeriodPickerOpen] = useState<"start" | "end" | null>(null);
+  const detailPeriodPickerRef = useRef<HTMLDivElement>(null);
+  const detailPeriodTriggerRef = useRef<HTMLButtonElement>(null);
+  const [detailDateRange, setDetailDateRange] = useState<PeriodDateRange>({ startDate: null, endDate: null });
+  const [detailRangePickerOpen, setDetailRangePickerOpen] = useState(false);
+  const [detailRangeMonth, setDetailRangeMonth] = useState(() => new Date());
+  const [detailCalendarPosition, setDetailCalendarPosition] = useState<CalendarPosition | null>(null);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
@@ -1035,6 +1164,25 @@ const Cluster3Content = () => {
       setOpenDropdownId(id);
       setDropdownPosition({ top: rect.bottom, left: rect.left, width: rect.width });
     }
+  };
+
+  const getCalendarPosition = (trigger: HTMLButtonElement | null): CalendarPosition | null => {
+    if (!trigger) return null;
+    const rect = trigger.getBoundingClientRect();
+    return {
+      top: rect.bottom + window.scrollY + 8,
+      left: rect.right + window.scrollX - PERIOD_CALENDAR_WIDTH,
+    };
+  };
+
+  const updateOutputCalendarPosition = () => {
+    const position = getCalendarPosition(outputPeriodTriggerRef.current);
+    if (position) setOutputCalendarPosition(position);
+  };
+
+  const updateDetailCalendarPosition = () => {
+    const position = getCalendarPosition(detailPeriodTriggerRef.current);
+    if (position) setDetailCalendarPosition(position);
   };
 
   useEffect(() => {
@@ -1052,6 +1200,108 @@ const Cluster3Content = () => {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [openDropdownId]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if ((e.target as Element).closest?.(".period-range-panel")) return;
+      if (outputPeriodPickerRef.current?.contains(e.target as Node)) return;
+      if (detailPeriodPickerRef.current?.contains(e.target as Node)) return;
+      setOutputRangePickerOpen(false);
+      setDetailRangePickerOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    if (!outputRangePickerOpen) return;
+    updateOutputCalendarPosition();
+    window.addEventListener("resize", updateOutputCalendarPosition);
+    window.addEventListener("scroll", updateOutputCalendarPosition, true);
+    return () => {
+      window.removeEventListener("resize", updateOutputCalendarPosition);
+      window.removeEventListener("scroll", updateOutputCalendarPosition, true);
+    };
+  }, [outputRangePickerOpen]);
+
+  useEffect(() => {
+    if (!detailRangePickerOpen) return;
+    updateDetailCalendarPosition();
+    window.addEventListener("resize", updateDetailCalendarPosition);
+    window.addEventListener("scroll", updateDetailCalendarPosition, true);
+    return () => {
+      window.removeEventListener("resize", updateDetailCalendarPosition);
+      window.removeEventListener("scroll", updateDetailCalendarPosition, true);
+    };
+  }, [detailRangePickerOpen]);
+
+  const getCardDateRange = (card: OutputCard): PeriodDateRange => ({
+    startDate:
+      card.periodStartYear && card.periodStartMonth && card.periodStartDay
+        ? new Date(card.periodStartYear, card.periodStartMonth - 1, card.periodStartDay)
+        : null,
+    endDate:
+      card.periodEndYear && card.periodEndMonth && card.periodEndDay
+        ? new Date(card.periodEndYear, card.periodEndMonth - 1, card.periodEndDay)
+        : null,
+  });
+
+  const getInitialRangeMonth = (range: PeriodDateRange) => range.startDate || range.endDate || new Date();
+
+  const formatPeriodRange = (card: OutputCard) =>
+    `${formatPeriodDateWithWeekday(card.periodStartYear, card.periodStartMonth, card.periodStartDay)} ~ ${formatPeriodDateWithWeekday(card.periodEndYear, card.periodEndMonth, card.periodEndDay)}`;
+
+  const applyOutputDateRange = (range: PeriodDateRange) => {
+    const updated = [...outputCards];
+    updated[currentOutputIndex] = {
+      ...updated[currentOutputIndex],
+      periodStartYear: range.startDate?.getFullYear() ?? null,
+      periodStartMonth: range.startDate ? range.startDate.getMonth() + 1 : null,
+      periodStartDay: range.startDate?.getDate() ?? null,
+      periodEndYear: range.endDate?.getFullYear() ?? null,
+      periodEndMonth: range.endDate ? range.endDate.getMonth() + 1 : null,
+      periodEndDay: range.endDate?.getDate() ?? null,
+    };
+    setOutputCards(updated);
+    setOutputDateRange(range);
+    setOutputRangeMonth(getInitialRangeMonth(range));
+  };
+
+  const applyDetailDateRange = (range: PeriodDateRange) => {
+    const updated = [...detailCards];
+    updated[currentDetailIndex] = {
+      ...updated[currentDetailIndex],
+      periodStartYear: range.startDate?.getFullYear() ?? null,
+      periodStartMonth: range.startDate ? range.startDate.getMonth() + 1 : null,
+      periodStartDay: range.startDate?.getDate() ?? null,
+      periodEndYear: range.endDate?.getFullYear() ?? null,
+      periodEndMonth: range.endDate ? range.endDate.getMonth() + 1 : null,
+      periodEndDay: range.endDate?.getDate() ?? null,
+    };
+    setDetailCards(updated);
+    setDetailDateRange(range);
+    setDetailRangeMonth(getInitialRangeMonth(range));
+  };
+
+  const selectOutputRangeDate = (date: Date) => {
+    const selected = toDateOnly(date);
+    const current = outputDateRange;
+    if (!current.startDate || current.endDate || selected < toDateOnly(current.startDate)) {
+      applyOutputDateRange({ startDate: selected, endDate: null });
+      return;
+    }
+    applyOutputDateRange({ startDate: current.startDate, endDate: selected });
+  };
+
+  const selectDetailRangeDate = (date: Date) => {
+    const selected = toDateOnly(date);
+    const current = detailDateRange;
+    if (!current.startDate || current.endDate || selected < toDateOnly(current.startDate)) {
+      applyDetailDateRange({ startDate: selected, endDate: null });
+      return;
+    }
+    applyDetailDateRange({ startDate: current.startDate, endDate: selected });
+  };
 
   const isCardComplete = (card: (typeof channelCards)[0]): boolean => {
     if (!card.channelName?.trim()) return false;
@@ -1115,6 +1365,7 @@ const Cluster3Content = () => {
   // Output 편집 모드 종료/카드 전환 시 캡션 토글 리셋
   useEffect(() => {
     if (!isOutputEditMode) setCaptionOpenIndex(null);
+    if (!isOutputEditMode) setOutputRangePickerOpen(false);
   }, [isOutputEditMode, currentOutputIndex]);
 
   const isOutputDirty = () => {
@@ -1341,6 +1592,7 @@ const Cluster3Content = () => {
 
   useEffect(() => {
     if (!isDetailEditMode) setDetailCaptionOpenIndex(null);
+    if (!isDetailEditMode) setDetailRangePickerOpen(false);
   }, [isDetailEditMode, currentDetailIndex]);
 
   // 안내문 자동 복원
@@ -2343,60 +2595,6 @@ const Cluster3Content = () => {
                               </button>
                             </div>
                           )}
-                          {(img || isEditMode) && (
-                            <div
-                              className="image-caption-overlay"
-                              style={{
-                                position: "absolute",
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                textAlign: "center",
-                                padding: "4px 6px",
-                                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                                zIndex: 1,
-                              }}
-                            >
-                              {isEditMode ? (
-                                <input
-                                  type="text"
-                                  className="image-caption-input"
-                                  value={(channelCards[currentCardIndex] as any)?.captions?.[si] || ""}
-                                  onChange={(e) => {
-                                    if (e.target.value.length <= 15) {
-                                      const newCaptions = [...((channelCards[currentCardIndex] as any)?.captions || ["", "", "", "", ""])];
-                                      newCaptions[si] = e.target.value;
-                                      handleCardChange("captions", newCaptions);
-                                    }
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  placeholder="캡션 입력"
-                                  maxLength={15}
-                                  style={{
-                                    width: "100%",
-                                    background: "transparent",
-                                    border: "none",
-                                    color: "#fff",
-                                    fontSize: "10pt",
-                                    textAlign: "center",
-                                    outline: "none",
-                                    padding: 0,
-                                    fontFamily: "inherit",
-                                  }}
-                                />
-                              ) : (
-                                <span
-                                  style={{
-                                    color: "#fff",
-                                    fontSize: "10pt",
-                                    display: "block",
-                                  }}
-                                >
-                                  {(channelCards[currentCardIndex] as any)?.captions?.[si] || ""}
-                                </span>
-                              )}
-                            </div>
-                          )}
                         </div>
                         <input
                           type="file"
@@ -2787,6 +2985,44 @@ const Cluster3Content = () => {
             </div>
           );
         })()}
+      {isOutputEditMode &&
+        outputRangePickerOpen &&
+        outputCalendarPosition &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <PeriodRangePicker
+            range={outputDateRange}
+            month={outputRangeMonth}
+            position={outputCalendarPosition}
+            onMonthChange={setOutputRangeMonth}
+            onSelect={selectOutputRangeDate}
+            onToday={() => {
+              const today = toDateOnly(new Date());
+              applyOutputDateRange({ startDate: today, endDate: today });
+            }}
+            onClear={() => applyOutputDateRange({ startDate: null, endDate: null })}
+          />,
+          document.body,
+        )}
+      {isDetailEditMode &&
+        detailRangePickerOpen &&
+        detailCalendarPosition &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <PeriodRangePicker
+            range={detailDateRange}
+            month={detailRangeMonth}
+            position={detailCalendarPosition}
+            onMonthChange={setDetailRangeMonth}
+            onSelect={selectDetailRangeDate}
+            onToday={() => {
+              const today = toDateOnly(new Date());
+              applyDetailDateRange({ startDate: today, endDate: today });
+            }}
+            onClear={() => applyDetailDateRange({ startDate: null, endDate: null })}
+          />,
+          document.body,
+        )}
       {previewImage && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100002 }} onClick={() => setPreviewImage(null)}>
           <div
@@ -2843,85 +3079,30 @@ const Cluster3Content = () => {
                       <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Top 5 [{currentOutputIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">
-                      <div className="period-display-row">
-                        {isOutputEditMode && <span className="required-mark">*</span>}
-                        <span className="period-value">
-                          {outputCards[currentOutputIndex].periodStartYear
-                            ? `${String(outputCards[currentOutputIndex].periodStartYear).slice(2)}. ${String(outputCards[currentOutputIndex].periodStartMonth || 0).padStart(2, "0")}. ${String(outputCards[currentOutputIndex].periodStartDay || 0).padStart(2, "0")}`
-                            : "00. 00. 00"}
-                        </span>
-                        <span className="period-separator">~</span>
-                        <span className="period-value">
-                          {outputCards[currentOutputIndex].periodEndYear
-                            ? `${String(outputCards[currentOutputIndex].periodEndYear).slice(2)}. ${String(outputCards[currentOutputIndex].periodEndMonth || 0).padStart(2, "0")}. ${String(outputCards[currentOutputIndex].periodEndDay || 0).padStart(2, "0")}`
-                            : "00. 00. 00"}
-                        </span>
-                        {isOutputEditMode && (
-                          <button
-                            className="period-trigger-btn"
-                            onClick={() => {
-                              if (periodPickerOpen === "start") {
-                                periodStartInputRef.current?.blur();
-                                setPeriodPickerOpen(null);
-                              } else {
-                                (periodStartInputRef.current as any)?.showPicker?.() ?? periodStartInputRef.current?.click();
-                                setPeriodPickerOpen("start");
-                              }
-                            }}
-                          >
-                            ▽
-                          </button>
-                        )}
+                      <div className="period-wrapper" ref={outputPeriodPickerRef}>
+                        <div className="period-display-row">
+                          <div className="period-display-left">
+                            {isOutputEditMode && <span className="required-mark">*</span>}
+                            <span className="period-value period-range-value">{formatPeriodRange(outputCards[currentOutputIndex])}</span>
+                          </div>
+                          {isOutputEditMode && (
+                            <button
+                              ref={outputPeriodTriggerRef}
+                              className="period-trigger-btn"
+                              onClick={() => {
+                                const range = getCardDateRange(outputCards[currentOutputIndex]);
+                                setOutputDateRange(range);
+                                setOutputRangeMonth(getInitialRangeMonth(range));
+                                const position = getCalendarPosition(outputPeriodTriggerRef.current);
+                                if (position) setOutputCalendarPosition(position);
+                                setOutputRangePickerOpen((open) => !open);
+                              }}
+                            >
+                              ▽
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <input
-                        type="date"
-                        ref={periodStartInputRef}
-                        style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0, colorScheme: "dark" }}
-                        value={
-                          outputCards[currentOutputIndex].periodStartYear ? `${outputCards[currentOutputIndex].periodStartYear}-${String(outputCards[currentOutputIndex].periodStartMonth || 1).padStart(2, "0")}-${String(outputCards[currentOutputIndex].periodStartDay || 1).padStart(2, "0")}` : ""
-                        }
-                        onBlur={() => setPeriodPickerOpen(null)}
-                        onChange={(e) => {
-                          const dateValue = e.target.value;
-                          if (!dateValue) return;
-                          const [y, m, d] = dateValue.split("-").map(Number);
-                          if (!y || !m || !d) return;
-                          const updated = [...outputCards];
-                          updated[currentOutputIndex] = { ...updated[currentOutputIndex], periodStartYear: y, periodStartMonth: m, periodStartDay: d };
-                          setOutputCards(updated);
-                          setPeriodPickerOpen(null);
-                          setTimeout(() => {
-                            (periodEndInputRef.current as any)?.showPicker?.() ?? periodEndInputRef.current?.click();
-                            setPeriodPickerOpen("end");
-                          }, 300);
-                        }}
-                      />
-                      <input
-                        type="date"
-                        ref={periodEndInputRef}
-                        style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0, colorScheme: "dark" }}
-                        value={outputCards[currentOutputIndex].periodEndYear ? `${outputCards[currentOutputIndex].periodEndYear}-${String(outputCards[currentOutputIndex].periodEndMonth || 1).padStart(2, "0")}-${String(outputCards[currentOutputIndex].periodEndDay || 1).padStart(2, "0")}` : ""}
-                        onBlur={() => setPeriodPickerOpen(null)}
-                        onChange={(e) => {
-                          const dateValue = e.target.value;
-                          if (!dateValue) return;
-                          const [y, m, d] = dateValue.split("-").map(Number);
-                          if (!y || !m || !d) return;
-                          const card = outputCards[currentOutputIndex];
-                          if (card.periodStartYear) {
-                            const start = new Date(card.periodStartYear, (card.periodStartMonth || 1) - 1, card.periodStartDay || 1);
-                            const end = new Date(y, m - 1, d);
-                            if (start > end) {
-                              window.alert("시작일이 종료일보다 미래일 수 없습니다.");
-                              return;
-                            }
-                          }
-                          const updated = [...outputCards];
-                          updated[currentOutputIndex] = { ...updated[currentOutputIndex], periodEndYear: y, periodEndMonth: m, periodEndDay: d };
-                          setOutputCards(updated);
-                          setPeriodPickerOpen(null);
-                        }}
-                      />
                     </div>
                   </div>
                   <div className="output-main-title output-field-with-count" data-field="mainTitle">
@@ -3648,85 +3829,30 @@ const Cluster3Content = () => {
                       <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Detail 10 [{currentDetailIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">
-                      <div className="period-display-row">
-                        {isDetailEditMode && <span className="required-mark">*</span>}
-                        <span className="period-value">
-                          {detailCards[currentDetailIndex].periodStartYear
-                            ? `${String(detailCards[currentDetailIndex].periodStartYear).slice(2)}. ${String(detailCards[currentDetailIndex].periodStartMonth || 0).padStart(2, "0")}. ${String(detailCards[currentDetailIndex].periodStartDay || 0).padStart(2, "0")}`
-                            : "00. 00. 00"}
-                        </span>
-                        <span className="period-separator">~</span>
-                        <span className="period-value">
-                          {detailCards[currentDetailIndex].periodEndYear
-                            ? `${String(detailCards[currentDetailIndex].periodEndYear).slice(2)}. ${String(detailCards[currentDetailIndex].periodEndMonth || 0).padStart(2, "0")}. ${String(detailCards[currentDetailIndex].periodEndDay || 0).padStart(2, "0")}`
-                            : "00. 00. 00"}
-                        </span>
-                        {isDetailEditMode && (
-                          <button
-                            className="period-trigger-btn"
-                            onClick={() => {
-                              if (detailPeriodPickerOpen === "start") {
-                                detailPeriodStartInputRef.current?.blur();
-                                setDetailPeriodPickerOpen(null);
-                              } else {
-                                (detailPeriodStartInputRef.current as any)?.showPicker?.() ?? detailPeriodStartInputRef.current?.click();
-                                setDetailPeriodPickerOpen("start");
-                              }
-                            }}
-                          >
-                            ▽
-                          </button>
-                        )}
+                      <div className="period-wrapper" ref={detailPeriodPickerRef}>
+                        <div className="period-display-row">
+                          <div className="period-display-left">
+                            {isDetailEditMode && <span className="required-mark">*</span>}
+                            <span className="period-value period-range-value">{formatPeriodRange(detailCards[currentDetailIndex])}</span>
+                          </div>
+                          {isDetailEditMode && (
+                            <button
+                              ref={detailPeriodTriggerRef}
+                              className="period-trigger-btn"
+                              onClick={() => {
+                                const range = getCardDateRange(detailCards[currentDetailIndex]);
+                                setDetailDateRange(range);
+                                setDetailRangeMonth(getInitialRangeMonth(range));
+                                const position = getCalendarPosition(detailPeriodTriggerRef.current);
+                                if (position) setDetailCalendarPosition(position);
+                                setDetailRangePickerOpen((open) => !open);
+                              }}
+                            >
+                              ▽
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <input
-                        type="date"
-                        ref={detailPeriodStartInputRef}
-                        style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0, colorScheme: "dark" }}
-                        value={
-                          detailCards[currentDetailIndex].periodStartYear ? `${detailCards[currentDetailIndex].periodStartYear}-${String(detailCards[currentDetailIndex].periodStartMonth || 1).padStart(2, "0")}-${String(detailCards[currentDetailIndex].periodStartDay || 1).padStart(2, "0")}` : ""
-                        }
-                        onBlur={() => setDetailPeriodPickerOpen(null)}
-                        onChange={(e) => {
-                          const dateValue = e.target.value;
-                          if (!dateValue) return;
-                          const [y, m, d] = dateValue.split("-").map(Number);
-                          if (!y || !m || !d) return;
-                          const updated = [...detailCards];
-                          updated[currentDetailIndex] = { ...updated[currentDetailIndex], periodStartYear: y, periodStartMonth: m, periodStartDay: d };
-                          setDetailCards(updated);
-                          setDetailPeriodPickerOpen(null);
-                          setTimeout(() => {
-                            (detailPeriodEndInputRef.current as any)?.showPicker?.() ?? detailPeriodEndInputRef.current?.click();
-                            setDetailPeriodPickerOpen("end");
-                          }, 300);
-                        }}
-                      />
-                      <input
-                        type="date"
-                        ref={detailPeriodEndInputRef}
-                        style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0, colorScheme: "dark" }}
-                        value={detailCards[currentDetailIndex].periodEndYear ? `${detailCards[currentDetailIndex].periodEndYear}-${String(detailCards[currentDetailIndex].periodEndMonth || 1).padStart(2, "0")}-${String(detailCards[currentDetailIndex].periodEndDay || 1).padStart(2, "0")}` : ""}
-                        onBlur={() => setDetailPeriodPickerOpen(null)}
-                        onChange={(e) => {
-                          const dateValue = e.target.value;
-                          if (!dateValue) return;
-                          const [y, m, d] = dateValue.split("-").map(Number);
-                          if (!y || !m || !d) return;
-                          const card = detailCards[currentDetailIndex];
-                          if (card.periodStartYear) {
-                            const start = new Date(card.periodStartYear, (card.periodStartMonth || 1) - 1, card.periodStartDay || 1);
-                            const end = new Date(y, m - 1, d);
-                            if (start > end) {
-                              window.alert("시작일이 종료일보다 미래일 수 없습니다.");
-                              return;
-                            }
-                          }
-                          const updated = [...detailCards];
-                          updated[currentDetailIndex] = { ...updated[currentDetailIndex], periodEndYear: y, periodEndMonth: m, periodEndDay: d };
-                          setDetailCards(updated);
-                          setDetailPeriodPickerOpen(null);
-                        }}
-                      />
                     </div>
                   </div>
                   <div className="output-main-title output-field-with-count" data-field="mainTitle">

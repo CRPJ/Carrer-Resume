@@ -100,7 +100,9 @@
       "Bash(npm root:*)",
       "Bash(npm ls:*)",
       "Bash(npm install:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(sed -n '1945,1950p' components/cluster-3/Cluster3Content.tsx)",
+      "Bash(sed -n '2516,2522p' components/cluster-3/Cluster3Content.tsx)"
     ],
     "deny": [],
     "ask": []

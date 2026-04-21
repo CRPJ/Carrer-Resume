@@ -4089,11 +4089,30 @@
 
       .output-period {
         position: relative;
+        width: 286px;
+        flex: 0 0 286px;
+
+        .period-wrapper {
+          position: relative;
+          overflow: visible;
+        }
 
         .period-display-row {
           display: flex;
           align-items: center;
           gap: 6px;
+          width: 100%;
+        }
+
+        .period-display-left {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex: 1 1 auto;
+          min-width: 0;
+          padding-left: 44px;
+          box-sizing: border-box;
+          pointer-events: none;
         }
 
         .period-value {
@@ -4102,12 +4121,15 @@
           font-family: Pretendard, sans-serif;
         }
 
-        .period-separator {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 14px;
+        .period-range-value {
+          min-width: 240px;
+          white-space: nowrap;
         }
 
         .period-trigger-btn {
+          position: relative;
+          z-index: 2;
+          flex: 0 0 24px;
           width: 24px;
           height: 24px;
           background: transparent;
@@ -4119,10 +4141,159 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-left: 4px;
+          margin-left: auto;
+          line-height: 1;
 
           &:hover {
             background: rgba(250, 171, 7, 0.1);
+          }
+        }
+
+        .period-range-panel {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          width: 286px;
+          padding: 12px;
+          background: #151520;
+          border: 1px solid rgba(250, 171, 7, 0.75);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+          z-index: 100020;
+          color: #fff;
+          font-family: Pretendard, sans-serif;
+          pointer-events: auto;
+        }
+
+        .period-range-helper {
+          margin-bottom: 8px;
+          color: #faab07;
+          font-size: 12px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+
+        .period-range-header {
+          display: grid;
+          grid-template-columns: 28px 1fr 28px;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+
+        .period-month-title {
+          color: #fff;
+          font-size: 14px;
+          font-weight: 700;
+          text-align: center;
+        }
+
+        .period-month-btn,
+        .period-range-actions button,
+        .period-day-btn {
+          border: 0;
+          font-family: Pretendard, sans-serif;
+          cursor: pointer;
+        }
+
+        .period-month-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          justify-self: center;
+          width: 28px;
+          height: 28px;
+          background: rgba(255, 255, 255, 0.08);
+          color: #faab07;
+          font-size: 14px;
+        }
+
+        .period-weekdays,
+        .period-calendar-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 4px;
+          align-items: center;
+          justify-items: center;
+        }
+
+        .period-weekdays {
+          margin-bottom: 5px;
+
+          span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 11px;
+            text-align: center;
+          }
+        }
+
+        .period-day-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 30px;
+          background: rgba(255, 255, 255, 0.06);
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 12px;
+          transition:
+            background 0.15s ease,
+            color 0.15s ease;
+
+          &.outside-month {
+            color: rgba(255, 255, 255, 0.28);
+          }
+
+          &.today {
+            outline: 1px solid rgba(250, 171, 7, 0.65);
+            outline-offset: -1px;
+          }
+
+          &.in-range {
+            background: rgba(250, 171, 7, 0.22);
+            color: #fff;
+          }
+
+          &.range-start,
+          &.range-end {
+            background: #faab07;
+            color: #111;
+            font-weight: 700;
+          }
+
+          &:hover {
+            background: rgba(250, 171, 7, 0.35);
+            color: #fff;
+          }
+        }
+
+        .period-range-actions {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 6px;
+          margin-top: 10px;
+
+          button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            height: 28px;
+            padding: 0 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 12px;
+
+            &:last-child {
+              background: #faab07;
+              color: #111;
+              font-weight: 700;
+            }
           }
         }
       }
@@ -5216,6 +5387,196 @@
             left: 100%;
           }
         }
+      }
+    }
+  }
+}
+
+// Output / Detail modal scoped refinements
+.cluster3-content .output-modal {
+  .output-modal-body {
+    .output-title-row .output-period {
+      .period-wrapper {
+        position: relative;
+      }
+
+    }
+
+    .output-platform {
+      margin-left: auto;
+      width: 272px;
+      flex: 0 0 272px;
+
+      .output-platform-dropdown,
+      > .field-value {
+        flex: 0 0 180px;
+        min-width: 180px;
+        max-width: 180px;
+        box-sizing: border-box;
+      }
+
+      > .field-value {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .output-role-tags .role-tag {
+      height: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1;
+    }
+  }
+}
+
+.period-range-panel.calendar-popup {
+  position: absolute;
+  width: 286px;
+  padding: 12px;
+  background: #151520;
+  border: 1px solid rgba(250, 171, 7, 0.75);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  z-index: 999999;
+  color: #fff;
+  font-family: Pretendard, sans-serif;
+  pointer-events: auto;
+
+  .period-range-helper {
+    margin-bottom: 8px;
+    color: #faab07;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .period-range-header {
+    display: grid;
+    grid-template-columns: 28px 1fr 28px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .period-month-title {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .period-month-btn,
+  .period-range-actions button,
+  .period-day-btn {
+    border: 0;
+    font-family: Pretendard, sans-serif;
+    cursor: pointer;
+  }
+
+  .period-month-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #faab07;
+    font-size: 14px;
+  }
+
+  .period-weekdays,
+  .period-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .period-weekdays {
+    margin-bottom: 5px;
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 11px;
+      text-align: center;
+    }
+  }
+
+  .period-day-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+
+    &.outside-month {
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    &.today {
+      outline: 1px solid rgba(250, 171, 7, 0.65);
+      outline-offset: -1px;
+    }
+
+    &.in-range {
+      background: rgba(250, 171, 7, 0.22);
+      color: #fff;
+    }
+
+    &.range-start,
+    &.range-end {
+      background: #faab07;
+      color: #111;
+      font-weight: 700;
+    }
+
+    &:hover {
+      background: rgba(250, 171, 7, 0.35);
+      color: #fff;
+    }
+  }
+
+  .period-range-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      height: 28px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 12px;
+
+      &:last-child {
+        background: #faab07;
+        color: #111;
+        font-weight: 700;
       }
     }
   }

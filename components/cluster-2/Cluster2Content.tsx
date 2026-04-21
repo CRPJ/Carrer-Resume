@@ -892,6 +892,22 @@ const Cluster2Content = () => {
   // 학력 저장 함수
   const handleSaveEducations = async (processedData: EduData[]) => {
     if (isDemoMode) {
+      const primary = processedData[0];
+      const isEmptyRequired = (value?: string) => !value || value.trim() === "" || value === "-";
+      const isPrimaryCleared =
+        !canChangePrimary &&
+        (!primary ||
+          isEmptyRequired(primary.school) ||
+          isEmptyRequired(primary.status) ||
+          isEmptyRequired(primary.category) ||
+          isEmptyRequired(primary.major1) ||
+          isEmptyRequired(primary.gradeValue));
+
+      if (isPrimaryCleared) {
+        alert("관리자 승인 후 수정할 수 있습니다.");
+        return;
+      }
+
       setEducationData(processedData);
       alert("저장되었습니다.");
       setSection3ModalOpen(false);
@@ -1052,6 +1068,7 @@ const Cluster2Content = () => {
   ]);
   const [editingReviewLinks, setEditingReviewLinks] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""]);
   const [reviewLinkSaving, setReviewLinkSaving] = useState(false);
+  const [canEditClubReview, setCanEditClubReview] = useState<boolean>(false);
 
   // dirty 추적: 편집 데이터 변경 감지 (초기 설정 시 skip)
   const introMountRef = useRef(false);
@@ -1221,6 +1238,10 @@ const Cluster2Content = () => {
 
   // 리뷰 링크 저장
   const handleSaveReviewLinks = async () => {
+    if (!canEditClubReview) {
+      window.alert("관리자 승인이 필요합니다");
+      return;
+    }
     if (isDemoMode) {
       setReviewLinks([...editingReviewLinks]);
       alert("저장되었습니다.");
@@ -2372,25 +2393,25 @@ const Cluster2Content = () => {
         <div className="section1-modal-overlay">
           <div className="section1-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section1-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>프로필 사진</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    if (isSection1Dirty()) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setPhotos([...photosSnapshot]);
-                        setFooterNotice("default");
-                        setSection1ModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (isSection1Dirty()) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setPhotos([...photosSnapshot]);
+                      setFooterNotice("default");
                       setSection1ModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setSection1ModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>프로필 사진</h3>
               </div>
               <p className="modal-subtitle">나를 어필하는 프로필 사진을 등록해주세요. 총 5개를 업로드할 수 있으며, 정해진 규격이 권장됩니다. 😊</p>
             </div>
@@ -2548,25 +2569,25 @@ const Cluster2Content = () => {
         <div className="section2-modal-overlay">
           <div className="section2-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section2-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>캐치프레이즈/슬로건 작성</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    if (isSection2Dirty()) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setEditingSloganData({ ...sloganSnapshot });
-                        setSection2FooterNotice("default");
-                        setSection2ModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (isSection2Dirty()) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setEditingSloganData({ ...sloganSnapshot });
+                      setSection2FooterNotice("default");
                       setSection2ModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setSection2ModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>캐치프레이즈/슬로건 작성</h3>
               </div>
               <p className="modal-subtitle">나의 매력과 가치를 드러낼 수 있는 슬로건, 캐치프레이즈를 작성해주세요. 😊 내가 어필하고자 하는 생각, 세상을 보는 관점, 의지, 다짐, 비전 등을 총 3개까지 등록할 수 있습니다.</p>
             </div>
@@ -2980,24 +3001,24 @@ const Cluster2Content = () => {
         <div className="section21-modal-overlay" ref={section21OverlayRef}>
           <div className="section21-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section21-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>프로필 동영상</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    if (isSection21Dirty()) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setEditingVideoData([...videoSnapshot]);
-                        setSection21ModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (isSection21Dirty()) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setEditingVideoData([...videoSnapshot]);
                       setSection21ModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setSection21ModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>프로필 동영상</h3>
               </div>
               <p className="modal-subtitle">나를 나타내거나, 활동했던 영상의 링크를 등록해주세요. 총 3개를 업로드할 수 있으며, 유튜브 링크를 권장합니다. 😊</p>
             </div>
@@ -3111,28 +3132,28 @@ const Cluster2Content = () => {
         <div className="intro-modal-overlay">
           <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
             <div className="intro-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>{introCards[selectedIntroCard].title}</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
-                    if (isDirty) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setEditingIntroData({ content: initialIntroContent });
-                        setIntroDirty(false);
-                        setIsEditingIntro(false);
-                        setIntroModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
+                  if (isDirty) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setEditingIntroData({ content: initialIntroContent });
+                      setIntroDirty(false);
                       setIsEditingIntro(false);
                       setIntroModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setIsEditingIntro(false);
+                    setIntroModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>{introCards[selectedIntroCard].title}</h3>
               </div>
               <p className="modal-subtitle">{introComments[introCards[selectedIntroCard].title] || ""}</p>
             </div>
@@ -3220,24 +3241,29 @@ const Cluster2Content = () => {
                   </div>
                 </>
               ) : (
-                <div className="modal-footer-top" style={{ justifyContent: "flex-end" }}>
-                  <div className="modal-footer-right">
-                    <button
-                      className="modal-save-btn"
-                      onClick={() =>
-                        handleEditClick(() => {
-                          setEditingIntroData({
-                            content: introCards[selectedIntroCard].content,
-                          });
-                          setInitialIntroContent(introCards[selectedIntroCard].content);
-                          setIsEditingIntro(true);
-                        })
-                      }
-                    >
-                      수정
-                    </button>
+                <>
+                  <div className="modal-footer-top" style={{ justifyContent: "flex-end" }}>
+                    <div className="modal-footer-right">
+                      <button
+                        className="modal-save-btn"
+                        onClick={() =>
+                          handleEditClick(() => {
+                            setEditingIntroData({
+                              content: introCards[selectedIntroCard].content,
+                            });
+                            setInitialIntroContent(introCards[selectedIntroCard].content);
+                            setIsEditingIntro(true);
+                          })
+                        }
+                      >
+                        수정
+                      </button>
+                    </div>
                   </div>
-                </div>
+                  <div className="modal-footer-bottom" style={{ visibility: "hidden" }}>
+                    <p className="modal-footer-notice">내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊</p>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -3248,24 +3274,24 @@ const Cluster2Content = () => {
         <div className="section4-modal-overlay">
           <div className="section4-modal">
             <div className="section4-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>성장 기록 / 리뷰 작성</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    if (isSection4Dirty()) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setEditingReviewLinks([...reviewSnapshot]);
-                        setSection4ModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (isSection4Dirty()) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setEditingReviewLinks([...reviewSnapshot]);
                       setSection4ModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setSection4ModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>성장 기록 / 리뷰 작성</h3>
               </div>
               <p className="modal-subtitle">
                 내가 어떻게 성장해왔는지 돌아보고, 나의 성장 기록을 남겨보세요!
@@ -3273,7 +3299,16 @@ const Cluster2Content = () => {
                 나의 성장 과정을 돌아보고 이전의 나와 지금의 나를 비교해보며 더 좋은 성장의 발판으로 삼아보자구요 😊
               </p>
             </div>
-            <div className="section4-modal-body">
+            <div
+              className={`section4-modal-body${!canEditClubReview ? " locked" : ""}`}
+              onClick={(e) => {
+                if (!canEditClubReview) {
+                  const target = e.target as HTMLElement;
+                  if (target.closest("button")) return;
+                  window.alert("관리자 승인이 필요합니다");
+                }
+              }}
+            >
               {reviewPermissions.map((perm, index) => {
                 const hasContent = editingReviewLinks[index]?.trim().length > 0;
                 const medalWeeks = index === 0 ? 30 : [3, 6, 9, 12, 15, 18, 21, 24, 27][index - 1];
@@ -3338,7 +3373,9 @@ const Cluster2Content = () => {
                         handleSaveReviewLinks();
                       }
                     }}
-                    disabled={reviewLinkSaving}
+                    disabled={reviewLinkSaving || !canEditClubReview}
+                    style={!canEditClubReview ? { opacity: 0.3, cursor: "not-allowed" } : {}}
+                    title={canEditClubReview ? "저장" : "관리자 승인 필요"}
                   >
                     {reviewLinkSaving ? "저장 중..." : "저장"}
                   </button>
@@ -3356,32 +3393,42 @@ const Cluster2Content = () => {
         <div className="section3-modal-overlay">
           <div className="section3-modal" onClick={(e) => e.stopPropagation()}>
             <div className="section3-modal-header">
-              <div className="modal-header-top">
-                <span style={{ fontSize: "20px" }}>✍️</span>
-                <h3>학적/학력 사항 작성</h3>
-                <button
-                  className="modal-close-btn"
-                  onClick={() => {
-                    if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
-                      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
-                        setEditingEduData([...initialEduDataSnapshot]);
-                        setHasEduChanges(false);
-                        setEduValidationErrors({});
-                        setSection3ModalOpen(false);
-                      }
-                    } else {
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
+                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                      setEditingEduData([...initialEduDataSnapshot]);
+                      setHasEduChanges(false);
+                      setEduValidationErrors({});
                       setSection3ModalOpen(false);
                     }
-                  }}
-                >
-                  <i className="ti ti-x"></i>
-                </button>
+                  } else {
+                    setSection3ModalOpen(false);
+                  }
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
+                <h3>학적/학력 사항 작성</h3>
               </div>
               <p className="modal-subtitle">본인의 학적/학력 사항을 입력해주세요! 😊</p>
             </div>
             <div className="section3-modal-body" ref={modalBodyRef}>
               {editingEduData.map((edu, index) => (
-                <div key={index} className={`edu-edit-card ${edu.isFinal ? "is-final" : ""} ${index === 0 && !canChangePrimary ? "primary-locked" : ""}`}>
+                <div
+                  key={index}
+                  className={`edu-edit-card ${edu.isFinal ? "is-final" : ""} ${index === 0 && !canChangePrimary ? "primary-locked" : ""}`}
+                  onClick={(e) => {
+                    if (index === 0 && !canChangePrimary) {
+                      const target = e.target as HTMLElement;
+                      if (target.closest("button")) return;
+                      window.alert("관리자 승인이 필요합니다");
+                    }
+                  }}
+                >
                   {/* 헤더: 번호 + 학력 선택 + 대표학력 버튼 */}
                   <div className="edu-edit-header">
                     <span className="edu-edit-number">{index + 1}</span>
