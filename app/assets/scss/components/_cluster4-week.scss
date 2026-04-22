@@ -8597,3 +8597,1184 @@
     word-break: break-all !important;
   }
 }
+
+// ============================================================================
+// workInfo View Modal — 가로형_대 1468×855 (1차: 헤더/푸터/state)
+// ----------------------------------------------------------------------------
+// 대상: workInfo 보기/편집 모달만. workAbility/workExp/workCareer view 모달과
+// section-modal-work-edit(9카드 일괄)은 영향 없음.
+// 식별자: .workinfo-view-modal (TSX에서 work-view-modal과 함께 부여)
+// 기준: cluster2 가로형_대 헤더 + cluster3 output-modal-footer Type B
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal {
+  width: 1468px !important;
+  max-width: 1468px !important;
+  height: 855px !important;
+  max-height: 855px !important;
+
+  // ── 헤더 (110px) — cluster3 .section-modal .section-modal-header 패턴 정확 통일 ──
+  // 참조: app/assets/scss/components/_cluster3.scss L2710-2814
+  .section-modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+    padding: 8px 24px 16px;
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      position: relative;
+      margin-top: 12px;
+
+      // img width/height/object-fit는 workInfo 1차 spec(write.png 72×72)으로 유지 — cluster3 미명시
+      img[alt="write"] {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+      }
+    }
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffa500;
+      font-family: "Pretendard", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      padding-left: 80px;
+      margin: 0;
+      flex: 1;
+
+      // workInfo 전용: 라인/카테고리 텍스트 ellipsis (cluster3 미존재)
+      .line-name-text {
+        color: #ffa500;
+        max-width: 300px;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+      }
+    }
+
+    .modal-subtitle {
+      width: 100%;
+      padding-left: 80px;
+      padding-right: 67px;
+      margin: 0;
+      color: #fff;
+      font-family: "Pretendard", sans-serif;
+      font-size: 1.3125rem;
+      font-weight: 400;
+      text-align: left;
+      order: 3;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      i {
+        display: inline-block;
+        transition: transform 0.4s ease;
+      }
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  // ── 미드 (637px = 855 - 100 - 118) — 2차: 좌우 2열 ──
+  .section-modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 20px 28px;
+    box-sizing: border-box;
+  }
+
+  // ── 2차 미드 콘텐츠 ──
+  .workinfo-content-layout {
+    display: flex;
+    gap: 24px;
+    height: 100%;
+    box-sizing: border-box;
+
+    .workinfo-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px; // 사용자 요청: Main Title y좌표 위로 (16 → 8)
+      overflow-y: auto;
+      padding-right: 8px;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(250, 171, 7, 0.4);
+        border-radius: 2px;
+      }
+      scrollbar-width: thin;
+      scrollbar-color: rgba(250, 171, 7, 0.4) transparent;
+
+      // ★ 좌측 자식 섹션 모두 동일 폭 — 우측 끝 x좌표 정렬
+      > .workinfo-personal-card,
+      > .workinfo-mid-section,
+      > .workinfo-text-section {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    .workinfo-right {
+      width: 420px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // ── 우측: 이미지 2×2 그리드 (1·2번 필수, 순차 업로드, 캡션 — cluster3 패턴) ──
+  // 그리드 순서: 좌상=1, 우상=2, 좌하=3, 우하=4
+  .workinfo-image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: 100%;
+
+    .workinfo-image-slot {
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.02);
+      display: flex;
+      flex-direction: column;
+
+      &.disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      &.has-image {
+        border-color: rgba(255, 165, 0, 0.3);
+      }
+    }
+
+    // cluster3 .image-preview 그대로 (position relative, w/h 100%, img object-fit cover)
+    .image-preview {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover !important;
+      }
+    }
+
+    // cluster3 .image-actions-overlay 패턴 그대로 (top 4 right 4 — 항상 표시, hover 의존 없음)
+    .image-actions-overlay {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      z-index: 2;
+
+      .image-action-btn {
+        width: 28px;
+        height: 28px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 165, 0, 0.5);
+        color: #faab07;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        padding: 0;
+
+        &:hover:not(:disabled) {
+          background: rgba(0, 0, 0, 0.8);
+          border-color: #faab07;
+        }
+        &:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+        &.image-delete-btn:hover {
+          color: #ff4444;
+          border-color: #ff4444;
+        }
+      }
+    }
+
+    .image-action-btn.image-caption-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      z-index: 3;
+      width: 28px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 165, 0, 0.5);
+      color: #faab07;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      padding: 0;
+
+      &:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.8);
+      }
+    }
+
+    .image-empty-slot {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: rgba(255, 255, 255, 0.4);
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+
+      i {
+        font-size: 24px;
+      }
+      &:hover {
+        color: #faab07;
+      }
+    }
+
+    .empty-placeholder {
+      color: rgba(255, 255, 255, 0.2);
+      font-family: "Pretendard", sans-serif;
+      font-size: 20px;
+    }
+
+    .slot-number {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    // 캡션 — cluster3 image-caption-overlay 패턴 참조 (사용자 요청: 폰트 절반 이하)
+    .image-caption-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 4px 6px;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      height: 24px;
+      box-sizing: border-box;
+    }
+
+    .image-caption-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 7pt !important;
+      text-align: center;
+      outline: none;
+      padding: 0 !important;
+      font-family: inherit;
+      line-height: normal;
+      height: auto;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+      }
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+        text-align: center;
+      }
+    }
+
+    .image-caption-text {
+      color: #fff;
+      font-size: 7pt !important;
+      display: block;
+    }
+  }
+
+  // 좌상단: 인적사항 카드 — 5열 그리드 (1열 사진 rowspan 3 + 2열 3행)
+  .workinfo-personal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 7px 12px;
+    flex-shrink: 0;
+
+    .personal-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto; // 사진 | 정보 | 태그
+      grid-template-rows: auto;
+      gap: 3px 12px;
+      align-items: start; // 위쪽 정렬 — 태그 늘어나도 사진/정보 행 밀림 없음
+    }
+
+    // 1열: 사진
+    .personal-photo {
+      grid-column: 1;
+      grid-row: 1;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    // 2열: 인적사항 텍스트 stack (3행)
+    .personal-info {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3 {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 11px;
+      line-height: 1.14;
+      color: #ddd;
+      min-width: 0;
+    }
+
+    .personal-row-2,
+    .personal-row-3 {
+      display: grid;
+      grid-template-columns: 220px 40px 20px 220px 40px;
+      align-items: center;
+      column-gap: 0;
+      white-space: nowrap;
+
+      > .personal-field {
+        display: contents;
+      }
+    }
+
+    .personal-separator {
+      color: rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    // 1행 — 고정폭 (말줄임 없음, 최대 글자수 입력 차단으로 보장)
+    .personal-name {
+      min-width: 64px; // 4자 × 16px
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .personal-gender {
+      min-width: 16px; // 1자
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .personal-age {
+      min-width: 48px; // "22 세"
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    // 3열 독립: 역할/키워드 색상 textbox (세로 2행) — row-1 행 높이에 영향 없음
+    .personal-tags {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: center; // 사진/정보 영역 세로 중앙
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 180px;
+      flex-shrink: 0;
+    }
+
+    .tag-badge {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 10px;
+      line-height: 1.14;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: center;
+      min-width: 180px; // 역할/키워드 최대 글자수 기준 고정폭
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      box-sizing: border-box;
+    }
+
+    .tag-role {
+      background: rgba(250, 171, 7, 0.15);
+      color: #faab07;
+      border: 1px solid rgba(250, 171, 7, 0.3);
+    }
+
+    .tag-keyword {
+      background: rgba(135, 206, 250, 0.15);
+      color: #87ceeb;
+      border: 1px solid rgba(135, 206, 250, 0.3);
+    }
+
+    // 2·3행 — 필드명/값 분리 (값은 고정폭, 라벨은 작은 폰트 + 연한 색)
+    .personal-field {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-shrink: 0;
+
+      .field-value {
+        font-family: "Pretendard", sans-serif;
+        font-size: 11px;
+        line-height: 1.14;
+        color: #ddd;
+        display: block;
+        white-space: nowrap;
+        overflow: visible;
+      }
+
+      .field-label {
+        font-family: "Pretendard", sans-serif;
+        font-size: 9px;
+        line-height: 1.14;
+        color: rgba(255, 255, 255, 0.4);
+        flex-shrink: 0;
+        min-width: 28px;
+        display: block;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  // 좌중단: 2열 (시즌/주차/카테고리/상태 + Output Link 5개)
+  .workinfo-mid-section {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
+    .workinfo-mid-col1 {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+      box-sizing: border-box;
+    }
+
+    .workinfo-mid-col2 {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+      box-sizing: border-box;
+    }
+  }
+
+  .workinfo-date-badge {
+    display: flex !important;
+    flex-direction: row !important; // column → row 강제 (다른 셀렉터 override 방지)
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: nowrap; // 줄바꿈 안 함
+
+    .date-badge-text {
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #faab07;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .date-range-text {
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  .workinfo-line-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+
+    .line-info-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      line-height: 1;
+      color: #ddd;
+      margin: 0;
+    }
+
+    .line-status-icon {
+      font-size: 9px;
+      flex-shrink: 0;
+      color: #faab07;
+    }
+
+    // 활동 카테고리 아이콘 (selectedWorkInfoCard.icon — activityTypeConfig.icon)
+    // 사용자 요청: 3배 확대 (24 → 72)
+    .line-activity-icon {
+      width: 48px !important;
+      height: 48px !important;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    // 강화 상태 아이콘 (selectedWorkInfoCard.statusIcon — enhancementStatusIcons[status])
+    // 사용자 요청: 3배 확대 (24 → 72)
+    .line-enhance-icon {
+      width: 48px !important;
+      height: 48px !important;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    // 사용자 요청: 폰트 3배 확대 (14 → 42)
+    .line-name {
+      max-width: 600px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .line-enhance-status {
+      white-space: nowrap;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    // 사용자 요청: 폰트 3배 확대 (12 → 36)
+    .line-code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 10px;
+      font-size: 22px;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.7);
+      flex-shrink: 0;
+    }
+  }
+
+  // Output Link — cluster3 output modal 패턴 준용 (link-dot + input/text + open-btn)
+  // (cluster3 _cluster3.scss L4806 .output-links-section의 시각 스타일을 workInfo 스코프에 복제)
+  .workinfo-output-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 54%;
+    width: 54%;
+    max-width: 270px;
+    min-width: 0;
+    box-sizing: border-box;
+
+    .output-link-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      padding-left: 10px;
+      box-sizing: border-box;
+    }
+
+    .admin-badge {
+      background: #faab07;
+      color: #1a1a1a;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      line-height: 1;
+    }
+
+    // cluster3 .link-dot 패턴
+    .link-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    // cluster3 .output-link-text 스타일 그대로
+    .output-link-text {
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      &.output-link-empty {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    // cluster3 .output-link-input 스타일 — 편집 모드 폰트/높이 축소 (5행 누적 높이로 인한 아래 영역 밀림 방지)
+    .output-link-input {
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      font-size: 11px !important;
+      color: #fff;
+      font-family: "Pretendard", sans-serif;
+      background: transparent;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      padding: 3px 6px !important;
+      height: 24px;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #faab07;
+      }
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    // cluster3 .link-open-btn 스타일 그대로
+    .link-open-btn {
+      width: 28px;
+      height: 28px;
+      background: #faab07;
+      border: none;
+      color: #1a1a1a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      padding: 0;
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    // 삭제 버튼 (편집 모드 전용 — workInfo 추가 기능, cluster3에는 없음)
+    .output-link-delete {
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: #ff4444;
+        border-color: #ff4444;
+      }
+      i {
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 좌하단: Main Title / Sub Title / Growth Point
+  // 사용자 요청: Main Title 0.5cm(≈ -19px) 위로 — text-section만 추가 보정
+  .workinfo-text-section {
+    margin-top: -7px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+
+    .workinfo-text-block {
+      display: flex;
+      flex-direction: column;
+
+      .text-block-title {
+        font-family: "Pretendard", sans-serif;
+        font-size: 16px;
+        line-height: 1;
+        font-weight: 600;
+        color: #ddd;
+        margin: 0 0 13px 0;
+        padding: 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .text-block-content {
+        font-family: "Pretendard", sans-serif;
+        color: #ddd;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: pre-wrap;
+        min-height: auto;
+        font-size: 10px;
+        line-height: 1.35;
+        box-sizing: border-box;
+      }
+
+      // Main Title — 운영진 read-only
+      .main-title-readonly {
+        background: rgba(250, 171, 7, 0.05);
+        border-color: rgba(250, 171, 7, 0.15);
+        color: rgba(255, 255, 255, 0.55);
+        font-style: italic;
+      }
+
+      .text-block-edit {
+        position: relative;
+        margin: 0;
+      }
+
+      .text-block-textarea {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ddd;
+        font-family: "Pretendard", sans-serif;
+        font-size: 10px;
+        line-height: 1.35;
+        resize: vertical;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #faab07;
+        }
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      .char-count {
+        position: absolute;
+        bottom: 6px;
+        right: 10px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+      }
+    }
+
+    // 텍스트 3종 글자수 기반 박스 크기 (font 11px line-height 1.5 ≈ 16.5px/줄 기준)
+    // Main Title: 100자 → 약 3줄
+    .text-block-main {
+      .main-title-readonly,
+      .text-block-textarea,
+      textarea.text-block-textarea {
+        height: 44px;
+        min-height: 44px;
+        max-height: 44px;
+        font-size: 18px !important;
+        line-height: 1.25;
+      }
+
+      .text-block-content {
+        height: 44px;
+        min-height: 44px;
+        max-height: 44px;
+        overflow-y: auto;
+      }
+    }
+    // Sub Title: 300자 → 약 8줄
+    .text-block-sub {
+      .sub-title-input {
+        height: 86px;
+        min-height: 86px;
+        max-height: 86px;
+        font-size: 14px !important;
+        line-height: 1.35;
+        padding-top: 3px !important;
+        vertical-align: top;
+        resize: none;
+      }
+      .text-block-content {
+        height: 78px;
+        min-height: 78px;
+        max-height: 78px;
+        font-size: 14px !important;
+        overflow-y: auto;
+      }
+    }
+    // Growth Point: 200자 → 약 6줄
+    .text-block-growth {
+      .growth-point-input {
+        height: 66px;
+        min-height: 66px;
+        max-height: 66px;
+        font-size: 14px !important;
+        line-height: 1.35;
+        padding-top: 3px !important;
+        vertical-align: top;
+        resize: none;
+      }
+      .text-block-content {
+        height: 58px;
+        min-height: 58px;
+        max-height: 58px;
+        font-size: 14px !important;
+        overflow-y: auto;
+      }
+    }
+  }
+
+  // ── 사용자 요청: 편집 가능 영역 폰트 일괄 축소 (헤더/인적사항 제외) ──
+  // 위 개별 규칙들과 중복되지만 cascade 마지막에 두어 확실히 override
+  .text-block-textarea,
+  textarea.text-block-textarea {
+    font-size: 10px !important;
+    line-height: 1.35;
+  }
+  .text-block-content {
+    font-size: 10px !important;
+    line-height: 1.35;
+  }
+  .output-link-input {
+    font-size: 11px !important;
+  }
+  .image-caption-input,
+  .image-caption-text {
+    font-size: 10px !important;
+  }
+  .char-count {
+    font-size: 9px !important;
+  }
+
+  // ── 푸터 (118px) Type B — 2행 구조 (cluster2/3 표준) ──
+  .workinfo-text-section {
+    .workinfo-text-block > .text-block-title {
+      font-size: 16px !important;
+      line-height: 1 !important;
+      margin-bottom: 13px !important;
+      padding-bottom: 0 !important;
+
+      .required-mark {
+        font-size: inherit !important;
+        line-height: inherit !important;
+        vertical-align: baseline;
+      }
+    }
+
+    .text-block-main {
+      .main-title-readonly,
+      .text-block-textarea,
+      textarea.text-block-textarea {
+        font-size: 18px !important;
+      }
+    }
+
+    .text-block-sub {
+      .text-block-content,
+      .sub-title-input,
+      textarea.sub-title-input {
+        font-size: 14px !important;
+      }
+    }
+
+    .text-block-growth {
+      .text-block-content,
+      .growth-point-input,
+      textarea.growth-point-input {
+        font-size: 14px !important;
+      }
+    }
+  }
+
+  .section-modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 28px;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    box-sizing: border-box;
+    border-top: none;
+    background: transparent;
+
+    // ── 행 1: 🔎 좌 + 버튼 우 ──
+    .modal-footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+
+      .modal-help-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 36px;
+        font-size: 20px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 46px;
+          height: 46px;
+          background: rgba(0, 0, 0, 0.6);
+          border: none;
+          border-radius: 0;
+          z-index: -1;
+        }
+      }
+
+      .modal-footer-right {
+        flex-shrink: 0;
+        min-width: 160px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    // ── 행 2: 안내문 우측 정렬 (visibility 토글 — display:none 금지, 공간 유지) ──
+    .modal-footer-bottom {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      border: none;
+
+      .modal-notice {
+        font-family: "Pretendard", sans-serif;
+        font-size: 15px;
+        color: #faab07;
+        text-align: right;
+        margin: 0;
+      }
+    }
+
+    .modal-edit-btn,
+    .modal-save-btn {
+      padding: 8px 20px;
+      background: #faab07;
+      border: 1px solid transparent;
+      color: #1a1a1a;
+      border-radius: 0;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: #ffb820;
+      }
+    }
+
+    .modal-cancel-btn {
+      padding: 8px 20px;
+      border: 1px solid #888;
+      background: transparent;
+      color: #888;
+      border-radius: 0;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: rgba(136, 136, 136, 0.1);
+        color: #aaa;
+      }
+    }
+
+    .modal-reset-btn {
+      padding: 8px 20px;
+      border: 1px solid #4caf50;
+      background: transparent;
+      color: #4caf50;
+      border-radius: 0;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
+    }
+  }
+
+  // 필수필드 표시 — 제목 옆 빨간색 *
+  .required-mark {
+    color: #ff4444;
+    margin-left: 2px;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+    font-weight: 700;
+  }
+}
+
+// ============================================================================
+// 이미지 확대 2차 모달 (workinfo-view-modal 위에 표시)
+// z-index 100001 — workinfo-view-modal/_global.scss 모달 오버레이보다 높게
+// ============================================================================
+.image-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100001;
+  backdrop-filter: blur(5px);
+}
+
+.image-preview-modal {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+
+  img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    display: block;
+  }
+
+  .preview-close-btn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+
+    i {
+      font-size: 18px;
+    }
+
+    &:hover {
+      color: #faab07;
+      border-color: #faab07;
+    }
+  }
+}

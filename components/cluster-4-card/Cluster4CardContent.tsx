@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -60,6 +60,13 @@ const formatMajor = (value: string) => {
   if (value.endsWith("학과")) return value.slice(0, -1); // "컴퓨터공학과" → "컴퓨터공학" (+ 학과 라벨)
   if (value.endsWith("학부")) return value.slice(0, -1); // "소프트웨어학부" → "소프트웨어학" (+ 부 라벨은 안 맞지만 일단)
   return value;
+};
+
+const stripFieldLabel = (value: string | null | undefined, labels: string[]) => {
+  const text = value?.trim();
+  if (!text || text === "-") return "-";
+  const matchedLabel = labels.find((label) => text.endsWith(label));
+  return matchedLabel ? text.slice(0, -matchedLabel.length).trim() || text : text;
 };
 
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
@@ -645,17 +652,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 데모 모드: activity_types 관련 state (DB 경로에서만 조회되므로 데모 모드에서 수동 세팅)
       setCompetencyTypeIds(["comp-1", "comp-2", "comp-3", "comp-4", "comp-5"]);
       setExperienceTypeIds(["exp-1", "exp-2", "exp-3", "exp-4"]);
-      setActivityTypesMap(new Map<string, ActivityTypeInfo>([
-        ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
-        ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
-        ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
-        ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
-        ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
-        ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
-        ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
-        ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
-        ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
-      ]));
+      setActivityTypesMap(
+        new Map<string, ActivityTypeInfo>([
+          ["comp-1", { id: "comp-1", name: "[실무 Info]일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십", line_code: "CP09 - UN010", cluster_id: "practical_competency", description: null }],
+          ["comp-2", { id: "comp-2", name: "[실무 Info]마케팅", line_code: "CP02 - MK001", cluster_id: "practical_competency", description: null }],
+          ["comp-3", { id: "comp-3", name: "[실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시 [실무 Info]인하우스 & 에이전시", line_code: "CP03 - HA001", cluster_id: "practical_competency", description: null }],
+          ["comp-4", { id: "comp-4", name: "[실무 Info]가나다라마바사아자차카타파하가나다라마바사", line_code: "CP04 - LG001", cluster_id: "practical_competency", description: null }],
+          ["comp-5", { id: "comp-5", name: "-", line_code: "-", cluster_id: "practical_competency", description: null }],
+          ["exp-1", { id: "exp-1", name: "[커리어]일이삼사오육칠팔구십 일이삼사오육칠팔구십", line_code: "EX01 - SFA01", cluster_id: "practical_experience", description: null }],
+          ["exp-2", { id: "exp-2", name: "[생산성]상호 피드백", line_code: "EX02 - RUA99", cluster_id: "practical_experience", description: null }],
+          ["exp-3", { id: "exp-3", name: "[콘텐츠]", line_code: "EX03 - RUA99", cluster_id: "practical_experience", description: null }],
+          ["exp-4", { id: "exp-4", name: "[퍼포먼스]마케팅 실무", line_code: "EX04 - PMP01", cluster_id: "practical_experience", description: null }],
+        ]),
+      );
       setExperienceTypeInfos([
         { id: "exp-1", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
         { id: "exp-2", eligible_min_approved_weeks: null, eligible_max_approved_weeks: null, count_once_in_total: false },
@@ -1403,6 +1412,234 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [workAbilityViewIsEditing, setWorkAbilityViewIsEditing] = useState(false);
   const [workExpViewIsEditing, setWorkExpViewIsEditing] = useState(false);
   const [workCareerViewIsEditing, setWorkCareerViewIsEditing] = useState(false);
+
+  // workInfo View 모달 — 편집 진입 시 스냅샷 (취소/초기화/isDirty 비교용)
+  const workInfoSnapshot = useRef<any>(null);
+
+  // workInfo View 모달 — 편집 모드 입력 state (보기 모드에서는 selectedWorkInfoCard 직접 표시)
+  const [editingSubTitle, setEditingSubTitle] = useState<string>("");
+  // TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 — 백엔드 머지 후 selectedWorkInfoCard.growthPoint로 교체
+  const [editingGrowthPoint, setEditingGrowthPoint] = useState<string>("");
+  const [editingOutputLinks, setEditingOutputLinks] = useState<{ desc: string; url: string }[]>(Array(5).fill({ desc: "", url: "" }));
+  // TODO: [백엔드 작업 필요] weekly_activity_details에 image_urls(text[]) 컬럼 추가 — 백엔드 머지 후 selectedWorkInfoCard.images 사용 + URL.createObjectURL 결과를 서버 업로드로 교체
+  const [editingImages, setEditingImages] = useState<(string | null)[]>([null, null, null, null]);
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadTargetIdx, setUploadTargetIdx] = useState<number>(0);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  // TODO: [백엔드 작업 필요] image_captions 컬럼 추가 — 백엔드 머지 후 card.imageCaptions 사용
+  const [editingImageCaptions, setEditingImageCaptions] = useState<string[]>(["", "", "", ""]);
+  const [captionOpenIndex, setCaptionOpenIndex] = useState<number | null>(null);
+  // 데모 모드: true (수정 가능 — UI 테스트용) / 일반 모드: false (관리자 승인 필요)
+  // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditWorkInfo로 반영
+  const [canEditWorkInfo, setCanEditWorkInfo] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    // isDemoMode는 마운트 시 useEffect로 false → checkDemoMode() 결과로 sync됨 (SSR/hydration 일관성).
+    // useState 초기값은 첫 렌더만 사용되므로, 마운트 후 isDemoMode 변경을 canEditWorkInfo로 따라잡기 위해 별도 sync.
+    setCanEditWorkInfo(isDemoMode);
+  }, [isDemoMode]);
+
+  // workInfo View 모달 — 스냅샷 vs 현재값 비교 (정밀 isDirty)
+  const isWorkInfoDirty = (): boolean => {
+    const snap = workInfoSnapshot.current;
+    if (!snap) return false;
+    if (editingSubTitle !== (snap.subTitle || "")) return true;
+    if (editingGrowthPoint !== (snap.growthPoint || "")) return true;
+    const snapLinks: { desc: string; url: string }[] = snap.outputLinks || [];
+    for (let i = 0; i < 5; i++) {
+      const sUrl = snapLinks[i]?.url || "";
+      const sDesc = snapLinks[i]?.desc || "";
+      const eUrl = editingOutputLinks[i]?.url || "";
+      const eDesc = editingOutputLinks[i]?.desc || "";
+      if (sUrl !== eUrl || sDesc !== eDesc) return true;
+    }
+    const snapImages: (string | null)[] = snap.images || [null, null, null, null];
+    for (let i = 0; i < 4; i++) {
+      if ((snapImages[i] || null) !== (editingImages[i] || null)) return true;
+    }
+    const snapCaptions: string[] = snap.imageCaptions || ["", "", "", ""];
+    for (let i = 0; i < 4; i++) {
+      if ((snapCaptions[i] || "") !== (editingImageCaptions[i] || "")) return true;
+    }
+    return false;
+  };
+
+  // workInfo View 모달 — 보기/편집 토글 핸들러 (Type B 푸터 규칙 + 관리자 승인)
+  const handleEditWorkInfo = () => {
+    if (!canEditWorkInfo) {
+      window.alert("관리자 승인이 필요합니다");
+      return;
+    }
+    const card = selectedWorkInfoCard;
+    // 스냅샷: 비교 대상 필드만 (subTitle/growthPoint/outputLinks/images)
+    const initialOutputLinks = card?.outputLinks && card.outputLinks.length > 0 ? card.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" });
+    // TODO: [백엔드 작업 필요] card.images / card.imageCaptions로 교체. 현재는 항상 빈 슬롯 4개로 초기화.
+    const initialImages: (string | null)[] = card?.images ? [card.images[0] || null, card.images[1] || null, card.images[2] || null, card.images[3] || null] : [null, null, null, null];
+    const initialCaptions: string[] = card?.imageCaptions ? [card.imageCaptions[0] || "", card.imageCaptions[1] || "", card.imageCaptions[2] || "", card.imageCaptions[3] || ""] : ["", "", "", ""];
+    workInfoSnapshot.current = {
+      subTitle: card?.subTitle || "",
+      growthPoint: card?.growthPoint || "",
+      outputLinks: JSON.parse(JSON.stringify(initialOutputLinks)),
+      images: [...initialImages],
+      imageCaptions: [...initialCaptions],
+    };
+    setEditingSubTitle(card?.subTitle || "");
+    setEditingGrowthPoint(card?.growthPoint || "");
+    setEditingOutputLinks(initialOutputLinks);
+    setEditingImages(initialImages);
+    setEditingImageCaptions(initialCaptions);
+    setWorkInfoViewIsEditing(true);
+  };
+
+  const handleCancelWorkInfo = () => {
+    // Type B + isDirty: 변경 있으면 confirm. "아니오"면 편집 모드 유지.
+    if (isWorkInfoDirty()) {
+      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+        return;
+      }
+    }
+    const snap = workInfoSnapshot.current;
+    if (snap) {
+      setEditingSubTitle(snap.subTitle || "");
+      setEditingGrowthPoint(snap.growthPoint || "");
+      setEditingOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
+      setEditingImages(snap.images ? [...snap.images] : [null, null, null, null]);
+      setEditingImageCaptions(snap.imageCaptions ? [...snap.imageCaptions] : ["", "", "", ""]);
+    }
+    setWorkInfoViewIsEditing(false);
+  };
+
+  const handleResetWorkInfo = () => {
+    // 편집 모드 유지. confirm 후 스냅샷 복원.
+    const snap = workInfoSnapshot.current;
+    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+      setEditingSubTitle(snap.subTitle || "");
+      setEditingGrowthPoint(snap.growthPoint || "");
+      setEditingOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
+      setEditingImages(snap.images ? [...snap.images] : [null, null, null, null]);
+      setEditingImageCaptions(snap.imageCaptions ? [...snap.imageCaptions] : ["", "", "", ""]);
+    }
+  };
+
+  const handleSaveWorkInfo = () => {
+    // 필수필드 검증: Sub Title / Growth Point / 이미지 1·2번
+    const missing: string[] = [];
+    if (!editingSubTitle.trim()) missing.push("Sub Title");
+    if (!editingGrowthPoint.trim()) missing.push("Growth Point");
+    if (!editingImages[0]) missing.push("이미지 1번");
+    if (!editingImages[1]) missing.push("이미지 2번");
+    if (missing.length > 0) {
+      window.alert("필수 항목을 입력해주세요:\n" + missing.join("\n"));
+      return;
+    }
+    // sub_title + output_links 저장 (weekActivityDetails + selectedWorkInfoCard 동시 갱신)
+    // TODO: [백엔드 작업 필요] growth_point + image_urls 컬럼 추가 후 sub_title과 동일 패턴으로 저장. blob: URL은 서버 업로드 → 영구 URL 교체 필요.
+    if (selectedWorkInfoCard?.activityType) {
+      const newSubTitle = editingSubTitle.trim() || null;
+      const newOutputLinks = editingOutputLinks;
+      setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle, output_links: newOutputLinks } : d)));
+      setSelectedWorkInfoCard((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              subTitle: newSubTitle || "",
+              outputLinks: newOutputLinks,
+              growthPoint: editingGrowthPoint,
+              images: editingImages,
+              imageCaptions: editingImageCaptions,
+            }
+          : prev,
+      );
+      // 저장 완료 → 스냅샷 갱신 (isDirty 초기화)
+      workInfoSnapshot.current = {
+        subTitle: newSubTitle || "",
+        growthPoint: editingGrowthPoint,
+        outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
+        images: [...editingImages],
+        imageCaptions: [...editingImageCaptions],
+      };
+    }
+    setWorkInfoViewIsEditing(false);
+  };
+
+  const handleCloseWorkInfo = () => {
+    // 편집 모드에서만 isDirty 체크 (보기 모드는 변경 없음)
+    if (workInfoViewIsEditing && isWorkInfoDirty()) {
+      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+        return;
+      }
+    }
+    setWorkInfoViewModalOpen(false);
+    setWorkInfoViewIsEditing(false);
+  };
+
+  // workInfo View 모달 — Output Link 편집 핸들러 (운영진 링크 보호 + 순차 입력 + 삭제 시 뒤가 앞으로)
+  const handleOutputLinkChange = (idx: number, field: "desc" | "url", value: string) => {
+    if (!selectedWorkInfoCard?.activityType) return;
+    const adminCount = getAdminOutputLinksCount(selectedWorkInfoCard.activityType);
+    if (idx < adminCount) return; // 운영진 링크는 수정 불가
+    setEditingOutputLinks((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], [field]: value };
+      return next;
+    });
+  };
+
+  const handleOutputLinkDelete = (idx: number) => {
+    if (!selectedWorkInfoCard?.activityType) return;
+    const adminCount = getAdminOutputLinksCount(selectedWorkInfoCard.activityType);
+    if (idx < adminCount) return; // 운영진 링크는 삭제 불가
+    setEditingOutputLinks((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < 5) next.push({ desc: "", url: "" });
+      return next;
+    });
+  };
+
+  // workInfo View 모달 — 이미지 업로드/삭제/확대 핸들러
+  const triggerImageUpload = (idx: number) => {
+    setUploadTargetIdx(idx);
+    imageFileInputRef.current?.click();
+  };
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // TODO: [백엔드 작업 필요] 실제 모드에서는 서버 업로드 후 영구 URL로 교체. 현재는 blob: URL (미리보기 전용).
+    const url = URL.createObjectURL(file);
+    setEditingImages((prev) => {
+      const next = [...prev];
+      next[uploadTargetIdx] = url;
+      return next;
+    });
+    e.target.value = ""; // 같은 파일 재선택 허용
+  };
+
+  const handleImageDelete = (idx: number) => {
+    setEditingImages((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < 4) next.push(null);
+      return next;
+    });
+    // 캡션도 동일 인덱스 삭제 + 빈 슬롯 push (이미지와 1:1 매핑 유지)
+    setEditingImageCaptions((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < 4) next.push("");
+      return next;
+    });
+  };
+
+  const handleCaptionChange = (idx: number, value: string) => {
+    setEditingImageCaptions((prev) => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+  };
+
+  const handleImagePreview = (idx: number) => {
+    const image = editingImages[idx] || selectedWorkInfoCard?.images?.[idx];
+    if (image) setPreviewImageUrl(image);
+  };
 
   // 모달 열릴 때 배경 스크롤 잠금
   const anyModalOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
@@ -5132,150 +5369,395 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 실무 정보 카드 상세보기 모달 ========== */}
+      {/* ========== 실무 정보 카드 상세보기 모달 (1차: 가로형_대 1468×855 / 헤더·푸터·state) ========== */}
       {workInfoViewModalOpen && selectedWorkInfoCard && (
         <div className="section-modal-overlay">
-          <div className="section-modal work-view-modal">
+          <div className="section-modal work-view-modal workinfo-view-modal">
+            {/* ── 헤더 (100px) ── */}
             <div className="section-modal-header">
-              <h3>실무 정보</h3>
-              <button
-                className="modal-close-btn"
-                onClick={() => {
-                  setWorkInfoViewModalOpen(false);
-                  setWorkInfoViewIsEditing(false);
-                }}
-              >
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                {/* TODO: [백엔드 작업 필요] line↔activity 매핑 확정 후 "[라인: {lineName}]" 형태로 복원 — 현재는 category 표시 */}
+                <h3>
+                  실무 정보 [<span className="line-name-text">{selectedWorkInfoCard.category || "카테고리"}</span>]
+                </h3>
+              </div>
+              <p className="modal-subtitle">이번 주에 어떤 실무 정보들을 통해, 어떤 과정과 성장을 이루어냈는지를 마음껏 어필해주세요. 😊</p>
+              <button className="modal-close-btn" onClick={handleCloseWorkInfo}>
                 <i className="ti ti-x"></i>
               </button>
             </div>
+
+            {/* ── 미드 (637px) — 2차: 좌측 콘텐츠(인적사항/시즌/Output/텍스트3종) + 우측 이미지 placeholder(3차) ── */}
             <div className="section-modal-body">
-              <div className="work-view-fixed">
-                <div className="date-badge">{weekDateRange}</div>
-                {/* 헤더: 아이콘 + 카테고리 제목 + 강화 상태 */}
-                <div className="work-view-header-row">
-                  <div className="work-view-left">
-                    <div className={`work-icon-box ${selectedWorkInfoCard.isFruit ? "fruit" : ""}`}>{selectedWorkInfoCard.icon && <img src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category} />}</div>
-                    <span className="category-title">{selectedWorkInfoCard.category}</span>
+              <div className="workinfo-content-layout">
+                {/* ──── 좌측 ──── */}
+                <div className="workinfo-left">
+                  {/* 좌상단: 인적사항 카드 — 5열 그리드 (1열 사진 rowspan 3 + 2열 3행) */}
+                  {/* TODO: [백엔드 작업 필요] profile API 응답에 인적사항(profilePhoto/name/gender/age/role/school/major/keyword) 필드 보장 후 아래 더미값 교체 */}
+                  <div className="workinfo-personal-card">
+                    <div className="personal-grid">
+                      {/* 1열: 프로필 사진 (3행 차지) */}
+                      <div className="personal-photo">
+                        {/* TODO: [백엔드 작업 필요] profile API의 photo URL 사용 — 현재는 데모 더미 또는 기본 아이콘 */}
+                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="profile" />
+                      </div>
+
+                      {/* 2열: 인적사항 텍스트 컬럼 (3행 stack) */}
+                      <div className="personal-info">
+                        {/* 1행 — 이름·성별·나이 */}
+                        <div className="personal-row-1">
+                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                        </div>
+
+                        {/* 2행 — 학교·학과 (필드명/값 분리, 고정폭, 말줄임 없음) */}
+                        <div className="personal-row-2">
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-label">학교</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-label">학과</span>
+                          </span>
+                        </div>
+
+                        {/* 3행 — 팀·파트 (필드명/값 분리, 고정폭, 말줄임 없음) */}
+                        <div className="personal-row-3">
+                          <span className="personal-field">
+                            <span className="field-value">{teamName || (isDemoMode ? "마케팅" : "—")}</span>
+                            <span className="field-label">팀</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{partName || (isDemoMode ? "바이럴" : "—")}</span>
+                            <span className="field-label">파트</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 3열: 역할/키워드 태그 (그리드 독립 — row-1 행 높이에 영향 없음) */}
+                      <div className="personal-tags">
+                        {/* TODO: [백엔드 작업 필요] role 필드 (운영진/앰배서더/일반 등) — profile API에 추가 필요 */}
+                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
+                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="work-view-right">
-                    {selectedWorkInfoCard.status === "success" && (
-                      <div className="status-badge success">
-                        <img src="/images/0/cluster4/icon/5 강화 성공.png" alt="강화성공" />
-                        <span>강화성공</span>
+
+                  {/* 좌중단: 2열 (시즌/주차/카테고리/상태 + Output Link 5개) */}
+                  <div className="workinfo-mid-section">
+                    {/* 1열: 시즌/주차/날짜 + 카테고리/강화상태 */}
+                    <div className="workinfo-mid-col1">
+                      <div className="workinfo-date-badge">
+                        <span className="date-badge-text">{weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}</span>
+                        <span className="date-range-text">{weekDateRange}</span>
                       </div>
-                    )}
-                    {selectedWorkInfoCard.status === "waiting" && (
-                      <div className="status-badge waiting">
-                        <img src="/images/0/cluster4/icon/6 강화 대기.png" alt="강화대기" />
-                        <span>강화대기</span>
+                      <div className="workinfo-line-info">
+                        {/* TODO: [백엔드 작업 필요] line↔activity 매핑 확정 후 lineName/lineCode로 교체. 현재는 category로 대체. */}
+                        {/* 1행: 활동 카테고리 — 기존 매핑 activityTypeConfig[activityType].icon (selectedWorkInfoCard.icon) 사용 */}
+                        <div className="line-info-row">
+                          {selectedWorkInfoCard.icon ? <img className="line-activity-icon" src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category || "활동"} /> : <span className="line-status-icon">●</span>}
+                          <span className="line-name">{selectedWorkInfoCard.category || "—"}</span>
+                        </div>
+                        {/* 2행: 강화 상태 — 기존 매핑 enhancementStatusIcons[status] (selectedWorkInfoCard.statusIcon) 사용 */}
+                        {(() => {
+                          const enhanceStatusTextMap: Record<string, string> = {
+                            success: "강화 성공",
+                            waiting: "강화 대기",
+                            failed: "강화 실패",
+                            not_applicable: "해당 없음",
+                          };
+                          const statusKey = selectedWorkInfoCard.status as string;
+                          const statusText = enhanceStatusTextMap[statusKey] || "—";
+                          return (
+                            <div className="line-info-row">
+                              {selectedWorkInfoCard.statusIcon ? <img className="line-enhance-icon" src={selectedWorkInfoCard.statusIcon} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                              <span className="line-enhance-status">{statusText}</span>
+                              {/* TODO: [백엔드 작업 필요] line_code 매핑 확정 후 추가 — 현재는 activityType 표시 */}
+                              <span className="line-code">{selectedWorkInfoCard.activityType || ""}</span>
+                            </div>
+                          );
+                        })()}
                       </div>
-                    )}
-                    {selectedWorkInfoCard.status === "failed" && (
-                      <div className="status-badge fail">
-                        <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화실패" />
-                        <span>강화실패</span>
+                    </div>
+
+                    {/* 2열: Output Link 5개 — cluster3 output modal 패턴 (dot + input/text + open-btn) + adminCount 보호 + 순차 입력 */}
+                    <div className="workinfo-mid-col2">
+                      <div className="workinfo-output-links">
+                        {[0, 1, 2, 3, 4].map((i) => {
+                          // cluster3 dot 색상(3개) → 5개 확장
+                          const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
+                          const adminCount = selectedWorkInfoCard?.activityType ? getAdminOutputLinksCount(selectedWorkInfoCard.activityType) : 0;
+                          const isAdminLink = i < adminCount;
+                          // 보기 모드는 카드 데이터, 편집 모드는 editingOutputLinks
+                          const link = workInfoViewIsEditing ? editingOutputLinks[i] || { desc: "", url: "" } : selectedWorkInfoCard.outputLinks?.[i] || { desc: "", url: "" };
+                          const hasUrl = !!link.url?.trim();
+                          // 순차 입력: 사용자 링크 영역(idx >= adminCount)에서 이전 칸 비어있으면 disabled
+                          const prevUserLink = i > adminCount ? editingOutputLinks[i - 1] : null;
+                          const sequentialDisabled = workInfoViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const displayText = link.desc?.trim() || link.url;
+                          return (
+                            <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
+                              {/* admin 배지는 라벨 제거 후에도 유지 — row 시작부에 inline 표시 */}
+                              {isAdminLink && (
+                                <span className="admin-badge" title="운영진 입력">
+                                  A
+                                </span>
+                              )}
+                              {/* cluster3 패턴: dot + input/text + open-btn */}
+                              <span className="link-dot" style={{ backgroundColor: dotColor }} />
+                              {workInfoViewIsEditing && !isAdminLink ? (
+                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleOutputLinkChange(i, "url", e.target.value)} />
+                              ) : hasUrl ? (
+                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                              ) : (
+                                <span className="output-link-text output-link-empty">-</span>
+                              )}
+                              <button type="button" className="link-open-btn" onClick={() => hasUrl && window.open(ensureProtocol(link.url), "_blank")} disabled={!hasUrl} aria-label="링크 열기">
+                                <i className="ti ti-external-link"></i>
+                              </button>
+                              {workInfoViewIsEditing && !isAdminLink && hasUrl && (
+                                <button type="button" className="output-link-delete" onClick={() => handleOutputLinkDelete(i)} aria-label="링크 삭제">
+                                  <i className="ti ti-x"></i>
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
-                    {selectedWorkInfoCard.status === "not_applicable" && (
-                      <div className="status-badge not-applicable">
-                        <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당없음" />
-                        <span>해당없음</span>
-                      </div>
-                    )}
+                    </div>
+                  </div>
+
+                  {/* 좌하단: Main Title (운영진 read-only) + Sub Title 300자 + Growth Point 200자 */}
+                  <div className="workinfo-text-section">
+                    {/* Main Title — 항상 보기 전용 (관리자가 어드민에서 입력) */}
+                    <div className="workinfo-text-block text-block-main">
+                      <h4 className="text-block-title">Main Title</h4>
+                      <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "작성되는 창이 아님. 어드민에서 작성된 데이터를 가져오는 방식."}</div>
+                    </div>
+
+                    {/* Sub Title — 사용자 입력 300자 (필수) */}
+                    <div className="workinfo-text-block text-block-sub">
+                      <h4 className="text-block-title">
+                        Sub Title <span className="required-mark">*</span>
+                      </h4>
+                      {workInfoViewIsEditing ? (
+                        <div className="text-block-edit">
+                          <textarea
+                            className="text-block-textarea sub-title-input"
+                            value={editingSubTitle}
+                            onChange={(e) => {
+                              if (e.target.value.length <= 300) setEditingSubTitle(e.target.value);
+                            }}
+                            placeholder="이번 주 이 라인에서 어떤 내용을 진행하고, 어떤 과정을 밟으며, 어떤 정보들을 얻게 되었는지를 작성해주세요. 😊"
+                            maxLength={300}
+                          />
+                          <span className="char-count">{editingSubTitle.length}/300</span>
+                        </div>
+                      ) : (
+                        <div className="text-block-content">{selectedWorkInfoCard.subTitle || "-"}</div>
+                      )}
+                    </div>
+
+                    {/* Growth Point — 사용자 입력 200자 (필수) */}
+                    {/* TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 + API 확장 후, sub_title과 동일 패턴으로 데이터 연결 */}
+                    <div className="workinfo-text-block text-block-growth">
+                      <h4 className="text-block-title">
+                        Growth Point <span className="required-mark">*</span>
+                      </h4>
+                      {workInfoViewIsEditing ? (
+                        <div className="text-block-edit">
+                          <textarea
+                            className="text-block-textarea growth-point-input"
+                            value={editingGrowthPoint}
+                            onChange={(e) => {
+                              if (e.target.value.length <= 200) setEditingGrowthPoint(e.target.value);
+                            }}
+                            placeholder="이번 주 이 라인을 진행하며 느낀 통찰, 정보, 감각, 식견을 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
+                            maxLength={200}
+                          />
+                          <span className="char-count">{editingGrowthPoint.length}/200</span>
+                        </div>
+                      ) : (
+                        <div className="text-block-content">{selectedWorkInfoCard.growthPoint || "-"}</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Main Title + Content */}
-                <div className="work-view-title-section">
-                  <div className="main-title">Main Title</div>
-                  <div className={`content-text ${workInfoViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workInfoViewIsEditing && isAdmin} suppressContentEditableWarning>
-                    {selectedWorkInfoCard.title}
+                {/* ──── 우측 — 이미지 2×2 그리드 (1·2번 필수, 순차 업로드, 클릭 시 확대) ──── */}
+                <div className="workinfo-right">
+                  <div className="workinfo-image-grid">
+                    {[0, 1, 2, 3].map((imageIdx) => {
+                      // 보기 모드는 카드 데이터, 편집 모드는 editingImages
+                      // TODO: [백엔드 작업 필요] selectedWorkInfoCard.images 필드 보장 후 fallback 제거
+                      const image = workInfoViewIsEditing ? editingImages[imageIdx] : selectedWorkInfoCard?.images?.[imageIdx] || editingImages[imageIdx] || null;
+                      const isEnabled = imageIdx === 0 || !!editingImages[imageIdx - 1];
+                      const isRequired = imageIdx < 2; // 1·2번만 필수
+                      return (
+                        <div key={imageIdx} className={`workinfo-image-slot ${image ? "has-image" : ""} ${workInfoViewIsEditing && !isEnabled ? "disabled" : ""}`}>
+                          {image ? (
+                            <div className="image-preview" onClick={() => handleImagePreview(imageIdx)}>
+                              <img src={image} alt={`이미지 ${imageIdx + 1}`} />
+                              {/* cluster3 image-actions-overlay 패턴: 편집 모드에서 항상 표시 */}
+                              {workInfoViewIsEditing && (
+                                <div className="image-actions-overlay">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerImageUpload(imageIdx);
+                                    }}
+                                    title="교체"
+                                    aria-label="교체"
+                                  >
+                                    <i className="ti ti-upload"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="image-action-btn image-delete-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleImageDelete(imageIdx);
+                                    }}
+                                    title="삭제"
+                                    aria-label="삭제"
+                                  >
+                                    <i className="ti ti-trash"></i>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div
+                              className="image-empty-slot"
+                              onClick={() => {
+                                if (workInfoViewIsEditing && isEnabled) triggerImageUpload(imageIdx);
+                              }}
+                            >
+                              {/* 빈 슬롯에서도 편집 모드면 cluster3 image-actions-overlay 표시 (업로드 아이콘) */}
+                              {workInfoViewIsEditing && isEnabled && (
+                                <div className="image-actions-overlay">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerImageUpload(imageIdx);
+                                    }}
+                                    title="업로드"
+                                    aria-label="업로드"
+                                  >
+                                    <i className="ti ti-upload"></i>
+                                  </button>
+                                </div>
+                              )}
+                              {workInfoViewIsEditing && isEnabled ? (
+                                <div className="upload-placeholder">
+                                  <i className="ti ti-upload"></i>
+                                  <span className="slot-number">
+                                    {imageIdx + 1}
+                                    {isRequired && <span className="required-mark">*</span>}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="empty-placeholder">
+                                  <span className="slot-number">
+                                    {imageIdx + 1}
+                                    {isRequired && <span className="required-mark">*</span>}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {workInfoViewIsEditing && captionOpenIndex === imageIdx ? (
+                            <div className="image-caption-overlay">
+                              <input type="text" className="image-caption-input" value={editingImageCaptions[imageIdx] || ""} onChange={(e) => handleCaptionChange(imageIdx, e.target.value)} onClick={(e) => e.stopPropagation()} placeholder="캡션 입력 (최대 20자)" maxLength={20} autoFocus />
+                            </div>
+                          ) : (
+                            <div className="image-caption-overlay">
+                              <span className="image-caption-text">{editingImageCaptions[imageIdx] || ""}</span>
+                            </div>
+                          )}
+                          {workInfoViewIsEditing && (
+                            <button
+                              type="button"
+                              className={`image-action-btn image-caption-btn${captionOpenIndex === imageIdx ? " active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCaptionOpenIndex(captionOpenIndex === imageIdx ? null : imageIdx);
+                              }}
+                              title="캡션"
+                              aria-label="캡션"
+                            >
+                              <i className="ti ti-text-caption"></i>
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
-
-                {/* Sub Title */}
-                <div className="work-view-section">
-                  <div className="section-label">Sub Title</div>
-                  <div className={`section-content ${workInfoViewIsEditing ? "editing" : ""}`} contentEditable={workInfoViewIsEditing} suppressContentEditableWarning>
-                    {selectedWorkInfoCard.subTitle || "-"}
-                  </div>
-                </div>
-              </div>
-
-              {/* Output Link */}
-              <div className="work-view-section">
-                <div className="section-label">Output Link</div>
-                <div className="output-links-view">
-                  {[0, 1, 2, 3, 4].map((idx) => {
-                    const link = selectedWorkInfoCard.outputLinks?.[idx];
-                    const hasLink = link?.url && link.url.trim() !== "";
-                    const prevLink = idx > 0 ? selectedWorkInfoCard.outputLinks?.[idx - 1] : null;
-                    const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
-                    const isDisabled = !prevHasLink;
-                    return workInfoViewIsEditing ? (
-                      <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
-                        <span className="link-num">{idx + 1}</span>
-                        <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
-                          {hasLink ? link.desc || "링크" : "-"}
-                        </span>
-                        <input
-                          className="link-url-edit"
-                          defaultValue={hasLink ? link.url : ""}
-                          placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
-                          disabled={isDisabled}
-                          style={{
-                            border: "1px solid rgba(255,165,0,0.5)",
-                            background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
-                            padding: "4px 8px",
-                            borderRadius: "6px",
-                            color: "inherit",
-                            fontSize: "inherit",
-                            outline: "none",
-                            width: "100%",
-                            marginTop: "4px",
-                            cursor: isDisabled ? "not-allowed" : "text",
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
-                        <span className="link-num">{idx + 1}</span>
-                        <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>
-                      </a>
-                    );
-                  })}
+                  {/* hidden file input */}
+                  <input type="file" ref={imageFileInputRef} accept="image/*" style={{ display: "none" }} onChange={handleImageFileChange} />
                 </div>
               </div>
             </div>
+
+            {/* ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] ── */}
             <div className="section-modal-footer">
-              {!workInfoViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkInfoViewIsEditing(true)}>
-                  수정
-                </button>
-              ) : (
-                <>
-                  <button className="cancel-btn" onClick={() => setWorkInfoViewIsEditing(false)}>
-                    취소
-                  </button>
-                  <button
-                    className="save-btn"
-                    onClick={() => {
-                      const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                      if (modal && selectedWorkInfoCard?.activityType) {
-                        const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                        setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle } : d)));
-                        setSelectedWorkInfoCard((prev: any) => (prev ? { ...prev, subTitle: newSubTitle || "" } : prev));
-                      }
-                      setWorkInfoViewIsEditing(false);
-                    }}
-                  >
-                    저장
-                  </button>
-                </>
-              )}
+              {/* 행 1 */}
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말">
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  {!workInfoViewIsEditing ? (
+                    <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={!canEditWorkInfo} style={!canEditWorkInfo ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다"}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button className="modal-cancel-btn" onClick={handleCancelWorkInfo}>
+                        취소
+                      </button>
+                      <button className="modal-reset-btn" onClick={handleResetWorkInfo}>
+                        초기화
+                      </button>
+                      <button className="modal-save-btn" onClick={handleSaveWorkInfo}>
+                        저장
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 행 2 — visibility 토글로 공간 유지 (cluster2/3 표준: 우측 정렬) */}
+              <div className="modal-footer-bottom">
+                <span className="modal-notice" style={{ visibility: workInfoViewIsEditing ? "visible" : "hidden" }}>
+                  내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* 이미지 확대 2차 모달 (workinfo-view-modal 위에 표시. z-index는 SCSS 100001) */}
+          {previewImageUrl && (
+            <div className="image-preview-overlay" onClick={() => setPreviewImageUrl(null)}>
+              <div className="image-preview-modal" onClick={(e) => e.stopPropagation()}>
+                <img src={previewImageUrl} alt="확대 이미지" />
+                <button type="button" className="preview-close-btn" onClick={() => setPreviewImageUrl(null)} aria-label="닫기">
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
