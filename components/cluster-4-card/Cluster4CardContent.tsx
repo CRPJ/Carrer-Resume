@@ -85,9 +85,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const t = text || "-";
     return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
   };
-  const isOwner = !urlUserId || session?.user?.id === urlUserId;
-  // TODO: 백엔드 연동 시 API에서 받아오기
-  const isAdmin = false;
+  // 어드민(마더) 계정은 모든 프로필 편집 가능
+  const isOwner = session?.user?.isAdmin || !urlUserId || session?.user?.id === urlUserId;
+  const isAdmin = !!session?.user?.isAdmin;
+
+  // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
+  const apiUrl = (path: string) => {
+    if (urlUserId && session?.user?.isAdmin) {
+      const separator = path.includes("?") ? "&" : "?";
+      return `${path}${separator}targetUserId=${urlUserId}`;
+    }
+    return path;
+  };
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -157,7 +166,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     activity_type_id: string;
     title: string | null;
     is_active: boolean;
-    opened_at: string | null; // 개설 시각 (48시간 이내에만 2차 정보 작성 가능)
+    opened_at: string | null;
+    deadline?: string | null; // 마감 시각 (없으면 opened_at+48h 폴백)
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
@@ -205,6 +215,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 활동별 평점 (activity_type_id → points)
   const [activityRatings, setActivityRatings] = useState<Map<string, number>>(new Map());
+
+  // 어드민 개별 권한 부여 (secondary_info_grants)
+  interface SecondaryInfoGrant { activity_type_id: string; deadline: string; }
+  const [secondaryInfoGrants, setSecondaryInfoGrants] = useState<SecondaryInfoGrant[]>([]);
 
   // DB에서 가져온 activity_types 정보
   interface ActivityTypeInfo {
@@ -719,7 +733,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           supabase.from("weeks").select("id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)").eq("id", weekId).single(),
           fetch(profileUrl),
           supabase.from("weeks").select("id, start_date, end_date, season_id, seasons(name)").order("start_date", { ascending: false }),
-          supabase.from("weekly_activities").select("id, activity_type_id, title, is_active, opened_at, output_links").eq("week_id", weekId),
+          supabase.from("weekly_activities").select("id, activity_type_id, title, is_active, opened_at, deadline, output_links").eq("week_id", weekId),
         ]);
 
         // urlUserId가 있으면 API fetch + DB 쿼리도 동시 시작
@@ -1018,6 +1032,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const filteredActivityDetails = apiActivityDetails.filter((ad: { week_id: string }) => ad.week_id === weekId);
           setWeekActivityDetails(filteredActivityDetails);
 
+          // 12-1. 어드민 개별 권한 (secondary_info_grants) - 해당 주차 / 유저 기준
+          try {
+            const { data: grantsData } = await supabase
+              .from("secondary_info_grants")
+              .select("activity_type_id, deadline")
+              .eq("user_id", userId)
+              .eq("week_id", weekId);
+            if (grantsData) setSecondaryInfoGrants(grantsData as SecondaryInfoGrant[]);
+          } catch {
+            // 테이블 없거나 권한 없으면 조용히 무시
+          }
+
           // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
           const ratingsMap = new Map<string, number>();
           filteredActivityRecords.forEach((ar: { id: string; activity_type_id: string }) => {
@@ -1049,38 +1075,51 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 정보: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 해당 주차의 활성화된 활동 수
           const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter((a) => infoTypesList.includes(a.activity_type_id)).length;
 
-          // 실무 역량: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 1 (매주 최대 1개 선택 가능)
-          const competencyTotal = isOnboardingWeekLocal ? 0 : 1;
+          // 실무 역량: 평소 매주 최대 1개. 공식 휴식 주차는 기본 0이지만, 예외적으로 개설된 활동이 있으면 1.
+          const hasActiveCompetency = activeActivities.some((a) => competencyTypesList.includes(a.activity_type_id));
+          const competencyTotal = isOnboardingWeekLocal
+            ? 0
+            : (currentWeek.is_club_break || isBreakSeason)
+              ? (hasActiveCompetency ? 1 : 0)
+              : 1;
 
-          // 실무 경험: eligible 조건 체크 (cluster-4-1과 동일한 로직)
+          // 실무 경험: 해당 주차에 개설된 experience 활동 중 eligible 조건 체크
+          // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
+          // 그 이전에는 개설된 모든 실무 경험 활동이 적격 (룰 없이 전부 카운트)
+          const isEligibilityRuleActive = seasonData && (
+            seasonData.year > 2026 ||
+            (seasonData.year === 2026 && seasonData.name !== 'spring') ||
+            (seasonData.year === 2026 && seasonData.name === 'spring' && currentWeek.week_number >= 9)
+          );
           let experienceTotal = 0;
+          // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
+          const activeExperienceActivities = activeActivities.filter((a) => experienceTypesList.includes(a.activity_type_id));
           if (!isOnboardingWeekLocal) {
-            const experienceActivities = activeActivities.filter((a) => experienceTypesList.includes(a.activity_type_id));
-
-            experienceActivities.forEach((a) => {
+            activeExperienceActivities.forEach((a) => {
               const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
 
               if (!typeInfo) {
-                experienceTotal++; // 정보가 없으면 기본 포함
+                experienceTotal++;
                 return;
               }
 
-              // eligible_min/max 체크 (null이면 제한 없음)
-              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+              if (isEligibilityRuleActive) {
+                const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+                const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-              // 누적 주차가 eligible 범위 내인지 확인
-              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
-                // count_once_in_total 체크 (1회만 가능한 활동)
-                if (typeInfo.count_once_in_total) {
-                  // 이미 이전 주차에서 완료했는지 확인
-                  const previouslyCompleted = allCompletedActivities.some((ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId);
-                  if (!previouslyCompleted) {
+                if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                  if (typeInfo.count_once_in_total) {
+                    const previouslyCompleted = allCompletedActivities.some((ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId);
+                    if (!previouslyCompleted) {
+                      experienceTotal++;
+                    }
+                  } else {
                     experienceTotal++;
                   }
-                } else {
-                  experienceTotal++;
                 }
+              } else {
+                // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
+                experienceTotal++;
               }
             });
           }
@@ -1104,27 +1143,74 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
             if (hasSecondaryInfo) return true;
 
-            // 3. 48시간 경과 여부 확인
+            // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
             const activity = activitiesData.find((a) => a.activity_type_id === activityTypeId);
-            if (!activity?.opened_at) return false;
+
+            if (activity?.deadline) {
+              return Date.now() >= new Date(activity.deadline).getTime();
+            }
+
+            const deadline48h = 48 * 60 * 60 * 1000;
+
+            if (!activity?.opened_at) {
+              // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
+              if (currentWeek?.end_date) {
+                const weekEndTime = new Date(`${currentWeek.end_date}T23:59:59`).getTime();
+                if (Date.now() - weekEndTime >= deadline48h) return true;
+              }
+              return false;
+            }
 
             const openedTime = new Date(activity.opened_at).getTime();
-            const now = Date.now();
-            const elapsed = now - openedTime;
-            const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+            const elapsed = Date.now() - openedTime;
 
-            return elapsed >= deadline;
+            return elapsed >= deadline48h;
           };
 
           const infoSuccess = infoTypesList.filter((activityTypeId) => isEnhancementSuccess(activityTypeId)).length;
           // 실무 역량 success: 온보딩 주차면 0 (강화율 계산에서 제외)
           const competencySuccess = isOnboardingWeekLocal ? 0 : competencyTypesList.some((activityTypeId) => isEnhancementSuccess(activityTypeId)) ? 1 : 0;
-          const experienceSuccess = isOnboardingWeekLocal ? 0 : experienceTypesList.filter((activityTypeId) => isEnhancementSuccess(activityTypeId)).length;
+          // 실무 경험 success: 개설된 활동 중 eligible한 타입의 강화 성공만 카운트
+          const eligibleExperienceTypes: string[] = [];
+          if (!isOnboardingWeekLocal) {
+            activeExperienceActivities.forEach((a) => {
+              const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
+              if (!typeInfo) {
+                eligibleExperienceTypes.push(a.activity_type_id);
+                return;
+              }
+              if (isEligibilityRuleActive) {
+                const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+                const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+                if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                  if (typeInfo.count_once_in_total) {
+                    const previouslyCompleted = allCompletedActivities.some((ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId);
+                    if (!previouslyCompleted) eligibleExperienceTypes.push(typeInfo.id);
+                  } else {
+                    eligibleExperienceTypes.push(typeInfo.id);
+                  }
+                }
+              } else {
+                eligibleExperienceTypes.push(a.activity_type_id);
+              }
+            });
+          }
+          const experienceSuccess = eligibleExperienceTypes.filter((activityTypeId) => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
-          setInfoStats({ total: infoTotal, success: infoSuccess });
-          setCompetencyStats({ total: competencyTotal, success: competencySuccess });
-          setExperienceStats({ total: experienceTotal, success: experienceSuccess });
+          // 개인 휴식 크루는 통계를 0으로 강제 (해당 주차에 활동 자체가 없는 게 정상).
+          // 공식 휴식 주차는 강제로 0 처리하지 않음 — 예외적으로 개설된 활동이 있으면 자연스럽게 반영.
+          const isPersonalRest = growthStatus === "휴식(개인)";
+          if (isPersonalRest) {
+            setInfoStats({ total: 0, success: 0 });
+            setCompetencyStats({ total: 0, success: 0 });
+            setExperienceStats({ total: 0, success: 0 });
+            setCareerStats({ total: 0, success: 0 });
+          } else {
+            setInfoStats({ total: infoTotal, success: infoSuccess });
+            setCompetencyStats({ total: competencyTotal, success: competencySuccess });
+            setExperienceStats({ total: experienceTotal, success: experienceSuccess });
+          }
           // careerStats는 career_records useEffect에서 설정됨
         }
 
@@ -1197,6 +1283,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
+    // 개인 휴식만 경력 통계 0으로 강제. 공식 휴식이라도 예외적으로 등록된 프로젝트가 있으면 그대로 반영.
+    if (weekData?.growthStatus === "휴식(개인)") {
+      setCareerStats({ total: 0, success: 0 });
+      return;
+    }
     // 전체 프로젝트 수 (제한 없음)
     const rawTotal = careerRecords.length;
     const total = rawTotal;
@@ -1214,7 +1305,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }).length;
     const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
-  }, [careerRecords, weekActivityDetails]);
+  }, [careerRecords, weekActivityDetails, weekData]);
 
   // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchKeywordsIfNeeded = async () => {
@@ -2039,14 +2130,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = "success" | "waiting" | "failed" | "not_applicable";
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
+    // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
+    if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
+
     // 해당 활동 정보 가져오기
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
 
     // activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find((ar) => ar.activity_type_id === activityType);
 
-    // 1. 해당 없음: 활동이 개설되지 않음 AND 크루가 참여하지도 않음
-    if (!activity?.is_active && (!record || !record.is_completed)) return "not_applicable";
+    // eligible한 실무 경험인지 판단 (eligible 조건 충족하는 타입 정보가 있는지)
+    const expInfo = experienceTypeInfos.find((info) => info.id === activityType);
+
+    // 1. 활동이 개설되지 않음(is_active=false) → 사용자에게 노출 안 됨. 통계와 일관되게 처리.
+    //   - 휴식 주차: 미개설은 '해당 없음' (필수 아님)
+    //   - 평소 주차에서 eligible 실무 경험: '강화 실패' (운영진이 개설 누락한 시그널)
+    //   - 그 외: '해당 없음'
+    if (!activity?.is_active) {
+      if (weekData?.growthStatus?.includes("휴식")) return "not_applicable";
+      if (expInfo) return "failed";
+      return "not_applicable";
+    }
 
     if (!record || !record.is_completed) {
       // 레코드 없거나 is_completed = false → 강화 실패
@@ -2062,10 +2166,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return "success";
     }
 
-    // 4. 2차 정보 미기입 시, 48시간 경과 여부 확인
+    // 4. 2차 정보 미기입 시, 마감 시간 경과 여부 확인 (deadline 컬럼 우선)
+    if (activity?.deadline) {
+      const isPastDeadline = Date.now() >= new Date(activity.deadline).getTime();
+      console.log(`[getEnhancementStatus] ${activityType}: deadline=${activity.deadline}, result=${isPastDeadline ? "success" : "waiting"}`);
+      return isPastDeadline ? "success" : "waiting";
+    }
+
     const openedAt = activity?.opened_at;
     if (!openedAt) {
-      // 개설 시각이 없으면 대기 상태로 처리
+      // 개설 시각이 없으면, 주차 종료일 기준 48시간 경과 여부로 판단
+      if (weekData?.endDate) {
+        const weekEndTime = new Date(`${weekData.endDate}T23:59:59`).getTime();
+        if (Date.now() - weekEndTime >= 48 * 60 * 60 * 1000) {
+          return "success";
+        }
+      }
       console.log(`[getEnhancementStatus] ${activityType}: no opened_at -> waiting`);
       return "waiting";
     }
@@ -2073,16 +2189,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const openedTime = new Date(openedAt).getTime();
     const now = Date.now();
     const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
+    const deadline48h = 48 * 60 * 60 * 1000;
     const hoursElapsed = Math.floor(elapsed / (60 * 60 * 1000));
 
-    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, deadline=48h, result=${elapsed >= deadline ? "success" : "waiting"}`);
+    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, result=${elapsed >= deadline48h ? "success" : "waiting"}`);
 
-    if (elapsed >= deadline) {
-      // 48시간 경과 → 강화 성공 (2차 정보 없이도 자동 성공)
+    if (elapsed >= deadline48h) {
       return "success";
     } else {
-      // 48시간 미경과 + 2차 정보 미기입 → 강화 대기
       return "waiting";
     }
   };
@@ -2100,30 +2214,47 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return weekActivityDetails.find((ad) => ad.activity_type_id === activityType);
   };
 
-  // 48시간 이내인지 확인
-  const isWithin48Hours = (openedAt: string | null): boolean => {
-    if (!openedAt) return false;
-    const openedTime = new Date(openedAt).getTime();
-    const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-    return elapsed < deadline;
+  // 마감 시간 이내인지 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
+  const isBeforeDeadline = (activity: { opened_at: string | null; deadline?: string | null } | null): boolean => {
+    if (!activity) return false;
+    if (activity.deadline) {
+      return Date.now() < new Date(activity.deadline).getTime();
+    }
+    if (!activity.opened_at) return false;
+    const openedTime = new Date(activity.opened_at).getTime();
+    return (Date.now() - openedTime) < 48 * 60 * 60 * 1000;
   };
 
-  // 활동이 개설되었고 48시간 이내인지 확인 (운영진이 개설해야만 + 48시간 이내에만 사용자가 2차 정보 입력 가능)
+  // 어드민 개별 권한(grant)이 활성 상태인지 확인
+  const hasActiveGrant = (activityType: string): boolean => {
+    const grant = secondaryInfoGrants.find((g) => g.activity_type_id === activityType);
+    if (!grant) return false;
+    return new Date(grant.deadline).getTime() > Date.now();
+  };
+
+  // 활동이 개설되었고 마감 전인지 확인, 또는 어드민 개별 grant가 있는지 확인
   const isActivityActive = (activityType: string): boolean => {
+    // Path 1: 기존 플로우 — 파트 개설 + 마감 전
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
-    if (!activity?.is_active) return false;
-    // 48시간 이내인지 확인
-    return isWithin48Hours(activity.opened_at);
+    if (activity?.is_active && isBeforeDeadline(activity)) return true;
+    // Path 2: 어드민 개별 권한 부여 (예외 메커니즘)
+    if (hasActiveGrant(activityType)) return true;
+    return false;
   };
 
-  // 활동이 개설되었지만 48시간이 지났는지 확인 (마감 표시용)
+  // 활동이 개설되었지만 마감 시간이 지났는지 확인 (마감 표시용)
   const isActivityExpired = (activityType: string): boolean => {
+    // 어드민 grant가 활성이면 만료 아님
+    if (hasActiveGrant(activityType)) return false;
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
-    if (!activity?.is_active) return false;
-    // 개설은 되었지만 48시간이 지남
-    return !isWithin48Hours(activity.opened_at);
+    if (!activity?.is_active) {
+      // 파트 개설 안 됐지만, 만료된 grant가 있으면 만료로 표시
+      const grant = secondaryInfoGrants.find((g) => g.activity_type_id === activityType);
+      if (grant && new Date(grant.deadline).getTime() <= Date.now()) return true;
+      return false;
+    }
+    // 개설은 되었지만 마감 시간이 지남
+    return !isBeforeDeadline(activity);
   };
 
   // 실무 역량: 아무 activity type이나 개설되었는지 확인
@@ -2148,22 +2279,43 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return openedType || workAbilityActivityTypes[0];
   };
 
-  // 남은 시간 계산 (표시용)
+  // 남은 시간 계산 (표시용) - deadline 컬럼 우선, 없으면 opened_at+48h 폴백
   const getRemainingTime = (activityType: string): { hours: number; minutes: number } | null => {
-    const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
-    if (!activity?.is_active || !activity.opened_at) return null;
-
-    const openedTime = new Date(activity.opened_at).getTime();
     const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline = 48 * 60 * 60 * 1000;
-    const remaining = deadline - elapsed;
 
-    if (remaining <= 0) return null;
+    const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
+    if (activity?.is_active) {
+      let deadlineTime: number | null = null;
+      if (activity.deadline) {
+        deadlineTime = new Date(activity.deadline).getTime();
+      } else if (activity.opened_at) {
+        deadlineTime = new Date(activity.opened_at).getTime() + 48 * 60 * 60 * 1000;
+      }
+      if (deadlineTime) {
+        const remaining = deadlineTime - now;
+        if (remaining > 0) {
+          return {
+            hours: Math.floor(remaining / (60 * 60 * 1000)),
+            minutes: Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)),
+          };
+        }
+      }
+    }
 
-    const hours = Math.floor(remaining / (60 * 60 * 1000));
-    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-    return { hours, minutes };
+    // 어드민 grant 확인
+    const grant = secondaryInfoGrants.find((g) => g.activity_type_id === activityType);
+    if (grant) {
+      const deadlineTime = new Date(grant.deadline).getTime();
+      const remaining = deadlineTime - now;
+      if (remaining > 0) {
+        return {
+          hours: Math.floor(remaining / (60 * 60 * 1000)),
+          minutes: Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)),
+        };
+      }
+    }
+
+    return null;
   };
 
   // 특정 activity types 중 하나라도 개설되었는지 확인
@@ -2265,15 +2417,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 운영진 링크 이후의 사용자 링크만 필터링 (빈 링크 제외)
       const userLinks = detail.outputLinks.slice(adminCount).filter((link) => link.url.trim() !== "");
 
-      const response = await fetch("/api/activity-details", {
+      // 기존 DB 데이터와 비교하여 변경이 없으면 스킵
+      const existing = getActivityDetail(activityType);
+      const newSubTitle = detail.subTitle || null;
+      const newOutputLinks = userLinks.length > 0 ? userLinks : null;
+      const existingSubTitle = existing?.sub_title || null;
+      const existingOutputLinks = existing?.output_links && existing.output_links.length > 0 ? existing.output_links : null;
+
+      if (newSubTitle === existingSubTitle &&
+          JSON.stringify(newOutputLinks) === JSON.stringify(existingOutputLinks)) {
+        setIsSaving(false);
+        return; // 변경 없음 — API 호출 스킵
+      }
+
+      const response = await fetch(apiUrl("/api/activity-details"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: currentUserId,
           week_id: weekId,
           activity_type_id: activityType,
-          sub_title: detail.subTitle || null,
-          output_links: userLinks.length > 0 ? userLinks : null,
+          sub_title: newSubTitle,
+          output_links: newOutputLinks,
         }),
       });
 
@@ -2306,16 +2471,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
       if (hasSecondaryInfo) return true;
 
-      // 3. 48시간 경과 여부 확인
+      // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
       const activity = weeklyActivities.find((a) => a.activity_type_id === activityTypeId);
+      if (activity?.deadline) {
+        return Date.now() >= new Date(activity.deadline).getTime();
+      }
       if (!activity?.opened_at) return false;
 
       const openedTime = new Date(activity.opened_at).getTime();
-      const now = Date.now();
-      const elapsed = now - openedTime;
-      const deadline = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-
-      return elapsed >= deadline;
+      return (Date.now() - openedTime) >= 48 * 60 * 60 * 1000;
     };
 
     const calcStats = (types: string[]) => {
@@ -2326,8 +2490,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ["calendar", "essay", "forum", "infodesk", "session", "wisdom", "practical_lecture", "community", "etc_a"];
-    // 온보딩 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
-    if (isOnboardingWeek) {
+    // 온보딩 주차 또는 개인 휴식이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
+    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)") {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
@@ -2335,7 +2499,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     } else {
       setInfoStats(calcStats(infoTypes));
       const competencyCalc = calcStats(competencyTypeIds);
-      setCompetencyStats({ total: 1, success: competencyCalc.success > 0 ? 1 : 0 });
+      // 평소 매주 최대 1개. 공식 휴식 주차는 예외 개설 있을 때만 1.
+      const isClubBreakNow = weekData?.growthStatus === "휴식(공식)";
+      const competencyTotalNow = isClubBreakNow ? (competencyCalc.total > 0 ? 1 : 0) : 1;
+      setCompetencyStats({ total: competencyTotalNow, success: competencyCalc.success > 0 ? 1 : 0 });
       setExperienceStats(calcStats(experienceTypeIds));
       setCareerStats(calcStats(careerTypeIds));
     }
@@ -3899,7 +4066,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             {getEnhancementStatus(card.activityType) === "failed"
                               ? "❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다."
                               : isActivityExpired(card.activityType)
-                                ? "⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)"
+                                ? "⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)"
                                 : "⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다."}
                           </p>
                         </div>
@@ -4104,7 +4271,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           }}
                         >
                           <p style={{ margin: 0, color: isAbilityFailed || isAnyAbilityActivityExpired() ? "#dc2626" : "#856404", fontSize: "14px" }}>
-                            {isAbilityFailed ? "❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다." : isAnyAbilityActivityExpired() ? "⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)" : "⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다."}
+                            {isAbilityFailed ? "❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다." : isAnyAbilityActivityExpired() ? "⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)" : "⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다."}
                           </p>
                         </div>
                       )}
@@ -4336,7 +4503,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 }}
                               >
                                 <p style={{ margin: 0, color: isFailed || isExpired ? "#dc2626" : "#856404", fontSize: "14px" }}>
-                                  {isFailed ? "❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다." : isExpired ? "⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)" : "⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다."}
+                                  {isFailed ? "❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다." : isExpired ? "⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)" : "⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다."}
                                 </p>
                               </div>
                             )}
@@ -4535,7 +4702,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           if (isDeadlineExpired)
                             return (
                               <div style={{ padding: "16px", backgroundColor: "#fee2e2", border: "1px solid #ef4444", borderRadius: "8px", marginBottom: "16px" }}>
-                                <p style={{ margin: 0, color: "#dc2626", fontSize: "14px" }}>⏰ 2차 정보 작성 기간이 마감되었습니다. (마감: {new Date(card.secondaryInfoDeadline!).toLocaleString("ko-KR")})</p>
+                                <p style={{ margin: 0, color: "#dc2626", fontSize: "14px" }}>⏰ 2차 정보 작성 기간이 마감되었습니다</p>
                               </div>
                             );
                           if (!card.secondaryInfoDeadline)
