@@ -594,10 +594,34 @@
           color: #ffffff;
           align-items: center;
 
+          .detail-spacer {
+            width: 16px !important;
+            min-width: 16px !important;
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+          }
+
+          .major-text {
+            color: #ffec8f;
+            font-size: 14px;
+            font-family: "Pretendard", sans-serif;
+            font-weight: 400;
+            line-height: 24px;
+            cursor: pointer;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+          }
+
           .detail-icon {
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
             filter: brightness(0) invert(0.77) sepia(1) saturate(1.79);
+            flex-shrink: 0;
           }
 
           .icon {
@@ -617,6 +641,13 @@
               font-size: 0.8125rem;
               color: #999;
             }
+          }
+
+          > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
           }
         }
       }
@@ -779,7 +810,7 @@
   .resume-badges {
     flex-shrink: 0;
     width: 86px;
-    margin-left: -8px;
+    margin-left: 8px !important;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -824,6 +855,9 @@
         flex: none;
         margin-left: 8px;
         text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         &.red {
           color: #ffec8f;
@@ -843,6 +877,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    top: 7px;
     font-size: 0.875rem;
     overflow: visible;
     margin-left: 10px;
@@ -855,11 +890,13 @@
         }
 
         img {
-          box-shadow:
-            0 0 30px rgba(255, 215, 0, 0.9),
-            0 0 60px rgba(255, 165, 0, 0.7),
-            0 0 90px rgba(255, 200, 0, 0.5);
+          box-shadow: none;
         }
+      }
+
+      // 리본 박스(배경 PNG)에 금장 glow
+      .medal-text {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 16px rgba(255, 165, 0, 0.6));
       }
     }
 
@@ -868,7 +905,7 @@
       width: 121px;
       height: 121px;
       border-radius: 512px;
-      overflow: hidden;
+      overflow: visible !important;
 
       // 오버레이 제거 — 피그마 시안 원본 밝기 유지
       &::before {
@@ -882,8 +919,21 @@
         object-fit: contain;
         box-shadow: 0px 10px 5px rgba(0, 0, 0, 0.03);
         border-radius: 512px;
+        overflow: hidden;
         position: relative;
         z-index: 0;
+      }
+
+      .medal-week-num {
+        position: absolute;
+        top: 14px;
+        right: -5px;
+        z-index: 3;
+        font-family: var(--black-ops-one), cursive;
+        font-size: 32px;
+        font-weight: 400;
+        color: #ffec8f;
+        line-height: 25px;
       }
     }
 
@@ -892,9 +942,11 @@
       bottom: -6px;
       right: -42px;
       z-index: 2;
-      width: 101px;
+      width: fit-content !important;
+      min-width: 80px;
+      max-width: 150px;
       height: 64px;
-      padding: 0;
+      padding: 0 22px !important;
       font-family: "Cafe24Ohsquare", sans-serif;
       font-size: 14px;
       color: #ffec8f;
@@ -904,7 +956,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      // PNG가 이미 회전된 리본 형태이므로 CSS rotate 불필요
       background-image: url("/images/0/cluster 1/ribon box.png");
       background-size: 100% 100%;
       background-repeat: no-repeat;
@@ -913,8 +964,9 @@
       transition: width 0.3s ease;
 
       .medal-text-inner {
-        transform: rotate(-15deg);
+        transform: rotate(-13.5deg);
         display: inline-block;
+        white-space: nowrap;
       }
 
       // 짧은-중간 길이 (Complete)
@@ -933,8 +985,43 @@
 
       // 긴 길이 (Next Challenge)
       &.long {
-        width: 125px;
+        width: 180px;
         font-size: 0.75rem;
+        padding-left: 30px !important;
+        padding-right: 30px !important;
+      }
+
+      // 텍스트별 색상 분기 — CSS filter로 리본 PNG + 텍스트 동시 변경
+      &.medal-complete {
+        // 원본 금색 유지 — filter 없음
+      }
+
+      &.medal-running {
+        filter: hue-rotate(-10deg) saturate(2) !important;
+      }
+
+      &.medal-onrest {
+        filter: hue-rotate(120deg) saturate(1.5) !important;
+      }
+
+      &.medal-recharging {
+        filter: hue-rotate(-30deg) saturate(3) brightness(0.8) !important;
+
+        .medal-text-inner {
+          position: relative;
+          top: 0px;
+          font-size: 14px !important;
+        }
+      }
+
+      &.medal-next {
+        filter: grayscale(1) brightness(0.6) !important;
+
+        .medal-text-inner {
+          position: relative;
+          top: 0px;
+          font-size: 15px !important;
+        }
       }
     }
 
@@ -1045,6 +1132,8 @@
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
 
             &.active {
@@ -1061,14 +1150,16 @@
             width: 60px;
             flex-shrink: 0;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             text-align: center;
 
             &.pending {
-              color: #999;
+              color: #9dfa07;
             }
 
             &.approved {
-              color: #fff;
+              color: #65e3ff;
             }
           }
         }
@@ -1114,7 +1205,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 30px;
+    gap: 18px;
     padding: 30px 0 0;
     margin: 0;
     width: 100%;
@@ -1256,6 +1347,12 @@
         position: relative;
         z-index: 10;
         margin-left: -5px;
+        overflow: visible;
+
+        img {
+          width: 69px !important;
+          height: 69px !important;
+        }
       }
 
       .notice-stamp-wrapper {
@@ -1271,10 +1368,16 @@
         align-items: center;
         justify-content: center;
         background: rgba(0, 0, 0, 0.6);
+        overflow: visible;
 
-        // 도장이 찍히면 배경 제거
+        img {
+          width: 69px !important;
+          height: 69px !important;
+        }
+
+        // 도장이 찍혀도 배경 사각형 유지
         &.stamped {
-          background: transparent;
+          // background 그대로 유지
         }
       }
 
@@ -1437,6 +1540,14 @@
       background-image: url("/images/0/cluster 1/bg image/EC02 (2).png") !important;
       background-position: center -80px !important;
     }
+  }
+}
+
+// 1920 미만에서 sidebar shell이 카드(489px)보다 좁아지는 현상 방지
+// 1920×1080에서의 shell width(583px)를 최소값으로 고정
+@media (max-width: 1919px) {
+  .sidebar-card-shell {
+    min-width: 583px !important;
   }
 }
 
@@ -1763,5 +1874,37 @@
         flex-shrink: 0;
       }
     }
+  }
+}
+
+.edit-icon.search-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    top: -30px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 30;
+  }
+
+  &:hover .tooltip {
+    display: block;
   }
 }

@@ -9,6 +9,8 @@
   z-index: 999;
   background-color: var(--template-bg);
   border-bottom: 1px solid #39424c;
+  width: 100%;
+  max-width: var(--content-max-width);
 
   .navbar__logo {
     img {
@@ -21,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: clamp(8px, 1.5625vw, 30px); // 브라우저 줌 시 vw 자동 축소
+    gap: 30px; // 고정 px — 브라우저 zoom 시 자연스럽게 확대
     flex-wrap: nowrap; // 확대 시 줄바꿈 방지
   }
 
@@ -39,13 +41,13 @@
 
     button,
     a {
-      padding: 24px clamp(4px, 0.625vw, 12px) 24px; // 좌우 패딩만 vw 축소, 수직 24px 유지
+      padding: 24px 12px; // 고정 px — 브라우저 zoom 시 자연스럽게 확대
       font-weight: 600;
       width: 100%;
       color: var(--white);
       text-transform: uppercase;
       letter-spacing: 0.3px;
-      font-size: clamp(11px, 0.78125vw, 15px); // 1920px=15px, 1280px(150%줌)=10→min 11px
+      font-size: 15px; // 고정 px — 브라우저 zoom 시 자연스럽게 확대
       gap: 4px;
       white-space: nowrap;
       &:hover {

@@ -33,6 +33,21 @@ const HomePageTwo = () => {
 
   useEffect(() => {
     const updateSidebar = () => {
+      // 1920 미만 뷰포트 + zoom 미적용 상태에서는 fixed 전환하지 않음
+      // (1920×1080 레이아웃 그대로 유지 + 가로스크롤)
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      if (zoom <= 1 && window.innerWidth < 1920) {
+        setSidebarStyle({
+          position: 'relative',
+          left: '',
+          top: '',
+          overflow: 'visible',
+          zIndex: 100,
+        });
+        return;
+      }
+
+      // 1920 이상에서만 기존 fixed 로직 실행
       const left = getSidebarLeft();
       const footer = document.querySelector('footer');
       if (!footer) {

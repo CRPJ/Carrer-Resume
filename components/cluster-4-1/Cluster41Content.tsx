@@ -4,11 +4,106 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
+
+// 글자수 기반 말줄임 (info-badge role 8자 초과 시 "..")
+const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
+  const t = text || "-";
+  return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
+};
 
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
+  const isDemoMode = checkDemoMode();
+
+  // 데모 모드에서 사용자별 collection-content 문구 분기용
+  const [demoUserName, setDemoUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isDemoMode || !targetUserId) return;
+    const fetchName = async () => {
+      try {
+        const res = await fetch(`/api/profile/?userId=${targetUserId}`);
+        if (res.ok) {
+          const json = await res.json();
+          const name = json.data?.display_name || null;
+          setDemoUserName(name);
+          // 데모 모드 사용자별 성장 상태 설정
+          const demoStatusMap: Record<string, { us: string | null; gs: string | null }> = {
+            '전민경': { us: 'graduated', gs: '졸업 완료' },
+            '곽예원': { us: 'weekly_rest', gs: '주차 휴식 중' },
+            '김의환': { us: 'suspended', gs: '활동 중단' },
+          };
+          if (name && demoStatusMap[name]) {
+            setUserStatus(demoStatusMap[name].us);
+            setGrowthStatus(demoStatusMap[name].gs);
+          }
+          // 데모 모드 사용자별 weekly-card 더미 데이터 (자릿수 분산)
+          const demoWeekOverrides: Record<string, typeof DUMMY_WEEK_EXTRA[string]> = {
+            '윤재윤': {
+              points: { star: 150, shield: 37, lightning: 30 },
+              teamPart: { teamName: '마케팅', partName: '전략파트' }, roleLabel: '일반',
+              growthRate: { rate: 75, count: 16, total: 24 },
+              infoRate: { rate: 100, count: 10, total: 10 },
+              competencyRate: { rate: 0, count: 0, total: 1 },
+              experienceRate: { rate: 60, count: 3, total: 5 },
+              careerRate: { rate: 0, count: 0, total: 20 },
+              reputationCount: 2, fmScore: 85, colleagueCount: 1,
+            },
+            '전민경': {
+              points: { star: 3, shield: 933, lightning: 45 },
+              teamPart: { teamName: '사업개발전략기획', partName: '제휴협력사업파트' }, roleLabel: '팀장(사업개발전략)',
+              growthRate: { rate: 100, count: 800, total: 999 },
+              infoRate: { rate: 50, count: 5, total: 10 },
+              competencyRate: { rate: 100, count: 99, total: 99 },
+              experienceRate: { rate: 0, count: 0, total: 12 },
+              careerRate: { rate: 80, count: 4, total: 5 },
+              reputationCount: 3, fmScore: 9999, colleagueCount: 3,
+            },
+            '곽예원': {
+              points: { star: 50, shield: 999, lightning: 999 },
+              teamPart: { teamName: '브랜드커뮤니케이션', partName: '디지털마케팅전략파' }, roleLabel: '운영진(앰배서더)',
+              growthRate: { rate: 1, count: 1, total: 8 },
+              infoRate: { rate: 0, count: 0, total: 25 },
+              competencyRate: { rate: 50, count: 2, total: 4 },
+              experienceRate: { rate: 100, count: 15, total: 15 },
+              careerRate: { rate: 0, count: 0, total: 1 },
+              reputationCount: 0, fmScore: 0, colleagueCount: 0,
+            },
+            '김의환': {
+              points: { star: 88, shield: 200, lightning: 0 },
+              teamPart: { teamName: '글로벌크로스보더커머스', partName: '퍼포먼스마케팅최적화' }, roleLabel: '심화(에이전트파트장)',
+              growthRate: { rate: 0, count: 0, total: 18 },
+              infoRate: { rate: 70, count: 7, total: 10 },
+              competencyRate: { rate: 0, count: 0, total: 2 },
+              experienceRate: { rate: 25, count: 1, total: 4 },
+              careerRate: { rate: 100, count: 10, total: 10 },
+              reputationCount: 0, fmScore: 1500, colleagueCount: 0,
+            },
+          };
+          if (name && demoWeekOverrides[name]) {
+            DUMMY_WEEK_EXTRA['dw-01'] = demoWeekOverrides[name];
+            setWeeklyReputationCounts(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].reputationCount }));
+            setWeeklyFmScores(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].fmScore }));
+            setWeeklyColleagueCounts(prev => ({ ...prev, 'dw-01': demoWeekOverrides[name].colleagueCount }));
+          }
+        }
+      } catch {
+        // API 실패 시 기존 더미 문구로 fallback
+      }
+    };
+    fetchName();
+  }, [isDemoMode, targetUserId]);
+
+  const demoCollectionMessage = isDemoMode && demoUserName ? ({
+    '윤재윤': <>현재 클럽은, <strong>26년 봄 시즌, 1주차</strong>를 진행 중에 있습니다.</>,
+    '전민경': <>현재 클럽은, <strong>26년 가을 시즌, 16주차</strong>를 진행 중에 있습니다.</>,
+    '곽예원': <>현재 클럽은, <strong>26년 겨울 시즌, 99주차</strong>를 진행 중에 있습니다.</>,
+    '김의환': <>현재 클럽은, <strong>26년 여름 시즌, 전환 주차</strong>를 진행 중에 있습니다.</>,
+  } as Record<string, React.ReactNode>)[demoUserName] || null : null;
 
   const router = useRouter();
   const headerRef = useRef<HTMLElement>(null);
@@ -71,7 +166,11 @@ const Cluster41Content = () => {
     isBreakSeason: boolean;
     fromSeason: string | null;
     toSeason: string | null;
-  } | null>(null);
+  } | null>(isDemoMode ? {
+    year: 26, name: '봄', currentWeek: 1,
+    isClubBreak: false, holidayName: null,
+    isBreakSeason: false, fromSeason: null, toSeason: null
+  } : null);
 
   // 성장 기간 집계 데이터 상태
   interface GrowthPeriodStats {
@@ -95,6 +194,8 @@ const Cluster41Content = () => {
 
   // 주차별 평판 개수 (week_card_id -> count)
   const [weeklyReputationCounts, setWeeklyReputationCounts] = useState<{ [key: string]: number }>({});
+  const [weeklyFmScores, setWeeklyFmScores] = useState<{ [key: string]: number }>({});
+  const [weeklyColleagueCounts, setWeeklyColleagueCounts] = useState<{ [key: string]: number }>({});
 
   // 성장 시작/종료 주차 정보 상태
   interface WeekInfo {
@@ -128,10 +229,11 @@ const Cluster41Content = () => {
     roleInSeason: string;
   }
   const [seasonCards, setSeasonCards] = useState<SeasonCardData[]>([]);
-  const [isLoadingSeasons, setIsLoadingSeasons] = useState(true);
+  const [isLoadingSeasons, setIsLoadingSeasons] = useState(!isDemoMode);
 
   // 주차별 평판 개수 가져오기
   useEffect(() => {
+    if (isDemoMode) return;
     const fetchWeeklyReputationCounts = async () => {
       if (!targetUserId) return;
       try {
@@ -154,8 +256,25 @@ const Cluster41Content = () => {
     fetchWeeklyReputationCounts();
   }, [targetUserId]);
 
+  // 데모 모드: 주차별 평판/FM/동료 데이터 설정
+  useEffect(() => {
+    if (!isDemoMode) return;
+    const counts: { [key: string]: number } = {};
+    const fmScores: { [key: string]: number } = {};
+    const colleagues: { [key: string]: number } = {};
+    Object.entries(DUMMY_WEEK_EXTRA).forEach(([weekId, extra]) => {
+      counts[weekId] = extra.reputationCount;
+      fmScores[weekId] = extra.fmScore;
+      colleagues[weekId] = extra.colleagueCount;
+    });
+    setWeeklyReputationCounts(counts);
+    setWeeklyFmScores(fmScores);
+    setWeeklyColleagueCounts(colleagues);
+  }, [isDemoMode]);
+
   // 현재 시즌 정보 가져오기
   useEffect(() => {
+    if (isDemoMode) return;
     const fetchCurrentSeason = async () => {
       const today = new Date().toISOString().split('T')[0];
 
@@ -228,8 +347,10 @@ const Cluster41Content = () => {
     growthStatus: string; // 성공, 실패, 휴식(개인), 휴식(공식)
   }
 
-  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>([]);
-  const [isLoadingWeeks, setIsLoadingWeeks] = useState(true);
+  const [dbWeeklyData, setDbWeeklyData] = useState<DBWeekData[]>(
+    isDemoMode ? DUMMY_WEEKLY_LIST : []
+  );
+  const [isLoadingWeeks, setIsLoadingWeeks] = useState(!isDemoMode);
   const [isPendingApproval, setIsPendingApproval] = useState(false);
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
 
@@ -359,7 +480,8 @@ const Cluster41Content = () => {
 
   // 특정 날짜에 해당하는 팀/파트 정보 찾기
   const getTeamPartForDate = (date: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return { teamName: '운영진(6기)', partName: '팀장(엔터드라마팀)' };
+    // 데모 모드 팀/파트는 getFormattedTeamPart에서 DUMMY_WEEK_EXTRA로 처리
+    if (isDemoMode) return { teamName: null, partName: null };
     const dateObj = new Date(date);
 
     // 해당 날짜에 활성화된 user_team_parts 찾기
@@ -387,7 +509,8 @@ const Cluster41Content = () => {
   // 1순위: user_role_history 테이블에서 해당 날짜에 맞는 역할
   // 2순위: user_profiles.role 기본값
   const getRoleForDate = (date: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return { roleLabel: '운영진(앰배서더)' };
+    // 데모 모드 역할은 렌더링에서 DUMMY_WEEK_EXTRA로 직접 처리
+    if (isDemoMode) return null;
     const dateObj = new Date(date);
 
     // 1순위: 해당 날짜에 활성화된 역할 이력 찾기
@@ -430,6 +553,11 @@ const Cluster41Content = () => {
     // 온보딩 주차는 '클럽온보딩' / '신입OT' 표시
     if (onboardingWeekId && week.id === onboardingWeekId) return { teamName: '클럽온보딩', partName: '신입OT' };
     if (week.isBreakSeason) return { teamName: '-', partName: '-' };
+    // 데모 모드: DUMMY_WEEK_EXTRA에서 팀/파트 조회
+    if (isDemoMode && DUMMY_WEEK_EXTRA[week.id]) {
+      const extra = DUMMY_WEEK_EXTRA[week.id];
+      return { teamName: extra.teamPart.teamName || '-', partName: extra.teamPart.partName || '-' };
+    }
     const teamPart = getTeamPartForDate(date);
     const roleInfo = getRoleForDate(date);
 
@@ -457,13 +585,11 @@ const Cluster41Content = () => {
 
   // 특정 주차의 포인트 정보 계산
   const getPointsForWeek = (weekId: string) => {
-    if (weekId === 'dummy-1') return { star: 25, shield: 30, lightning: 2 };
-    if (weekId === 'dummy-2') return { star: 25, shield: 30, lightning: 2 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { star: 25, shield: 30, lightning: 2 };
-    if (weekId.startsWith('dummy')) return { star: 0, shield: 0, lightning: 0 };
-    
+    // 데모 모드: DUMMY_WEEK_EXTRA에서 포인트 조회
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].points;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { star: 0, shield: 0, lightning: 0 };
+
     const weekPoints = userPoints.filter(p => p.week_id === weekId);
-    if (weekId.startsWith('dummy')) return { star: 25, shield: 30, lightning: 2 };
 
     const star = weekPoints
       .filter(p => p.point_type === 'star')
@@ -506,7 +632,9 @@ const Cluster41Content = () => {
 
   // 활동 누적 주차 계산 (해당 주차까지 전체 승인된 주차 수)
   const getCumulativeApprovedWeeks = (weekEndDate: string) => {
-    if (dbWeeklyData[0]?.id.startsWith('dummy')) return 25;
+    if (isDemoMode) {
+      return dbWeeklyData.filter(w => w.endDate <= weekEndDate && w.growthStatus === '성공').length;
+    }
     // 해당 주차까지의 전체 승인된(성공) 주차 수 (모든 시즌 통틀어)
     // 표시되는 주차는 모두 완료된 과거 주차(end_date < today)이므로 성공 주차만 카운트
     return dbWeeklyData
@@ -564,10 +692,8 @@ const Cluster41Content = () => {
 
   // 주차별 실무 정보 강화율 (info)
   const getWeeklyInfoRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 4, total: 6 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 6 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 4, total: 6 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 6 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].infoRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차도 강화율 정상 계산 (팀/파트 + 강화 성공/실패 표시)
     // 해당 주차에 열린 활동 중 info 타입 개수 (total)
     const weekOpenActivities = weeklyActivities.filter(wa => wa.week_id === weekId && wa.is_active);
@@ -584,10 +710,8 @@ const Cluster41Content = () => {
   // - 평소: 분모 1
   // - 공식 휴식 주차: 기본 0, 예외적으로 활동이 개설(is_active)되면 1
   const getWeeklyCompetencyRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 1, total: 1 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 1 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 1, total: 1 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 1 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].competencyRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     const week = dbWeeklyData.find(w => w.id === weekId);
     const isClubBreak = !!week?.isClubBreak;
     const hasActiveCompetency = weeklyActivities.some(
@@ -602,10 +726,8 @@ const Cluster41Content = () => {
 
   // 주차별 실무 경험 강화율 (experience) - 유저의 누적 활동 주차에 따라 P값 동적 계산
   const getWeeklyExperienceRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 4 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 4 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 4 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 4 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].experienceRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차도 강화율 정상 계산
     // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
@@ -681,10 +803,8 @@ const Cluster41Content = () => {
   // P(분모) = 해당 주차에 개설된 경력 프로젝트 수 (career_projects)
   // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수 (career_records)
   const getWeeklyCareerRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 3, total: 5 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 5 };
-    if (['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 100, count: 3, total: 5 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 5 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].careerRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
     // 온보딩 주차도 강화율 정상 계산
 
     // P(분모) = 해당 주차 경력 프로젝트 수 (career_projects 기반, 최대 5개)
@@ -704,10 +824,8 @@ const Cluster41Content = () => {
   // k = {(a' + b' + c' + d') / (a + b + c + d)} * 100% (소수점 올림)
   // 주의: 각 파트 강화율(p,q,r,s)은 k 계산에 포함되지 않음
   const getWeeklyGrowthRate = (weekId: string) => {
-    if (weekId === 'dummy-1') return { rate: 100, count: 13, total: 13 };
-    if (weekId === 'dummy-2') return { rate: 0, count: 0, total: 7 };
-    if (weekId.startsWith('dummy-') && ['dummy-5','dummy-6','dummy-7','dummy-8'].includes(weekId)) return { rate: 50, count: 7, total: 13 };
-    if (weekId.startsWith('dummy')) return { rate: 0, count: 0, total: 0 };
+    if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].growthRate;
+    if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
 
     // 온보딩 주차는 무조건 성장(성공) → 100%
     if (onboardingWeekId && weekId === onboardingWeekId) {
@@ -828,6 +946,8 @@ const Cluster41Content = () => {
 
   // DB에서 주차 데이터 가져오기
   useEffect(() => {
+    if (isDemoMode) return; // 더미 모드면 API 안 부름
+
     const abortController = new AbortController();
     const currentTargetUserId = targetUserId; // 현재 요청 시점의 targetUserId 저장
 
@@ -1452,10 +1572,12 @@ const Cluster41Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  {currentSeasonInfo?.isBreakSeason ? (
-                    <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
-                  ) : (
-                    <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                  {demoCollectionMessage ? demoCollectionMessage : (
+                    currentSeasonInfo?.isBreakSeason ? (
+                      <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
+                    ) : (
+                      <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                    )
                   )}
                 </p>
               </div>
@@ -1910,7 +2032,7 @@ const Cluster41Content = () => {
                       className="weekly-card-main"
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
                         <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                         <div className="image-badges">
                           <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
@@ -1919,7 +2041,7 @@ const Cluster41Content = () => {
 
                       <div className="weekly-card-content">
                         <div className="weekly-card-header">
-                          <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                          <h4 className="weekly-card-title">{week.seasonYear}년, <span className="season-name-fixed">{week.seasonName}</span> 시즌, {week.isBreakSeason ? <><span className="week-name-fixed">전환</span> 주차</> : <><span className="week-name-fixed">{week.weekNumber}</span>주차</>}</h4>
                           <span className="weekly-card-date">
                             <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" className="date-icon" />
                             {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
@@ -1962,7 +2084,10 @@ const Cluster41Content = () => {
                           const weekPoints = getPointsForWeek(week.id);
                           const injeolmi = getCumulativeInjeolmi(week.id);
                           const teamPart = getFormattedTeamPart(week.startDate, week);
-                          const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
+                          const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId))
+                            ? null
+                            : (isDemoMode && DUMMY_WEEK_EXTRA[week.id] ? { roleLabel: DUMMY_WEEK_EXTRA[week.id].roleLabel } : getRoleForDate(week.startDate));
+
                           return (
                             <>
                               <div className="weekly-card-details-top">
@@ -2009,12 +2134,18 @@ const Cluster41Content = () => {
               return (
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
-                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`}>
+                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
                     <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
                         <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>
                         <span className="rest-text-line">쉬었나요..?</span>
+                      </div>
+                    )}
+                    {week.growthStatus === '실패' && (
+                      <div className="rest-message">
+                        <span className="rest-text-line">값진 실패는 <span className="rest-emoji">😎</span></span>
+                        <span className="rest-text-line">훌륭한 스승님!</span>
                       </div>
                     )}
                     <div className="image-badges">
@@ -2031,14 +2162,14 @@ const Cluster41Content = () => {
                   <div className="weekly-card-content">
                     {/* 첫 번째 줄: 타이틀, 날짜, 주차 */}
                     <div className="weekly-card-header">
-                      <h4 className="weekly-card-title">{week.seasonYear}년, {week.seasonName} 시즌, {week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}</h4>
+                      <h4 className="weekly-card-title">{week.seasonYear}년, <span className="season-name-fixed">{week.seasonName}</span> 시즌, {week.isBreakSeason ? <><span className="week-name-fixed">전환</span> 주차</> : <><span className="week-name-fixed">{week.weekNumber}</span>주차</>}</h4>
                       <span className="weekly-card-date">
                         <img src="/images/0/cluster4/icon/icon - 6.png" alt="calendar" className="date-icon" />
                         {formatDate(week.startDate)} ~ {formatDate(week.endDate)}
                       </span>
                       <span className="weekly-card-week">
                         <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                        <span className="week-number">{getCumulativeApprovedWeeks(week.endDate)}</span> / 30 주차
+                        <span className="week-number num-2">{getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
                       </span>
                     </div>
 
@@ -2048,25 +2179,27 @@ const Cluster41Content = () => {
                       {(() => {
                         // 전환 주차는 팀/파트/역할을 '-'로 표시
                         const teamPart = getFormattedTeamPart(week.startDate, week);
-                        const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId)) ? null : getRoleForDate(week.startDate);
+                        const roleInfo = (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId))
+                          ? null
+                          : (isDemoMode && DUMMY_WEEK_EXTRA[week.id] ? { roleLabel: DUMMY_WEEK_EXTRA[week.id].roleLabel } : getRoleForDate(week.startDate));
                         return (
                           <>
                             <div className="info-group">
                               <span className="info-item team">
                                 <strong>[팀]</strong>{' '}
-                                <span className="text-gray">{teamPart.teamName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'clip', whiteSpace: 'nowrap' }}>{(teamPart.teamName || '-').length > 6 ? (teamPart.teamName || '-').slice(0, 6) + '..' : teamPart.teamName || '-'}</span>
                               </span>
                               <span className="info-divider">|</span>
                               <span className="info-item part">
                                 <strong>[파트]</strong>{' '}
-                                <span className="text-gray">{teamPart.partName || '-'}</span>
+                                <span className="text-gray" style={{ display: 'inline-block', width: '109px', overflow: 'hidden', textOverflow: 'clip', whiteSpace: 'nowrap' }}>{(teamPart.partName || '-').length > 6 ? (teamPart.partName || '-').slice(0, 6) + '..' : teamPart.partName || '-'}</span>
                               </span>
                             </div>
                             {/* 그룹 2: 역할 */}
                             <div className="info-group">
                               <span className="info-badge role">
                                 <img src="/images/0/cluster4/icon/icon - 8.png" alt="role" className="role-icon" />
-                                <span>{roleInfo?.roleLabel || '-'}</span>
+                                <span style={{ display: 'inline-block', maxWidth: '109px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif" }}>{truncate(roleInfo?.roleLabel, 8)}</span>
                               </span>
                             </div>
                           </>
@@ -2082,21 +2215,21 @@ const Cluster41Content = () => {
                             <span className="info-item with-icon">
                               단감
                               <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
-                              <strong className="number-value">{weekPoints.star}</strong>
+                              <strong className="number-value num-3">{weekPoints.star}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
                               인절미
                               <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
-                              <strong className="number-value">{injeolmi}</strong>
+                              <strong className="number-value num-3">{injeolmi}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
                               어흥
                               <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
-                              <strong className="number-value">{Math.abs(weekPoints.lightning)}</strong>
+                              <strong className="number-value num-3">{Math.abs(weekPoints.lightning)}</strong>
                               개
                             </span>
                           </div>
@@ -2123,7 +2256,7 @@ const Cluster41Content = () => {
                       return (
                         <>
                           <div className="weekly-card-main-progress">
-                            <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong>{hideGrowth ? '-' : `${growthRate.rate}%`}</strong></span>
+                            <span className="progress-label"><span className="dot">·</span> 주차 성장률 <strong><span className="num-3">{hideGrowth ? '-' : growthRate.rate}</span>%</strong></span>
                             <div className="progress-bar-wrapper">
                               <div className="progress-bar">
                                 <div className="progress-fill" style={{ width: `${hideGrowth ? 0 : growthRate.rate}%` }}></div>
@@ -2131,22 +2264,22 @@ const Cluster41Content = () => {
                             </div>
                             <span className="total-count">
                               <img src="/images/0/cluster4/icon/icon - 0.png" alt="leaf" className="leaf-icon" />
-                              총 {hideStats ? '-' : growthRate.total} 개 중 <strong>{hideStats ? '-' : growthRate.count}</strong> 개
+                              총 <span className="num-3">{hideStats ? '-' : growthRate.total}</span> 개 중 <strong><span className="num-3">{hideStats ? '-' : growthRate.count}</span></strong> 개
                             </span>
                           </div>
 
                           {/* 네 번째, 다섯 번째 줄: 스탯들 */}
                           <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
                             <div className="weekly-card-stats">
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{hideStats ? '-' : infoRate.rate}%</strong> <span className="gray">(<span className="num">{hideStats ? '-' : infoRate.count}</span>/{hideStats ? '-' : infoRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{hideStats ? '-' : competencyRate.rate}%</strong> <span className="gray">(<span className="num">{hideStats ? '-' : competencyRate.count}</span>/{hideStats ? '-' : competencyRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{hideStats ? '-' : experienceRate.rate}%</strong> <span className="gray">(<span className="num">{hideStats ? '-' : experienceRate.count}</span>/{hideStats ? '-' : experienceRate.total})</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{hideStats ? '-' : careerRate.rate}%</strong> <span className="gray">(<span className="num">{hideStats ? '-' : careerRate.count}</span>/{hideStats ? '-' : careerRate.total})</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : infoRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : infoRate.count}</span>/<span className="num-2">{hideStats ? '-' : infoRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : competencyRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : competencyRate.count}</span>/<span className="num-2">{hideStats ? '-' : competencyRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : experienceRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : experienceRate.count}</span>/<span className="num-2">{hideStats ? '-' : experienceRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : careerRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : careerRate.count}</span>/<span className="num-2">{hideStats ? '-' : careerRate.total}</span>)</span></span>
                             </div>
                             <div className="weekly-card-extra-stats">
-                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/3</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num">{isRest ? '-' : 0}</span><span className="white">/3</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num num-1">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num num-4">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num num-1">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
                               <span className="stat empty"></span>
                             </div>
                           </div>

@@ -1,10 +1,11 @@
 // Cluster 2 - Club Final Index Styles
 
-@import url("https://fonts.googleapis.com/css2?family=Khula:wght@800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Khula:wght@800&display=block");
 
 @font-face {
   font-family: "Cafe24Ohsquare";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff") format("woff");
+  font-display: block;
   font-weight: normal;
   font-style: normal;
 }
@@ -49,14 +50,14 @@
     display: none;
     position: absolute;
     top: 40px;
-    right: 47px; // 전 섹션 통일: search-icon이 기존 pencil-icon x좌표에 위치
+    right: 35px; // 전 섹션 통일: 그룹 끝 x좌표 19px 우측 이동 (47→28)
     z-index: 100;
-    gap: 5px;
+    gap: 15px;
     align-items: center;
 
     .edit-icon {
-      width: 22px;
-      height: 22px;
+      width: 33px;
+      height: 33px;
       background: #faab07;
       border-radius: 50%;
       display: flex;
@@ -71,14 +72,19 @@
         background: #ffc919;
       }
 
+      i {
+        position: relative;
+        top: 2px;
+      }
+
       svg {
-        width: 11px;
-        height: 11px;
+        width: 16px;
+        height: 16px;
       }
 
       img {
-        width: 11px;
-        height: 11px;
+        width: 16px;
+        height: 16px;
         object-fit: contain;
       }
 
@@ -372,6 +378,9 @@
             color: #fff;
             line-height: 30px;
             transition: color 0.3s ease;
+            min-width: 80px;
+            flex-shrink: 0;
+            text-align: center;
           }
 
           &:hover .hex-label {
@@ -462,6 +471,8 @@
           display: flex;
           align-items: center;
           gap: 8px;
+          min-width: 70px;
+          flex-shrink: 0;
 
           .joined-text {
             font-family: "Pretendard", sans-serif;
@@ -739,9 +750,10 @@
           left: 45%;
           transform: translate(-50%, -50%);
           font-family: "Pretendard", sans-serif;
-          font-size: 0.875rem;
+          font-size: 18px !important;
           font-weight: 700;
           color: #000;
+          white-space: nowrap;
         }
 
         &:hover {
@@ -907,6 +919,8 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        max-width: 100%;
+        overflow: hidden;
 
         .quote-badge {
           display: inline-block;
@@ -942,6 +956,11 @@
           font-weight: 400;
           word-break: break-word;
           overflow-wrap: break-word;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          max-width: 100%;
         }
 
         .quote-footer {
@@ -950,12 +969,16 @@
           align-items: center;
           margin-top: auto;
           margin-bottom: 10px;
+          overflow: hidden;
         }
 
         .quote-author {
           display: flex;
           align-items: center;
           gap: 12px;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
 
           img {
             width: 50px;
@@ -969,6 +992,8 @@
             display: flex;
             flex-direction: column;
             gap: 0px;
+            max-width: 100%;
+            overflow: hidden;
 
             .author-name {
               font-family: "DM Sans", sans-serif;
@@ -976,6 +1001,10 @@
               color: #fff;
               font-weight: 500;
               line-height: 26.1px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              max-width: 100%;
             }
 
             .author-role {
@@ -984,6 +1013,9 @@
               font-weight: 400;
               color: #999;
               line-height: 22.4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
           }
         }
@@ -993,6 +1025,7 @@
           flex-direction: column;
           align-items: flex-end;
           gap: 0px;
+          flex-shrink: 0;
 
           .score-label {
             font-family: "DM Sans", sans-serif;
@@ -1307,6 +1340,7 @@
               display: flex;
               flex-direction: column;
               gap: 2px;
+              min-width: 0;
 
               .video-title {
                 font-family: "Khula", sans-serif;
@@ -1317,6 +1351,9 @@
                 padding: 0;
                 line-height: 34px;
                 transform: translateY(-7px);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
 
                 .highlight-orange {
                   color: #faab07;
@@ -1331,6 +1368,9 @@
                 margin: 0;
                 padding: 0;
                 line-height: 26px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
 
@@ -1797,6 +1837,12 @@
             position: relative;
             z-index: 1;
             left: 20px;
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
           }
         }
 
@@ -1843,6 +1889,12 @@
             font-size: 1rem;
             font-weight: 600;
             line-height: 24px;
+            min-width: 100px;
+            max-width: 165px;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             &.highlight {
               color: #fff;
@@ -2882,14 +2934,13 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    backdrop-filter: blur(5px);
     animation: fadeIn 0.3s ease;
   }
 
@@ -2915,14 +2966,37 @@
 
   .edu-modal {
     position: relative;
-    width: 600px;
-    max-width: 90vw;
-    max-height: min(80vh, 700px);
+    width: 1024px;
+    max-width: 1024px;
+    height: 794px;
+    max-height: 794px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
     overflow: hidden;
     animation: slideUp 0.3s ease;
+
+    // 코너 장식
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+    }
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
 
     .modal-close {
       position: absolute;
@@ -2956,8 +3030,13 @@
     .modal-header {
       position: relative;
       padding: 40px 40px 30px;
+      height: 110px;
+      min-height: 110px;
+      max-height: 110px;
+      flex-shrink: 0;
+      box-sizing: border-box;
       background: linear-gradient(180deg, rgba(255, 165, 0, 0.1) 0%, transparent 100%);
-      border-bottom: 1px solid rgba(255, 165, 0, 0.3);
+      border-bottom: none;
 
       .modal-border-tl {
         position: absolute;
@@ -2997,6 +3076,8 @@
           font-weight: 700;
           color: #fff;
           margin: 0;
+          word-break: keep-all;
+          overflow-wrap: break-word;
         }
 
         .final-tag {
@@ -3081,7 +3162,7 @@
 
     // 비고 내용만 표시하는 모달 스타일
     &.description-only {
-      width: 500px;
+      width: 1024px;
 
       .modal-header {
         padding: 20px 40px 15px;
@@ -3142,52 +3223,88 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    backdrop-filter: blur(5px);
   }
 
   .section4-modal {
-    width: 501px;
-    height: 758px;
-    max-width: 90vw;
-    max-height: min(90vh, 758px);
+    width: 674px;
+    height: 826px;
+    max-width: 674px;
+    max-height: 826px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    // 코너 장식
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+    }
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
 
     .section4-modal-header {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
+      flex-direction: column;
       position: relative;
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
-      background: rgba(255, 165, 0, 0.05);
+      padding: 20px 24px 12px;
+      height: 153px;
+      min-height: 153px;
+      max-height: 153px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border-bottom: none;
+
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+
+        img[alt="write"] {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
 
       h3 {
         margin: 0;
         font-family: "Cafe24Ohsquare", sans-serif;
-        font-size: 1.375rem;
-        font-weight: 700;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 34px;
+        padding-top: 4px;
+        padding-left: 80px;
         color: #ffa500;
         display: flex;
         align-items: center;
         gap: 10px;
-
-        &::before {
-          content: "✦";
-          font-size: 0.875rem;
-          color: #ffa500;
-        }
+        flex: 1;
       }
 
       .modal-subtitle {
@@ -3195,15 +3312,17 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
+        font-size: 18px;
         font-weight: 400;
-        order: 3;
+        padding-left: 80px;
+        padding-right: 52px;
       }
 
       .modal-close-btn {
         position: absolute;
         top: 16px;
-        right: 20px;
+        right: 24px;
+        z-index: 2;
         width: 32px;
         height: 32px;
         background: none;
@@ -3236,23 +3355,25 @@
 
     .section4-modal-body {
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       padding: 16px 24px;
 
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      scrollbar-width: thin;
+      scrollbar-color: #FFA500 #252836;
 
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-      }
+      // 관리자 승인 전 잠금 (canEditClubReview === false)
+      &.locked {
+        opacity: 0.6;
+        cursor: pointer;
 
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 165, 0, 0.5);
-        border-radius: 3px;
-
-        &:hover {
-          background: #ffa500;
+        input, textarea, select, button {
+          pointer-events: none;
+          cursor: not-allowed;
         }
       }
 
@@ -3275,6 +3396,23 @@
           .link-label {
             color: #ffa500;
             font-weight: 700;
+          }
+        }
+
+        &.slot-disabled {
+          opacity: 0.4;
+
+          input {
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+          }
+        }
+
+        &.slot-filled {
+          border-color: #FAAB07;
+
+          .link-label {
+            color: #FAAB07;
           }
         }
 
@@ -3327,9 +3465,14 @@
       justify-content: flex-end;
       align-items: center;
       gap: 12px;
-      padding: 20px 28px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.2);
+      padding: 10px 28px;
+      height: 118px;
+      min-height: 118px;
+      max-height: 118px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border-top: none;
+      flex-shrink: 0;
 
       .cancel-btn {
         font-family: "Pretendard", sans-serif;
@@ -3374,188 +3517,132 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    backdrop-filter: blur(5px);
   }
 
   .intro-modal {
-    width: 600px;
-    max-width: 90vw;
-    height: min(85vh, 750px); // 상세보기/수정 모달 크기 통일: max-height → height
-    max-height: min(85vh, 750px);
+    width: 1468px;
+    max-width: 1468px;
+    height: 855px;
+    min-height: 855px;
+    max-height: 855px;
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    // 코너 장식
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+    }
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
 
     .intro-modal-header {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
+      flex-direction: column;
       position: relative;
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
-      background: rgba(255, 165, 0, 0.05);
+      padding: 16px 24px 4px;
+      height: 100px;
+      min-height: 100px;
+      max-height: 100px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border-bottom: none;
 
-      .header-left {
+      .modal-header-top {
         display: flex;
         align-items: center;
-        gap: 14px;
+        width: 100%;
+        position: relative;
 
-        .modal-icon {
-          width: 40px;
-          height: 40px;
-          object-fit: contain;
+        img[alt="write"] {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
         }
+      }
 
-        h3 {
-          margin: 0;
-          font-family: "Cafe24Ohsquare", sans-serif;
-          font-size: 1.375rem;
-          font-weight: 700;
-          color: #ffa500;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-
-          &::before {
-            content: "✦";
-            font-size: 0.875rem;
-            color: #ffa500;
-          }
-        }
-
-        .title-input {
-          font-family: "Cafe24Ohsquare", sans-serif;
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #fff;
-          background: #151515;
-          border: 1px solid #ffa500;
-          padding: 12px 16px;
-          outline: none;
-          width: 200px;
-          transition: all 0.2s;
-
-          &:focus {
-            border-color: #ffa500;
-            background: #1a1a1a;
-          }
-        }
+      h3 {
+        margin: 0;
+        font-family: "Cafe24Ohsquare", sans-serif;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 34px;
+        padding-top: 4px;
+        padding-left: 80px;
+        color: #ffa500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
       }
 
       .modal-subtitle {
         width: 100%;
-        margin: -2px 0 0 0;
+        margin: 4px 0 0 0;
         color: #fff;
         font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
+        font-size: 18px;
         font-weight: 400;
-        order: 3;
+        padding-left: 80px;
       }
 
-      .header-right {
+      .modal-close-btn {
         position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 20px;
+        top: 16px;
+        right: 24px;
+        z-index: 2;
+        width: 32px;
+        height: 32px;
+        background: none;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #999;
+        font-size: 1.125rem;
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
 
-        .edit-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 16px;
-          padding-top: 10px;
-          background: rgba(255, 165, 0, 0.2);
-          border: 1px solid #ffa500;
+        i {
+          display: inline-block;
+          transition: transform 0.4s ease;
+          position: relative;
+          top: 2px;
+        }
+
+        &:hover {
           color: #ffa500;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
+          border-color: #ffa500;
 
           i {
-            font-size: 1rem;
-          }
-
-          &:hover {
-            background: #ffa500;
-            color: #000;
-          }
-        }
-
-        .cancel-edit-btn {
-          padding: 8px 16px;
-          padding-top: 10px;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: #999;
-          font-size: 0.875rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            border-color: #fff;
-            color: #fff;
-          }
-        }
-
-        .save-edit-btn {
-          padding: 8px 16px;
-          padding-top: 10px;
-          background: linear-gradient(135deg, #ffa500 0%, #ffa500 100%);
-          border: none;
-          color: #000;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
-          }
-        }
-
-        .modal-close-btn {
-          width: 32px;
-          height: 32px;
-          background: none;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: #999;
-          font-size: 1.125rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          i {
-            display: inline-block;
-            transition: transform 0.4s ease;
-            position: relative;
-            top: 2px;
-          }
-
-          &:hover {
-            color: #ffa500;
-            border-color: #ffa500;
-
-            i {
-              transform: rotate(180deg);
-            }
+            transform: rotate(180deg);
           }
         }
       }
@@ -3598,34 +3685,25 @@
 
     .intro-modal-body {
       flex: 1;
-      overflow-y: auto;
+      min-height: 0;
+      overflow-y: scroll !important;
       padding: 24px;
       display: flex;
       flex-direction: column;
 
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 165, 0, 0.5);
-        border-radius: 3px;
-
-        &:hover {
-          background: #ffa500;
-        }
-      }
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      scrollbar-width: thin;
+      scrollbar-color: #FFA500 #252836;
 
       .subtitle-section {
         margin-bottom: 20px;
         text-align: center;
 
         .subtitle-text {
-          font-size: 1rem;
+          font-size: 17px;
           color: rgba(255, 255, 255, 0.7);
           margin: 0;
           font-style: italic;
@@ -3724,6 +3802,91 @@
               color: #ffa500;
             }
           }
+        }
+      }
+    }
+
+    .intro-modal-footer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 28px;
+      border-top: none;
+      height: 118px;
+      min-height: 118px;
+      max-height: 118px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+
+      .cancel-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #888;
+        padding: 12px 32px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.4);
+          color: #fff;
+        }
+      }
+
+      .save-btn {
+        background: #ffa500;
+        border: 1px solid #ffa500;
+        color: #000;
+        padding: 12px 32px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #ffb733;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+
+      .intro-edit-btn {
+        padding: 8px 16px;
+        padding-top: 10px;
+        border: none;
+        border-radius: 0;
+        background: #faab07;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #000;
+        transition:
+          transform 0.15s ease,
+          filter 0.15s ease;
+
+        i {
+          font-size: 0.875rem;
+          color: #000;
+        }
+
+        &:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.05);
         }
       }
     }
@@ -3894,50 +4057,87 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    backdrop-filter: blur(5px);
     padding-left: 68px;
 
     .section21-modal {
-      background: #0d0d0d;
       border: 1px solid #ffa500;
-      width: 90%;
-      max-width: 1140px !important;
-      max-height: min(90vh, 800px);
+      width: 1468px;
+      max-width: 95vw;
+      height: 855px;
+      max-height: 855px;
       border-radius: 0;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
       box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
+      position: relative;
+
+      // 코너 장식
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-color: #ffa500;
+        border-style: solid;
+      }
+      &::before {
+        top: -1px;
+        left: -1px;
+        border-width: 2px 0 0 2px;
+      }
+      &::after {
+        bottom: -1px;
+        right: -1px;
+        border-width: 0 2px 2px 0;
+      }
 
       .section21-modal-header {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex-wrap: wrap;
+        flex-direction: column;
         position: relative;
-        padding: 24px 32px;
-        background: rgba(255, 165, 0, 0.05);
-        border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+        padding: 16px 24px 4px;
+        height: 100px;
+        min-height: 100px;
+        max-height: 100px;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        border-bottom: none;
+
+        .modal-header-top {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          position: relative;
+
+          img[alt="write"] {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+        }
 
         h3 {
-          font-family: "Cafe24Anemone", sans-serif;
+          font-family: "Cafe24Ohsquare", sans-serif;
           color: #ffa500;
-          font-size: 1.375rem;
+          font-size: 24px;
           font-weight: 400;
+          line-height: 34px;
+          padding-top: 4px;
+          padding-left: 80px;
           margin: 0;
           display: flex;
           align-items: center;
           gap: 10px;
-
-          &::before {
-            content: "✦";
-            font-size: 0.875rem;
-            color: #ffa500;
-          }
+          flex: 1;
         }
 
         .modal-subtitle {
@@ -3945,15 +4145,17 @@
           margin: -2px 0 0 0;
           color: #fff;
           font-family: "Pretendard", sans-serif;
-          font-size: 0.875rem;
+          font-size: 18px;
           font-weight: 400;
-          order: 3;
+          padding-left: 80px;
+          padding-right: 67px;
         }
 
         .modal-close-btn {
           position: absolute;
-          top: 20px;
-          right: 28px;
+          top: 16px;
+          right: 24px;
+          z-index: 2;
           background: none;
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: #999;
@@ -3986,7 +4188,8 @@
 
       .section21-modal-body {
         padding: 40px 32px;
-        max-height: min(60vh, 500px);
+        flex: 1;
+        min-height: 0;
         overflow-y: auto;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4034,7 +4237,7 @@
             label {
               display: block;
               color: #94a3b8;
-              font-size: 0.75rem;
+              font-size: 15px;
               margin-bottom: 6px;
             }
 
@@ -4059,7 +4262,7 @@
 
               &::placeholder {
                 color: #444;
-                font-size: 0.75rem;
+                font-size: 15px;
               }
             }
           }
@@ -4070,7 +4273,7 @@
             label {
               display: block;
               color: #94a3b8;
-              font-size: 0.75rem;
+              font-size: 15px;
               margin-bottom: 6px;
             }
 
@@ -4109,9 +4312,13 @@
         display: flex;
         justify-content: flex-end;
         gap: 12px;
-        padding: 20px 28px;
-        background: rgba(0, 0, 0, 0.3);
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 10px 28px;
+        height: 118px;
+        min-height: 118px;
+        max-height: 118px;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        border-top: none;
         flex-shrink: 0;
 
         .cancel-btn {
@@ -4157,10 +4364,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(4px);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4171,17 +4377,13 @@
   }
 
   .section1-modal {
-    background: #0d0d0d;
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 562px;
-    height: 826px; // 피그마 시안 562×826px 고정
-    max-height: 826px;
-    /* @media (max-height: 900px) {
-      height: 80vh;
-      max-height: 80vh;
-    } */
-    margin: 20px 0;
+    width: 1468px;
+    max-width: 95vw;
+    height: 855px;
+    max-height: 855px;
+    margin: 0;
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -4212,29 +4414,44 @@
 
     .section1-modal-header {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 20px 28px;
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      flex-direction: column;
+      padding: 16px 24px 4px;
+      height: 100px;
+      min-height: 100px;
+      max-height: 100px;
       flex-shrink: 0;
+      box-sizing: border-box;
+      border-bottom: none;
       position: relative;
+
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+
+        img[alt="write"] {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
 
       h3 {
         display: flex;
         align-items: center;
         gap: 10px;
         color: #ffa500;
-        font-family: "Cafe24Anemone", sans-serif;
-        font-size: 1.25rem;
+        font-family: "Cafe24Ohsquare", sans-serif;
+        font-size: 24px;
         font-weight: 400;
+        line-height: 34px;
+        padding-top: 4px;
+        padding-left: 80px;
         margin: 0;
         letter-spacing: 1px;
-
-        &::before {
-          content: "✦";
-          font-size: 0.875rem;
-        }
+        flex: 1;
       }
 
       .modal-subtitle {
@@ -4242,15 +4459,17 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
+        font-size: 18px;
         font-weight: 400;
-        order: 3;
+        padding-left: 80px;
+        padding-right: 67px;
       }
 
       .modal-close-btn {
         position: absolute;
-        top: 20px;
-        right: 28px;
+        top: 16px;
+        right: 24px;
+        z-index: 2;
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
@@ -4282,298 +4501,169 @@
     }
 
     .section1-modal-body {
-      padding: 28px;
       flex: 1;
       min-height: 0;
-      overflow-y: scroll;
-      overscroll-behavior: contain;
+      overflow-y: auto;
+      padding: 20px 24px;
 
-      &::-webkit-scrollbar {
-        width: 8px;
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      scrollbar-width: thin;
+      scrollbar-color: #FFA500 #252836;
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
       }
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
+
+      .photo-slot {
+        display: flex;
+        flex-direction: column;
+
+        &.disabled {
+          .photo-preview {
+            opacity: 0.3;
+          }
+          .photo-action-btn {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+          }
+        }
       }
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 165, 0, 0.6);
-        border-radius: 4px;
+
+      .photo-slot-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        font-family: "Pretendard", sans-serif;
+        margin-bottom: 8px;
+      }
+
+      .photo-slot-content {
+        display: flex;
+        gap: 4px;
+      }
+
+      .photo-preview {
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #2a2a3e;
         border: 1px solid rgba(255, 165, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .photo-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .photo-action-btn {
+        width: 36px;
+        height: 36px;
+        border: 1px solid rgba(255, 165, 0, 0.3);
+        background: #2a2a3e;
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-family: "Pretendard", sans-serif;
+        transition: all 0.2s ease;
 
         &:hover {
-          background: #ffa500;
+          background: rgba(250, 171, 7, 0.2);
+        }
+
+        &.disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+          pointer-events: none;
         }
       }
 
-      .section-label {
-        display: inline-block;
-        font-family: "Cafe24Anemone", sans-serif;
-        color: #ffa500;
-        font-size: 0.875rem;
-        font-weight: 400;
-        letter-spacing: 1px;
-        margin-bottom: 16px;
-        padding: 4px 10px;
-        background: rgba(255, 165, 0, 0.1);
-        border: 1px solid rgba(255, 165, 0, 0.2);
+      .photo-slot-description {
+        font-size: 11px;
+        color: #999;
+        margin-top: 8px;
+        line-height: 1.4;
+        font-family: "Pretendard", sans-serif;
       }
 
-      .main-photo-section {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 20px;
-        margin-bottom: 24px;
+      .photo-preview-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100002;
+      }
 
-        .main-photo-box {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
+      .photo-preview-modal {
+        width: 979px;
+        height: 570px;
+        background: var(--template-bg, #1a1a2e);
+        border: 1px solid #FFA500;
+        box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
 
-          .main-photo-preview {
-            width: 150px;
-            height: 200px; // 3:4 비율
-            border: 1px solid rgba(255, 165, 0, 0.4);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 165, 0, 0.05);
-
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-            }
-
-            .empty-photo {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 8px;
-              color: #ffa500;
-              font-size: 0.75rem;
-              text-align: center;
-              padding: 10px;
-
-              i {
-                font-size: 2rem;
-              }
-            }
-          }
-
-          .main-photo-buttons {
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-          }
-
-          .change-photo-btn,
-          .delete-photo-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: transparent;
-            border: 1px solid #ffa500;
-            color: #ffa500;
-            padding: 10px 20px;
-            font-family: "Pretendard", sans-serif;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-
-            &::before {
-              content: "";
-              position: absolute;
-              top: 0;
-              left: -100%;
-              width: 100%;
-              height: 100%;
-              background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.2), transparent);
-              transition: left 0.5s ease;
-            }
-
-            &:hover {
-              background: rgba(255, 165, 0, 0.1);
-              box-shadow: 0 0 20px rgba(255, 165, 0, 0.2);
-
-              &::before {
-                left: 100%;
-              }
-            }
-
-            i {
-              font-size: 1.125rem;
-            }
-          }
-
-          .delete-photo-btn {
-            border-color: #ff4757;
-            color: #ff4757;
-
-            &::before {
-              background: linear-gradient(90deg, transparent, rgba(255, 71, 87, 0.2), transparent);
-            }
-
-            &:hover {
-              background: rgba(255, 71, 87, 0.1);
-              box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
-            }
-          }
+        &::before {
+          content: "";
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-color: #ffa500;
+          border-style: solid;
+          border-width: 2px 0 0 2px;
+          top: -1px;
+          left: -1px;
         }
-      }
 
-      .sub-photo-section {
-        .sub-photo-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
+        &::after {
+          content: "";
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-color: #ffa500;
+          border-style: solid;
+          border-width: 0 2px 2px 0;
+          bottom: -1px;
+          right: -1px;
+        }
 
-          .sub-photo-item {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            overflow: visible;
+        img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
 
-            .sub-photo-preview {
-              aspect-ratio: 1;
-              overflow: hidden;
-
-              img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-              }
-
-              .empty-photo {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 4px;
-                color: #ffa500;
-                font-size: 0.625rem;
-                text-align: center;
-                background: rgba(255, 165, 0, 0.05);
-
-                i {
-                  font-size: 1.5rem;
-                }
-              }
-            }
-
-            .sub-photo-actions {
-              display: flex;
-              justify-content: space-around;
-              padding: 8px 4px;
-              background: rgba(0, 0, 0, 0.3);
-              position: relative;
-              overflow: visible;
-
-              .action-btn {
-                background: none;
-                border: none;
-                color: #888;
-                font-size: 1rem;
-                cursor: pointer;
-                padding: 4px;
-                transition: color 0.2s;
-                position: relative;
-
-                // 툴팁 스타일
-                &[data-tooltip]::after {
-                  content: attr(data-tooltip);
-                  position: absolute;
-                  bottom: 100%;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  background: rgba(0, 0, 0, 0.9);
-                  color: #fff;
-                  font-size: 0.6875rem;
-                  padding: 6px 10px;
-                  border-radius: 4px;
-                  white-space: nowrap;
-                  opacity: 0;
-                  visibility: hidden;
-                  transition: all 0.2s ease;
-                  pointer-events: none;
-                  margin-bottom: 6px;
-                  border: 1px solid rgba(255, 165, 0, 0.3);
-                  z-index: 100;
-                }
-
-                &[data-tooltip]::before {
-                  content: "";
-                  position: absolute;
-                  bottom: 100%;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  border: 5px solid transparent;
-                  border-top-color: rgba(0, 0, 0, 0.9);
-                  opacity: 0;
-                  visibility: hidden;
-                  transition: all 0.2s ease;
-                  margin-bottom: -4px;
-                  z-index: 100;
-                }
-
-                // 왼쪽 아이콘 (업로드) - 오른쪽으로 정렬
-                &.upload[data-tooltip]::after {
-                  left: 0;
-                  transform: translateX(0);
-                }
-                &.upload[data-tooltip]::before {
-                  left: 8px;
-                  transform: translateX(0);
-                }
-
-                // 오른쪽 아이콘 (별) - 왼쪽으로 정렬
-                &.star[data-tooltip]::after {
-                  left: auto;
-                  right: 0;
-                  transform: translateX(0);
-                }
-                &.star[data-tooltip]::before {
-                  left: auto;
-                  right: 8px;
-                  transform: translateX(0);
-                }
-
-                &[data-tooltip]:hover::after,
-                &[data-tooltip]:hover::before {
-                  opacity: 1;
-                  visibility: visible;
-                }
-
-                &:hover {
-                  color: #ffa500;
-                }
-
-                &.star.active {
-                  color: #ffa500;
-                }
-
-                &.disabled {
-                  color: #444;
-                  cursor: not-allowed;
-                  opacity: 0.5;
-
-                  &:hover {
-                    color: #444;
-                  }
-
-                  &[data-tooltip]::after {
-                    background: rgba(100, 100, 100, 0.9);
-                    border-color: rgba(100, 100, 100, 0.5);
-                  }
-                }
-              }
-            }
-          }
+        .modal-close-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 1;
         }
       }
     }
@@ -4582,8 +4672,13 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 20px 28px;
-      border-top: 1px solid rgba(255, 165, 0, 0.2);
+      padding: 10px 28px;
+      border-top: none;
+      height: 118px;
+      min-height: 118px;
+      max-height: 118px;
+      flex-shrink: 0;
+      box-sizing: border-box;
       flex-shrink: 0;
 
       .cancel-btn {
@@ -4644,10 +4739,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4677,12 +4771,11 @@
   }
 
   .section2-modal {
-    background: #0d0d0d;
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 523px;
-    height: 926px;
-    max-height: min(90vh, 926px);
+    width: 674px;
+    height: 826px;
+    max-height: 826px;
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -4714,30 +4807,43 @@
 
     .section2-modal-header {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 24px 28px;
-      background: rgba(255, 165, 0, 0.05);
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      flex-direction: column;
+      padding: 20px 24px 12px;
+      height: 153px;
+      min-height: 153px;
+      max-height: 153px;
       flex-shrink: 0;
+      box-sizing: border-box;
+      border-bottom: none;
       position: relative;
 
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+
+        img[alt="write"] {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+
       h3 {
-        font-family: "Cafe24Anemone", sans-serif;
+        font-family: "Cafe24Ohsquare", sans-serif;
         color: #ffa500;
-        font-size: 1.375rem;
+        font-size: 24px;
         font-weight: 400;
+        line-height: 34px;
+        padding-top: 4px;
+        padding-left: 80px;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 10px;
-
-        &::before {
-          content: "✦";
-          font-size: 0.875rem;
-          color: #ffa500;
-        }
+        flex: 1;
       }
 
       .modal-subtitle {
@@ -4745,15 +4851,17 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
+        font-size: 18px;
         font-weight: 400;
-        order: 3;
+        padding-left: 80px;
+        padding-right: 67px;
       }
 
       .modal-close-btn {
         position: absolute;
-        top: 24px;
-        right: 28px;
+        top: 16px;
+        right: 24px;
+        z-index: 2;
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
@@ -4791,23 +4899,6 @@
       min-height: 0;
       overscroll-behavior: contain;
 
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 165, 0, 0.6);
-        border-radius: 4px;
-        border: 1px solid rgba(255, 165, 0, 0.3);
-
-        &:hover {
-          background: #ffa500;
-        }
-      }
-
       .slogan-edit-item {
         margin-bottom: 28px;
         padding: 20px;
@@ -4823,7 +4914,7 @@
           display: inline-block;
           font-family: "Cafe24Anemone", sans-serif;
           color: #ffa500;
-          font-size: 0.875rem;
+          font-size: 1.0625rem;
           font-weight: 400;
           letter-spacing: 1px;
           margin-bottom: 16px;
@@ -5016,7 +5107,7 @@
           }
 
           .slogan-rating-value {
-            font-size: 0.75rem;
+            font-size: 15px;
             font-weight: 600;
             color: #ffa500;
             font-family: "Pretendard", sans-serif;
@@ -5029,9 +5120,13 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 20px 28px;
-      background: rgba(0, 0, 0, 0.3);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px 28px;
+      height: 118px;
+      min-height: 118px;
+      max-height: 118px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border-top: none;
       flex-shrink: 0;
 
       .cancel-btn {
@@ -5094,10 +5189,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5107,12 +5201,11 @@
   }
 
   .section3-modal {
-    background: #0d0d0d;
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 683px;
-    height: 1210px;
-    max-height: min(90vh, 1210px);
+    width: 674px;
+    height: 826px;
+    max-height: 826px;
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -5144,30 +5237,43 @@
 
     .section3-modal-header {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
+      flex-direction: column;
       position: relative;
-      padding: 24px 28px;
-      background: rgba(255, 165, 0, 0.05);
-      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      padding: 20px 24px 12px;
+      height: 153px;
+      min-height: 153px;
+      max-height: 153px;
       flex-shrink: 0;
+      box-sizing: border-box;
+      border-bottom: none;
+
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+
+        img[alt="write"] {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
 
       h3 {
-        font-family: "Cafe24Anemone", sans-serif;
+        font-family: "Cafe24Ohsquare", sans-serif;
         color: #ffa500;
-        font-size: 1.375rem;
+        font-size: 24px;
         font-weight: 400;
+        line-height: 34px;
+        padding-top: 4px;
+        padding-left: 80px;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 10px;
-
-        &::before {
-          content: "✦";
-          font-size: 0.875rem;
-          color: #ffa500;
-        }
+        flex: 1;
       }
 
       .modal-subtitle {
@@ -5175,47 +5281,25 @@
         margin: -2px 0 0 0;
         color: #fff;
         font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
+        font-size: 18px;
         font-weight: 400;
-        order: 3;
+        padding-left: 80px;
+        padding-right: 67px;
       }
 
       .header-actions {
-        position: absolute;
-        top: 20px;
-        right: 28px;
         display: flex;
         align-items: center;
         gap: 12px;
       }
 
-      .add-edu-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: #ffa500;
-        border: none;
-        border-radius: 0;
-        color: #000;
-        font-family: "Pretendard", sans-serif;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        svg {
-          flex-shrink: 0;
-        }
-
-        &:hover {
-          background: #ffb820;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
-        }
-      }
+      // .add-edu-btn은 .section3-modal-body 하위로 이동됨
 
       .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 24px;
+        z-index: 2;
         background: none;
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: #999;
@@ -5254,22 +5338,46 @@
       overscroll-behavior: contain;
       max-height: calc(min(85vh, 750px) - 160px);
 
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-      &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 165, 0, 0.6);
-        border-radius: 4px;
-        border: 1px solid rgba(255, 165, 0, 0.3);
+      .add-edu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 20px;
+        margin-top: 16px;
+        background: transparent;
+        border: 1px dashed rgba(255, 165, 0, 0.4);
+        border-radius: 0;
+        color: #FAAB07;
+        font-family: "Pretendard", sans-serif;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        svg {
+          flex-shrink: 0;
+          stroke: #FAAB07;
+        }
 
         &:hover {
-          background: #ffa500;
+          background: rgba(255, 165, 0, 0.08);
+          border-color: #ffa500;
+          color: #ffa500;
+
+          svg {
+            stroke: #ffa500;
+          }
         }
       }
+
+      &::-webkit-scrollbar { width: 3px; }
+      &::-webkit-scrollbar-track { background: #252836; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb { background: #FFA500; border-radius: 2px; }
+      &::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+      scrollbar-width: thin;
+      scrollbar-color: #FFA500 #252836;
 
       .edu-edit-card {
         background: rgba(255, 255, 255, 0.02);
@@ -5280,6 +5388,24 @@
 
         &:last-child {
           margin-bottom: 0;
+        }
+
+        // 1번 카드 수정 잠금 (관리자 승인 전)
+        &.primary-locked {
+          cursor: pointer;
+          input, textarea, select {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+          }
+          .edu-custom-dropdown {
+            opacity: 0.6;
+            pointer-events: none;
+          }
+          .delete-edu-btn, .final-edu-btn {
+            opacity: 0.3;
+            pointer-events: none;
+          }
         }
 
         // 대표학력 카드 스타일
@@ -5395,13 +5521,13 @@
             border-radius: 16px;
             color: #666;
             font-family: "Pretendard", sans-serif;
-            font-size: 0.75rem;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
 
             i {
-              font-size: 0.75rem;
+              font-size: 15px;
               color: #666;
               transition: all 0.2s;
             }
@@ -5637,7 +5763,7 @@
                         &::before {
                           content: "✓";
                           margin-right: 8px;
-                          font-size: 0.75rem;
+                          font-size: 15px;
                         }
                       }
 
@@ -5696,7 +5822,7 @@
             .major-hint {
               grid-column: 1 / -1;
               font-family: "Pretendard", sans-serif;
-              font-size: 0.75rem;
+              font-size: 15px;
               color: #888;
               margin: -8px 0 0 0;
             }
@@ -6067,7 +6193,7 @@
                     &::before {
                       content: "✓";
                       margin-right: 8px;
-                      font-size: 0.75rem;
+                      font-size: 15px;
                     }
                   }
                 }
@@ -6179,7 +6305,7 @@
                 text-align: right;
                 margin-top: 6px;
                 font-family: "Pretendard", sans-serif;
-                font-size: 0.75rem;
+                font-size: 15px;
                 color: #666;
               }
             }
@@ -6192,9 +6318,13 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 20px 28px;
-      background: rgba(0, 0, 0, 0.3);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px 28px;
+      height: 118px;
+      min-height: 118px;
+      max-height: 118px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      border-top: none;
       flex-shrink: 0;
 
       .cancel-btn {
@@ -6257,9 +6387,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6268,11 +6398,36 @@
   }
 
   .delete-confirm-modal {
-    background: #1a1a1a;
     border: 1px solid #ffa500;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+    position: relative;
+
+    // 코너 장식
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+    }
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
+
     padding: 40px;
-    width: 100%;
-    max-width: 420px;
+    width: 611px;
+    max-width: 95vw;
+    height: 449px;
+    max-height: 449px;
     text-align: center;
     animation: deleteModalSlideUp 0.3s ease;
 
@@ -6397,4 +6552,338 @@
       stroke: var(--quaternary-color);
     }
   }
+  // ===== 공통 모달 body scroll chaining 차단 =====
+  .section1-modal-body,
+  .section2-modal-body,
+  .section21-modal-body,
+  .section3-modal-body,
+  .section4-modal-body,
+  .intro-modal-body {
+    overscroll-behavior: contain;
+  }
+
+  // ===== 공통 모달 푸터 스타일 =====
+  .section1-modal-footer,
+  .section2-modal-footer,
+  .section21-modal-footer,
+  .section3-modal-footer,
+  .section4-modal-footer,
+  .intro-modal-footer {
+    .modal-footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      border: none !important;
+      border-bottom: none !important;
+    }
+
+    .modal-footer-bottom {
+      width: 100%;
+      text-align: right !important;
+      border: none !important;
+      border-top: none !important;
+    }
+
+    .modal-help-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      position: relative;
+      z-index: 1;
+      visibility: visible !important;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 46px;
+        height: 46px;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: -1;
+      }
+    }
+
+    .modal-footer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      border: none !important;
+    }
+
+    .modal-footer-notice {
+      font-size: 15px;
+      color: #FAAB07;
+      text-align: right !important;
+      margin: 0;
+      border: none !important;
+    }
+
+    .modal-cancel-btn {
+      padding: 8px 20px;
+      border: 1px solid #888;
+      background: transparent;
+      color: #888;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(136, 136, 136, 0.1);
+        color: #aaa;
+      }
+    }
+
+    .modal-reset-btn {
+      padding: 8px 20px;
+      border: 1px solid #4CAF50;
+      background: transparent;
+      color: #4CAF50;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
+    }
+
+    .modal-save-btn {
+      padding: 8px 20px;
+      background: #FAAB07;
+      border: 1px solid transparent;
+      color: #1a1a1a;
+      border-radius: 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #ffb820;
+        box-shadow: 0 0 15px rgba(255, 165, 0, 0.4);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // 기존 푸터 레이아웃 오버라이드 (가로 2열 구조)
+  .section1-modal-footer,
+  .section2-modal-footer,
+  .section21-modal-footer,
+  .section3-modal-footer,
+  .section4-modal-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .intro-modal-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  // ===== 도움말 모달 =====
+  .help-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100001;
+  }
+
+  .help-modal {
+    width: 1024px;
+    height: 794px;
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    border: 1px solid #FFA500;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+      border-width: 2px 0 0 2px;
+      top: -1px;
+      left: -1px;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+      border-width: 0 2px 2px 0;
+      bottom: -1px;
+      right: -1px;
+    }
+
+    .help-modal-header {
+      height: 126px;
+      min-height: 126px;
+      max-height: 126px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      h3 {
+        margin: 0;
+        color: #faab07;
+        font-family: "Pretendard", sans-serif;
+        font-size: 21px;
+        font-weight: 800;
+        flex: 1;
+
+        &::before {
+          content: none;
+        }
+      }
+
+      .modal-close-btn {
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .help-modal-body {
+      flex: 1;
+      padding: 20px;
+    }
+  }
+  // 필수필드 적색 안내문 + 깜빡임
+  .notice-error {
+    color: #ff4444 !important;
+    animation: blink-notice 0.3s ease-in-out 2;
+  }
+
+  @keyframes blink-notice {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  // 필수필드 미입력 슬롯 빨간 테두리 깜빡임
+  .photo-slot.field-missing .photo-preview,
+  .slogan-edit-item.field-missing {
+    animation: border-blink 0.3s ease-in-out 3;
+  }
+
+  @keyframes border-blink {
+    0%, 100% { border-color: transparent; }
+    50% { border: 2px solid #ff4444; }
+  }
 } // end .cluster2-content
+
+// ===== Zone A (<1920): 모달 1920 baseline 고정 + 가로 스크롤 허용 =====
+// 페이지 본문과 별개 정책. viewport<1920 시 모달은 축소하지 않고 오버레이 내에서 스크롤.
+// Zone B(1920) / Zone C(>1920) 변화 없음.
+@media (max-width: 1919px) {
+  // Zone A에서 overlay를 block으로 전환 — flex의 "centered overflow 왼쪽 접근 불가" 버그를 근본 회피.
+  // Zone B에서는 @media 밖이라 기존 flex/center 규칙 그대로 유지.
+  // !important 이유: Zone B nested selector(0,2,0) + inline style까지 모두 덮어쓰기 위함.
+  .section1-modal-overlay,
+  .section2-modal-overlay,
+  .section21-modal-overlay,
+  .section3-modal-overlay,
+  .section4-modal-overlay,
+  .intro-modal-overlay,
+  .edu-modal-overlay,
+  .help-modal-overlay,
+  .delete-confirm-overlay {
+    display: block !important;
+    overflow: auto !important;
+  }
+
+  // section21 오버레이의 padding-left:68이 좌측을 잘라내므로 Zone A에서 제거
+  .section21-modal-overlay {
+    padding-left: 0;
+  }
+
+  // 스크롤 컨테이너: 1468 모달을 감싸 오버레이 내부 자체 스크롤을 유발.
+  // overlay가 block이므로 wrapper는 overlay의 x=0 위치에서 시작 → scrollLeft [0, 480] 양방향 정상 동작.
+  // wrapper(1920) ≥ modal(1468)이라 wrapper 내부 flex center는 centered overflow 문제 없음.
+  // Zone B(1920)에서는 @media 밖이라 이 규칙 적용 안 됨.
+  .modal-scroll-content {
+    min-width: 1920px;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  // 가로형_대(1468×855): 기존 max-width:95vw 제약 제거, 축소 금지
+  .section1-modal,
+  .section21-modal,
+  .intro-modal {
+    max-width: 1468px !important;
+    flex-shrink: 0;
+  }
+
+  // 세로형_대(674×826)
+  .section2-modal,
+  .section3-modal,
+  .section4-modal {
+    flex-shrink: 0;
+  }
+
+  // 보조(1024×794)
+  .edu-modal,
+  .help-modal {
+    flex-shrink: 0;
+  }
+
+  .delete-confirm-modal {
+    flex-shrink: 0;
+  }
+}

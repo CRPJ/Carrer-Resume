@@ -36,15 +36,26 @@
   --tab-font-size: 14px;
 }
 
+// ===== 초기 로딩 flash 방지 =====
+.nftg-app {
+  opacity: 0;
+}
+.nftg-app.app-ready {
+  opacity: 1;
+  transition: opacity 0.12s ease-in;
+}
+
 // ===== 공통 레이아웃 스타일 =====
 
 html {
   background-color: #0a0a0a;
+  overflow-x: auto;
 }
 
 body {
   width: var(--content-max-width);
   min-width: var(--content-max-width);
+  max-width: var(--content-max-width);
   margin: 0 auto !important;
   position: relative;
 }
@@ -296,5 +307,37 @@ body {
     height: 56px;
     font-size: 14px;
     box-sizing: border-box;
+  }
+}
+
+// ===== 2560px 이상 대응 =====
+@media (min-width: 1921px) {
+  :root {
+    --sidebar-width: 651px;
+  }
+
+  body {
+    max-width: 2072px !important;
+    width: 2072px !important;
+    margin: 0 auto !important;
+  }
+
+  .nftg-app {
+    max-width: 2072px !important;
+    width: 2072px !important;
+    margin: 0 auto !important;
+  }
+
+  .nftg-content {
+    max-width: 2072px !important;
+  }
+
+  .home-two-sidebar-col {
+    min-height: 100vh !important;
+    background-color: #0c0f14;
+  }
+
+  .header {
+    max-width: 100% !important;
   }
 }

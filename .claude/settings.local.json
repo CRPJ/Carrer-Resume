@@ -87,9 +87,22 @@
       "Bash(vercel --version:*)",
       "Bash(npx next:*)",
       "Bash(grep:*)",
+      "Bash(git:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)",
       "mcp__playwright__browser_resize",
       "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_evaluate"
+      "mcp__playwright__browser_evaluate",
+      "Bash(node -e \":*)",
+      "Bash(cd:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm list:*)",
+      "Bash(npm root:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "Read(//tmp/**)",
+      "Bash(sed -n '1945,1950p' components/cluster-3/Cluster3Content.tsx)",
+      "Bash(sed -n '2516,2522p' components/cluster-3/Cluster3Content.tsx)"
     ],
     "deny": [],
     "ask": []

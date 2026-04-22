@@ -7,10 +7,14 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
+import { useModalScroll } from "@/utils/useModalScroll";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
+const DEFAULT_PHONE_COMMENT = "평일 오전 10시 ~ 오후 20시 사이에 언제든지 연락가능합니다. 주말은 문자나 텍스트로만 부탁드려요! 😊";
 
 const IDENTITY_TAB_IMAGES = [
   { src: "/images/0/cluster 1/identity-tab-bg-1.png", overlay: 0.45 },
@@ -20,7 +24,8 @@ const IDENTITY_TAB_IMAGES = [
 ];
 
 const Sidebar = () => {
-  const [tabBg] = useState(() => IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
+  // SSR-safe: 첫 렌더는 항상 [0], 마운트 후 useEffect에서 random 갱신
+  const [tabBg, setTabBg] = useState(IDENTITY_TAB_IMAGES[0]);
   const { data: session } = useSession();
   const { mask, isAdmin } = useDataMasking();
   const searchParams = useSearchParams();
@@ -37,26 +42,29 @@ const Sidebar = () => {
     return path;
   };
 
+  // SSR-safe: localStorage를 render time에 읽으면 SSR(false)/client(true) 불일치 → stateful로 변환
+  const [demoMode, setDemoMode] = useState(false);
   const [isOwner, setIsOwner] = useState(true);
+  // SSR-safe 기본값 (비-demo 기본값으로 통일). demo 모드일 때는 마운트 useEffect에서 덮어씀.
   const [reliabilityRate, setReliabilityRate] = useState<number | null>(100);
   const [hasReliabilityData, setHasReliabilityData] = useState<boolean>(false);
   const [completionRate, setCompletionRate] = useState<number | null>(80);
   const [hasCompletionData, setHasCompletionData] = useState<boolean>(false);
-  const [practicalCompetency, setPracticalCompetency] = useState<number>(21); // 실무 역량 성장
-  const [practicalExperience, setPracticalExperience] = useState<number>(21); // 실무 경험 축적
-  const [practicalInfo, setPracticalInfo] = useState<number>(21); // 실무 정보 습득
-  const [practicalCareer, setPracticalCareer] = useState<number>(21); // 실무 경력 누적
+  const [practicalCompetency, setPracticalCompetency] = useState<number>(0); // 실무 역량 성장
+  const [practicalExperience, setPracticalExperience] = useState<number>(0); // 실무 경험 축적
+  const [practicalInfo, setPracticalInfo] = useState<number>(0); // 실무 정보 습득
+  const [practicalCareer, setPracticalCareer] = useState<number>(0); // 실무 경력 누적
   const [hasActivityData, setHasActivityData] = useState<boolean>(false);
   const [stat1, setStat1] = useState(0);
   const [stat2, setStat2] = useState(0);
   const [badge1, setBadge1] = useState(0);
   const [badge2, setBadge2] = useState(0);
   const [badge3, setBadge3] = useState(0);
-  // 배지 데이터 상태 (user_cumulative_points 테이블)
+  // 배지 데이터 상태 (user_cumulative_points 테이블) — SSR-safe 기본값
   const [badgeData, setBadgeData] = useState({
-    stars: 99999, // 별
-    lightnings: 9999, // 번개
-    shields: 99999, // 방패
+    stars: 0, // 별
+    lightnings: 0, // 번개
+    shields: 0, // 방패
   });
   const [hasBadgeData, setHasBadgeData] = useState<boolean>(false);
 
@@ -75,116 +83,7 @@ const Sidebar = () => {
       start_date: string;
     };
   }
-  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([
-    {
-      id: "dummy-1",
-      role_in_season: "admin",
-      approved_weeks: 3,
-      total_weeks: 16,
-      progress_status: "in_progress",
-      review_status: "reviewing",
-      seasons: { id: "s1", year: 2025, name: "winter", start_date: "2025-01-01" },
-    },
-    {
-      id: "dummy-2",
-      role_in_season: "crew_advanced",
-      approved_weeks: 8,
-      total_weeks: 8,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s2", year: 2025, name: "fall", start_date: "2024-09-01" },
-    },
-    {
-      id: "dummy-3",
-      role_in_season: "crew_regular",
-      approved_weeks: 12,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s3", year: 2025, name: "summer", start_date: "2024-06-01" },
-    },
-    {
-      id: "dummy-4",
-      role_in_season: "crew_basic",
-      approved_weeks: 10,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s4", year: 2024, name: "spring", start_date: "2024-03-01" },
-    },
-    {
-      id: "dummy-5",
-      role_in_season: "admin",
-      approved_weeks: 6,
-      total_weeks: 16,
-      progress_status: "in_progress",
-      review_status: "reviewing",
-      seasons: { id: "s5", year: 2024, name: "winter", start_date: "2024-01-01" },
-    },
-    {
-      id: "dummy-6",
-      role_in_season: "crew_advanced",
-      approved_weeks: 12,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s6", year: 2023, name: "fall", start_date: "2023-09-01" },
-    },
-    {
-      id: "dummy-7",
-      role_in_season: "crew_basic",
-      approved_weeks: 4,
-      total_weeks: 16,
-      progress_status: "in_progress",
-      review_status: "reviewing",
-      seasons: { id: "s7", year: 2023, name: "summer", start_date: "2023-06-01" },
-    },
-    {
-      id: "dummy-8",
-      role_in_season: "admin",
-      approved_weeks: 16,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s8", year: 2023, name: "spring", start_date: "2023-03-01" },
-    },
-    {
-      id: "dummy-9",
-      role_in_season: "crew_regular",
-      approved_weeks: 16,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s9", year: 2023, name: "spring", start_date: "2023-03-01" },
-    },
-    {
-      id: "dummy-10",
-      role_in_season: "crew_regular",
-      approved_weeks: 16,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s10", year: 2023, name: "spring", start_date: "2023-03-01" },
-    },
-    {
-      id: "dummy-11",
-      role_in_season: "crew_regular",
-      approved_weeks: 16,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s11", year: 2023, name: "spring", start_date: "2023-03-01" },
-    },
-    {
-      id: "dummy-12",
-      role_in_season: "crew_regular",
-      approved_weeks: 16,
-      total_weeks: 16,
-      progress_status: "completed",
-      review_status: "approved",
-      seasons: { id: "s12", year: 2023, name: "spring", start_date: "2023-03-01" },
-    },
-  ]);
+  const [seasonHistories, setSeasonHistories] = useState<SeasonHistory[]>([]);
   const [hasSeasonData, setHasSeasonData] = useState<boolean>(false);
 
   // 시즌 이름 한글 변환
@@ -256,6 +155,18 @@ const Sidebar = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    if (isEditModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isEditModalOpen]);
   const [isSaving, setIsSaving] = useState(false);
 
   // 실제 유저 프로필 데이터
@@ -280,16 +191,158 @@ const Sidebar = () => {
     photo: string;
   } | null>(null);
 
+  // 데모 모드 사용자별 sidebar 더미 데이터 분기 (targetUserId 없을 때만 적용)
+  useEffect(() => {
+    if (!demoMode || !targetUserId) return;
+    // targetUserId가 있으면 sidebar는 실제 API 데이터를 표시 (cluster2/3 더미와 별개)
+    return;
+    const applyDemoByName = () => {
+      // 데모 모드에서는 URL의 userId를 이름으로 직접 사용
+      const name = decodeURIComponent(targetUserId || "");
+
+        const demoProfiles: Record<string, typeof DUMMY_USER_PROFILE> = {
+          윤재윤: DUMMY_USER_PROFILE,
+          안지혜: {
+            name: "안지혜",
+            nameEng: "AN JIHYE",
+            gender: "여",
+            birthDate: "1999.07.10",
+            city: "대전광역시",
+            district: "유성구",
+            phone: "010-5555-6666",
+            email: "jihye.an@gmail.com",
+            school: "성균관대학교",
+            major: "소프트웨어학과",
+            major2: "",
+            major3: "",
+            enrollPeriod: "2018.03 - 2022.02",
+            graduationStatus: "졸업",
+            gpa: "4.4",
+            gpaMax: "4.5",
+            quote: "끊임없이 배우고 의심하는 것이 개발자의 기본 자세라 믿습니다",
+            photo: "/images/0/crew profile/여 1.jpg",
+          },
+          전민경: {
+            name: "전민경",
+            nameEng: "JEON MINKYUNG",
+            gender: "여",
+            birthDate: "1998.05.15",
+            city: "경기도",
+            district: "성남시",
+            phone: "010-8765-4321",
+            email: "minkyung.j@naver.com",
+            school: "성균관대학교",
+            major: "경영학과",
+            major2: "",
+            major3: "",
+            enrollPeriod: "2017.03 - ~ing",
+            graduationStatus: "재학",
+            gpa: "3.8",
+            gpaMax: "4.5",
+            quote: "끊임없이 도전하는 사람이 세상을 바꾼다",
+            photo: "/images/0/crew profile/여 1.jpg",
+          },
+          곽예원: {
+            name: "곽예원",
+            nameEng: "KWAK YEWON",
+            gender: "여",
+            birthDate: "2000.11.23",
+            city: "부산광역시",
+            district: "해운대구",
+            phone: "010-1111-2222",
+            email: "yewon.kwak@gmail.com",
+            school: "부산대학교",
+            major: "디자인학과",
+            major2: "",
+            major3: "",
+            enrollPeriod: "2019.03 - ~ing",
+            graduationStatus: "재학",
+            gpa: "4.0",
+            gpaMax: "4.5",
+            quote: "감각을 넘어 전략으로, 디자인의 가치를 증명하다 감각을 넘어 전략으로, 디자인의 가치를 증명하다 감각을 넘어 전략으로, 디자인의 가치를 증명하다 ",
+            photo: "/images/0/crew profile/여 3.jpg",
+          },
+          김의환: {
+            name: "김의환",
+            nameEng: "KIM UIHWAN",
+            gender: "남",
+            birthDate: "1995.08.30",
+            city: "인천광역시",
+            district: "남동구",
+            phone: "010-3333-4444",
+            email: "uihwan.kim@daum.net",
+            school: "인하대학교",
+            major: "컴퓨터공학과",
+            major2: "",
+            major3: "",
+            enrollPeriod: "2014.03 - ~ing",
+            graduationStatus: "재학",
+            gpa: "3.2",
+            gpaMax: "4.5",
+            quote: "코드 한 줄이 세상을 바꿀 수 있다고 믿는 개발자는 나야 나 나야 나, 오늘 밤 주인공은 나야 나, 나야 나, 개발자는 나야 나 나야 나",
+            photo: "/images/0/crew profile/남 2.jpg",
+          },
+        };
+
+        const demoStats: Record<string, { reliability: number; completion: number; stars: number; lightnings: number; shields: number; info: number; competency: number; experience: number; career: number; status: "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge" }> = {
+          윤재윤: { reliability: 87, completion: 90, stars: 25, lightnings: 8, shields: 12, info: 10, competency: 60, experience: 200, career: 4, status: "Running" },
+          안지혜: { reliability: 95, completion: 96, stars: 33, lightnings: 4, shields: 22, info: 18, competency: 130, experience: 450, career: 7, status: "Complete" },
+          전민경: { reliability: 85, completion: 93, stars: 150, lightnings: 99999, shields: 88, info: 15, competency: 120, experience: 500, career: 8, status: "Running" },
+          곽예원: { reliability: 42, completion: 67, stars: 50, lightnings: 200, shields: 0, info: 8, competency: 45, experience: 120, career: 3, status: "On Rest" },
+          김의환: { reliability: 15, completion: 30, stars: 88, lightnings: 0, shields: 7, info: 3, competency: 10, experience: 25, career: 1, status: "Next Challenge" },
+        };
+
+        if (demoProfiles[name]) {
+          setUserProfile(demoProfiles[name]);
+        }
+        if (demoStats[name]) {
+          const s = demoStats[name];
+          setReliabilityRate(s.reliability);
+          setCompletionRate(s.completion);
+          setBadgeData({ stars: s.stars, lightnings: s.lightnings, shields: s.shields });
+          setPracticalInfo(s.info);
+          setPracticalCompetency(s.competency);
+          setPracticalExperience(s.experience);
+          setPracticalCareer(s.career);
+          setCrewStatus(s.status);
+        }
+    };
+    applyDemoByName();
+  }, [demoMode, targetUserId]);
+
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
-  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태
+  const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태 (SSR-safe 기본)
   useEffect(() => {
     setIsMounted(true);
+    // 마운트 후 demo 모드 확정 + tabBg random 갱신
+    const checked = checkDemoMode();
+    setDemoMode(checked);
+    setTabBg(IDENTITY_TAB_IMAGES[Math.floor(Math.random() * IDENTITY_TAB_IMAGES.length)]);
+    if (checked && !targetUserId) {
+      // demo 모드 + 본인 프로필일 때만 더미 데이터 주입 (특정 크루 조회 시는 실제 API 사용)
+      setReliabilityRate(DUMMY_SIDEBAR_EXTRA.reliabilityRate);
+      setHasReliabilityData(true);
+      setCompletionRate(DUMMY_SIDEBAR_EXTRA.completionRate);
+      setHasCompletionData(true);
+      setPracticalCompetency(DUMMY_SIDEBAR_EXTRA.practicalCompetency);
+      setPracticalExperience(DUMMY_SIDEBAR_EXTRA.practicalExperience);
+      setPracticalInfo(DUMMY_SIDEBAR_EXTRA.practicalInfo);
+      setPracticalCareer(DUMMY_SIDEBAR_EXTRA.practicalCareer);
+      setHasActivityData(true);
+      setBadgeData(DUMMY_SIDEBAR_EXTRA.badgeData);
+      setHasBadgeData(true);
+      setHasSeasonData(true);
+      setUserProfile(DUMMY_USER_PROFILE);
+      setHasData(true);
+      setCrewStatus(DUMMY_SIDEBAR_EXTRA.crewStatus);
+    }
   }, []);
 
   // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
   const cacheInitRef = useRef(false);
   useLayoutEffect(() => {
+    if (demoMode) return; // 더미 모드면 캐시 초기화 스킵
     if (cacheInitRef.current || !cachedProfile?.data) return;
     cacheInitRef.current = true;
 
@@ -396,15 +449,15 @@ const Sidebar = () => {
   useEffect(() => {
     const handleDropdownOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.custom-dropdown-list') && !target.closest('.chamfer-box')) {
+      if (!target.closest(".custom-dropdown-list") && !target.closest(".chamfer-box")) {
         setOpenDropdown(null);
       }
     };
     if (openDropdown) {
-      document.addEventListener('mousedown', handleDropdownOutsideClick);
+      document.addEventListener("mousedown", handleDropdownOutsideClick);
     }
     return () => {
-      document.removeEventListener('mousedown', handleDropdownOutsideClick);
+      document.removeEventListener("mousedown", handleDropdownOutsideClick);
     };
   }, [openDropdown]);
 
@@ -427,8 +480,19 @@ const Sidebar = () => {
       const BASE_CARD_HEIGHT = 810;
       const BASE_SIDEBAR_WIDTH = 497;
 
-      // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게
-      const viewportHeight = window.innerHeight;
+      // 브라우저 zoom 보정: zoom 시 innerWidth/innerHeight가 줄어드므로
+      // 원래 뷰포트 기준으로 계산하기 위해 zoom 비율을 적용
+      const browserZoom = window.outerWidth / window.innerWidth || 1;
+
+      // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
+      const viewportHeight = (window.innerWidth < 1920 && window.innerHeight * browserZoom < 1080) ? 1080 : window.innerHeight * browserZoom;
+      console.log('[calculateScale]', {
+        screenWidth: screen.width,
+        innerHeight: window.innerHeight,
+        browserZoom: window.outerWidth / window.innerWidth,
+        계산값: window.innerHeight * (window.outerWidth / window.innerWidth),
+        조건: screen.width < 1920 && window.innerHeight * (window.outerWidth / window.innerWidth) < 1080
+      });
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
 
@@ -436,11 +500,22 @@ const Sidebar = () => {
       let scale = Math.min(1.25, scaleByHeight);
       scale = Math.max(0.55, scale);
 
-      setCardScale(scale);
+      // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
+      // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
+      const originalWidth = screen.width;
+      if (originalWidth > 1920) {
+        scale = 1.31;
+      }
 
-      // 사이드바 폭을 스케일에 맞게 조정
-      const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
-      document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
+      setCardScale(scale);
+      console.log('[setCardScale]', scale);
+
+      // 사이드바 폭: 1920 이하만 JS로 동적 설정
+      // 1921px+ 는 SCSS @media (min-width: 1921px)에서 --sidebar-width: 651px 고정
+      if (originalWidth <= 1920) {
+        const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
+        document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
+      }
     };
 
     calculateScale();
@@ -463,7 +538,7 @@ const Sidebar = () => {
     addressDistrict: "",
     customAddress: "",
     phone: "",
-    phoneComment: "",
+    phoneComment: DEFAULT_PHONE_COMMENT,
     emailId: "",
     emailDomain: "",
     customEmailDomain: "",
@@ -488,6 +563,10 @@ const Sidebar = () => {
   });
   const [isCustomEmailDomain, setIsCustomEmailDomain] = useState(false);
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
+  const [isPhoneEditing, setIsPhoneEditing] = useState(false);
+  const phoneCommentSnapshot = useRef("");
+  const [isPhoneHelpModalOpen, setIsPhoneHelpModalOpen] = useState(false);
+  const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
   const [debugPanelType, setDebugPanelType] = useState<"OK" | "EC" | "PX">("OK");
@@ -495,6 +574,17 @@ const Sidebar = () => {
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  // Sidebar 모달 배경 스크롤 차단
+  const isSidebarModalOpen = isEditModalOpen || isPhoneCommentModalOpen || isPhoneHelpModalOpen;
+  useModalScroll(isSidebarModalOpen);
+
+  // 연락 가능 시간대 모달: 열릴 때 읽기전용 모드로 초기화
+  useEffect(() => {
+    if (isPhoneCommentModalOpen) {
+      setIsPhoneEditing(false);
+    }
+  }, [isPhoneCommentModalOpen]);
 
   // 전공 툴팁 외부 클릭시 닫기
   useEffect(() => {
@@ -828,10 +918,11 @@ const Sidebar = () => {
 
   // 세션 또는 targetUserId 변경 시 프로필 로드
   useEffect(() => {
+    if (demoMode) return; // 더미 모드면 API 안 부름
     if (session || targetUserId) {
       fetchUserProfile();
     }
-  }, [session, targetUserId]);
+  }, [session, targetUserId, demoMode]);
 
   // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {
@@ -844,8 +935,8 @@ const Sidebar = () => {
         });
       }
     };
-    window.addEventListener('sloganUpdated', handleSloganUpdated);
-    return () => window.removeEventListener('sloganUpdated', handleSloganUpdated);
+    window.addEventListener("sloganUpdated", handleSloganUpdated);
+    return () => window.removeEventListener("sloganUpdated", handleSloganUpdated);
   }, []);
 
   // 학력 변경 이벤트 수신 → .resume-card 즉시 반영
@@ -853,8 +944,20 @@ const Sidebar = () => {
     const handleEducationUpdated = () => {
       fetchEducations();
     };
-    window.addEventListener('educationUpdated', handleEducationUpdated);
-    return () => window.removeEventListener('educationUpdated', handleEducationUpdated);
+    window.addEventListener("educationUpdated", handleEducationUpdated);
+    return () => window.removeEventListener("educationUpdated", handleEducationUpdated);
+  }, []);
+
+  // 프로필 사진 변경 이벤트 수신 → Sidebar 즉시 반영
+  useEffect(() => {
+    const handlePhotoUpdated = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.photo) {
+        setUserProfile(prev => prev ? { ...prev, photo: detail.photo } : prev);
+      }
+    };
+    window.addEventListener("photoUpdated", handlePhotoUpdated);
+    return () => window.removeEventListener("photoUpdated", handlePhotoUpdated);
   }, []);
 
   // Error state for validation
@@ -888,6 +991,8 @@ const Sidebar = () => {
       } else {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
+    } else {
+      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
@@ -905,6 +1010,8 @@ const Sidebar = () => {
       } else {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
+    } else {
+      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
@@ -1027,7 +1134,7 @@ const Sidebar = () => {
           emailId,
           emailDomain,
           vision: profile.vision || "",
-          phoneComment: profile.contact_available || "",
+          phoneComment: profile.contact_available || DEFAULT_PHONE_COMMENT,
         }));
       }
     } catch (error) {
@@ -1037,6 +1144,11 @@ const Sidebar = () => {
 
   // 프로필 수정 버튼 클릭 핸들러
   const handleEditButtonClick = async () => {
+    if (demoMode) {
+      setIsEditModalOpen(true);
+      return;
+    }
+
     if (!session) {
       alert("로그인이 필요합니다.");
       return;
@@ -1059,16 +1171,16 @@ const Sidebar = () => {
 
   // 모달 필드 네비게이션: Enter로 다음 필드 이동
   const navigateToNextField = (currentNavIndex: number) => {
-    const allNav = Array.from(document.querySelectorAll('[data-nav-index]')) as HTMLElement[];
-    const sorted = allNav.sort((a, b) => Number(a.getAttribute('data-nav-index')) - Number(b.getAttribute('data-nav-index')));
-    const currentPos = sorted.findIndex((el) => Number(el.getAttribute('data-nav-index')) === currentNavIndex);
+    const allNav = Array.from(document.querySelectorAll("[data-nav-index]")) as HTMLElement[];
+    const sorted = allNav.sort((a, b) => Number(a.getAttribute("data-nav-index")) - Number(b.getAttribute("data-nav-index")));
+    const currentPos = sorted.findIndex((el) => Number(el.getAttribute("data-nav-index")) === currentNavIndex);
     if (currentPos < 0 || currentPos >= sorted.length - 1) {
       const submitBtn = document.querySelector('.edit-modal-content button[type="submit"]') as HTMLButtonElement;
       if (submitBtn) submitBtn.click();
       return;
     }
     const next = sorted[currentPos + 1];
-    const dropdownName = next.getAttribute('data-nav-dropdown');
+    const dropdownName = next.getAttribute("data-nav-dropdown");
     if (dropdownName) {
       setOpenDropdown(dropdownName);
       next.focus();
@@ -1078,11 +1190,11 @@ const Sidebar = () => {
   };
 
   const handleEnterKeyNavigation = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key !== 'Enter') return;
+    if (e.key !== "Enter") return;
     e.preventDefault();
     const el = e.currentTarget as HTMLElement;
-    const navIndex = Number(el.getAttribute('data-nav-index'));
-    const dropdownName = el.getAttribute('data-nav-dropdown');
+    const navIndex = Number(el.getAttribute("data-nav-index"));
+    const dropdownName = el.getAttribute("data-nav-dropdown");
     if (dropdownName) {
       setOpenDropdown(dropdownName);
     } else {
@@ -1092,6 +1204,12 @@ const Sidebar = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (demoMode) {
+      alert("저장되었습니다.");
+      setIsEditModalOpen(false);
+      return;
+    }
 
     const missingFields = validateForm();
 
@@ -1350,7 +1468,7 @@ const Sidebar = () => {
       // 배지 데이터는 실제 API 데이터 사용 (hasBadgeData가 true인 경우)
       animateNumber(setBadge1, hasBadgeData ? badgeData.stars : currentStats.badge1, 1000), // 별 (단감)
       animateNumber(setBadge2, hasBadgeData ? badgeData.shields : currentStats.badge2, 1000), // 방패 (인절미) - DB에서 이미 계산된 값
-      animateNumber(setBadge3, hasBadgeData ? badgeData.lightnings : currentStats.badge3, 1000), // 번개 (어흥) - 양수로 표시
+      animateNumber(setBadge3, hasBadgeData ? Math.abs(badgeData.lightnings || 0) : currentStats.badge3, 1000), // 번개 (어흥) - 양수로 표시
       animateNumber(setSkill1, currentStats.skill1, 1000),
       animateNumber(setSkill2, currentStats.skill2, 1000),
       animateNumber(setSkill3, currentStats.skill3, 1000),
@@ -1500,6 +1618,7 @@ const Sidebar = () => {
       />
       {/* 스케일된 카드 - 비율 유지하며 화면에 맞춤 */}
       <div
+        className="sidebar-card-shell"
         style={{
           // transform scale은 레이아웃 크기를 바꾸지 않기 때문에,
           // 확대(>1) 시에는 wrapper의 레이아웃 폭도 함께 늘려 "잘림"을 방지한다.
@@ -1513,17 +1632,18 @@ const Sidebar = () => {
         <div
           ref={cardRef}
           className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
-          style={{
-            position: "relative",
-            "--identity-tab-bg": `url('${tabBg.src}')`,
-            "--identity-tab-overlay": String(tabBg.overlay),
-            ...(isMobileView ? {} : { transform: `scale(${cardScale})`, transformOrigin: "top center" }),
-          } as React.CSSProperties}
+          style={
+            {
+              position: "relative",
+              "--identity-tab-bg": `url('${tabBg.src}')`,
+              "--identity-tab-overlay": String(tabBg.overlay),
+              ...(isMobileView ? {} : { transform: `scale(${cardScale})`, transformOrigin: "top center" }),
+            } as React.CSSProperties
+          }
         >
           {/* 프로필 수정 버튼: resume-card(고정 크기, position:relative) 기준 absolute 배치 — 콘텐츠 로딩/스크롤 무관 */}
-          {(
-            <button
-              onClick={isOwner ? handleEditButtonClick : undefined}
+          {/* <button
+              onClick={isOwner || demoMode ? handleEditButtonClick : undefined}
               style={{
                 position: "absolute",
                 top: "6px",
@@ -1536,16 +1656,60 @@ const Sidebar = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                cursor: isOwner ? "pointer" : "not-allowed",
+                cursor: isOwner || demoMode ? "pointer" : "not-allowed",
                 zIndex: 20,
                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                 padding: 0,
-                opacity: isOwner ? 1 : 0.4,
+                opacity: isOwner || demoMode ? 1 : 0.4,
               }}
             >
               <i className="ti ti-pencil" style={{ fontSize: "11px", color: "#000" }}></i>
-            </button>
-          )}
+            </button> */}
+          <div
+            onMouseEnter={() => setShowSearchTooltip(true)}
+            onMouseLeave={() => setShowSearchTooltip(false)}
+            style={{
+              position: "absolute",
+              top: "6px",
+              right: "18px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 20,
+              boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
+              overflow: "visible",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <i className="ti ti-search" style={{ fontSize: "11px", color: "#000" }}></i>
+            {showSearchTooltip && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: "0",
+                  background: "#222",
+                  color: "#fff",
+                  fontFamily: "'Pretendard', sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  whiteSpace: "nowrap" as const,
+                  zIndex: 1000,
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                  pointerEvents: "none" as const,
+                }}
+              >
+                등록된 도움말이 없습니다
+              </div>
+            )}
+          </div>
           {/* Header Section */}
           <div className="resume-header" style={{ position: "relative" }}>
             <div className="resume-photo" style={{ position: "relative" }}>
@@ -1623,7 +1787,21 @@ const Sidebar = () => {
               </button>
 
               <button
-                onClick={() => iconLink3 && window.open(iconLink3, "_blank")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const targetPath = '/cluster-3';
+                  const targetSection = 'cluster3-section3';
+                  // 이미 해당 페이지에 있고 section이 DOM에 있으면 바로 스크롤
+                  const section = document.querySelector('.' + targetSection);
+                  if (section) {
+                    const offset = 120;
+                    window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+                    return;
+                  }
+                  // 다른 페이지에 있으면 /cluster-3으로 이동 후 스크롤
+                  window.location.href = targetPath + '?scrollTo=' + targetSection;
+                }}
                 style={{
                   width: "24px",
                   height: "24px",
@@ -1664,7 +1842,7 @@ const Sidebar = () => {
                   <div className="resume-details">
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/User_01-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/User_01-px.png" : "/images/0/cluster 1/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
-                      <span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gender}{" "}
                         <Image
                           src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Gift-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Gift-px.png" : "/images/0/cluster 1/small icon/Gift.png"}
@@ -1679,11 +1857,11 @@ const Sidebar = () => {
                     </div>
                     <div className="detail-row">
                       <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
-                      <span>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || '') + ' ' + (currentProfile.district || ''))}
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || "") + " " + (currentProfile.district || ""))}
                       </span>
                     </div>
-                    <div className="detail-row">
+                    <div className="detail-row" style={{ overflow: "hidden" }}>
                       <Image
                         src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"}
                         alt=""
@@ -1692,7 +1870,8 @@ const Sidebar = () => {
                         className="detail-icon"
                       />
                       <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.phone}
+                        <span style={{ color: currentProfile.lightColor, flexShrink: 0 }}>·</span>
+                        {currentProfile.phone}
                         {isOwner && (
                           <span
                             onClick={async () => {
@@ -1703,13 +1882,14 @@ const Sidebar = () => {
                                 if (result.success && result.data) {
                                   setFormData((prev) => ({
                                     ...prev,
-                                    phoneComment: result.data.contact_available || "",
+                                    phoneComment: result.data.contact_available || DEFAULT_PHONE_COMMENT,
                                   }));
                                 }
                               } catch (error) {
                                 console.error("연락처 코멘트 로드 오류:", error);
                               }
                               setIsPhoneCommentModalOpen(true);
+                              setIsPhoneEditing(false);
                             }}
                             style={{
                               color: currentProfile.accentColor,
@@ -1717,6 +1897,7 @@ const Sidebar = () => {
                               fontWeight: "400",
                               lineHeight: "1",
                               cursor: "pointer",
+                              flexShrink: 0,
                             }}
                           >
                             +
@@ -1764,34 +1945,24 @@ const Sidebar = () => {
 
                     {/* 학과명 — 별도 줄 (피그마 시안: #FFEC8F, 14px, Pretendard 400, lineHeight 24) */}
                     <div className="detail-row">
-                      <span style={{ width: "16px" }}></span>
+                      <span className="detail-spacer"></span>
                       <span
+                        className="major-text"
                         onClick={(e) => {
                           e.stopPropagation();
                           setTooltipVisible(tooltipVisible === "major" ? null : "major");
                           setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
                         }}
-                        style={{
-                          color: "#FFEC8F",
-                          fontSize: "14px",
-                          fontFamily: "Pretendard, sans-serif",
-                          fontWeight: 400,
-                          lineHeight: "24px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span>{mask.major(currentProfile.major)}
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.major(currentProfile.major)}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, marginLeft: "5px" }}>
                           <path d="M8.33 6.67L11.67 10L8.33 13.33" stroke="#FFEC8F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
                     </div>
 
                     <div className="detail-row">
-                      <span style={{ width: "16px" }}></span>
+                      <span className="detail-spacer"></span>
                       <span className="sub-text" style={{ color: currentProfile.lightColor }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.period(currentProfile.enrollPeriod)}
                       </span>
@@ -1895,8 +2066,13 @@ const Sidebar = () => {
             <div className={`resume-medal ${crewStatus === "Complete" ? "no-overlay" : ""}`}>
               <div className="medal-image-wrapper">
                 <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={512} height={512} />
+                <span className="medal-week-num">{demoMode ? 12 : 0}</span>
               </div>
-              <div className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""}`}><span className="medal-text-inner">{crewStatus}</span></div>
+              <div
+                className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""} ${crewStatus === "Complete" ? "medal-complete" : crewStatus === "Running" ? "medal-running" : crewStatus === "On Rest" ? "medal-onrest" : crewStatus === "Recharging" ? "medal-recharging" : crewStatus === "Next Challenge" ? "medal-next" : ""}`}
+              >
+                <span className="medal-text-inner">{crewStatus}</span>
+              </div>
             </div>
           </div>
 
@@ -2073,16 +2249,12 @@ const Sidebar = () => {
               <div className="notice-box yellow">
                 <Image src="/images/0/cluster 1/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
                 <span className="notice-text notice-text-top">{debugPanelType === "EC" ? "전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레" : debugPanelType === "PX" ? "전국청춘연합 기획/컨설팅 클럽, 팔랑크스" : "전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐"}</span>
-                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>
-                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} />}
-                </div>
+                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>{crewStatus === "Complete" && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} />}</div>
               </div>
               <div className="notice-box green">
                 <Image src="/images/0/cluster 1/Star Badge2.png" alt="" width={25} height={25} className="notice-icon-img" />
                 <span className="notice-text">전국청춘성장 클럽- 기업/실무자 후원 관리 위원회</span>
-                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>
-                  {crewStatus === "Complete" && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} />}
-                </div>
+                <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>{crewStatus === "Complete" && <Image src="/images/0/cluster 1/실무기업 도장.png" alt="" width={46} height={46} />}</div>
               </div>
             </div>
           </div>
@@ -2106,22 +2278,16 @@ const Sidebar = () => {
             paddingTop: "20px",
           }}
         >
-          <div onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
+          <div className="edit-modal-content" onClick={(e) => e.stopPropagation()} style={{ position: "relative", borderRadius: 0 }}>
             <Image src="/images/0/cluster 1/card01.png" alt="Contact Info" width={540} height={150} style={{ display: "block" }} />
             {/* X 닫기 버튼 */}
             <button
+              className="modal-close-btn"
               onClick={() => setIsEditModalOpen(false)}
               style={{
                 position: "absolute",
                 top: "15px",
                 right: "15px",
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                fontSize: "20px",
-                cursor: "pointer",
-                padding: 0,
-                lineHeight: 1,
               }}
             >
               ×
@@ -2155,7 +2321,6 @@ const Sidebar = () => {
             <div
               className="edit-modal-content"
               style={{
-                backgroundColor: "#1a1d29",
                 border: "1px solid #FFA500",
                 boxShadow: "0 0 10px rgba(255, 165, 0, 0.15)",
                 width: "580px",
@@ -2189,13 +2354,15 @@ const Sidebar = () => {
               >
                 <div>
                   <h3 style={{ margin: 0 }}>프로필 수정</h3>
-                  <p className="modal-subtitle" style={{ marginTop: "6px", marginBottom: 0 }}>프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.</p>
+                  <p className="modal-subtitle" style={{ marginTop: "6px", marginBottom: 0 }}>
+                    프로필 정보를 수정하고 하단의 [작성완료]를 눌러 저장하세요.
+                  </p>
                 </div>
                 <button
                   type="button"
                   className="modal-close-btn"
                   onClick={() => {
-                    if (confirm('변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?')) {
+                    if (confirm("변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?")) {
                       setIsEditModalOpen(false);
                     }
                   }}
@@ -2209,186 +2376,191 @@ const Sidebar = () => {
                 </button>
               </div>
 
-
               <form onSubmit={handleSubmit}>
-              {/* 모달 본문 */}
-              <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px" }}>
-                {/* 성 & 이름 - 일렬 배치 */}
-                <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
-                  {/* 성 */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>성</label>
-                    <input
-                      className="modal-input chamfer-box"
-                      type="text"
-                      name="lastName"
-                      data-nav-index={1}
-                      value={formData.lastName}
-                      onChange={(e) => handleNameChange(e, "lastName", 2)}
-                      onKeyDown={handleEnterKeyNavigation}
-                      maxLength={2}
-                      placeholder="홍"
-                      style={{
-                        width: "100%",
-                        padding: "14px 16px",
-                        backgroundColor: "#252836",
-                        border: errors.lastName ? "1px solid #ff6b6b" : "1px solid transparent",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                    {errors.lastName && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.lastName}</span>}
+                {/* 모달 본문 */}
+                <div className="edit-modal-body" style={{ padding: "30px 32px 40px 40px", overflowY: "scroll" }}>
+                  {/* 성 & 이름 - 일렬 배치 */}
+                  <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
+                    {/* 성 */}
+                    <div style={{ flex: 1 }}>
+                      <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>성</label>
+                      <input
+                        className="modal-input chamfer-box"
+                        type="text"
+                        name="lastName"
+                        data-nav-index={1}
+                        value={formData.lastName}
+                        onChange={(e) => handleNameChange(e, "lastName", 2)}
+                        onKeyDown={handleEnterKeyNavigation}
+                        maxLength={2}
+                        placeholder="홍"
+                        style={{
+                          width: "100%",
+                          padding: "14px 16px",
+                          backgroundColor: "#252836",
+                          border: errors.lastName ? "1px solid #ff6b6b" : "1px solid transparent",
+                          borderRadius: "0",
+                          color: "#fff",
+                          fontSize: "14px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                      {errors.lastName && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.lastName}</span>}
+                    </div>
+
+                    {/* 이름 */}
+                    <div style={{ flex: 2 }}>
+                      <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>이름</label>
+                      <input
+                        className="modal-input chamfer-box"
+                        type="text"
+                        name="firstName"
+                        data-nav-index={2}
+                        value={formData.firstName}
+                        onChange={(e) => handleNameChange(e, "firstName", 5)}
+                        onKeyDown={handleEnterKeyNavigation}
+                        maxLength={5}
+                        placeholder="길동"
+                        style={{
+                          width: "100%",
+                          padding: "14px 16px",
+                          backgroundColor: "#252836",
+                          border: errors.firstName ? "1px solid #ff6b6b" : "1px solid transparent",
+                          borderRadius: "0",
+                          color: "#fff",
+                          fontSize: "14px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                      {errors.firstName && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.firstName}</span>}
+                    </div>
                   </div>
 
-                  {/* 이름 */}
-                  <div style={{ flex: 2 }}>
-                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>이름</label>
-                    <input
-                      className="modal-input chamfer-box"
-                      type="text"
-                      name="firstName"
-                      data-nav-index={2}
-                      value={formData.firstName}
-                      onChange={(e) => handleNameChange(e, "firstName", 5)}
-                      onKeyDown={handleEnterKeyNavigation}
-                      maxLength={5}
-                      placeholder="길동"
-                      style={{
-                        width: "100%",
-                        padding: "14px 16px",
-                        backgroundColor: "#252836",
-                        border: errors.firstName ? "1px solid #ff6b6b" : "1px solid transparent",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                    {errors.firstName && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.firstName}</span>}
-                  </div>
-                </div>
+                  {/* 영문 성 & 이름 - 일렬 배치 */}
+                  <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
+                    {/* 영문 성 */}
+                    <div style={{ flex: 1 }}>
+                      <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>영문 성</label>
+                      <input
+                        className="modal-input chamfer-box"
+                        type="text"
+                        name="lastNameEng"
+                        data-nav-index={3}
+                        value={formData.lastNameEng}
+                        onChange={(e) => handleEngNameChange(e, "lastNameEng", 20)}
+                        onKeyDown={handleEnterKeyNavigation}
+                        maxLength={20}
+                        placeholder="Hong"
+                        style={{
+                          width: "100%",
+                          padding: "14px 16px",
+                          backgroundColor: "#252836",
+                          border: errors.lastNameEng ? "1px solid #ff6b6b" : "1px solid transparent",
+                          borderRadius: "0",
+                          color: "#fff",
+                          fontSize: "14px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                      {errors.lastNameEng && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.lastNameEng}</span>}
+                    </div>
 
-                {/* 영문 성 & 이름 - 일렬 배치 */}
-                <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
-                  {/* 영문 성 */}
-                  <div style={{ flex: 1 }}>
-                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>영문 성</label>
-                    <input
-                      className="modal-input chamfer-box"
-                      type="text"
-                      name="lastNameEng"
-                      data-nav-index={3}
-                      value={formData.lastNameEng}
-                      onChange={(e) => handleEngNameChange(e, "lastNameEng", 20)}
-                      onKeyDown={handleEnterKeyNavigation}
-                      maxLength={20}
-                      placeholder="Hong"
-                      style={{
-                        width: "100%",
-                        padding: "14px 16px",
-                        backgroundColor: "#252836",
-                        border: errors.lastNameEng ? "1px solid #ff6b6b" : "1px solid transparent",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                    {errors.lastNameEng && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.lastNameEng}</span>}
+                    {/* 영문 이름 */}
+                    <div style={{ flex: 2 }}>
+                      <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>영문 이름</label>
+                      <input
+                        className="modal-input chamfer-box"
+                        type="text"
+                        name="firstNameEng"
+                        data-nav-index={4}
+                        value={formData.firstNameEng}
+                        onChange={(e) => handleEngNameChange(e, "firstNameEng", 30)}
+                        onKeyDown={handleEnterKeyNavigation}
+                        maxLength={30}
+                        placeholder="Gildong"
+                        style={{
+                          width: "100%",
+                          padding: "14px 16px",
+                          backgroundColor: "#252836",
+                          border: errors.firstNameEng ? "1px solid #ff6b6b" : "1px solid transparent",
+                          borderRadius: "0",
+                          color: "#fff",
+                          fontSize: "14px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                      {errors.firstNameEng && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.firstNameEng}</span>}
+                    </div>
                   </div>
 
-                  {/* 영문 이름 */}
-                  <div style={{ flex: 2 }}>
-                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>영문 이름</label>
-                    <input
-                      className="modal-input chamfer-box"
-                      type="text"
-                      name="firstNameEng"
-                      data-nav-index={4}
-                      value={formData.firstNameEng}
-                      onChange={(e) => handleEngNameChange(e, "firstNameEng", 30)}
-                      onKeyDown={handleEnterKeyNavigation}
-                      maxLength={30}
-                      placeholder="Gildong"
-                      style={{
-                        width: "100%",
-                        padding: "14px 16px",
-                        backgroundColor: "#252836",
-                        border: errors.firstNameEng ? "1px solid #ff6b6b" : "1px solid transparent",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                    {errors.firstNameEng && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{errors.firstNameEng}</span>}
+                  {/* 성별 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>성별</label>
+                    <div style={{ display: "flex", gap: "12px" }}>
+                      <button
+                        type="button"
+                        className="chamfer-box"
+                        data-nav-index={5}
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, gender: "male" }));
+                          setTimeout(() => navigateToNextField(5), 0);
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "14px 16px",
+                          backgroundColor: formData.gender === "male" ? "#FFA500" : "#252836",
+                          border: "1px solid transparent",
+                          borderRadius: "0",
+                          color: formData.gender === "male" ? "#1a1d29" : "#8a8d98",
+                          fontSize: "16px",
+                          fontWeight: formData.gender === "male" ? 600 : 500,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        남
+                      </button>
+                      <button
+                        type="button"
+                        className="chamfer-box"
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, gender: "female" }));
+                          setTimeout(() => navigateToNextField(5), 0);
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "14px 16px",
+                          backgroundColor: formData.gender === "female" ? "#FFA500" : "#252836",
+                          border: "1px solid transparent",
+                          borderRadius: "0",
+                          color: formData.gender === "female" ? "#1a1d29" : "#8a8d98",
+                          fontSize: "16px",
+                          fontWeight: formData.gender === "female" ? 600 : 500,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        여
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* 성별 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>성별</label>
-                  <div style={{ display: "flex", gap: "12px" }}>
-                    <button
-                      type="button"
-                      className="chamfer-box"
-                      data-nav-index={5}
-                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "male" })); setTimeout(() => navigateToNextField(5), 0); }}
-                      style={{
-                        flex: 1,
-                        padding: "14px 16px",
-                        backgroundColor: formData.gender === "male" ? "#FFA500" : "#252836",
-                        border: "1px solid transparent",
-                        borderRadius: "0",
-                        color: formData.gender === "male" ? "#1a1d29" : "#8a8d98",
-                        fontSize: "16px",
-                        fontWeight: formData.gender === "male" ? 600 : 500,
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      남
-                    </button>
-                    <button
-                      type="button"
-                      className="chamfer-box"
-                      onClick={() => { setFormData((prev) => ({ ...prev, gender: "female" })); setTimeout(() => navigateToNextField(5), 0); }}
-                      style={{
-                        flex: 1,
-                        padding: "14px 16px",
-                        backgroundColor: formData.gender === "female" ? "#FFA500" : "#252836",
-                        border: "1px solid transparent",
-                        borderRadius: "0",
-                        color: formData.gender === "female" ? "#1a1d29" : "#8a8d98",
-                        fontSize: "16px",
-                        fontWeight: formData.gender === "female" ? 600 : 500,
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      여
-                    </button>
-                  </div>
-                </div>
-
-                {/* 생년월일 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>생년월일</label>
-                  <style
-                    dangerouslySetInnerHTML={{
-                      __html: `
+                  {/* 생년월일 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>생년월일</label>
+                    <style
+                      dangerouslySetInnerHTML={{
+                        __html: `
                   .edit-modal-content {
                     font-family: 'Pretendard', sans-serif !important;
                   }
@@ -2396,18 +2568,22 @@ const Sidebar = () => {
                     font-family: 'Pretendard', sans-serif !important;
                   }
                   .edit-modal-body::-webkit-scrollbar {
-                    width: 8px;
+                    width: 1px;
                   }
                   .edit-modal-body::-webkit-scrollbar-track {
                     background: #252836;
-                    border-radius: 4px;
+                    border-radius: 2px;
                   }
                   .edit-modal-body::-webkit-scrollbar-thumb {
                     background: #FFA500;
-                    border-radius: 4px;
+                    border-radius: 2px;
                   }
                   .edit-modal-body::-webkit-scrollbar-thumb:hover {
                     background: #22c55e;
+                  }
+                  .edit-modal-body::-webkit-scrollbar-button {
+                    display: none;
+                    height: 0;
                   }
                   .custom-dropdown-list::-webkit-scrollbar {
                     width: 6px;
@@ -2421,907 +2597,916 @@ const Sidebar = () => {
                     border-radius: 3px;
                   }
                 `,
-                    }}
-                  />
-                  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                    {/* 년도 커스텀 드롭다운 */}
-                    <div style={{ flex: 1.2, position: "relative" }}>
-                      <div
-                        className="chamfer-box"
-                        tabIndex={0}
-                        data-nav-index={6}
-                        data-nav-dropdown="year"
-                        onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}
-                        style={{
-                          padding: "14px 12px",
-                          backgroundColor: "#252836",
-                          borderRadius: "0",
-                          color: formData.birthDate.split("-")[0] ? "#fff" : "#6b6e7a",
-                          fontSize: "14px",
-                          cursor: "pointer",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          border: openDropdown === "year" ? "1px solid #FFA500" : "1px solid transparent",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        <span>{formData.birthDate.split("-")[0] ? `${formData.birthDate.split("-")[0]}년` : "년"}</span>
-                        <span
-                          style={{
-                            transform: openDropdown === "year" ? "rotate(180deg)" : "rotate(0deg)",
-                            transition: "transform 0.2s ease",
-                            fontSize: "10px",
-                            color: "#8a8d98",
-                          }}
-                        >
-                          ▼
-                        </span>
-                      </div>
-                      {openDropdown === "year" && (
+                      }}
+                    />
+                    <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                      {/* 년도 커스텀 드롭다운 */}
+                      <div style={{ flex: 1.2, position: "relative" }}>
                         <div
-                          className="custom-dropdown-list"
+                          className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={6}
+                          data-nav-dropdown="year"
+                          onClick={() => setOpenDropdown(openDropdown === "year" ? null : "year")}
                           style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: 0,
-                            right: 0,
-                            marginTop: "4px",
-                            backgroundColor: "#1a1d29",
-                            borderRadius: "8px",
-                            border: "1px solid #333",
-                            maxHeight: "200px",
-                            overflowY: "auto",
-                            zIndex: 100,
-                            boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            padding: "14px 12px",
+                            backgroundColor: "#252836",
+                            borderRadius: "0",
+                            color: formData.birthDate.split("-")[0] ? "#fff" : "#6b6e7a",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            border: openDropdown === "year" ? "1px solid #FFA500" : "1px solid transparent",
+                            transition: "all 0.2s ease",
                           }}
                         >
-                          {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year, idx) => (
-                            <div
-                              key={year}
-                              onClick={() => {
-                                const month = formData.birthDate.split("-")[1] || "";
-                                const day = formData.birthDate.split("-")[2] || "";
-                                setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${day}` }));
-                                setOpenDropdown("month");
-                              }}
-                              style={{
-                                padding: "12px 14px",
-                                color: formData.birthDate.split("-")[0] === String(year) ? "#FFA500" : "#fff",
-                                backgroundColor: formData.birthDate.split("-")[0] === String(year) ? "rgba(255, 165, 0, 0.1)" : "transparent",
-                                cursor: "pointer",
-                                transition: "all 0.15s ease",
-                                borderBottom: "1px solid #252836",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                e.currentTarget.style.color = "#FFA500";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[0] === String(year) ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                e.currentTarget.style.color = formData.birthDate.split("-")[0] === String(year) ? "#FFA500" : "#fff";
-                              }}
-                            >
-                              {year}년
-                            </div>
-                          ))}
+                          <span>{formData.birthDate.split("-")[0] ? `${formData.birthDate.split("-")[0]}년` : "년"}</span>
+                          <span
+                            style={{
+                              transform: openDropdown === "year" ? "rotate(180deg)" : "rotate(0deg)",
+                              transition: "transform 0.2s ease",
+                              fontSize: "10px",
+                              color: "#8a8d98",
+                            }}
+                          >
+                            ▼
+                          </span>
                         </div>
-                      )}
-                    </div>
+                        {openDropdown === "year" && (
+                          <div
+                            className="custom-dropdown-list"
+                            style={{
+                              position: "absolute",
+                              top: "100%",
+                              left: 0,
+                              right: 0,
+                              marginTop: "4px",
+                              backgroundColor: "#1a1d29",
+                              borderRadius: "8px",
+                              border: "1px solid #333",
+                              maxHeight: "200px",
+                              overflowY: "auto",
+                              zIndex: 100,
+                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            {Array.from({ length: 56 }, (_, i) => 2025 - i).map((year, idx) => (
+                              <div
+                                key={year}
+                                onClick={() => {
+                                  const month = formData.birthDate.split("-")[1] || "";
+                                  const day = formData.birthDate.split("-")[2] || "";
+                                  setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${day}` }));
+                                  setOpenDropdown("month");
+                                }}
+                                style={{
+                                  padding: "12px 14px",
+                                  color: formData.birthDate.split("-")[0] === String(year) ? "#FFA500" : "#fff",
+                                  backgroundColor: formData.birthDate.split("-")[0] === String(year) ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                  borderBottom: "1px solid #252836",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                  e.currentTarget.style.color = "#FFA500";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[0] === String(year) ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                  e.currentTarget.style.color = formData.birthDate.split("-")[0] === String(year) ? "#FFA500" : "#fff";
+                                }}
+                              >
+                                {year}년
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    {/* 월 커스텀 드롭다운 */}
-                    <div style={{ flex: 1, position: "relative" }}>
-                      <div
-                        className="chamfer-box"
-                        tabIndex={0}
-                        data-nav-index={7}
-                        data-nav-dropdown="month"
-                        onClick={() => setOpenDropdown(openDropdown === "month" ? null : "month")}
-                        style={{
-                          padding: "14px 12px",
-                          backgroundColor: "#252836",
-                          borderRadius: "0",
-                          color: formData.birthDate.split("-")[1] ? "#fff" : "#6b6e7a",
-                          fontSize: "14px",
-                          cursor: "pointer",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          border: openDropdown === "month" ? "1px solid #FFA500" : "1px solid transparent",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        <span>{formData.birthDate.split("-")[1] ? `${parseInt(formData.birthDate.split("-")[1])}월` : "월"}</span>
-                        <span
-                          style={{
-                            transform: openDropdown === "month" ? "rotate(180deg)" : "rotate(0deg)",
-                            transition: "transform 0.2s ease",
-                            fontSize: "10px",
-                            color: "#8a8d98",
-                          }}
-                        >
-                          ▼
-                        </span>
-                      </div>
-                      {openDropdown === "month" && (
+                      {/* 월 커스텀 드롭다운 */}
+                      <div style={{ flex: 1, position: "relative" }}>
                         <div
-                          className="custom-dropdown-list"
+                          className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={7}
+                          data-nav-dropdown="month"
+                          onClick={() => setOpenDropdown(openDropdown === "month" ? null : "month")}
                           style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: 0,
-                            right: 0,
-                            marginTop: "4px",
-                            backgroundColor: "#1a1d29",
-                            borderRadius: "8px",
-                            border: "1px solid #333",
-                            maxHeight: "200px",
-                            overflowY: "auto",
-                            zIndex: 100,
-                            boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            padding: "14px 12px",
+                            backgroundColor: "#252836",
+                            borderRadius: "0",
+                            color: formData.birthDate.split("-")[1] ? "#fff" : "#6b6e7a",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            border: openDropdown === "month" ? "1px solid #FFA500" : "1px solid transparent",
+                            transition: "all 0.2s ease",
                           }}
                         >
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month, idx) => (
-                            <div
-                              key={month}
-                              onClick={() => {
-                                const year = formData.birthDate.split("-")[0] || "";
-                                const day = formData.birthDate.split("-")[2] || "";
-                                setFormData((prev) => ({ ...prev, birthDate: `${year}-${String(month).padStart(2, "0")}-${day}` }));
-                                setOpenDropdown("day");
-                              }}
-                              style={{
-                                padding: "12px 14px",
-                                color: formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "#FFA500" : "#fff",
-                                backgroundColor: formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent",
-                                cursor: "pointer",
-                                transition: "all 0.15s ease",
-                                borderBottom: "1px solid #252836",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                e.currentTarget.style.color = "#FFA500";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                e.currentTarget.style.color = formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "#FFA500" : "#fff";
-                              }}
-                            >
-                              {month}월
-                            </div>
-                          ))}
+                          <span>{formData.birthDate.split("-")[1] ? `${parseInt(formData.birthDate.split("-")[1])}월` : "월"}</span>
+                          <span
+                            style={{
+                              transform: openDropdown === "month" ? "rotate(180deg)" : "rotate(0deg)",
+                              transition: "transform 0.2s ease",
+                              fontSize: "10px",
+                              color: "#8a8d98",
+                            }}
+                          >
+                            ▼
+                          </span>
                         </div>
-                      )}
-                    </div>
+                        {openDropdown === "month" && (
+                          <div
+                            className="custom-dropdown-list"
+                            style={{
+                              position: "absolute",
+                              top: "100%",
+                              left: 0,
+                              right: 0,
+                              marginTop: "4px",
+                              backgroundColor: "#1a1d29",
+                              borderRadius: "8px",
+                              border: "1px solid #333",
+                              maxHeight: "200px",
+                              overflowY: "auto",
+                              zIndex: 100,
+                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((month, idx) => (
+                              <div
+                                key={month}
+                                onClick={() => {
+                                  const year = formData.birthDate.split("-")[0] || "";
+                                  const day = formData.birthDate.split("-")[2] || "";
+                                  setFormData((prev) => ({ ...prev, birthDate: `${year}-${String(month).padStart(2, "0")}-${day}` }));
+                                  setOpenDropdown("day");
+                                }}
+                                style={{
+                                  padding: "12px 14px",
+                                  color: formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "#FFA500" : "#fff",
+                                  backgroundColor: formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                  borderBottom: "1px solid #252836",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                  e.currentTarget.style.color = "#FFA500";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                  e.currentTarget.style.color = formData.birthDate.split("-")[1] === String(month).padStart(2, "0") ? "#FFA500" : "#fff";
+                                }}
+                              >
+                                {month}월
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    {/* 일 커스텀 드롭다운 */}
-                    <div style={{ flex: 1, position: "relative" }}>
-                      <div
-                        className="chamfer-box"
-                        tabIndex={0}
-                        data-nav-index={8}
-                        data-nav-dropdown="day"
-                        onClick={() => setOpenDropdown(openDropdown === "day" ? null : "day")}
-                        style={{
-                          padding: "14px 12px",
-                          backgroundColor: "#252836",
-                          borderRadius: "0",
-                          color: formData.birthDate.split("-")[2] ? "#fff" : "#6b6e7a",
-                          fontSize: "14px",
-                          cursor: "pointer",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          border: openDropdown === "day" ? "1px solid #FFA500" : "1px solid transparent",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        <span>{formData.birthDate.split("-")[2] ? `${parseInt(formData.birthDate.split("-")[2])}일` : "일"}</span>
-                        <span
-                          style={{
-                            transform: openDropdown === "day" ? "rotate(180deg)" : "rotate(0deg)",
-                            transition: "transform 0.2s ease",
-                            fontSize: "10px",
-                            color: "#8a8d98",
-                          }}
-                        >
-                          ▼
-                        </span>
-                      </div>
-                      {openDropdown === "day" && (
+                      {/* 일 커스텀 드롭다운 */}
+                      <div style={{ flex: 1, position: "relative" }}>
                         <div
-                          className="custom-dropdown-list"
+                          className="chamfer-box"
+                          tabIndex={0}
+                          data-nav-index={8}
+                          data-nav-dropdown="day"
+                          onClick={() => setOpenDropdown(openDropdown === "day" ? null : "day")}
                           style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: 0,
-                            right: 0,
-                            marginTop: "4px",
-                            backgroundColor: "#1a1d29",
-                            borderRadius: "8px",
-                            border: "1px solid #333",
-                            maxHeight: "200px",
-                            overflowY: "auto",
-                            zIndex: 100,
-                            boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            padding: "14px 12px",
+                            backgroundColor: "#252836",
+                            borderRadius: "0",
+                            color: formData.birthDate.split("-")[2] ? "#fff" : "#6b6e7a",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            border: openDropdown === "day" ? "1px solid #FFA500" : "1px solid transparent",
+                            transition: "all 0.2s ease",
                           }}
                         >
-                          {Array.from({ length: 31 }, (_, i) => i + 1).map((day, idx) => (
-                            <div
-                              key={day}
-                              onClick={() => {
-                                const year = formData.birthDate.split("-")[0] || "";
-                                const month = formData.birthDate.split("-")[1] || "";
-                                setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${String(day).padStart(2, "0")}` }));
-                                setOpenDropdown("city");
-                              }}
-                              style={{
-                                padding: "12px 14px",
-                                color: formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "#FFA500" : "#fff",
-                                backgroundColor: formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent",
-                                cursor: "pointer",
-                                transition: "all 0.15s ease",
-                                borderBottom: "1px solid #252836",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                e.currentTarget.style.color = "#FFA500";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                e.currentTarget.style.color = formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "#FFA500" : "#fff";
-                              }}
-                            >
-                              {day}일
-                            </div>
-                          ))}
+                          <span>{formData.birthDate.split("-")[2] ? `${parseInt(formData.birthDate.split("-")[2])}일` : "일"}</span>
+                          <span
+                            style={{
+                              transform: openDropdown === "day" ? "rotate(180deg)" : "rotate(0deg)",
+                              transition: "transform 0.2s ease",
+                              fontSize: "10px",
+                              color: "#8a8d98",
+                            }}
+                          >
+                            ▼
+                          </span>
                         </div>
-                      )}
+                        {openDropdown === "day" && (
+                          <div
+                            className="custom-dropdown-list"
+                            style={{
+                              position: "absolute",
+                              top: "100%",
+                              left: 0,
+                              right: 0,
+                              marginTop: "4px",
+                              backgroundColor: "#1a1d29",
+                              borderRadius: "8px",
+                              border: "1px solid #333",
+                              maxHeight: "200px",
+                              overflowY: "auto",
+                              zIndex: 100,
+                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((day, idx) => (
+                              <div
+                                key={day}
+                                onClick={() => {
+                                  const year = formData.birthDate.split("-")[0] || "";
+                                  const month = formData.birthDate.split("-")[1] || "";
+                                  setFormData((prev) => ({ ...prev, birthDate: `${year}-${month}-${String(day).padStart(2, "0")}` }));
+                                  setOpenDropdown("city");
+                                }}
+                                style={{
+                                  padding: "12px 14px",
+                                  color: formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "#FFA500" : "#fff",
+                                  backgroundColor: formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                  borderBottom: "1px solid #252836",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                  e.currentTarget.style.color = "#FFA500";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                  e.currentTarget.style.color = formData.birthDate.split("-")[2] === String(day).padStart(2, "0") ? "#FFA500" : "#fff";
+                                }}
+                              >
+                                {day}일
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 주소 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>주소</label>
-                  {!isCustomAddress ? (
-                    <div style={{ display: "flex", gap: "12px" }}>
-                      {/* 시/도 커스텀 드롭다운 */}
-                      <div style={{ flex: 1, position: "relative" }}>
-                        <div
-                          className="chamfer-box"
-                          tabIndex={0}
-                          data-nav-index={9}
-                          data-nav-dropdown="city"
-                          onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
-                          style={{
-                            padding: "14px 12px",
-                            backgroundColor: "#252836",
-                            borderRadius: "0",
-                            color: formData.addressCity ? "#fff" : "#6b6e7a",
-                            fontSize: "14px",
-                            cursor: "pointer",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            border: openDropdown === "city" ? "1px solid #FFA500" : "1px solid transparent",
-                            transition: "all 0.2s ease",
-                          }}
-                        >
-                          <span>{formData.addressCity || "시/도 선택"}</span>
-                          <span
-                            style={{
-                              transform: openDropdown === "city" ? "rotate(180deg)" : "rotate(0deg)",
-                              transition: "transform 0.2s ease",
-                              fontSize: "10px",
-                              color: "#8a8d98",
-                            }}
-                          >
-                            ▼
-                          </span>
-                        </div>
-                        {openDropdown === "city" && (
+                  {/* 주소 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>주소</label>
+                    {!isCustomAddress ? (
+                      <div style={{ display: "flex", gap: "12px" }}>
+                        {/* 시/도 커스텀 드롭다운 */}
+                        <div style={{ flex: 1, position: "relative" }}>
                           <div
-                            className="custom-dropdown-list"
+                            className="chamfer-box"
+                            tabIndex={0}
+                            data-nav-index={9}
+                            data-nav-dropdown="city"
+                            onClick={() => setOpenDropdown(openDropdown === "city" ? null : "city")}
                             style={{
-                              position: "absolute",
-                              top: "100%",
-                              left: 0,
-                              right: 0,
-                              marginTop: "4px",
-                              backgroundColor: "#1a1d29",
-                              borderRadius: "8px",
-                              border: "1px solid #333",
-                              maxHeight: "200px",
-                              overflowY: "auto",
-                              zIndex: 100,
-                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                              padding: "14px 12px",
+                              backgroundColor: "#252836",
+                              borderRadius: "0",
+                              color: formData.addressCity ? "#fff" : "#6b6e7a",
+                              fontSize: "14px",
+                              cursor: "pointer",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              border: openDropdown === "city" ? "1px solid #FFA500" : "1px solid transparent",
+                              transition: "all 0.2s ease",
                             }}
                           >
-                            {Object.keys(koreaRegions).map((city, idx) => (
-                              <div
-                                key={city}
-                                onClick={() => {
-                                  setFormData((prev) => ({ ...prev, addressCity: city, addressDistrict: "" }));
-                                  setOpenDropdown("district");
-                                }}
-                                style={{
-                                  padding: "12px 14px",
-                                  color: formData.addressCity === city ? "#FFA500" : "#fff",
-                                  backgroundColor: formData.addressCity === city ? "rgba(255, 165, 0, 0.1)" : "transparent",
-                                  cursor: "pointer",
-                                  transition: "all 0.15s ease",
-                                  borderBottom: "1px solid #252836",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                  e.currentTarget.style.color = "#FFA500";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = formData.addressCity === city ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                  e.currentTarget.style.color = formData.addressCity === city ? "#FFA500" : "#fff";
-                                }}
-                              >
-                                {city}
-                              </div>
-                            ))}
-                            {/* 직접 입력 옵션 */}
-                            <div
-                              onClick={() => {
-                                setIsCustomAddress(true);
-                                setFormData((prev) => ({ ...prev, addressCity: "", addressDistrict: "" }));
-                                setOpenDropdown(null);
-                              }}
+                            <span>{formData.addressCity || "시/도 선택"}</span>
+                            <span
                               style={{
-                                padding: "12px 14px",
-                                color: "#FFA500",
-                                backgroundColor: "transparent",
-                                cursor: "pointer",
-                                transition: "all 0.15s ease",
-                                borderTop: "2px solid #333",
-                                fontWeight: 500,
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "transparent";
+                                transform: openDropdown === "city" ? "rotate(180deg)" : "rotate(0deg)",
+                                transition: "transform 0.2s ease",
+                                fontSize: "10px",
+                                color: "#8a8d98",
                               }}
                             >
-                              직접 입력
-                            </div>
+                              ▼
+                            </span>
                           </div>
-                        )}
-                      </div>
-
-                      {/* 구/군 커스텀 드롭다운 */}
-                      <div style={{ flex: 1, position: "relative" }}>
-                        <div
-                          className="chamfer-box"
-                          tabIndex={0}
-                          data-nav-index={10}
-                          data-nav-dropdown="district"
-                          onClick={() => {
-                            if (formData.addressCity) {
-                              setOpenDropdown(openDropdown === "district" ? null : "district");
-                            }
-                          }}
-                          style={{
-                            padding: "14px 12px",
-                            backgroundColor: "#252836",
-                            borderRadius: "0",
-                            color: formData.addressDistrict ? "#fff" : "#6b6e7a",
-                            fontSize: "14px",
-                            cursor: formData.addressCity ? "pointer" : "not-allowed",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            border: openDropdown === "district" ? "1px solid #FFA500" : "1px solid transparent",
-                            transition: "all 0.2s ease",
-                            opacity: formData.addressCity ? 1 : 0.6,
-                          }}
-                        >
-                          <span>{formData.addressDistrict || "구/군 선택"}</span>
-                          <span
-                            style={{
-                              transform: openDropdown === "district" ? "rotate(180deg)" : "rotate(0deg)",
-                              transition: "transform 0.2s ease",
-                              fontSize: "10px",
-                              color: "#8a8d98",
-                            }}
-                          >
-                            ▼
-                          </span>
-                        </div>
-                        {openDropdown === "district" && formData.addressCity && (
-                          <div
-                            className="custom-dropdown-list"
-                            style={{
-                              position: "absolute",
-                              top: "100%",
-                              left: 0,
-                              right: 0,
-                              marginTop: "4px",
-                              backgroundColor: "#1a1d29",
-                              borderRadius: "8px",
-                              border: "1px solid #333",
-                              maxHeight: "200px",
-                              overflowY: "auto",
-                              zIndex: 100,
-                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-                            }}
-                          >
-                            {koreaRegions[formData.addressCity]?.map((district, idx) => (
+                          {openDropdown === "city" && (
+                            <div
+                              className="custom-dropdown-list"
+                              style={{
+                                position: "absolute",
+                                top: "100%",
+                                left: 0,
+                                right: 0,
+                                marginTop: "4px",
+                                backgroundColor: "#1a1d29",
+                                borderRadius: "8px",
+                                border: "1px solid #333",
+                                maxHeight: "200px",
+                                overflowY: "auto",
+                                zIndex: 100,
+                                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                              }}
+                            >
+                              {Object.keys(koreaRegions).map((city, idx) => (
+                                <div
+                                  key={city}
+                                  onClick={() => {
+                                    setFormData((prev) => ({ ...prev, addressCity: city, addressDistrict: "" }));
+                                    setOpenDropdown("district");
+                                  }}
+                                  style={{
+                                    padding: "12px 14px",
+                                    color: formData.addressCity === city ? "#FFA500" : "#fff",
+                                    backgroundColor: formData.addressCity === city ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                    cursor: "pointer",
+                                    transition: "all 0.15s ease",
+                                    borderBottom: "1px solid #252836",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                    e.currentTarget.style.color = "#FFA500";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = formData.addressCity === city ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                    e.currentTarget.style.color = formData.addressCity === city ? "#FFA500" : "#fff";
+                                  }}
+                                >
+                                  {city}
+                                </div>
+                              ))}
+                              {/* 직접 입력 옵션 */}
                               <div
-                                key={district}
                                 onClick={() => {
-                                  setFormData((prev) => ({ ...prev, addressDistrict: district }));
+                                  setIsCustomAddress(true);
+                                  setFormData((prev) => ({ ...prev, addressCity: "", addressDistrict: "" }));
                                   setOpenDropdown(null);
-                                  setTimeout(() => navigateToNextField(10), 0);
                                 }}
                                 style={{
                                   padding: "12px 14px",
-                                  color: formData.addressDistrict === district ? "#FFA500" : "#fff",
-                                  backgroundColor: formData.addressDistrict === district ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                  color: "#FFA500",
+                                  backgroundColor: "transparent",
                                   cursor: "pointer",
                                   transition: "all 0.15s ease",
-                                  borderBottom: "1px solid #252836",
+                                  borderTop: "2px solid #333",
+                                  fontWeight: 500,
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                  e.currentTarget.style.color = "#FFA500";
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = formData.addressDistrict === district ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                  e.currentTarget.style.color = formData.addressDistrict === district ? "#FFA500" : "#fff";
+                                  e.currentTarget.style.backgroundColor = "transparent";
                                 }}
                               >
-                                {district}
+                                직접 입력
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    /* 직접 입력 모드 */
-                    <div>
-                      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                        <input
-                          className="modal-input chamfer-box"
-                          type="text"
-                          name="customAddress"
-                          data-nav-index={9}
-                          value={formData.customAddress}
-                          onChange={handleInputChange}
-                          onKeyDown={handleEnterKeyNavigation}
-                          placeholder="해외 또는 기타 주소를 입력해주세요 (예: 미국 캘리포니아, 독도)"
-                          style={{
-                            flex: 1,
-                            padding: "14px 16px",
-                            backgroundColor: "#252836",
-                            border: "1px solid #FFB84D",
-                            borderRadius: "0",
-                            color: "#fff",
-                            fontSize: "14px",
-                            outline: "none",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="chamfer-box"
-                          onClick={() => {
-                            setIsCustomAddress(false);
-                            setFormData((prev) => ({ ...prev, customAddress: "" }));
-                          }}
-                          style={{
-                            padding: "14px 16px",
-                            backgroundColor: "#252836",
-                            border: "1px solid #555",
-                            borderRadius: "0",
-                            color: "#8a8d98",
-                            fontSize: "14px",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "#FFA500";
-                            e.currentTarget.style.color = "#FFA500";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#555";
-                            e.currentTarget.style.color = "#8a8d98";
-                          }}
-                        >
-                          목록에서 선택
-                        </button>
-                      </div>
-                      <span style={{ color: "#8a8d98", fontSize: "12px", marginTop: "8px", display: "block" }}>해외 거주자 또는 특수 지역 거주자는 주소를 직접 입력해주세요.</span>
-                    </div>
-                  )}
-                </div>
+                            </div>
+                          )}
+                        </div>
 
-                {/* 핸드폰 번호 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>핸드폰 번호</label>
-                  <style
-                    dangerouslySetInnerHTML={{
-                      __html: `
+                        {/* 구/군 커스텀 드롭다운 */}
+                        <div style={{ flex: 1, position: "relative" }}>
+                          <div
+                            className="chamfer-box"
+                            tabIndex={0}
+                            data-nav-index={10}
+                            data-nav-dropdown="district"
+                            onClick={() => {
+                              if (formData.addressCity) {
+                                setOpenDropdown(openDropdown === "district" ? null : "district");
+                              }
+                            }}
+                            style={{
+                              padding: "14px 12px",
+                              backgroundColor: "#252836",
+                              borderRadius: "0",
+                              color: formData.addressDistrict ? "#fff" : "#6b6e7a",
+                              fontSize: "14px",
+                              cursor: formData.addressCity ? "pointer" : "not-allowed",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              border: openDropdown === "district" ? "1px solid #FFA500" : "1px solid transparent",
+                              transition: "all 0.2s ease",
+                              opacity: formData.addressCity ? 1 : 0.6,
+                            }}
+                          >
+                            <span>{formData.addressDistrict || "구/군 선택"}</span>
+                            <span
+                              style={{
+                                transform: openDropdown === "district" ? "rotate(180deg)" : "rotate(0deg)",
+                                transition: "transform 0.2s ease",
+                                fontSize: "10px",
+                                color: "#8a8d98",
+                              }}
+                            >
+                              ▼
+                            </span>
+                          </div>
+                          {openDropdown === "district" && formData.addressCity && (
+                            <div
+                              className="custom-dropdown-list"
+                              style={{
+                                position: "absolute",
+                                top: "100%",
+                                left: 0,
+                                right: 0,
+                                marginTop: "4px",
+                                backgroundColor: "#1a1d29",
+                                borderRadius: "8px",
+                                border: "1px solid #333",
+                                maxHeight: "200px",
+                                overflowY: "auto",
+                                zIndex: 100,
+                                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                              }}
+                            >
+                              {koreaRegions[formData.addressCity]?.map((district, idx) => (
+                                <div
+                                  key={district}
+                                  onClick={() => {
+                                    setFormData((prev) => ({ ...prev, addressDistrict: district }));
+                                    setOpenDropdown(null);
+                                    setTimeout(() => navigateToNextField(10), 0);
+                                  }}
+                                  style={{
+                                    padding: "12px 14px",
+                                    color: formData.addressDistrict === district ? "#FFA500" : "#fff",
+                                    backgroundColor: formData.addressDistrict === district ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                    cursor: "pointer",
+                                    transition: "all 0.15s ease",
+                                    borderBottom: "1px solid #252836",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                    e.currentTarget.style.color = "#FFA500";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = formData.addressDistrict === district ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                    e.currentTarget.style.color = formData.addressDistrict === district ? "#FFA500" : "#fff";
+                                  }}
+                                >
+                                  {district}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      /* 직접 입력 모드 */
+                      <div>
+                        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                          <input
+                            className="modal-input chamfer-box"
+                            type="text"
+                            name="customAddress"
+                            data-nav-index={9}
+                            value={formData.customAddress}
+                            onChange={handleInputChange}
+                            onKeyDown={handleEnterKeyNavigation}
+                            placeholder="해외 또는 기타 주소를 입력해주세요 (예: 미국 캘리포니아, 독도)"
+                            style={{
+                              flex: 1,
+                              padding: "14px 16px",
+                              backgroundColor: "#252836",
+                              border: "1px solid #FFB84D",
+                              borderRadius: "0",
+                              color: "#fff",
+                              fontSize: "14px",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="chamfer-box"
+                            onClick={() => {
+                              setIsCustomAddress(false);
+                              setFormData((prev) => ({ ...prev, customAddress: "" }));
+                            }}
+                            style={{
+                              padding: "14px 16px",
+                              backgroundColor: "#252836",
+                              border: "1px solid #555",
+                              borderRadius: "0",
+                              color: "#8a8d98",
+                              fontSize: "14px",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = "#FFA500";
+                              e.currentTarget.style.color = "#FFA500";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = "#555";
+                              e.currentTarget.style.color = "#8a8d98";
+                            }}
+                          >
+                            목록에서 선택
+                          </button>
+                        </div>
+                        <span style={{ color: "#8a8d98", fontSize: "12px", marginTop: "8px", display: "block" }}>해외 거주자 또는 특수 지역 거주자는 주소를 직접 입력해주세요.</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 핸드폰 번호 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>핸드폰 번호</label>
+                    <style
+                      dangerouslySetInnerHTML={{
+                        __html: `
                   .phone-input::placeholder {
                     color: #6b6e7a;
                   }
                 `,
-                    }}
-                  />
-                  {(() => {
-                    const phoneMid = formData.phone.split("-")[0] || "";
-                    const phoneLast = formData.phone.split("-")[1] || "";
-                    return (
-                      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                        {/* 010 고정 */}
-                        <div
-                          className="chamfer-box"
-                          style={{
-                            width: "70px",
-                            flexShrink: 0,
-                            padding: "14px 16px",
-                            backgroundColor: "#1a1d29",
-                            border: "1px solid #333",
-                            borderRadius: "0",
-                            color: "#fff",
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            textAlign: "center",
-                          }}
-                        >
-                          010
-                        </div>
-                        <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>-</span>
-                        {/* 중간 4자리 */}
-                        <input
-                          type="text"
-                          name="phoneMid"
-                          className="phone-input modal-input chamfer-box"
-                          data-nav-index={11}
-                          value={phoneMid}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
-                            setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
-                          }}
-                          onKeyDown={handleEnterKeyNavigation}
-                          maxLength={4}
-                          placeholder="0000"
-                          style={{
-                            width: "100px",
-                            flexShrink: 0,
-                            padding: "14px 16px",
-                            backgroundColor: "#252836",
-                            border: "1px solid transparent",
-                            borderRadius: "0",
-                            color: "#fff",
-                            fontSize: "14px",
-                            outline: "none",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                        <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>-</span>
-                        {/* 마지막 4자리 */}
-                        <input
-                          type="text"
-                          name="phoneLast"
-                          className="phone-input modal-input chamfer-box"
-                          data-nav-index={12}
-                          value={phoneLast}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
-                            setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
-                          }}
-                          onKeyDown={handleEnterKeyNavigation}
-                          maxLength={4}
-                          placeholder="0000"
-                          style={{
-                            width: "100px",
-                            flexShrink: 0,
-                            padding: "14px 16px",
-                            backgroundColor: "#252836",
-                            border: "1px solid transparent",
-                            borderRadius: "0",
-                            color: "#fff",
-                            fontSize: "14px",
-                            outline: "none",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* 이메일 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>이메일</label>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    {/* 이메일 아이디 입력 */}
-                    <input
-                      className="modal-input chamfer-box"
-                      type="text"
-                      name="emailId"
-                      data-nav-index={13}
-                      value={formData.emailId}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setFormData((prev) => ({ ...prev, emailId: value }));
-
-                        // 이메일 아이디 형식 검증 (영문, 숫자, ., _, - 만 허용)
-                        const emailIdRegex = /^[a-zA-Z0-9._-]*$/;
-                        if (value && !emailIdRegex.test(value)) {
-                          setErrors((prev) => ({ ...prev, email: "이메일 아이디는 영문, 숫자, ., _, - 만 사용 가능합니다" }));
-                        } else if (value && value.length < 2) {
-                          setErrors((prev) => ({ ...prev, email: "이메일 아이디는 2자 이상 입력해주세요" }));
-                        } else {
-                          setErrors((prev) => ({ ...prev, email: "" }));
-                        }
-                      }}
-                      onKeyDown={handleEnterKeyNavigation}
-                      placeholder="example"
-                      style={{
-                        flex: 1,
-                        padding: "14px 16px",
-                        backgroundColor: "#252836",
-                        border: errors.email ? "1px solid #ff6b6b" : "1px solid transparent",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                        boxSizing: "border-box",
-                        clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%)",
                       }}
                     />
-                    <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>@</span>
-                    {/* 이메일 도메인 드롭다운 또는 직접 입력 */}
-                    {!isCustomEmailDomain ? (
-                      <div style={{ flex: 1, position: "relative" }}>
-                        <div
-                          className="chamfer-box"
-                          tabIndex={0}
-                          data-nav-index={14}
-                          data-nav-dropdown="emailDomain"
-                          onClick={() => setOpenDropdown(openDropdown === "emailDomain" ? null : "emailDomain")}
-                          style={{
-                            padding: "14px 12px",
-                            backgroundColor: "#252836",
-                            borderRadius: "0",
-                            color: formData.emailDomain ? "#fff" : "#6b6e7a",
-                            fontSize: "14px",
-                            cursor: "pointer",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            border: openDropdown === "emailDomain" ? "1px solid #FFA500" : "1px solid transparent",
-                            transition: "all 0.2s ease",
-                          }}
-                        >
-                          <span>{formData.emailDomain || "선택"}</span>
-                          <span
-                            style={{
-                              transform: openDropdown === "emailDomain" ? "rotate(180deg)" : "rotate(0deg)",
-                              transition: "transform 0.2s ease",
-                              fontSize: "10px",
-                              color: "#8a8d98",
-                            }}
-                          >
-                            ▼
-                          </span>
-                        </div>
-                        {openDropdown === "emailDomain" && (
+                    {(() => {
+                      const phoneMid = formData.phone.split("-")[0] || "";
+                      const phoneLast = formData.phone.split("-")[1] || "";
+                      return (
+                        <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                          {/* 010 고정 */}
                           <div
-                            className="custom-dropdown-list"
+                            className="chamfer-box"
                             style={{
-                              position: "absolute",
-                              top: "100%",
-                              left: 0,
-                              right: 0,
-                              marginTop: "4px",
+                              width: "70px",
+                              flexShrink: 0,
+                              padding: "14px 16px",
                               backgroundColor: "#1a1d29",
-                              borderRadius: "8px",
                               border: "1px solid #333",
-                              maxHeight: "200px",
-                              overflowY: "auto",
-                              zIndex: 100,
-                              boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                              borderRadius: "0",
+                              color: "#fff",
+                              fontSize: "14px",
+                              fontWeight: 500,
+                              textAlign: "center",
                             }}
                           >
-                            {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain, idx) => (
-                              <div
-                                key={domain}
-                                onClick={() => {
-                                  setFormData((prev) => ({ ...prev, emailDomain: domain }));
-                                  setOpenDropdown(null);
-                                  setTimeout(() => navigateToNextField(14), 0);
-                                }}
-                                style={{
-                                  padding: "12px 14px",
-                                  color: formData.emailDomain === domain ? "#FFA500" : "#fff",
-                                  backgroundColor: formData.emailDomain === domain ? "rgba(255, 165, 0, 0.1)" : "transparent",
-                                  cursor: "pointer",
-                                  transition: "all 0.15s ease",
-                                  borderBottom: "1px solid #252836",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                                  e.currentTarget.style.color = "#FFA500";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = formData.emailDomain === domain ? "rgba(255, 165, 0, 0.1)" : "transparent";
-                                  e.currentTarget.style.color = formData.emailDomain === domain ? "#FFA500" : "#fff";
-                                }}
-                              >
-                                {domain}
-                              </div>
-                            ))}
-                            {/* 직접 입력 옵션 */}
-                            <div
-                              onClick={() => {
-                                setIsCustomEmailDomain(true);
-                                setFormData((prev) => ({ ...prev, emailDomain: "" }));
-                                setOpenDropdown(null);
-                              }}
-                              style={{
-                                padding: "12px 14px",
-                                color: "#FFA500",
-                                backgroundColor: "transparent",
-                                cursor: "pointer",
-                                transition: "all 0.15s ease",
-                                borderTop: "2px solid #333",
-                                fontWeight: 500,
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "transparent";
-                              }}
-                            >
-                              직접 입력
-                            </div>
+                            010
                           </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div style={{ flex: 1, display: "flex", gap: "8px", alignItems: "center" }}>
-                        <input
-                          className="modal-input chamfer-box"
-                          type="text"
-                          name="customEmailDomain"
-                          data-nav-index={14}
-                          value={formData.customEmailDomain}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^a-zA-Z0-9.-]/g, "");
-                            setFormData((prev) => ({ ...prev, customEmailDomain: value }));
-                          }}
-                          onKeyDown={handleEnterKeyNavigation}
-                          placeholder="domain.com"
-                          style={{
-                            flex: 1,
-                            padding: "14px 16px",
-                            backgroundColor: "#252836",
-                            border: "1px solid #FFB84D",
-                            borderRadius: "0",
-                            color: "#fff",
-                            fontSize: "14px",
-                            outline: "none",
-                            boxSizing: "border-box",
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="chamfer-box"
-                          onClick={() => {
-                            setIsCustomEmailDomain(false);
-                            setFormData((prev) => ({ ...prev, customEmailDomain: "" }));
-                          }}
-                          style={{
-                            padding: "14px 12px",
-                            backgroundColor: "#252836",
-                            border: "1px solid #555",
-                            borderRadius: "0",
-                            color: "#8a8d98",
-                            fontSize: "12px",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "#FFA500";
-                            e.currentTarget.style.color = "#FFA500";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#555";
-                            e.currentTarget.style.color = "#8a8d98";
-                          }}
-                        >
-                          목록
-                        </button>
-                      </div>
-                    )}
+                          <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>-</span>
+                          {/* 중간 4자리 */}
+                          <input
+                            type="text"
+                            name="phoneMid"
+                            className="phone-input modal-input chamfer-box"
+                            data-nav-index={11}
+                            value={phoneMid}
+                            onChange={(e) => {
+                              const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+                              const value = digitsOnly.slice(0, 4);
+                              if (digitsOnly.length > 4) {
+                                alert("최대 4자까지 입력할 수 있습니다.");
+                              }
+                              setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
+                            }}
+                            onKeyDown={handleEnterKeyNavigation}
+                            maxLength={4}
+                            placeholder="0000"
+                            style={{
+                              width: "100px",
+                              flexShrink: 0,
+                              padding: "14px 16px",
+                              backgroundColor: "#252836",
+                              border: "1px solid transparent",
+                              borderRadius: "0",
+                              color: "#fff",
+                              fontSize: "14px",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                          <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>-</span>
+                          {/* 마지막 4자리 */}
+                          <input
+                            type="text"
+                            name="phoneLast"
+                            className="phone-input modal-input chamfer-box"
+                            data-nav-index={12}
+                            value={phoneLast}
+                            onChange={(e) => {
+                              const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+                              const value = digitsOnly.slice(0, 4);
+                              if (digitsOnly.length > 4) {
+                                alert("최대 4자까지 입력할 수 있습니다.");
+                              }
+                              setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
+                            }}
+                            onKeyDown={handleEnterKeyNavigation}
+                            maxLength={4}
+                            placeholder="0000"
+                            style={{
+                              width: "100px",
+                              flexShrink: 0,
+                              padding: "14px 16px",
+                              backgroundColor: "#252836",
+                              border: "1px solid transparent",
+                              borderRadius: "0",
+                              color: "#fff",
+                              fontSize: "14px",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                        </div>
+                      );
+                    })()}
                   </div>
-                  {errors.email && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "8px", display: "block" }}>{errors.email}</span>}
-                </div>
 
-                {/* 비전 섹션 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>비전</label>
-                  <input
-                    className="modal-input chamfer-box"
-                    type="text"
-                    name="vision"
-                    data-nav-index={15}
-                    value={formData.vision}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 10) {
-                        setFormData((prev) => ({ ...prev, vision: e.target.value }));
-                      }
-                    }}
-                    onKeyDown={handleEnterKeyNavigation}
-                    placeholder="가고 싶은 기업/브랜드를 기재합니다. (ex.구글)"
-                    maxLength={10}
-                    style={{
-                      width: "100%",
-                      padding: "12px 16px",
-                      backgroundColor: "#252836",
-                      border: "1px solid transparent",
-                      borderRadius: "0",
-                      color: "#fff",
-                      fontSize: "14px",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                  <span style={{ color: "#8a8d98", fontSize: "11px", marginTop: "4px", display: "block" }}>{formData.vision.length}/10자 (공백 포함)</span>
-                </div>
-
-                {/* 연계 링크 */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>연계 링크</label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    <div>
-                      <label style={{ color: "#8a8d98", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <Image src="/images/0/cluster 1/003.png" alt="" width={16} height={16} />
-                        Portfolio Files
-                      </label>
+                  {/* 이메일 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>이메일</label>
+                    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                      {/* 이메일 아이디 입력 */}
                       <input
                         className="modal-input chamfer-box"
-                        type="url"
-                        data-nav-index={16}
-                        value={iconLink3}
-                        onChange={(e) => handleIconLinkChange(e.target.value, 3)}
+                        type="text"
+                        name="emailId"
+                        data-nav-index={13}
+                        value={formData.emailId}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData((prev) => ({ ...prev, emailId: value }));
+
+                          // 이메일 아이디 형식 검증 (영문, 숫자, ., _, - 만 허용)
+                          const emailIdRegex = /^[a-zA-Z0-9._-]*$/;
+                          if (value && !emailIdRegex.test(value)) {
+                            setErrors((prev) => ({ ...prev, email: "이메일 아이디는 영문, 숫자, ., _, - 만 사용 가능합니다" }));
+                          } else if (value && value.length < 2) {
+                            setErrors((prev) => ({ ...prev, email: "이메일 아이디는 2자 이상 입력해주세요" }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, email: "" }));
+                          }
+                        }}
                         onKeyDown={handleEnterKeyNavigation}
-                        placeholder="https://example.com"
+                        placeholder="example"
                         style={{
-                          width: "100%",
-                          padding: "12px 16px",
+                          flex: 1,
+                          padding: "14px 16px",
                           backgroundColor: "#252836",
-                          border: iconLinkErrors.link3 ? "1px solid #ff6b6b" : "1px solid transparent",
+                          border: errors.email ? "1px solid #ff6b6b" : "1px solid transparent",
                           borderRadius: "0",
                           color: "#fff",
                           fontSize: "14px",
                           outline: "none",
                           boxSizing: "border-box",
+                          clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%)",
                         }}
                       />
-                      {iconLinkErrors.link3 && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{iconLinkErrors.link3}</span>}
+                      <span style={{ color: "#555", fontSize: "16px", padding: "0 8px" }}>@</span>
+                      {/* 이메일 도메인 드롭다운 또는 직접 입력 */}
+                      {!isCustomEmailDomain ? (
+                        <div style={{ flex: 1, position: "relative" }}>
+                          <div
+                            className="chamfer-box"
+                            tabIndex={0}
+                            data-nav-index={14}
+                            data-nav-dropdown="emailDomain"
+                            onClick={() => setOpenDropdown(openDropdown === "emailDomain" ? null : "emailDomain")}
+                            style={{
+                              padding: "14px 12px",
+                              backgroundColor: "#252836",
+                              borderRadius: "0",
+                              color: formData.emailDomain ? "#fff" : "#6b6e7a",
+                              fontSize: "14px",
+                              cursor: "pointer",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              border: openDropdown === "emailDomain" ? "1px solid #FFA500" : "1px solid transparent",
+                              transition: "all 0.2s ease",
+                            }}
+                          >
+                            <span>{formData.emailDomain || "선택"}</span>
+                            <span
+                              style={{
+                                transform: openDropdown === "emailDomain" ? "rotate(180deg)" : "rotate(0deg)",
+                                transition: "transform 0.2s ease",
+                                fontSize: "10px",
+                                color: "#8a8d98",
+                              }}
+                            >
+                              ▼
+                            </span>
+                          </div>
+                          {openDropdown === "emailDomain" && (
+                            <div
+                              className="custom-dropdown-list"
+                              style={{
+                                position: "absolute",
+                                top: "100%",
+                                left: 0,
+                                right: 0,
+                                marginTop: "4px",
+                                backgroundColor: "#1a1d29",
+                                borderRadius: "8px",
+                                border: "1px solid #333",
+                                maxHeight: "200px",
+                                overflowY: "auto",
+                                zIndex: 100,
+                                boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+                              }}
+                            >
+                              {["naver.com", "gmail.com", "daum.net", "hanmail.net", "kakao.com", "nate.com", "outlook.com", "icloud.com"].map((domain, idx) => (
+                                <div
+                                  key={domain}
+                                  onClick={() => {
+                                    setFormData((prev) => ({ ...prev, emailDomain: domain }));
+                                    setOpenDropdown(null);
+                                    setTimeout(() => navigateToNextField(14), 0);
+                                  }}
+                                  style={{
+                                    padding: "12px 14px",
+                                    color: formData.emailDomain === domain ? "#FFA500" : "#fff",
+                                    backgroundColor: formData.emailDomain === domain ? "rgba(255, 165, 0, 0.1)" : "transparent",
+                                    cursor: "pointer",
+                                    transition: "all 0.15s ease",
+                                    borderBottom: "1px solid #252836",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                    e.currentTarget.style.color = "#FFA500";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = formData.emailDomain === domain ? "rgba(255, 165, 0, 0.1)" : "transparent";
+                                    e.currentTarget.style.color = formData.emailDomain === domain ? "#FFA500" : "#fff";
+                                  }}
+                                >
+                                  {domain}
+                                </div>
+                              ))}
+                              {/* 직접 입력 옵션 */}
+                              <div
+                                onClick={() => {
+                                  setIsCustomEmailDomain(true);
+                                  setFormData((prev) => ({ ...prev, emailDomain: "" }));
+                                  setOpenDropdown(null);
+                                }}
+                                style={{
+                                  padding: "12px 14px",
+                                  color: "#FFA500",
+                                  backgroundColor: "transparent",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                  borderTop: "2px solid #333",
+                                  fontWeight: 500,
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = "rgba(255, 165, 0, 0.15)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = "transparent";
+                                }}
+                              >
+                                직접 입력
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div style={{ flex: 1, display: "flex", gap: "8px", alignItems: "center" }}>
+                          <input
+                            className="modal-input chamfer-box"
+                            type="text"
+                            name="customEmailDomain"
+                            data-nav-index={14}
+                            value={formData.customEmailDomain}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^a-zA-Z0-9.-]/g, "");
+                              setFormData((prev) => ({ ...prev, customEmailDomain: value }));
+                            }}
+                            onKeyDown={handleEnterKeyNavigation}
+                            placeholder="domain.com"
+                            style={{
+                              flex: 1,
+                              padding: "14px 16px",
+                              backgroundColor: "#252836",
+                              border: "1px solid #FFB84D",
+                              borderRadius: "0",
+                              color: "#fff",
+                              fontSize: "14px",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="chamfer-box"
+                            onClick={() => {
+                              setIsCustomEmailDomain(false);
+                              setFormData((prev) => ({ ...prev, customEmailDomain: "" }));
+                            }}
+                            style={{
+                              padding: "14px 12px",
+                              backgroundColor: "#252836",
+                              border: "1px solid #555",
+                              borderRadius: "0",
+                              color: "#8a8d98",
+                              fontSize: "12px",
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = "#FFA500";
+                              e.currentTarget.style.color = "#FFA500";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = "#555";
+                              e.currentTarget.style.color = "#8a8d98";
+                            }}
+                          >
+                            목록
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {errors.email && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "8px", display: "block" }}>{errors.email}</span>}
+                  </div>
+
+                  {/* 비전 섹션 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>비전</label>
+                    <input
+                      className="modal-input chamfer-box"
+                      type="text"
+                      name="vision"
+                      data-nav-index={15}
+                      value={formData.vision}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 10) {
+                          setFormData((prev) => ({ ...prev, vision: e.target.value }));
+                        } else {
+                          alert("최대 10자까지 입력할 수 있습니다.");
+                        }
+                      }}
+                      onKeyDown={handleEnterKeyNavigation}
+                      placeholder="가고 싶은 기업/브랜드를 기재합니다. (ex.구글)"
+                      maxLength={10}
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        backgroundColor: "#252836",
+                        border: "1px solid transparent",
+                        borderRadius: "0",
+                        color: "#fff",
+                        fontSize: "14px",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                    <span style={{ color: "#8a8d98", fontSize: "11px", marginTop: "4px", display: "block" }}>{formData.vision.length}/10자 (공백 포함)</span>
+                  </div>
+
+                  {/* 연계 링크 */}
+                  <div style={{ marginBottom: "24px" }}>
+                    <label style={{ color: "#8a8d98", fontSize: "14px", display: "block", marginBottom: "10px" }}>연계 링크</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div>
+                        <label style={{ color: "#8a8d98", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                          <Image src="/images/0/cluster 1/003.png" alt="" width={16} height={16} />
+                          Portfolio Files
+                        </label>
+                        <input
+                          className="modal-input chamfer-box"
+                          type="url"
+                          data-nav-index={16}
+                          value={iconLink3}
+                          onChange={(e) => handleIconLinkChange(e.target.value, 3)}
+                          onKeyDown={handleEnterKeyNavigation}
+                          placeholder="https://example.com"
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            backgroundColor: "#252836",
+                            border: iconLinkErrors.link3 ? "1px solid #ff6b6b" : "1px solid transparent",
+                            borderRadius: "0",
+                            color: "#fff",
+                            fontSize: "14px",
+                            outline: "none",
+                            boxSizing: "border-box",
+                          }}
+                        />
+                        {iconLinkErrors.link3 && <span style={{ color: "#ff6b6b", fontSize: "12px", marginTop: "6px", display: "block" }}>{iconLinkErrors.link3}</span>}
+                      </div>
                     </div>
                   </div>
                 </div>
-
-              </div>
-              {/* 모달 푸터 */}
-              <div className="edit-modal-footer">
-                <style
-                  dangerouslySetInnerHTML={{
-                    __html: `
+                {/* 모달 푸터 */}
+                <div className="edit-modal-footer">
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: `
                 @font-face {
                   font-family: 'Cafe24Ohsquare';
                   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
@@ -3332,30 +3517,30 @@ const Sidebar = () => {
                   font-family: 'Cafe24Ohsquare', sans-serif !important;
                 }
               `,
-                  }}
-                />
-                <button
-                  type="submit"
-                  className="chamfer-box submit-btn-cafe"
-                  style={{
-                    width: "100%",
-                    padding: "16px",
-                    backgroundColor: "#FFA500",
-                    border: "none",
-                    borderRadius: "0",
-                    color: "#1a1d29",
-                    fontSize: "20px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    letterSpacing: "0.5px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  작성완료
-                </button>
-              </div>
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    className="chamfer-box submit-btn-cafe"
+                    style={{
+                      width: "100%",
+                      padding: "16px",
+                      backgroundColor: "#FFA500",
+                      border: "none",
+                      borderRadius: "0",
+                      color: "#1a1d29",
+                      fontSize: "20px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      letterSpacing: "0.5px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    작성완료
+                  </button>
+                </div>
               </form>
             </div>
           </div>,
@@ -3378,10 +3563,9 @@ const Sidebar = () => {
           }}
         >
           <div
+            className="edit-modal-content"
             onClick={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: "#1a1d29",
-              borderRadius: "0",
               padding: "24px",
               width: "90%",
               maxWidth: "480px",
@@ -3434,9 +3618,7 @@ const Sidebar = () => {
               }}
             >
               <p style={{ color: "#ffffff", fontSize: "16px", margin: 0, lineHeight: 1.6, fontFamily: "Pretendard, sans-serif", wordBreak: "keep-all" }}>
-                저는 평일 9~23시까지 언제든 연락이 가능합니다 :)
-                <br />
-                주말에는 10~24시까지 연락이 가능합니다. 수요일 5시는 어려워요!
+                {formData.phoneComment || "등록된 코멘트가 없습니다."}
               </p>
             </div>
           </div>
@@ -3444,157 +3626,169 @@ const Sidebar = () => {
       )}
       {/* 핸드폰 코멘트 모달 - 본인 프로필용 (입력 폼) */}
       {isPhoneCommentModalOpen && debugProfileType === "본인" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 2000,
-          }}
-        >
+        <div className="phone-comment-modal-overlay">
           <div
+            className="edit-modal-content"
+            data-modal="phone-comment"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: "#1a1d29",
-              borderRadius: "0",
-              padding: "24px",
-              width: "90%",
-              maxWidth: "480px",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
-              border: "1px solid #FFA500",
-            }}
           >
             {/* 헤더 */}
-            <div className="edit-modal-header" style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "8px", padding: 0 }}>
-              {/* 전화 아이콘 */}
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Image src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
+            <div className="edit-modal-header">
+              <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)}>
+                ✕
+              </button>
+
+              <div className="modal-header-top">
+                <Image className="modal-icon" src="/images/0/cluster 1/phone-only-dynamic-color.png" alt="phone" width={28} height={28} />
+                <h3>연락 가능 시간대</h3>
               </div>
-              <div>
-                <h3
-                  style={{
-                    margin: 0,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  연락이 가능한 시간대와 코멘트를 작성해 주세요 :)
-                </h3>
-                <p
-                  className="modal-subtitle"
-                  style={{
-                    margin: "2px 0 0 0",
-                  }}
-                >
-                  최대 70자까지 작성 가능합니다
+
+              <p className="modal-subtitle">
+                연락이 용이한 시간대 및 코멘트를 남겨주세요
+              </p>
+            </div>
+
+            <div className="edit-modal-body">
+              {isPhoneEditing ? (
+                <>
+                  <div className="phone-comment-counter">
+                    <span>최대 150자까지 작성 가능합니다.</span>
+                    <span className={formData.phoneComment.length > 150 ? "is-over-limit" : undefined}>
+                      {formData.phoneComment.length} / 150
+                    </span>
+                  </div>
+                  <textarea
+                    className="phone-comment-input"
+                    value={formData.phoneComment}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 150) {
+                        setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
+                      }
+                    }}
+                    placeholder="내용을 작성해 주세요."
+                    maxLength={150}
+                    rows={4}
+                  />
+                </>
+              ) : (
+                <p className="modal-content-text">
+                  {formData.phoneComment || "등록된 내용이 없습니다."}
                 </p>
+              )}
+            </div>
+
+            {/* 푸터 — Type B (2-row: 🔎+버튼 동일 y좌표 고정 + 안내문 하단) */}
+            <div className="edit-modal-footer">
+              <div className="modal-footer-top">
+                {/* 좌측: 🔎 notice-stamp */}
+                <div
+                  className="notice-stamp"
+                  onClick={() => setIsPhoneHelpModalOpen(true)}
+                  role="button"
+                  aria-label="도움말"
+                >
+                  🔎
+                </div>
+
+                {/* 우측: 버튼 그룹 */}
+                <div className="modal-footer-right">
+                  {!isPhoneEditing ? (
+                    <button
+                      type="button"
+                      className="modal-edit-btn"
+                      onClick={() => {
+                        phoneCommentSnapshot.current = formData.phoneComment;
+                        setIsPhoneEditing(true);
+                      }}
+                    >
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="modal-cancel-btn"
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, phoneComment: phoneCommentSnapshot.current }));
+                          setIsPhoneEditing(false);
+                        }}
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        className="modal-reset-btn"
+                        onClick={() => {
+                          if (window.confirm("입력한 내용을 초기화하시겠습니까?")) {
+                            setFormData((prev) => ({ ...prev, phoneComment: DEFAULT_PHONE_COMMENT }));
+                          }
+                        }}
+                      >
+                        초기화
+                      </button>
+                      <button
+                        type="button"
+                        className="modal-save-btn"
+                        onClick={async () => {
+                          if (!window.confirm("저장하시겠습니까?")) return;
+                          if (demoMode) {
+                            setIsPhoneEditing(false);
+                            setIsPhoneCommentModalOpen(false);
+                            return;
+                          }
+                          try {
+                            const response = await fetch("/api/profile/", {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ contact_available: formData.phoneComment || null }),
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                              setIsPhoneEditing(false);
+                              setIsPhoneCommentModalOpen(false);
+                            } else {
+                              alert("저장 실패: " + (result.error || "알 수 없는 오류"));
+                            }
+                          } catch (error) {
+                            console.error("연락처 코멘트 저장 오류:", error);
+                            alert("저장 중 오류가 발생했습니다.");
+                          }
+                        }}
+                      >
+                        저장
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 하단 row: 안내문 — visibility 토글로 공간 유지 (🔎/버튼 y좌표 고정) */}
+              <div className="modal-footer-bottom">
+                <span
+                  className="modal-notice"
+                  style={{ visibility: isPhoneEditing ? "visible" : "hidden" }}
+                >
+                  내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊
+                </span>
               </div>
             </div>
-
-            {/* 입력 필드 */}
-            <style
-              dangerouslySetInnerHTML={{
-                __html: `
-              .phone-comment-input::placeholder {
-                color: #999;
-              }
-            `,
-              }}
-            />
-            <div style={{ marginTop: "20px" }}>
-              <input
-                className="phone-comment-input"
-                type="text"
-                value={formData.phoneComment}
-                onChange={(e) => {
-                  if (e.target.value.length <= 70) {
-                    setFormData((prev) => ({ ...prev, phoneComment: e.target.value }));
-                  }
-                }}
-                placeholder="내용을 작성해 주세요."
-                maxLength={70}
-                style={{
-                  width: "100%",
-                  padding: "16px",
-                  backgroundColor: "#252836",
-                  border: "1px solid #333",
-                  borderRadius: "8px",
-                  color: "#fff",
-                  fontSize: "14px",
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-              />
+          </div>
+        </div>
+      )}
+      {/* 연락 가능 시간대 도움말 모달 */}
+      {isPhoneHelpModalOpen && (
+        <div className="help-modal-overlay" onClick={() => setIsPhoneHelpModalOpen(false)} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100vh", background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2001 }}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()} style={{ width: "1024px", maxWidth: "1024px", height: "794px", maxHeight: "794px", border: "1px solid #ffa500", display: "flex", flexDirection: "column" as const, overflow: "hidden", position: "relative" }}>
+            <div className="help-modal-header" style={{ height: "153px", minHeight: "153px", maxHeight: "153px", flexShrink: 0, boxSizing: "border-box" as const, display: "flex", flexDirection: "column" as const, padding: "20px 24px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)" }}>
+              <div className="modal-header-top" style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                <span style={{ fontSize: "20px" }}>🔎</span>
+                <h3 style={{ margin: 0, color: "#ffa500", fontSize: "2.0625rem", fontWeight: 700, flex: 1, marginLeft: "10px" }}>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setIsPhoneHelpModalOpen(false)} style={{ background: "transparent", border: "none", color: "#ffa500", fontSize: "20px", cursor: "pointer" }}>
+                  ✕
+                </button>
+              </div>
             </div>
-
-            {/* 작성 완료 버튼 */}
-            <style
-              dangerouslySetInnerHTML={{
-                __html: `
-              @font-face {
-                font-family: 'Cafe24Ohsquare';
-                src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
-                font-weight: normal;
-                font-style: normal;
-              }
-              .phone-modal-btn {
-                font-family: 'Cafe24Ohsquare', sans-serif !important;
-              }
-            `,
-              }}
-            />
-            <button
-              className="chamfer-box phone-modal-btn"
-              onClick={async () => {
-                try {
-                  const response = await fetch(apiUrl("/api/profile/"), {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ contact_available: formData.phoneComment || null }),
-                  });
-                  const result = await response.json();
-                  if (result.success) {
-                    setIsPhoneCommentModalOpen(false);
-                  } else {
-                    alert("저장 실패: " + (result.error || "알 수 없는 오류"));
-                  }
-                } catch (error) {
-                  console.error("연락처 코멘트 저장 오류:", error);
-                  alert("저장 중 오류가 발생했습니다.");
-                }
-              }}
-              style={{
-                width: "70%",
-                marginTop: "20px",
-                marginLeft: "auto",
-                marginRight: "auto",
-                display: "block",
-                padding: "12px 24px",
-                backgroundColor: "#FFA500",
-                border: "none",
-                color: "#000",
-                fontSize: "16px",
-                fontWeight: 600,
-                cursor: "pointer",
-                clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-              }}
-            >
-              작성 완료
-            </button>
+            <div className="help-modal-body" style={{ flex: 1, padding: "24px", overflowY: "auto" }}>{/* 빈 콘텐츠 — 추후 추가 */}</div>
           </div>
         </div>
       )}

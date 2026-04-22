@@ -32,6 +32,19 @@ const HomePageTwo = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      // 1920 미만 뷰포트 + zoom 미적용 상태에서는 fixed 전환하지 않음
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
+      if (zoom <= 1 && window.innerWidth < 1920) {
+        setSidebarStyle({
+          position: 'relative',
+          left: '',
+          top: '',
+          overflow: 'visible',
+          zIndex: 100,
+        });
+        return;
+      }
+
       const footer = document.querySelector('footer');
       if (!footer) return;
 

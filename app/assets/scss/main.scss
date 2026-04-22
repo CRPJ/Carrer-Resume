@@ -77,7 +77,7 @@
 // (moved) mobile-responsive는 가장 마지막에 로드 (오버라이드)
 
 // Google Fonts
-@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=block');
 
 // bootstrap five css
 @import "bootstrap/scss/bootstrap.scss";
@@ -87,6 +87,16 @@
 
 // tabler icons
 @import "@tabler/icons-webfont/dist/tabler-icons.min.css";
+
+// tabler icons font-display 오버라이드 — 로딩 전 'X' 깜빡임(FOMI) 방지
+@font-face {
+  font-family: "tabler-icons";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("~@tabler/icons-webfont/dist/fonts/tabler-icons.woff2") format("woff2"),
+       url("~@tabler/icons-webfont/dist/fonts/tabler-icons.woff") format("woff");
+}
 
 // ui range slider
 @import "@yaireo/ui-range/ui-range.css";

@@ -4,6 +4,8 @@ import Link from "next/link";
 import Animations from "@/components/shared/Animations";
 import Breadcrumb from "@/components/shared/Breadcrumb";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
+import { DEMO_CREW_MEMBERS } from "@/constants/dummyData";
 
 interface Crew {
   id: string;
@@ -39,6 +41,14 @@ const ITEMS_PER_PAGE = 50;
 
 const page = () => {
   const { mask } = useDataMasking();
+  const [demoMode, setDemoMode] = useState(false);
+  useEffect(() => { setDemoMode(checkDemoMode()); }, []);
+  const resolveHref = (crew: Crew) => {
+    if (demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)) {
+      return `/cluster-4?userId=${crew.id}&demoName=${encodeURIComponent(crew.name)}`;
+    }
+    return `/cluster-4?userId=${crew.id}`;
+  };
   const [crews, setCrews] = useState<Crew[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -491,47 +501,44 @@ const page = () => {
             <div className="col-12">
               <div className="trending-slider-wrapper">
                 {loading ? (
-                  <>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 'calc(100vh - 200px)',
+                  }}>
+                    <img
+                      src="/images/0/금장_OK.png"
+                      alt="로딩 중"
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        animation: 'crewsLively 2s ease-in-out infinite',
+                      }}
+                    />
+                    <p style={{
+                      marginTop: '16px',
+                      fontSize: '16px',
+                      fontWeight: 500,
+                      color: '#fff',
+                      fontFamily: "'Pretendard', sans-serif",
+                      animation: 'crewsPulse 1.5s ease-in-out infinite',
+                    }}>
+                      데이터를 열심히 불러오고 있어요…
+                    </p>
                     <style>{`
-                      @keyframes skeletonPulse {
-                        0%, 100% { opacity: 0.4; }
-                        50% { opacity: 0.8; }
+                      @keyframes crewsLively {
+                        0%, 100% { transform: translateY(0) scale(1); }
+                        50% { transform: translateY(-10px) scale(1.05); }
                       }
-                      .skeleton-card {
-                        border-radius: 12px;
-                        overflow: hidden;
-                        background: #1c242f;
-                        animation: skeletonPulse 1.4s ease-in-out infinite;
-                      }
-                      .skeleton-thumb {
-                        width: 100%;
-                        aspect-ratio: 1;
-                        background: linear-gradient(135deg, #1c242f 0%, #263040 50%, #1c242f 100%);
-                      }
-                      .skeleton-body { padding: 12px; }
-                      .skeleton-line {
-                        height: 12px;
-                        border-radius: 6px;
-                        background: #263040;
-                        margin-bottom: 8px;
+                      @keyframes crewsPulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.4; }
                       }
                     `}</style>
-                    <div
-                      style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}
-                      className="crews-grid"
-                    >
-                      {Array.from({ length: 12 }).map((_, i) => (
-                        <div key={i} className="skeleton-card" style={{ animationDelay: `${i * 0.08}s` }}>
-                          <div className="skeleton-thumb" />
-                          <div className="skeleton-body">
-                            <div className="skeleton-line" style={{ width: '60%' }} />
-                            <div className="skeleton-line" style={{ width: '40%' }} />
-                            <div className="skeleton-line" style={{ width: '50%' }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </>
+                  </div>
                 ) : filteredCrews.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa" }}>
                     조건에 맞는 크루가 없습니다.
@@ -559,7 +566,7 @@ const page = () => {
                     {paginatedCrews.map((crew) => (
                       <div key={crew.id} className="trending__single" style={{ height: "100%" }}>
                         <div className="thumb">
-                          <Link href={`/cluster-4?userId=${crew.id}`} style={{ aspectRatio: "1", overflow: "hidden", maxHeight: "none" }}>
+                          <Link href={resolveHref(crew)} style={{ aspectRatio: "1", overflow: "hidden", maxHeight: "none" }}>
                             {crew.profileImg ? (
                               <img
                                 src={crew.profileImg}
@@ -585,7 +592,7 @@ const page = () => {
                         <div className="content-wrapper">
                           <div className="info">
                             <p className="text-sm fw-6">
-                              <Link href={`/cluster-4?userId=${crew.id}`} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
+                              <Link href={resolveHref(crew)} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
                             </p>
                             <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={`${mask.school(crew.university)} ${mask.major(crew.major)}`}>
                               <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
@@ -595,7 +602,7 @@ const page = () => {
                           <div className="trending__single-footer">
                             <div className="author">
                               <div className="author-meta">
-                                <Link href={`/cluster-4?userId=${crew.id}`} aria-label="view profile" title="view profile">
+                                <Link href={resolveHref(crew)} aria-label="view profile" title="view profile">
                                   <span className="hexagon-wrapper">
                                     {crew.profileImg ? (
                                       <img
@@ -623,7 +630,7 @@ const page = () => {
                                   {crew.totalStars.toLocaleString()}{" "}
                                   <span className="currency">단감</span>
                                 </p>
-                                <Link href={`/cluster-4?userId=${crew.id}`} className="btn--primary text-sm">
+                                <Link href={resolveHref(crew)} className="btn--primary text-sm">
                                   Car
                                   <i className="ti ti-arrow-narrow-right"></i>
                                 </Link>

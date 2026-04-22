@@ -1432,6 +1432,25 @@ svg {
  Based on section1-modal reference (cluster2)
  ==== */
 
+// 0. 전역 모달 배경 공식 (intro-modal 기준)
+.intro-modal,
+.section1-modal,
+.section2-modal,
+.section21-modal,
+.section3-modal,
+.section4-modal,
+.edu-modal,
+.delete-confirm-modal,
+.help-modal,
+.section-modal,
+.season-reputation-edit-modal,
+.season-reputation-view-modal,
+.season-review-modal,
+.edit-modal-content {
+  background-color: rgba(0, 0, 0, 0) !important;
+  background-image: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%) !important;
+}
+
 // 1. Modal Container — border-radius: 0 (sharp corners)
 .section1-modal,
 .section-modal,
@@ -1453,9 +1472,9 @@ svg {
 
   h3 {
     color: #FAAB07 !important;
-    font-family: 'Cafe24Ohsquare', sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 400 !important;
+    font-family: 'Pretendard', sans-serif !important;
+    font-size: 21px !important;
+    font-weight: 800 !important;
     line-height: 34px !important;
     word-wrap: break-word;
   }
@@ -1463,7 +1482,7 @@ svg {
   .modal-subtitle {
     color: #fff !important;
     font-family: 'Pretendard', sans-serif !important;
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 30px !important;
     word-wrap: break-word;
@@ -1502,6 +1521,19 @@ svg {
   }
 }
 
+// 4-1. 전역 속성 셀렉터가 내부 자식에 border를 적용하는 것 방지
+.modal-header-top { border-bottom: none !important; }
+.modal-footer-left { border-top: none !important; }
+.modal-footer-right { border-top: none !important; }
+.modal-footer-notice { border-top: none !important; }
+
+// 4-2. 연락 가능 시간대 모달 — 미드-푸터 경계 + 푸터 내부(1행-2행) 구분선 제거
+.edit-modal-content[data-modal="phone-comment"] {
+  .edit-modal-footer { border-top: none !important; }
+  .modal-footer-top { border-top: none !important; border-bottom: none !important; }
+  .modal-footer-bottom { border-top: none !important; border-bottom: none !important; }
+}
+
 // 5. Edit Modal (.resume-card) — 헤더/푸터 고정 + 본문 스크롤 레이아웃
 .edit-modal-content {
   display: flex !important;
@@ -1525,23 +1557,6 @@ svg {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 165, 0, 0.5);
-      border-radius: 3px;
-
-      &:hover {
-        background: #FFA500;
-      }
-    }
   }
 
   .edit-modal-footer {
@@ -1566,6 +1581,46 @@ svg {
       background: #2a2f3e;
     }
   }
+}
+
+// 7. 모달 본문 스크롤바 — cluster4-1 스타일 복사 + thumb 색상 교체
+.section1-modal-body,
+.section2-modal-body,
+.section21-modal-body,
+.section3-modal-body,
+.section4-modal-body,
+.section5-modal-body,
+.section6-modal-body,
+.section-modal-body,
+.intro-modal-body,
+.edit-modal-body,
+.modal-body {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(250, 171, 7, 1) #252836 !important;
+
+  &::-webkit-scrollbar {
+    width: 3px !important;
+  }
+  &::-webkit-scrollbar-track {
+    background: #252836 !important;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(250, 171, 7, 1) !important;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+// 8. 모달 오버레이 투명도 통일 (Sidebar edit-modal 기준: rgba(0,0,0,0.7), blur 없음)
+[class*="modal-overlay"] {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* ====
