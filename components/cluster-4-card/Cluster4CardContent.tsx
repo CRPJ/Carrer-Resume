@@ -717,8 +717,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 정보: 해당 주차의 활성화된 활동 수 (온보딩 주차도 정상 계산)
           const infoTotal = activeActivities.filter(a => infoTypesList.includes(a.activity_type_id)).length;
 
-          // 실무 역량: 매주 최대 1개 선택 가능 (온보딩 주차도 정상 계산)
-          const competencyTotal = 1;
+          // 실무 역량: 평소 매주 최대 1개. 공식 휴식 주차는 기본 0이지만, 예외적으로 개설된 활동이 있으면 1.
+          const hasActiveCompetency = activeActivities.some(a => competencyTypesList.includes(a.activity_type_id));
+          const competencyTotal = (currentWeek.is_club_break || isBreakSeason) ? (hasActiveCompetency ? 1 : 0) : 1;
 
           // 실무 경험: 해당 주차에 개설된 experience 활동 중 eligible 조건 체크
           // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
@@ -850,9 +851,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const experienceSuccess = eligibleExperienceTypes.filter(activityTypeId => isEnhancementSuccess(activityTypeId)).length;
           // 실무 경력 success: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
 
-          // 휴식 주차(공식/개인)는 모든 통계를 0으로 설정
-          const isRestWeek = growthStatus?.includes('휴식') || false;
-          if (isRestWeek) {
+          // 개인 휴식 크루는 통계를 0으로 강제 (해당 주차에 활동 자체가 없는 게 정상)
+          // 공식 휴식 주차는 강제로 0 처리하지 않음 — 예외적으로 개설된 활동이 있으면 자연스럽게 반영
+          const isPersonalRest = growthStatus === '휴식(개인)';
+          if (isPersonalRest) {
             setInfoStats({ total: 0, success: 0 });
             setCompetencyStats({ total: 0, success: 0 });
             setExperienceStats({ total: 0, success: 0 });
@@ -932,9 +934,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (최대 5개)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
-    // 휴식 주차(공식/개인)는 경력 통계도 0으로 설정
-    const restMode = weekData?.growthStatus?.includes('휴식') || false;
-    if (restMode) {
+    // 개인 휴식만 경력 통계 0으로 강제. 공식 휴식이라도 예외적으로 등록된 프로젝트가 있으면 그대로 반영.
+    if (weekData?.growthStatus === '휴식(개인)') {
       setCareerStats({ total: 0, success: 0 });
       return;
     }
@@ -1637,8 +1638,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return 'not_applicable';
     }
 
-    // 휴식 주차(공식/개인)는 모든 활동이 해당 없음
-    if (isRestMode) {
+    // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
+    if (weekData?.growthStatus === '휴식(개인)') {
       return 'not_applicable';
     }
 
@@ -1658,9 +1659,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find(ar => ar.activity_type_id === activityType);
 
-    // 1. 해당 없음: 활동이 개설되지 않음 AND 크루가 참여하지도 않음
-    if (!activity?.is_active && (!record || !record.is_completed)) {
-      // eligible 조건을 통과한 실무 경험 활동은 개설 안 됐어도 '강화 실패'로 처리
+    // 1. 활동이 개설되지 않음(is_active=false) → 사용자에게 노출 안 됨. 통계와 일관되게 처리.
+    //   - 휴식 주차: 미개설은 '해당 없음' (필수 아님)
+    //   - 평소 주차에서 eligible 실무 경험: '강화 실패' (운영진이 개설 누락한 시그널)
+    //   - 그 외: '해당 없음'
+    if (!activity?.is_active) {
+      if (weekData?.growthStatus?.includes('휴식')) return 'not_applicable';
       if (expInfo) return 'failed';
       return 'not_applicable';
     }
@@ -2001,16 +2005,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
-    // 온보딩 주차 또는 휴식 주차면 강화율 계산에서 제외 (이력은 보이되 수치에 미반영)
-    if (isOnboardingWeek || isRestMode) {
+    // 온보딩 주차 또는 개인 휴식이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
+    if (isOnboardingWeek || weekData?.growthStatus === '휴식(개인)') {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
       setCareerStats({ total: 0, success: 0 });
     } else {
       setInfoStats(calcStats(infoTypes));
-      const competencyCalc = calcStats(competencyTypeIds);
-      setCompetencyStats({ total: 1, success: competencyCalc.success > 0 ? 1 : 0 });
+      const competencyCalc = calcStats(competencyTypeIds)
+      // 평소 매주 최대 1개. 공식 휴식 주차는 예외 개설 있을 때만 1.
+      const isClubBreakNow = weekData?.growthStatus === '휴식(공식)'
+      const competencyTotalNow = isClubBreakNow ? (competencyCalc.total > 0 ? 1 : 0) : 1
+      setCompetencyStats({ total: competencyTotalNow, success: competencyCalc.success > 0 ? 1 : 0 })
       setExperienceStats(calcStats(experienceTypeIds));
       setCareerStats(calcStats(careerTypeIds));
     }
@@ -3103,7 +3110,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           {getEnhancementStatus(card.activityType) === 'failed'
                             ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
                             : isActivityExpired(card.activityType)
-                              ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                              ? '⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)'
                               : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
                         </p>
                       </div>
@@ -3289,7 +3296,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isAbilityFailed
                           ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
                           : isAnyAbilityActivityExpired()
-                            ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                            ? '⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)'
                             : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
                       </p>
                     </div>
@@ -3495,7 +3502,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 {isFailed
                                   ? '❌ 강화에 실패하여 2차 정보를 작성할 수 없습니다.'
                                   : isExpired
-                                    ? '⏰ 2차 정보 작성 기간이 마감되었습니다. (개설 후 48시간 경과)'
+                                    ? '⏰ 2차 정보 작성 기간이 마감되었습니다 (수 오후 22시까지)'
                                     : '⚠️ 이 활동은 아직 개설되지 않았습니다. 운영진이 개설한 후 편집할 수 있습니다.'}
                               </p>
                             </div>
@@ -3672,7 +3679,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       if (isDeadlineExpired) return (
                         <div style={{ padding: '16px', backgroundColor: '#fee2e2', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '16px' }}>
                           <p style={{ margin: 0, color: '#dc2626', fontSize: '14px' }}>
-                            ⏰ 2차 정보 작성 기간이 마감되었습니다. (마감: {new Date(card.secondaryInfoDeadline!).toLocaleString('ko-KR')})
+                            ⏰ 2차 정보 작성 기간이 마감되었습니다
                           </p>
                         </div>
                       );
