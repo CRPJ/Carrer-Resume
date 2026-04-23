@@ -2542,6 +2542,21 @@
   }
 }
 
+// 채널 모달 초기 상태(데이터 없음) 빛바랜 처리 — 헤더/푸터 제외
+.section-modal.modal-dimmed {
+  .section-modal-body {
+    opacity: 0.4;
+    filter: grayscale(30%);
+  }
+}
+
+// 채널 모달 플랫폼 드롭다운 placeholder — 나머지(#fff)와 색상 통일 강제
+.section-modal .platform-dropdown .platform-selected .placeholder,
+.section-modal .platform-dropdown .placeholder {
+  color: rgb(255, 255, 255) !important;
+  opacity: 1 !important;
+}
+
 // 필수필드 미입력 깜빡임
 // fixed 드롭다운 옵션 (overflow 잘림 방지)
 .dropdown-options-fixed {
@@ -2961,6 +2976,14 @@
           }
         }
 
+        .platform-display .field-value {
+          width: auto;
+          max-width: none;
+          height: auto;
+          min-height: 0;
+          padding: 0;
+        }
+
         input,
         select,
         .dropdown-selected,
@@ -3081,16 +3104,24 @@
           align-items: center;
           gap: 8px;
           padding: 6px 10px;
-          background: transparent;
+          background: #1a1a2e;
           border: 1px solid rgba(255, 165, 0, 0.3);
           color: #fff;
           font-size: 14px;
           cursor: pointer;
           .placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+            background: transparent;
+            background-color: transparent;
+            user-select: none;
+            &::selection {
+              background: transparent;
+            }
           }
           .ti-chevron-down {
             margin-left: auto;
+            font-size: 12px;
+            flex-shrink: 0;
           }
           &:hover {
             border-color: #faab07;
@@ -3159,6 +3190,14 @@
           border: none !important;
           background: transparent !important;
           padding-left: 0;
+          &::placeholder {
+            color: #fff;
+            opacity: 1;
+          }
+          &::-webkit-input-placeholder {
+            color: #fff;
+            opacity: 1;
+          }
         }
       }
 
