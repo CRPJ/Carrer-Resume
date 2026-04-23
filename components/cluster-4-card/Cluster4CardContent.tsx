@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useModalScroll } from "@/utils/useModalScroll";
-import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
@@ -125,6 +124,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     } // 더미 모드: 체크 스킵
     // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
+      openModalFn();
+      return;
+    }
+
+    // 어드민(마더) 계정은 승인 체크 건너뛰기
+    if (session.user?.isAdmin) {
       openModalFn();
       return;
     }
@@ -723,20 +728,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       try {
         setIsLoadingWeek(true);
 
-        // ========== 1단계: 모든 독립 데이터 최대 병렬 로드 ==========
-        const profileUrl = urlUserId ? `/api/profile?userId=${urlUserId}&context=card` : "/api/profile?context=card";
+        // ========== 1단계: 프로필 API (weekId 번들) + 보조 API 최대 병렬 로드 ==========
+        const profileUrl = urlUserId
+          ? `/api/profile?userId=${urlUserId}&context=card&weekId=${weekId}`
+          : `/api/profile?context=card&weekId=${weekId}`;
         const earlyUserId = urlUserId || null;
 
-        // 기본 DB + 프로필 쿼리
-        const basePromise = Promise.all([
-          supabase.from("activity_types").select("id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total").eq("is_active", true),
-          supabase.from("weeks").select("id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)").eq("id", weekId).single(),
-          fetch(profileUrl),
-          supabase.from("weeks").select("id, start_date, end_date, season_id, seasons(name)").order("start_date", { ascending: false }),
-          supabase.from("weekly_activities").select("id, activity_type_id, title, is_active, opened_at, deadline, output_links").eq("week_id", weekId),
-        ]);
-
-        // urlUserId가 있으면 API fetch + DB 쿼리도 동시 시작
+        // 프로필 API (주차 번들 포함) + 보조 API 동시 시작
         const earlyApiPromise = earlyUserId
           ? Promise.all([
               fetch(`/api/career-records?week_id=${weekId}&user_id=${earlyUserId}`, { cache: "no-store" })
@@ -751,24 +749,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             ])
           : Promise.resolve([null, null, null] as const);
 
-        const earlyDbPromise = earlyUserId
-          ? Promise.all([
-              supabase.from("user_weekly_growth").select("is_success, is_resting, is_club_break, failure_reason").eq("user_id", earlyUserId).eq("week_id", weekId).maybeSingle(),
-              supabase.from("points").select("week_id, point_type, points").eq("user_id", earlyUserId),
-              supabase.from("user_weekly_growth").select("week_id, weeks!inner(end_date)").eq("user_id", earlyUserId).eq("is_success", true),
-            ])
-          : null;
-
         // 모든 병렬 요청 동시 대기
-        const [baseResults, earlyApiResults, earlyDbResults] = await Promise.all([basePromise, earlyApiPromise, earlyDbPromise]);
-        const [activityTypesResult, currentWeekResult, profileResponse, allUserWeeksResult, activitiesResult] = baseResults;
+        const [profileResponse, earlyApiResults] = await Promise.all([fetch(profileUrl), earlyApiPromise]);
         const [earlyCareerResult, earlyReputationsResult, earlyColleaguesResult] = earlyApiResults;
 
-        const activityTypesData = activityTypesResult.data;
-        const currentWeek = currentWeekResult.data;
-        const weekError = currentWeekResult.error;
+        // 프로필 정보 처리 (weekBundle 포함)
+        const profileResult = await profileResponse.json();
+        if (!profileResponse.ok || !profileResult.data?.id) {
+          console.error("Failed to fetch profile");
+          return;
+        }
 
-        if (weekError) throw weekError;
+        const userId = profileResult.data.id;
+        setCurrentUserId(userId);
+        const apiActivityWeekIds = profileResult.activityWeekIds || [];
+        const apiRestWeekIds = profileResult.restWeekIds || [];
+        const apiApprovedActivities = profileResult.approvedActivities || [];
+        const apiActivityRecords = profileResult.activityRecords || [];
+        const apiActivityDetails = profileResult.activityDetails || [];
+        const apiActivityPoints = profileResult.activityPoints || [];
+
+        // profile API에서 제공하는 teams, parts 사용
+        const apiTeams = profileResult.teams || [];
+        const apiParts = profileResult.parts || [];
+        const apiUserTeamParts = profileResult.userTeamParts || [];
+
+        // ========== weekBundle에서 주차 관련 데이터 추출 (서버 사이드 번들) ==========
+        const wb = profileResult.weekBundle;
+        if (!wb || !wb.currentWeek) throw new Error("Week not found");
+
+        const activityTypesData = wb.activityTypes;
+        const currentWeek = wb.currentWeek;
 
         // activity_types 처리
         const typesMap = new Map<string, ActivityTypeInfo>();
@@ -778,7 +789,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const experienceInfos: ExperienceTypeInfo[] = [];
 
         if (activityTypesData) {
-          activityTypesData.forEach((at) => {
+          activityTypesData.forEach((at: any) => {
             typesMap.set(at.id, at);
             if (at.cluster_id === "practical_competency") {
               competencyIds.push(at.id);
@@ -802,7 +813,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         }
 
         // 현재 주차 정보 처리
-        if (!currentWeek) throw new Error("Week not found");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const seasonData = currentWeek.seasons as any;
         const rawSeasonName = seasonData?.name || "";
@@ -818,50 +828,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           seasonName = "시즌 전환";
         }
 
-        // 프로필 정보 처리
-        const profileResult = await profileResponse.json();
-        if (!profileResponse.ok || !profileResult.data?.id) {
-          console.error("Failed to fetch profile");
-          return;
-        }
-
-        const userId = profileResult.data.id;
-        setCurrentUserId(userId);
-        const apiActivityWeekIds = profileResult.activityWeekIds || [];
-        const apiRestWeekIds = profileResult.restWeekIds || [];
-        const apiApprovedActivities = profileResult.approvedActivities || [];
-        const apiActivityRecords = profileResult.activityRecords || [];
-        const apiActivityDetails = profileResult.activityDetails || [];
-        const apiActivityPoints = profileResult.activityPoints || [];
-
-        // profile API에서 제공하는 teams, parts 사용
-        const apiTeams = profileResult.teams || [];
-        const apiParts = profileResult.parts || [];
-        const apiUserTeamParts = profileResult.userTeamParts || [];
-
-        // ========== 2단계: userId 의존 데이터 (Stage 1에서 선행 실행 안 된 경우만) ==========
         const today = new Date().toISOString().split("T")[0];
         const userStartDate = profileResult.growthInfo?.startDate || "1900-01-01";
 
-        let weeklyGrowthResult, pointsResult, successWeeksResult;
-        if (earlyDbResults) {
-          // Stage 1에서 이미 병렬 실행됨
-          [weeklyGrowthResult, pointsResult, successWeeksResult] = earlyDbResults;
-        } else {
-          // urlUserId가 없어서 profile에서 userId를 받은 후에야 실행 가능
-          [weeklyGrowthResult, pointsResult, successWeeksResult] = await Promise.all([
-            supabase.from("user_weekly_growth").select("is_success, is_resting, is_club_break, failure_reason").eq("user_id", userId).eq("week_id", weekId).maybeSingle(),
-            supabase.from("points").select("week_id, point_type, points").eq("user_id", userId),
-            supabase.from("user_weekly_growth").select("week_id, weeks!inner(end_date)").eq("user_id", userId).eq("is_success", true),
-          ]);
-        }
+        // weekBundle에서 직접 사용 (클라이언트 Supabase 쿼리 제거)
+        const weeklyGrowthData = wb.weeklyGrowth;
+        const allPointsData = wb.allPoints || [];
+        const successWeeksData = wb.successWeeks || [];
+        const allUserWeeksData = wb.allWeeks || [];
 
-        // 누적 주차는 Stage 1의 allUserWeeksResult를 클라이언트 필터로 대체
-        const allWeeksForCumulative = (allUserWeeksResult.data || []).filter((w: any) => w.end_date && w.end_date <= currentWeek.end_date);
+        // 누적 주차 필터
+        const allWeeksForCumulative = allUserWeeksData.filter((w: any) => w.end_date && w.end_date <= currentWeek.end_date);
         const allWeeksResult = { data: allWeeksForCumulative };
 
         // 성장 상태 결정
-        const weeklyGrowth = weeklyGrowthResult.data;
+        const weeklyGrowth = weeklyGrowthData;
         const onboardingWeekId = profileResult.onboardingWeekId;
         const isCurrentWeekOnboarding = weekId === onboardingWeekId;
 
@@ -939,22 +920,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         }
 
         // 포인트 정보 처리
-        const allPointsData = pointsResult.data || [];
-        const weekPointsData = allPointsData.filter((p) => p.week_id === weekId);
+        const weekPointsData = allPointsData.filter((p: any) => p.week_id === weekId);
         if (weekPointsData.length > 0) {
-          const star = weekPointsData.filter((p) => p.point_type === "star").reduce((sum, p) => sum + p.points, 0);
-          const lightning = weekPointsData.filter((p) => p.point_type === "lightning").reduce((sum, p) => sum + p.points, 0);
-          const shield = weekPointsData.filter((p) => p.point_type === "shield").reduce((sum, p) => sum + p.points, 0);
+          const star = weekPointsData.filter((p: any) => p.point_type === "star").reduce((sum: number, p: any) => sum + p.points, 0);
+          const lightning = weekPointsData.filter((p: any) => p.point_type === "lightning").reduce((sum: number, p: any) => sum + p.points, 0);
+          const shield = weekPointsData.filter((p: any) => p.point_type === "shield").reduce((sum: number, p: any) => sum + p.points, 0);
           setWeekPoints({ star, lightning, shield });
         }
 
+        // 누적 인절미 계산 (현재 시즌 내, 현재 주차까지의 shield 합계 - lightning 합계)
+        const currentSeasonId = seasonData?.id;
+        const seasonWeekIds = new Set(
+          allWeeksForCumulative
+            .filter((w: any) => w.season_id === currentSeasonId)
+            .map((w: any) => w.id)
+        );
+        const seasonPointsData = allPointsData.filter((p: any) => seasonWeekIds.has(p.week_id));
+        const totalShields = seasonPointsData.filter((p: any) => p.point_type === "shield").reduce((sum: number, p: any) => sum + p.points, 0);
+        const totalLightnings = seasonPointsData.filter((p: any) => p.point_type === "lightning").reduce((sum: number, p: any) => sum + p.points, 0);
+        setCumulativeInjeolmi(totalShields - totalLightnings);
+
         // 누적 성공 주차 수 계산
         let currentApprovedCount = 0;
-        const successWeeksData = successWeeksResult.data || [];
         if (successWeeksData.length > 0) {
+          // 온보딩 주차 이전의 성공 주차는 제외 (크루가 합류하기 전 주차)
           currentApprovedCount = successWeeksData.filter((sw: any) => {
             const weekEndDate = sw.weeks?.end_date;
-            return weekEndDate && weekEndDate <= currentWeek.end_date;
+            return weekEndDate && weekEndDate <= currentWeek.end_date && weekEndDate >= userStartDate;
           }).length;
         }
 
@@ -971,20 +963,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             }
           }
         }
-        setCumulativeApprovedWeeks(currentApprovedCount);
+        // 현재 주차가 활동 주차이면 eligible 체크에 포함 (+1)
+        const currentWeekIsActive = !currentWeek.is_club_break && weekId !== onboardingWeekIdForCount;
+        const currentWeekAlreadyInSuccess = successWeeksData.some((sw: any) => sw.week_id === weekId);
+        const cumulativeForEligible = currentApprovedCount + (currentWeekIsActive && !currentWeekAlreadyInSuccess ? 1 : 0);
+        setCumulativeApprovedWeeks(cumulativeForEligible);
 
         // 이전/다음 주차 ID 가져오기
-        const allUserWeeks = allUserWeeksResult.data;
+        const allUserWeeks = allUserWeeksData;
 
         if (allUserWeeks && allUserWeeks.length > 0) {
           // 클라이언트에서 날짜 필터링 + break 시즌 제외
-          const filteredWeeks = allUserWeeks.filter((w) => {
+          const filteredWeeks = allUserWeeks.filter((w: any) => {
             const sName = (w.seasons as any)?.name || "";
             const isBreakSeason = sName.toLowerCase().includes("break");
             return w.start_date >= userStartDate && w.start_date <= today && !isBreakSeason;
           });
 
-          const currentIndex = filteredWeeks.findIndex((w) => w.id === weekId);
+          const currentIndex = filteredWeeks.findIndex((w: any) => w.id === weekId);
 
           if (currentIndex !== -1) {
             // 내림차순 정렬이므로: index-1 = 더 최근(다음), index+1 = 더 과거(이전)
@@ -997,13 +993,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
         }
 
-        // 9. 주간 활동 데이터 처리 (이미 병렬로 가져옴)
-        const activitiesData = activitiesResult.data;
-        const activitiesError = activitiesResult.error;
+        // 9. 주간 활동 데이터 처리 (weekBundle에서 가져옴)
+        const activitiesData = wb.weeklyActivities;
 
-        if (activitiesError) {
-          console.error("주간 활동 데이터 로드 오류:", activitiesError);
-        } else if (activitiesData) {
+        if (activitiesData) {
           setWeeklyActivities(activitiesData);
 
           // 11. 파트별 강화 집계 계산
@@ -1032,16 +1025,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           const filteredActivityDetails = apiActivityDetails.filter((ad: { week_id: string }) => ad.week_id === weekId);
           setWeekActivityDetails(filteredActivityDetails);
 
-          // 12-1. 어드민 개별 권한 (secondary_info_grants) - 해당 주차 / 유저 기준
-          try {
-            const { data: grantsData } = await supabase
-              .from("secondary_info_grants")
-              .select("activity_type_id, deadline")
-              .eq("user_id", userId)
-              .eq("week_id", weekId);
-            if (grantsData) setSecondaryInfoGrants(grantsData as SecondaryInfoGrant[]);
-          } catch {
-            // 테이블 없거나 권한 없으면 조용히 무시
+          // 12-1. 어드민 개별 권한 (secondary_info_grants) - weekBundle에서 가져옴
+          if (wb.secondaryInfoGrants) {
+            setSecondaryInfoGrants(wb.secondaryInfoGrants as SecondaryInfoGrant[]);
           }
 
           // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
@@ -1070,18 +1056,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           setAllUserCompletedActivities(allCompletedActivities);
 
           // 누적 성공 주차 수 (현재 주차 포함) - 위에서 계산된 값 사용
-          const currentCumulativeApproved = currentApprovedCount;
+          const currentCumulativeApproved = cumulativeForEligible;
 
-          // 실무 정보: 온보딩 주차면 0 (강화율 계산에서 제외), 아니면 해당 주차의 활성화된 활동 수
-          const infoTotal = isOnboardingWeekLocal ? 0 : activeActivities.filter((a) => infoTypesList.includes(a.activity_type_id)).length;
+          // 실무 정보: 해당 주차의 활성화된 활동 수 (온보딩 주차도 정상 계산)
+          const infoTotal = activeActivities.filter((a) => infoTypesList.includes(a.activity_type_id)).length;
 
           // 실무 역량: 평소 매주 최대 1개. 공식 휴식 주차는 기본 0이지만, 예외적으로 개설된 활동이 있으면 1.
           const hasActiveCompetency = activeActivities.some((a) => competencyTypesList.includes(a.activity_type_id));
-          const competencyTotal = isOnboardingWeekLocal
-            ? 0
-            : (currentWeek.is_club_break || isBreakSeason)
-              ? (hasActiveCompetency ? 1 : 0)
-              : 1;
+          const competencyTotal = (currentWeek.is_club_break || isBreakSeason)
+            ? (hasActiveCompetency ? 1 : 0)
+            : 1;
 
           // 실무 경험: 해당 주차에 개설된 experience 활동 중 eligible 조건 체크
           // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
@@ -1092,37 +1076,35 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             (seasonData.year === 2026 && seasonData.name === 'spring' && currentWeek.week_number >= 9)
           );
           let experienceTotal = 0;
-          // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
+          // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함 (온보딩 주차도 정상 계산)
           const activeExperienceActivities = activeActivities.filter((a) => experienceTypesList.includes(a.activity_type_id));
-          if (!isOnboardingWeekLocal) {
-            activeExperienceActivities.forEach((a) => {
-              const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
+          activeExperienceActivities.forEach((a) => {
+            const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
 
-              if (!typeInfo) {
-                experienceTotal++;
-                return;
-              }
+            if (!typeInfo) {
+              experienceTotal++;
+              return;
+            }
 
-              if (isEligibilityRuleActive) {
-                const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-                const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+            if (isEligibilityRuleActive) {
+              const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
+              const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-                if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
-                  if (typeInfo.count_once_in_total) {
-                    const previouslyCompleted = allCompletedActivities.some((ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId);
-                    if (!previouslyCompleted) {
-                      experienceTotal++;
-                    }
-                  } else {
+              if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
+                if (typeInfo.count_once_in_total) {
+                  const previouslyCompleted = allCompletedActivities.some((ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId);
+                  if (!previouslyCompleted) {
                     experienceTotal++;
                   }
+                } else {
+                  experienceTotal++;
                 }
-              } else {
-                // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
-                experienceTotal++;
               }
-            });
-          }
+            } else {
+              // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
+              experienceTotal++;
+            }
+          });
 
           // 실무 경력: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
           // 여기서는 초기값 0으로 설정, career_records 로드 후 덮어씀
@@ -1168,11 +1150,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           };
 
           const infoSuccess = infoTypesList.filter((activityTypeId) => isEnhancementSuccess(activityTypeId)).length;
-          // 실무 역량 success: 온보딩 주차면 0 (강화율 계산에서 제외)
-          const competencySuccess = isOnboardingWeekLocal ? 0 : competencyTypesList.some((activityTypeId) => isEnhancementSuccess(activityTypeId)) ? 1 : 0;
+          // 실무 역량 success (온보딩 주차도 정상 계산)
+          const competencySuccess = competencyTypesList.some((activityTypeId) => isEnhancementSuccess(activityTypeId)) ? 1 : 0;
           // 실무 경험 success: 개설된 활동 중 eligible한 타입의 강화 성공만 카운트
           const eligibleExperienceTypes: string[] = [];
-          if (!isOnboardingWeekLocal) {
+          {
             activeExperienceActivities.forEach((a) => {
               const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
               if (!typeInfo) {
@@ -1468,6 +1450,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
   const [selectedReputationCard, setSelectedReputationCard] = useState<any>(null);
+  // 어드민 평판 수정 시 사용하는 평판 ID
+  const [editingWeeklyReputationId, setEditingWeeklyReputationId] = useState<string | null>(null);
 
   // 연계 동료 카드 상세보기 모달 상태
   const [colleagueViewModalOpen, setColleagueViewModalOpen] = useState(false);
@@ -1596,7 +1580,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         message: c.message || "",
       }));
 
-      const res = await fetch("/api/weekly-colleagues", {
+      const res = await fetch(apiUrl("/api/weekly-colleagues"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1654,6 +1638,40 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setReputationEditData({ rating: 0, content: "", keyword: "" });
       return;
     }
+
+    // 어드민 수정 모드
+    if (editingWeeklyReputationId && session?.user?.isAdmin) {
+      setReputationSaving(true);
+      try {
+        const res = await fetch("/api/weekly-reputations", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: editingWeeklyReputationId,
+            rating: reputationEditData.rating,
+            content: reputationEditData.content.trim(),
+            keyword: reputationEditData.keyword,
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          alert(json.error || "수정에 실패했습니다.");
+          return;
+        }
+
+        fetchWeeklyReputations();
+        alert("수정되었습니다.");
+        setHeaderModalOpen(false);
+        setReputationEditData({ rating: 0, content: "", keyword: "" });
+        setEditingWeeklyReputationId(null);
+      } catch {
+        alert("서버 오류가 발생했습니다.");
+      } finally {
+        setReputationSaving(false);
+      }
+      return;
+    }
+
     if (!urlUserId || !weekId) {
       alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return;
@@ -1691,7 +1709,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setReputationSaveSuccess(false);
 
     try {
-      const res = await fetch("/api/weekly-reputations", {
+      const res = await fetch(apiUrl("/api/weekly-reputations"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1715,6 +1733,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       alert("저장되었습니다.");
       setHeaderModalOpen(false);
       setReputationEditData({ rating: 0, content: "", keyword: "" });
+      setEditingWeeklyReputationId(null);
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
       alert("서버 오류가 발생했습니다.");
@@ -1816,66 +1835,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 평판 데이터 (API 데이터 기반)
   // 주차 평판 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyReputations = [
-    {
-      id: "dummy-rep-1",
-      name: "오준",
-      gender: "남",
-      age: 22,
-      profileImg: "/images/0/crew profile/남 1.webp",
-      university: "한대",
-      major: "경영",
-      team: "기획",
-      part: "전략",
-      nickname: "짧음",
-      role: "심화",
-      rating: 0.5,
-      ratingCount: "1 / 10",
-      description: "짧은코멘트",
-      fm: 1,
-      tagColor: "tag--pink",
-      tagText: "#힘",
-      isEmpty: false,
-    },
-    {
-      id: "dummy-rep-2",
-      name: "김서연아",
-      gender: "여",
-      age: 25,
-      profileImg: "/images/0/crew profile/여 1.jpg",
-      university: "성균관대학교",
-      major: "컴퓨터공학",
-      team: "마케팅전략",
-      part: "브랜드콘텐츠",
-      nickname: "중간닉네임임",
-      role: "운영진(앰배서더)",
-      rating: 3,
-      ratingCount: "6 / 10",
-      description: "중간길이의코멘트입니다이번주",
-      fm: 42,
-      tagColor: "tag--red",
-      tagText: "#추진력있는",
-      isEmpty: false,
-    },
-    {
-      id: "dummy-rep-3",
-      name: "알렉산더워싱턴",
-      gender: "남",
-      age: 29,
-      profileImg: "/images/0/crew profile/남 2.jpg",
-      university: "한국예술종합",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트사업",
-      part: "글로벌마케팅전략",
-      nickname: "엔비디아구글테슬라쿵",
-      role: "일반(정규)",
-      rating: 5,
-      ratingCount: "10 / 10",
-      description: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
-      fm: 999,
-      tagColor: "tag--yellow",
-      tagText: "#끈기와인내의결과물",
-      isEmpty: false,
-    },
+    { id: "dummy-rep-1", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", rating: 0, ratingCount: "- / 10", description: "-", rawRating: 0, rawKeyword: "-", fm: 0, tagColor: "tag--pink", tagText: "#-", isEmpty: true },
+    { id: "dummy-rep-2", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", rating: 0, ratingCount: "- / 10", description: "-", rawRating: 0, rawKeyword: "-", fm: 0, tagColor: "tag--red", tagText: "#-", isEmpty: true },
+    { id: "dummy-rep-3", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", rating: 0, ratingCount: "- / 10", description: "-", rawRating: 0, rawKeyword: "-", fm: 0, tagColor: "tag--yellow", tagText: "#-", isEmpty: true },
   ];
 
   const reputationData = useMemo(() => {
@@ -1957,39 +1919,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 연계 동료 더미 데이터 (비로그인 / 데이터 미입력 시 폴백)
   const dummyColleagues = [
-    { id: "dummy-col-1", name: "윤아", gender: "여", age: "21", profileImg: "/images/0/crew profile/여 3.jpg", university: "한대", major: "경영", team: "기획", part: "전략", nickname: "윤아", role: "심화", date: "2026 - 03 - 01 (토)", message: "좋은 동료", isEmpty: false },
-    {
-      id: "dummy-col-2",
-      name: "박진우",
-      gender: "남",
-      age: "26",
-      profileImg: "/images/0/crew profile/남 2.jpg",
-      university: "성균관대학교",
-      major: "컴퓨터공학",
-      team: "마케팅전략",
-      part: "브랜드콘텐츠",
-      nickname: "마케팅장인",
-      role: "운영진(앰배서더)",
-      date: "2026 - 03 - 02 (일)",
-      message: "기술적인 부분에서 큰 도움을 받았고 앞으로도 함께 성장하고 싶습니다",
-      isEmpty: false,
-    },
-    {
-      id: "dummy-col-3",
-      name: "크리스티나앤더슨",
-      gender: "여",
-      age: "28",
-      profileImg: "/images/0/crew profile/여 4.webp",
-      university: "한국예술종합",
-      major: "미디어커뮤니케이션",
-      team: "엔터테인먼트사업",
-      part: "글로벌마케팅전략",
-      nickname: "글로벌마케터의꿈나무",
-      role: "일반(정규)",
-      date: "2026 - 03 - 03 (월)",
-      message: "다양한 관점에서 프로젝트를 바라보는 시각이 인상적이었고 특히 글로벌 마케팅 전략 수립 과정에서 보여준 리더십과 커뮤니케이션 능력이 뛰어났습니다",
-      isEmpty: false,
-    },
+    { id: "dummy-col-1", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", date: "-", message: "", isEmpty: true },
+    { id: "dummy-col-2", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", date: "-", message: "", isEmpty: true },
+    { id: "dummy-col-3", name: "-", gender: "-", age: "-", profileImg: "", university: "-", major: "-", team: "-", part: "-", nickname: "-", role: "", date: "-", message: "", isEmpty: true },
   ];
 
   // 연계 동료 데이터 (API 데이터 기반)
@@ -2084,11 +2016,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const allActivityTypes = [...workInfoActivityTypes, ...workAbilityActivityTypes, ...workExpActivityTypes, ...workCareerActivityTypes];
 
   // 실무 역량: 유저가 완료한 활동 찾기 (is_completed = true인 것 중 첫 번째)
+  // activity_record가 있으면 weekly_activities.is_active 여부와 관계없이 표시
   const findFirstCompletedAbilityActivity = () => {
     for (const actType of workAbilityActivityTypes) {
-      const activity = weeklyActivities.find((a) => a.activity_type_id === actType && a.is_active);
       const record = weekActivityRecords.find((ar) => ar.activity_type_id === actType);
-      if (activity && record?.is_completed) return activity;
+      if (record?.is_completed) {
+        const activity = weeklyActivities.find((a) => a.activity_type_id === actType);
+        if (activity) return activity;
+        // weekly_activities에 없어도 activity_types 정보로 대체
+        const typeInfo = activityTypesMap.get(actType);
+        if (typeInfo) return { activity_type_id: actType, title: typeInfo.name, is_active: false, week_id: weekId } as any;
+      }
     }
     return null;
   };
@@ -2105,9 +2043,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 실무 역량: 유저가 선택한(record가 있는) 활동 찾기
   const findFirstSelectedAbilityActivity = () => {
     for (const actType of workAbilityActivityTypes) {
-      const activity = weeklyActivities.find((a) => a.activity_type_id === actType && a.is_active);
       const record = weekActivityRecords.find((ar) => ar.activity_type_id === actType);
-      if (activity && record) return activity; // record가 있으면 유저가 선택한 것
+      if (record) {
+        const activity = weeklyActivities.find((a) => a.activity_type_id === actType);
+        if (activity) return activity;
+        const typeInfo = activityTypesMap.get(actType);
+        if (typeInfo) return { activity_type_id: actType, title: typeInfo.name, is_active: false, week_id: weekId } as any;
+      }
     }
     return null;
   };
@@ -2133,14 +2075,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
     if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
 
+    // 실무 경험 활동의 eligible 조건 체크 (누적 주차 범위 밖이면 해당 없음)
+    const expInfo = experienceTypeInfos.find((info) => info.id === activityType);
+    if (expInfo) {
+      const minWeek = expInfo.eligible_min_approved_weeks ?? 1;
+      const maxWeek = expInfo.eligible_max_approved_weeks ?? 999;
+      if (cumulativeApprovedWeeks < minWeek || cumulativeApprovedWeeks > maxWeek) {
+        return "not_applicable";
+      }
+    }
+
     // 해당 활동 정보 가져오기
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
 
     // activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find((ar) => ar.activity_type_id === activityType);
-
-    // eligible한 실무 경험인지 판단 (eligible 조건 충족하는 타입 정보가 있는지)
-    const expInfo = experienceTypeInfos.find((info) => info.id === activityType);
 
     // 1. 활동이 개설되지 않음(is_active=false) → 사용자에게 노출 안 됨. 통계와 일관되게 처리.
     //   - 휴식 주차: 미개설은 '해당 없음' (필수 아님)
@@ -2839,6 +2788,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return stars;
   };
 
+  if (isLoadingWeek) {
+    return <div className="cluster4-card-content weekly-card-detail" style={{ marginRight: "27px", minHeight: "400px" }} />;
+  }
+
   return (
     <div className="cluster4-card-content weekly-card-detail" style={{ marginRight: "27px" }}>
       {/* 탭 영역 */}
@@ -2908,7 +2861,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div
               className="edit-icon"
               onClick={() => {
-                if (!isDemoMode && isOwner) {
+                if (!isDemoMode && isOwner && !session?.user?.isAdmin) {
                   alert("주차 평판은 타 크루만이 작성할 수 있습니다.");
                   return;
                 }
@@ -3570,9 +3523,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{experienceStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : experienceStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {experienceStats.success}
+                {isOnboardingWeek ? "-" : experienceStats.success}
               </span>{" "}
               개
             </span>
@@ -3580,7 +3533,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                  {isRestMode ? "-" : experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}
+                  {(isOnboardingWeek || isRestMode) ? "-" : experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}
                 </span>
                 %
               </span>
@@ -3710,9 +3663,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{competencyStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : competencyStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {competencyStats.success}
+                {isOnboardingWeek ? "-" : competencyStats.success}
               </span>{" "}
               개
             </span>
@@ -3720,7 +3673,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                  {isRestMode ? "-" : competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}
+                  {(isOnboardingWeek || isRestMode) ? "-" : competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}
                 </span>
                 %
               </span>
@@ -3825,9 +3778,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{careerStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : careerStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {careerStats.success}
+                {isOnboardingWeek ? "-" : careerStats.success}
               </span>{" "}
               개
             </span>
@@ -3835,7 +3788,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                  {isRestMode ? "-" : careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}
+                  {(isOnboardingWeek || isRestMode) ? "-" : careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}
                 </span>
                 %
               </span>
@@ -5240,6 +5193,50 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <span className={`tag ${selectedReputationCard.tagColor}`}>{selectedReputationCard.tagText}</span>
                 </div>
               </div>
+
+              {/* 어드민 전용: 수정/삭제 버튼 */}
+              {session?.user?.isAdmin && !selectedReputationCard.isEmpty && (
+                <div style={{ display: "flex", gap: "8px", marginTop: "16px", justifyContent: "flex-end" }}>
+                  <button
+                    onClick={() => {
+                      setReputationEditData({
+                        rating: selectedReputationCard.rawRating || 0,
+                        content: selectedReputationCard.description || "",
+                        keyword: selectedReputationCard.rawKeyword || "",
+                      });
+                      setEditingWeeklyReputationId(selectedReputationCard.id);
+                      setReputationViewModalOpen(false);
+                      setHeaderModalType("타크루");
+                      setHeaderModalOpen(true);
+                      fetchKeywordsIfNeeded();
+                    }}
+                    style={{ padding: "8px 16px", background: "rgba(250, 171, 7, 0.2)", border: "1px solid #FAAB07", borderRadius: "6px", color: "#FAAB07", fontSize: "13px", cursor: "pointer" }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm("이 평판을 삭제하시겠습니까?")) return;
+                      try {
+                        const res = await fetch(`/api/weekly-reputations?id=${selectedReputationCard.id}`, { method: "DELETE" });
+                        const json = await res.json();
+                        if (json.success) {
+                          alert("삭제되었습니다.");
+                          setReputationViewModalOpen(false);
+                          fetchWeeklyReputations();
+                        } else {
+                          alert(json.error || "삭제 실패");
+                        }
+                      } catch {
+                        alert("삭제 중 오류 발생");
+                      }
+                    }}
+                    style={{ padding: "8px 16px", background: "rgba(255, 60, 60, 0.2)", border: "1px solid #ff3c3c", borderRadius: "6px", color: "#ff3c3c", fontSize: "13px", cursor: "pointer" }}
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
