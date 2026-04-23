@@ -5866,6 +5866,8 @@
       max-width: 979px !important;
       height: 570px !important;
       max-height: 570px !important;
+      display: flex;
+      flex-direction: column;
 
       // ── 헤더 (110px) — cluster3/workInfo 패턴 ──
       .section-modal-header {
@@ -5874,9 +5876,9 @@
         justify-content: flex-start;
         box-sizing: border-box;
         flex-shrink: 0;
-        height: 110px;
+        height: auto;
         min-height: 110px;
-        max-height: 110px;
+        max-height: none;
         padding: 8px 24px 16px;
         position: relative;
         overflow: visible;
@@ -5911,7 +5913,16 @@
           font-family: "Pretendard", sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
-          margin: 4px 0 0 80px; // h3 left-padding(72 아이콘 + 8 gap)와 정렬
+          margin: 4px 67px 0 80px; // 좌 80(아이콘+gap) / 우 67(close-btn 영역)
+          max-width: calc(100% - 147px);
+          min-width: 0;
+          white-space: normal !important;
+          overflow-wrap: break-word !important;
+          word-break: normal !important;
+          overflow: visible !important;
+          text-overflow: unset !important;
+          box-sizing: border-box !important;
+          transform: translateX(-95px);
         }
 
         .modal-close-btn {
@@ -5937,7 +5948,9 @@
 
       // ── 미드 (460px) — 1열 세로 배치 ──
       .section-modal-body.reputation-body {
-        height: calc(100% - 110px);
+        height: auto;
+        min-height: 0;
+        flex: 1 1 auto;
         padding: 16px 24px;
         display: flex;
         flex-direction: column;
@@ -5952,13 +5965,16 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 7px 12px;
         flex-shrink: 0;
+        display: flex;
+        align-items: center; // 인적사항 전체 세로 중앙 정렬
 
         .personal-grid {
+          width: 100%;
           display: grid;
-          grid-template-columns: auto 1fr auto;
+          grid-template-columns: auto 1fr; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
           grid-template-rows: auto;
           gap: 3px 12px;
-          align-items: start;
+          align-items: center; // 그리드 각 셀도 세로 중앙 정렬
         }
 
         .personal-photo {
@@ -5995,19 +6011,35 @@
           align-items: center;
           gap: 5px;
           font-family: "Pretendard", sans-serif;
-          font-size: 11px;
+          font-size: 13px !important; // 인적사항 본문 pt 통일
           line-height: 1.14;
           color: #ddd;
           min-width: 0;
         }
 
+        // row-1 안에 태그 가로 배치 — 우측 정렬
+        .personal-row-1 {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px;
+
+          .personal-tags {
+            margin-left: auto !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px !important;
+            flex-shrink: 0;
+          }
+        }
+
         .personal-row-2,
         .personal-row-3 {
           display: grid;
-          grid-template-columns: 160px 40px 20px 160px 40px;
+          grid-template-columns: minmax(0, 160px) 40px 20px minmax(0, 160px) 40px;
           align-items: center;
           column-gap: 0;
-          white-space: nowrap;
+          white-space: normal !important;
+          min-width: 0;
 
           > .personal-field {
             display: contents;
@@ -6017,6 +6049,8 @@
         .personal-separator {
           color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
+          padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
+          font-size: 13px !important; // 본문 pt 통일
         }
 
         .personal-name {
@@ -6030,52 +6064,72 @@
           border: 1px solid rgba(255, 165, 0, 0.3);
           background: rgb(26, 26, 46);
           white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
         }
         .personal-gender {
           min-width: 16px;
           display: inline-block;
           white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
         }
         .personal-age {
           min-width: 48px;
           display: inline-block;
           white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
         }
 
-        // role 뱃지 1개만 — 세로 중앙 정렬
+        // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
         .personal-tags {
-          grid-column: 3;
-          grid-row: 1;
-          align-self: center;
           display: flex;
-          flex-direction: column;
-          gap: 2px;
-          width: 140px;
+          flex-direction: row;
+          align-items: center;
+          gap: 8px;
+          width: auto;
           flex-shrink: 0;
-          margin-right: 8px;
         }
 
         .tag-badge {
-          padding: 4px 7px;
+          padding: 3px 11px !important; // 태그 패딩 통일
           border-radius: 4px;
           font-family: "Pretendard", sans-serif;
-          font-size: 10px;
+          font-size: 13px !important; // 태그 pt 통일
           line-height: 1.14;
           font-weight: 600;
-          white-space: nowrap;
+          white-space: normal !important;
           text-align: center;
-          min-width: 140px;
-          width: 100%;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          width: 170px; // fixed tag width
+          min-width: 170px;
+          flex-shrink: 0;
+          overflow: visible !important;
+          overflow-wrap: break-word !important;
+          text-overflow: unset !important;
           display: block;
           box-sizing: border-box;
+        }
+
+        .personal-tags .tag-badge {
+          width: 170px;
+          box-sizing: border-box;
+          flex-shrink: 0;
+        }
+
+        .personal-tags .tag-badge.tag-role,
+        .personal-tags .tag-badge.tag-keyword {
+          width: 170px;
+          text-align: center;
         }
 
         .tag-role {
           background: rgba(250, 171, 7, 0.15);
           color: #faab07;
           border: 1px solid rgba(250, 171, 7, 0.3);
+        }
+
+        .tag-keyword {
+          background: rgba(135, 206, 250, 0.15);
+          color: #87ceeb;
+          border: 1px solid rgba(135, 206, 250, 0.3);
         }
 
         .personal-field {
@@ -6086,51 +6140,46 @@
 
           .field-value {
             font-family: "Pretendard", sans-serif;
-            font-size: 11px;
+            font-size: 13px !important; // 필드값 pt 통일
             line-height: 1.14;
             color: #ddd;
             display: block;
-            white-space: nowrap;
-            overflow: visible;
+            min-width: 0;
+            white-space: normal !important;
+            overflow: visible !important;
+            overflow-wrap: break-word !important;
+            text-overflow: unset !important;
           }
 
           .field-label {
             font-family: "Pretendard", sans-serif;
-            font-size: 9px;
+            font-size: 13px !important; // 필드 라벨 pt 통일
             line-height: 1.14;
             color: rgba(255, 255, 255, 0.4);
             flex-shrink: 0;
             min-width: 28px;
             display: block;
             white-space: nowrap;
+            margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
           }
         }
       }
 
-      // ── 중단: 키워드 + 내용 ──
+      // ── 중단: 키워드(tag.tag--색상 재사용) + 내용 ──
       .reputation-content-section {
         display: flex;
         flex-direction: column;
         gap: 6px;
         flex-shrink: 0;
 
-        .reputation-keyword {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-
-          .keyword-hash {
-            color: #faab07;
-            font-size: 14px;
-            font-weight: 700;
-          }
-
-          .keyword-text {
-            font-family: "Pretendard", sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: #faab07;
-          }
+        // .tag.tag--pink 등은 최상위 .tag 셀렉터(L30) 스타일 그대로 사용
+        > .tag {
+          align-self: flex-start; // 키워드 너비만큼만 차지
+          font-size: 15.6px !important;
+          white-space: normal !important;
+          overflow: visible !important;
+          overflow-wrap: break-word !important;
+          text-overflow: unset !important;
         }
 
         .reputation-content-box {
@@ -6146,7 +6195,9 @@
             font-size: 13px;
             line-height: 1.6;
             color: #ddd;
-            white-space: pre-wrap;
+            white-space: pre-wrap !important;
+            overflow-wrap: break-word !important;
+            text-overflow: unset !important;
             margin: 0;
           }
         }
@@ -6169,7 +6220,7 @@
 
         .stats-label {
           font-family: "Pretendard", sans-serif;
-          font-size: 13px;
+          font-size: 18px !important; // 사용자 요청: 13 → 18
           font-weight: 700;
           color: #ddd;
         }
@@ -6179,7 +6230,7 @@
           gap: 2px;
 
           .rating-star {
-            font-size: 18px;
+            font-size: 24px !important; // 사용자 요청: 18 → 24
             line-height: 1;
 
             &.star-empty {
@@ -6200,7 +6251,7 @@
 
         .rating-value {
           font-family: "Pretendard", sans-serif;
-          font-size: 13px;
+          font-size: 18px !important; // 사용자 요청: 13 → 18
           font-weight: 700;
           color: #faab07;
           min-width: 48px;
@@ -6208,10 +6259,10 @@
 
         .fm-value {
           font-family: "Pretendard", sans-serif;
-          font-size: 18px;
+          font-size: 24px !important; // 사용자 요청: 18 → 24
           font-weight: 700;
           color: #ddd;
-          min-width: 24px; // 2자리수(10) 고정
+          min-width: 28px; // 2자리수(10) 고정 — 24px 기준 확대
         }
       }
 
@@ -6228,6 +6279,13 @@
           font-size: 11px;
           color: rgba(255, 255, 255, 0.4);
         }
+      }
+
+      .section-modal-header h3,
+      .reputation-content-text,
+      .personal-field .field-value {
+        text-overflow: unset !important;
+        overflow-wrap: break-word !important;
       }
     }
 
@@ -8786,7 +8844,7 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    padding: 20px 28px;
+    padding: 16px 28px 20px;
     box-sizing: border-box;
   }
 
@@ -8796,6 +8854,7 @@
     gap: 12px !important;
     height: 100%;
     box-sizing: border-box;
+    align-items: stretch !important; // 좌우 동일 높이 — 평점 bottom = growth box bottom
 
     .workinfo-left {
       // 사용자 요청: 좌측 고정폭 + 우측 확대 (3cm≈114px 축소 → 우측 120px 확대)
@@ -8805,7 +8864,7 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px; // 사용자 요청: Main Title y좌표 위로 (16 → 8)
+      gap: 10px; // 미드 내부 요소 간 여유 확보
       overflow-y: auto;
       padding-right: 8px;
 
@@ -8837,6 +8896,12 @@
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
+      gap: 8px;
+      height: auto !important;
+      max-height: none !important;
+      align-self: stretch !important; // 좌측 전체 높이에 맞춰 확장
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
     }
   }
 
@@ -8847,7 +8912,12 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 8px;
-    height: 100%;
+    // 4개 모달 공통: 우측 컬럼 남은 공간 전부 차지 (520px 고정 해제 — 좌측 전체 높이와 연동)
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    align-self: stretch;
 
     // cluster3 .image-slot 실측값 (border 1px solid rgba(255,165,0,0.3), border-radius 0)
     .workinfo-image-slot {
@@ -9060,29 +9130,47 @@
 
   // 좌상단: 인적사항 카드 — 5열 그리드 (1열 사진 rowspan 3 + 2열 3행)
   .workinfo-personal-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 7px 12px;
+    background: transparent;
+    border: 0;
+    padding: 0;
     flex-shrink: 0;
+    margin-top: 0 !important; // 박스 위치 원복 (내부 텍스트만 별도 조정)
 
     .personal-grid {
       display: grid;
-      grid-template-columns: auto 1fr auto; // 사진 | 정보 | 태그
+      grid-template-columns: auto 1fr !important; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
       grid-template-rows: auto;
-      gap: 3px 12px;
-      align-items: start; // 위쪽 정렬 — 태그 늘어나도 사진/정보 행 밀림 없음
+      gap: 0 18px;
+      align-items: center !important; // 사진/정보 세로 중앙 균형
+      position: relative;
+
+      &::before {
+        content: "";
+        grid-column: 1 / 3;
+        grid-row: 1;
+        align-self: stretch;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+        z-index: 0;
+      }
     }
 
     // 1열: 사진
     .personal-photo {
       grid-column: 1;
       grid-row: 1;
-      width: 64px;
-      height: 64px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      align-self: center;
+      align-self: center !important; // 세로 중앙
+      // 인적사항 ↓ 0.5cm — margin-top으로 처리해 grid row가 실제로 확장되도록 함 (border ::before 포함)
+      margin: 21px 0 2px 10px;
+      margin-top: -3px !important; // 사진만 위로 (현재보다 0.1cm 아래로: -7 → -3)
+      position: relative;
+      z-index: 1;
 
       img {
         width: 100%;
@@ -9098,8 +9186,13 @@
       grid-row: 1;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 0;
       min-width: 0;
+      padding: 3px 8px 3px 0;
+      position: relative;
+      z-index: 1;
+      align-self: center !important; // 세로 중앙
+      margin-top: 0 !important; // -6px 원복
     }
 
     .personal-row-1,
@@ -9109,16 +9202,31 @@
       align-items: center;
       gap: 5px;
       font-family: "Pretendard", sans-serif;
-      font-size: 11px;
+      font-size: 13px !important; // 인적사항 본문 pt 통일
       line-height: 1.14;
       color: #ddd;
       min-width: 0;
     }
 
+    // row-1 안에 태그 가로 배치 — 우측 정렬
+    .personal-row-1 {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px;
+
+      .personal-tags {
+        margin-left: auto !important; // row-1 내부 우측 정렬
+        display: flex !important;
+        flex-direction: row !important; // 가로 배치
+        gap: 8px !important;
+        flex-shrink: 0;
+      }
+    }
+
     .personal-row-2,
     .personal-row-3 {
       display: grid;
-      grid-template-columns: 220px 40px 20px 220px 40px;
+      grid-template-columns: 174px 32px 14px 174px 32px;
       align-items: center;
       column-gap: 0;
       white-space: nowrap;
@@ -9131,6 +9239,8 @@
     .personal-separator {
       color: rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
+      padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
+      font-size: 13px !important; // 본문 pt 통일
     }
 
     // 1행 — 고정폭 (말줄임 없음, 최대 글자수 입력 차단으로 보장)
@@ -9138,53 +9248,146 @@
       min-width: 64px; // 4자 × 16px
       display: flex;
       align-items: center;
-      width: 180px;
-      height: 40px;
-      padding: 6px 10px;
+      width: 150px;
+      height: 24px;
+      padding: 2px 8px;
       margin: 0;
       border: 1px solid rgba(255, 165, 0, 0.3);
       background: rgb(26, 26, 46);
       white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
     }
     .personal-gender {
       min-width: 16px; // 1자
       display: inline-block;
       white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
     }
     .personal-age {
       min-width: 48px; // "22 세"
       display: inline-block;
       white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
     }
 
-    // 3열 독립: 역할/키워드 색상 textbox (세로 2행) — row-1 행 높이에 영향 없음
+    // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
     .personal-tags {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      width: auto;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    // 기존 personal-tags 위치: 강화 상태 표시
+    .personal-line-status {
+      --enhance-color: 255, 107, 154;
       grid-column: 3;
       grid-row: 1;
-      align-self: center; // 사진/정보 영역 세로 중앙
+      align-self: start;
+      justify-self: end;
       display: flex;
-      flex-direction: column;
-      gap: 2px;
-      width: 180px;
-      flex-shrink: 0;
-      margin-right: 8px !important; // 19px → 8px (오른쪽으로 11px 이동)
+      align-items: center;
+      gap: 8px;
+      min-width: 180px;
+      padding-left: 16px;
+      transform: translateX(-19px) translateY(-8px); // 현재 대비 오른쪽 0.5cm + 위로 0.2cm (-38 → -19, 0 → -8)
+
+      &:has(.enhance-success) {
+        --enhance-color: 255, 107, 154;
+      }
+
+      &:has(.enhance-wait),
+      &:has(.enhance-waiting) {
+        --enhance-color: 107, 203, 119;
+      }
+
+      &:has(.enhance-fail),
+      &:has(.enhance-failed) {
+        --enhance-color: 77, 171, 247;
+      }
+
+      &:has(.enhance-none),
+      &:has(.enhance-not_applicable) {
+        --enhance-color: 160, 132, 220;
+      }
+
+      .line-enhance-icon {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      .line-status-icon {
+        font-size: 60px;
+        line-height: 1;
+        color: rgb(var(--enhance-color));
+        flex-shrink: 0;
+      }
+
+      .line-enhance-status {
+        margin-left: 0;
+        font-size: 20px !important; // 가독성 확보 (9px 너무 작음)
+        font-weight: 600 !important;
+        // CSS 변수로 배지 아이콘 색상과 동기화 — 상태 클래스가 --enhance-color 덮어씀
+        color: rgb(var(--enhance-color, 255, 107, 154));
+        text-shadow:
+          0 0 4px rgba(var(--enhance-color, 255, 107, 154), 0.6),
+          0 0 8px rgba(var(--enhance-color, 255, 107, 154), 0.4);
+
+        &.enhance-success {
+          --enhance-color: 255, 107, 154;
+        }
+
+        &.enhance-wait,
+        &.enhance-waiting {
+          --enhance-color: 107, 203, 119;
+        }
+
+        &.enhance-fail,
+        &.enhance-failed {
+          --enhance-color: 77, 171, 247;
+        }
+
+        &.enhance-none,
+        &.enhance-not_applicable {
+          --enhance-color: 160, 132, 220;
+        }
+      }
     }
 
     .tag-badge {
-      padding: 2px 7px;
+      padding: 3px 11px !important; // 태그 패딩 통일
       border-radius: 4px;
       font-family: "Pretendard", sans-serif;
-      font-size: 10px;
+      font-size: 13px !important; // 태그 pt 통일
       line-height: 1.14;
       font-weight: 600;
-      white-space: nowrap;
+      white-space: nowrap !important;
       text-align: center;
-      min-width: 180px; // 역할/키워드 최대 글자수 기준 고정폭
-      width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      min-width: 170px;
+      width: 170px;
+      flex-shrink: 0;
+      overflow: visible !important;
+      overflow-wrap: break-word !important;
+      text-overflow: unset !important;
       display: block;
       box-sizing: border-box;
+    }
+
+    .personal-tags .tag-badge {
+      width: 170px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .personal-tags .tag-badge.tag-role,
+    .personal-tags .tag-badge.tag-keyword {
+      width: 170px;
+      text-align: center;
     }
 
     .tag-role {
@@ -9208,7 +9411,7 @@
 
       .field-value {
         font-family: "Pretendard", sans-serif;
-        font-size: 11px;
+        font-size: 13px !important; // 필드값 pt 통일
         line-height: 1.14;
         color: #ddd;
         display: block;
@@ -9218,13 +9421,14 @@
 
       .field-label {
         font-family: "Pretendard", sans-serif;
-        font-size: 9px;
+        font-size: 13px !important; // 필드 라벨 pt 통일
         line-height: 1.14;
         color: rgba(255, 255, 255, 0.4);
         flex-shrink: 0;
         min-width: 28px;
         display: block;
         white-space: nowrap;
+        margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
       }
     }
   }
@@ -9234,6 +9438,11 @@
     display: flex;
     gap: 20px;
     flex-shrink: 0;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 122px;
+    overflow: visible !important;
+    overflow-y: visible !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -9243,17 +9452,19 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 12px;
+      margin-top: 4px;
       box-sizing: border-box;
     }
 
     .workinfo-mid-col2 {
-      flex: 1;
+      flex: none !important;
+      width: 360px !important; // Output Link 영역 고정폭 (220 + 76 ≈ 2cm 확장)
       min-width: 0;
       display: flex;
       justify-content: flex-end;
       box-sizing: border-box;
+      margin-top: 20px !important; // 강화 상태 행과 수직 겹침 방지
     }
   }
 
@@ -9294,11 +9505,20 @@
       align-items: center;
       gap: 5px;
       font-family: "Pretendard", sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1;
       color: #ddd;
       margin: 0;
       width: 100%; // 행1(.line-name min-width 560px)과 행2 우측 끝 x좌표 정렬
+    }
+
+    // 행1: 컴팩트 행 — 주변 요소 위치 불변
+    .line-info-row:nth-child(1) {
+      height: 44px !important; // 아이콘 40px + 여유
+      min-height: 44px !important;
+      max-height: 44px !important;
+      overflow: visible;
+      align-items: center;
     }
 
     // 행2: 강화 상태가 남은 공간 차지 + 라인코드는 우측 끝에 고정
@@ -9316,10 +9536,9 @@
     }
 
     // 활동 카테고리 아이콘 (selectedWorkInfoCard.icon — activityTypeConfig.icon)
-    // 사용자 요청: 3배 확대 (24 → 72)
     .line-activity-icon {
-      width: 48px !important;
-      height: 48px !important;
+      width: 40px !important; // 32 → 40
+      height: 40px !important;
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -9327,8 +9546,8 @@
     // 강화 상태 아이콘 (selectedWorkInfoCard.statusIcon — enhancementStatusIcons[status])
     // 사용자 요청: 3배 확대 (24 → 72)
     .line-enhance-icon {
-      width: 48px !important;
-      height: 48px !important;
+      width: 32px !important;
+      height: 32px !important;
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -9338,13 +9557,13 @@
       display: inline-block;
       min-width: 560px;
       white-space: nowrap;
-      font-size: 28px;
+      font-size: 20px !important; // 16 → 20
       line-height: 1;
     }
 
     .line-enhance-status {
       white-space: nowrap;
-      font-size: 28px;
+      font-size: 18px;
       line-height: 1;
     }
 
@@ -9365,6 +9584,44 @@
     }
   }
 
+  // .badge-status.yellow 스타일 그대로 적용
+  .image-line-code {
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin: 0 5px 0 0; // badge-status margin (left 0 유지)
+    background: #faab07;
+    color: #111111;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: "Pretendard", sans-serif;
+    font-size: 0.625rem; // 10px
+    font-weight: 600;
+    line-height: 15px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .line-code.image-line-code {
+    all: unset;
+    display: inline-flex;
+    width: fit-content;
+    max-width: max-content;
+    padding: 4px 7.2px;
+    background: rgba(250, 171, 7, 0.1);
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: "Pretendard", sans-serif;
+    font-weight: 600;
+    line-height: 15px;
+    color: #faab07;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+
   // Output Link — cluster3 output modal 패턴 준용 (link-dot + input/text + open-btn)
   // (cluster3 _cluster3.scss L4806 .output-links-section의 시각 스타일을 workInfo 스코프에 복제)
   .workinfo-output-links {
@@ -9376,6 +9633,7 @@
     max-width: 270px;
     min-width: 0;
     box-sizing: border-box;
+    transform: translateY(-57px); // 전체 ↑ 1.5cm
 
     .output-link-row {
       display: flex;
@@ -9498,7 +9756,7 @@
   // 좌하단: Main Title / Sub Title / Growth Point
   // 사용자 요청: Main Title 0.5cm(≈ -19px) 위로 — text-section만 추가 보정
   .workinfo-text-section {
-    margin-top: -7px;
+    margin-top: -73px !important;
     display: flex;
     flex-direction: column;
     gap: 16px !important;
@@ -9582,10 +9840,10 @@
     // Main Title: 74px 고정 박스 + 18px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
     .text-block-main {
       .main-title-readonly {
-        height: 74px !important;
-        min-height: 74px !important;
-        max-height: 74px !important;
-        font-size: 18px !important;
+        height: 59px !important; // 78 → 59 (-19px, 0.5cm 축소)
+        min-height: 59px !important;
+        max-height: 59px !important;
+        font-size: 14px !important;
         font-weight: 700 !important;
         line-height: 1.6 !important;
         overflow-y: auto;
@@ -9607,9 +9865,9 @@
     // Sub Title: 200자 → 보기/편집 동일 높이 75px (사용자 요청: 300→200자, 90→75px)
     .text-block-sub {
       .sub-title-input {
-        height: 75px !important;
-        min-height: 75px !important;
-        max-height: 75px !important;
+        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        min-height: 111px !important;
+        max-height: 111px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
@@ -9618,9 +9876,9 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 75px !important;
-        min-height: 75px !important;
-        max-height: 75px !important;
+        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        min-height: 111px !important;
+        max-height: 111px !important;
         overflow-y: auto !important;
         font-size: 14px !important;
       }
@@ -9628,9 +9886,9 @@
     // Growth Point: 100자 → 보기/편집 동일 높이 45px (사용자 요청: 200→100자, 60→45px)
     .text-block-growth {
       .growth-point-input {
-        height: 45px !important;
-        min-height: 45px !important;
-        max-height: 45px !important;
+        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        min-height: 71px !important;
+        max-height: 71px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
@@ -9639,9 +9897,9 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 45px !important;
-        min-height: 45px !important;
-        max-height: 45px !important;
+        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        min-height: 71px !important;
+        max-height: 71px !important;
         overflow-y: auto !important;
         font-size: 14px !important;
       }
@@ -9683,7 +9941,7 @@
 
     .text-block-main {
       .main-title-readonly {
-        font-size: 18px !important;
+        font-size: 14px !important;
         font-weight: 700 !important;
       }
     }
@@ -9840,6 +10098,52 @@
     line-height: inherit;
     vertical-align: baseline;
     font-weight: 700;
+  }
+}
+
+// ============================================================================
+// reputation view 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
   }
 }
 
@@ -10156,19 +10460,21 @@
   .workcareer-grade-section {
     display: flex;
     align-items: center;
-    justify-content: flex-end !important; // 우측 정렬 (사용자 요청)
+    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
     gap: 8px;
-    padding: 0 12px !important;
+    width: 100%;
     border: none !important;
     background: transparent !important;
-    margin-top: 20px;
-    flex-shrink: 0;
+    margin: 0 !important;          // 모든 margin 리셋
+    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important;          // 모든 padding 리셋
+    flex-shrink: 0 !important;
 
     .grade-label {
-      font-family: "Pretendard", sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: #ddd;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 14px !important;          // 13 → 14 (통일)
+      font-weight: 700 !important;         // 600 → 700 (통일)
+      color: #ddd !important;
       white-space: nowrap;
     }
 
@@ -10215,12 +10521,19 @@
     }
   }
 
-  // 이미지 그리드가 평점 영역 높이를 양보하도록 (workExp 패턴 준용)
-  .workinfo-image-grid {
-    flex: 1;
-    min-height: 0;
+  // 우측 컬럼이 좌측 전체 높이에 맞춰 stretch (workexp와 통일)
+  .workinfo-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     height: auto !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
+
+  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
 }
 
 // ============================================================================
@@ -10273,31 +10586,34 @@
   .workinfo-right {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    height: auto !important;
+    max-height: none !important;
+    align-self: stretch !important;  // 좌측 전체 높이에 맞춤
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
-  .workinfo-image-grid {
-    flex: 1;
-    min-height: 0;
-    height: auto !important; // 공유 규칙의 height:100% 오버라이드 (평점 영역 공간 확보)
-  }
+  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
 
   .workexp-rating-section {
     display: flex;
     align-items: center;
-    justify-content: center; // 중앙 정렬
+    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
     gap: 8px;
-    padding: 0 12px !important;
+    width: 100%;
     border: none !important;
     background: transparent !important;
-    margin-top: 20px;
-    flex-shrink: 0;
+    margin: 0 !important;          // 모든 margin 리셋
+    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important;          // 모든 padding 리셋
+    flex-shrink: 0 !important;
 
     .rating-label {
-      font-family: "Pretendard", sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: #ddd;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 14px !important;          // 13 → 14 (통일)
+      font-weight: 700 !important;         // 600 → 700 (통일)
+      color: #ddd !important;
       white-space: nowrap;
     }
 
@@ -10508,5 +10824,34 @@
     color: rgba(255, 255, 255, 0.7);
     font-family: "Pretendard", sans-serif;
     font-size: 15px;
+  }
+}
+
+// ============================================================================
+// 4개 모달(workInfo/workAbility/workCareer/workExp) + reputation-view-modal 공유
+// 인적사항 내부 글자 전부 동일 pt(13px)로 통일
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
+  .workinfo-personal-card {
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3,
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-separator,
+    .field-value,
+    .field-label,
+    .tag-badge {
+      font-size: 13px !important;
+    }
+
+    .tag-badge {
+      padding: 3px 10px !important;
+    }
   }
 }

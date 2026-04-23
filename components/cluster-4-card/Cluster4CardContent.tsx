@@ -668,6 +668,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return `${year} - ${month} - ${day} (${dayOfWeek})`;
   };
 
+  const compactPersonalTag = (value: string | null | undefined, fallback: string): string => {
+    return (value || fallback).replace(/\s+/g, "");
+  };
+
+  // reputation-view-modal 최하단 타임스탬프 — YY. MM. DD(요일)  HH:MM
+  // TODO: [백엔드 작업 필요] weeklyReputations에 created_at 필드 추가 시 자동 동작
+  const formatReputationTime = (timestamp: string | undefined | null): string => {
+    if (!timestamp) return "";
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return "";
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    const yy = String(d.getFullYear()).slice(-2);
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const day = days[d.getDay()];
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${yy}. ${mm}. ${dd}(${day})  ${hh}:${mi}`;
+  };
+
   // DB에서 주차 데이터 및 관련 정보 가져오기
   useEffect(() => {
     // 마운트 전엔 isDemoMode가 확정되지 않았으므로 아무것도 안 함 (SSR/client hydration 일관성)
@@ -2844,6 +2864,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               fm: 1, // FM은 항상 1
               tagColor: colors[index % colors.length],
               tagText: `#${rep.keyword || "-"}`,
+              // TODO: [백엔드 작업 필요] weeklyReputations 테이블에 created_at 필드 추가 후
+              // formatReputationTime(createdAt)으로 "YY. MM. DD(요일) HH:MM" 표시
+              createdAt: rep.created_at || null,
               isEmpty: false,
             };
           })
@@ -2870,6 +2893,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         fm: 0,
         tagColor: "tag--dark",
         tagText: "-",
+        createdAt: null,
         isEmpty: true,
       });
     }
@@ -6211,7 +6235,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
             {/* ── 미드 (460px) — 1열 세로 배치 ── */}
             <div className="section-modal-body reputation-body">
-              {/* 상단: 인적사항 카드 (4개 모달과 동일 구조, role 뱃지 1개) */}
+              {/* 상단: 인적사항 카드 (4개 모달과 동일 구조) */}
               <div className="workinfo-personal-card">
                 <div className="personal-grid">
                   <div className="personal-photo">
@@ -6227,46 +6251,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="personal-age">
                         {mask.age(selectedReputationCard.age) || "—"} 세
                       </span>
+                      <div className="personal-tags">
+                        <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
+                        <span className="tag-badge tag-keyword">{selectedReputationCard.nickname || selectedReputationCard.keyword || "키워드"}</span>
+                      </div>
                     </div>
 
                     <div className="personal-row-2">
                       <span className="personal-field">
-                        <span className="field-value">{truncate(formatSchool(mask.school(selectedReputationCard.university))) || "—"}</span>
+                        <span className="field-value">{formatSchool(mask.school(selectedReputationCard.university)) || "—"}</span>
                         <span className="field-label">학교</span>
                       </span>
                       <span className="personal-separator">|</span>
                       <span className="personal-field">
-                        <span className="field-value">{truncate(formatMajor(mask.major(selectedReputationCard.major))) || "—"}</span>
+                        <span className="field-value">{formatMajor(mask.major(selectedReputationCard.major)) || "—"}</span>
                         <span className="field-label">학과</span>
                       </span>
                     </div>
 
                     <div className="personal-row-3">
                       <span className="personal-field">
-                        <span className="field-value">{truncate(selectedReputationCard.team) || "—"}</span>
+                        <span className="field-value">{selectedReputationCard.team || "—"}</span>
                         <span className="field-label">팀</span>
                       </span>
                       <span className="personal-separator">|</span>
                       <span className="personal-field">
-                        <span className="field-value">{truncate(selectedReputationCard.part) || "—"}</span>
+                        <span className="field-value">{selectedReputationCard.part || "—"}</span>
                         <span className="field-label">파트</span>
                       </span>
                     </div>
                   </div>
-
-                  <div className="personal-tags">
-                    {/* role 뱃지 1개만 (결정사항) */}
-                    <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
-                  </div>
                 </div>
               </div>
 
-              {/* 중단: 키워드 + 내용 */}
+              {/* 중단: 키워드(tag.tag--색상) + 내용 */}
               <div className="reputation-content-section">
-                <div className="reputation-keyword">
-                  <span className="keyword-hash">#</span>
-                  <span className="keyword-text">{(selectedReputationCard.tagText || "").replace(/^#/, "") || "—"}</span>
-                </div>
+                <span className={`tag ${selectedReputationCard.tagColor || "tag--pink"}`}>
+                  {selectedReputationCard.tagText || "#—"}
+                </span>
                 <div className="reputation-content-box">
                   <p className="reputation-content-text">{selectedReputationCard.description || "-"}</p>
                 </div>
@@ -6297,10 +6319,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
 
-              {/* 최하단: 타임스탬프 (우측 정렬) */}
-              {/* TODO: [백엔드 작업 필요] weeklyReputations에 created_at 필드 추가 후 YY. MM. DD(요일) HH:MM 포맷으로 표시 */}
+              {/* 최하단: 타임스탬프 (우측 정렬) — 백엔드 created_at 없으면 빈 문자열 */}
               <div className="reputation-timestamp">
-                <span></span>
+                <span>{formatReputationTime(selectedReputationCard.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -6397,13 +6418,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                       {/* 2열: 인적사항 텍스트 컬럼 (3행 stack) */}
                       <div className="personal-info">
-                        {/* 1행 — 이름·성별·나이 */}
+                        {/* 1행 — 이름·성별·나이 + 역할/키워드 태그 (태그는 우측 정렬) */}
                         <div className="personal-row-1">
                           <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
                           <span className="personal-separator">|</span>
                           <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
                           <span className="personal-separator">|</span>
                           <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <div className="personal-tags">
+                            {/* TODO: [백엔드 작업 필요] role 필드 (운영진/앰배서더/일반 등) — profile API에 추가 필요 */}
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                          </div>
                         </div>
 
                         {/* 2행 — 학교·학과 (필드명/값 분리, 고정폭, 말줄임 없음) */}
@@ -6433,11 +6459,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       </div>
 
-                      {/* 3열: 역할/키워드 태그 (그리드 독립 — row-1 행 높이에 영향 없음) */}
-                      <div className="personal-tags">
-                        {/* TODO: [백엔드 작업 필요] role 필드 (운영진/앰배서더/일반 등) — profile API에 추가 필요 */}
-                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
-                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                      <div className="personal-line-status line-info-row">
+                        {selectedWorkInfoCard.statusIcon ? <img className="line-enhance-icon" src={selectedWorkInfoCard.statusIcon} alt={selectedWorkInfoCard.status || "강화 상태"} /> : <span className="line-status-icon">●</span>}
+                        <span className={`line-enhance-status enhance-${(selectedWorkInfoCard.status as string) || "not_applicable"}`}>
+                          {{
+                            success: "강화 성공",
+                            waiting: "강화 대기",
+                            failed: "강화 실패",
+                            not_applicable: "해당 없음",
+                          }[selectedWorkInfoCard.status as string] || "—"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -6457,25 +6488,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           {selectedWorkInfoCard.icon ? <img className="line-activity-icon" src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category || "활동"} /> : <span className="line-status-icon">●</span>}
                           <span className="line-name">{selectedWorkInfoCard.category || "—"}</span>
                         </div>
-                        {/* 2행: 강화 상태 — 기존 매핑 enhancementStatusIcons[status] (selectedWorkInfoCard.statusIcon) 사용 */}
-                        {(() => {
-                          const enhanceStatusTextMap: Record<string, string> = {
-                            success: "강화 성공",
-                            waiting: "강화 대기",
-                            failed: "강화 실패",
-                            not_applicable: "해당 없음",
-                          };
-                          const statusKey = selectedWorkInfoCard.status as string;
-                          const statusText = enhanceStatusTextMap[statusKey] || "—";
-                          return (
-                            <div className="line-info-row">
-                              {selectedWorkInfoCard.statusIcon ? <img className="line-enhance-icon" src={selectedWorkInfoCard.statusIcon} alt={statusText} /> : <span className="line-status-icon">●</span>}
-                              <span className="line-enhance-status">{statusText}</span>
-                              {/* TODO: [백엔드 작업 필요] line_code 매핑 확정 후 추가 — 현재는 activityType 표시 */}
-                              <span className="line-code">{lineCodeMap[selectedWorkInfoCard.activityType] || selectedWorkInfoCard.activityType || ""}</span>
-                            </div>
-                          );
-                        })()}
                       </div>
                     </div>
 
@@ -6545,12 +6557,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingSubTitle(e.target.value);
+                              if (e.target.value.length <= 300) setEditingSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 내용을 진행하고, 어떤 과정을 밟으며, 어떤 정보들을 얻게 되었는지를 작성해주세요. 😊"
-                            maxLength={200}
+                            maxLength={300}
                           />
-                          <span className="char-count">{editingSubTitle.length}/200</span>
+                          <span className="char-count">{editingSubTitle.length}/300</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkInfoCard.subTitle || "-"}</div>
@@ -6569,12 +6581,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 100) setEditingGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 200) setEditingGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 라인을 진행하며 느낀 통찰, 정보, 감각, 식견을 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={100}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingGrowthPoint.length}/100</span>
+                          <span className="char-count">{editingGrowthPoint.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkInfoCard.growthPoint || "-"}</div>
@@ -6728,6 +6740,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       );
                     })}
                   </div>
+                  <span className="line-code image-line-code">{lineCodeMap[selectedWorkInfoCard.activityType] || selectedWorkInfoCard.activityType || ""}</span>
                 </div>
               </div>
             </div>
@@ -6817,6 +6830,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
                           <span className="personal-separator">|</span>
                           <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <div className="personal-tags">
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                          </div>
                         </div>
 
                         <div className="personal-row-2">
@@ -6844,10 +6861,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       </div>
 
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
-                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
-                      </div>
+                      {(() => {
+                        const enhanceStatusTextMap: Record<string, string> = {
+                          success: "강화 성공",
+                          waiting: "강화 대기",
+                          failed: "강화 실패",
+                          not_applicable: "해당 없음",
+                        };
+                        const statusKey = selectedWorkExpCard.enhancementStatus as string;
+                        const statusText = enhanceStatusTextMap[statusKey] || "—";
+                        const statusImages: Record<string, string> = {
+                          success: "/images/0/cluster4/icon/5 강화 성공.png",
+                          waiting: "/images/0/cluster4/icon/6 강화 대기.png",
+                          failed: "/images/0/cluster4/icon/7 강화 실패.png",
+                          not_applicable: "/images/0/cluster4/icon/8 해당 없음.png",
+                        };
+                        return (
+                          <div className="personal-line-status line-info-row">
+                            {statusImages[statusKey] ? <img className="line-enhance-icon" src={statusImages[statusKey]} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                            <span className={`line-enhance-status enhance-${statusKey || "not_applicable"}`}>{statusText}</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -6867,30 +6902,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           />
                           <span className="line-name">{lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "—"}</span>
                         </div>
-                        {(() => {
-                          const enhanceStatusTextMap: Record<string, string> = {
-                            success: "강화 성공",
-                            waiting: "강화 대기",
-                            failed: "강화 실패",
-                            not_applicable: "해당 없음",
-                          };
-                          const statusKey = selectedWorkExpCard.enhancementStatus as string;
-                          const statusText = enhanceStatusTextMap[statusKey] || "—";
-                          const statusImages: Record<string, string> = {
-                            success: "/images/0/cluster4/icon/5 강화 성공.png",
-                            waiting: "/images/0/cluster4/icon/6 강화 대기.png",
-                            failed: "/images/0/cluster4/icon/7 강화 실패.png",
-                            not_applicable: "/images/0/cluster4/icon/8 해당 없음.png",
-                          };
-                          const expMapping = lookupWorkExpMapping(selectedWorkExpCard.code);
-                          return (
-                            <div className="line-info-row">
-                              {statusImages[statusKey] ? <img className="line-enhance-icon" src={statusImages[statusKey]} alt={statusText} /> : <span className="line-status-icon">●</span>}
-                              <span className="line-enhance-status">{statusText}</span>
-                              <span className="line-code">{expMapping?.lineCode || selectedWorkExpCard.code || ""}</span>
-                            </div>
-                          );
-                        })()}
                       </div>
                     </div>
 
@@ -6953,12 +6964,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingExpSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingExpSubTitle(e.target.value);
+                              if (e.target.value.length <= 300) setEditingExpSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 실무 경험을 진행했고, 어떤 과정을 거쳐, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={200}
+                            maxLength={300}
                           />
-                          <span className="char-count">{editingExpSubTitle.length}/200</span>
+                          <span className="char-count">{editingExpSubTitle.length}/300</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkExpCard.subTitle || "-"}</div>
@@ -6975,12 +6986,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingExpGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 100) setEditingExpGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 200) setEditingExpGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 경험을 통해 느낀 통찰, 역량, 성과를 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={100}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingExpGrowthPoint.length}/100</span>
+                          <span className="char-count">{editingExpGrowthPoint.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkExpCard.growthPoint || "-"}</div>
@@ -7128,6 +7139,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       );
                     })}
                   </div>
+                  <span className="line-code image-line-code">{lookupWorkExpMapping(selectedWorkExpCard.code)?.lineCode || selectedWorkExpCard.code || ""}</span>
 
                   {/* 라인 평점 — workExp 전용 (필수, 0=미입력, 1~10) */}
                   {(() => {
@@ -7280,6 +7292,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
                           <span className="personal-separator">|</span>
                           <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <div className="personal-tags">
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                          </div>
                         </div>
                         <div className="personal-row-2">
                           <span className="personal-field">
@@ -7304,10 +7320,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           </span>
                         </div>
                       </div>
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
-                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
-                      </div>
+                      {(() => {
+                        const statusTextMap: Record<string, string> = {
+                          success: "강화 성공",
+                          waiting: "강화 대기",
+                          failed: "강화 실패",
+                          not_applicable: "해당 없음",
+                        };
+                        const statusKey = selectedWorkAbilityCard.enhancementStatus as string;
+                        const statusText = statusTextMap[statusKey] || "—";
+                        return (
+                          <div className="personal-line-status line-info-row">
+                            {selectedWorkAbilityCard.statusIcon ? <img className="line-enhance-icon" src={selectedWorkAbilityCard.statusIcon} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                            <span className={`line-enhance-status enhance-${statusKey || "not_applicable"}`}>{statusText}</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -7322,23 +7350,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           {selectedWorkAbilityCard.icon ? <img className="line-activity-icon" src={selectedWorkAbilityCard.icon} alt={selectedWorkAbilityCard.lineName || "활동"} /> : <span className="line-status-icon">●</span>}
                           <span className="line-name">{selectedWorkAbilityCard.lineName || "—"}</span>
                         </div>
-                        {(() => {
-                          const statusTextMap: Record<string, string> = {
-                            success: "강화 성공",
-                            waiting: "강화 대기",
-                            failed: "강화 실패",
-                            not_applicable: "해당 없음",
-                          };
-                          const statusKey = selectedWorkAbilityCard.enhancementStatus as string;
-                          const statusText = statusTextMap[statusKey] || "—";
-                          return (
-                            <div className="line-info-row">
-                              {selectedWorkAbilityCard.statusIcon ? <img className="line-enhance-icon" src={selectedWorkAbilityCard.statusIcon} alt={statusText} /> : <span className="line-status-icon">●</span>}
-                              <span className="line-enhance-status">{statusText}</span>
-                              <span className="line-code">{selectedWorkAbilityCard.lineCode || selectedWorkAbilityCard.code || ""}</span>
-                            </div>
-                          );
-                        })()}
                       </div>
                     </div>
 
@@ -7398,12 +7409,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingAbilitySubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingAbilitySubTitle(e.target.value);
+                              if (e.target.value.length <= 300) setEditingAbilitySubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 역량을 어떤 과정으로 습득했고, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={200}
+                            maxLength={300}
                           />
-                          <span className="char-count">{editingAbilitySubTitle.length}/200</span>
+                          <span className="char-count">{editingAbilitySubTitle.length}/300</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkAbilityCard.subTitle || "-"}</div>
@@ -7419,12 +7430,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingAbilityGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 100) setEditingAbilityGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 200) setEditingAbilityGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 역량을 통해 느낀 통찰, 역량, 성과를 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={100}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingAbilityGrowthPoint.length}/100</span>
+                          <span className="char-count">{editingAbilityGrowthPoint.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkAbilityCard.growthPoint || "-"}</div>
@@ -7506,6 +7517,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       );
                     })}
                   </div>
+                  <span className="line-code image-line-code">{selectedWorkAbilityCard.lineCode || selectedWorkAbilityCard.code || ""}</span>
                 </div>
               </div>
             </div>
@@ -7601,6 +7613,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
                           <span className="personal-separator">|</span>
                           <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <div className="personal-tags">
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                          </div>
                         </div>
 
                         <div className="personal-row-2">
@@ -7628,10 +7644,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       </div>
 
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
-                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
-                      </div>
+                      {(() => {
+                        const statusKey = selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not_applicable" : "waiting";
+                        const statusText = selectedWorkCareerCard.verified ? "강화 성공" : selectedWorkCareerCard.isFailed ? "강화 실패" : selectedWorkCareerCard.isNotApplicable ? "해당 없음" : "강화 대기";
+                        return (
+                          <div className="personal-line-status line-info-row">
+                            {selectedWorkCareerCard.statusBadge ? <img className="line-enhance-icon" src={selectedWorkCareerCard.statusBadge} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                            <span className={`line-enhance-status enhance-${statusKey}`}>{statusText}</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -7660,16 +7682,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           )}
                           <span className="line-name">{selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "—"}</span>
                         </div>
-                        {(() => {
-                          const statusText = selectedWorkCareerCard.verified ? "강화 성공" : selectedWorkCareerCard.isFailed ? "강화 실패" : selectedWorkCareerCard.isNotApplicable ? "해당 없음" : "강화 대기";
-                          return (
-                            <div className="line-info-row">
-                              {selectedWorkCareerCard.statusBadge ? <img className="line-enhance-icon" src={selectedWorkCareerCard.statusBadge} alt={statusText} /> : <span className="line-status-icon">●</span>}
-                              <span className="line-enhance-status">{statusText}</span>
-                              <span className="line-code">{selectedWorkCareerCard.lineCode || selectedWorkCareerCard.code || ""}</span>
-                            </div>
-                          );
-                        })()}
                       </div>
                     </div>
 
@@ -7732,12 +7744,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingCareerSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingCareerSubTitle(e.target.value);
+                              if (e.target.value.length <= 300) setEditingCareerSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 실무 경력을 쌓았고, 어떤 과정을 거쳐, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={200}
+                            maxLength={300}
                           />
-                          <span className="char-count">{editingCareerSubTitle.length}/200</span>
+                          <span className="char-count">{editingCareerSubTitle.length}/300</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkCareerCard.subTitle || selectedWorkCareerCard.projectDescription || "-"}</div>
@@ -7754,12 +7766,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingCareerGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 100) setEditingCareerGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 200) setEditingCareerGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 경력을 통해 느낀 인사이트와 저변 확장을 어필해주세요. 😊"
-                            maxLength={100}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingCareerGrowthPoint.length}/100</span>
+                          <span className="char-count">{editingCareerGrowthPoint.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkCareerCard.growthPoint || "-"}</div>
@@ -7978,6 +7990,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       );
                     })()}
                   </div>
+                  <span className="line-code image-line-code">{selectedWorkCareerCard.lineCode || selectedWorkCareerCard.code || ""}</span>
 
                   {/* 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용 */}
                   <div className="workcareer-grade-section">
