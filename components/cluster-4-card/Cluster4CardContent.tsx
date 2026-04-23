@@ -7831,12 +7831,59 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       );
                     })}
-                    {/* 4번째 슬롯 — 4단계에서 후원/제휴사 카드 JSX 삽입 */}
+                    {/* 4번째 슬롯 — 후원/제휴사 카드 (항상 읽기전용, 편집 모드에서도 수정 불가) */}
                     <div className="workinfo-image-slot sponsor-card-slot">
-                      {/* TODO: 4단계에서 후원/제휴사 카드 (기업 로고/명 + 담당자 사진/이름/직무/회사/직책) */}
+                      <div className="sponsor-card">
+                        {/* 1행: 기업 로고 + 기업명 */}
+                        <div className="sponsor-company">
+                          <div className="sponsor-company-logo">
+                            {selectedWorkCareerCard.icon ? (
+                              <img src={selectedWorkCareerCard.icon} alt="기업 로고" />
+                            ) : (
+                              <div className="logo-placeholder">
+                                기업
+                                <br />
+                                로고
+                              </div>
+                            )}
+                          </div>
+                          <span className="sponsor-company-name">{selectedWorkCareerCard.badge || "기업명"}</span>
+                        </div>
+
+                        {/* 2~4행: 담당자 사진 + Supervised By + 이름/직무 + 회사/직책 */}
+                        <div className="sponsor-supervisor">
+                          <div className="sponsor-supervisor-photo">
+                            {selectedWorkCareerCard.supervisorImg ? <img src={selectedWorkCareerCard.supervisorImg} alt="담당자" /> : <div className="photo-placeholder"></div>}
+                          </div>
+                          <div className="sponsor-supervisor-info">
+                            <span className="supervisor-label">Supervised By</span>
+                            <div className="supervisor-details">
+                              <span className="supervisor-name">{selectedWorkCareerCard.supervisorName || "-"}</span>
+                              <span className="supervisor-separator">|</span>
+                              <span className="supervisor-dept">{selectedWorkCareerCard.supervisorDept || "-"}</span>
+                            </div>
+                            <div className="supervisor-details">
+                              <span className="supervisor-company">{selectedWorkCareerCard.supervisorCompany || "-"}</span>
+                              <span className="supervisor-separator">|</span>
+                              <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  {/* TODO: 5단계에서 라인 평점 grade-row (S/A/B/C/D 관리자 읽기전용) 배치 */}
+
+                  {/* 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용 */}
+                  <div className="workcareer-grade-section">
+                    <span className="grade-label">라인 평점</span>
+                    <div className="grade-row">
+                      {["S", "A", "B", "C", "D"].map((g) => (
+                        <span key={g} className={`grade ${selectedWorkCareerCard?.grade === g ? "active" : ""}`}>
+                          {g}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

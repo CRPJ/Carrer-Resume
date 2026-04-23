@@ -9838,6 +9838,279 @@
 }
 
 // ============================================================================
+// workCareer 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 4단계: 후원/제휴사 카드 (이미지 그리드 4번째 슬롯) — 항상 읽기전용
+  // 필드 고정 위치 원칙 적용: min-width 지정, 말줄임 제거 (인적사항과 동일 원칙)
+  // 카드 슬롯 폭 ~210px (workinfo-right 420px / 2) 안에 수용되도록 폰트 10px, min-width 90px 기준
+  // ──────────────────────────────────────────────────────────────────────
+  .sponsor-card-slot {
+    cursor: default !important;
+
+    // 편집 모드에서도 업로드/삭제 버튼이나 hover 효과 없음
+    &:hover {
+      border-color: rgba(255, 165, 0, 0.3) !important;
+    }
+  }
+
+  .sponsor-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.02);
+    gap: 8px;
+
+    // 1행: 기업 로고 + 기업명
+    .sponsor-company {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+
+      .sponsor-company-logo {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .logo-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 8px;
+          color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.05);
+          text-align: center;
+          line-height: 1.1;
+        }
+      }
+
+      // 기업명: 최대 10자 기준 고정폭, 말줄임 제거
+      .sponsor-company-name {
+        font-family: "Pretendard", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        color: #ddd;
+        display: inline-block;
+        min-width: 110px;
+        overflow: visible;
+        text-overflow: unset;
+        white-space: nowrap;
+      }
+    }
+
+    // 2~4행: 담당자 사진 + Supervised By 라벨 + 이름/직무 + 회사/직책
+    .sponsor-supervisor {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+
+      .sponsor-supervisor-photo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .photo-placeholder {
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+        }
+      }
+
+      .sponsor-supervisor-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+
+        .supervisor-label {
+          font-family: "Pretendard", sans-serif;
+          font-size: 9px;
+          color: rgba(255, 255, 255, 0.4);
+          font-style: italic;
+          margin-bottom: 2px;
+        }
+
+        // 각 필드 min-width 고정 (인적사항과 동일 원칙, 말줄임 제거)
+        // 폰트 10px / 카드 폭 ~190px 가용 기준 — name 50px + separator 8px + dept 90px = 148px ✓
+        //                                         company 90px + separator 8px + position 90px = 188px ✓
+        .supervisor-details {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 10px;
+          color: #ddd;
+          white-space: nowrap;
+
+          .supervisor-separator {
+            color: rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+          }
+
+          .supervisor-name {
+            font-weight: 600;
+            display: inline-block;
+            min-width: 50px; // 5자 × 10px
+            overflow: visible;
+            text-overflow: unset;
+          }
+
+          .supervisor-dept,
+          .supervisor-company,
+          .supervisor-position {
+            display: inline-block;
+            min-width: 90px; // 10자 × 9~10px (여유 포함)
+            overflow: visible;
+            text-overflow: unset;
+          }
+        }
+      }
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용
+  // 이미지 그리드 아래 배치 (workExp의 rating-section 위치 동일 개념)
+  // grade/grade-row 원형 스타일은 L6732의 .work-view-title-section 스코프와 분리되어 있으므로
+  // 여기서 동일 스펙으로 재선언한다 (타 영역 영향 없음)
+  // ──────────────────────────────────────────────────────────────────────
+  .workcareer-grade-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px !important;
+    border: none !important;
+    background: transparent !important;
+    margin-top: 20px;
+    flex-shrink: 0;
+
+    .grade-label {
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    .grade-row {
+      display: flex;
+      gap: 6px;
+
+      .grade {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        font-weight: 400;
+        color: #9c9c9c;
+        background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
+        font-family: "Black Ops One", sans-serif;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
+        cursor: default; // 사용자는 선택 불가
+        box-shadow:
+          4px 4px 10px rgba(0, 0, 0, 0.5),
+          -2px -2px 6px rgba(255, 255, 255, 0.15),
+          inset 2px 2px 3px rgba(255, 255, 255, 0.35),
+          inset -2px -2px 3px rgba(0, 0, 0, 0.15);
+
+        &.active {
+          background: linear-gradient(145deg, #ffbc1a, #d99200);
+          color: #fff;
+          text-shadow:
+            1px 1px 3px rgba(0, 0, 0, 0.35),
+            0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(255, 220, 100, 0.7),
+            0 0 30px rgba(255, 200, 50, 0.5);
+          box-shadow:
+            4px 4px 12px rgba(0, 0, 0, 0.4),
+            -2px -2px 6px rgba(255, 200, 50, 0.3),
+            inset 2px 2px 3px rgba(255, 255, 255, 0.5),
+            inset -2px -2px 3px rgba(0, 0, 0, 0.15),
+            0 0 15px rgba(255, 180, 0, 0.4);
+        }
+      }
+    }
+  }
+
+  // 이미지 그리드가 평점 영역 높이를 양보하도록 (workExp 패턴 준용)
+  .workinfo-image-grid {
+    flex: 1;
+    min-height: 0;
+    height: auto !important;
+  }
+}
+
+// ============================================================================
 // workExp 전용 — 우측 이미지 그리드 하단에 라인 평점 영역 추가 (workInfo 영향 없음)
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
