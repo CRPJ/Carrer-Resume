@@ -6193,68 +6193,114 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 주차 평판 카드 상세보기 모달 ========== */}
+      {/* ========== 주차 평판 카드 상세보기 모달 — 가로형_중 979×570, 보기 전용 ========== */}
       {reputationViewModalOpen && selectedReputationCard && (
         <div className="section-modal-overlay">
           <div className="section-modal reputation-view-modal">
+            {/* ── 헤더 (110px) — workInfo/workExp 패턴 준용 ── */}
             <div className="section-modal-header">
-              <h3>주차 평판</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                <h3>위클리 평판 (Weekly Reputation)</h3>
+              </div>
+              <p className="modal-subtitle">저는 당신의 한 주를 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊</p>
               <button className="modal-close-btn" onClick={() => setReputationViewModalOpen(false)}>
-                ×
+                <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
-              {/* 프로필 */}
-              <div className="reputation-view-profile">
-                <div className="profile-image">{selectedReputationCard.profileImg ? <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} /> : <div className="profile-placeholder"></div>}</div>
-                <div className="profile-info">
-                  <div className="profile-name">
-                    <span className="text">{selectedReputationCard.name}</span> | <span className="text">{selectedReputationCard.gender}</span> | <span className="text">{mask.age(selectedReputationCard.age)}세</span>
+
+            {/* ── 미드 (460px) — 1열 세로 배치 ── */}
+            <div className="section-modal-body reputation-body">
+              {/* 상단: 인적사항 카드 (4개 모달과 동일 구조, role 뱃지 1개) */}
+              <div className="workinfo-personal-card">
+                <div className="personal-grid">
+                  <div className="personal-photo">
+                    {selectedReputationCard.profileImg ? <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} /> : <img src="/images/0/crew profile/남 1.webp" alt="profile" />}
                   </div>
-                  <div className="profile-details">
-                    <div className="detail-line">
-                      <span className="text">{truncate(formatSchool(mask.school(selectedReputationCard.university)))}</span>
-                      <span className="label">학교</span> | <span className="text">{truncate(formatMajor(mask.major(selectedReputationCard.major)))}</span>
-                      <span className="label">학과</span>
+
+                  <div className="personal-info">
+                    <div className="personal-row-1">
+                      <span className="personal-name">{selectedReputationCard.name || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-gender">{selectedReputationCard.gender || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-age">
+                        {mask.age(selectedReputationCard.age) || "—"} 세
+                      </span>
                     </div>
-                    <div className="detail-line">
-                      <span className="text">{truncate(selectedReputationCard.team)}</span>
-                      <span className="label">팀</span> | <span className="text">{truncate(selectedReputationCard.part)}</span>
-                      <span className="label">파트</span>
+
+                    <div className="personal-row-2">
+                      <span className="personal-field">
+                        <span className="field-value">{truncate(formatSchool(mask.school(selectedReputationCard.university))) || "—"}</span>
+                        <span className="field-label">학교</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{truncate(formatMajor(mask.major(selectedReputationCard.major))) || "—"}</span>
+                        <span className="field-label">학과</span>
+                      </span>
                     </div>
-                    <div className="detail-line">
-                      <span className="nickname">{truncate(selectedReputationCard.nickname)}</span>
+
+                    <div className="personal-row-3">
+                      <span className="personal-field">
+                        <span className="field-value">{truncate(selectedReputationCard.team) || "—"}</span>
+                        <span className="field-label">팀</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{truncate(selectedReputationCard.part) || "—"}</span>
+                        <span className="field-label">파트</span>
+                      </span>
                     </div>
+                  </div>
+
+                  <div className="personal-tags">
+                    {/* role 뱃지 1개만 (결정사항) */}
+                    <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
                   </div>
                 </div>
               </div>
 
-              {/* 평점 */}
-              <div className="reputation-view-rating">
-                <div className="rating-label">평점</div>
-                <div className="rating-content">
-                  <div className="stars">{renderStars(selectedReputationCard.rating)}</div>
-                  <span className="rating-count">{selectedReputationCard.ratingCount}</span>
+              {/* 중단: 키워드 + 내용 */}
+              <div className="reputation-content-section">
+                <div className="reputation-keyword">
+                  <span className="keyword-hash">#</span>
+                  <span className="keyword-text">{(selectedReputationCard.tagText || "").replace(/^#/, "") || "—"}</span>
+                </div>
+                <div className="reputation-content-box">
+                  <p className="reputation-content-text">{selectedReputationCard.description || "-"}</p>
                 </div>
               </div>
 
-              {/* 내용 */}
-              <div className="reputation-view-content">
-                <div className="content-label">내용</div>
-                <div className="content-text">{selectedReputationCard.description}</div>
+              {/* 하단: 평점 + FM */}
+              <div className="reputation-stats-row">
+                <div className="reputation-rating">
+                  <span className="stats-label">■ 평점</span>
+                  <div className="rating-stars">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const halfValue = selectedReputationCard.rating || 0; // 이미 5점 만점 (memo에서 /2 변환됨)
+                      let starClass = "star-empty";
+                      if (halfValue >= star) starClass = "star-full";
+                      else if (halfValue >= star - 0.5) starClass = "star-half";
+                      return (
+                        <span key={star} className={`rating-star ${starClass}`}>
+                          ★
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <span className="rating-value">{selectedReputationCard.ratingCount || "- / 10"}</span>
+                </div>
+                <div className="reputation-fm">
+                  <span className="stats-label">■ FM</span>
+                  <span className="fm-value">{selectedReputationCard.fm ?? 0}</span>
+                </div>
               </div>
 
-              {/* FM & 키워드 */}
-              <div className="reputation-view-footer">
-                <div className="footer-item">
-                  <span className="footer-label">FM</span>
-                  <span className="footer-value">{selectedReputationCard.fm}</span>
-                </div>
-                <span className="footer-divider">|</span>
-                <div className="footer-item">
-                  <span className="footer-label">키워드</span>
-                  <span className={`tag ${selectedReputationCard.tagColor}`}>{selectedReputationCard.tagText}</span>
-                </div>
+              {/* 최하단: 타임스탬프 (우측 정렬) */}
+              {/* TODO: [백엔드 작업 필요] weeklyReputations에 created_at 필드 추가 후 YY. MM. DD(요일) HH:MM 포맷으로 표시 */}
+              <div className="reputation-timestamp">
+                <span></span>
               </div>
             </div>
           </div>

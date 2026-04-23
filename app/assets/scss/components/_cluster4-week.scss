@@ -5858,328 +5858,376 @@
       }
     }
 
-    // 주차 평판 상세보기 모달
+    // 주차 평판 상세보기 모달 — 가로형_중 979×570, 보기 전용, 푸터 없음
+    // 공유 셀렉터(.workinfo-view-modal, .workexp-view-modal…) 추가 안 함 — 979×570 vs 1468×855 충돌 방지
+    // 인적사항은 .workinfo-personal-card 클래스 재사용 (이 블록 내부에 독립 선언)
     &.reputation-view-modal {
-      width: 540px;
-      height: 640px;
-      max-height: 640px;
+      width: 979px !important;
+      max-width: 979px !important;
+      height: 570px !important;
+      max-height: 570px !important;
 
+      // ── 헤더 (110px) — cluster3/workInfo 패턴 ──
       .section-modal-header {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        height: 110px;
+        min-height: 110px;
+        max-height: 110px;
+        padding: 8px 24px 16px;
+        position: relative;
+        overflow: visible;
+        border-bottom: none;
+        background: transparent;
 
-        .header-right {
+        .modal-header-top {
           display: flex;
-          align-items: flex-end;
-          align-self: flex-start;
-          margin-top: 16px;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-items: center;
           gap: 8px;
-          flex-shrink: 0;
+          width: 100%;
 
-          * {
-            transition: none !important;
-            animation: none !important;
+          img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            flex-shrink: 0;
           }
 
-          .intro-edit-btn {
-            padding: 6px 14px;
-            background: #faab07;
-            border: none;
-            color: #000;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            &:hover {
-              background: #ffa500;
-            }
+          h3 {
+            font-family: "Pretendard", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #faab07;
+            margin: 0;
           }
+        }
 
-          .cancel-edit-btn {
-            padding: 6px 14px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #999;
-            font-size: 0.875rem;
-            cursor: pointer;
-            white-space: nowrap;
-            &:hover {
-              border-color: #fff;
-              color: #fff;
-            }
-          }
-
-          .save-edit-btn {
-            padding: 6px 14px;
-            background: #ffa500;
-            border: none;
-            color: #000;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            &:hover {
-              box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
-            }
-          }
-
-          .modal-close-btn {
-            align-self: auto !important;
-            margin-top: 0 !important;
-          }
+        .modal-subtitle {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 4px 0 0 80px; // h3 left-padding(72 아이콘 + 8 gap)와 정렬
         }
 
         .modal-close-btn {
-          background: none;
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: transparent;
           border: none;
           color: rgba(255, 255, 255, 0.6);
-          font-size: 2rem;
           cursor: pointer;
-          padding: 0;
+          padding: 4px;
           line-height: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          align-self: flex-start;
-          margin-top: 16px;
+
+          i {
+            font-size: 20px;
+          }
 
           &:hover {
-            color: #fff;
+            color: #faab07;
           }
         }
       }
 
-      .section-modal-body {
-        padding: 24px;
+      // ── 미드 (460px) — 1열 세로 배치 ──
+      .section-modal-body.reputation-body {
+        height: calc(100% - 110px);
+        padding: 16px 24px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
+        overflow-y: auto;
+        box-sizing: border-box;
       }
 
-      .reputation-view-profile {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      // ── 인적사항 카드 — L9014 공유 셀렉터 스타일 복제 (reputation 독립 스코프) ──
+      .workinfo-personal-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 7px 12px;
+        flex-shrink: 0;
 
-        .profile-image {
-          width: 60px;
-          height: 60px;
+        .personal-grid {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          grid-template-rows: auto;
+          gap: 3px 12px;
+          align-items: start;
+        }
+
+        .personal-photo {
+          grid-column: 1;
+          grid-row: 1;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
-          background: #ccc;
+          align-self: center;
 
           img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-          }
-
-          .profile-placeholder {
-            width: 100%;
-            height: 100%;
-            background: #ccc;
+            display: block;
           }
         }
 
-        .profile-info {
-          flex: 1;
+        .personal-info {
+          grid-column: 2;
+          grid-row: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
           min-width: 0;
+        }
 
-          .text {
-            color: #fff;
+        .personal-row-1,
+        .personal-row-2,
+        .personal-row-3 {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 11px;
+          line-height: 1.14;
+          color: #ddd;
+          min-width: 0;
+        }
+
+        .personal-row-2,
+        .personal-row-3 {
+          display: grid;
+          grid-template-columns: 160px 40px 20px 160px 40px;
+          align-items: center;
+          column-gap: 0;
+          white-space: nowrap;
+
+          > .personal-field {
+            display: contents;
+          }
+        }
+
+        .personal-separator {
+          color: rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+        }
+
+        .personal-name {
+          min-width: 64px;
+          display: flex;
+          align-items: center;
+          width: 150px;
+          height: 32px;
+          padding: 4px 10px;
+          margin: 0;
+          border: 1px solid rgba(255, 165, 0, 0.3);
+          background: rgb(26, 26, 46);
+          white-space: nowrap;
+        }
+        .personal-gender {
+          min-width: 16px;
+          display: inline-block;
+          white-space: nowrap;
+        }
+        .personal-age {
+          min-width: 48px;
+          display: inline-block;
+          white-space: nowrap;
+        }
+
+        // role 뱃지 1개만 — 세로 중앙 정렬
+        .personal-tags {
+          grid-column: 3;
+          grid-row: 1;
+          align-self: center;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          width: 140px;
+          flex-shrink: 0;
+          margin-right: 8px;
+        }
+
+        .tag-badge {
+          padding: 4px 7px;
+          border-radius: 4px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 10px;
+          line-height: 1.14;
+          font-weight: 600;
+          white-space: nowrap;
+          text-align: center;
+          min-width: 140px;
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: block;
+          box-sizing: border-box;
+        }
+
+        .tag-role {
+          background: rgba(250, 171, 7, 0.15);
+          color: #faab07;
+          border: 1px solid rgba(250, 171, 7, 0.3);
+        }
+
+        .personal-field {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 4px;
+          flex-shrink: 0;
+
+          .field-value {
             font-family: "Pretendard", sans-serif;
+            font-size: 11px;
+            line-height: 1.14;
+            color: #ddd;
+            display: block;
+            white-space: nowrap;
+            overflow: visible;
+          }
+
+          .field-label {
+            font-family: "Pretendard", sans-serif;
+            font-size: 9px;
+            line-height: 1.14;
+            color: rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            min-width: 28px;
+            display: block;
+            white-space: nowrap;
+          }
+        }
+      }
+
+      // ── 중단: 키워드 + 내용 ──
+      .reputation-content-section {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+
+        .reputation-keyword {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .keyword-hash {
+            color: #faab07;
+            font-size: 14px;
             font-weight: 700;
           }
 
-          .label {
-            color: #999;
-            font-size: 0.875rem;
-          }
-
-          .profile-name {
-            font-size: 1.125rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 2px;
-
-            .text {
-              font-size: 1.125rem;
-              font-weight: 700;
-              color: #fff;
-              font-family: "Pretendard", sans-serif;
-            }
-          }
-
-          .profile-details {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
-            line-height: 1.2;
-
-            .detail-line {
-              margin-bottom: 1px;
-              white-space: nowrap;
-              font-size: 0.875rem;
-              display: flex;
-              align-items: baseline;
-              overflow: hidden;
-
-              .text {
-                font-size: 0.875rem;
-                color: #fff;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-                flex: 0 1 auto;
-              }
-
-              .label {
-                font-size: 0.875rem;
-                color: #999;
-                font-family: "Pretendard", sans-serif;
-                flex-shrink: 0;
-              }
-
-              .nickname {
-                font-size: 0.875rem;
-                color: #faab07;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-              }
-            }
-          }
-        }
-      }
-
-      .reputation-view-rating,
-      .reputation-view-content,
-      .reputation-view-fm,
-      .reputation-view-keyword {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-
-        > div:first-child {
-          width: 50px;
-          flex-shrink: 0;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #ffa500;
-          font-family: "Pretendard", sans-serif;
-        }
-      }
-
-      .reputation-view-rating {
-        .rating-content {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-
-          .stars {
-            display: flex;
-            gap: 1px;
-
-            img.star {
-              width: 14px;
-              height: 14px;
-            }
-
-            .star.half {
-              position: relative;
-              width: 14px;
-              height: 14px;
-              display: inline-block;
-
-              img {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 14px;
-                height: 14px;
-              }
-
-              .star-half-filled {
-                clip-path: inset(0 50% 0 0);
-                z-index: 2;
-              }
-
-              .star-half-empty {
-                z-index: 1;
-              }
-            }
-          }
-
-          .rating-count {
-            font-size: 0.75rem;
+          .keyword-text {
+            font-family: "Pretendard", sans-serif;
+            font-size: 14px;
             font-weight: 600;
             color: #faab07;
+          }
+        }
+
+        .reputation-content-box {
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          min-height: 72px;
+          max-height: 120px;
+          overflow-y: auto;
+
+          .reputation-content-text {
             font-family: "Pretendard", sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ddd;
+            white-space: pre-wrap;
+            margin: 0;
           }
         }
       }
 
-      .reputation-view-content {
-        .content-text {
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.9);
-          font-family: "Pretendard", sans-serif;
-          line-height: 1.6;
-          background: rgba(255, 255, 255, 0.05);
-          padding: 12px 16px;
-          border-radius: 8px;
-          border-left: 3px solid #faab07;
-        }
-      }
-
-      .reputation-view-footer {
+      // ── 하단: 평점 + FM ──
+      .reputation-stats-row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 40px;
+        padding: 4px 0;
+        flex-shrink: 0;
 
-        .footer-item {
+        .reputation-rating,
+        .reputation-fm {
           display: flex;
           align-items: center;
           gap: 8px;
+        }
 
-          .footer-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #faab07;
-            font-family: "Pretendard", sans-serif;
-          }
+        .stats-label {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #ddd;
+        }
 
-          .footer-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #fff;
-            font-family: "Pretendard", sans-serif;
-          }
+        .rating-stars {
+          display: flex;
+          gap: 2px;
 
-          .tag {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            font-family: "Pretendard", sans-serif;
+          .rating-star {
+            font-size: 18px;
+            line-height: 1;
+
+            &.star-empty {
+              color: rgba(255, 255, 255, 0.2);
+            }
+            &.star-full {
+              color: #faab07;
+            }
+            &.star-half {
+              background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.2) 50%);
+              -webkit-background-clip: text;
+              background-clip: text;
+              -webkit-text-fill-color: transparent;
+              color: transparent;
+            }
           }
         }
 
-        .footer-divider {
-          color: rgba(255, 255, 255, 0.3);
-          font-size: 0.875rem;
+        .rating-value {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #faab07;
+          min-width: 48px;
+        }
+
+        .fm-value {
+          font-family: "Pretendard", sans-serif;
+          font-size: 18px;
+          font-weight: 700;
+          color: #ddd;
+          min-width: 24px; // 2자리수(10) 고정
         }
       }
 
-      .section-modal-footer {
-        justify-content: center;
+      // ── 최하단: 타임스탬프 (우측 정렬, 하단 붙음) ──
+      .reputation-timestamp {
+        display: flex;
+        justify-content: flex-end;
+        padding: 4px 0;
+        margin-top: auto;
+        flex-shrink: 0;
+
+        span {
+          font-family: "Pretendard", sans-serif;
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+        }
       }
     }
 
