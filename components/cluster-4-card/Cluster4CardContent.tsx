@@ -4640,7 +4640,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-exp-cards">
-            {effectiveWorkExpCards.map((card, cardIndex) => {
+            {effectiveWorkExpCards.slice(0, 4).map((card, cardIndex) => {
               const isEmpty = card.isEmpty;
               const expActivityType = workExpActivityTypes[cardIndex];
               return (
