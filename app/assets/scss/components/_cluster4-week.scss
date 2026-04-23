@@ -3109,6 +3109,14 @@
         }
       }
 
+      .work-ability-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 920px;
+        max-width: 100%;
+      }
+
       .work-ability-card {
         position: relative;
         background: #232323;
@@ -8605,8 +8613,12 @@
 // section-modal-work-edit(9카드 일괄)은 영향 없음.
 // 식별자: .workinfo-view-modal (TSX에서 work-view-modal과 함께 부여)
 // 기준: cluster2 가로형_대 헤더 + cluster3 output-modal-footer Type B
+// workExp 모달도 동일 스타일 공유 (.workexp-view-modal)
 // ============================================================================
-.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal {
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
   width: 1468px !important;
   max-width: 1468px !important;
   height: 855px !important;
@@ -8662,15 +8674,20 @@
       padding-left: 80px;
       margin: 0;
       flex: 1;
+      // 말줄임 차단 — 카테고리 전체 표시 (workInfo + workExp 공통)
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      white-space: normal !important;
 
-      // workInfo 전용: 라인/카테고리 텍스트 ellipsis (cluster3 미존재)
+      // 라인/카테고리 텍스트 — 말줄임 제거, 전체 표시 (workInfo + workExp 공통)
       .line-name-text {
         color: #ffa500;
-        max-width: 300px;
+        max-width: none !important;
         display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        white-space: normal !important;
         vertical-align: bottom;
       }
     }
@@ -8781,32 +8798,44 @@
     gap: 8px;
     height: 100%;
 
+    // cluster3 .image-slot 실측값 (border 1px solid rgba(255,165,0,0.3), border-radius 0)
     .workinfo-image-slot {
+      border: 1px solid rgba(255, 165, 0, 0.3) !important;
+      border-radius: 0 !important;
       position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.1);
       overflow: hidden;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.02);
-      display: flex;
-      flex-direction: column;
 
       &.disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      &.has-image {
-        border-color: rgba(255, 165, 0, 0.3);
+        .image-preview {
+          opacity: 0.3;
+        }
+        .image-actions-overlay .image-action-btn {
+          opacity: 0.3;
+          pointer-events: none;
+        }
       }
     }
 
-    // cluster3 .image-preview 그대로 (position relative, w/h 100%, img object-fit cover)
+    // 이미지 1·2번 필수 표시 (편집 모드 전용, TSX 조건부 렌더)
+    .image-required-mark {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      color: #ff4444;
+      font-size: 16px;
+      font-weight: 700;
+      z-index: 3;
+      line-height: 1;
+    }
+
+    // cluster3 .image-preview 값 그대로 (border, cursor, overflow, w/h 100%, img object-fit cover)
     .image-preview {
       position: relative;
-      flex: 1;
       width: 100%;
-      min-height: 0;
+      height: 100%;
+      cursor: pointer;
+      overflow: hidden;
+      border: 1px solid rgba(255, 165, 0, 0.3);
 
       img {
         position: absolute;
@@ -8815,6 +8844,21 @@
         width: 100%;
         height: 100%;
         object-fit: cover !important;
+      }
+    }
+
+    // cluster3 .empty-slot 값 그대로 (_cluster3.scss:3310)
+    .empty-slot {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+
+      i {
+        font-size: 32px;
+        color: rgba(255, 165, 0, 0.4);
       }
     }
 
@@ -8856,28 +8900,6 @@
       }
     }
 
-    .image-action-btn.image-caption-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      z-index: 3;
-      width: 28px;
-      height: 28px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 165, 0, 0.5);
-      color: #faab07;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      padding: 0;
-
-      &:hover:not(:disabled) {
-        background: rgba(0, 0, 0, 0.8);
-      }
-    }
-
     .image-empty-slot {
       position: relative;
       flex: 1;
@@ -8916,51 +8938,72 @@
       align-items: center;
     }
 
-    // 캡션 — cluster3 image-caption-overlay 패턴 참조 (사용자 요청: 폰트 절반 이하)
-    .image-caption-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      text-align: center;
-      padding: 4px 6px;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: 2;
+    // cluster3 image-caption-btn 실측값 (transparent, no border, white 16px, absolute bottom/right 8px)
+    .image-action-btn.image-caption-btn {
+      background: transparent !important;
+      border: none !important;
+      color: rgb(255, 255, 255) !important;
+      font-size: 16px !important;
+      position: absolute !important;
+      right: 8px !important;
+      bottom: 8px !important;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      z-index: 3;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 24px;
-      height: 24px;
-      box-sizing: border-box;
+
+      &:hover {
+        color: #faab07 !important;
+      }
     }
 
-    .image-caption-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-size: 7pt !important;
-      text-align: center;
-      outline: none;
-      padding: 0 !important;
-      font-family: inherit;
-      line-height: normal;
-      height: auto;
+    // 캡션 오버레이 — cluster3 실측값 (이미지/빈 슬롯 무관 항상 렌더)
+    .image-caption-overlay {
+      background: rgba(0, 0, 0, 0.6) !important;
+      border: none !important;
+      height: 24px !important;
+      min-height: 24px !important;
+      padding: 4px 6px !important;
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 2 !important;
+      opacity: 1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-sizing: border-box;
 
-      &:focus {
-        outline: none;
-      }
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.3);
+      .caption-text {
+        color: rgb(255, 255, 255) !important;
+        font-size: 7pt !important;
+        font-family: "Pretendard", sans-serif;
+        display: block;
         text-align: center;
       }
-    }
 
-    .image-caption-text {
-      color: #fff;
-      font-size: 7pt !important;
-      display: block;
+      .caption-input {
+        width: 100%;
+        background: transparent !important;
+        border: none !important;
+        color: rgb(255, 255, 255) !important;
+        font-size: 7pt !important;
+        font-family: "Pretendard", sans-serif;
+        text-align: center;
+        outline: none;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 7pt;
+        }
+      }
     }
   }
 
@@ -9042,7 +9085,14 @@
     // 1행 — 고정폭 (말줄임 없음, 최대 글자수 입력 차단으로 보장)
     .personal-name {
       min-width: 64px; // 4자 × 16px
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      width: 180px;
+      height: 40px;
+      padding: 6px 10px;
+      margin: 0;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      background: rgb(26, 26, 46);
       white-space: nowrap;
     }
     .personal-gender {
@@ -9066,6 +9116,7 @@
       gap: 2px;
       width: 180px;
       flex-shrink: 0;
+      margin-right: 19px; // 사용자 요청: 왼쪽으로 0.5cm (≈19px @ 96 PPI)
     }
 
     .tag-badge {
@@ -9196,6 +9247,15 @@
       line-height: 1;
       color: #ddd;
       margin: 0;
+      width: 100%; // 행1(.line-name min-width 560px)과 행2 우측 끝 x좌표 정렬
+    }
+
+    // 행2: 강화 상태가 남은 공간 차지 + 라인코드는 우측 끝에 고정
+    // → 라인코드 우측 끝 = 라인명 20자 기준 우측 끝
+    .line-info-row:nth-child(2) {
+      .line-enhance-status {
+        flex: 1;
+      }
     }
 
     .line-status-icon {
@@ -9222,11 +9282,10 @@
       flex-shrink: 0;
     }
 
-    // 사용자 요청: 폰트 3배 확대 (14 → 42)
+    // 라인명은 최대 20자 제한 → min-width로 line-code 시작 x 좌표 고정 (20자 × 28px ≈ 560px)
     .line-name {
-      max-width: 600px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      display: inline-block;
+      min-width: 560px;
       white-space: nowrap;
       font-size: 28px;
       line-height: 1;
@@ -9238,14 +9297,20 @@
       line-height: 1;
     }
 
-    // 사용자 요청: 폰트 3배 확대 (12 → 36)
+    // badge-status.yellow 스타일 준용
     .line-code {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2px 10px;
-      font-size: 22px;
-      line-height: 1;
-      color: rgba(255, 255, 255, 0.7);
+      padding: 4px 7.2px;
+      background: rgba(250, 171, 7, 0.1);
+      border-radius: 4px;
+      font-size: 15px;
+      font-family: "Pretendard", sans-serif;
+      font-weight: 600;
+      line-height: 15px;
+      color: rgb(250, 171, 7);
+      white-space: nowrap;
       flex-shrink: 0;
+      margin-left: auto; // 우측 끝으로 밀기 (라인명 20자 기준 끝 x좌표와 정렬)
+      margin-right: 0;
     }
   }
 
@@ -9385,7 +9450,7 @@
     margin-top: -7px;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 9px;
 
     .workinfo-text-block {
       display: flex;
@@ -9397,7 +9462,7 @@
         line-height: 1;
         font-weight: 600;
         color: #ddd;
-        margin: 0 0 13px 0;
+        margin: 0 0 9px 0;
         padding: 0;
         text-decoration: underline;
         text-underline-offset: 3px;
@@ -9463,16 +9528,19 @@
     }
 
     // 텍스트 3종 글자수 기반 박스 크기 (font 11px line-height 1.5 ≈ 16.5px/줄 기준)
-    // Main Title: 100자 → 약 3줄
+    // Main Title: 60px 고정 박스 + 13px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
     .text-block-main {
       .main-title-readonly,
       .text-block-textarea,
       textarea.text-block-textarea {
-        height: 44px;
-        min-height: 44px;
-        max-height: 44px;
-        font-size: 18px !important;
-        line-height: 1.25;
+        height: 60px !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        line-height: 1.6 !important;
+        overflow-y: auto;
+        padding: 8px 12px !important;
       }
 
       .text-block-content {
@@ -9482,44 +9550,46 @@
         overflow-y: auto;
       }
     }
-    // Sub Title: 300자 → 약 8줄
+    // Sub Title: 300자 → 보기/편집 동일 높이 90px (workInfo + workExp 공통)
     .text-block-sub {
       .sub-title-input {
-        height: 86px;
-        min-height: 86px;
-        max-height: 86px;
+        height: 90px !important;
+        min-height: 90px !important;
+        max-height: 90px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
         vertical-align: top;
         resize: none;
+        overflow-y: auto;
       }
       .text-block-content {
-        height: 78px;
-        min-height: 78px;
-        max-height: 78px;
+        height: 90px !important;
+        min-height: 90px !important;
+        max-height: 90px !important;
+        overflow-y: auto !important;
         font-size: 14px !important;
-        overflow-y: auto;
       }
     }
-    // Growth Point: 200자 → 약 6줄
+    // Growth Point: 200자 → 보기/편집 동일 높이 60px (workInfo + workExp 공통)
     .text-block-growth {
       .growth-point-input {
-        height: 66px;
-        min-height: 66px;
-        max-height: 66px;
+        height: 60px !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
         vertical-align: top;
         resize: none;
+        overflow-y: auto;
       }
       .text-block-content {
-        height: 58px;
-        min-height: 58px;
-        max-height: 58px;
+        height: 60px !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
+        overflow-y: auto !important;
         font-size: 14px !important;
-        overflow-y: auto;
       }
     }
   }
@@ -9538,10 +9608,6 @@
   .output-link-input {
     font-size: 11px !important;
   }
-  .image-caption-input,
-  .image-caption-text {
-    font-size: 10px !important;
-  }
   .char-count {
     font-size: 9px !important;
   }
@@ -9551,7 +9617,7 @@
     .workinfo-text-block > .text-block-title {
       font-size: 16px !important;
       line-height: 1 !important;
-      margin-bottom: 13px !important;
+      margin-bottom: 9px !important;
       padding-bottom: 0 !important;
 
       .required-mark {
@@ -9565,7 +9631,8 @@
       .main-title-readonly,
       .text-block-textarea,
       textarea.text-block-textarea {
-        font-size: 18px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
       }
     }
 
@@ -9725,56 +9792,335 @@
 }
 
 // ============================================================================
-// 이미지 확대 2차 모달 (workinfo-view-modal 위에 표시)
-// z-index 100001 — workinfo-view-modal/_global.scss 모달 오버레이보다 높게
+// workAbility 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// ============================================================================
+// workExp 전용 — 우측 이미지 그리드 하단에 라인 평점 영역 추가 (workInfo 영향 없음)
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
+  // 인적사항은 편집 대상이 아닌 표시 전용 UI다. workInfo 공용 스타일에서
+  // 이름에 입력 박스처럼 보이는 배경/테두리가 들어가므로 workExp에서만 제거한다.
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .workinfo-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .workinfo-image-grid {
+    flex: 1;
+    min-height: 0;
+    height: auto !important; // 공유 규칙의 height:100% 오버라이드 (평점 영역 공간 확보)
+  }
+
+  .workexp-rating-section {
+    display: flex;
+    align-items: center;
+    justify-content: center; // 중앙 정렬
+    gap: 8px;
+    padding: 0 12px !important;
+    border: none !important;
+    background: transparent !important;
+    margin-top: 20px;
+    flex-shrink: 0;
+
+    .rating-label {
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    .rating-stars {
+      display: flex;
+      gap: 2px;
+
+      .rating-star {
+        font-size: 18px;
+        line-height: 1;
+
+        &.star-empty {
+          color: rgba(255, 255, 255, 0.2);
+        }
+        &.star-half {
+          background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.2) 50%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          color: transparent;
+        }
+        &.star-full {
+          color: #faab07;
+        }
+      }
+    }
+
+    .rating-number-input {
+      width: 48px;
+      height: 28px;
+      padding: 2px 6px;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      background: rgb(26, 26, 46);
+      color: #faab07;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+
+      &:focus {
+        border-color: #faab07;
+      }
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+
+    .rating-max {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      min-width: 30px; // "/ 10" 고정폭
+      display: inline-block;
+    }
+
+    .rating-display {
+      font-size: 14px;
+      font-weight: 700;
+      color: #faab07;
+      min-width: 44px; // select와 동일 고정폭
+      display: inline-block;
+      text-align: center;
+    }
+  }
+}
+
+// ============================================================================
+// 이미지 확대 2차 모달 — cluster3 Cluster3Content.tsx:3049-3057 실측값 준용
+// Overlay: rgba(0,0,0,0.7), z-index 100002 (help-modal 100001보다 위)
+// Modal: 1020×794, #1a1a2e, border rgba(255,165,0,0.3), box-shadow 60px glow
 // ============================================================================
 .image-preview-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100001;
-  backdrop-filter: blur(5px);
+  z-index: 100002;
 }
 
 .image-preview-modal {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
+  width: 1020px;
+  height: 794px;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  padding: 0;
+  box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 
   img {
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 100%;
     object-fit: contain;
-    border: 1px solid rgba(255, 165, 0, 0.3);
-    display: block;
+  }
+}
+
+// ============================================================================
+// 도움말 모달 (workinfo-view-modal 위에 표시)
+// workinfo overlay z-index 99999보다 높게 → 100001
+// cluster2.scss .help-modal-overlay는 .cluster2-content 스코프라 cluster4에선 상속 불가
+// ============================================================================
+.help-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100001 !important;
+}
+
+.help-modal {
+  width: 1024px;
+  height: 794px;
+  background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+  border: 1px solid #ffa500;
+  box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #ffa500;
+    border-style: solid;
+    border-width: 2px 0 0 2px;
+    top: -1px;
+    left: -1px;
   }
 
-  .preview-close-btn {
+  &::after {
+    content: "";
     position: absolute;
-    top: -40px;
-    right: 0;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    height: 20px;
+    border-color: #ffa500;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    bottom: -1px;
+    right: -1px;
+  }
+
+  .help-modal-header {
+    height: 126px;
+    min-height: 126px;
+    max-height: 126px;
+    flex-shrink: 0;
+    box-sizing: border-box;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    transition: all 0.2s;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 165, 0, 0.2);
 
-    i {
-      font-size: 18px;
+    .modal-header-top {
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
 
-    &:hover {
+    h3 {
+      margin: 0;
       color: #faab07;
-      border-color: #faab07;
+      font-family: "Pretendard", sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      flex: 1;
+
+      &::before {
+        content: none;
+      }
     }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .help-modal-body {
+    flex: 1;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: "Pretendard", sans-serif;
+    font-size: 15px;
   }
 }
