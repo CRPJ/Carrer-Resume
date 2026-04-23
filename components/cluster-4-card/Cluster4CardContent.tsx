@@ -70,6 +70,13 @@ const createEmptyWorkInfoCaptions = (): string[] => Array.from({ length: WORKINF
 const normalizeWorkInfoImages = (images?: (string | null)[]): (string | null)[] => Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }, (_, index) => images?.[index] || null);
 const normalizeWorkInfoCaptions = (captions?: string[]): string[] => Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }, (_, index) => captions?.[index] || "");
 
+// workCareer 전용: 이미지 3장 + 후원사 카드 1칸 (2×2 그리드 유지, index 3은 4단계에서 후원사)
+const WORKCAREER_IMAGE_SLOT_COUNT = 3;
+const createEmptyWorkCareerImages = (): (string | null)[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, () => null);
+const createEmptyWorkCareerCaptions = (): string[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, () => "");
+const normalizeWorkCareerImages = (images?: (string | null)[]): (string | null)[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, (_, index) => images?.[index] || null);
+const normalizeWorkCareerCaptions = (captions?: string[]): string[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, (_, index) => captions?.[index] || "");
+
 const WORK_ABILITY_ICON_FILES = [
   "실무 역량 - default.png",
   "실무 역량 - [Job]브랜딩 마케팅.png",
@@ -1547,6 +1554,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }, [isDemoMode]);
   // workExp 전용: 라인 평점 (0~10, 0=미입력)
   const [editingExpRating, setEditingExpRating] = useState<number>(0);
+
+  // ========== workCareer View 모달 전용 state (workExp 패턴 복제, 3장 이미지, 평점 없음) ==========
+  const [workCareerFooterNotice, setWorkCareerFooterNotice] = useState<"default" | "error">("default");
+  const workCareerSnapshot = useRef<any>(null);
+  const [editingCareerSubTitle, setEditingCareerSubTitle] = useState<string>("");
+  const [editingCareerGrowthPoint, setEditingCareerGrowthPoint] = useState<string>("");
+  const [editingCareerOutputLinks, setEditingCareerOutputLinks] = useState<{ desc: string; url: string }[]>(Array(5).fill({ desc: "", url: "" }));
+  const careerImageFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  // TODO: [백엔드 작업 필요] 이미지 저장 DB 컬럼 확정 후 editingCareerImages를 record 필드와 연동
+  const [editingCareerImages, setEditingCareerImages] = useState<(string | null)[]>(createEmptyWorkCareerImages);
+  const [previewCareerImageUrl, setPreviewCareerImageUrl] = useState<string | null>(null);
+  const [editingCareerImageCaptions, setEditingCareerImageCaptions] = useState<string[]>(createEmptyWorkCareerCaptions);
+  const [activeCareerCaptionIdx, setActiveCareerCaptionIdx] = useState<number | null>(null);
+  useEffect(() => {
+    if (!workCareerViewIsEditing) setActiveCareerCaptionIdx(null);
+  }, [workCareerViewIsEditing]);
+  const [showCareerHelpModal, setShowCareerHelpModal] = useState(false);
+  const [canEditWorkCareer, setCanEditWorkCareer] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    setCanEditWorkCareer(isDemoMode);
+  }, [isDemoMode]);
+
   // workInfo View 모달 — 스냅샷 vs 현재값 비교 (정밀 isDirty)
   const isWorkInfoDirty = (): boolean => {
     const snap = workInfoSnapshot.current;
@@ -2176,6 +2205,209 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleExpImagePreview = (idx: number) => {
     const image = editingExpImages[idx] || selectedWorkExpCard?.images?.[idx];
     if (image) setPreviewExpImageUrl(image);
+  };
+
+  // ========== workCareer View 모달 전용 핸들러 (workExp 패턴 복제, 평점/rating 로직 제외) ==========
+  const isWorkCareerDirty = (): boolean => {
+    const snap = workCareerSnapshot.current;
+    if (!snap) return false;
+    if (editingCareerSubTitle !== (snap.subTitle || "")) return true;
+    if (editingCareerGrowthPoint !== (snap.growthPoint || "")) return true;
+    const snapLinks: { desc: string; url: string }[] = snap.outputLinks || [];
+    for (let i = 0; i < 5; i++) {
+      const sUrl = snapLinks[i]?.url || "";
+      const sDesc = snapLinks[i]?.desc || "";
+      const eUrl = editingCareerOutputLinks[i]?.url || "";
+      const eDesc = editingCareerOutputLinks[i]?.desc || "";
+      if (sUrl !== eUrl || sDesc !== eDesc) return true;
+    }
+    const snapImages = normalizeWorkCareerImages(snap.images);
+    for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
+      if ((snapImages[i] || null) !== (editingCareerImages[i] || null)) return true;
+    }
+    const snapCaptions = normalizeWorkCareerCaptions(snap.imageCaptions);
+    for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
+      if ((snapCaptions[i] || "") !== (editingCareerImageCaptions[i] || "")) return true;
+    }
+    return false;
+  };
+
+  const handleEditWorkCareer = () => {
+    if (selectedWorkCareerCard?.isEmpty) {
+      window.alert("해당 카드는 비어있습니다");
+      return;
+    }
+    if (!canEditWorkCareer) {
+      window.alert("관리자 승인이 필요합니다");
+      return;
+    }
+    const card = selectedWorkCareerCard;
+    const initialOutputLinks = card?.outputLinks && card.outputLinks.length > 0 ? card.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" });
+    const initialImages = normalizeWorkCareerImages(card?.images);
+    const initialCaptions = normalizeWorkCareerCaptions(card?.imageCaptions);
+    workCareerSnapshot.current = {
+      subTitle: card?.subTitle || card?.projectDescription || "",
+      growthPoint: card?.growthPoint || "",
+      outputLinks: JSON.parse(JSON.stringify(initialOutputLinks)),
+      images: [...initialImages],
+      imageCaptions: [...initialCaptions],
+    };
+    setEditingCareerSubTitle(card?.subTitle || card?.projectDescription || "");
+    setEditingCareerGrowthPoint(card?.growthPoint || "");
+    setEditingCareerOutputLinks(initialOutputLinks);
+    setEditingCareerImages(initialImages);
+    setEditingCareerImageCaptions(initialCaptions);
+    setWorkCareerViewIsEditing(true);
+  };
+
+  const handleCancelWorkCareer = () => {
+    if (isWorkCareerDirty()) {
+      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+        return;
+      }
+    }
+    const snap = workCareerSnapshot.current;
+    if (snap) {
+      setEditingCareerSubTitle(snap.subTitle || "");
+      setEditingCareerGrowthPoint(snap.growthPoint || "");
+      setEditingCareerOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
+      setEditingCareerImages(normalizeWorkCareerImages(snap.images));
+      setEditingCareerImageCaptions(normalizeWorkCareerCaptions(snap.imageCaptions));
+    }
+    setWorkCareerViewIsEditing(false);
+  };
+
+  const handleResetWorkCareer = () => {
+    const snap = workCareerSnapshot.current;
+    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+      setEditingCareerSubTitle(snap.subTitle || "");
+      setEditingCareerGrowthPoint(snap.growthPoint || "");
+      setEditingCareerOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
+      setEditingCareerImages(normalizeWorkCareerImages(snap.images));
+      setEditingCareerImageCaptions(normalizeWorkCareerCaptions(snap.imageCaptions));
+    }
+  };
+
+  const handleSaveWorkCareer = () => {
+    const missing: string[] = [];
+    if (!editingCareerSubTitle.trim()) missing.push("subTitle");
+    if (!editingCareerGrowthPoint.trim()) missing.push("growthPoint");
+    if (!editingCareerImages[0]) missing.push("image0");
+    if (!editingCareerImages[1]) missing.push("image1");
+    if (missing.length > 0) {
+      setWorkCareerFooterNotice("error");
+      const targetEl = document.querySelector(`.workcareer-view-modal [data-field="${missing[0]}"]`);
+      if (targetEl) {
+        targetEl.classList.add("field-missing");
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => targetEl.classList.remove("field-missing"), 900);
+      }
+      return;
+    }
+    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    if (activityType) {
+      const newSubTitle = editingCareerSubTitle.trim() || null;
+      const newOutputLinks = editingCareerOutputLinks;
+      setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle, output_links: newOutputLinks } : d)));
+      setSelectedWorkCareerCard((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              subTitle: newSubTitle || "",
+              outputLinks: newOutputLinks,
+              growthPoint: editingCareerGrowthPoint,
+              // TODO: [백엔드 작업 필요] 이미지 저장 DB 컬럼 확정 후 연동 — 현재는 isDemoMode 더미 저장
+              images: editingCareerImages,
+              imageCaptions: editingCareerImageCaptions,
+            }
+          : prev,
+      );
+      workCareerSnapshot.current = {
+        subTitle: newSubTitle || "",
+        growthPoint: editingCareerGrowthPoint,
+        outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
+        images: [...editingCareerImages],
+        imageCaptions: [...editingCareerImageCaptions],
+      };
+    }
+    setWorkCareerFooterNotice("default");
+    setWorkCareerViewIsEditing(false);
+  };
+
+  const handleCloseWorkCareer = () => {
+    if (workCareerViewIsEditing && isWorkCareerDirty()) {
+      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+        return;
+      }
+    }
+    setWorkCareerViewModalOpen(false);
+    setWorkCareerViewIsEditing(false);
+  };
+
+  const handleCareerOutputLinkChange = (idx: number, field: "desc" | "url", value: string) => {
+    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    if (!activityType) return;
+    const adminCount = getAdminOutputLinksCount(activityType);
+    if (idx < adminCount) return;
+    setEditingCareerOutputLinks((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], [field]: value };
+      return next;
+    });
+  };
+
+  const handleCareerOutputLinkDelete = (idx: number) => {
+    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    if (!activityType) return;
+    const adminCount = getAdminOutputLinksCount(activityType);
+    if (idx < adminCount) return;
+    setEditingCareerOutputLinks((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < 5) next.push({ desc: "", url: "" });
+      return next;
+    });
+  };
+
+  const triggerCareerImageUpload = (idx: number) => {
+    careerImageFileInputRefs.current[idx]?.click();
+  };
+
+  const handleCareerImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setEditingCareerImages((prev) => {
+      const next = [...prev];
+      next[idx] = url;
+      return next;
+    });
+    e.target.value = "";
+  };
+
+  const handleCareerImageDelete = (idx: number) => {
+    setEditingCareerImages((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < WORKCAREER_IMAGE_SLOT_COUNT) next.push(null);
+      return next;
+    });
+    setEditingCareerImageCaptions((prev) => {
+      const next = prev.filter((_, i) => i !== idx);
+      while (next.length < WORKCAREER_IMAGE_SLOT_COUNT) next.push("");
+      return next;
+    });
+  };
+
+  const handleCareerCaptionChange = (idx: number, value: string) => {
+    setEditingCareerImageCaptions((prev) => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+  };
+
+  const handleCareerImagePreview = (idx: number) => {
+    const image = editingCareerImages[idx] || selectedWorkCareerCard?.images?.[idx];
+    if (image) setPreviewCareerImageUrl(image);
   };
 
   // 모달 열릴 때 배경 스크롤 잠금
@@ -7283,152 +7515,393 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </h3>
               </div>
               <p className="modal-subtitle">이번 주에 어떤 실무 경력을 쌓았으며, 그 과정 속에서 어떤 인사이트와 저변을 넓혔는지를 마음껏 어필해주세요. 😊</p>
-              <button
-                className="modal-close-btn"
-                onClick={() => {
-                  setWorkCareerViewModalOpen(false);
-                  setWorkCareerViewIsEditing(false);
-                }}
-              >
+              <button className="modal-close-btn" onClick={handleCloseWorkCareer}>
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
-              <div className="work-view-fixed">
-                <div className="date-badge">{weekDateRange}</div>
-                {/* 헤더: 아이콘 + 카테고리 제목 + 코드 + 강화 상태 */}
-                <div className="work-view-header-row">
-                  <div className="work-view-left">
-                    <div className="work-icon-box fruit">{selectedWorkCareerCard.icon && <img src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge} />}</div>
-                    <span className="category-title">{selectedWorkCareerCard.badge}</span>
-                    <span className="code-badge">{selectedWorkCareerCard.code}</span>
-                  </div>
-                  <div className="work-view-right">
-                    {selectedWorkCareerCard.statusBadge &&
-                      (() => {
-                        const statusText = selectedWorkCareerCard.verified ? "강화성공" : selectedWorkCareerCard.isFailed ? "강화실패" : selectedWorkCareerCard.isNotApplicable ? "해당없음" : "강화대기";
-                        const statusClass = selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not-applicable" : "pending";
-                        return (
-                          <div className={`status-badge ${statusClass}`}>
-                            <img src={selectedWorkCareerCard.statusBadge} alt="상태" />
-                            <span>{statusText}</span>
-                          </div>
-                        );
-                      })()}
-                  </div>
-                </div>
 
-                {/* Main Title + 등급 + Content */}
-                <div className="work-view-title-section">
-                  <div className="main-title-row">
-                    <div className="main-title">Main Title</div>
-                    <div className="grade-row">
-                      <span className={`grade ${selectedWorkCareerCard.grade === "S" ? "active" : ""}`}>S</span>
-                      <span className={`grade ${selectedWorkCareerCard.grade === "A" ? "active" : ""}`}>A</span>
-                      <span className={`grade ${selectedWorkCareerCard.grade === "B" ? "active" : ""}`}>B</span>
-                      <span className={`grade ${selectedWorkCareerCard.grade === "C" ? "active" : ""}`}>C</span>
-                      <span className={`grade ${selectedWorkCareerCard.grade === "D" ? "active" : ""}`}>D</span>
+            {/* ── 미드 — 좌측 콘텐츠 + 우측 이미지 3장 + 후원사(4단계) ── */}
+            <div className="section-modal-body">
+              <div className="workinfo-content-layout">
+                {/* ──── 좌측 ──── */}
+                <div className="workinfo-left">
+                  {/* 좌상단: 인적사항 카드 (workExp와 동일) */}
+                  <div className="workinfo-personal-card">
+                    <div className="personal-grid">
+                      <div className="personal-photo">
+                        <img src="/images/0/crew profile/남 1.webp" alt="profile" />
+                      </div>
+
+                      <div className="personal-info">
+                        <div className="personal-row-1">
+                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                        </div>
+
+                        <div className="personal-row-2">
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-label">학교</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-label">학과</span>
+                          </span>
+                        </div>
+
+                        <div className="personal-row-3">
+                          <span className="personal-field">
+                            <span className="field-value">{teamName || (isDemoMode ? "마케팅" : "—")}</span>
+                            <span className="field-label">팀</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{partName || (isDemoMode ? "바이럴" : "—")}</span>
+                            <span className="field-label">파트</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="personal-tags">
+                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "역할"}</span>
+                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className={`content-text ${workCareerViewIsEditing && isAdmin ? "editing" : ""}`} contentEditable={workCareerViewIsEditing && isAdmin} suppressContentEditableWarning>
-                    {selectedWorkCareerCard.title}
-                  </div>
-                </div>
 
-                {/* Sub Title */}
-                <div className="work-view-section">
-                  <div className="section-label">Sub Title</div>
-                  <div className={`section-content ${workCareerViewIsEditing ? "editing" : ""}`} contentEditable={workCareerViewIsEditing} suppressContentEditableWarning>
-                    {(() => {
-                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                      return weekActivityDetails.find((d) => d.activity_type_id === activityType)?.sub_title || "-";
-                    })()}
-                  </div>
-                </div>
-              </div>
+                  {/* 좌중단: 시즌/주차 + 라인정보 / Output Link 5개 */}
+                  <div className="workinfo-mid-section">
+                    <div className="workinfo-mid-col1">
+                      <div className="workinfo-date-badge">
+                        <span className="date-badge-text">{weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}</span>
+                        <span className="date-range-text">{weekDateRange}</span>
+                      </div>
+                      <div className="workinfo-line-info">
+                        <div className="line-info-row">
+                          {selectedWorkCareerCard.icon && <img className="line-activity-icon" src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge || "활동"} />}
+                          <span className="line-name">{selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "—"}</span>
+                        </div>
+                        {(() => {
+                          const statusText = selectedWorkCareerCard.verified ? "강화 성공" : selectedWorkCareerCard.isFailed ? "강화 실패" : selectedWorkCareerCard.isNotApplicable ? "해당 없음" : "강화 대기";
+                          return (
+                            <div className="line-info-row">
+                              {selectedWorkCareerCard.statusBadge ? <img className="line-enhance-icon" src={selectedWorkCareerCard.statusBadge} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                              <span className="line-enhance-status">{statusText}</span>
+                              <span className="line-code">{selectedWorkCareerCard.lineCode || selectedWorkCareerCard.code || ""}</span>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
 
-              {/* Output Link */}
-              <div className="work-view-section">
-                <div className="section-label">Output Link</div>
-                <div className="output-links-view">
-                  {(() => {
-                    const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                    const careerRecord = careerRecords[selectedWorkCareerCard.id - 1];
-                    const detail = weekActivityDetails.find((d) => d.activity_type_id === activityType);
-                    const adminLinks = (careerRecord?.output_links || []) as { desc: string; url: string }[];
-                    const userLinks = detail?.output_links || [];
-                    const adminCount = adminLinks.filter((l) => l.url?.trim()).length;
-                    return [0, 1, 2, 3, 4].map((idx) => {
-                      const link = idx < adminCount ? adminLinks[idx] : userLinks[idx - adminCount];
-                      const hasLink = link?.url && link.url.trim() !== "";
-                      const prevLink = idx > 0 ? (idx - 1 < adminCount ? adminLinks[idx - 1] : userLinks[idx - 1 - adminCount]) : null;
-                      const prevHasLink = idx === 0 || (prevLink?.url && prevLink.url.trim() !== "");
-                      const isDisabled = !prevHasLink;
-                      return workCareerViewIsEditing ? (
-                        <div key={idx} className={`output-link-item editing ${isDisabled ? "disabled-link" : ""}`} style={{ opacity: isDisabled ? 0.4 : 1 }}>
-                          <span className="link-num">{idx + 1}</span>
-                          <span className="link-desc editing" contentEditable={!isDisabled} suppressContentEditableWarning>
-                            {hasLink ? link.desc || "링크" : "-"}
-                          </span>
-                          <input
-                            className="link-url-edit"
-                            defaultValue={hasLink ? link.url : ""}
-                            placeholder={isDisabled ? "이전 링크를 먼저 입력하세요" : "URL 입력"}
-                            disabled={isDisabled}
-                            style={{
-                              border: "1px solid rgba(255,165,0,0.5)",
-                              background: isDisabled ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.05)",
-                              padding: "4px 8px",
-                              borderRadius: "6px",
-                              color: "inherit",
-                              fontSize: "inherit",
-                              outline: "none",
-                              width: "100%",
-                              marginTop: "4px",
-                              cursor: isDisabled ? "not-allowed" : "text",
+                    <div className="workinfo-mid-col2">
+                      <div className="workinfo-output-links">
+                        {[0, 1, 2, 3, 4].map((i) => {
+                          const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
+                          const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+                          const adminCount = activityType ? getAdminOutputLinksCount(activityType) : 0;
+                          const isAdminLink = i < adminCount;
+                          const link = workCareerViewIsEditing ? editingCareerOutputLinks[i] || { desc: "", url: "" } : selectedWorkCareerCard.outputLinks?.[i] || { desc: "", url: "" };
+                          const hasUrl = !!link.url?.trim();
+                          const prevUserLink = i > adminCount ? editingCareerOutputLinks[i - 1] : null;
+                          const sequentialDisabled = workCareerViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const displayText = link.desc?.trim() || link.url;
+                          return (
+                            <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
+                              {isAdminLink && (
+                                <span className="admin-badge" title="운영진 입력">
+                                  A
+                                </span>
+                              )}
+                              <span className="link-dot" style={{ backgroundColor: dotColor }} />
+                              {workCareerViewIsEditing && !isAdminLink ? (
+                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleCareerOutputLinkChange(i, "url", e.target.value)} />
+                              ) : hasUrl ? (
+                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                              ) : (
+                                <span className="output-link-text output-link-empty">-</span>
+                              )}
+                              <button type="button" className="link-open-btn" onClick={() => hasUrl && window.open(ensureProtocol(link.url), "_blank")} disabled={!hasUrl} aria-label="링크 열기">
+                                <i className="ti ti-external-link"></i>
+                              </button>
+                              {workCareerViewIsEditing && !isAdminLink && hasUrl && (
+                                <button type="button" className="output-link-delete" onClick={() => handleCareerOutputLinkDelete(i)} aria-label="링크 삭제">
+                                  <i className="ti ti-x"></i>
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 좌하단: Main Title(읽기전용) + Sub Title + Growth Point */}
+                  <div className="workinfo-text-section">
+                    <div className="workinfo-text-block text-block-main">
+                      <h4 className="text-block-title">Main Title</h4>
+                      <div className="text-block-content main-title-readonly">{selectedWorkCareerCard.title && selectedWorkCareerCard.title !== "-" ? selectedWorkCareerCard.title : "준비 중입니다"}</div>
+                    </div>
+
+                    <div className="workinfo-text-block text-block-sub" data-field="subTitle">
+                      <h4 className="text-block-title">
+                        Sub Title {workCareerViewIsEditing && <span className="required-mark">*</span>}
+                      </h4>
+                      {workCareerViewIsEditing ? (
+                        <div className="text-block-edit">
+                          <textarea
+                            className="text-block-textarea sub-title-input"
+                            value={editingCareerSubTitle}
+                            onChange={(e) => {
+                              if (e.target.value.length <= 300) setEditingCareerSubTitle(e.target.value);
                             }}
+                            placeholder="이번 주 이 라인에서 어떤 실무 경력을 쌓았고, 어떤 과정을 거쳐, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
+                            maxLength={300}
                           />
+                          <span className="char-count">{editingCareerSubTitle.length}/300</span>
                         </div>
                       ) : (
-                        <a key={idx} href={hasLink ? ensureProtocol(link.url) : undefined} target={hasLink ? "_blank" : undefined} rel={hasLink ? "noopener noreferrer" : undefined} className={`output-link-item ${!hasLink ? "disabled" : ""}`} onClick={(e) => !hasLink && e.preventDefault()}>
-                          <span className="link-num">{idx + 1}</span>
-                          <span className="link-desc">{hasLink ? link.desc || "링크" : "-"}</span>
-                        </a>
+                        <div className="text-block-content">{selectedWorkCareerCard.subTitle || selectedWorkCareerCard.projectDescription || "-"}</div>
+                      )}
+                    </div>
+
+                    <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
+                      <h4 className="text-block-title">
+                        Growth Point {workCareerViewIsEditing && <span className="required-mark">*</span>}
+                      </h4>
+                      {workCareerViewIsEditing ? (
+                        <div className="text-block-edit">
+                          <textarea
+                            className="text-block-textarea growth-point-input"
+                            value={editingCareerGrowthPoint}
+                            onChange={(e) => {
+                              if (e.target.value.length <= 200) setEditingCareerGrowthPoint(e.target.value);
+                            }}
+                            placeholder="이번 주 이 실무 경력을 통해 느낀 인사이트와 저변 확장을 어필해주세요. 😊"
+                            maxLength={200}
+                          />
+                          <span className="char-count">{editingCareerGrowthPoint.length}/200</span>
+                        </div>
+                      ) : (
+                        <div className="text-block-content">{selectedWorkCareerCard.growthPoint || "-"}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ──── 우측 — 이미지 3장 + 후원사 placeholder(4단계) ──── */}
+                <div className="workinfo-right">
+                  <div className="workinfo-image-grid images-grid workcareer-image-grid">
+                    {Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }).map((_, imageIdx) => {
+                      const viewImages = normalizeWorkCareerImages(selectedWorkCareerCard?.images);
+                      const viewCaptions = normalizeWorkCareerCaptions(selectedWorkCareerCard?.imageCaptions);
+                      const imagesForState = workCareerViewIsEditing ? editingCareerImages : viewImages;
+                      const captionsForState = workCareerViewIsEditing ? editingCareerImageCaptions : viewCaptions;
+                      const image = imagesForState[imageIdx] || null;
+                      const caption = captionsForState[imageIdx] || "";
+                      const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
+                      const isRequired = imageIdx < 2;
+                      return (
+                        <div
+                          key={imageIdx}
+                          className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`}
+                          {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}
+                        >
+                          {workCareerViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
+                          {image ? (
+                            <div className="image-preview" onClick={() => handleCareerImagePreview(imageIdx)}>
+                              <img src={image} alt={`이미지 ${imageIdx + 1}`} />
+                              {workCareerViewIsEditing && (
+                                <div className="image-actions-overlay">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerCareerImageUpload(imageIdx);
+                                    }}
+                                    title="교체"
+                                    aria-label="교체"
+                                  >
+                                    <i className="ti ti-upload"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="image-action-btn image-delete-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCareerImageDelete(imageIdx);
+                                    }}
+                                    title="삭제"
+                                    aria-label="삭제"
+                                  >
+                                    <i className="ti ti-trash"></i>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div
+                              className="image-preview"
+                              onClick={() => {
+                                if (workCareerViewIsEditing && isEnabled) triggerCareerImageUpload(imageIdx);
+                              }}
+                            >
+                              {workCareerViewIsEditing && (
+                                <div className="image-actions-overlay">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerCareerImageUpload(imageIdx);
+                                    }}
+                                    disabled={!isEnabled}
+                                    title="업로드"
+                                    aria-label="업로드"
+                                  >
+                                    <i className="ti ti-upload"></i>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="image-action-btn image-delete-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCareerImageDelete(imageIdx);
+                                    }}
+                                    disabled
+                                    title="삭제"
+                                    aria-label="삭제"
+                                  >
+                                    <i className="ti ti-trash"></i>
+                                  </button>
+                                </div>
+                              )}
+                              <div className="empty-slot">
+                                <i className="ti ti-photo-plus"></i>
+                              </div>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={(el) => {
+                              careerImageFileInputRefs.current[imageIdx] = el;
+                            }}
+                            style={{ display: "none" }}
+                            onChange={(e) => handleCareerImageFileChange(e, imageIdx)}
+                          />
+                          <div className="image-caption-overlay">
+                            {workCareerViewIsEditing && activeCareerCaptionIdx === imageIdx ? (
+                              <input
+                                type="text"
+                                className="caption-input"
+                                value={editingCareerImageCaptions[imageIdx] || ""}
+                                onChange={(e) => {
+                                  if (e.target.value.length <= 20) handleCareerCaptionChange(imageIdx, e.target.value);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                placeholder="캡션 입력 (최대 20자)"
+                                maxLength={20}
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="caption-text">{caption}</span>
+                            )}
+                          </div>
+                          {workCareerViewIsEditing && (
+                            <button
+                              type="button"
+                              className={`image-action-btn image-caption-btn${activeCareerCaptionIdx === imageIdx ? " active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveCareerCaptionIdx(activeCareerCaptionIdx === imageIdx ? null : imageIdx);
+                              }}
+                              title={activeCareerCaptionIdx === imageIdx ? "캡션 저장" : "캡션 편집"}
+                              aria-label="캡션"
+                              style={{ position: "absolute", bottom: "8px", right: "8px", zIndex: 3 }}
+                            >
+                              <i className="ti ti-text-caption"></i>
+                            </button>
+                          )}
+                        </div>
                       );
-                    });
-                  })()}
+                    })}
+                    {/* 4번째 슬롯 — 4단계에서 후원/제휴사 카드 JSX 삽입 */}
+                    <div className="workinfo-image-slot sponsor-card-slot">
+                      {/* TODO: 4단계에서 후원/제휴사 카드 (기업 로고/명 + 담당자 사진/이름/직무/회사/직책) */}
+                    </div>
+                  </div>
+                  {/* TODO: 5단계에서 라인 평점 grade-row (S/A/B/C/D 관리자 읽기전용) 배치 */}
                 </div>
               </div>
             </div>
+
+            {/* ── 푸터 Type B ── */}
             <div className="section-modal-footer">
-              {!workCareerViewIsEditing ? (
-                <button className="save-btn" onClick={() => setWorkCareerViewIsEditing(true)}>
-                  수정
-                </button>
-              ) : (
-                <>
-                  <button className="cancel-btn" onClick={() => setWorkCareerViewIsEditing(false)}>
-                    취소
-                  </button>
-                  <button
-                    className="save-btn"
-                    onClick={() => {
-                      const modal = document.querySelector(".section-modal-overlay:last-of-type");
-                      const activityType = workCareerActivityTypes[selectedWorkCareerCard.id - 1];
-                      if (modal && activityType) {
-                        const subTitleEl = modal.querySelector(".work-view-fixed .section-content[contenteditable]");
-                        const newSubTitle = subTitleEl?.textContent?.trim() || null;
-                        setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle } : d)));
-                      }
-                      setWorkCareerViewIsEditing(false);
-                    }}
-                  >
-                    저장
-                  </button>
-                </>
-              )}
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말" onClick={() => setShowCareerHelpModal(true)} style={{ cursor: "pointer" }}>
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  {!workCareerViewIsEditing ? (
+                    <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty} style={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkCareerCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다"}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button className="modal-cancel-btn" onClick={handleCancelWorkCareer}>
+                        취소
+                      </button>
+                      <button className="modal-reset-btn" onClick={handleResetWorkCareer}>
+                        초기화
+                      </button>
+                      <button className="modal-save-btn" onClick={handleSaveWorkCareer}>
+                        저장
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-footer-bottom">
+                <span className={`modal-notice modal-footer-notice ${workCareerFooterNotice === "error" ? "notice-error" : ""}`} style={{ visibility: workCareerViewIsEditing ? "visible" : "hidden" }}>
+                  {workCareerFooterNotice === "error" ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* 이미지 확대 2차 모달 */}
+          {previewCareerImageUrl && (
+            <div className="image-preview-overlay" onClick={() => setPreviewCareerImageUrl(null)}>
+              <div className="image-preview-modal" onClick={(e) => e.stopPropagation()}>
+                <img src={previewCareerImageUrl} alt="확대 이미지" />
+              </div>
+            </div>
+          )}
+
+          {/* 도움말 모달 */}
+          {showCareerHelpModal && (
+            <div className="help-modal-overlay" onClick={() => setShowCareerHelpModal(false)}>
+              <div className="help-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="help-modal-header">
+                  <div className="modal-header-top">
+                    <span style={{ fontSize: "20px" }}>🔎</span>
+                    <h3>도움말</h3>
+                    <button className="modal-close-btn" onClick={() => setShowCareerHelpModal(false)}>
+                      <i className="ti ti-x"></i>
+                    </button>
+                  </div>
+                </div>
+                <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
