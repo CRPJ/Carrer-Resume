@@ -8745,12 +8745,15 @@
   // ── 2차 미드 콘텐츠 ──
   .workinfo-content-layout {
     display: flex;
-    gap: 24px;
+    gap: 12px !important;
     height: 100%;
     box-sizing: border-box;
 
     .workinfo-left {
-      flex: 1;
+      // 사용자 요청: 좌측 고정폭 + 우측 확대 (3cm≈114px 축소 → 우측 120px 확대)
+      // 540 = 우측 폭, 24 = .workinfo-content-layout의 gap
+      flex: none !important;
+      width: calc(100% - 540px - 24px) !important;
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -8782,7 +8785,7 @@
     }
 
     .workinfo-right {
-      width: 420px;
+      width: 552px !important; // 사용자 요청: 420 → 540 (약 120px 확대)
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -9116,7 +9119,7 @@
       gap: 2px;
       width: 180px;
       flex-shrink: 0;
-      margin-right: 19px; // 사용자 요청: 왼쪽으로 0.5cm (≈19px @ 96 PPI)
+      margin-right: 8px !important; // 19px → 8px (오른쪽으로 11px 이동)
     }
 
     .tag-badge {
@@ -9450,7 +9453,7 @@
     margin-top: -7px;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 16px !important;
 
     .workinfo-text-block {
       display: flex;
@@ -9528,19 +9531,22 @@
     }
 
     // 텍스트 3종 글자수 기반 박스 크기 (font 11px line-height 1.5 ≈ 16.5px/줄 기준)
-    // Main Title: 60px 고정 박스 + 13px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
+    // Main Title: 74px 고정 박스 + 18px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
     .text-block-main {
-      .main-title-readonly,
-      .text-block-textarea,
-      textarea.text-block-textarea {
-        height: 60px !important;
-        min-height: 60px !important;
-        max-height: 60px !important;
-        font-size: 13px !important;
+      .main-title-readonly {
+        height: 74px !important;
+        min-height: 74px !important;
+        max-height: 74px !important;
+        font-size: 18px !important;
         font-weight: 700 !important;
         line-height: 1.6 !important;
         overflow-y: auto;
-        padding: 8px 12px !important;
+        padding: 3px 12px 8px 12px !important; // 사용자 요청: padding-top 8 → 3
+        // 사용자 요청: 텍스트 상단 정렬 (4개 모달 공통)
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
       }
 
       .text-block-content {
@@ -9550,12 +9556,12 @@
         overflow-y: auto;
       }
     }
-    // Sub Title: 300자 → 보기/편집 동일 높이 90px (workInfo + workExp 공통)
+    // Sub Title: 200자 → 보기/편집 동일 높이 75px (사용자 요청: 300→200자, 90→75px)
     .text-block-sub {
       .sub-title-input {
-        height: 90px !important;
-        min-height: 90px !important;
-        max-height: 90px !important;
+        height: 75px !important;
+        min-height: 75px !important;
+        max-height: 75px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
@@ -9564,19 +9570,19 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 90px !important;
-        min-height: 90px !important;
-        max-height: 90px !important;
+        height: 75px !important;
+        min-height: 75px !important;
+        max-height: 75px !important;
         overflow-y: auto !important;
         font-size: 14px !important;
       }
     }
-    // Growth Point: 200자 → 보기/편집 동일 높이 60px (workInfo + workExp 공통)
+    // Growth Point: 100자 → 보기/편집 동일 높이 45px (사용자 요청: 200→100자, 60→45px)
     .text-block-growth {
       .growth-point-input {
-        height: 60px !important;
-        min-height: 60px !important;
-        max-height: 60px !important;
+        height: 45px !important;
+        min-height: 45px !important;
+        max-height: 45px !important;
         font-size: 14px !important;
         line-height: 1.35;
         padding-top: 3px !important;
@@ -9585,9 +9591,9 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 60px !important;
-        min-height: 60px !important;
-        max-height: 60px !important;
+        height: 45px !important;
+        min-height: 45px !important;
+        max-height: 45px !important;
         overflow-y: auto !important;
         font-size: 14px !important;
       }
@@ -9628,10 +9634,8 @@
     }
 
     .text-block-main {
-      .main-title-readonly,
-      .text-block-textarea,
-      textarea.text-block-textarea {
-        font-size: 13px !important;
+      .main-title-readonly {
+        font-size: 18px !important;
         font-weight: 700 !important;
       }
     }
@@ -9904,18 +9908,23 @@
     padding: 10px;
     box-sizing: border-box;
     background: rgba(255, 255, 255, 0.02);
-    gap: 8px;
+    gap: 12px !important; // 사용자 요청: 8 → 12 (카드 전체 행간)
+    overflow: hidden; // 카드 밖으로 텍스트 넘침 방지
 
-    // 1행: 기업 로고 + 기업명
+    // 1행: 기업 로고 + 기업명 (사용자 요청: 아래 구분선 추가)
     .sponsor-company {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
+      min-width: 0;
+      padding-bottom: 10px; // 사용자 요청: 8 → 10
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 10px; // 사용자 요청: 8 → 10
 
       .sponsor-company-logo {
-        width: 32px;
-        height: 32px;
+        width: 56px !important; // 사용자 요청: 32 → 56 (로고 확대)
+        height: 56px !important;
         flex-shrink: 0;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -9940,95 +9949,105 @@
         }
       }
 
-      // 기업명: 최대 10자 기준 고정폭, 말줄임 제거
+      // 기업명: min-width 고정 제거, 카드 폭에 맞춰 ellipsis
       .sponsor-company-name {
         font-family: "Pretendard", sans-serif;
-        font-size: 11px;
+        font-size: 13px !important; // 사용자 요청: 폰트 확대 (우측 폭 확대로 수용 가능)
         font-weight: 600;
-        color: #ddd;
-        display: inline-block;
-        min-width: 110px;
-        overflow: visible;
-        text-overflow: unset;
+        color: rgb(255, 107, 107) !important; // 사용자 요청: link-dot 빨간색
+        min-width: unset !important;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
+        flex: 1;
       }
     }
 
-    // 2~4행: 담당자 사진 + Supervised By 라벨 + 이름/직무 + 회사/직책
+    // 2~4행: 사진+Supervised By(같은 행, 우측 정렬) → 이름|직무 → 회사|직책 (독립 행, 카드 전체 폭 사용)
     .sponsor-supervisor {
       display: flex;
-      gap: 8px;
+      flex-direction: column;
+      gap: 10px !important; // 사용자 요청: 6 → 10 (2↔3↔4행 간격)
       flex: 1;
       min-width: 0;
+      overflow: hidden;
 
-      .sponsor-supervisor-photo {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        overflow: hidden;
-        flex-shrink: 0;
+      // 2행: 사진 좌측 + 라벨 우측
+      .supervisor-row-2 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        .sponsor-supervisor-photo {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          overflow: hidden;
+          flex-shrink: 0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+          }
         }
 
-        .photo-placeholder {
-          width: 100%;
-          height: 100%;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 50%;
+        // Supervised By — 하이라이터 스타일 (사용자 요청)
+        .supervisor-label {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px !important; // 사용자 요청: 우측 라벨 확대
+          font-style: italic;
+          color: rgb(78, 205, 196) !important; // link-dot 청록색
+          background-color: rgba(78, 205, 196, 0.3) !important; // 하이라이터 반투명 배경
+          padding: 2px 6px !important;
+          padding-right: 8px !important; // 사용자 요청: 우측 'y' 잘림 방지 여유
+          border-radius: 2px;
+          text-align: right;
         }
       }
 
-      .sponsor-supervisor-info {
+      // 3·4행: 독립 행으로 카드 전체 폭 사용 — 폰트 13px 수용 가능
+      .supervisor-details {
         display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px !important;
+        color: #ddd;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
 
-        .supervisor-label {
-          font-family: "Pretendard", sans-serif;
-          font-size: 9px;
-          color: rgba(255, 255, 255, 0.4);
-          font-style: italic;
-          margin-bottom: 2px;
+        .supervisor-separator {
+          color: rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+          font-size: 13px !important;
         }
 
-        // 각 필드 min-width 고정 (인적사항과 동일 원칙, 말줄임 제거)
-        // 폰트 10px / 카드 폭 ~190px 가용 기준 — name 50px + separator 8px + dept 90px = 148px ✓
-        //                                         company 90px + separator 8px + position 90px = 188px ✓
-        .supervisor-details {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-family: "Pretendard", sans-serif;
-          font-size: 10px;
-          color: #ddd;
+        .supervisor-name,
+        .supervisor-dept,
+        .supervisor-company,
+        .supervisor-position {
+          min-width: unset !important;
+          max-width: none;
+          overflow: hidden;
+          text-overflow: ellipsis;
           white-space: nowrap;
+          font-size: 13px !important;
+          flex: 1;
+          min-width: 0;
+        }
 
-          .supervisor-separator {
-            color: rgba(255, 255, 255, 0.3);
-            flex-shrink: 0;
-          }
-
-          .supervisor-name {
-            font-weight: 600;
-            display: inline-block;
-            min-width: 50px; // 5자 × 10px
-            overflow: visible;
-            text-overflow: unset;
-          }
-
-          .supervisor-dept,
-          .supervisor-company,
-          .supervisor-position {
-            display: inline-block;
-            min-width: 90px; // 10자 × 9~10px (여유 포함)
-            overflow: visible;
-            text-overflow: unset;
-          }
+        .supervisor-name {
+          font-weight: 600;
         }
       }
     }
@@ -10043,7 +10062,7 @@
   .workcareer-grade-section {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end !important; // 우측 정렬 (사용자 요청)
     gap: 8px;
     padding: 0 12px !important;
     border: none !important;

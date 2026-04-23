@@ -77,6 +77,22 @@ const createEmptyWorkCareerCaptions = (): string[] => Array.from({ length: WORKC
 const normalizeWorkCareerImages = (images?: (string | null)[]): (string | null)[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, (_, index) => images?.[index] || null);
 const normalizeWorkCareerCaptions = (captions?: string[]): string[] => Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }, (_, index) => captions?.[index] || "");
 
+// workCareer 데모 모드 폴백 이미지 (DB 값 없을 때만 사용 — 일반 모드는 폴백 없음)
+// 실제 파일: public/images/0/cluster4/icon/실무 경력/
+const DEMO_COMPANY_LOGOS = [
+  "/images/0/cluster4/icon/실무 경력/네이버 웹툰.png",
+  "/images/0/cluster4/icon/실무 경력/씨제이.png",
+  "/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png",
+  "/images/0/cluster4/icon/실무 경력/우아한형제들.png",
+  "/images/0/cluster4/icon/실무 경력/티비엔.png",
+];
+const DEMO_SUPERVISOR_PHOTOS = [
+  "/images/0/cluster4/icon/실무 경력/감독자.jpg",
+  "/images/0/cluster4/icon/실무 경력/감독자2.png",
+  "/images/0/cluster4/icon/실무 경력/감독자3.png",
+  "/images/0/cluster4/icon/실무 경력/감독자4.png",
+];
+
 const WORK_ABILITY_ICON_FILES = [
   "실무 역량 - default.png",
   "실무 역량 - [Job]브랜딩 마케팅.png",
@@ -6464,7 +6480,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                   </div>
 
-                  {/* 좌하단: Main Title (운영진 read-only) + Sub Title 300자 + Growth Point 200자 */}
+                  {/* 좌하단: Main Title (운영진 read-only) + Sub Title 200자 + Growth Point 100자 */}
                   <div className="workinfo-text-section">
                     {/* Main Title — 항상 보기 전용 (관리자가 어드민에서 입력) */}
                     <div className="workinfo-text-block text-block-main">
@@ -6472,7 +6488,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "준비 중입니다"}</div>
                     </div>
 
-                    {/* Sub Title — 사용자 입력 300자 (필수) */}
+                    {/* Sub Title — 사용자 입력 200자 (필수) */}
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
                         Sub Title {workInfoViewIsEditing && <span className="required-mark">*</span>}
@@ -6483,19 +6499,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 300) setEditingSubTitle(e.target.value);
+                              if (e.target.value.length <= 200) setEditingSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 내용을 진행하고, 어떤 과정을 밟으며, 어떤 정보들을 얻게 되었는지를 작성해주세요. 😊"
-                            maxLength={300}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingSubTitle.length}/300</span>
+                          <span className="char-count">{editingSubTitle.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkInfoCard.subTitle || "-"}</div>
                       )}
                     </div>
 
-                    {/* Growth Point — 사용자 입력 200자 (필수) */}
+                    {/* Growth Point — 사용자 입력 100자 (필수) */}
                     {/* TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 + API 확장 후, sub_title과 동일 패턴으로 데이터 연결 */}
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
@@ -6507,12 +6523,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 100) setEditingGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 라인을 진행하며 느낀 통찰, 정보, 감각, 식견을 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={200}
+                            maxLength={100}
                           />
-                          <span className="char-count">{editingGrowthPoint.length}/200</span>
+                          <span className="char-count">{editingGrowthPoint.length}/100</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkInfoCard.growthPoint || "-"}</div>
@@ -6891,12 +6907,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingExpSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 300) setEditingExpSubTitle(e.target.value);
+                              if (e.target.value.length <= 200) setEditingExpSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 실무 경험을 진행했고, 어떤 과정을 거쳐, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={300}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingExpSubTitle.length}/300</span>
+                          <span className="char-count">{editingExpSubTitle.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkExpCard.subTitle || "-"}</div>
@@ -6913,12 +6929,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingExpGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingExpGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 100) setEditingExpGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 경험을 통해 느낀 통찰, 역량, 성과를 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={200}
+                            maxLength={100}
                           />
-                          <span className="char-count">{editingExpGrowthPoint.length}/200</span>
+                          <span className="char-count">{editingExpGrowthPoint.length}/100</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkExpCard.growthPoint || "-"}</div>
@@ -7336,12 +7352,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingAbilitySubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 300) setEditingAbilitySubTitle(e.target.value);
+                              if (e.target.value.length <= 200) setEditingAbilitySubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 역량을 어떤 과정으로 습득했고, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={300}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingAbilitySubTitle.length}/300</span>
+                          <span className="char-count">{editingAbilitySubTitle.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkAbilityCard.subTitle || "-"}</div>
@@ -7357,12 +7373,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingAbilityGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingAbilityGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 100) setEditingAbilityGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 역량을 통해 느낀 통찰, 역량, 성과를 통해 어떤 성장이 이루어졌는지를 어필해주세요. 😊"
-                            maxLength={200}
+                            maxLength={100}
                           />
-                          <span className="char-count">{editingAbilityGrowthPoint.length}/200</span>
+                          <span className="char-count">{editingAbilityGrowthPoint.length}/100</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkAbilityCard.growthPoint || "-"}</div>
@@ -7582,7 +7598,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                       <div className="workinfo-line-info">
                         <div className="line-info-row">
-                          {selectedWorkCareerCard.icon && <img className="line-activity-icon" src={selectedWorkCareerCard.icon} alt={selectedWorkCareerCard.badge || "활동"} />}
+                          {selectedWorkCareerCard.icon && selectedWorkCareerCard.icon !== "-" ? (
+                            <img
+                              className="line-activity-icon"
+                              src={selectedWorkCareerCard.icon}
+                              alt={selectedWorkCareerCard.badge || "활동"}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="line-activity-icon-placeholder" style={{ width: 48, height: 48, background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+                              <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>-</span>
+                            </div>
+                          )}
                           <span className="line-name">{selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "—"}</span>
                         </div>
                         {(() => {
@@ -7657,12 +7686,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea sub-title-input"
                             value={editingCareerSubTitle}
                             onChange={(e) => {
-                              if (e.target.value.length <= 300) setEditingCareerSubTitle(e.target.value);
+                              if (e.target.value.length <= 200) setEditingCareerSubTitle(e.target.value);
                             }}
                             placeholder="이번 주 이 라인에서 어떤 실무 경력을 쌓았고, 어떤 과정을 거쳐, 어떤 결과를 만들어냈는지를 작성해주세요. 😊"
-                            maxLength={300}
+                            maxLength={200}
                           />
-                          <span className="char-count">{editingCareerSubTitle.length}/300</span>
+                          <span className="char-count">{editingCareerSubTitle.length}/200</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkCareerCard.subTitle || selectedWorkCareerCard.projectDescription || "-"}</div>
@@ -7679,12 +7708,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             className="text-block-textarea growth-point-input"
                             value={editingCareerGrowthPoint}
                             onChange={(e) => {
-                              if (e.target.value.length <= 200) setEditingCareerGrowthPoint(e.target.value);
+                              if (e.target.value.length <= 100) setEditingCareerGrowthPoint(e.target.value);
                             }}
                             placeholder="이번 주 이 실무 경력을 통해 느낀 인사이트와 저변 확장을 어필해주세요. 😊"
-                            maxLength={200}
+                            maxLength={100}
                           />
-                          <span className="char-count">{editingCareerGrowthPoint.length}/200</span>
+                          <span className="char-count">{editingCareerGrowthPoint.length}/100</span>
                         </div>
                       ) : (
                         <div className="text-block-content">{selectedWorkCareerCard.growthPoint || "-"}</div>
@@ -7832,45 +7861,76 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       );
                     })}
                     {/* 4번째 슬롯 — 후원/제휴사 카드 (항상 읽기전용, 편집 모드에서도 수정 불가) */}
-                    <div className="workinfo-image-slot sponsor-card-slot">
-                      <div className="sponsor-card">
-                        {/* 1행: 기업 로고 + 기업명 */}
-                        <div className="sponsor-company">
-                          <div className="sponsor-company-logo">
-                            {selectedWorkCareerCard.icon ? (
-                              <img src={selectedWorkCareerCard.icon} alt="기업 로고" />
-                            ) : (
-                              <div className="logo-placeholder">
-                                기업
-                                <br />
-                                로고
+                    {(() => {
+                      // DB 값이 우선. 없으면 데모 모드에서만 card id 기반 랜덤 폴백
+                      const cardIdForDemo = selectedWorkCareerCard.id || 0;
+                      const cardIconValid = selectedWorkCareerCard.icon && selectedWorkCareerCard.icon !== "-";
+                      const supervisorImgValid = selectedWorkCareerCard.supervisorImg && selectedWorkCareerCard.supervisorImg !== "-";
+                      const companyLogo = cardIconValid ? selectedWorkCareerCard.icon : isDemoMode ? DEMO_COMPANY_LOGOS[cardIdForDemo % DEMO_COMPANY_LOGOS.length] : "";
+                      const supervisorPhoto = supervisorImgValid ? selectedWorkCareerCard.supervisorImg : isDemoMode ? DEMO_SUPERVISOR_PHOTOS[cardIdForDemo % DEMO_SUPERVISOR_PHOTOS.length] : "";
+                      return (
+                        <div className="workinfo-image-slot sponsor-card-slot">
+                          <div className="sponsor-card">
+                            {/* 1행: 기업 로고 + 기업명 */}
+                            <div className="sponsor-company">
+                              <div className="sponsor-company-logo">
+                                {companyLogo ? (
+                                  <img
+                                    src={companyLogo}
+                                    alt="기업 로고"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = "none";
+                                      const sibling = (e.target as HTMLImageElement).nextElementSibling as HTMLElement | null;
+                                      if (sibling) sibling.style.display = "flex";
+                                    }}
+                                  />
+                                ) : null}
+                                <div className="logo-placeholder" style={{ display: companyLogo ? "none" : "flex" }}>
+                                  기업
+                                  <br />
+                                  로고
+                                </div>
                               </div>
-                            )}
-                          </div>
-                          <span className="sponsor-company-name">{selectedWorkCareerCard.badge || "기업명"}</span>
-                        </div>
+                              <span className="sponsor-company-name">{selectedWorkCareerCard.badge || "기업명"}</span>
+                            </div>
 
-                        {/* 2~4행: 담당자 사진 + Supervised By + 이름/직무 + 회사/직책 */}
-                        <div className="sponsor-supervisor">
-                          <div className="sponsor-supervisor-photo">
-                            {selectedWorkCareerCard.supervisorImg ? <img src={selectedWorkCareerCard.supervisorImg} alt="담당자" /> : <div className="photo-placeholder"></div>}
-                          </div>
-                          <div className="sponsor-supervisor-info">
-                            <span className="supervisor-label">Supervised By</span>
-                            <div className="supervisor-details">
-                              <span className="supervisor-name">{selectedWorkCareerCard.supervisorName || "-"}</span>
-                              <span className="supervisor-separator">|</span>
-                              <span className="supervisor-dept">{selectedWorkCareerCard.supervisorDept || "-"}</span>
-                            </div>
-                            <div className="supervisor-details">
-                              <span className="supervisor-company">{selectedWorkCareerCard.supervisorCompany || "-"}</span>
-                              <span className="supervisor-separator">|</span>
-                              <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
+                            {/* 2~4행: 담당자 사진+라벨(같은 행) + 이름/직무 + 회사/직책 (독립 행) */}
+                            <div className="sponsor-supervisor">
+                              {/* 2행: 사진 좌측 + Supervised By 우측 */}
+                              <div className="supervisor-row-2">
+                                <div className="sponsor-supervisor-photo">
+                                  {supervisorPhoto ? (
+                                    <img
+                                      src={supervisorPhoto}
+                                      alt="담당자"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = "none";
+                                        const sibling = (e.target as HTMLImageElement).nextElementSibling as HTMLElement | null;
+                                        if (sibling) sibling.style.display = "block";
+                                      }}
+                                    />
+                                  ) : null}
+                                  <div className="photo-placeholder" style={{ display: supervisorPhoto ? "none" : "block" }}></div>
+                                </div>
+                                <span className="supervisor-label">Supervised By</span>
+                              </div>
+                              {/* 3행: 이름 | 직무 */}
+                              <div className="supervisor-details">
+                                <span className="supervisor-name">{selectedWorkCareerCard.supervisorName || "-"}</span>
+                                <span className="supervisor-separator">|</span>
+                                <span className="supervisor-dept">{selectedWorkCareerCard.supervisorDept || "-"}</span>
+                              </div>
+                              {/* 4행: 회사 | 직책 */}
+                              <div className="supervisor-details">
+                                <span className="supervisor-company">{selectedWorkCareerCard.supervisorCompany || "-"}</span>
+                                <span className="supervisor-separator">|</span>
+                                <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
                   </div>
 
                   {/* 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용 */}
