@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { useProfile } from "@/contexts/ProfileContext";
+import { isAdminEmail } from "@/lib/admin";
 import {
   CLUSTER3_DUMMY_PROFILE,
   CLUSTER3_DUMMY_ARCHIVES,
@@ -198,6 +200,8 @@ const PeriodRangePicker = ({
 const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
+  // Sidebar와 동일한 ProfileContext 캐시 — display_name 등 공통 프로필 정보 빠르게 접근
+  const { profileData: cachedProfile } = useProfile();
   const searchParams = useSearchParams();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const demoNameParam = searchParams.get("demoName");
@@ -300,6 +304,15 @@ const Cluster3Content = () => {
 
   // 영어 이름
   const [engName, setEngName] = useState<string>("Eng Name");
+
+  // 크루 한글 이름 (display_name) — 모달 타이틀 "{displayName} 님의 ..." 용
+  const [displayName, setDisplayName] = useState<string>("");
+
+  // ProfileContext 캐시(Sidebar와 공유)에서 display_name 즉시 동기화
+  useEffect(() => {
+    const cached = cachedProfile?.data?.display_name;
+    if (cached) setDisplayName(cached);
+  }, [cachedProfile?.data?.display_name]);
 
   // 성장 점수 기록 데이터 (단감, 인절미, 어흥)
   interface PointsData {
@@ -819,6 +832,7 @@ const Cluster3Content = () => {
         setReliabilityRate(userData.profile.reliabilityRate);
         setHasReliabilityData(true);
         setEngName(userData.profile.engName);
+        setDisplayName(demoUser);
         setPointsData(userData.profile.pointsData);
         setGradeStats(userData.profile.gradeStats);
         setTopPercent(userData.profile.gradeStats.avgPercentile);
@@ -851,6 +865,11 @@ const Cluster3Content = () => {
         // 영어 이름 설정
         if (result.data?.eng_name) {
           setEngName(result.data.eng_name);
+        }
+
+        // 한글 display_name 설정
+        if (result.data?.display_name) {
+          setDisplayName(result.data.display_name);
         }
 
         // 성장 점수 기록 데이터 설정 (badges에서 가져옴)
@@ -1169,6 +1188,17 @@ const Cluster3Content = () => {
   const [detailSnapshot, setDetailSnapshot] = useState<OutputCard | null>(null);
   const [detailFooterNotice, setDetailFooterNotice] = useState<"default" | "error">("default");
   const [canEditDetail, setCanEditDetail] = useState<boolean>(isDemoMode);
+
+  // 어드민(마더) 계정은 Portfolio Output/Detail 편집 권한 자동 부여
+  // session.user.isAdmin 플래그가 JWT 쿠키에 아직 반영 안 됐을 수 있어 email로도 직접 판정
+  useEffect(() => {
+    const isAdmin = session?.user?.isAdmin || isAdminEmail(session?.user?.email);
+    if (isAdmin) {
+      setCanEditOutput(true);
+      setCanEditDetail(true);
+    }
+  }, [session?.user?.isAdmin, session?.user?.email]);
+
   const [detailCaptionOpenIndex, setDetailCaptionOpenIndex] = useState<number | null>(null);
   const detailMainImageInputRef = useRef<HTMLInputElement>(null);
   const detailSubImageInputRefs = useRef<(HTMLInputElement | null)[]>([null, null]);
@@ -2464,7 +2494,7 @@ const Cluster3Content = () => {
                 <div className="channel-info-section">
                   <h4 className="channel-info-title">
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
-                    <span className="user-name">윤재윤 님</span>
+                    <span className="user-name">{displayName || "크루"} 님</span>
                     <span className="channel-title-text">의 Portfolio Channel</span>
                   </h4>
                   {(() => {
@@ -3115,7 +3145,7 @@ const Cluster3Content = () => {
                   <div className="output-title-row">
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
                     <span className="output-user-title">
-                      <span className="user-name">윤재윤 님</span>
+                      <span className="user-name">{displayName || "크루"} 님</span>
                       <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Top 5 [{currentOutputIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">
@@ -3867,7 +3897,7 @@ const Cluster3Content = () => {
                   <div className="output-title-row">
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
                     <span className="output-user-title">
-                      <span className="user-name">윤재윤 님</span>
+                      <span className="user-name">{displayName || "크루"} 님</span>
                       <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Detail 10 [{currentDetailIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">

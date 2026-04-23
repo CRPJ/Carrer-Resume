@@ -9,6 +9,7 @@ import { useProfile } from "@/contexts/ProfileContext";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
+import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import { useModalScroll } from "@/utils/useModalScroll";
 import koreaRegionsData from "@/data/korea-regions.json";
@@ -341,6 +342,8 @@ const Sidebar = () => {
 
   // 캐시된 프로필 데이터로 즉시 초기화 (클러스터 탭 전환 시 깜빡임 방지)
   const cacheInitRef = useRef(false);
+  // 슬로건이 프로필보다 먼저 도착했을 때 임시로 보관하는 버퍼 (병렬 fetch 시 경쟁 상태 방지)
+  const pendingSloganRef = useRef<string | null>(null);
   useLayoutEffect(() => {
     if (demoMode) return; // 더미 모드면 캐시 초기화 스킵
     if (cacheInitRef.current || !cachedProfile?.data) return;
@@ -348,6 +351,15 @@ const Sidebar = () => {
 
     const profile = cachedProfile.data;
     setHasData(true);
+
+    // 슬로건 우선순위: pending(네트워크로 먼저 도착) → sessionStorage 캐시 → bio 폴백
+    let cachedSlogan: string | null = null;
+    try {
+      if (typeof window !== "undefined") {
+        cachedSlogan = sessionStorage.getItem(`sidebar:slogan1:${targetUserId || "self"}`);
+      }
+    } catch {}
+    const initialQuote = pendingSloganRef.current || cachedSlogan || profile.bio || "";
 
     const addressParts = (profile.address || "").split(" ");
     setUserProfile({
@@ -371,7 +383,7 @@ const Sidebar = () => {
       graduationStatus: "",
       gpa: "",
       gpaMax: "",
-      quote: profile.bio || "",
+      quote: initialQuote,
       photo: profile.profile_photo_url || "",
     });
 
@@ -409,6 +421,9 @@ const Sidebar = () => {
     if (cachedProfile.seasonHistories && cachedProfile.seasonHistories.length > 0) {
       setSeasonHistories(cachedProfile.seasonHistories);
       setHasSeasonData(true);
+    }
+    if (cachedProfile.growthPeriodStats?.approvedWeeks !== undefined) {
+      setApprovedWeeksCount(cachedProfile.growthPeriodStats.approvedWeeks);
     }
   }, [cachedProfile]);
 
@@ -571,6 +586,7 @@ const Sidebar = () => {
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
   const [debugPanelType, setDebugPanelType] = useState<"OK" | "EC" | "PX">("OK");
   const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">("Running");
+  const [approvedWeeksCount, setApprovedWeeksCount] = useState<number | null>(null);
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -706,7 +722,7 @@ const Sidebar = () => {
           graduationStatus: userProfile.graduationStatus,
           gpa: userProfile.gpa,
           gpaMax: userProfile.gpaMax,
-          quote: userProfile.quote || defaultProfile.quote,
+          quote: userProfile.quote || SECTION2_SLOGAN_DEFAULTS.slogans[0].content,
           photo: userProfile.photo || defaultProfile.photo,
         }
       : defaultProfile;
@@ -748,6 +764,7 @@ const Sidebar = () => {
         practicalCounts: cachedResult.practicalCounts,
         badges: cachedResult.badges,
         seasonHistories: cachedResult.seasonHistories,
+        growthPeriodStats: cachedResult.growthPeriodStats,
       };
 
       if (result.success && result.data) {
@@ -768,6 +785,15 @@ const Sidebar = () => {
           setIsOwner(ownerCheck);
         }
         const addressParts = (profile.address || "").split(" ");
+
+        // 슬로건 우선순위: 병렬 fetch로 먼저 도착한 pending → sessionStorage 캐시 → bio 폴백
+        let cachedSlogan: string | null = null;
+        try {
+          if (typeof window !== "undefined") {
+            cachedSlogan = sessionStorage.getItem(`sidebar:slogan1:${targetUserId || "self"}`);
+          }
+        } catch {}
+        const initialQuote = pendingSloganRef.current || cachedSlogan || profile.bio || "";
 
         setUserProfile({
           name: profile.display_name || "",
@@ -790,12 +816,12 @@ const Sidebar = () => {
           graduationStatus: "",
           gpa: "",
           gpaMax: "",
-          quote: profile.bio || "",
+          quote: initialQuote,
           photo: profile.profile_photo_url || "",
         });
 
-        // 학력 + 슬로건 데이터 병렬 로드 (성능 최적화)
-        Promise.all([fetchEducations(), fetchSlogan()]);
+        // 학력은 프로필 응답 후 로드 (슬로건은 별도 useEffect에서 이미 병렬 실행)
+        fetchEducations();
 
         // DB status → crewStatus 매핑
         const statusMap: Record<string, "Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge"> = {
@@ -854,6 +880,13 @@ const Sidebar = () => {
         } else {
           setHasSeasonData(false);
         }
+
+        // 성장 성공 주차 수 (cluster-4-card의 cumulativeApprovedWeeks와 동일 소스)
+        if (result.growthPeriodStats?.approvedWeeks !== undefined) {
+          setApprovedWeeksCount(result.growthPeriodStats.approvedWeeks);
+        } else {
+          setApprovedWeeksCount(null);
+        }
       }
     } catch (error) {
       console.error("프로필 로드 오류:", error);
@@ -896,6 +929,7 @@ const Sidebar = () => {
   };
 
   // 슬로건 데이터 가져오기 (user_introductions에서)
+  // 프로필 fetch와 병렬로 실행 → 프로필보다 먼저 도착하면 pendingSloganRef에 보관
   const fetchSlogan = async () => {
     try {
       const apiUrl = targetUserId ? `/api/slogans?userId=${targetUserId}` : "/api/slogans";
@@ -903,12 +937,21 @@ const Sidebar = () => {
       const result = await response.json();
 
       if (result.success && result.data?.slogan1?.content) {
+        const content = result.data.slogan1.content as string;
+        // sessionStorage 캐싱 → 다음 방문 시 즉시 표시
+        try {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem(`sidebar:slogan1:${targetUserId || "self"}`, content);
+          }
+        } catch {}
         setUserProfile((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            quote: result.data.slogan1.content,
-          };
+          if (!prev) {
+            // 프로필이 아직 도착 안 함 → pending에 보관, 프로필 setUserProfile 시 사용됨
+            pendingSloganRef.current = content;
+            return prev;
+          }
+          pendingSloganRef.current = null;
+          return { ...prev, quote: content };
         });
       }
     } catch (error) {
@@ -916,11 +959,12 @@ const Sidebar = () => {
     }
   };
 
-  // 세션 또는 targetUserId 변경 시 프로필 로드
+  // 세션 또는 targetUserId 변경 시 프로필 + 슬로건 병렬 로드 (플리커 최소화)
   useEffect(() => {
     if (demoMode) return; // 더미 모드면 API 안 부름
     if (session || targetUserId) {
       fetchUserProfile();
+      fetchSlogan();
     }
   }, [session, targetUserId, demoMode]);
 
@@ -929,15 +973,27 @@ const Sidebar = () => {
     const handleSloganUpdated = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.slogan1?.content !== undefined) {
+        const newContent = detail.slogan1.content || "";
+        // sessionStorage 캐시도 함께 갱신 (다음 방문 플리커 방지)
+        try {
+          if (typeof window !== "undefined") {
+            const key = `sidebar:slogan1:${targetUserId || "self"}`;
+            if (newContent) {
+              sessionStorage.setItem(key, newContent);
+            } else {
+              sessionStorage.removeItem(key);
+            }
+          }
+        } catch {}
         setUserProfile((prev) => {
           if (!prev) return prev;
-          return { ...prev, quote: detail.slogan1.content || "" };
+          return { ...prev, quote: newContent };
         });
       }
     };
     window.addEventListener("sloganUpdated", handleSloganUpdated);
     return () => window.removeEventListener("sloganUpdated", handleSloganUpdated);
-  }, []);
+  }, [targetUserId]);
 
   // 학력 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {
@@ -2066,7 +2122,7 @@ const Sidebar = () => {
             <div className={`resume-medal ${crewStatus === "Complete" ? "no-overlay" : ""}`}>
               <div className="medal-image-wrapper">
                 <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={512} height={512} />
-                <span className="medal-week-num">{demoMode ? 12 : 0}</span>
+                <span className="medal-week-num">{demoMode ? 12 : (approvedWeeksCount ?? 0)}</span>
               </div>
               <div
                 className={`medal-text ${crewStatus === "Next Challenge" ? "long" : crewStatus === "Recharging" ? "medium" : crewStatus === "Complete" ? "short-medium" : ""} ${crewStatus === "Complete" ? "medal-complete" : crewStatus === "Running" ? "medal-running" : crewStatus === "On Rest" ? "medal-onrest" : crewStatus === "Recharging" ? "medal-recharging" : crewStatus === "Next Challenge" ? "medal-next" : ""}`}
