@@ -9796,6 +9796,52 @@
 }
 
 // ============================================================================
+// workInfo 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// ============================================================================
 // workAbility 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workability-view-modal {
