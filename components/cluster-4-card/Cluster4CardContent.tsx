@@ -7274,8 +7274,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {workCareerViewModalOpen && selectedWorkCareerCard && (
         <div className="section-modal-overlay">
           <div className="section-modal work-view-modal workcareer-view-modal">
+            {/* ── 헤더 — workInfo/workExp 패턴 복제 (modal-header-top + h3 + modal-subtitle + close) ── */}
             <div className="section-modal-header">
-              <h3>실무 경력</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                <h3>
+                  실무 경력 [<span className="line-name-text">{selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "카테고리"}</span>]
+                </h3>
+              </div>
+              <p className="modal-subtitle">이번 주에 어떤 실무 경력을 쌓았으며, 그 과정 속에서 어떤 인사이트와 저변을 넓혔는지를 마음껏 어필해주세요. 😊</p>
               <button
                 className="modal-close-btn"
                 onClick={() => {
