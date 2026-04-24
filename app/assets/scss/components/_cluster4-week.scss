@@ -4986,6 +4986,143 @@
         color: rgba(255, 255, 255, 0.4);
         margin-top: 4px;
       }
+
+      // ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] (5단계) ──
+      // 4개 모달(work-view-modal)의 .section-modal-footer 규칙과 동일 값 — reputation-form 전용 스코프에 복제
+      // reputation-form은 편집 전용 모달이므로 [수정] 버튼 없음 ([취소][초기화][저장])
+      .section-modal-footer {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px 28px;
+        height: 118px;
+        min-height: 118px;
+        max-height: 118px;
+        box-sizing: border-box;
+        border-top: none;
+        background: transparent;
+
+        // 행 1: 🔎 좌 + 버튼 우
+        .modal-footer-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          position: relative;
+
+          .modal-help-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 36px;
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 46px;
+              height: 46px;
+              background: rgba(0, 0, 0, 0.6);
+              border: none;
+              border-radius: 0;
+              z-index: -1;
+            }
+          }
+
+          .modal-footer-right {
+            flex-shrink: 0;
+            min-width: 160px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+          }
+        }
+
+        // 행 2: 안내문 우측 정렬 (visibility 토글로 공간 유지)
+        .modal-footer-bottom {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          text-align: right;
+          border: none;
+
+          .modal-notice {
+            font-family: "Pretendard", sans-serif;
+            font-size: 15px;
+            color: #faab07;
+            text-align: right;
+            margin: 0;
+
+            &.notice-error {
+              color: #ff4444;
+            }
+          }
+        }
+
+        .modal-save-btn {
+          padding: 8px 20px;
+          background: #faab07;
+          border: 1px solid transparent;
+          color: #1a1a1a;
+          border-radius: 0;
+          font-weight: 600;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover {
+            background: #ffb820;
+          }
+          &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+          }
+        }
+
+        .modal-cancel-btn {
+          padding: 8px 20px;
+          border: 1px solid #888;
+          background: transparent;
+          color: #888;
+          border-radius: 0;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover {
+            background: rgba(136, 136, 136, 0.1);
+            color: #aaa;
+          }
+        }
+
+        .modal-reset-btn {
+          padding: 8px 20px;
+          border: 1px solid #4caf50;
+          background: transparent;
+          color: #4caf50;
+          border-radius: 0;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover {
+            background: rgba(76, 175, 80, 0.1);
+          }
+        }
+      }
     }
 
     .section-modal-header {

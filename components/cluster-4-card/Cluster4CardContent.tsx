@@ -6435,20 +6435,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="char-count">{reputationEditData.content.length}/100</div>
               </div>
             </div>
+            {/* ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] ── */}
             <div className="section-modal-footer">
-              <button
-                className="cancel-btn"
-                onClick={() => {
-                  setHeaderModalOpen(false);
-                  setReputationSaveError(null);
-                  setReputationSaveSuccess(false);
-                }}
-              >
-                취소
-              </button>
-              <button className="save-btn" onClick={saveWeeklyReputation} disabled={reputationSaving || reputationSaveSuccess || reputationEditData.rating === 0 || reputationEditData.content.trim() === "" || reputationEditData.keyword === ""}>
-                {reputationSaving ? "저장 중..." : "저장"}
-              </button>
+              {/* 행 1 */}
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  <button className="modal-cancel-btn" onClick={handleFormCancel}>
+                    취소
+                  </button>
+                  <button className="modal-reset-btn" onClick={handleFormReset}>
+                    초기화
+                  </button>
+                  <button
+                    className="modal-save-btn"
+                    onClick={handleFormSave}
+                    disabled={!isFormDirty() || !isFormValid() || reputationSaving || reputationSaveSuccess}
+                  >
+                    {reputationSaving ? "저장 중..." : "저장"}
+                  </button>
+                </div>
+              </div>
+
+              {/* 행 2 — visibility 토글로 공간 유지 (cluster2/3 표준: 우측 정렬) */}
+              <div className="modal-footer-bottom">
+                <span
+                  className={`modal-notice modal-footer-notice ${saveAttemptFailed ? "notice-error" : ""}`}
+                  style={{ visibility: saveAttemptFailed ? "visible" : "hidden" }}
+                >
+                  필수 사항이 누락되었어요! 확인 부탁드려요! 😊
+                </span>
+              </div>
             </div>
           </div>
         </div>
