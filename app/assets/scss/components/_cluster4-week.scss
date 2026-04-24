@@ -6782,6 +6782,52 @@
             color: #faab07;
           }
         }
+
+        // 작업 1: [삭제] [수정] 버튼 (colleague-view-modal .modal-delete-btn 패턴 준용)
+        // 배치: [삭제(right:148)] [수정(right:80)] [X(right:16)]
+        .modal-delete-btn {
+          position: absolute;
+          top: 16px;
+          right: 148px;
+          padding: 6px 14px;
+          background: rgba(231, 76, 60, 0.15);
+          border: 1px solid rgba(231, 76, 60, 0.4);
+          color: #e74c3c;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.15s;
+          line-height: 1;
+
+          &:hover {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+          }
+        }
+
+        .modal-edit-btn {
+          position: absolute;
+          top: 16px;
+          right: 80px;
+          padding: 6px 14px;
+          background: rgba(250, 171, 7, 0.15);
+          border: 1px solid rgba(250, 171, 7, 0.4);
+          color: #faab07;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.15s;
+          line-height: 1;
+
+          &:hover {
+            background: rgba(250, 171, 7, 0.3);
+            border-color: #faab07;
+          }
+        }
       }
 
       // ── 미드 (460px) — 1열 세로 배치 ──
@@ -7335,162 +7381,255 @@
         min-height: 0;
       }
 
-      .colleague-header-row {
+      // ── 미드 바디 레이아웃 (작업 2~6) ──
+      .section-modal-body.colleague-body {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .colleague-to-badge {
-        display: flex;
-        align-items: baseline;
-        gap: 4px;
-
-        .to-text {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #faab07;
-          font-family: "Georgia", serif;
-          font-style: italic;
-        }
-
-        .rank-number {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #faab07;
-          font-family: "Georgia", serif;
-          font-style: italic;
-        }
-      }
-
-      .colleague-view-profile {
-        display: flex;
-        align-items: center;
+        flex-direction: column;
         gap: 14px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .profile-image {
-          width: 60px;
-          height: 60px;
+      // 작업 2: 최상단 감사 텍스트
+      .colleague-thanks-text {
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #ddd;
+        text-align: center;
+        padding: 8px 0 4px;
+      }
+
+      // 작업 3: 인적사항 카드 — reputation-view-modal .workinfo-personal-card 재사용하되 540px 비율에 맞춤
+      .workinfo-personal-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+
+        .personal-grid {
+          width: 100%;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 4px 12px;
+          align-items: center;
+        }
+
+        .personal-photo {
+          grid-column: 1;
+          grid-row: 1;
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
-          background: #ccc;
+          align-self: center;
 
           img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-          }
-
-          .profile-placeholder {
-            width: 100%;
-            height: 100%;
-            background: #ccc;
+            display: block;
           }
         }
 
-        .profile-info {
-          flex: 1;
+        .personal-info {
+          grid-column: 2;
+          grid-row: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .personal-row-1 {
+          display: flex !important;
+          align-items: center !important;
+          gap: 6px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 12px !important;
+          color: #ddd;
+
+          .personal-name {
+            display: inline-flex;
+            align-items: center;
+            height: 26px;
+            padding: 2px 8px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            background: rgb(26, 26, 46);
+            color: #fff;
+            white-space: nowrap;
+            font-size: 12px !important;
+          }
+
+          .personal-gender,
+          .personal-age {
+            white-space: nowrap;
+            font-size: 12px !important;
+          }
+
+          .personal-tags {
+            margin-left: auto !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 6px !important;
+            flex-shrink: 0;
+
+            .tag-badge {
+              font-size: 11px !important;
+              padding: 3px 10px !important;
+              max-width: 110px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              border-radius: 9999px;
+              font-family: "Pretendard", sans-serif;
+              font-weight: 600;
+
+              &.tag-role {
+                background: rgba(250, 171, 7, 0.15);
+                color: #faab07;
+                border: 1px solid rgba(250, 171, 7, 0.4);
+              }
+
+              &.tag-keyword {
+                background: rgba(255, 255, 255, 0.08);
+                color: #ddd;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              }
+            }
+          }
+        }
+
+        .personal-row-2,
+        .personal-row-3 {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto;
+          align-items: center;
+          column-gap: 6px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 12px !important;
+          color: #ddd;
           min-width: 0;
 
-          .text {
+          > .personal-field {
+            display: contents;
+          }
+
+          .field-value {
             color: #fff;
-            font-family: "Pretendard", sans-serif;
             font-weight: 700;
+            font-size: 12px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
-          .label {
+          .field-label {
             color: #999;
-            font-size: 0.875rem;
+            font-size: 10px !important;
           }
+        }
 
-          .profile-name {
-            font-size: 1.125rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 2px;
-
-            .text {
-              font-size: 1.125rem;
-              font-weight: 700;
-              color: #fff;
-              font-family: "Pretendard", sans-serif;
-            }
-          }
-
-          .profile-details {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
-            line-height: 1.2;
-
-            .detail-line {
-              margin-bottom: 1px;
-              white-space: normal;
-              word-break: break-word;
-              font-size: 0.875rem;
-
-              .text {
-                font-size: 0.875rem;
-                color: #fff;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-              }
-
-              .label {
-                font-size: 0.875rem;
-                color: #999;
-                font-family: "Pretendard", sans-serif;
-              }
-
-              .nickname {
-                font-size: 0.875rem;
-                color: #faab07;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-              }
-            }
-          }
+        .personal-separator {
+          color: rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+          font-size: 12px !important;
         }
       }
 
-      .colleague-view-message {
-        .message-label {
-          font-size: 0.875rem;
-          font-weight: 600;
+      // 작업 4: From / To
+      .colleague-fromto {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 4px 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px;
+        color: #ddd;
+
+        .fromto-label {
           color: #faab07;
-          font-family: "Pretendard", sans-serif;
-          margin-bottom: 8px;
+          font-weight: 700;
         }
 
-        .message-content {
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.9);
-          font-family: "Pretendard", sans-serif;
-          line-height: 1.6;
-          background: rgba(255, 255, 255, 0.05);
-          padding: 12px 16px;
-          border-radius: 8px;
-          border-left: 3px solid #faab07;
+        .fromto-name {
+          font-weight: 600;
+          color: #fff;
+        }
+
+        .fromto-suffix {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .fromto-arrow {
+          color: rgba(255, 255, 255, 0.4);
+          margin: 0 8px;
+          font-size: 14px;
         }
       }
 
-      .colleague-view-date {
-        .date-value {
-          font-size: 0.75rem;
-          color: #fff;
+      // 작업 5: Honor & Thank you
+      .colleague-honor-section {
+        .honor-label {
           font-family: "Pretendard", sans-serif;
-          font-weight: 800;
-          width: auto;
-          min-width: fit-content;
-          height: 26px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 9999px;
+          font-size: 14px;
+          font-weight: 700;
+          color: #faab07;
+          margin: 0 0 8px 0;
+        }
+
+        .honor-content-box {
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          min-height: 80px;
+          max-height: 120px;
+          overflow-y: auto;
+          border-radius: 4px;
+
+          .honor-content-text {
+            font-family: "Pretendard", sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ddd;
+            white-space: pre-wrap;
+            margin: 0;
+          }
+        }
+      }
+
+      // 작업 6: 하단 구분선 + 타임스탬프 (reputation-view-modal 준용)
+      .reputation-bottom-section {
+        margin-top: auto;
+        margin-left: -24px !important;
+        margin-right: -24px !important;
+        padding-top: 12px;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        flex-shrink: 0;
+
+        .reputation-bottom-divider {
+          height: 1px;
+          background: rgba(255, 165, 0, 0.2);
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          width: 100% !important;
+          margin-bottom: 10px;
+        }
+
+        .reputation-timestamp {
           display: flex;
-          align-items: center;
-          justify-content: center;
-          white-space: nowrap;
-          padding: 0 10px;
+          justify-content: flex-end;
+          padding: 0;
+
+          span {
+            font-family: "Pretendard", sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+          }
         }
       }
 

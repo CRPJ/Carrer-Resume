@@ -1572,6 +1572,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [fieldErrorFlash, setFieldErrorFlash] = useState(false); // 필수필드 미입력 시 테두리 깜빡임 트리거
   const [showResetConfirm, setShowResetConfirm] = useState(false); // cluster3 패턴: 초기화 확인 팝업
 
+  // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
+  // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
+  // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditReputation으로 반영
+  const [canEditReputation, setCanEditReputation] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    setCanEditReputation(isDemoMode);
+  }, [isDemoMode]);
+
   // 주차 평판 데이터 (API에서 가져옴)
   const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
 
@@ -2807,6 +2815,49 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setReputationEditData({ rating: 0, content: "", keyword: "" });
     }
     setSaveAttemptFailed(false);
+  };
+
+  // ========================================================================
+  // reputation-view-modal [수정] / [삭제] 핸들러 (작업 1 — 관리자 승인)
+  // ========================================================================
+
+  // [수정] — 관리자 승인 검증 + 편집 모달 진입 + 기존 데이터 초기화
+  const handleReputationEditClick = () => {
+    if (!canEditReputation) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+    if (!selectedReputationCard) return;
+
+    // selectedReputationCard에서 reputation-form 데이터로 역매핑
+    // reputationData useMemo: rating /= 2, tagText = `#${keyword}`, description = content
+    const restoredRating = Math.round((selectedReputationCard.rating || 0) * 2); // 5점 만점 → 10점 만점 복원
+    const restoredContent = selectedReputationCard.description && selectedReputationCard.description !== "-" ? selectedReputationCard.description : "";
+    const restoredKeyword = selectedReputationCard.tagText ? String(selectedReputationCard.tagText).replace(/^#/, "") : "";
+
+    const initial = {
+      rating: restoredRating,
+      content: restoredContent,
+      keyword: restoredKeyword,
+    };
+    setReputationEditData(initial);
+    setFormSnapshot(initial);
+    // 키워드가 있으면 기본 select 모드(MD 스펙: readonly) — 신규 작성이 아닌 수정이므로
+    setFormKeywordMode(restoredKeyword ? "select" : "select");
+    setSelectedKeywordTemp("");
+    setIsReputationFormEditing(true); // [수정] 진입 시 바로 편집 모드
+    setSaveAttemptFailed(false);
+
+    // view 모달 닫고 form 모달 오픈
+    setReputationViewModalOpen(false);
+    setHeaderModalType("타크루");
+    setHeaderModalOpen(true);
+  };
+
+  // [삭제] — 작업 5에서 완성. 작업 1에서는 placeholder (클릭 시 안내만).
+  // TODO: [백엔드 작업 필요] DELETE /api/weekly-reputations/:id 엔드포인트 확인/생성 → 작업 5에서 연동
+  const handleReputationDeleteClick = () => {
+    window.alert("삭제 기능은 준비 중입니다. (작업 5에서 구현)");
   };
 
   // isDirty — 스냅샷 대비 변경 여부
@@ -4375,7 +4426,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 주차 평판
               </span>
               <span className="section-count" style={{ fontSize: "17px" }}>
-                <span className="count-num">{weeklyReputations.length}</span>/3
+                <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
             </div>
             <div className="reputation-cards-grid">
@@ -6625,13 +6676,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {reputationViewModalOpen && selectedReputationCard && (
         <div className="section-modal-overlay">
           <div className="section-modal reputation-view-modal">
-            {/* ── 헤더 (110px) — workInfo/workExp 패턴 준용 ── */}
+            {/* ── 헤더 (110px) — workInfo/workExp 패턴 준용 + [삭제][수정][X] 3버튼 ── */}
             <div className="section-modal-header">
               <div className="modal-header-top">
                 <img src="/images/0/write.png" alt="write" />
                 <h3>위클리 평판 (Weekly Reputation)</h3>
               </div>
               <p className="modal-subtitle">저는 당신의 한 주를 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊</p>
+              <button className="modal-delete-btn" onClick={handleReputationDeleteClick}>
+                삭제
+              </button>
+              <button className="modal-edit-btn" onClick={handleReputationEditClick}>
+                수정
+              </button>
               <button className="modal-close-btn" onClick={() => setReputationViewModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
