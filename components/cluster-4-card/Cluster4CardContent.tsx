@@ -123,6 +123,93 @@ const stripFieldLabel = (value: string | null | undefined, labels: string[]) => 
   return matchedLabel ? text.slice(0, -matchedLabel.length).trim() || text : text;
 };
 
+// ============================================================================
+// reputation-form 중첩 모달 — 키워드 선택 (5군락 100개)
+// TODO: [백엔드 작업 필요] reputationKeywords DB를 5군락 구조로 매핑 후 대체
+// ============================================================================
+interface KeywordGroup {
+  id: string;
+  color: "blue" | "green" | "yellow" | "orange" | "red";
+  emoji: string;
+  title: string;
+  count: number;
+  keywords: string[];
+}
+
+const KEYWORD_GROUPS: KeywordGroup[] = [
+  {
+    id: "group1",
+    color: "blue",
+    emoji: "🔵",
+    title: "도구 · 기술 · 시스템 활용 역량",
+    count: 36,
+    keywords: [
+      "노션 유망주", "노션 마스터", "인스타 유망주", "인스타 마스터",
+      "유튜브 유망주", "유튜브 마스터", "AI 유망주", "AI 마스터",
+      "블로그 유망주", "블로그 마스터", "미드저니 유망주", "미드저니 마스터",
+      "깃업 유망주", "깃업 마스터", "노코드 유망주", "노코드 마스터",
+      "옵시디언 유망주", "옵시디언 마스터", "파워포인트", "엑셀 유망주",
+      "엑셀 마스터", "카카오 생태계", "네이버 생태계", "구글 생태계",
+      "퍼블리싱", "UI / UX 기획", "웹 develop", "앱 develop",
+      "서버 관리", "데이터 처리", "데이터 분석", "데이터 해석",
+      "AI 프롬프트", "시스템 구축력", "도구 사용력", "기술 습득력",
+    ],
+  },
+  {
+    id: "group2",
+    color: "green",
+    emoji: "🟢",
+    title: "콘텐츠 · 표현 · 메시지 생산 역량",
+    count: 16,
+    keywords: [
+      "콘텐츠", "카드 콘텐츠", "텍스트 콘텐츠", "스토리텔링",
+      "동영상 숏폼", "동영상 롱폼", "릴스 특화", "쇼츠 특화",
+      "캐치프레이즈", "슬로건", "표현력", "언어 능력",
+      "설득력", "상상력", "유머와 재미", "창의성",
+    ],
+  },
+  {
+    id: "group3",
+    color: "yellow",
+    emoji: "🟡",
+    title: "마케팅 · 확산 · 영향력 설계",
+    count: 10,
+    keywords: [
+      "퍼포먼스", "브랜딩 마케팅", "바이럴 마케팅", "커뮤니티",
+      "연관 검색어", "구글 트렌드", "정보력", "사회성",
+      "소통력", "공감력",
+    ],
+  },
+  {
+    id: "group4",
+    color: "orange",
+    emoji: "🟠",
+    title: "사고 · 분석 · 구조화 역량",
+    count: 16,
+    keywords: [
+      "인지력", "관찰력", "이해력", "논리력",
+      "상황 추론력", "문제 정의력", "연구력", "업무 분석력",
+      "업무 기획력", "계획력", "구조화", "도식화",
+      "범위화", "항목화", "자료화", "변칙성",
+    ],
+  },
+  {
+    id: "group5",
+    color: "red",
+    emoji: "🔴",
+    title: "태도 · 실행 · 지속성 기반 역량",
+    count: 22,
+    keywords: [
+      "지속성", "기민성", "신뢰성", "성장성",
+      "유연성", "안정성", "위기 대응성", "학습력",
+      "지도력", "소속감", "적극성", "자신감",
+      "헌신성", "행동력", "회복력", "몰입력",
+      "잠재력", "업무 진행력", "업무 관리력", "수용력",
+      "지구력", "강인한 체력",
+    ],
+  },
+];
+
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -1473,6 +1560,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reputationSaveSuccess, setReputationSaveSuccess] = useState(false);
   const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
 
+  // reputation-form 리디자인 2단계 — UI 상태 관리용 신규 state (DB 전송 X)
+  const [formKeywordMode, setFormKeywordMode] = useState<"select" | "write">("select");
+  const [keywordModalOpen, setKeywordModalOpen] = useState(false);
+  const [selectedKeywordTemp, setSelectedKeywordTemp] = useState<string>("");
+  const [showWriteConfirm, setShowWriteConfirm] = useState(false);
+  const [showSelectConfirm, setShowSelectConfirm] = useState(false);
+  const [formSnapshot, setFormSnapshot] = useState<{ rating: number; content: string; keyword: string } | null>(null);
+  const [saveAttemptFailed, setSaveAttemptFailed] = useState(false);
+
   // 주차 평판 데이터 (API에서 가져옴)
   const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
 
@@ -2582,6 +2678,114 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     } finally {
       setColleagueSaving(false);
     }
+  };
+
+  // ========================================================================
+  // reputation-form 리디자인 2단계 — 핸들러
+  // ========================================================================
+
+  // 별 클릭 → 평점 업데이트 (1~10 자연수, 반개 가능)
+  const handleRatingClick = (value: number) => {
+    setReputationEditData((prev) => ({ ...prev, rating: value }));
+    setSaveAttemptFailed(false);
+  };
+
+  // 키워드 모드 전환 (select ↔ write)
+  const handleKeywordModeChange = (mode: "select" | "write") => {
+    if (mode === "write") {
+      // 작성 모드로 전환: 확인 팝업
+      setShowWriteConfirm(true);
+    } else if (mode === "select") {
+      // 선택 모드로 전환: 중첩 모달 열기
+      setSelectedKeywordTemp("");
+      setKeywordModalOpen(true);
+    }
+  };
+
+  // 작성 모드 확인 → 키워드 초기화 + write 모드 전환
+  const handleWriteConfirmYes = () => {
+    setReputationEditData((prev) => ({ ...prev, keyword: "" }));
+    setFormKeywordMode("write");
+    setShowWriteConfirm(false);
+  };
+
+  // 중첩 모달 내 임시 선택
+  const handleKeywordSelect = (keyword: string) => {
+    setSelectedKeywordTemp(keyword);
+  };
+
+  // 중첩 모달 [선택] 버튼 → 확인 팝업 열기
+  const handleKeywordSelectConfirm = () => {
+    if (!selectedKeywordTemp) return;
+    setShowSelectConfirm(true);
+  };
+
+  // 선택 확인 팝업 → 최종 저장 + 중첩 모달 닫기
+  const handleKeywordSelectFinal = () => {
+    setReputationEditData((prev) => ({ ...prev, keyword: selectedKeywordTemp }));
+    setFormKeywordMode("select");
+    setKeywordModalOpen(false);
+    setShowSelectConfirm(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 취소 — reputation-form은 편집 전용이므로 모달 닫기 (옵션 A)
+  const handleFormCancel = () => {
+    setHeaderModalOpen(false);
+    setReputationSaveError(null);
+    setReputationSaveSuccess(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 초기화 — 스냅샷 복원
+  const handleFormReset = () => {
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    } else {
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
+    setSaveAttemptFailed(false);
+  };
+
+  // isDirty — 스냅샷 대비 변경 여부
+  const isFormDirty = (): boolean => {
+    if (!formSnapshot) {
+      return (
+        reputationEditData.rating !== 0 ||
+        reputationEditData.content.trim() !== "" ||
+        reputationEditData.keyword !== ""
+      );
+    }
+    return (
+      reputationEditData.rating !== formSnapshot.rating ||
+      reputationEditData.content !== formSnapshot.content ||
+      reputationEditData.keyword !== formSnapshot.keyword
+    );
+  };
+
+  // 필수필드 유효성 검사 — 평점>0 + 키워드 7~10자 + 내용>0
+  const isFormValid = (): boolean => {
+    const keywordLen = reputationEditData.keyword.trim().length;
+    return (
+      reputationEditData.rating > 0 &&
+      keywordLen >= 7 &&
+      keywordLen <= 10 &&
+      reputationEditData.content.trim().length > 0
+    );
+  };
+
+  // 저장 — 유효성 검사 후 saveWeeklyReputation 호출
+  const handleFormSave = () => {
+    if (!isFormValid()) {
+      setSaveAttemptFailed(true);
+      return;
+    }
+    setSaveAttemptFailed(false);
+    saveWeeklyReputation();
   };
 
   // 주차 평판 저장 함수
@@ -3980,6 +4184,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 handleEditClick(() => {
                   setHeaderModalType("타크루");
                   setHeaderModalOpen(true);
+                  // reputation-form 리디자인 2단계 — 초기 상태 + 스냅샷 캡처
+                  const initial = { rating: 0, content: "", keyword: "" };
+                  setReputationEditData(initial);
+                  setFormSnapshot(initial);
+                  setFormKeywordMode("select");
+                  setSelectedKeywordTemp("");
+                  setSaveAttemptFailed(false);
                   fetchCrewListIfNeeded();
                   fetchKeywordsIfNeeded();
                 });
