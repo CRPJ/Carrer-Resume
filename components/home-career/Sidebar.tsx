@@ -1936,8 +1936,10 @@ const Sidebar = () => {
                           <span
                             onClick={async () => {
                               // 모달 열기 전에 기존 값 로드
+                              // Profile GET은 ?userId= 사용 (PUT의 ?targetUserId=와 다름)
                               try {
-                                const response = await fetch("/api/profile/");
+                                const profileUrl = targetUserId ? `/api/profile/?userId=${targetUserId}` : "/api/profile/";
+                                const response = await fetch(profileUrl);
                                 const result = await response.json();
                                 if (result.success && result.data) {
                                   setFormData((prev) => ({
@@ -3797,7 +3799,8 @@ const Sidebar = () => {
                             return;
                           }
                           try {
-                            const response = await fetch("/api/profile/", {
+                            // admin이 다른 크루 페이지에서 편집 시 ?targetUserId= 자동 부착 (apiUrl 헬퍼)
+                            const response = await fetch(apiUrl("/api/profile/"), {
                               method: "PUT",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({ contact_available: formData.phoneComment || null }),

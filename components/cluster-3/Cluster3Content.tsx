@@ -540,8 +540,11 @@ const Cluster3Content = () => {
   ];
 
   // 포트폴리오 아카이빙 데이터 가져오기
+  // 다른 크루 페이지를 보는 경우 레거시 GET은 자기 프로필을 찾으므로 404 → skip.
+  // 신규 /api/portfolio-channel-cards가 userId로 같은 데이터 다 채워줌.
   useEffect(() => {
     const fetchPortfolioArchives = async () => {
+      if (urlUserId && urlUserId !== session?.user?.id) return;
       if (isDemoMode) {
         const demoUser = demoLookupName || DEFAULT_DEMO_USER;
         const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
@@ -774,8 +777,10 @@ const Cluster3Content = () => {
   };
 
   // 포트폴리오 Output 데이터 가져오기
+  // 다른 크루 페이지에선 skip (신규 /api/portfolio-top-cards가 채워줌)
   useEffect(() => {
     const fetchPortfolioOutputs = async () => {
+      if (urlUserId && urlUserId !== session?.user?.id) return;
       if (isDemoMode) {
         const demoUser = demoLookupName || DEFAULT_DEMO_USER;
         const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];
@@ -869,8 +874,10 @@ const Cluster3Content = () => {
   };
 
   // Detail 10 데이터 가져오기
+  // 다른 크루 페이지에선 skip (신규 /api/portfolio-top-cards가 채워줌)
   useEffect(() => {
     const fetchPortfolioDetails = async () => {
+      if (urlUserId && urlUserId !== session?.user?.id) return;
       if (isDemoMode) {
         const demoUser = demoLookupName || DEFAULT_DEMO_USER;
         const userData = CLUSTER3_DUMMY_BY_USER[demoUser] || CLUSTER3_DUMMY_BY_USER[DEFAULT_DEMO_USER];

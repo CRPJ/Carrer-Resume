@@ -32,8 +32,10 @@ const Sidebar = () => {
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
 
   // 로그인 시 user_profiles ID를 미리 가져옴
+  // 어드민(마더 계정)은 user_profiles에 없어 404 — skip
   useEffect(() => {
     if (!session?.user) return;
+    if (session.user.isAdmin) return;
     fetch('/api/profile/')
       .then(res => res.json())
       .then(result => {
