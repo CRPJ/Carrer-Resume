@@ -1,7 +1,7 @@
 // Cluster 4 - Club Challenge Growth Styles
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
-// reputation-form 전용 필드 깜빡임 키프레임 (cluster3의 border-blink와 동일 컨셉, outline 기반으로 레이아웃 shift 없음)
+// reputation-form ?꾩슜 ?꾨뱶 源쒕묀???ㅽ봽?덉엫 (cluster3??border-blink? ?숈씪 而⑥뀎, outline 湲곕컲?쇰줈 ?덉씠?꾩썐 shift ?놁쓬)
 @keyframes reputation-field-blink {
   0%,
   100% {
@@ -37,7 +37,7 @@
   font-style: normal;
 }
 
-// 공통 태그 스타일
+// 怨듯넻 ?쒓렇 ?ㅽ???
 .tag {
   border-radius: 4px;
   font-family: "Pretendard", sans-serif;
@@ -81,7 +81,7 @@
   }
 }
 
-// 주차 카드 전용: 우측 캐릭터 이미지 (시즌 카드와 분리 관리)
+// 二쇱감 移대뱶 ?꾩슜: ?곗륫 罹먮┃???대?吏 (?쒖쫵 移대뱶? 遺꾨━ 愿由?
 .cluster4-content--week {
   .cluster4-section2 {
     .season-growth-card {
@@ -107,18 +107,18 @@
   }
 }
 
-// Cluster 4-1-card: 주차 상세 페이지 스타일
+// Cluster 4-1-card: 二쇱감 ?곸꽭 ?섏씠吏 ?ㅽ???
 .cluster4-card-content {
   padding: 0;
   color: #fff;
-  width: calc(100% - 27px); // 우측 27px 여백 확보
+  width: calc(100% - 27px); // ?곗륫 27px ?щ갚 ?뺣낫
   max-width: 1330px;
   position: relative;
-  // overflow-x: hidden → clip 변경: hidden은 overflow-y를 auto로 강제하여 내부 스크롤 발생
+  // overflow-x: hidden ??clip 蹂寃? hidden? overflow-y瑜?auto濡?媛뺤젣?섏뿬 ?대? ?ㅽ겕濡?諛쒖깮
   overflow-x: clip;
   overflow-y: visible;
 
-  // 탭 영역 wrapper (1330x105)
+  // ???곸뿭 wrapper (1330x105)
   .top-tabs-wrapper {
     width: calc(100% + 27px);
     max-width: none;
@@ -130,7 +130,7 @@
     background-position: right center;
     background-repeat: no-repeat;
 
-    // 70% 검정 오버레이
+    // 70% 寃???ㅻ쾭?덉씠
     &::before {
       content: "";
       position: absolute;
@@ -142,7 +142,7 @@
       z-index: 1;
     }
 
-    // 하단 divider (1023px)
+    // ?섎떒 divider (1023px)
     &::after {
       content: "";
       position: absolute;
@@ -155,7 +155,7 @@
       z-index: 2;
     }
 
-    // 네비게이션 버튼들
+    // ?ㅻ퉬寃뚯씠??踰꾪듉??
     .nav-buttons {
       position: absolute;
       right: 65px;
@@ -166,7 +166,7 @@
       gap: 12px;
       z-index: 2;
 
-      // 모든 버튼 내 텍스트에 font-weight 명시 적용
+      // 紐⑤뱺 踰꾪듉 ???띿뒪?몄뿉 font-weight 紐낆떆 ?곸슜
       span {
         font-weight: 700 !important;
       }
@@ -294,7 +294,7 @@
     }
   }
 
-  // 카드 페이지에서 탭 스타일 (메인 콘텐츠 기준 좌측 상단)
+  // 移대뱶 ?섏씠吏?먯꽌 ???ㅽ???(硫붿씤 肄섑뀗痢?湲곗? 醫뚯륫 ?곷떒)
   .top-tabs {
     position: absolute;
     top: 0;
@@ -319,7 +319,7 @@
       width: 44px;
       height: 44px;
 
-      // hover 브릿지: tab-badge까지 hover 영역 연결
+      // hover 釉뚮┸吏: tab-badge源뚯? hover ?곸뿭 ?곌껐
       &::after {
         content: "";
         position: absolute;
@@ -329,7 +329,7 @@
         height: 100%;
       }
 
-      // cluster4-card: 첫번째 탭(전구)이 active
+      // cluster4-card: 泥ル쾲吏????꾧뎄)??active
       &:first-child {
         background: #faab07;
       }
@@ -381,7 +381,7 @@
     }
   }
 
-  // 상단 네비게이션
+  // ?곷떒 ?ㅻ퉬寃뚯씠??
   .card-nav {
     display: flex;
     align-items: center;
@@ -414,7 +414,7 @@
     }
   }
 
-  // 메인 헤더
+  // 硫붿씤 ?ㅻ뜑
   .card-header {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -483,7 +483,7 @@
     }
   }
 
-  // 메인 콘텐츠 영역
+  // 硫붿씤 肄섑뀗痢??곸뿭
   .card-main-content {
     display: flex;
     gap: 20px;
@@ -613,7 +613,7 @@
     }
   }
 
-  // 주차 성장률 섹션
+  // 二쇱감 ?깆옣瑜??뱀뀡
   .growth-rate-section {
     display: flex;
     align-items: center;
@@ -694,7 +694,7 @@
     }
   }
 
-  // 실무 섹션 공통 스타일
+  // ?ㅻТ ?뱀뀡 怨듯넻 ?ㅽ???
   .work-section {
     margin-bottom: 30px;
 
@@ -742,7 +742,7 @@
       }
     }
 
-    // 실무 정보/경험/경력 카드
+    // ?ㅻТ ?뺣낫/寃쏀뿕/寃쎈젰 移대뱶
     .work-cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -885,7 +885,7 @@
       }
     }
 
-    // 실무 역할 카드
+    // ?ㅻТ ??븷 移대뱶
     .role-cards {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1015,7 +1015,7 @@
   }
 
   // ============================================
-  // 플로팅 아이콘 스타일
+  // ?뚮줈???꾩씠肄??ㅽ???
   // ============================================
   .floating-icons {
     display: flex;
@@ -1061,7 +1061,7 @@
         top: 2px;
       }
 
-      // 툴팁 스타일
+      // ?댄똻 ?ㅽ???
       .tooltip {
         position: absolute;
         top: calc(100% + 8px);
@@ -1098,7 +1098,7 @@
   }
 
   // ============================================
-  // 섹션 1 레이아웃 (이미지 참고 디자인)
+  // ?뱀뀡 1 ?덉씠?꾩썐 (?대?吏 李멸퀬 ?붿옄??
   // ============================================
   .section1-layout {
     position: relative;
@@ -1111,13 +1111,13 @@
     box-sizing: border-box;
     overflow: visible;
 
-    // 주차 평판 남기기 floating-icons
+    // 二쇱감 ?됲뙋 ?④린湲?floating-icons
     > .floating-icons {
       top: 222px;
       right: 35px;
     }
 
-    // 왼쪽: 큰 주차 이미지
+    // ?쇱そ: ??二쇱감 ?대?吏
     .section1-left {
       flex: 0 0 540px;
       width: 540px;
@@ -1137,7 +1137,7 @@
           object-fit: cover;
         }
 
-        // 이미지 내 뱃지 두 개
+        // ?대?吏 ??諭껋? ??媛?
         .image-badges {
           position: absolute;
           top: 16px;
@@ -1182,7 +1182,7 @@
       }
     }
 
-    // 오른쪽: 정보 영역
+    // ?ㅻⅨ履? ?뺣낫 ?곸뿭
     .section1-right {
       flex: 1;
       min-width: 0;
@@ -1194,7 +1194,7 @@
       overflow-x: visible;
       overflow-y: visible;
 
-      // 헤더
+      // ?ㅻ뜑
       .section1-header {
         margin-top: 0;
         padding-top: 0;
@@ -1447,7 +1447,7 @@
         }
       }
 
-      // 주차 평판 섹션
+      // 二쇱감 ?됲뙋 ?뱀뀡
       .reputation-section {
         margin-top: 26px;
         overflow-x: visible;
@@ -1662,7 +1662,7 @@
               }
             }
 
-            // 작은 카드 스타일
+            // ?묒? 移대뱶 ?ㅽ???
             &.small {
               padding: 10px 14px;
 
@@ -1745,7 +1745,7 @@
         }
       }
 
-      // 연계 동료 섹션
+      // ?곌퀎 ?숇즺 ?뱀뀡
       .colleague-section {
         margin-top: 26px;
         position: relative;
@@ -1932,7 +1932,7 @@
     }
   }
 
-  // 주차 평판 카드 그리드 (2열)
+  // 二쇱감 ?됲뙋 移대뱶 洹몃━??(2??
   .reputation-cards-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1940,14 +1940,14 @@
     width: calc(100% + 21px);
     max-width: none;
 
-    // 작업 6 재구현: 카드 0개일 때 4슬롯 전체를 통합 대기 영역으로 전환
-    // (grid → flex 전환, 대기 이미지 + 텍스트 중앙 배치, 기존 4카드 그리드 높이 유지)
+    // ?묒뾽 6 ?ш뎄?? 移대뱶 0媛쒖씪 ??4?щ’ ?꾩껜瑜??듯빀 ?湲??곸뿭?쇰줈 ?꾪솚
+    // (grid ??flex ?꾪솚, ?湲??대?吏 + ?띿뒪??以묒븰 諛곗튂, 湲곗〈 4移대뱶 洹몃━???믪씠 ?좎?)
     &.reputation-all-empty {
       display: flex !important;
       grid-template-columns: none !important;
       align-items: center;
       justify-content: center;
-      min-height: 420px; // 4카드 2×2 그리드 총 높이 근사치 (실측 후 조정 가능)
+      min-height: 420px; // 4移대뱶 2횞2 洹몃━??珥??믪씠 洹쇱궗移?(?ㅼ륫 ??議곗젙 媛??
       background: rgba(255, 255, 255, 0.02);
       border: 1px dashed rgba(255, 255, 255, 0.15);
       border-radius: 20px;
@@ -1989,9 +1989,9 @@
       flex-direction: column;
       gap: 8px;
 
-      // 작업 6 재구현(3차): 1~3개 상태의 빈 슬롯은 pre-6단계와 동일 — 카드 골격 그대로 + 내부 값만 "-" placeholder
-      // 별도 SCSS 오버라이드 없음. .empty 클래스는 TSX의 isEmpty 분기용 마커로만 사용 (현재 CSS 효과 없음)
-      // ⚠️ dim/grayscale 제거 — 빈 슬롯도 정상 카드와 동일한 외관 (값만 비어있는 상태)
+      // ?묒뾽 6 ?ш뎄??3李?: 1~3媛??곹깭??鍮??щ’? pre-6?④퀎? ?숈씪 ??移대뱶 怨④꺽 洹몃?濡?+ ?대? 媛믩쭔 "-" placeholder
+      // 蹂꾨룄 SCSS ?ㅻ쾭?쇱씠???놁쓬. .empty ?대옒?ㅻ뒗 TSX??isEmpty 遺꾧린??留덉빱濡쒕쭔 ?ъ슜 (?꾩옱 CSS ?④낵 ?놁쓬)
+      // ?좑툘 dim/grayscale ?쒓굅 ??鍮??щ’???뺤긽 移대뱶? ?숈씪???멸? (媛믩쭔 鍮꾩뼱?덈뒗 ?곹깭)
 
       .card-profile {
         display: flex;
@@ -2229,7 +2229,7 @@
     }
   }
 
-  // 연계 동료 카드
+  // ?곌퀎 ?숇즺 移대뱶
   .colleague-cards {
     display: flex;
     flex-direction: column;
@@ -2383,7 +2383,7 @@
   }
 
   // ============================================
-  // 섹션 2 레이아웃
+  // ?뱀뀡 2 ?덉씠?꾩썐
   // ============================================
   .section2-layout {
     width: 100%;
@@ -2409,7 +2409,7 @@
       background: #ecbb02;
     }
 
-    // 주차 성장률 헤더
+    // 二쇱감 ?깆옣瑜??ㅻ뜑
     .growth-rate-header {
       display: flex;
       align-items: flex-end;
@@ -2443,7 +2443,7 @@
             margin-left: -24px;
 
             &::before {
-              content: "●";
+	              content: "•";
               display: inline-block;
               margin-right: 13px;
               font-size: 0.3em;
@@ -2580,7 +2580,7 @@
           top: -16px;
 
           &::before {
-            content: "●";
+	            content: "•";
             display: inline-block;
             margin-right: 13px;
             font-size: 0.3em;
@@ -2629,14 +2629,14 @@
       }
     }
 
-    // 실무 정보 섹션
+    // ?ㅻТ ?뺣낫 ?뱀뀡
     .work-info-section {
       margin-top: 23px;
       margin-bottom: 72px;
       position: relative;
       padding-left: 40px;
       padding-right: 46px;
-      overflow-y: hidden !important; // 1px 내부 스크롤 방지 (overflow-x: hidden이 overflow-y를 auto로 강제하는 현상 차단)
+      overflow-y: hidden !important; // 1px ?대? ?ㅽ겕濡?諛⑹? (overflow-x: hidden??overflow-y瑜?auto濡?媛뺤젣?섎뒗 ?꾩긽 李⑤떒)
 
       .floating-icons {
         top: 14px;
@@ -2910,7 +2910,7 @@
             }
           }
 
-          // 카테고리별 피그마 색상 오버라이드
+          // 移댄뀒怨좊━蹂??쇨렇留??됱긽 ?ㅻ쾭?쇱씠??
           .tag {
             font-size: 15px;
             font-weight: 600;
@@ -2960,11 +2960,11 @@
       }
     }
 
-    // 실무 역량 섹션
+    // ?ㅻТ ??웾 ?뱀뀡
   }
 
   // ============================================
-  // 섹션 3 레이아웃
+  // ?뱀뀡 3 ?덉씠?꾩썐
   // ============================================
   .section3-layout {
     width: 100%;
@@ -3067,7 +3067,7 @@
       margin-bottom: 40px;
       padding-left: 40px;
       padding-right: 42px;
-      overflow: visible; // character-image 하단 잘림 방지
+      overflow: visible; // character-image ?섎떒 ?섎┝ 諛⑹?
       max-height: none;
       height: auto;
 
@@ -3424,7 +3424,7 @@
         }
       }
 
-      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지
+      // badge ?덈뒗 移대뱶(empty ?꾨떂)留??띿뒪??max-width瑜?badge 吏곸쟾源뚯?
       .work-ability-card:not(.empty) {
         .main-desc,
         .main-desc-white {
@@ -3531,7 +3531,7 @@
     }
   }
 
-  // 실무 경험/경력 공통 스타일 (래퍼 독립)
+  // ?ㅻТ 寃쏀뿕/寃쎈젰 怨듯넻 ?ㅽ???(?섑띁 ?낅┰)
   .work-exp-section,
   .work-career-section {
     .section-header-row {
@@ -3619,7 +3619,7 @@
     }
   }
 
-  // 실무 경험: fontFamily Pretendard 오버라이드
+  // ?ㅻТ 寃쏀뿕: fontFamily Pretendard ?ㅻ쾭?쇱씠??
   .work-exp-section {
     .section-header-row {
       .section-count,
@@ -3633,7 +3633,7 @@
     }
   }
 
-  // 실무 경험/경력 섹션
+  // ?ㅻТ 寃쏀뿕/寃쎈젰 ?뱀뀡
   .work-exp-section,
   .work-career-section {
     margin-bottom: 20px;
@@ -3980,7 +3980,7 @@
         }
       }
 
-      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
+      // badge ?덈뒗 移대뱶(empty ?꾨떂)留??띿뒪??max-width瑜?badge 吏곸쟾源뚯? (badge: right 10px + width 53px = 63px)
       .work-exp-card:not(.empty) {
         .main-desc,
         .main-desc-white {
@@ -4064,7 +4064,7 @@
           }
         }
 
-        // Fix A: card-overlay.failed — absolute 배치로 flex flow에서 제거
+        // Fix A: card-overlay.failed ??absolute 諛곗튂濡?flex flow?먯꽌 ?쒓굅
         .card-overlay.failed {
           position: absolute;
           top: 0;
@@ -4298,7 +4298,7 @@
         }
       }
 
-      // 실무 경력 카드 전용 스타일
+      // ?ㅻТ 寃쎈젰 移대뱶 ?꾩슜 ?ㅽ???
       .work-career-card {
         .grade-row {
           display: flex;
@@ -4522,7 +4522,7 @@
         }
       }
 
-      // badge 있는 카드(empty 아님)만 텍스트 max-width를 badge 직전까지 (badge: right 10px + width 53px = 63px)
+      // badge ?덈뒗 移대뱶(empty ?꾨떂)留??띿뒪??max-width瑜?badge 吏곸쟾源뚯? (badge: right 10px + width 53px = 63px)
       .work-career-card:not(.empty) {
         .main-desc-white {
           max-width: 330px !important;
@@ -4731,7 +4731,7 @@
   }
 
   // ============================================
-  // 모달 스타일 (클러스터 3 디자인 적용)
+  // 紐⑤떖 ?ㅽ???(?대윭?ㅽ꽣 3 ?붿옄???곸슜)
   // ============================================
   .section-modal-overlay {
     position: fixed;
@@ -4797,7 +4797,7 @@
       width: 700px;
     }
 
-    // reputation/colleague 모달은 원래 font-size 유지
+    // reputation/colleague 紐⑤떖? ?먮옒 font-size ?좎?
     &.reputation-view-modal,
     &.colleague-view-modal {
       .section-modal-body {
@@ -4841,29 +4841,499 @@
     }
 
     &.section-modal-colleague-edit {
-      width: 674px;
-      height: 826px;
-      max-height: 826px;
-    }
-
-    &.section-modal-reputation-form {
-      // 사용자 요청: 가로형_중 979×570 (MD 스펙)
-      width: 979px !important;
-      max-width: 979px !important;
-      height: 570px !important;
-      max-height: 570px !important;
+      width: 540px !important;
+      max-width: 540px !important;
+      height: 640px !important;
+      max-height: 640px !important;
       display: flex;
       flex-direction: column;
-      // 사용자 요청: Zone A(<1920)에서 overlay가 display:block으로 override되어 flex 중앙 정렬 무효
-      // → 모달 자체를 absolute로 viewport 중앙 배치 (Zone B/C에도 영향 없음, 결과 동일 중앙)
-      // position: absolute는 confirm-popup-overlay(내부 absolute, inset:0)의 기준점 역할도 겸함
+      overflow: hidden;
       position: absolute !important;
       left: 50% !important;
       top: 50% !important;
       transform: translate(-50%, -50%) !important;
       margin: 0 !important;
 
-      // 타산지석 하이라이터
+      // ── 헤더 (110px) — reputation-form/view 패턴 준용 ──
+      .section-modal-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        height: auto;
+        min-height: 110px;
+        max-height: none;
+        padding: 8px 24px 16px;
+        position: relative;
+        overflow: visible;
+        border-bottom: none;
+        background: transparent;
+
+        .modal-header-top {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+
+          img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            flex-shrink: 0;
+          }
+
+          h3 {
+            font-family: "Pretendard", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #faab07;
+            margin: 0;
+
+            // _cluster4-season.scss 전역 ::before ✦ 제거
+            &::before {
+              content: none !important;
+              display: none !important;
+            }
+          }
+        }
+
+        .modal-subtitle {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 4px 67px 0 80px;
+          padding-left: 0 !important;
+          max-width: calc(100% - 147px);
+          min-width: 0;
+          white-space: normal !important;
+          overflow-wrap: break-word !important;
+          word-break: normal !important;
+          overflow: visible !important;
+          line-height: 1.5;
+          box-sizing: border-box !important;
+        }
+
+        .modal-close-btn {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          padding: 4px;
+          line-height: 1;
+
+          i { font-size: 20px; }
+          &:hover { color: #faab07; }
+        }
+      }
+
+      // ── 미드 (412px) — 영역 1: 동료 선택 / 영역 2: 코멘트 ──
+      .section-modal-body.colleague-edit-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 16px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        box-sizing: border-box;
+      }
+
+      .colleague-select-section,
+      .colleague-content-section {
+        display: flex;
+        flex-direction: column;
+
+        h4 {
+          font-family: "Pretendard", sans-serif;
+          font-size: 16px;
+          font-weight: 700;
+          color: #ddd;
+          margin: 0 0 8px 0;
+
+          .required-mark {
+            color: #e74c3c !important;
+            font-weight: 400 !important;
+            font-size: 14px !important;
+            margin-left: 4px;
+          }
+        }
+      }
+
+      // 영역 1-B: 선택된 동료 카드
+      .selected-colleague {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: rgba(250, 171, 7, 0.1);
+        border: 1px solid rgba(250, 171, 7, 0.4);
+        border-radius: 4px;
+        margin-bottom: 8px;
+
+        .crew-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #ddd;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          min-width: 0;
+          flex: 1;
+
+          .crew-number  { color: #faab07; font-weight: 600; flex-shrink: 0; }
+          .crew-divider { color: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
+          .crew-name    { font-weight: 700; color: #fff; flex-shrink: 0; }
+          .crew-team    { color: rgba(255, 255, 255, 0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        }
+
+        .btn-deselect {
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          padding: 4px;
+          line-height: 1;
+          flex-shrink: 0;
+
+          i { font-size: 16px; }
+          &:hover { color: #fff; }
+        }
+      }
+
+      .selected-colleague-empty {
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        color: rgba(255, 255, 255, 0.4);
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      // 영역 1-A: 검색 입력 + 후보
+      .search-input-wrapper {
+        position: relative;
+        margin-bottom: 4px;
+
+        .search-input {
+          width: 100%;
+          padding: 8px 36px 8px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ddd;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          border-radius: 4px;
+          outline: none;
+          box-sizing: border-box;
+          transition: border-color 0.15s;
+
+          &::placeholder { color: rgba(255, 255, 255, 0.3); }
+          &:focus { border-color: #faab07; }
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 16px;
+          pointer-events: none;
+        }
+      }
+
+      .search-results {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        max-height: 180px;
+        overflow-y: auto;
+
+        .search-result-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 12px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          transition: background 0.1s;
+
+          &:last-child { border-bottom: none; }
+          &:hover { background: rgba(250, 171, 7, 0.1); }
+
+          .crew-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ddd;
+            font-family: "Pretendard", sans-serif;
+            font-size: 12px;
+            min-width: 0;
+            flex: 1;
+
+            .crew-number  { color: #faab07; flex-shrink: 0; }
+            .crew-divider { color: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
+            .crew-name    { font-weight: 600; color: #fff; flex-shrink: 0; }
+            .crew-team    { color: rgba(255, 255, 255, 0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          }
+
+          .btn-select {
+            background: rgba(250, 171, 7, 0.2);
+            border: 1px solid #faab07;
+            color: #faab07;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+            line-height: 1;
+
+            i { font-size: 14px; }
+
+            &:hover {
+              background: #faab07;
+              color: #1a1a1a;
+            }
+          }
+        }
+      }
+
+      .search-no-results {
+        padding: 8px 12px;
+        color: rgba(255, 255, 255, 0.4);
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      // 영역 2: 코멘트 textarea + char-count
+      .colleague-content-section {
+        position: relative;
+
+        .content-wrapper {
+          position: relative;
+        }
+
+        .content-textarea {
+          width: 100%;
+          height: 130px;
+          padding: 12px 16px 24px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ddd;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          line-height: 1.6;
+          border-radius: 4px;
+          resize: none;
+          outline: none;
+          box-sizing: border-box;
+          transition: border-color 0.15s;
+
+          &::placeholder { color: rgba(255, 255, 255, 0.3); }
+          &:focus { border-color: #faab07; }
+        }
+
+        .char-count {
+          position: absolute !important;
+          bottom: 6px !important;
+          right: 10px !important;
+          font-family: "Pretendard", sans-serif;
+          font-size: 10px !important;
+          color: rgba(255, 255, 255, 0.4) !important;
+          background: transparent !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          pointer-events: none;
+          z-index: 2;
+        }
+      }
+
+      // 필수필드 에러 + 깜빡임 (reputation-form 동일 패턴)
+      .field-error {
+        border-color: #e74c3c !important;
+        box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+
+        &.flash {
+          animation: colleague-edit-field-flash 0.3s ease-in-out 2 !important;
+        }
+      }
+
+      .selected-colleague.field-error,
+      .selected-colleague-empty.field-error {
+        border-color: #e74c3c !important;
+        box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+
+        &.flash {
+          animation: colleague-edit-field-flash 0.3s ease-in-out 2 !important;
+        }
+      }
+
+      @keyframes colleague-edit-field-flash {
+        0%, 100% {
+          border-color: #e74c3c;
+          box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+        }
+        50% {
+          border-color: #ff6b6b;
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
+        }
+      }
+
+      // ── 푸터 (118px) Type B — reputation-form 동일 패턴 ──
+      .section-modal-footer {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px 28px;
+        height: 118px;
+        min-height: 118px;
+        max-height: 118px;
+        box-sizing: border-box;
+        border-top: none;
+        background: transparent;
+
+        .modal-footer-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          position: relative;
+
+          .modal-help-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 36px;
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 46px;
+              height: 46px;
+              background: rgba(0, 0, 0, 0.6);
+              border: none;
+              border-radius: 0;
+              z-index: -1;
+            }
+          }
+
+          .modal-footer-right {
+            flex-shrink: 0;
+            min-width: 160px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+          }
+        }
+
+        .modal-footer-bottom {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          text-align: right;
+          border: none;
+
+          .modal-notice {
+            font-family: "Pretendard", sans-serif;
+            font-size: 15px;
+            color: #faab07;
+            text-align: right;
+            margin: 0;
+
+            &.notice-error { color: #ff4444; }
+          }
+        }
+
+        .modal-save-btn {
+          padding: 8px 20px;
+          background: #faab07;
+          border: 1px solid transparent;
+          color: #1a1a1a;
+          border-radius: 0;
+          font-weight: 600;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover { background: #ffb820; }
+          &:disabled { opacity: 0.3; cursor: not-allowed; }
+        }
+
+        .modal-cancel-btn {
+          padding: 8px 20px;
+          border: 1px solid #888;
+          background: transparent;
+          color: #888;
+          border-radius: 0;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover {
+            background: rgba(136, 136, 136, 0.1);
+            color: #aaa;
+          }
+        }
+
+        .modal-reset-btn {
+          padding: 8px 20px;
+          border: 1px solid #4caf50;
+          background: transparent;
+          color: #4caf50;
+          border-radius: 0;
+          font-size: 14px;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover { background: rgba(76, 175, 80, 0.1); }
+        }
+      }
+
+      @media (max-width: 1919px) {
+        max-width: 90vw !important;
+        max-height: 90vh !important;
+      }
+    }
+
+    &.section-modal-reputation-form {
+      // ?ъ슜???붿껌: 媛濡쒗삎_以?979횞570 (MD ?ㅽ럺)
+      width: 979px !important;
+      max-width: 979px !important;
+      height: 570px !important;
+      max-height: 570px !important;
+      display: flex;
+      flex-direction: column;
+      // ?ъ슜???붿껌: Zone A(<1920)?먯꽌 overlay媛 display:block?쇰줈 override?섏뼱 flex 以묒븰 ?뺣젹 臾댄슚
+      // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (Zone B/C?먮룄 ?곹뼢 ?놁쓬, 寃곌낵 ?숈씪 以묒븰)
+      // position: absolute??confirm-popup-overlay(?대? absolute, inset:0)??湲곗?????븷??寃명븿
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      margin: 0 !important;
+
+      // ??곗????섏씠?쇱씠??
       .tagsanjiseok-highlight {
         background: rgba(250, 171, 7, 0.3);
         color: #faab07;
@@ -4915,7 +5385,7 @@
 
         .modal-subtitle {
           margin: 4px 67px 0 80px;
-          padding-left: 0 !important; // 사용자 요청: h3 시작 x좌표와 일치 (기존 +19 제거)
+          padding-left: 0 !important; // ?ъ슜???붿껌: h3 ?쒖옉 x醫뚰몴? ?쇱튂 (湲곗〈 +19 ?쒓굅)
           max-width: calc(100% - 147px);
           min-width: 0;
           font-family: "Pretendard", sans-serif;
@@ -4945,9 +5415,9 @@
         }
       }
 
-      // ── 미드 (342px) — 2열 레이아웃 + 내용 textarea (4단계) ──
+      // ?? 誘몃뱶 (342px) ??2???덉씠?꾩썐 + ?댁슜 textarea (4?④퀎) ??
       .reputation-form-body {
-        padding: 12px 24px 24px; // 사용자 요청: top 24 → 12 (평점/키워드 행 위로 이동)
+        padding: 12px 24px 24px; // ?ъ슜???붿껌: top 24 ??12 (?됱젏/?ㅼ썙?????꾨줈 ?대룞)
         flex: 1 1 auto;
         overflow-y: auto;
         box-sizing: border-box;
@@ -4957,10 +5427,10 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 32px;
-        margin-bottom: 12px; // 사용자 요청: 평점/키워드 ↔ 내용 간격 유지 (이미 축소된 값)
+        margin-bottom: 12px; // ?ъ슜???붿껌: ?됱젏/?ㅼ썙?????댁슜 媛꾧꺽 ?좎? (?대? 異뺤냼??媛?
       }
 
-      // 공통 섹션 h4 + .limit-hint + .required-mark
+      // 怨듯넻 ?뱀뀡 h4 + .limit-hint + .required-mark
       .form-rating-section,
       .form-keyword-section,
       .form-content-section {
@@ -4988,12 +5458,12 @@
         }
       }
 
-      // 사용자 요청: char-count absolute 기준점 — form-content-section 전용 position: relative
+      // ?ъ슜???붿껌: char-count absolute 湲곗?????form-content-section ?꾩슜 position: relative
       .form-content-section {
         position: relative;
       }
 
-      // 사용자 요청: 필수필드 검증 실패 시 빨간 테두리 하이라이트
+      // ?ъ슜???붿껌: ?꾩닔?꾨뱶 寃利??ㅽ뙣 ??鍮④컙 ?뚮몢由??섏씠?쇱씠??
       .field-error {
         border-color: #e74c3c !important;
         box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
@@ -5004,7 +5474,7 @@
       }
 
       .rating-stars.field-error {
-        // 별점 영역은 border 대신 배경 연하게 + outline-style 테두리 (레이아웃 shift 없음)
+        // 蹂꾩젏 ?곸뿭? border ???諛곌꼍 ?고븯寃?+ outline-style ?뚮몢由?(?덉씠?꾩썐 shift ?놁쓬)
         background: rgba(231, 76, 60, 0.05);
         border: 1px solid rgba(231, 76, 60, 0.3) !important;
         box-shadow: none !important;
@@ -5028,14 +5498,14 @@
         }
       }
 
-      // 1열: 평점
+      // 1?? ?됱젏
       .rating-input {
         display: flex;
         align-items: center;
         gap: 12px;
         margin-left: 19px;
 
-        // cluster3 패턴 적용: field-missing 시 outline 빨간 깜빡임 (stars는 span이라 border-blink 대상 아님)
+        // cluster3 ?⑦꽩 ?곸슜: field-missing ??outline 鍮④컙 源쒕묀??(stars??span?대씪 border-blink ????꾨떂)
         &.field-missing {
           animation: reputation-field-blink 0.3s ease-in-out 3;
           outline-offset: 4px;
@@ -5070,7 +5540,7 @@
         .rating-stars {
           display: flex;
           gap: 4px;
-          margin-top: 11px !important; // y좌표 0.3cm 아래로
+          margin-top: 11px !important; // y醫뚰몴 0.3cm ?꾨옒濡?
 
           .rating-star {
             font-size: 32px;
@@ -5120,7 +5590,7 @@
         }
       }
 
-      // 2열: 키워드 (선택/작성 라디오 + # 프리픽스 + input)
+      // 2?? ?ㅼ썙??(?좏깮/?묒꽦 ?쇰뵒??+ # ?꾨━?쎌뒪 + input)
       .keyword-mode-select {
         display: flex;
         gap: 24px;
@@ -5181,12 +5651,12 @@
         }
       }
 
-      // 하단: 내용 textarea
+      // ?섎떒: ?댁슜 textarea
       .form-content-textarea {
         width: 100%;
         height: 100px;
         padding: 12px 16px;
-        padding-bottom: 24px !important; // 사용자 요청: 카운터 영역 확보
+        padding-bottom: 24px !important; // ?ъ슜???붿껌: 移댁슫???곸뿭 ?뺣낫
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.15);
         color: #ddd;
@@ -5208,7 +5678,7 @@
         }
       }
 
-      // 사용자 요청: 카운터를 textarea 내부 우하단 absolute 배치 + 10px 축소
+      // ?ъ슜???붿껌: 移댁슫?곕? textarea ?대? ?고븯??absolute 諛곗튂 + 10px 異뺤냼
       .char-count {
         position: absolute !important;
         bottom: 6px !important;
@@ -5224,9 +5694,9 @@
         z-index: 2;
       }
 
-      // ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] (5단계) ──
-      // 4개 모달(work-view-modal)의 .section-modal-footer 규칙과 동일 값 — reputation-form 전용 스코프에 복제
-      // reputation-form은 편집 전용 모달이므로 [수정] 버튼 없음 ([취소][초기화][저장])
+      // ?? ?명꽣 (118px) Type B: ??[?뵊 + 踰꾪듉] / ??[?덈궡臾??곗륫 visibility ?좉?] (5?④퀎) ??
+      // 4媛?紐⑤떖(work-view-modal)??.section-modal-footer 洹쒖튃怨??숈씪 媛???reputation-form ?꾩슜 ?ㅼ퐫?꾩뿉 蹂듭젣
+      // reputation-form? ?몄쭛 ?꾩슜 紐⑤떖?대?濡?[?섏젙] 踰꾪듉 ?놁쓬 ([痍⑥냼][珥덇린??[???)
       .reputation-form-body {
         padding-top: 8px !important;
       }
@@ -5281,7 +5751,7 @@
         border-top: none;
         background: transparent;
 
-        // 행 1: 🔎 좌 + 버튼 우
+        // ??1: ?뵊 醫?+ 踰꾪듉 ??
         .modal-footer-top {
           display: flex;
           align-items: center;
@@ -5327,7 +5797,7 @@
           }
         }
 
-        // 행 2: 안내문 우측 정렬 (visibility 토글로 공간 유지)
+        // ??2: ?덈궡臾??곗륫 ?뺣젹 (visibility ?좉?濡?怨듦컙 ?좎?)
         .modal-footer-bottom {
           width: 100%;
           display: flex;
@@ -5418,8 +5888,8 @@
         }
       }
 
-      // ── 키워드 선택 중첩 모달 — section-modal 패턴 (가로형_중 979×570) ──
-      // 사용자 요청: reputation-view-modal 헤더 패턴 + 7-col grid + ★ 선택 표식
+      // ?? ?ㅼ썙???좏깮 以묒꺽 紐⑤떖 ??section-modal ?⑦꽩 (媛濡쒗삎_以?979횞570) ??
+      // ?ъ슜???붿껌: reputation-view-modal ?ㅻ뜑 ?⑦꽩 + 7-col grid + ???좏깮 ?쒖떇
       .keyword-select-overlay {
         position: fixed;
         inset: 0;
@@ -5483,7 +5953,7 @@
             position: absolute;
             top: 40px;
             right: 24px;
-            z-index: 2; // modal-header-top 위에 clickable하도록
+            z-index: 2; // modal-header-top ?꾩뿉 clickable?섎룄濡?
             background: transparent;
             border: none;
             color: rgba(255, 255, 255, 0.6);
@@ -5504,7 +5974,7 @@
             position: absolute;
             top: 40px;
             right: 80px;
-            z-index: 2; // modal-header-top 위에 clickable하도록 (사용자 버그 수정)
+            z-index: 2; // modal-header-top ?꾩뿉 clickable?섎룄濡?(?ъ슜??踰꾧렇 ?섏젙)
             padding: 8px 20px;
             background: #faab07;
             color: #1a1a1a;
@@ -5611,7 +6081,7 @@
             position: relative;
 
             &::after {
-              content: "★";
+	              content: "•";
               position: absolute;
               top: -4px;
               right: -4px;
@@ -5623,9 +6093,9 @@
       }
 
       .confirm-popup-overlay {
-        position: absolute !important; // 사용자 요청: fixed → absolute (팝업을 모달 중심에 배치)
+        position: absolute !important; // ?ъ슜???붿껌: fixed ??absolute (?앹뾽??紐⑤떖 以묒떖??諛곗튂)
         inset: 0 !important;
-        background: rgba(0, 0, 0, 0.6); // 모달 내부만 어둡게
+        background: rgba(0, 0, 0, 0.6); // 紐⑤떖 ?대?留??대몼寃?
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -5638,7 +6108,7 @@
         background: #1a1a1a;
         border: 1px solid rgba(250, 171, 7, 0.35);
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-        text-align: center !important; // 사용자 요청: 팝업 내부 전체 가운데 정렬
+        text-align: center !important; // ?ъ슜???붿껌: ?앹뾽 ?대? ?꾩껜 媛?대뜲 ?뺣젹
 
         p,
         h3,
@@ -5659,7 +6129,7 @@
         .popup-buttons {
           display: flex !important;
           flex-direction: row !important;
-          justify-content: center !important; // 사용자 요청: 버튼 영역 가운데 정렬
+          justify-content: center !important; // ?ъ슜???붿껌: 踰꾪듉 ?곸뿭 媛?대뜲 ?뺣젹
           align-items: center !important;
           gap: 12px;
           width: 100%;
@@ -5667,7 +6137,7 @@
 
           button {
             min-width: 88px;
-            width: auto !important; // 버튼 stretch 방지 (flex: 1 등 상위 영향 차단)
+            width: auto !important; // 踰꾪듉 stretch 諛⑹? (flex: 1 ???곸쐞 ?곹뼢 李⑤떒)
             flex: 0 0 auto !important;
             height: 38px;
             padding: 0 18px;
@@ -5678,7 +6148,7 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            text-align: center !important; // 버튼 내 텍스트 가운데
+            text-align: center !important; // 踰꾪듉 ???띿뒪??媛?대뜲
           }
 
           .btn-confirm {
@@ -5718,7 +6188,7 @@
         line-height: 1.6;
         padding-top: 8px;
 
-        // 사용자 요청: 헤더 h3 앞 ✦ 제거
+        // ?ъ슜???붿껌: ?ㅻ뜑 h3 ?????쒓굅
         &::before {
           content: none !important;
           display: none !important;
@@ -5935,7 +6405,7 @@
           border-bottom: none;
         }
 
-        // 실무 정보 모달 카드 스타일
+        // ?ㅻТ ?뺣낫 紐⑤떖 移대뱶 ?ㅽ???
         &.modal-card-workinfo {
           .modal-card-header-row {
             display: flex;
@@ -6108,7 +6578,7 @@
             font-weight: 400;
           }
 
-          // 타이틀 섹션 스타일
+          // ??댄? ?뱀뀡 ?ㅽ???
           .modal-title-section {
             margin-bottom: 16px;
 
@@ -6252,7 +6722,7 @@
             }
           }
 
-          // 섹션 라벨 스타일 (Sub Title, Output Link 등)
+          // ?뱀뀡 ?쇰꺼 ?ㅽ???(Sub Title, Output Link ??
           .section-label-row {
             display: flex;
             align-items: center;
@@ -6296,7 +6766,7 @@
             }
           }
 
-          // 읽기 전용 스타일
+          // ?쎄린 ?꾩슜 ?ㅽ???
           .modal-input-group.readonly {
             margin-bottom: 8px;
 
@@ -6383,7 +6853,7 @@
               border-radius: 8px;
               transition: all 0.2s ease;
 
-              // 비활성화 상태 (링크 없음)
+              // 鍮꾪솢?깊솕 ?곹깭 (留곹겕 ?놁쓬)
               .link-button {
                 width: 24px;
                 height: 24px;
@@ -6448,7 +6918,7 @@
                 }
               }
 
-              // 활성화 상태 (링크 있음)
+              // ?쒖꽦???곹깭 (留곹겕 ?덉쓬)
               &.active {
                 background: rgba(255, 165, 0, 0.08);
                 border-color: rgba(255, 165, 0, 0.3);
@@ -6642,7 +7112,7 @@
       }
     }
 
-    // 선택 모달 스타일
+    // ?좏깮 紐⑤떖 ?ㅽ???
     &.section-modal-selection {
       max-width: 500px;
 
@@ -6728,9 +7198,9 @@
       }
     }
 
-    // 주차 평판 상세보기 모달 — 가로형_중 979×570, 보기 전용, 푸터 없음
-    // 공유 셀렉터(.workinfo-view-modal, .workexp-view-modal…) 추가 안 함 — 979×570 vs 1468×855 충돌 방지
-    // 인적사항은 .workinfo-personal-card 클래스 재사용 (이 블록 내부에 독립 선언)
+    // 二쇱감 ?됲뙋 ?곸꽭蹂닿린 紐⑤떖 ??媛濡쒗삎_以?979횞570, 蹂닿린 ?꾩슜, ?명꽣 ?놁쓬
+    // 怨듭쑀 ??됲꽣(.workinfo-view-modal, .workexp-view-modal?? 異붽? ??????979횞570 vs 1468횞855 異⑸룎 諛⑹?
+    // ?몄쟻?ы빆? .workinfo-personal-card ?대옒???ъ궗??(??釉붾줉 ?대????낅┰ ?좎뼵)
     &.reputation-view-modal {
       width: 979px !important;
       max-width: 979px !important;
@@ -6738,16 +7208,16 @@
       max-height: 570px !important;
       display: flex;
       flex-direction: column;
-      // 사용자 요청: Zone A(<1920)에서 overlay가 display:block으로 override되어 flex 중앙 정렬 무효
-      // → 모달 자체를 absolute로 viewport 중앙 배치 (Zone B/C에도 영향 없음, 결과 동일 중앙)
-      // reputation-form과 동일 패턴
+      // ?ъ슜???붿껌: Zone A(<1920)?먯꽌 overlay媛 display:block?쇰줈 override?섏뼱 flex 以묒븰 ?뺣젹 臾댄슚
+      // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (Zone B/C?먮룄 ?곹뼢 ?놁쓬, 寃곌낵 ?숈씪 以묒븰)
+      // reputation-form怨??숈씪 ?⑦꽩
       position: absolute !important;
       left: 50% !important;
       top: 50% !important;
       transform: translate(-50%, -50%) !important;
       margin: 0 !important;
 
-      // ── 헤더 (110px) — cluster3/workInfo 패턴 ──
+      // ?? ?ㅻ뜑 (110px) ??cluster3/workInfo ?⑦꽩 ??
       .section-modal-header {
         display: flex;
         flex-direction: column;
@@ -6785,7 +7255,7 @@
             color: #faab07;
             margin: 0;
 
-            // 사용자 요청: 헤더 h3 앞 ✦ 제거 (_cluster4-season.scss 전역 ::before 오버라이드)
+            // ?ъ슜???붿껌: ?ㅻ뜑 h3 ?????쒓굅 (_cluster4-season.scss ?꾩뿭 ::before ?ㅻ쾭?쇱씠??
             &::before {
               content: none !important;
               display: none !important;
@@ -6797,8 +7267,8 @@
           font-family: "Pretendard", sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
-          margin: 4px 67px 0 80px; // 좌 80(아이콘+gap) / 우 67(close-btn 영역)
-          padding-left: 0 !important; // 사용자 요청: h3 시작 x와 일치 (기존 +19 제거)
+          margin: 4px 67px 0 80px; // 醫?80(?꾩씠肄?gap) / ??67(close-btn ?곸뿭)
+          padding-left: 0 !important; // ?ъ슜???붿껌: h3 ?쒖옉 x? ?쇱튂 (湲곗〈 +19 ?쒓굅)
           max-width: calc(100% - 147px);
           min-width: 0;
           white-space: normal !important;
@@ -6807,8 +7277,8 @@
           overflow: visible !important;
           text-overflow: unset !important;
           box-sizing: border-box !important;
-          transform: none !important; // 사용자 요청: translateX(-95px) 제거 (왼쪽으로 밀림 해소)
-          margin-left: 80px !important; // margin shorthand의 좌측값 명시 유지
+          transform: none !important; // ?ъ슜???붿껌: translateX(-95px) ?쒓굅 (?쇱そ?쇰줈 諛由??댁냼)
+          margin-left: 80px !important; // margin shorthand??醫뚯륫媛?紐낆떆 ?좎?
         }
 
         .modal-close-btn {
@@ -6831,8 +7301,8 @@
           }
         }
 
-        // 작업 1: [삭제] [수정] 버튼 (colleague-view-modal .modal-delete-btn 패턴 준용)
-        // 배치: [삭제(right:148)] [수정(right:80)] [X(right:16)]
+        // ?묒뾽 1: [??젣] [?섏젙] 踰꾪듉 (colleague-view-modal .modal-delete-btn ?⑦꽩 以??
+        // 諛곗튂: [??젣(right:148)] [?섏젙(right:80)] [X(right:16)]
         .modal-delete-btn {
           position: absolute;
           top: 16px;
@@ -6878,7 +7348,7 @@
         }
       }
 
-      // ── 미드 (460px) — 1열 세로 배치 ──
+      // ?? 誘몃뱶 (460px) ??1???몃줈 諛곗튂 ??
       .section-modal-body.reputation-body {
         height: auto;
         min-height: 0;
@@ -6891,22 +7361,22 @@
         box-sizing: border-box;
       }
 
-      // ── 인적사항 카드 — L9014 공유 셀렉터 스타일 복제 (reputation 독립 스코프) ──
+      // ?? ?몄쟻?ы빆 移대뱶 ??L9014 怨듭쑀 ??됲꽣 ?ㅽ???蹂듭젣 (reputation ?낅┰ ?ㅼ퐫?? ??
       .workinfo-personal-card {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 7px 12px;
         flex-shrink: 0;
         display: flex;
-        align-items: center; // 인적사항 전체 세로 중앙 정렬
+        align-items: center; // ?몄쟻?ы빆 ?꾩껜 ?몃줈 以묒븰 ?뺣젹
 
         .personal-grid {
           width: 100%;
           display: grid;
-          grid-template-columns: auto 1fr; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
+          grid-template-columns: auto 1fr; // 2?? ?ъ쭊 | ?뺣낫 (?쒓렇??row-1 ?대?濡??대룞)
           grid-template-rows: auto;
           gap: 3px 12px;
-          align-items: center; // 그리드 각 셀도 세로 중앙 정렬
+          align-items: center; // 洹몃━??媛?????몃줈 以묒븰 ?뺣젹
         }
 
         .personal-photo {
@@ -6943,13 +7413,13 @@
           align-items: center;
           gap: 5px;
           font-family: "Pretendard", sans-serif;
-          font-size: 13px !important; // 인적사항 본문 pt 통일
+          font-size: 13px !important; // ?몄쟻?ы빆 蹂몃Ц pt ?듭씪
           line-height: 1.14;
           color: #ddd;
           min-width: 0;
         }
 
-        // row-1 안에 태그 가로 배치 — 우측 정렬
+        // row-1 ?덉뿉 ?쒓렇 媛濡?諛곗튂 ???곗륫 ?뺣젹
         .personal-row-1 {
           display: flex !important;
           align-items: center !important;
@@ -6981,8 +7451,8 @@
         .personal-separator {
           color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
-          padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
-          font-size: 13px !important; // 본문 pt 통일
+          padding-left: 6px !important; // ?쇰꺼怨?| 援щ텇???ъ씠 ?щ갚
+          font-size: 13px !important; // 蹂몃Ц pt ?듭씪
         }
 
         .personal-name {
@@ -6996,22 +7466,22 @@
           border: 1px solid rgba(255, 165, 0, 0.3);
           background: rgb(26, 26, 46);
           white-space: nowrap;
-          font-size: 13px !important; // 본문 pt 통일
+          font-size: 13px !important; // 蹂몃Ц pt ?듭씪
         }
         .personal-gender {
           min-width: 16px;
           display: inline-block;
           white-space: nowrap;
-          font-size: 13px !important; // 본문 pt 통일
+          font-size: 13px !important; // 蹂몃Ц pt ?듭씪
         }
         .personal-age {
           min-width: 48px;
           display: inline-block;
           white-space: nowrap;
-          font-size: 13px !important; // 본문 pt 통일
+          font-size: 13px !important; // 蹂몃Ц pt ?듭씪
         }
 
-        // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
+        // ??븷/?ㅼ썙???쒓렇 ??row-1 ?대? 媛濡?諛곗튂 (?몃? override??.personal-row-1 .personal-tags)
         .personal-tags {
           display: flex;
           flex-direction: row;
@@ -7022,10 +7492,10 @@
         }
 
         .tag-badge {
-          padding: 3px 11px !important; // 태그 패딩 통일
+          padding: 3px 11px !important; // ?쒓렇 ?⑤뵫 ?듭씪
           border-radius: 4px;
           font-family: "Pretendard", sans-serif;
-          font-size: 13px !important; // 태그 pt 통일
+          font-size: 13px !important; // ?쒓렇 pt ?듭씪
           line-height: 1.14;
           font-weight: 600;
           white-space: normal !important;
@@ -7072,7 +7542,7 @@
 
           .field-value {
             font-family: "Pretendard", sans-serif;
-            font-size: 13px !important; // 필드값 pt 통일
+            font-size: 13px !important; // ?꾨뱶媛?pt ?듭씪
             line-height: 1.14;
             color: #ddd;
             display: block;
@@ -7085,28 +7555,28 @@
 
           .field-label {
             font-family: "Pretendard", sans-serif;
-            font-size: 13px !important; // 필드 라벨 pt 통일
+            font-size: 13px !important; // ?꾨뱶 ?쇰꺼 pt ?듭씪
             line-height: 1.14;
             color: rgba(255, 255, 255, 0.4);
             flex-shrink: 0;
             min-width: 28px;
             display: block;
             white-space: nowrap;
-            margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
+            margin-right: 6px !important; // ?쇰꺼怨?| 援щ텇???ъ씠 ?щ갚
           }
         }
       }
 
-      // ── 중단: 키워드(tag.tag--색상 재사용) + 내용 ──
+      // ?? 以묐떒: ?ㅼ썙??tag.tag--?됱긽 ?ъ궗?? + ?댁슜 ??
       .reputation-content-section {
         display: flex;
         flex-direction: column;
         gap: 6px;
         flex-shrink: 0;
 
-        // .tag.tag--pink 등은 최상위 .tag 셀렉터(L30) 스타일 그대로 사용
+        // .tag.tag--pink ?깆? 理쒖긽??.tag ??됲꽣(L30) ?ㅽ???洹몃?濡??ъ슜
         > .tag {
-          align-self: flex-start; // 키워드 너비만큼만 차지
+          align-self: flex-start; // ?ㅼ썙???덈퉬留뚰겮留?李⑥?
           font-size: 15.6px !important;
           white-space: normal !important;
           overflow: visible !important;
@@ -7119,7 +7589,7 @@
           padding: 12px 16px;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          height: 80px !important; // 사용자 요청: 100자 기준 재계산 (150 → 80)
+          height: 80px !important; // ?ъ슜???붿껌: 100??湲곗? ?ш퀎??(150 ??80)
           min-height: 80px !important;
           max-height: 80px !important;
           overflow-y: auto;
@@ -7137,10 +7607,10 @@
         }
       }
 
-      // ── 하단: 평점 + FM ──
+      // ?? ?섎떒: ?됱젏 + FM ??
       .reputation-stats-row {
         display: flex;
-        align-items: flex-end !important; // 사용자 요청: 별/라벨/값 하단 y좌표 일치
+        align-items: flex-end !important; // ?ъ슜???붿껌: 蹂??쇰꺼/媛??섎떒 y醫뚰몴 ?쇱튂
         gap: 40px;
         padding: 4px 0;
         flex-shrink: 0;
@@ -7154,7 +7624,7 @@
 
         .stats-label {
           font-family: "Pretendard", sans-serif;
-          font-size: 18px !important; // 사용자 요청: 13 → 18
+          font-size: 18px !important; // ?ъ슜???붿껌: 13 ??18
           font-weight: 700;
           color: #ddd;
         }
@@ -7162,15 +7632,15 @@
         .rating-stars {
           display: flex;
           gap: 2px;
-          transform: translateY(5px) !important; // 사용자 요청: 별만 0.3cm 아래로
-          line-height: 1.4 !important; // 사용자 요청: ★ glyph 상단 잘림 방지
+          transform: translateY(5px) !important; // ?ъ슜???붿껌: 蹂꾨쭔 0.3cm ?꾨옒濡?
+          line-height: 1.4 !important; // ?ъ슜???붿껌: ??glyph ?곷떒 ?섎┝ 諛⑹?
           height: auto !important;
           overflow: visible !important;
 
           .rating-star {
             display: inline-block;
-            font-size: 24px !important; // 사용자 요청: 18 → 24
-            line-height: 1.4 !important; // 사용자 요청: 1 → 1.4 (glyph 잘림 해소)
+            font-size: 24px !important; // ?ъ슜???붿껌: 18 ??24
+            line-height: 1.4 !important; // ?ъ슜???붿껌: 1 ??1.4 (glyph ?섎┝ ?댁냼)
             overflow: visible !important;
             vertical-align: middle;
 
@@ -7192,7 +7662,7 @@
 
         .rating-value {
           font-family: "Pretendard", sans-serif;
-          font-size: 18px !important; // 사용자 요청: 13 → 18
+          font-size: 18px !important; // ?ъ슜???붿껌: 13 ??18
           font-weight: 700;
           color: #faab07;
           min-width: 48px;
@@ -7200,34 +7670,34 @@
 
         .fm-value {
           font-family: "Pretendard", sans-serif;
-          font-size: 24px !important; // 사용자 요청: 18 → 24
+          font-size: 24px !important; // ?ъ슜???붿껌: 18 ??24
           font-weight: 700;
           color: #ddd;
-          min-width: 28px; // 2자리수(10) 고정 — 24px 기준 확대
+          min-width: 28px; // 2?먮━??10) 怨좎젙 ??24px 湲곗? ?뺣?
         }
       }
 
-      // ── 최하단: 구분선 + 타임스탬프 wrapper (사용자 요청: 하단 1.5cm 지점 구분선) ──
+      // ?? 理쒗븯?? 援щ텇??+ ??꾩뒪?ы봽 wrapper (?ъ슜???붿껌: ?섎떒 1.5cm 吏??援щ텇?? ??
       .reputation-bottom-section {
         margin-top: auto;
-        margin-left: -24px !important; // 사용자 요청: body padding 상쇄
+        margin-left: -24px !important; // ?ъ슜???붿껌: body padding ?곸뇙
         margin-right: -24px !important;
         padding-top: 16px;
-        padding-left: 24px !important; // timestamp는 패딩 안쪽 유지
+        padding-left: 24px !important; // timestamp???⑤뵫 ?덉そ ?좎?
         padding-right: 24px !important;
         flex-shrink: 0;
 
         .reputation-bottom-divider {
           height: 1px;
-          background: rgba(255, 165, 0, 0.2); // 사용자 요청: 헤더와 동일 오렌지 투명
-          margin-left: -48px !important; // 사용자 요청: -24 → -48 (모달 좌우 끝까지 추가 확장)
+          background: rgba(255, 165, 0, 0.2); // ?ъ슜???붿껌: ?ㅻ뜑? ?숈씪 ?ㅻ젋吏 ?щ챸
+          margin-left: -48px !important; // ?ъ슜???붿껌: -24 ??-48 (紐⑤떖 醫뚯슦 ?앷퉴吏 異붽? ?뺤옣)
           margin-right: -48px !important;
           width: calc(100% + 96px) !important;
           margin-bottom: 12px;
         }
       }
 
-      // ── 최하단: 타임스탬프 (우측 정렬) ──
+      // ?? 理쒗븯?? ??꾩뒪?ы봽 (?곗륫 ?뺣젹) ??
       .reputation-timestamp {
         display: flex;
         justify-content: flex-end;
@@ -7249,24 +7719,29 @@
       }
     }
 
-    // 연계 동료 상세보기 모달 — 세로형_중 540×640 (작업 1: 헤더 + 삭제 버튼)
+    // ?곌퀎 ?숇즺 ?곸꽭蹂닿린 紐⑤떖 ???몃줈??以?540횞640 (?묒뾽 1: ?ㅻ뜑 + ??젣 踰꾪듉)
     &.colleague-view-modal {
-      width: 540px !important;
-      max-width: 540px !important;
-      height: 640px !important;
-      max-height: 640px !important;
+	      width: 674px !important;
+	      max-width: 674px !important;
+	      height: 826px !important;
+	      max-height: 826px !important;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      // Zone A(<1920)에서 overlay display:block override로 flex 중앙 정렬 무효
-      // → 모달 자체를 absolute로 viewport 중앙 배치 (reputation-form/reputation-view-modal 동일 패턴)
+      // Zone A(<1920)?먯꽌 overlay display:block override濡?flex 以묒븰 ?뺣젹 臾댄슚
+      // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (reputation-form/reputation-view-modal ?숈씪 ?⑦꽩)
       position: absolute !important;
       left: 50% !important;
       top: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      margin: 0 !important;
+	      transform: translate(-50%, -50%) !important;
+	      margin: 0 !important;
 
-      // ── 헤더 (110px) — reputation-view-modal 패턴 준용 ──
+	      @media (max-width: 1919px) {
+	        max-width: 90vw !important;
+	        max-height: 90vh !important;
+	      }
+
+      // ?? ?ㅻ뜑 (110px) ??reputation-view-modal ?⑦꽩 以????
       .section-modal-header {
         display: flex;
         flex-direction: column;
@@ -7319,11 +7794,11 @@
           overflow: visible !important;
         }
 
-        // 【수정 3 (2차)】 삭제 버튼 — reputation-form modal-footer-right + modal-edit-btn 패턴
+        // ?먯닔??3 (2李?????젣 踰꾪듉 ??reputation-form modal-footer-right + modal-edit-btn ?⑦꽩
         .modal-footer-right.modal-header-right {
           position: absolute;
           top: 16px;
-          right: 56px; // X 버튼(right 16px + width ~20px + gap) 왼쪽
+          right: 56px; // X 踰꾪듉(right 16px + width ~20px + gap) ?쇱そ
           z-index: 2;
           display: flex;
           align-items: center;
@@ -7350,7 +7825,7 @@
           }
         }
 
-        // 【수정 2 (2차)】 h3 앞 ✦ 제거 (_cluster4-season.scss 전역 ::before 오버라이드)
+        // ?먯닔??2 (2李???h3 ?????쒓굅 (_cluster4-season.scss ?꾩뿭 ::before ?ㅻ쾭?쇱씠??
         .modal-header-top h3::before {
           content: none !important;
           display: none !important;
@@ -7377,7 +7852,7 @@
         }
       }
 
-      // 삭제 확인 팝업 — 모달 내부 오버레이
+      // ??젣 ?뺤씤 ?앹뾽 ??紐⑤떖 ?대? ?ㅻ쾭?덉씠
       .confirm-popup-overlay {
         position: absolute;
         inset: 0;
@@ -7451,8 +7926,8 @@
         min-height: 0;
       }
 
-      // ── 미드 바디 레이아웃 (작업 2~6) ──
-      // 【수정 4 (2차)】 body 좌우 padding 0 → 자식에 margin 24 분산, 하단 섹션만 풀폭
+      // ?? 誘몃뱶 諛붾뵒 ?덉씠?꾩썐 (?묒뾽 2~6) ??
+      // ?먯닔??4 (2李???body 醫뚯슦 padding 0 ???먯떇??margin 24 遺꾩궛, ?섎떒 ?뱀뀡留????
       .section-modal-body.colleague-body {
         display: flex;
         flex-direction: column;
@@ -7461,7 +7936,7 @@
         padding-right: 0 !important;
       }
 
-      // 일반 콘텐츠는 좌우 24px margin (기존 body padding 대체)
+      // ?쇰컲 肄섑뀗痢좊뒗 醫뚯슦 24px margin (湲곗〈 body padding ?泥?
       .section-modal-body.colleague-body > .colleague-thanks-text,
       .section-modal-body.colleague-body > .workinfo-personal-card,
       .section-modal-body.colleague-body > .colleague-fromto,
@@ -7470,7 +7945,7 @@
         margin-right: 24px !important;
       }
 
-      // 작업 2: 최상단 감사 텍스트
+      // ?묒뾽 2: 理쒖긽??媛먯궗 ?띿뒪??
       .colleague-thanks-text {
         font-family: "Pretendard", sans-serif;
         font-size: 14px;
@@ -7480,7 +7955,7 @@
         padding: 8px 0 4px;
       }
 
-      // 작업 3: 인적사항 카드 — reputation-view-modal .workinfo-personal-card 재사용하되 540px 비율에 맞춤
+      // ?묒뾽 3: ?몄쟻?ы빆 移대뱶 ??reputation-view-modal .workinfo-personal-card ?ъ궗?⑺븯??540px 鍮꾩쑉??留욎땄
       .workinfo-personal-card {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -7530,10 +8005,10 @@
           align-items: center !important;
           gap: 6px;
           font-family: "Pretendard", sans-serif;
-          font-size: 15px !important; // 【수정 1】 12 → 15
+          font-size: 15px !important; // ?먯닔??1??12 ??15
           color: #ddd;
 
-          // 【수정 2】 이름 박스(오렌지 border + 남색 bg + 26px 높이) 제거 — 보기전용 텍스트화
+          // ?먯닔??2???대쫫 諛뺤뒪(?ㅻ젋吏 border + ?⑥깋 bg + 26px ?믪씠) ?쒓굅 ??蹂닿린?꾩슜 ?띿뒪?명솕
           .personal-name {
             display: inline-flex;
             align-items: center;
@@ -7544,54 +8019,43 @@
             box-shadow: none !important;
             color: #fff;
             white-space: nowrap;
-            font-size: 15px !important; // 【수정 1】 12 → 15
+            font-size: 15px !important; // ?먯닔??1??12 ??15
             font-weight: 700;
           }
 
           .personal-gender,
           .personal-age {
             white-space: nowrap;
-            font-size: 15px !important; // 【수정 1】 12 → 15
+            font-size: 15px !important; // ?먯닔??1??12 ??15
           }
 
-          // 【수정 3】 margin-left:auto 제거 → 이름|성별|나이 바로 오른쪽 인접 (gap 12px)
-          .personal-tags {
-            margin-left: 12px !important;
-            display: flex !important;
-            flex-direction: row !important;
-            gap: 6px !important;
-            flex-shrink: 0;
+          // ?먯닔??3??margin-left:auto ?쒓굅 ???대쫫|?깅퀎|?섏씠 諛붾줈 ?ㅻⅨ履??몄젒 (gap 12px)
+	          .personal-tags {
+	            margin-left: 12px !important;
+	            display: flex !important;
+	            flex-direction: row !important;
+	            gap: 6px !important;
+	            flex-shrink: 0;
 
-            .tag-badge {
-              // 【수정 1 (2차)】 min = width = max 고정 → 글자수 무관 넉넉한 직사각형
-              min-width: 64px !important;
-              width: 64px !important;
-              max-width: 64px !important;
-              box-sizing: border-box !important;
-              padding: 4px 10px !important;
-              font-size: 13px !important;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              text-align: center !important;
-              border-radius: 0 !important;
-              font-family: "Pretendard", sans-serif;
-              font-weight: 600;
 
-              &.tag-role {
-                background: rgba(250, 171, 7, 0.15);
-                color: #faab07;
-                border: 1px solid rgba(250, 171, 7, 0.4);
-              }
-
-              &.tag-keyword {
-                background: rgba(255, 255, 255, 0.08);
-                color: #ddd;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-              }
-            }
-          }
-        }
+	            .tag-badge {
+	              min-width: 150px !important;
+	              width: 150px !important;
+	              max-width: 150px !important;
+	              padding: 6px 12px !important;
+	              font-size: 12px !important;
+	              font-family: "Pretendard", sans-serif !important;
+	              font-weight: 600 !important;
+	              line-height: 1.2 !important;
+	              text-align: center !important;
+	              border-radius: 4px !important;
+	              white-space: nowrap !important;
+	              overflow: hidden !important;
+	              text-overflow: ellipsis !important;
+	              box-sizing: border-box !important;
+	            }
+	          }
+	        }
 
         .personal-row-2,
         .personal-row-3 {
@@ -7600,7 +8064,7 @@
           align-items: center;
           column-gap: 6px;
           font-family: "Pretendard", sans-serif;
-          font-size: 15px !important; // 【수정 1】 12 → 15
+          font-size: 15px !important; // ?먯닔??1??12 ??15
           color: #ddd;
           min-width: 0;
 
@@ -7611,7 +8075,7 @@
           .field-value {
             color: #fff;
             font-weight: 700;
-            font-size: 15px !important; // 【수정 1】 12 → 15
+            font-size: 15px !important; // ?먯닔??1??12 ??15
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -7619,18 +8083,18 @@
 
           .field-label {
             color: #999;
-            font-size: 13px !important; // 【수정 1】 10 → 13
+            font-size: 13px !important; // ?먯닔??1??10 ??13
           }
         }
 
         .personal-separator {
           color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
-          font-size: 15px !important; // 【수정 1】 12 → 15
+          font-size: 15px !important; // ?먯닔??1??12 ??15
         }
       }
 
-      // 작업 4: From / To
+      // ?묒뾽 4: From / To
       .colleague-fromto {
         display: flex;
         align-items: center;
@@ -7662,7 +8126,7 @@
         }
       }
 
-      // 작업 5: Honor & Thank you
+      // ?묒뾽 5: Honor & Thank you
       .colleague-honor-section {
         .honor-label {
           font-family: "Pretendard", sans-serif;
@@ -7692,7 +8156,7 @@
         }
       }
 
-      // 작업 6 / 【수정 4 (2차)】 — 하단 구분선: body padding 0 상태에서 풀폭 border-top
+      // ?묒뾽 6 / ?먯닔??4 (2李??????섎떒 援щ텇?? body padding 0 ?곹깭?먯꽌 ???border-top
       .reputation-bottom-section {
         margin-top: auto;
         margin-left: 0 !important;
@@ -7703,7 +8167,7 @@
         flex-shrink: 0;
         box-sizing: border-box;
 
-        // 기존 divider element 숨김 (section border-top로 대체)
+        // 湲곗〈 divider element ?④? (section border-top濡??泥?
         .reputation-bottom-divider {
           display: none !important;
         }
@@ -7726,7 +8190,7 @@
       }
     }
 
-    // 실무 정보/역량/경험/경력 상세보기 모달
+    // ?ㅻТ ?뺣낫/??웾/寃쏀뿕/寃쎈젰 ?곸꽭蹂닿린 紐⑤떖
     &.work-view-modal {
       width: 674px;
       height: 826px;
@@ -7850,14 +8314,14 @@
         flex-direction: column;
         gap: 20px;
 
-        // Output Link label + links — Main Title과 x좌표 맞춤
+        // Output Link label + links ??Main Title怨?x醫뚰몴 留욎땄
         > .work-view-section {
           padding-left: 24px;
           padding-right: 24px;
         }
       }
 
-      // 헤더 row: 아이콘 + 태그 + 코드 | 강화상태
+      // ?ㅻ뜑 row: ?꾩씠肄?+ ?쒓렇 + 肄붾뱶 | 媛뺥솕?곹깭
       .work-view-header-row {
         display: flex;
         align-items: center;
@@ -7947,7 +8411,7 @@
         }
       }
 
-      // 타이틀 섹션
+      // ??댄? ?뱀뀡
       .work-view-title-section {
         .main-title-row {
           display: flex;
@@ -8073,7 +8537,7 @@
         }
       }
 
-      // 섹션 (Sub Title, Output Link)
+      // ?뱀뀡 (Sub Title, Output Link)
       .work-view-section {
         height: auto !important;
         max-height: none !important;
@@ -8147,12 +8611,12 @@
             }
 
             &::after {
-              content: "→";
+	              content: "•";
               color: rgba(255, 255, 255, 0.4);
               font-size: 1rem;
             }
 
-            // 비활성화 상태
+            // 鍮꾪솢?깊솕 ?곹깭
             &.disabled {
               opacity: 0.4;
               pointer-events: none;
@@ -8177,7 +8641,7 @@
       }
     }
 
-    // 헤더 편집 모달 스타일
+    // ?ㅻ뜑 ?몄쭛 紐⑤떖 ?ㅽ???
     .modal-card-header-edit {
       padding: 0;
 
@@ -8446,7 +8910,7 @@
           }
         }
 
-        // 연계 동료 안내 문구
+        // ?곌퀎 ?숇즺 ?덈궡 臾멸뎄
         &.colleague-guide {
           background: rgba(250, 171, 7, 0.08);
           border-bottom: 1px solid rgba(250, 171, 7, 0.2);
@@ -8475,7 +8939,7 @@
           }
         }
 
-        // 카운트 뱃지
+        // 移댁슫??諭껋?
         .count-badge {
           display: inline-block;
           padding: 2px 10px;
@@ -8487,7 +8951,7 @@
           margin-left: 8px;
         }
 
-        // 선택된 동료 목록
+        // ?좏깮???숇즺 紐⑸줉
         .selected-colleagues {
           display: flex;
           flex-direction: column;
@@ -8694,7 +9158,7 @@
             }
           }
 
-          // 추가 버튼 카드
+          // 異붽? 踰꾪듉 移대뱶
           .add-colleague-card {
             .add-colleague-btn,
             .add-colleague-placeholder {
@@ -8767,7 +9231,7 @@
           }
         }
 
-        // 검색 결과 없음
+        // 寃??寃곌낵 ?놁쓬
         .no-results {
           padding: 24px;
           text-align: center;
@@ -8776,13 +9240,13 @@
           font-family: "Pretendard", sans-serif;
         }
 
-        // 크루 검색 결과
+        // ?щ（ 寃??寃곌낵
         .crew-search-results {
           display: flex;
           flex-direction: column;
           gap: 8px;
           margin-top: 12px;
-          // 내부 스크롤 제거(기기/OS별 스크롤바 표시 편차 방지)
+          // ?대? ?ㅽ겕濡??쒓굅(湲곌린/OS蹂??ㅽ겕濡ㅻ컮 ?쒖떆 ?몄감 諛⑹?)
           max-height: none;
           overflow-y: visible;
 
@@ -8940,10 +9404,10 @@
         }
       }
 
-      // [사용자 요청] reputation-form 리디자인으로 기존 .reputation-form-modal 블록 제거
-      // 새 레이아웃은 .section-modal-reputation-form 스코프 내 .reputation-form-body / .reputation-form-top 등으로 대체 (단계 4에서 추가)
+      // [?ъ슜???붿껌] reputation-form 由щ뵒?먯씤?쇰줈 湲곗〈 .reputation-form-modal 釉붾줉 ?쒓굅
+      // ???덉씠?꾩썐? .section-modal-reputation-form ?ㅼ퐫????.reputation-form-body / .reputation-form-top ?깆쑝濡??泥?(?④퀎 4?먯꽌 異붽?)
 
-      // 주차 평판 모달 스타일 (타크루가 나에게 남긴 평판)
+      // 二쇱감 ?됲뙋 紐⑤떖 ?ㅽ???(??щ（媛 ?섏뿉寃??④릿 ?됲뙋)
       &.reputation-cards-modal {
         padding: 16px 24px;
         margin-bottom: 0;
@@ -9285,7 +9749,7 @@
         }
       }
 
-      // 평판 편집 뷰 스타일
+      // ?됲뙋 ?몄쭛 酉??ㅽ???
       &.reputation-edit-view {
         .readonly-section {
           opacity: 0.8;
@@ -9517,7 +9981,7 @@
   }
 }
 
-// Section 2.5: 시즌별 카드 리스트
+// Section 2.5: ?쒖쫵蹂?移대뱶 由ъ뒪??
 .cluster4-season-list {
   padding: 30px 0;
   margin-bottom: 20px;
@@ -9678,7 +10142,7 @@
   }
 }
 
-// season-badge hover — cluster4 (weekly)
+// season-badge hover ??cluster4 (weekly)
 .season-badge {
   cursor: pointer;
   position: relative;
@@ -9710,7 +10174,7 @@
   }
 }
 
-// work-exp-section 전용 word-break override (work-ability/work-career에 영향 없음)
+// work-exp-section ?꾩슜 word-break override (work-ability/work-career???곹뼢 ?놁쓬)
 .work-exp-section {
   .main-desc,
   .sub-desc {
@@ -9719,13 +10183,13 @@
 }
 
 // ============================================================================
-// workInfo View Modal — 가로형_대 1468×855 (1차: 헤더/푸터/state)
+// workInfo View Modal ??媛濡쒗삎_? 1468횞855 (1李? ?ㅻ뜑/?명꽣/state)
 // ----------------------------------------------------------------------------
-// 대상: workInfo 보기/편집 모달만. workAbility/workExp/workCareer view 모달과
-// section-modal-work-edit(9카드 일괄)은 영향 없음.
-// 식별자: .workinfo-view-modal (TSX에서 work-view-modal과 함께 부여)
-// 기준: cluster2 가로형_대 헤더 + cluster3 output-modal-footer Type B
-// workExp 모달도 동일 스타일 공유 (.workexp-view-modal)
+// ??? workInfo 蹂닿린/?몄쭛 紐⑤떖留? workAbility/workExp/workCareer view 紐⑤떖怨?
+// section-modal-work-edit(9移대뱶 ?쇨큵)? ?곹뼢 ?놁쓬.
+// ?앸퀎?? .workinfo-view-modal (TSX?먯꽌 work-view-modal怨??④퍡 遺??
+// 湲곗?: cluster2 媛濡쒗삎_? ?ㅻ뜑 + cluster3 output-modal-footer Type B
+// workExp 紐⑤떖???숈씪 ?ㅽ???怨듭쑀 (.workexp-view-modal)
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
 .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
@@ -9736,8 +10200,8 @@
   height: 855px !important;
   max-height: 855px !important;
 
-  // ── 헤더 (110px) — cluster3 .section-modal .section-modal-header 패턴 정확 통일 ──
-  // 참조: app/assets/scss/components/_cluster3.scss L2710-2814
+  // ?? ?ㅻ뜑 (110px) ??cluster3 .section-modal .section-modal-header ?⑦꽩 ?뺥솗 ?듭씪 ??
+  // 李몄“: app/assets/scss/components/_cluster3.scss L2710-2814
   .section-modal-header {
     display: flex;
     flex-direction: column;
@@ -9763,7 +10227,7 @@
       position: relative;
       margin-top: 12px;
 
-      // img width/height/object-fit는 workInfo 1차 spec(write.png 72×72)으로 유지 — cluster3 미명시
+      // img width/height/object-fit??workInfo 1李?spec(write.png 72횞72)?쇰줈 ?좎? ??cluster3 誘몃챸??
       img[alt="write"] {
         position: absolute;
         left: 0;
@@ -9786,13 +10250,13 @@
       padding-left: 80px;
       margin: 0;
       flex: 1;
-      // 말줄임 차단 — 카테고리 전체 표시 (workInfo + workExp 공통)
+      // 留먯쨪??李⑤떒 ??移댄뀒怨좊━ ?꾩껜 ?쒖떆 (workInfo + workExp 怨듯넻)
       max-width: none !important;
       overflow: visible !important;
       text-overflow: unset !important;
       white-space: normal !important;
 
-      // 라인/카테고리 텍스트 — 말줄임 제거, 전체 표시 (workInfo + workExp 공통)
+      // ?쇱씤/移댄뀒怨좊━ ?띿뒪????留먯쨪???쒓굅, ?꾩껜 ?쒖떆 (workInfo + workExp 怨듯넻)
       .line-name-text {
         color: #ffa500;
         max-width: none !important;
@@ -9845,7 +10309,7 @@
     }
   }
 
-  // ── 미드 (637px = 855 - 100 - 118) — 2차: 좌우 2열 ──
+  // ?? 誘몃뱶 (637px = 855 - 100 - 118) ??2李? 醫뚯슦 2????
   .section-modal-body {
     flex: 1;
     min-height: 0;
@@ -9854,23 +10318,23 @@
     box-sizing: border-box;
   }
 
-  // ── 2차 미드 콘텐츠 ──
+  // ?? 2李?誘몃뱶 肄섑뀗痢???
   .workinfo-content-layout {
     display: flex;
     gap: 12px !important;
     height: 100%;
     box-sizing: border-box;
-    align-items: stretch !important; // 좌우 동일 높이 — 평점 bottom = growth box bottom
+    align-items: stretch !important; // 醫뚯슦 ?숈씪 ?믪씠 ???됱젏 bottom = growth box bottom
 
     .workinfo-left {
-      // 사용자 요청: 좌측 고정폭 + 우측 확대 (3cm≈114px 축소 → 우측 120px 확대)
-      // 540 = 우측 폭, 24 = .workinfo-content-layout의 gap
+      // ?ъ슜???붿껌: 醫뚯륫 怨좎젙??+ ?곗륫 ?뺣? (3cm??14px 異뺤냼 ???곗륫 120px ?뺣?)
+      // 540 = ?곗륫 ?? 24 = .workinfo-content-layout??gap
       flex: none !important;
       width: calc(100% - 540px - 24px) !important;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px; // 미드 내부 요소 간 여유 확보
+      gap: 10px; // 誘몃뱶 ?대? ?붿냼 媛??ъ쑀 ?뺣낫
       overflow-y: auto;
       padding-right: 8px;
 
@@ -9887,7 +10351,7 @@
       scrollbar-width: thin;
       scrollbar-color: rgba(250, 171, 7, 0.4) transparent;
 
-      // ★ 좌측 자식 섹션 모두 동일 폭 — 우측 끝 x좌표 정렬
+      // ??醫뚯륫 ?먯떇 ?뱀뀡 紐⑤몢 ?숈씪 ?????곗륫 ??x醫뚰몴 ?뺣젹
       > .workinfo-personal-card,
       > .workinfo-mid-section,
       > .workinfo-text-section {
@@ -9898,34 +10362,34 @@
     }
 
     .workinfo-right {
-      width: 552px !important; // 사용자 요청: 420 → 540 (약 120px 확대)
+      width: 552px !important; // ?ъ슜???붿껌: 420 ??540 (??120px ?뺣?)
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
       height: auto !important;
       max-height: none !important;
-      align-self: stretch !important; // 좌측 전체 높이에 맞춰 확장
+      align-self: stretch !important; // 醫뚯륫 ?꾩껜 ?믪씠??留욎떠 ?뺤옣
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
     }
   }
 
-  // ── 우측: 이미지 2×2 그리드 (1·2번 필수, 순차 업로드, 캡션 — cluster3 패턴) ──
-  // 그리드 순서: 좌상=1, 우상=2, 좌하=3, 우하=4
+  // ?? ?곗륫: ?대?吏 2횞2 洹몃━??(1쨌2踰??꾩닔, ?쒖감 ?낅줈?? 罹≪뀡 ??cluster3 ?⑦꽩) ??
+  // 洹몃━???쒖꽌: 醫뚯긽=1, ?곗긽=2, 醫뚰븯=3, ?고븯=4
   .workinfo-image-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 8px;
-    // 4개 모달 공통: 우측 컬럼 남은 공간 전부 차지 (520px 고정 해제 — 좌측 전체 높이와 연동)
+    // 4媛?紐⑤떖 怨듯넻: ?곗륫 而щ읆 ?⑥? 怨듦컙 ?꾨? 李⑥? (520px 怨좎젙 ?댁젣 ??醫뚯륫 ?꾩껜 ?믪씠? ?곕룞)
     flex: 1 1 0 !important;
     min-height: 0 !important;
     max-height: none !important;
     height: auto !important;
     align-self: stretch;
 
-    // cluster3 .image-slot 실측값 (border 1px solid rgba(255,165,0,0.3), border-radius 0)
+    // cluster3 .image-slot ?ㅼ륫媛?(border 1px solid rgba(255,165,0,0.3), border-radius 0)
     .workinfo-image-slot {
       border: 1px solid rgba(255, 165, 0, 0.3) !important;
       border-radius: 0 !important;
@@ -9943,7 +10407,7 @@
       }
     }
 
-    // 이미지 1·2번 필수 표시 (편집 모드 전용, TSX 조건부 렌더)
+    // ?대?吏 1쨌2踰??꾩닔 ?쒖떆 (?몄쭛 紐⑤뱶 ?꾩슜, TSX 議곌굔遺 ?뚮뜑)
     .image-required-mark {
       position: absolute;
       top: 4px;
@@ -9955,7 +10419,7 @@
       line-height: 1;
     }
 
-    // cluster3 .image-preview 값 그대로 (border, cursor, overflow, w/h 100%, img object-fit cover)
+    // cluster3 .image-preview 媛?洹몃?濡?(border, cursor, overflow, w/h 100%, img object-fit cover)
     .image-preview {
       position: relative;
       width: 100%;
@@ -9974,7 +10438,7 @@
       }
     }
 
-    // cluster3 .empty-slot 값 그대로 (_cluster3.scss:3310)
+    // cluster3 .empty-slot 媛?洹몃?濡?(_cluster3.scss:3310)
     .empty-slot {
       width: 100%;
       height: 100%;
@@ -9989,7 +10453,7 @@
       }
     }
 
-    // cluster3 .image-actions-overlay 패턴 그대로 (top 4 right 4 — 항상 표시, hover 의존 없음)
+    // cluster3 .image-actions-overlay ?⑦꽩 洹몃?濡?(top 4 right 4 ????긽 ?쒖떆, hover ?섏〈 ?놁쓬)
     .image-actions-overlay {
       position: absolute;
       top: 8px;
@@ -10065,7 +10529,7 @@
       align-items: center;
     }
 
-    // cluster3 image-caption-btn 실측값 (transparent, no border, white 16px, absolute bottom/right 8px)
+    // cluster3 image-caption-btn ?ㅼ륫媛?(transparent, no border, white 16px, absolute bottom/right 8px)
     .image-action-btn.image-caption-btn {
       background: transparent !important;
       border: none !important;
@@ -10087,7 +10551,7 @@
       }
     }
 
-    // 캡션 오버레이 — cluster3 실측값 (이미지/빈 슬롯 무관 항상 렌더)
+    // 罹≪뀡 ?ㅻ쾭?덉씠 ??cluster3 ?ㅼ륫媛?(?대?吏/鍮??щ’ 臾닿? ??긽 ?뚮뜑)
     .image-caption-overlay {
       background: rgba(0, 0, 0, 0.6) !important;
       border: none !important;
@@ -10134,20 +10598,20 @@
     }
   }
 
-  // 좌상단: 인적사항 카드 — 5열 그리드 (1열 사진 rowspan 3 + 2열 3행)
+  // 醫뚯긽?? ?몄쟻?ы빆 移대뱶 ??5??洹몃━??(1???ъ쭊 rowspan 3 + 2??3??
   .workinfo-personal-card {
     background: transparent;
     border: 0;
     padding: 0;
     flex-shrink: 0;
-    margin-top: 0 !important; // 박스 위치 원복 (내부 텍스트만 별도 조정)
+    margin-top: 0 !important; // 諛뺤뒪 ?꾩튂 ?먮났 (?대? ?띿뒪?몃쭔 蹂꾨룄 議곗젙)
 
     .personal-grid {
       display: grid;
-      grid-template-columns: auto 1fr !important; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
+      grid-template-columns: auto 1fr !important; // 2?? ?ъ쭊 | ?뺣낫 (?쒓렇??row-1 ?대?濡??대룞)
       grid-template-rows: auto;
       gap: 0 18px;
-      align-items: center !important; // 사진/정보 세로 중앙 균형
+      align-items: center !important; // ?ъ쭊/?뺣낫 ?몃줈 以묒븰 洹좏삎
       position: relative;
 
       &::before {
@@ -10162,7 +10626,7 @@
       }
     }
 
-    // 1열: 사진
+    // 1?? ?ъ쭊
     .personal-photo {
       grid-column: 1;
       grid-row: 1;
@@ -10171,10 +10635,10 @@
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      align-self: center !important; // 세로 중앙
-      // 인적사항 ↓ 0.5cm — margin-top으로 처리해 grid row가 실제로 확장되도록 함 (border ::before 포함)
+      align-self: center !important; // ?몃줈 以묒븰
+      // ?몄쟻?ы빆 ??0.5cm ??margin-top?쇰줈 泥섎━??grid row媛 ?ㅼ젣濡??뺤옣?섎룄濡???(border ::before ?ы븿)
       margin: 21px 0 2px 10px;
-      margin-top: -3px !important; // 사진만 위로 (현재보다 0.1cm 아래로: -7 → -3)
+      margin-top: -3px !important; // ?ъ쭊留??꾨줈 (?꾩옱蹂대떎 0.1cm ?꾨옒濡? -7 ??-3)
       position: relative;
       z-index: 1;
 
@@ -10186,7 +10650,7 @@
       }
     }
 
-    // 2열: 인적사항 텍스트 stack (3행)
+    // 2?? ?몄쟻?ы빆 ?띿뒪??stack (3??
     .personal-info {
       grid-column: 2;
       grid-row: 1;
@@ -10197,8 +10661,8 @@
       padding: 3px 8px 3px 0;
       position: relative;
       z-index: 1;
-      align-self: center !important; // 세로 중앙
-      margin-top: 0 !important; // -6px 원복
+      align-self: center !important; // ?몃줈 以묒븰
+      margin-top: 0 !important; // -6px ?먮났
     }
 
     .personal-row-1,
@@ -10208,22 +10672,22 @@
       align-items: center;
       gap: 5px;
       font-family: "Pretendard", sans-serif;
-      font-size: 13px !important; // 인적사항 본문 pt 통일
+      font-size: 13px !important; // ?몄쟻?ы빆 蹂몃Ц pt ?듭씪
       line-height: 1.14;
       color: #ddd;
       min-width: 0;
     }
 
-    // row-1 안에 태그 가로 배치 — 우측 정렬
+    // row-1 ?덉뿉 ?쒓렇 媛濡?諛곗튂 ???곗륫 ?뺣젹
     .personal-row-1 {
       display: flex !important;
       align-items: center !important;
       gap: 8px;
 
       .personal-tags {
-        margin-left: auto !important; // row-1 내부 우측 정렬
+        margin-left: auto !important; // row-1 ?대? ?곗륫 ?뺣젹
         display: flex !important;
-        flex-direction: row !important; // 가로 배치
+        flex-direction: row !important; // 媛濡?諛곗튂
         gap: 8px !important;
         flex-shrink: 0;
       }
@@ -10245,13 +10709,13 @@
     .personal-separator {
       color: rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
-      padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
-      font-size: 13px !important; // 본문 pt 통일
+      padding-left: 6px !important; // ?쇰꺼怨?| 援щ텇???ъ씠 ?щ갚
+      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
     }
 
-    // 1행 — 고정폭 (말줄임 없음, 최대 글자수 입력 차단으로 보장)
+    // 1????怨좎젙??(留먯쨪???놁쓬, 理쒕? 湲?먯닔 ?낅젰 李⑤떒?쇰줈 蹂댁옣)
     .personal-name {
-      min-width: 64px; // 4자 × 16px
+      min-width: 64px; // 4??횞 16px
       display: flex;
       align-items: center;
       width: 150px;
@@ -10261,22 +10725,22 @@
       border: 1px solid rgba(255, 165, 0, 0.3);
       background: rgb(26, 26, 46);
       white-space: nowrap;
-      font-size: 13px !important; // 본문 pt 통일
+      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
     }
     .personal-gender {
-      min-width: 16px; // 1자
+      min-width: 16px; // 1??
       display: inline-block;
       white-space: nowrap;
-      font-size: 13px !important; // 본문 pt 통일
+      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
     }
     .personal-age {
-      min-width: 48px; // "22 세"
+      min-width: 48px; // "22 ??
       display: inline-block;
       white-space: nowrap;
-      font-size: 13px !important; // 본문 pt 통일
+      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
     }
 
-    // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
+    // ??븷/?ㅼ썙???쒓렇 ??row-1 ?대? 媛濡?諛곗튂 (?몃? override??.personal-row-1 .personal-tags)
     .personal-tags {
       display: flex;
       flex-direction: row;
@@ -10287,7 +10751,7 @@
       z-index: 2;
     }
 
-    // 기존 personal-tags 위치: 강화 상태 표시
+    // 湲곗〈 personal-tags ?꾩튂: 媛뺥솕 ?곹깭 ?쒖떆
     .personal-line-status {
       --enhance-color: 255, 107, 154;
       grid-column: 3;
@@ -10299,7 +10763,7 @@
       gap: 8px;
       min-width: 180px;
       padding-left: 16px;
-      transform: translateX(-19px) translateY(-8px); // 현재 대비 오른쪽 0.5cm + 위로 0.2cm (-38 → -19, 0 → -8)
+      transform: translateX(-19px) translateY(-8px); // ?꾩옱 ?鍮??ㅻⅨ履?0.5cm + ?꾨줈 0.2cm (-38 ??-19, 0 ??-8)
 
       &:has(.enhance-success) {
         --enhance-color: 255, 107, 154;
@@ -10336,9 +10800,9 @@
 
       .line-enhance-status {
         margin-left: 0;
-        font-size: 20px !important; // 가독성 확보 (9px 너무 작음)
+        font-size: 20px !important; // 媛?낆꽦 ?뺣낫 (9px ?덈Т ?묒쓬)
         font-weight: 600 !important;
-        // CSS 변수로 배지 아이콘 색상과 동기화 — 상태 클래스가 --enhance-color 덮어씀
+        // CSS 蹂?섎줈 諛곗? ?꾩씠肄??됱긽怨??숆린?????곹깭 ?대옒?ㅺ? --enhance-color ??뼱?
         color: rgb(var(--enhance-color, 255, 107, 154));
         text-shadow:
           0 0 4px rgba(var(--enhance-color, 255, 107, 154), 0.6),
@@ -10366,10 +10830,10 @@
     }
 
     .tag-badge {
-      padding: 3px 11px !important; // 태그 패딩 통일
+      padding: 3px 11px !important; // ?쒓렇 ?⑤뵫 ?듭씪
       border-radius: 4px;
       font-family: "Pretendard", sans-serif;
-      font-size: 13px !important; // 태그 pt 통일
+      font-size: 13px !important; // ?쒓렇 pt ?듭씪
       line-height: 1.14;
       font-weight: 600;
       white-space: nowrap !important;
@@ -10408,7 +10872,7 @@
       border: 1px solid rgba(135, 206, 250, 0.3);
     }
 
-    // 2·3행 — 필드명/값 분리 (값은 고정폭, 라벨은 작은 폰트 + 연한 색)
+    // 2쨌3?????꾨뱶紐?媛?遺꾨━ (媛믪? 怨좎젙?? ?쇰꺼? ?묒? ?고듃 + ?고븳 ??
     .personal-field {
       display: inline-flex;
       align-items: baseline;
@@ -10417,7 +10881,7 @@
 
       .field-value {
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important; // 필드값 pt 통일
+        font-size: 13px !important; // ?꾨뱶媛?pt ?듭씪
         line-height: 1.14;
         color: #ddd;
         display: block;
@@ -10427,19 +10891,19 @@
 
       .field-label {
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important; // 필드 라벨 pt 통일
+        font-size: 13px !important; // ?꾨뱶 ?쇰꺼 pt ?듭씪
         line-height: 1.14;
         color: rgba(255, 255, 255, 0.4);
         flex-shrink: 0;
         min-width: 28px;
         display: block;
         white-space: nowrap;
-        margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
+        margin-right: 6px !important; // ?쇰꺼怨?| 援щ텇???ъ씠 ?щ갚
       }
     }
   }
 
-  // 좌중단: 2열 (시즌/주차/카테고리/상태 + Output Link 5개)
+  // 醫뚯쨷?? 2??(?쒖쫵/二쇱감/移댄뀒怨좊━/?곹깭 + Output Link 5媛?
   .workinfo-mid-section {
     display: flex;
     gap: 20px;
@@ -10465,21 +10929,21 @@
 
     .workinfo-mid-col2 {
       flex: none !important;
-      width: 360px !important; // Output Link 영역 고정폭 (220 + 76 ≈ 2cm 확장)
+      width: 360px !important; // Output Link ?곸뿭 怨좎젙??(220 + 76 ??2cm ?뺤옣)
       min-width: 0;
       display: flex;
       justify-content: flex-end;
       box-sizing: border-box;
-      margin-top: 20px !important; // 강화 상태 행과 수직 겹침 방지
+      margin-top: 20px !important; // 媛뺥솕 ?곹깭 ?됯낵 ?섏쭅 寃뱀묠 諛⑹?
     }
   }
 
   .workinfo-date-badge {
     display: flex !important;
-    flex-direction: row !important; // column → row 강제 (다른 셀렉터 override 방지)
+    flex-direction: row !important; // column ??row 媛뺤젣 (?ㅻⅨ ??됲꽣 override 諛⑹?)
     align-items: baseline;
     gap: 12px;
-    flex-wrap: nowrap; // 줄바꿈 안 함
+    flex-wrap: nowrap; // 以꾨컮轅?????
 
     .date-badge-text {
       font-family: "Pretendard", sans-serif;
@@ -10515,20 +10979,20 @@
       line-height: 1;
       color: #ddd;
       margin: 0;
-      width: 100%; // 행1(.line-name min-width 560px)과 행2 우측 끝 x좌표 정렬
+      width: 100%; // ??(.line-name min-width 560px)怨??? ?곗륫 ??x醫뚰몴 ?뺣젹
     }
 
-    // 행1: 컴팩트 행 — 주변 요소 위치 불변
+    // ??: 而댄뙥??????二쇰? ?붿냼 ?꾩튂 遺덈?
     .line-info-row:nth-child(1) {
-      height: 44px !important; // 아이콘 40px + 여유
+      height: 44px !important; // ?꾩씠肄?40px + ?ъ쑀
       min-height: 44px !important;
       max-height: 44px !important;
       overflow: visible;
       align-items: center;
     }
 
-    // 행2: 강화 상태가 남은 공간 차지 + 라인코드는 우측 끝에 고정
-    // → 라인코드 우측 끝 = 라인명 20자 기준 우측 끝
+    // ??: 媛뺥솕 ?곹깭媛 ?⑥? 怨듦컙 李⑥? + ?쇱씤肄붾뱶???곗륫 ?앹뿉 怨좎젙
+    // ???쇱씤肄붾뱶 ?곗륫 ??= ?쇱씤紐?20??湲곗? ?곗륫 ??
     .line-info-row:nth-child(2) {
       .line-enhance-status {
         flex: 1;
@@ -10541,16 +11005,16 @@
       color: #faab07;
     }
 
-    // 활동 카테고리 아이콘 (selectedWorkInfoCard.icon — activityTypeConfig.icon)
+    // ?쒕룞 移댄뀒怨좊━ ?꾩씠肄?(selectedWorkInfoCard.icon ??activityTypeConfig.icon)
     .line-activity-icon {
-      width: 40px !important; // 32 → 40
+      width: 40px !important; // 32 ??40
       height: 40px !important;
       object-fit: contain;
       flex-shrink: 0;
     }
 
-    // 강화 상태 아이콘 (selectedWorkInfoCard.statusIcon — enhancementStatusIcons[status])
-    // 사용자 요청: 3배 확대 (24 → 72)
+    // 媛뺥솕 ?곹깭 ?꾩씠肄?(selectedWorkInfoCard.statusIcon ??enhancementStatusIcons[status])
+    // ?ъ슜???붿껌: 3諛??뺣? (24 ??72)
     .line-enhance-icon {
       width: 32px !important;
       height: 32px !important;
@@ -10558,12 +11022,12 @@
       flex-shrink: 0;
     }
 
-    // 라인명은 최대 20자 제한 → min-width로 line-code 시작 x 좌표 고정 (20자 × 28px ≈ 560px)
+    // ?쇱씤紐낆? 理쒕? 20???쒗븳 ??min-width濡?line-code ?쒖옉 x 醫뚰몴 怨좎젙 (20??횞 28px ??560px)
     .line-name {
       display: inline-block;
       min-width: 560px;
       white-space: nowrap;
-      font-size: 20px !important; // 16 → 20
+      font-size: 20px !important; // 16 ??20
       line-height: 1;
     }
 
@@ -10573,7 +11037,7 @@
       line-height: 1;
     }
 
-    // badge-status.yellow 스타일 준용
+    // badge-status.yellow ?ㅽ???以??
     .line-code {
       padding: 4px 7.2px;
       background: rgba(250, 171, 7, 0.1);
@@ -10585,16 +11049,16 @@
       color: rgb(250, 171, 7);
       white-space: nowrap;
       flex-shrink: 0;
-      margin-left: auto; // 우측 끝으로 밀기 (라인명 20자 기준 끝 x좌표와 정렬)
+      margin-left: auto; // ?곗륫 ?앹쑝濡?諛湲?(?쇱씤紐?20??湲곗? ??x醫뚰몴? ?뺣젹)
       margin-right: 0;
     }
   }
 
-  // .badge-status.yellow 스타일 그대로 적용
+  // .badge-status.yellow ?ㅽ???洹몃?濡??곸슜
   .image-line-code {
     align-self: flex-start;
     flex-shrink: 0;
-    margin: 0 5px 0 0; // badge-status margin (left 0 유지)
+    margin: 0 5px 0 0; // badge-status margin (left 0 ?좎?)
     background: #faab07;
     color: #111111;
     padding: 3px 10px;
@@ -10628,8 +11092,8 @@
     margin-right: 8px;
   }
 
-  // Output Link — cluster3 output modal 패턴 준용 (link-dot + input/text + open-btn)
-  // (cluster3 _cluster3.scss L4806 .output-links-section의 시각 스타일을 workInfo 스코프에 복제)
+  // Output Link ??cluster3 output modal ?⑦꽩 以??(link-dot + input/text + open-btn)
+  // (cluster3 _cluster3.scss L4806 .output-links-section???쒓컖 ?ㅽ??쇱쓣 workInfo ?ㅼ퐫?꾩뿉 蹂듭젣)
   .workinfo-output-links {
     display: flex;
     flex-direction: column;
@@ -10639,7 +11103,7 @@
     max-width: 270px;
     min-width: 0;
     box-sizing: border-box;
-    transform: translateY(-57px); // 전체 ↑ 1.5cm
+    transform: translateY(-57px); // ?꾩껜 ??1.5cm
 
     .output-link-row {
       display: flex;
@@ -10662,7 +11126,7 @@
       line-height: 1;
     }
 
-    // cluster3 .link-dot 패턴
+    // cluster3 .link-dot ?⑦꽩
     .link-dot {
       width: 10px;
       height: 10px;
@@ -10670,7 +11134,7 @@
       flex-shrink: 0;
     }
 
-    // cluster3 .output-link-text 스타일 그대로
+    // cluster3 .output-link-text ?ㅽ???洹몃?濡?
     .output-link-text {
       flex: 1;
       min-width: 0;
@@ -10686,7 +11150,7 @@
       }
     }
 
-    // cluster3 .output-link-input 스타일 — 편집 모드 폰트/높이 축소 (5행 누적 높이로 인한 아래 영역 밀림 방지)
+    // cluster3 .output-link-input ?ㅽ??????몄쭛 紐⑤뱶 ?고듃/?믪씠 異뺤냼 (5???꾩쟻 ?믪씠濡??명븳 ?꾨옒 ?곸뿭 諛由?諛⑹?)
     .output-link-input {
       flex: 1;
       min-width: 0;
@@ -10710,7 +11174,7 @@
       }
     }
 
-    // cluster3 .link-open-btn 스타일 그대로
+    // cluster3 .link-open-btn ?ㅽ???洹몃?濡?
     .link-open-btn {
       width: 28px;
       height: 28px;
@@ -10735,7 +11199,7 @@
       }
     }
 
-    // 삭제 버튼 (편집 모드 전용 — workInfo 추가 기능, cluster3에는 없음)
+    // ??젣 踰꾪듉 (?몄쭛 紐⑤뱶 ?꾩슜 ??workInfo 異붽? 湲곕뒫, cluster3?먮뒗 ?놁쓬)
     .output-link-delete {
       flex-shrink: 0;
       background: transparent;
@@ -10759,8 +11223,8 @@
     }
   }
 
-  // 좌하단: Main Title / Sub Title / Growth Point
-  // 사용자 요청: Main Title 0.5cm(≈ -19px) 위로 — text-section만 추가 보정
+  // 醫뚰븯?? Main Title / Sub Title / Growth Point
+  // ?ъ슜???붿껌: Main Title 0.5cm(??-19px) ?꾨줈 ??text-section留?異붽? 蹂댁젙
   .workinfo-text-section {
     margin-top: -73px !important;
     display: flex;
@@ -10796,7 +11260,7 @@
         box-sizing: border-box;
       }
 
-      // Main Title — 운영진 read-only
+      // Main Title ???댁쁺吏?read-only
       .main-title-readonly {
         background: rgba(250, 171, 7, 0.05);
         border-color: rgba(250, 171, 7, 0.15);
@@ -10842,19 +11306,19 @@
       }
     }
 
-    // 텍스트 3종 글자수 기반 박스 크기 (font 11px line-height 1.5 ≈ 16.5px/줄 기준)
-    // Main Title: 74px 고정 박스 + 18px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
+    // ?띿뒪??3醫?湲?먯닔 湲곕컲 諛뺤뒪 ?ш린 (font 11px line-height 1.5 ??16.5px/以?湲곗?)
+    // Main Title: 74px 怨좎젙 諛뺤뒪 + 18px/700 ?고듃 + 1.6 line-height ??2以?媛?낆꽦 ?뺣낫
     .text-block-main {
       .main-title-readonly {
-        height: 59px !important; // 78 → 59 (-19px, 0.5cm 축소)
+        height: 59px !important; // 78 ??59 (-19px, 0.5cm 異뺤냼)
         min-height: 59px !important;
         max-height: 59px !important;
         font-size: 14px !important;
         font-weight: 700 !important;
         line-height: 1.6 !important;
         overflow-y: auto;
-        padding: 3px 12px 8px 12px !important; // 사용자 요청: padding-top 8 → 3
-        // 사용자 요청: 텍스트 상단 정렬 (4개 모달 공통)
+        padding: 3px 12px 8px 12px !important; // ?ъ슜???붿껌: padding-top 8 ??3
+        // ?ъ슜???붿껌: ?띿뒪???곷떒 ?뺣젹 (4媛?紐⑤떖 怨듯넻)
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
@@ -10868,10 +11332,10 @@
         overflow-y: auto;
       }
     }
-    // Sub Title: 200자 → 보기/편집 동일 높이 75px (사용자 요청: 300→200자, 90→75px)
+    // Sub Title: 200????蹂닿린/?몄쭛 ?숈씪 ?믪씠 75px (?ъ슜???붿껌: 300??00?? 90??5px)
     .text-block-sub {
       .sub-title-input {
-        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        height: 111px !important; // 130 ??111 (-19px, 0.5cm 異뺤냼)
         min-height: 111px !important;
         max-height: 111px !important;
         font-size: 14px !important;
@@ -10882,17 +11346,17 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        height: 111px !important; // 130 ??111 (-19px, 0.5cm 異뺤냼)
         min-height: 111px !important;
         max-height: 111px !important;
         overflow-y: auto !important;
         font-size: 14px !important;
       }
     }
-    // Growth Point: 100자 → 보기/편집 동일 높이 45px (사용자 요청: 200→100자, 60→45px)
+    // Growth Point: 100????蹂닿린/?몄쭛 ?숈씪 ?믪씠 45px (?ъ슜???붿껌: 200??00?? 60??5px)
     .text-block-growth {
       .growth-point-input {
-        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        height: 71px !important; // 90 ??71 (-19px, 0.5cm 異뺤냼)
         min-height: 71px !important;
         max-height: 71px !important;
         font-size: 14px !important;
@@ -10903,7 +11367,7 @@
         overflow-y: auto;
       }
       .text-block-content {
-        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        height: 71px !important; // 90 ??71 (-19px, 0.5cm 異뺤냼)
         min-height: 71px !important;
         max-height: 71px !important;
         overflow-y: auto !important;
@@ -10912,8 +11376,8 @@
     }
   }
 
-  // ── 사용자 요청: 편집 가능 영역 폰트 일괄 축소 (헤더/인적사항 제외) ──
-  // 위 개별 규칙들과 중복되지만 cascade 마지막에 두어 확실히 override
+  // ?? ?ъ슜???붿껌: ?몄쭛 媛???곸뿭 ?고듃 ?쇨큵 異뺤냼 (?ㅻ뜑/?몄쟻?ы빆 ?쒖쇅) ??
+  // ??媛쒕퀎 洹쒖튃?ㅺ낵 以묐났?섏?留?cascade 留덉?留됱뿉 ?먯뼱 ?뺤떎??override
   .text-block-textarea,
   textarea.text-block-textarea {
     font-size: 10px !important;
@@ -10930,7 +11394,7 @@
     font-size: 9px !important;
   }
 
-  // ── 푸터 (118px) Type B — 2행 구조 (cluster2/3 표준) ──
+  // ?? ?명꽣 (118px) Type B ??2??援ъ“ (cluster2/3 ?쒖?) ??
   .workinfo-text-section {
     .workinfo-text-block > .text-block-title {
       font-size: 16px !important;
@@ -10983,7 +11447,7 @@
     border-top: none;
     background: transparent;
 
-    // ── 행 1: 🔎 좌 + 버튼 우 ──
+    // ?? ??1: ?뵊 醫?+ 踰꾪듉 ????
     .modal-footer-top {
       display: flex;
       align-items: center;
@@ -11029,7 +11493,7 @@
       }
     }
 
-    // ── 행 2: 안내문 우측 정렬 (visibility 토글 — display:none 금지, 공간 유지) ──
+    // ?? ??2: ?덈궡臾??곗륫 ?뺣젹 (visibility ?좉? ??display:none 湲덉?, 怨듦컙 ?좎?) ??
     .modal-footer-bottom {
       width: 100%;
       display: flex;
@@ -11096,7 +11560,7 @@
     }
   }
 
-  // 필수필드 표시 — 제목 옆 빨간색 *
+  // ?꾩닔?꾨뱶 ?쒖떆 ???쒕ぉ ??鍮④컙??*
   .required-mark {
     color: #ff4444;
     margin-left: 2px;
@@ -11108,7 +11572,7 @@
 }
 
 // ============================================================================
-// reputation view 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// reputation view ?꾩슜 ???몄쟻?ы빆? ?몄쭛 ??곸씠 ?꾨땶 ?쒖떆 ?꾩슜 UI
 // ============================================================================
 .cluster4-card-content .section-modal.reputation-view-modal {
   .workinfo-personal-card {
@@ -11154,7 +11618,7 @@
 }
 
 // ============================================================================
-// workInfo 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// workInfo ?꾩슜 ???몄쟻?ы빆? ?몄쭛 ??곸씠 ?꾨땶 ?쒖떆 ?꾩슜 UI
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal {
   .workinfo-personal-card {
@@ -11200,7 +11664,7 @@
 }
 
 // ============================================================================
-// workAbility 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// workAbility ?꾩슜 ???몄쟻?ы빆? ?몄쭛 ??곸씠 ?꾨땶 ?쒖떆 ?꾩슜 UI
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workability-view-modal {
   .workinfo-personal-card {
@@ -11246,7 +11710,7 @@
 }
 
 // ============================================================================
-// workCareer 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// workCareer ?꾩슜 ???몄쟻?ы빆? ?몄쭛 ??곸씠 ?꾨땶 ?쒖떆 ?꾩슜 UI
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
   .workinfo-personal-card {
@@ -11290,15 +11754,15 @@
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 4단계: 후원/제휴사 카드 (이미지 그리드 4번째 슬롯) — 항상 읽기전용
-  // 필드 고정 위치 원칙 적용: min-width 지정, 말줄임 제거 (인적사항과 동일 원칙)
-  // 카드 슬롯 폭 ~210px (workinfo-right 420px / 2) 안에 수용되도록 폰트 10px, min-width 90px 기준
-  // ──────────────────────────────────────────────────────────────────────
+  // ??????????????????????????????????????????????????????????????????????
+  // 4?④퀎: ?꾩썝/?쒗쑕??移대뱶 (?대?吏 洹몃━??4踰덉㎏ ?щ’) ????긽 ?쎄린?꾩슜
+  // ?꾨뱶 怨좎젙 ?꾩튂 ?먯튃 ?곸슜: min-width 吏?? 留먯쨪???쒓굅 (?몄쟻?ы빆怨??숈씪 ?먯튃)
+  // 移대뱶 ?щ’ ??~210px (workinfo-right 420px / 2) ?덉뿉 ?섏슜?섎룄濡??고듃 10px, min-width 90px 湲곗?
+  // ??????????????????????????????????????????????????????????????????????
   .sponsor-card-slot {
     cursor: default !important;
 
-    // 편집 모드에서도 업로드/삭제 버튼이나 hover 효과 없음
+    // ?몄쭛 紐⑤뱶?먯꽌???낅줈????젣 踰꾪듉?대굹 hover ?④낵 ?놁쓬
     &:hover {
       border-color: rgba(255, 165, 0, 0.3) !important;
     }
@@ -11310,25 +11774,25 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
-    padding-top: 18px !important; // 사용자 요청: 내부 전체 그룹 0.2cm(8px) 아래로
+    padding-top: 18px !important; // ?ъ슜???붿껌: ?대? ?꾩껜 洹몃９ 0.2cm(8px) ?꾨옒濡?
     box-sizing: border-box;
     background: rgba(255, 255, 255, 0.02);
-    gap: 12px !important; // 사용자 요청: 8 → 12 (카드 전체 행간)
-    overflow: hidden; // 카드 밖으로 텍스트 넘침 방지
+    gap: 12px !important; // ?ъ슜???붿껌: 8 ??12 (移대뱶 ?꾩껜 ?됯컙)
+    overflow: hidden; // 移대뱶 諛뽰쑝濡??띿뒪???섏묠 諛⑹?
 
-    // 1행: 기업 로고 + 기업명 (사용자 요청: 아래 구분선 추가)
+    // 1?? 湲곗뾽 濡쒓퀬 + 湲곗뾽紐?(?ъ슜???붿껌: ?꾨옒 援щ텇??異붽?)
     .sponsor-company {
       display: flex;
       align-items: flex-start !important;
-      gap: 12px !important; // 사용자 요청: 6 → 12 (로고/기업명 간격 확대)
+      gap: 12px !important; // ?ъ슜???붿껌: 6 ??12 (濡쒓퀬/湲곗뾽紐?媛꾧꺽 ?뺣?)
       flex-shrink: 0;
       min-width: 0;
-      padding-bottom: 10px; // 사용자 요청: 8 → 10
-      border-bottom: 1px solid #faab07 !important; // 사용자 요청: 노란색 구분선
-      margin-bottom: 10px; // 사용자 요청: 8 → 10
+      padding-bottom: 10px; // ?ъ슜???붿껌: 8 ??10
+      border-bottom: 1px solid #faab07 !important; // ?ъ슜???붿껌: ?몃???援щ텇??
+      margin-bottom: 10px; // ?ъ슜???붿껌: 8 ??10
 
       .sponsor-company-logo {
-        width: 50% !important; // 사용자 요청: 60 → 50
+        width: 50% !important; // ?ъ슜???붿껌: 60 ??50
         height: auto !important;
         aspect-ratio: 16 / 9 !important;
         max-width: none !important;
@@ -11356,12 +11820,12 @@
         }
       }
 
-      // 기업명: 최대 3줄 줄바꿈, 말줄임 제거 (사용자 요청)
+      // 湲곗뾽紐? 理쒕? 3以?以꾨컮轅? 留먯쨪???쒓굅 (?ъ슜???붿껌)
       .sponsor-company-name {
         font-family: "Pretendard", sans-serif;
-        font-size: 16px !important; // 사용자 요청: 13 → 16 (94px × 3줄 기준)
+        font-size: 16px !important; // ?ъ슜???붿껌: 13 ??16 (94px 횞 3以?湲곗?)
         font-weight: 600;
-        color: rgb(255, 107, 107) !important; // 사용자 요청: link-dot 빨간색
+        color: rgb(255, 107, 107) !important; // ?ъ슜???붿껌: link-dot 鍮④컙??
         min-width: unset !important;
         max-width: 100%;
         white-space: normal !important;
@@ -11371,32 +11835,32 @@
         display: -webkit-box !important;
         -webkit-line-clamp: 3 !important;
         -webkit-box-orient: vertical !important;
-        line-height: 1.3 !important; // 사용자 요청: 1.4 → 1.3
+        line-height: 1.3 !important; // ?ъ슜???붿껌: 1.4 ??1.3
         flex: 1;
         align-self: flex-start !important;
         margin-top: 0 !important;
       }
     }
 
-    // 2~4행: 사진+Supervised By(같은 행, 우측 정렬) → 이름|직무 → 회사|직책 (독립 행, 카드 전체 폭 사용)
+    // 2~4?? ?ъ쭊+Supervised By(媛숈? ?? ?곗륫 ?뺣젹) ???대쫫|吏곷Т ???뚯궗|吏곸콉 (?낅┰ ?? 移대뱶 ?꾩껜 ???ъ슜)
     .sponsor-supervisor {
       display: flex;
       flex-direction: column;
-      gap: 10px !important; // 사용자 요청: 6 → 10 (2↔3↔4행 간격)
+      gap: 10px !important; // ?ъ슜???붿껌: 6 ??10 (2??????媛꾧꺽)
       flex: 1;
       min-width: 0;
       overflow: hidden;
 
-      // 2행: 사진 좌측 + 라벨 우측
+      // 2?? ?ъ쭊 醫뚯륫 + ?쇰꺼 ?곗륫
       .supervisor-row-2 {
         display: flex;
-        align-items: flex-end !important; // 사용자 요청: 사진/라벨 하단 y좌표 일치
+        align-items: flex-end !important; // ?ъ슜???붿껌: ?ъ쭊/?쇰꺼 ?섎떒 y醫뚰몴 ?쇱튂
         justify-content: space-between;
 
         .sponsor-supervisor-photo {
-          width: 54px !important; // 사용자 요청: 36 → 54 (1.5배)
+          width: 54px !important; // ?ъ슜???붿껌: 36 ??54 (1.5諛?
           height: 54px !important;
-          margin-left: 19px !important; // 사용자 요청: 오른쪽으로 0.5cm
+          margin-left: 19px !important; // ?ъ슜???붿껌: ?ㅻⅨ履쎌쑝濡?0.5cm
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
@@ -11415,29 +11879,29 @@
           }
         }
 
-        // Supervised By — 하이라이터 스타일 (사용자 요청)
+        // Supervised By ???섏씠?쇱씠???ㅽ???(?ъ슜???붿껌)
         .supervisor-label {
           font-family: "Pretendard", sans-serif;
-          font-size: 18px !important; // 사용자 요청: 13 → 18 (+5pt)
+          font-size: 18px !important; // ?ъ슜???붿껌: 13 ??18 (+5pt)
           font-style: italic;
-          color: rgb(78, 205, 196) !important; // link-dot 청록색
-          background-color: rgba(78, 205, 196, 0.3) !important; // 하이라이터 반투명 배경
+          color: rgb(78, 205, 196) !important; // link-dot 泥?줉??
+          background-color: rgba(78, 205, 196, 0.3) !important; // ?섏씠?쇱씠??諛섑닾紐?諛곌꼍
           padding: 2px 6px !important;
-          padding-right: 8px !important; // 사용자 요청: 우측 'y' 잘림 방지 여유
-          margin-right: 19px !important; // 사용자 요청: 왼쪽으로 0.5cm
+          padding-right: 8px !important; // ?ъ슜???붿껌: ?곗륫 'y' ?섎┝ 諛⑹? ?ъ쑀
+          margin-right: 19px !important; // ?ъ슜???붿껌: ?쇱そ?쇰줈 0.5cm
           border-radius: 2px;
           text-align: right;
-          text-decoration: underline !important; // 사용자 요청: 밑줄
+          text-decoration: underline !important; // ?ъ슜???붿껌: 諛묒쨪
         }
       }
 
-      // 3·4행: grid 레이아웃 — name(80px) | sep(12px) | dept/position(1fr)
+      // 3쨌4?? grid ?덉씠?꾩썐 ??name(80px) | sep(12px) | dept/position(1fr)
       .supervisor-details {
-        display: grid !important; // 사용자 요청: flex → grid
+        display: grid !important; // ?ъ슜???붿껌: flex ??grid
         grid-template-columns: 80px 12px 1fr !important;
         gap: 8px;
         align-items: center;
-        margin-left: 11px !important; // 사용자 요청: 우측 이동 (여유 11px 활용)
+        margin-left: 11px !important; // ?ъ슜???붿껌: ?곗륫 ?대룞 (?ъ쑀 11px ?쒖슜)
         margin-right: 0 !important;
         width: calc(100% - 11px) !important;
         font-family: "Pretendard", sans-serif;
@@ -11463,7 +11927,7 @@
           .honorific {
             margin-left: 2px;
             color: rgba(255, 255, 255, 0.5);
-            font-size: 12px !important; // 사용자 요청: 이름 14px보다 작게
+            font-size: 12px !important; // ?ъ슜???붿껌: ?대쫫 14px蹂대떎 ?묎쾶
           }
         }
 
@@ -11484,29 +11948,29 @@
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용
-  // 이미지 그리드 아래 배치 (workExp의 rating-section 위치 동일 개념)
-  // grade/grade-row 원형 스타일은 L6732의 .work-view-title-section 스코프와 분리되어 있으므로
-  // 여기서 동일 스펙으로 재선언한다 (타 영역 영향 없음)
-  // ──────────────────────────────────────────────────────────────────────
+  // ??????????????????????????????????????????????????????????????????????
+  // 5?④퀎: ?쇱씤 ?됱젏 (S/A/B/C/D) ??愿由ъ옄留??ㅼ젙, ?ъ슜???쎄린?꾩슜
+  // ?대?吏 洹몃━???꾨옒 諛곗튂 (workExp??rating-section ?꾩튂 ?숈씪 媛쒕뀗)
+  // grade/grade-row ?먰삎 ?ㅽ??쇱? L6732??.work-view-title-section ?ㅼ퐫?꾩? 遺꾨━?섏뼱 ?덉쑝誘濡?
+  // ?ш린???숈씪 ?ㅽ럺?쇰줈 ?ъ꽑?명븳??(? ?곸뿭 ?곹뼢 ?놁쓬)
+  // ??????????????????????????????????????????????????????????????????????
   .workcareer-grade-section {
     display: flex;
     align-items: center;
-    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
+    justify-content: flex-end !important; // ?곗륫 ?뺣젹 (?대?吏 洹몃━??醫낅즺 x醫뚰몴 ?쇱튂)
     gap: 8px;
     width: 100%;
     border: none !important;
     background: transparent !important;
-    margin: 0 !important; // 모든 margin 리셋
-    margin-top: -31px !important; // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
-    padding: 0 !important; // 모든 padding 리셋
+    margin: 0 !important; // 紐⑤뱺 margin 由ъ뀑
+    margin-top: -31px !important; // ?됱젏 top = ?쇱씤肄붾뱶 top ?뺣젹 (?ㅼ륫 31px ?곹뼢)
+    padding: 0 !important; // 紐⑤뱺 padding 由ъ뀑
     flex-shrink: 0 !important;
 
     .grade-label {
       font-family: "Pretendard", sans-serif !important;
-      font-size: 14px !important; // 13 → 14 (통일)
-      font-weight: 700 !important; // 600 → 700 (통일)
+      font-size: 14px !important; // 13 ??14 (?듭씪)
+      font-weight: 700 !important; // 600 ??700 (?듭씪)
       color: #ddd !important;
       white-space: nowrap;
     }
@@ -11528,7 +11992,7 @@
         background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
         font-family: "Black Ops One", sans-serif;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
-        cursor: default; // 사용자는 선택 불가
+        cursor: default; // ?ъ슜?먮뒗 ?좏깮 遺덇?
         box-shadow:
           4px 4px 10px rgba(0, 0, 0, 0.5),
           -2px -2px 6px rgba(255, 255, 255, 0.15),
@@ -11554,7 +12018,7 @@
     }
   }
 
-  // 우측 컬럼이 좌측 전체 높이에 맞춰 stretch (workexp와 통일)
+  // ?곗륫 而щ읆??醫뚯륫 ?꾩껜 ?믪씠??留욎떠 stretch (workexp? ?듭씪)
   .workinfo-right {
     display: flex;
     flex-direction: column;
@@ -11566,15 +12030,15 @@
     margin-bottom: 0 !important;
   }
 
-  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
+  // (?대?吏 洹몃━??洹쒖튃? 怨듭슜 scope L8910???뺤쓽 ??workInfo 湲곗? ?듭씪. 以묐났 ?쒓굅)
 }
 
 // ============================================================================
-// workExp 전용 — 우측 이미지 그리드 하단에 라인 평점 영역 추가 (workInfo 영향 없음)
+// workExp ?꾩슜 ???곗륫 ?대?吏 洹몃━???섎떒???쇱씤 ?됱젏 ?곸뿭 異붽? (workInfo ?곹뼢 ?놁쓬)
 // ============================================================================
 .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
-  // 인적사항은 편집 대상이 아닌 표시 전용 UI다. workInfo 공용 스타일에서
-  // 이름에 입력 박스처럼 보이는 배경/테두리가 들어가므로 workExp에서만 제거한다.
+  // ?몄쟻?ы빆? ?몄쭛 ??곸씠 ?꾨땶 ?쒖떆 ?꾩슜 UI?? workInfo 怨듭슜 ?ㅽ??쇱뿉??
+  // ?대쫫???낅젰 諛뺤뒪泥섎읆 蹂댁씠??諛곌꼍/?뚮몢由ш? ?ㅼ뼱媛誘濡?workExp?먯꽌留??쒓굅?쒕떎.
   .workinfo-personal-card {
     .personal-info {
       cursor: default;
@@ -11622,30 +12086,30 @@
     gap: 8px;
     height: auto !important;
     max-height: none !important;
-    align-self: stretch !important; // 좌측 전체 높이에 맞춤
+    align-self: stretch !important; // 醫뚯륫 ?꾩껜 ?믪씠??留욎땄
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
   }
 
-  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
+  // (?대?吏 洹몃━??洹쒖튃? 怨듭슜 scope L8910???뺤쓽 ??workInfo 湲곗? ?듭씪. 以묐났 ?쒓굅)
 
   .workexp-rating-section {
     display: flex;
     align-items: center;
-    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
+    justify-content: flex-end !important; // ?곗륫 ?뺣젹 (?대?吏 洹몃━??醫낅즺 x醫뚰몴 ?쇱튂)
     gap: 8px;
     width: 100%;
     border: none !important;
     background: transparent !important;
-    margin: 0 !important; // 모든 margin 리셋
-    margin-top: -31px !important; // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
-    padding: 0 !important; // 모든 padding 리셋
+    margin: 0 !important; // 紐⑤뱺 margin 由ъ뀑
+    margin-top: -31px !important; // ?됱젏 top = ?쇱씤肄붾뱶 top ?뺣젹 (?ㅼ륫 31px ?곹뼢)
+    padding: 0 !important; // 紐⑤뱺 padding 由ъ뀑
     flex-shrink: 0 !important;
 
     .rating-label {
       font-family: "Pretendard", sans-serif !important;
-      font-size: 14px !important; // 13 → 14 (통일)
-      font-weight: 700 !important; // 600 → 700 (통일)
+      font-size: 14px !important; // 13 ??14 (?듭씪)
+      font-weight: 700 !important; // 600 ??700 (?듭씪)
       color: #ddd !important;
       white-space: nowrap;
     }
@@ -11701,7 +12165,7 @@
     .rating-max {
       font-size: 14px;
       color: rgba(255, 255, 255, 0.5);
-      min-width: 30px; // "/ 10" 고정폭
+      min-width: 30px; // "/ 10" 怨좎젙??
       display: inline-block;
     }
 
@@ -11709,7 +12173,7 @@
       font-size: 14px;
       font-weight: 700;
       color: #faab07;
-      min-width: 44px; // select와 동일 고정폭
+      min-width: 44px; // select? ?숈씪 怨좎젙??
       display: inline-block;
       text-align: center;
     }
@@ -11717,9 +12181,9 @@
 }
 
 // ============================================================================
-// 이미지 확대 2차 모달 — cluster3 Cluster3Content.tsx:3049-3057 실측값 준용
-// Overlay: rgba(0,0,0,0.7), z-index 100002 (help-modal 100001보다 위)
-// Modal: 1020×794, #1a1a2e, border rgba(255,165,0,0.3), box-shadow 60px glow
+// ?대?吏 ?뺣? 2李?紐⑤떖 ??cluster3 Cluster3Content.tsx:3049-3057 ?ㅼ륫媛?以??
+// Overlay: rgba(0,0,0,0.7), z-index 100002 (help-modal 100001蹂대떎 ??
+// Modal: 1020횞794, #1a1a2e, border rgba(255,165,0,0.3), box-shadow 60px glow
 // ============================================================================
 .image-preview-overlay {
   position: fixed;
@@ -11754,9 +12218,9 @@
 }
 
 // ============================================================================
-// 도움말 모달 (workinfo-view-modal 위에 표시)
-// workinfo overlay z-index 99999보다 높게 → 100001
-// cluster2.scss .help-modal-overlay는 .cluster2-content 스코프라 cluster4에선 상속 불가
+// ?꾩?留?紐⑤떖 (workinfo-view-modal ?꾩뿉 ?쒖떆)
+// workinfo overlay z-index 99999蹂대떎 ?믨쾶 ??100001
+// cluster2.scss .help-modal-overlay??.cluster2-content ?ㅼ퐫?꾨씪 cluster4?먯꽑 ?곸냽 遺덇?
 // ============================================================================
 .help-modal-overlay {
   position: fixed !important;
@@ -11861,8 +12325,8 @@
 }
 
 // ============================================================================
-// 4개 모달(workInfo/workAbility/workCareer/workExp) + reputation-view-modal 공유
-// 인적사항 내부 글자 전부 동일 pt(13px)로 통일
+// 4媛?紐⑤떖(workInfo/workAbility/workCareer/workExp) + reputation-view-modal 怨듭쑀
+// ?몄쟻?ы빆 ?대? 湲???꾨? ?숈씪 pt(13px)濡??듭씪
 // ============================================================================
 .cluster4-card-content .section-modal.reputation-view-modal,
 .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
@@ -11890,9 +12354,9 @@
 }
 
 // ============================================================================
-// reputation-view-modal 인적사항 원복 — 4개 모달 공유 스타일/내부 조정으로 커진
-// 폰트·태그 크기를 초기 상태(commit 325fbc8)로 복원.
-// workInfo/workExp/workAbility/workCareer 4개 모달에는 영향 없음.
+// reputation-view-modal ?몄쟻?ы빆 ?먮났 ??4媛?紐⑤떖 怨듭쑀 ?ㅽ????대? 議곗젙?쇰줈 而ㅼ쭊
+// ?고듃쨌?쒓렇 ?ш린瑜?珥덇린 ?곹깭(commit 325fbc8)濡?蹂듭썝.
+// workInfo/workExp/workAbility/workCareer 4媛?紐⑤떖?먮뒗 ?곹뼢 ?놁쓬.
 // ============================================================================
 .cluster4-card-content .section-modal.reputation-view-modal {
   .workinfo-personal-card {
@@ -11942,21 +12406,21 @@
 }
 
 // ============================================================================
-// reputation-view-modal 인적사항 미세 조정 (4개 모달 영향 없음)
-//  · personal-photo 위로 0.2cm(translateY -8px) — 레이아웃 영향 없음
-//  · personal-info 폰트 +4pt (11px→15px, field-label 9px→13px)
-//  · personal-tags grid 3열 독립 배치 + 왼쪽 40px 이동(우측 여유 20px)
-//  · tag-badge 폰트 +4pt + padding 비례 확대
+// reputation-view-modal ?몄쟻?ы빆 誘몄꽭 議곗젙 (4媛?紐⑤떖 ?곹뼢 ?놁쓬)
+//  쨌 personal-photo ?꾨줈 0.2cm(translateY -8px) ???덉씠?꾩썐 ?곹뼢 ?놁쓬
+//  쨌 personal-info ?고듃 +4pt (11px??5px, field-label 9px??3px)
+//  쨌 personal-tags grid 3???낅┰ 諛곗튂 + ?쇱そ 40px ?대룞(?곗륫 ?ъ쑀 20px)
+//  쨌 tag-badge ?고듃 +4pt + padding 鍮꾨? ?뺣?
 // ============================================================================
 .cluster4-card-content .section-modal.reputation-view-modal {
   .workinfo-personal-card {
-    // 사진: 위로 0.2cm 이동 (transform은 레이아웃에 영향 없음)
+    // ?ъ쭊: ?꾨줈 0.2cm ?대룞 (transform? ?덉씠?꾩썐???곹뼢 ?놁쓬)
     .personal-photo {
       margin-top: 0 !important;
       transform: translateY(-8px) !important;
     }
 
-    // 인적사항 폰트 +4pt
+    // ?몄쟻?ы빆 ?고듃 +4pt
     .personal-info {
       .personal-row-1,
       .personal-row-2,
@@ -11974,8 +12438,8 @@
       }
     }
 
-    // 태그 블록 — grid 3열에 독립 배치 + 세로 2행
-    // (TSX에서 .personal-tags를 .personal-info 밖, .personal-grid 직접 자식으로 이동 완료)
+    // ?쒓렇 釉붾줉 ??grid 3?댁뿉 ?낅┰ 諛곗튂 + ?몃줈 2??
+    // (TSX?먯꽌 .personal-tags瑜?.personal-info 諛? .personal-grid 吏곸젒 ?먯떇?쇰줈 ?대룞 ?꾨즺)
     .personal-grid {
       display: grid !important;
       grid-template-columns: auto 1fr auto !important;
@@ -11998,20 +12462,20 @@
       gap: 4px !important;
       align-items: flex-end !important;
       justify-self: end !important;
-      margin: 0 20px 0 -80px !important; // 사용자 요청: -40 → -80 (태그 확대분 보상)
-      width: 192px !important; // 사용자 요청: 140 → 192 (10글자 + padding 수용)
+      margin: 0 20px 0 -80px !important; // ?ъ슜???붿껌: -40 ??-80 (?쒓렇 ?뺣?遺?蹂댁긽)
+      width: 192px !important; // ?ъ슜???붿껌: 140 ??192 (10湲??+ padding ?섏슜)
       min-width: 192px !important;
       max-width: 192px !important;
     }
 
-    // 태그 박스 폰트 +4pt + padding 비례 확대 + 고정폭 192px
+    // ?쒓렇 諛뺤뒪 ?고듃 +4pt + padding 鍮꾨? ?뺣? + 怨좎젙??192px
     .tag-badge,
     .personal-tags .tag-badge,
     .personal-tags .tag-badge.tag-role,
     .personal-tags .tag-badge.tag-keyword {
       font-size: 16px !important;
       padding: 6px 16px !important;
-      width: 192px !important; // 사용자 요청: 10글자 + padding 고정폭
+      width: 192px !important; // ?ъ슜???붿껌: 10湲??+ padding 怨좎젙??
       min-width: 192px !important;
       max-width: 192px !important;
       box-sizing: border-box !important;
@@ -12019,11 +12483,11 @@
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 하단 구분선 + 타임스탬프 가시성 강화 (사용자 문제 3)
-  // body overflow-y: auto 환경에서 스크롤 아래로 밀리지 않도록
-  // body 자체의 padding-bottom 확보 + 요소 명시적 visibility
-  // ──────────────────────────────────────────────────────────────────────
+  // ??????????????????????????????????????????????????????????????????????
+  // ?섎떒 援щ텇??+ ??꾩뒪?ы봽 媛?쒖꽦 媛뺥솕 (?ъ슜??臾몄젣 3)
+  // body overflow-y: auto ?섍꼍?먯꽌 ?ㅽ겕濡??꾨옒濡?諛由ъ? ?딅룄濡?
+  // body ?먯껜??padding-bottom ?뺣낫 + ?붿냼 紐낆떆??visibility
+  // ??????????????????????????????????????????????????????????????????????
   .section-modal-body.reputation-body {
     padding-bottom: 16px !important;
   }
@@ -12037,7 +12501,7 @@
     padding-top: 16px !important;
     flex-shrink: 0 !important;
     z-index: 10;
-    // 사용자 요청: body padding(24px 좌우) 만큼 확장하여 모달 끝까지 divider 표시
+    // ?ъ슜???붿껌: body padding(24px 醫뚯슦) 留뚰겮 ?뺤옣?섏뿬 紐⑤떖 ?앷퉴吏 divider ?쒖떆
     overflow: visible !important;
     margin-left: -24px !important;
     margin-right: -24px !important;
@@ -12050,9 +12514,9 @@
     display: block !important;
     visibility: visible !important;
     height: 1px !important;
-    background: rgba(255, 165, 0, 0.2) !important; // 사용자 요청: 헤더와 동일 오렌지 투명
+    background: rgba(255, 165, 0, 0.2) !important; // ?ъ슜???붿껌: ?ㅻ뜑? ?숈씪 ?ㅻ젋吏 ?щ챸
     background-color: rgba(255, 165, 0, 0.2) !important;
-    margin: 0 0 12px 0 !important; // 사용자 요청: divider는 section 전체 폭 사용
+    margin: 0 0 12px 0 !important; // ?ъ슜???붿껌: divider??section ?꾩껜 ???ъ슜
     width: 100% !important;
     padding: 0 !important;
   }
@@ -12062,22 +12526,22 @@
     justify-content: flex-end !important;
     visibility: visible !important;
     opacity: 1 !important;
-    transform: translateX(20px) !important; // 사용자 요청: 우측 1.5cm 이동 (레이아웃 영향 없음)
-    padding-left: 24px !important; // 사용자 요청: 타임스탬프는 원래 안쪽 위치 유지
+    transform: translateX(20px) !important; // ?ъ슜???붿껌: ?곗륫 1.5cm ?대룞 (?덉씠?꾩썐 ?곹뼢 ?놁쓬)
+    padding-left: 24px !important; // ?ъ슜???붿껌: ??꾩뒪?ы봽???먮옒 ?덉そ ?꾩튂 ?좎?
     padding-right: 24px !important;
 
     span {
       font-family: "Pretendard", sans-serif;
-      font-size: 13px !important; // 사용자 요청: 11 → 13 (+2pt)
+      font-size: 13px !important; // ?ъ슜???붿껌: 11 ??13 (+2pt)
       color: rgba(255, 255, 255, 0.4) !important;
       text-align: right;
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 키워드 태그(#힘 등) 위아래 여백 확보 (사용자 요청)
-  // TSX: <span className="tag tag--pink"> → .reputation-content-section > .tag
-  // ──────────────────────────────────────────────────────────────────────
+  // ??????????????????????????????????????????????????????????????????????
+  // ?ㅼ썙???쒓렇(#???? ?꾩븘???щ갚 ?뺣낫 (?ъ슜???붿껌)
+  // TSX: <span className="tag tag--pink"> ??.reputation-content-section > .tag
+  // ??????????????????????????????????????????????????????????????????????
   .reputation-content-section > .tag {
     margin-top: 16px !important;
     margin-bottom: 12px !important;

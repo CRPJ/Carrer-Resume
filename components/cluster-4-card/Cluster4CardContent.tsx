@@ -1603,6 +1603,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [colleagueSaveSuccess, setColleagueSaveSuccess] = useState(false);
   const [colleagueSaveError, setColleagueSaveError] = useState<string | null>(null);
 
+  // 연계 동료 편집 모달 — 1명 선택 + 코멘트 (자동완성 패턴)
+  const [colleagueEditData, setColleagueEditData] = useState<{ selectedColleague: any | null; content: string }>({
+    selectedColleague: null,
+    content: "",
+  });
+  const [colleagueSearchQuery, setColleagueSearchQuery] = useState<string>("");
+  const [colleagueFormSnapshot, setColleagueFormSnapshot] = useState<{ selectedColleague: any | null; content: string } | null>(null);
+  const [colleagueSaveAttemptFailed, setColleagueSaveAttemptFailed] = useState(false);
+  const [colleagueFieldErrorFlash, setColleagueFieldErrorFlash] = useState(false);
+
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
   const [selectedReputationCard, setSelectedReputationCard] = useState<any>(null);
@@ -2598,6 +2608,152 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return () => clearTimeout(timer);
   });
 
+  // ─── 연계 동료 편집 모달 — 한글 초성 매칭 + 자동완성 (스펙 작업 3) ───
+  const CHOSUNG_LIST = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+  const getInitialConsonant = (char: string): string => {
+    const code = char.charCodeAt(0) - 0xac00;
+    if (code < 0 || code > 11171) return char;
+    const idx = Math.floor(code / 588);
+    return CHOSUNG_LIST[idx];
+  };
+
+  // 스펙: 이름 startsWith + 마지막 글자가 자음이면 초성 매칭. 숫자 차단. 가나다 순. 최대 5개. 본인 및 이미 선택된 동료 제외.
+  const searchColleagueCandidates = (query: string, pool: any[]): any[] => {
+    const q = (query || "").trim();
+    if (!q) return [];
+    if (/^\d+$/.test(q)) return [];
+
+    const excludedIds = new Set(selectedColleagues.map((c) => c.id));
+
+    const filtered = pool.filter((crew) => {
+      if (!crew || !crew.name) return false;
+      if (excludedIds.has(crew.id)) return false;
+      const name: string = crew.name;
+      if (name.startsWith(q)) return true;
+      const lastChar = q[q.length - 1];
+      if (/[ㄱ-ㅎ]/.test(lastChar)) {
+        const prefix = q.slice(0, -1);
+        if (name.startsWith(prefix) && name.length > prefix.length) {
+          const nextChar = name[prefix.length];
+          if (getInitialConsonant(nextChar) === lastChar) return true;
+        }
+      }
+      return false;
+    });
+
+    return filtered.sort((a, b) => (a.name || "").localeCompare(b.name || "", "ko")).slice(0, 5);
+  };
+
+  const colleagueSearchResults = useMemo(
+    () => searchColleagueCandidates(colleagueSearchQuery, allCrewList),
+    [colleagueSearchQuery, allCrewList, selectedColleagues]
+  );
+
+  // 편집 모달 오픈 — 빈 상태로 초기화 + 스냅샷 캡처 + 크루 리스트 fetch
+  const handleOpenColleagueEdit = async () => {
+    setColleagueEditData({ selectedColleague: null, content: "" });
+    setColleagueSearchQuery("");
+    setColleagueSaveAttemptFailed(false);
+    setColleagueFormSnapshot({ selectedColleague: null, content: "" });
+    await fetchCrewListIfNeeded();
+    setHeaderModalType("본인");
+    setHeaderModalOpen(true);
+  };
+
+  const handleSelectColleagueCandidate = (crew: any) => {
+    setColleagueEditData((prev) => ({ ...prev, selectedColleague: crew }));
+    setColleagueSearchQuery("");
+    if (colleagueSaveAttemptFailed) setColleagueSaveAttemptFailed(false);
+  };
+
+  const handleDeselectColleague = () => {
+    setColleagueEditData((prev) => ({ ...prev, selectedColleague: null }));
+    setColleagueSearchQuery("");
+  };
+
+  const handleColleagueEditCancel = () => {
+    setHeaderModalOpen(false);
+  };
+
+  const handleColleagueEditReset = () => {
+    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    if (!ok) return;
+    if (colleagueFormSnapshot) {
+      setColleagueEditData(colleagueFormSnapshot);
+    } else {
+      setColleagueEditData({ selectedColleague: null, content: "" });
+    }
+    setColleagueSearchQuery("");
+    setColleagueSaveAttemptFailed(false);
+  };
+
+  const isColleagueEditFormValid = (): boolean => {
+    return !!colleagueEditData.selectedColleague && colleagueEditData.content.trim().length > 0;
+  };
+
+  const handleColleagueEditSave = async () => {
+    if (!isColleagueEditFormValid()) {
+      setColleagueSaveAttemptFailed(true);
+      setColleagueFieldErrorFlash(true);
+      setTimeout(() => setColleagueFieldErrorFlash(false), 600);
+      return;
+    }
+
+    const picked = colleagueEditData.selectedColleague!;
+    // 다음 rank 할당 (기존 selectedColleagues의 빈 rank 자리를 채움)
+    const usedRanks = new Set(selectedColleagues.map((c) => c.rank));
+    let nextRank = 1;
+    for (let r = 1; r <= 3; r++) {
+      if (!usedRanks.has(r)) {
+        nextRank = r;
+        break;
+      }
+    }
+
+    const newEntry = {
+      id: picked.id,
+      name: picked.name || "-",
+      gender: picked.gender || "-",
+      age: picked.age || "-",
+      profileImg: picked.profileImg || "",
+      university: picked.university || "-",
+      major: picked.major || "-",
+      team: picked.team || "-",
+      part: picked.part || "-",
+      nickname: picked.nickname || "-",
+      role: picked.role || "",
+      rank: nextRank,
+      message: colleagueEditData.content.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedList = [...selectedColleagues, newEntry].sort((a, b) => a.rank - b.rank);
+    setSelectedColleagues(updatedList);
+
+    if (isDemoMode) {
+      setHeaderModalOpen(false);
+      return;
+    }
+
+    setColleagueSaving(true);
+    try {
+      const payload = updatedList.map((c) => ({ colleagueId: c.id, rank: c.rank, message: c.message || "" }));
+      const res = await fetch("/api/weekly-colleagues", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
+      });
+      if (!res.ok) throw new Error("저장 실패");
+      setHeaderModalOpen(false);
+    } catch (err) {
+      console.error("연계 동료 저장 실패:", err);
+      window.alert("저장에 실패했습니다.");
+    } finally {
+      setColleagueSaving(false);
+    }
+  };
+
   // 동료 삭제 함수
   const removeColleague = (id: number) => {
     setSelectedColleagues((prev) => prev.filter((c) => c.id !== id));
@@ -3257,6 +3413,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       tagText: "#끈기와인내의결과물",
       isEmpty: false,
     },
+    {
+      id: "dummy-rep-4",
+      name: "최지우",
+      gender: "여",
+      age: 24,
+      profileImg: "/images/0/crew profile/여 2.jpg",
+      university: "연세대학교",
+      major: "경영학",
+      team: "전략기획",
+      part: "리서치",
+      nickname: "네번째슬롯",
+      role: "일반",
+      rating: 4,
+      ratingCount: "8 / 10",
+      description: "네번째 슬롯 테스트용 평판 코멘트입니다.",
+      fm: 30,
+      tagColor: "tag--purple",
+      tagText: "#꼼꼼함",
+      isEmpty: false,
+    },
   ];
 
   const reputationData = useMemo(() => {
@@ -3300,7 +3476,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               isEmpty: false,
             };
           })
-        : dummyReputations; // 데이터 없으면 더미 데이터 폴백
+        : (() => {
+            // 테스트용: ?admin=true&repCount=N (N: 0~4) — 데모 모드에서만 더미 개수 조절
+            if (isDemoMode && searchParams.get("admin") === "true") {
+              const raw = searchParams.get("repCount");
+              if (raw !== null) {
+                const n = Math.max(0, Math.min(4, parseInt(raw, 10) || 0));
+                return dummyReputations.slice(0, n);
+              }
+            }
+            return dummyReputations;
+          })(); // 데이터 없으면 더미 데이터 폴백
 
     // 작업 4: created_at 오름차순 정렬 (오래된 것이 1번 슬롯 → 가장 최신이 4번)
     // null/undefined createdAt는 Infinity로 취급해 뒤로 밀어냄 (안정 정렬로 원래 순서 보존)
@@ -3337,7 +3523,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     return result.slice(0, 4); // 최대 4개만 반환
-  }, [weeklyReputations]);
+  }, [weeklyReputations, isDemoMode, searchParams]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
   const filteredCrewData = allCrewList
@@ -4734,9 +4920,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       return;
                     }
                     handleEditClick(() => {
-                      setHeaderModalType("본인");
-                      setHeaderModalOpen(true);
-                      fetchCrewListIfNeeded();
+                      handleOpenColleagueEdit();
                     });
                   }}
                   style={{ cursor: "pointer", marginTop: "8px" }}
@@ -6375,175 +6559,146 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
+      {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) — 스펙: 1명 선택 + 코멘트 + Type B 푸터 ========== */}
       {headerModalOpen && headerModalType === "본인" && (
         <div className="section-modal-overlay">
           <div className="section-modal section-modal-colleague-edit">
+            {/* ── 헤더 (110px) ── */}
             <div className="section-modal-header">
-              <h3>연계 동료 편집</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                <h3>연계 동료</h3>
+              </div>
+              <p className="modal-subtitle">
+                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나 기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
+              </p>
+              <button className="modal-close-btn" onClick={handleColleagueEditCancel}>
+                <i className="ti ti-x"></i>
+              </button>
             </div>
-            <div className="section-modal-body">
-              <div className="modal-card-item modal-card-header-edit">
-                {/* 안내 문구 */}
-                <div className="header-edit-section colleague-guide">
-                  <div className="guide-text">
-                    <p>
-                      이번 주차 동안 클럽에서 성장하며,
-                      <br />
-                      <span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span>
-                    </p>
-                  </div>
-                </div>
 
-                {/* 연계 동료 선택 */}
-                <div className="header-edit-section">
-                  <div className="header-edit-title">
-                    연계 동료 선택 <span className="count-badge">{selectedColleagues.length} / 3</span>
-                  </div>
+            {/* ── 미드 (412px) ── */}
+            <div className="section-modal-body colleague-edit-body">
+              {/* 영역 1: 연계 동료 선택 (자동완성) */}
+              <div className="colleague-select-section">
+                <h4>
+                  ■ 연계 동료 <span className="required-mark">*</span>
+                </h4>
 
-                  {/* 선택된 동료 목록 */}
-                  <div className="selected-colleagues">
-                    {selectedColleagues.map((colleague, index) => (
-                      <div key={colleague.id} className="selected-colleague-card">
-                        <div className="colleague-header">
-                          <div className="to-badge">
-                            <span className="to-text">To.</span>
-                            <span className="rank-number">
-                              {colleague.rank}
-                              {colleague.rank === 1 ? "st" : colleague.rank === 2 ? "nd" : "rd"}
-                            </span>
-                          </div>
-                          <button className="remove-btn" title="삭제" onClick={() => removeColleague(colleague.id)}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M18 6L6 18M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="colleague-profile-row">
-                          <div className="colleague-avatar">{colleague.profileImg ? <img src={colleague.profileImg} alt={colleague.name} /> : <div className="profile-placeholder"></div>}</div>
-                          <div className="colleague-info">
-                            <div className="colleague-name">
-                              {colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세
-                            </div>
-                            <div className="colleague-details">
-                              {truncate(colleague.team)} 팀 | {truncate(colleague.part)} 파트 | {truncate(colleague.nickname)}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="colleague-message-section">
-                          <label>
-                            Thank you message <span className="char-limit">(최대 100자)</span>
-                          </label>
-                          <div className="message-input-wrapper">
-                            <textarea
-                              placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={100}
-                              rows={1}
-                              value={colleague.message}
-                              onChange={(e) => {
-                                if (e.target.value.length > 100) {
-                                  alert("최대 100자까지 입력할 수 있습니다.");
-                                  return;
-                                }
-                                updateColleagueMessage(colleague.id, e.target.value);
-                              }}
-                            ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 100</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* 추가 버튼 (3명 미만일 때만 표시) */}
-                    {selectedColleagues.length < 3 && (
-                      <div className="add-colleague-card">
-                        <div className="add-colleague-placeholder">
-                          <div className="add-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M12 5v14M5 12h14" />
-                            </svg>
-                          </div>
-                          <span>아래에서 크루를 검색하고 추가하세요</span>
-                          <span className="add-sublabel">{3 - selectedColleagues.length}명 추가 가능</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 크루 검색 섹션 */}
-                <div className="header-edit-section">
-                  <div className="header-edit-title with-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="title-icon">
-                      <circle cx="11" cy="11" r="8" />
-                      <path d="M21 21l-4.35-4.35" />
-                    </svg>
-                    크루 검색
-                  </div>
-                  <div className="header-edit-row">
-                    <div className="edit-field full-width">
-                      <div className="search-input-wrapper">
-                        <input type="text" placeholder="크루 이름 또는 닉네임으로 검색..." value={crewSearchQuery} onChange={(e) => setCrewSearchQuery(e.target.value)} />
-                        <button className="search-btn">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="M21 21l-4.35-4.35" />
-                          </svg>
-                        </button>
-                      </div>
+                {/* B 영역: 선택 결과 (상단) */}
+                {colleagueEditData.selectedColleague ? (
+                  <div className={`selected-colleague ${colleagueSaveAttemptFailed && !colleagueEditData.selectedColleague ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
+                    <div className="crew-info">
+                      <span className="crew-number">No.{colleagueEditData.selectedColleague.number ?? colleagueEditData.selectedColleague.id}</span>
+                      <span className="crew-divider">|</span>
+                      <span className="crew-name">{colleagueEditData.selectedColleague.name || "-"}</span>
+                      <span className="crew-divider">|</span>
+                      <span className="crew-team">{colleagueEditData.selectedColleague.team || "-"}</span>
                     </div>
+                    <button className="btn-deselect" title="선택 해제" onClick={handleDeselectColleague}>
+                      <i className="ti ti-x"></i>
+                    </button>
                   </div>
+                ) : (
+                  <div className={`selected-colleague-empty ${colleagueSaveAttemptFailed ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
+                    아직 선택된 크루가 없습니다.
+                  </div>
+                )}
 
-                  {/* 검색 결과 목록 */}
-                  <div className="crew-search-results">
-                    {filteredCrewData.length === 0 ? (
-                      <div className="no-results">{selectedColleagues.length >= 3 ? "최대 3명까지만 선택 가능합니다." : "검색 결과가 없습니다."}</div>
-                    ) : (
-                      filteredCrewData.map((user) => (
-                        <div key={user.id} className="crew-search-item">
-                          <div className="crew-profile">
-                            <div className="crew-avatar">{user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
+                {/* A 영역: 검색 + 후보 (선택 전에만) */}
+                {!colleagueEditData.selectedColleague && (
+                  <>
+                    <div className="search-input-wrapper">
+                      <input
+                        type="text"
+                        className="search-input"
+                        value={colleagueSearchQuery}
+                        onChange={(e) => setColleagueSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && colleagueSearchResults.length > 0) {
+                            e.preventDefault();
+                            handleSelectColleagueCandidate(colleagueSearchResults[0]);
+                          }
+                        }}
+                        placeholder="크루 이름을 입력하세요 (예: 김, 김ㅎ)"
+                        autoFocus
+                      />
+                      <i className="ti ti-search search-icon"></i>
+                    </div>
+
+                    {colleagueSearchResults.length > 0 && (
+                      <div className="search-results">
+                        {colleagueSearchResults.map((crew) => (
+                          <div key={crew.id} className="search-result-item">
                             <div className="crew-info">
-                              <div className="crew-name">
-                                {user.name} | {user.gender} | {mask.age(user.age)}세
-                              </div>
-                              <div className="crew-details">
-                                {truncate(user.team)} 팀 | {truncate(user.part)} 파트 | {truncate(user.nickname)}
-                              </div>
+                              <span className="crew-number">No.{crew.number ?? crew.id}</span>
+                              <span className="crew-divider">|</span>
+                              <span className="crew-name">{crew.name || "-"}</span>
+                              <span className="crew-divider">|</span>
+                              <span className="crew-team">{crew.team || "-"}</span>
                             </div>
-                          </div>
-                          <div className="rank-select-buttons">
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 1) ? "disabled" : ""}`} title="1순위로 선택" onClick={() => addColleague(user, 1)} disabled={!!selectedColleagues.find((c) => c.rank === 1) || selectedColleagues.length >= 3}>
-                              1st
-                            </button>
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 2) ? "disabled" : ""}`} title="2순위로 선택" onClick={() => addColleague(user, 2)} disabled={!!selectedColleagues.find((c) => c.rank === 2) || selectedColleagues.length >= 3}>
-                              2nd
-                            </button>
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 3) ? "disabled" : ""}`} title="3순위로 선택" onClick={() => addColleague(user, 3)} disabled={!!selectedColleagues.find((c) => c.rank === 3) || selectedColleagues.length >= 3}>
-                              3rd
+                            <button className="btn-select" title="이 크루 선택" onClick={() => handleSelectColleagueCandidate(crew)}>
+                              <i className="ti ti-check"></i>
                             </button>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     )}
-                  </div>
+
+                    {colleagueSearchQuery.trim() && colleagueSearchResults.length === 0 && (
+                      <div className="search-no-results">일치하는 크루가 없습니다.</div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* 영역 2: 코멘트 작성 */}
+              <div className="colleague-content-section">
+                <h4>
+                  ■ 연계 내용 <span className="required-mark">*</span>
+                </h4>
+                <div className="content-wrapper">
+                  <textarea
+                    className={`content-textarea ${colleagueSaveAttemptFailed && !colleagueEditData.content.trim() ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}
+                    value={colleagueEditData.content}
+                    onChange={(e) => {
+                      setColleagueEditData((prev) => ({ ...prev, content: e.target.value.slice(0, 100) }));
+                      if (colleagueSaveAttemptFailed) setColleagueSaveAttemptFailed(false);
+                    }}
+                    placeholder="연계 동료에게 전하고 싶은 말을 100자 이내로 작성해주세요."
+                    maxLength={100}
+                  />
+                  <div className="char-count">{colleagueEditData.content.length}/100</div>
                 </div>
               </div>
             </div>
+
+            {/* ── 푸터 (118px) Type B ── */}
             <div className="section-modal-footer">
-              <button
-                className="cancel-btn"
-                onClick={() => {
-                  setHeaderModalOpen(false);
-                  setColleagueSaveError(null);
-                  setColleagueSaveSuccess(false);
-                }}
-              >
-                취소
-              </button>
-              <button className="save-btn" onClick={saveWeeklyColleagues} disabled={colleagueSaving || colleagueSaveSuccess}>
-                {colleagueSaving ? "저장 중..." : "저장"}
-              </button>
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  <button className="modal-cancel-btn" onClick={handleColleagueEditCancel}>
+                    취소
+                  </button>
+                  <button className="modal-reset-btn" onClick={handleColleagueEditReset}>
+                    초기화
+                  </button>
+                  <button className="modal-save-btn" onClick={handleColleagueEditSave} disabled={colleagueSaving}>
+                    {colleagueSaving ? "저장 중..." : "저장"}
+                  </button>
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <span
+                  className={`modal-notice ${colleagueSaveAttemptFailed ? "notice-error" : ""}`}
+                  style={{ visibility: colleagueSaveAttemptFailed ? "visible" : "hidden" }}
+                >
+                  필수 사항이 누락되었어요! 확인 부탁드려요! 😊
+                </span>
+              </div>
             </div>
           </div>
         </div>
