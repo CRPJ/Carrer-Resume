@@ -2887,8 +2887,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   };
 
-  // 저장 — 사용자 요청: 클릭 시 바로 검증 → 실패 시 안내문 + 필드 하이라이트 표시
-  const handleFormSave = () => {
+  // 저장 — 작업 2: 저장 → view 데이터 갱신 → 리스트 재조회 → 편집 진입 경로면 view 복귀
+  const handleFormSave = async () => {
     if (!isFormValid()) {
       setSaveAttemptFailed(true);
       setFieldErrorFlash(true);
@@ -2896,69 +2896,81 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     setSaveAttemptFailed(false);
-    saveWeeklyReputation();
+
+    // 편집 진입 경로 여부 — view에서 [수정] 클릭 시 selectedReputationCard 유지됨, 신규 진입 시 null
+    const wasEditEntry = !!selectedReputationCard;
+
+    const saved = await saveWeeklyReputation();
+    if (!saved) return; // 저장 실패 — 폼 유지
+
+    // 편집 진입 경로에서만 view 데이터 즉시 갱신 (reputationData useMemo 재계산 전 낙관적 업데이트)
+    if (wasEditEntry && selectedReputationCard) {
+      setSelectedReputationCard({
+        ...selectedReputationCard,
+        rating: reputationEditData.rating / 2, // 10점 만점 → 5점 만점 역변환 (별 표시용)
+        ratingCount: `${reputationEditData.rating} / 10`,
+        description: reputationEditData.content,
+        tagText: `#${reputationEditData.keyword}`,
+        createdAt: saved.created_at || selectedReputationCard.createdAt,
+      });
+    }
+
+    // 일반 모드: DB 재조회로 reputation-section 최신화 (데모는 saveWeeklyReputation에서 이미 로컬 append)
+    if (!isDemoMode) {
+      await fetchWeeklyReputations();
+    }
+
+    // 스냅샷 업데이트 — 저장 직후 isDirty false 보장
+    setFormSnapshot({
+      rating: reputationEditData.rating,
+      content: reputationEditData.content,
+      keyword: reputationEditData.keyword,
+    });
+
+    alert("저장되었습니다.");
+    setHeaderModalOpen(false);
+
+    if (wasEditEntry) {
+      // 편집 진입 경로: 갱신된 데이터로 view 모달 재오픈 (사용자가 결과 확인)
+      setReputationViewModalOpen(true);
+    } else {
+      // 신규 작성 경로: 폼 데이터 리셋
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
   };
 
-  // 주차 평판 저장 함수
-  const saveWeeklyReputation = async () => {
+  // 주차 평판 저장 함수 — 작업 2: 결과 반환 형태로 리팩토링 (post-save 처리는 handleFormSave에서)
+  // 성공 시 { id, created_at } 반환, 실패 시 null. 모달/폼 상태 변경은 호출부에서 담당.
+  const saveWeeklyReputation = async (): Promise<{ id: string; created_at: string } | null> => {
     if (isDemoMode) {
-      // weeklyReputations에 새 평판 추가 (UI 즉시 반영)
-      setWeeklyReputations((prev) => [
-        ...prev,
-        {
-          id: `demo-${Date.now()}`,
-          rating: reputationEditData.rating,
-          content: reputationEditData.content.trim(),
-          keyword: reputationEditData.keyword,
-          reviewer: {
-            display_name: session?.user?.name || "데모 유저",
-            gender: "-",
-            birth_date: null,
-            profile_photo_url: session?.user?.image || "",
-            university: "-",
-            major_first: "-",
-            teamName: "-",
-            partName: "-",
-            vision: "-",
-            role: "",
-          },
+      const now = new Date().toISOString();
+      const demoId = `demo-${Date.now()}`;
+      const newRecord = {
+        id: demoId,
+        rating: reputationEditData.rating,
+        content: reputationEditData.content.trim(),
+        keyword: reputationEditData.keyword,
+        created_at: now,
+        reviewer: {
+          display_name: session?.user?.name || "데모 유저",
+          gender: "-",
+          birth_date: null,
+          profile_photo_url: session?.user?.image || "",
+          university: "-",
+          major_first: "-",
+          teamName: "-",
+          partName: "-",
+          vision: "-",
+          role: "",
         },
-      ]);
-      alert("저장되었습니다.");
-      setHeaderModalOpen(false);
-      setReputationEditData({ rating: 0, content: "", keyword: "" });
-      return;
+      };
+      setWeeklyReputations((prev) => [...prev, newRecord]);
+      return { id: demoId, created_at: now };
     }
+
     if (!urlUserId || !weekId) {
       alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
-      return;
-    }
-
-    if (reputationEditData.rating === 0) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(1)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-
-    if (!reputationEditData.content.trim()) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(2)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-
-    if (!reputationEditData.keyword) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(3)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
+      return null;
     }
 
     setReputationSaving(true);
@@ -2979,20 +2991,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
 
       const json = await res.json();
-
       if (!res.ok) {
         alert(json.error || "저장에 실패했습니다.");
-        return;
+        return null;
       }
-
-      // 주차 평판 데이터 새로고침
-      fetchWeeklyReputations();
-      alert("저장되었습니다.");
-      setHeaderModalOpen(false);
-      setReputationEditData({ rating: 0, content: "", keyword: "" });
+      setReputationSaveSuccess(true);
+      return {
+        id: json.data?.id || "",
+        created_at: json.data?.created_at || new Date().toISOString(),
+      };
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
+      setReputationSaveError((error as Error)?.message || "서버 오류");
       alert("서버 오류가 발생했습니다.");
+      return null;
     } finally {
       setReputationSaving(false);
     }
@@ -4303,6 +4315,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   setSelectedKeywordTemp("");
                   setIsReputationFormEditing(false); // 사용자 요청: 기본 보기 모드 ([수정] 버튼 표시)
                   setSaveAttemptFailed(false);
+                  setSelectedReputationCard(null); // 신규 작성 경로 — 편집 경로와 구분
                   fetchCrewListIfNeeded();
                   fetchKeywordsIfNeeded();
                 });
