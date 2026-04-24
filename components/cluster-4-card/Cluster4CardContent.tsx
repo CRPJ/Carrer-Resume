@@ -1492,6 +1492,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [colleagueViewModalOpen, setColleagueViewModalOpen] = useState(false);
   const [selectedColleagueCard, setSelectedColleagueCard] = useState<any>(null);
   const [selectedColleagueIndex, setSelectedColleagueIndex] = useState<number>(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDeleteColleague = async () => {
+    // TODO: [백엔드 작업 필요] 연계동료 삭제 API 호출
+    // await deleteColleague(selectedColleagueCard.id);
+    setShowDeleteConfirm(false);
+    setColleagueViewModalOpen(false);
+  };
 
   // 실무 정보 카드 상세보기 모달 상태
   const [workInfoViewModalOpen, setWorkInfoViewModalOpen] = useState(false);
@@ -2966,6 +2974,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         role: "",
         date: "-",
         message: "",
+        created_at: null as string | null,
         isEmpty: true,
       }));
     }
@@ -2987,6 +2996,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             role: c.role || "일반",
             date: c.createdAt ? formatDate(c.createdAt) : "-",
             message: c.message || "",
+            created_at: c.createdAt || null, // 작업 6에서 reputation-timestamp 표시용
             isEmpty: false,
           }))
         : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
@@ -3008,6 +3018,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         role: "",
         date: "-",
         message: "",
+        created_at: null,
         isEmpty: true,
       });
     }
@@ -6333,14 +6344,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 연계 동료 카드 상세보기 모달 ========== */}
+      {/* ========== 연계 동료 카드 상세보기 모달 — 세로형_중 540×640, 보기 전용 ========== */}
       {colleagueViewModalOpen && selectedColleagueCard && (
         <div className="section-modal-overlay">
           <div className="section-modal colleague-view-modal">
+            {/* ── 헤더 (110px) — reputation-view-modal 패턴 준용 ── */}
             <div className="section-modal-header">
-              <h3>연계 동료</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                <h3>연계 동료</h3>
+              </div>
+              <p className="modal-subtitle">저와 함께한 동료입니다. 😊</p>
+              <button className="modal-delete-btn" onClick={() => setShowDeleteConfirm(true)}>
+                삭제
+              </button>
               <button className="modal-close-btn" onClick={() => setColleagueViewModalOpen(false)}>
-                ×
+                <i className="ti ti-x"></i>
               </button>
             </div>
             <div className="section-modal-body">
@@ -6383,6 +6402,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="message-content">{selectedColleagueCard.message}</div>
               </div>
             </div>
+
+            {/* 삭제 확인 팝업 */}
+            {showDeleteConfirm && (
+              <div className="confirm-popup-overlay">
+                <div className="confirm-popup">
+                  <p>연계동료를 삭제하시겠습니까?</p>
+                  <div className="popup-buttons">
+                    <button onClick={() => setShowDeleteConfirm(false)}>취소</button>
+                    <button className="btn-danger" onClick={handleDeleteColleague}>확인</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
