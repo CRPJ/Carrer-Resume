@@ -502,6 +502,8 @@ const Cluster3Content = () => {
   const [portfolioArchiveChannels, setPortfolioArchiveChannels] = useState<string[]>(["instagram", "youtube", "blog", "tistory", "twitter", "threads", "tiktok", "behance", "etc", "etc"]);
   const [editingArchiveChannels, setEditingArchiveChannels] = useState<string[]>([]);
   const [isSavingArchives, setIsSavingArchives] = useState(false);
+  // 채널 카드 16개 풀 데이터 저장 (cluster-3 Channel 모달)
+  const [isSavingChannelCard, setIsSavingChannelCard] = useState(false);
 
   // 포트폴리오 Output 데이터 (DB 저장용)
   const [portfolioOutputs, setPortfolioOutputs] = useState<string[]>(Array(5).fill(""));
@@ -579,6 +581,142 @@ const Cluster3Content = () => {
 
     fetchPortfolioArchives();
   }, [session?.user?.email]);
+
+  // 채널 카드 16개 풀 데이터 로드 (portfolio_channel_cards 테이블)
+  // 저장된 카드만 응답에 포함되며, 미저장 카드는 default(1번=샘플, 2~16=빈) 그대로 유지
+  useEffect(() => {
+    if (isDemoMode) return;
+    const fetchChannelCards = async () => {
+      try {
+        const url = urlUserId
+          ? `/api/portfolio-channel-cards?userId=${urlUserId}`
+          : "/api/portfolio-channel-cards";
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const result = await response.json();
+        if (!result?.success || !Array.isArray(result.cards) || result.cards.length === 0) return;
+
+        // cardIndex(1~16) → 응답 카드 매핑
+        const byIndex = new Map<number, any>();
+        for (const c of result.cards) byIndex.set(Number(c.cardIndex), c);
+
+        setChannelCards((prev) =>
+          prev.map((card, i) => {
+            const saved = byIndex.get(i + 1);
+            if (!saved) return card;
+            return {
+              ...card,
+              channelName: saved.channelName ?? "",
+              platform: saved.platform ?? "",
+              management: saved.management ?? "",
+              startYear: saved.startYear ?? "",
+              startMonth: saved.startMonth ?? "",
+              startDay: saved.startDay ?? "",
+              rating: saved.rating ?? "",
+              status: saved.status ?? "",
+              link: saved.link ?? "",
+              images: Array.isArray(saved.images) ? saved.images : card.images,
+              insight: saved.insight ?? "",
+              experience: saved.experience ?? "",
+              metrics: saved.metrics ?? "",
+            };
+          })
+        );
+      } catch (error) {
+        console.error("채널 카드 로드 오류:", error);
+      }
+    };
+    fetchChannelCards();
+  }, [session?.user?.email, urlUserId, isDemoMode]);
+
+  // 채널 카드 저장: blob URL 이미지 업로드 → 카드 PUT
+  // 성공 시 업로드된 URL이 반영된 카드 객체 반환, 실패 시 null
+  const saveChannelCard = async (cardIndex: number, card: any): Promise<any | null> => {
+    if (isDemoMode) {
+      return card;
+    }
+    setIsSavingChannelCard(true);
+    try {
+      // 이미지 5칸 중 blob: URL은 업로드 후 public URL로 교체, 기존 URL은 유지
+      const rawImages: (string | null)[] = Array.isArray(card.images) ? card.images.slice(0, 5) : [];
+      while (rawImages.length < 5) rawImages.push(null);
+
+      const uploadedImages: (string | null)[] = [];
+      for (let slot = 0; slot < 5; slot++) {
+        const img = rawImages[slot];
+        if (!img) {
+          uploadedImages.push(null);
+          continue;
+        }
+        if (typeof img === "string" && img.startsWith("blob:")) {
+          try {
+            const blob = await fetch(img).then((r) => r.blob());
+            const mime = blob.type || "image/jpeg";
+            const ext = mime.split("/")[1] || "jpg";
+            const file = new File([blob], `slot-${slot}.${ext}`, { type: mime });
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("cardIndex", String(cardIndex));
+            fd.append("slotIndex", String(slot));
+            const uploadRes = await fetch(apiUrl("/api/portfolio-channel-cards/upload"), {
+              method: "POST",
+              body: fd,
+            });
+            const uploadJson = await uploadRes.json();
+            if (!uploadRes.ok) throw new Error(uploadJson?.error || "이미지 업로드 실패");
+            uploadedImages.push(uploadJson.url);
+          } catch (e) {
+            console.error(`slot-${slot} 업로드 오류:`, e);
+            throw e;
+          }
+        } else {
+          // 이미 저장된 public URL 또는 default 경로
+          uploadedImages.push(img);
+        }
+      }
+
+      const putRes = await fetch(apiUrl("/api/portfolio-channel-cards"), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cardIndex,
+          channelName: card.channelName ?? "",
+          platform: card.platform ?? "",
+          management: card.management ?? "",
+          startYear: card.startYear ?? "",
+          startMonth: card.startMonth ?? "",
+          startDay: card.startDay ?? "",
+          rating: card.rating ?? "",
+          status: card.status ?? "",
+          link: card.link ?? "",
+          images: uploadedImages,
+          insight: card.insight ?? "",
+          experience: card.experience ?? "",
+          metrics: card.metrics ?? "",
+        }),
+      });
+      const putJson = await putRes.json();
+      if (!putRes.ok) {
+        console.error("카드 저장 실패:", putJson);
+        alert(putJson?.error || "저장에 실패했습니다.");
+        return null;
+      }
+
+      const finalCard = { ...card, images: uploadedImages };
+      setChannelCards((prev) => {
+        const next = [...prev];
+        next[cardIndex - 1] = { ...prev[cardIndex - 1], ...finalCard };
+        return next;
+      });
+      return finalCard;
+    } catch (e) {
+      console.error("채널 카드 저장 오류:", e);
+      alert(e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.");
+      return null;
+    } finally {
+      setIsSavingChannelCard(false);
+    }
+  };
 
   // 포트폴리오 아카이빙 저장 함수
   const savePortfolioArchives = async (links: string[], channels: string[]) => {
@@ -2205,7 +2343,7 @@ const Cluster3Content = () => {
                   <div className="card-info">
                     <div className="info-row">
                       <div className="info-author">
-                        {card.platform && PLATFORM_ICONS[card.platform] ? <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className={`sns-icon`} /> : <img src={snsImage} alt="SNS" className={`sns-icon${isEtcIcon ? " sns-icon-etc" : ""}`} />}
+                        {card.platform && PLATFORM_ICONS[card.platform] && <img src={PLATFORM_ICONS[card.platform]} alt={card.platform} className={`sns-icon`} />}
                         <div className="author-text">
                           <span className="info-label">Created by:</span>
                           <span className="author-name">{engName || "Unknown"}</span>
@@ -2217,7 +2355,7 @@ const Cluster3Content = () => {
                       {card.management ? <span className={`management-tag ${card.management === "개인 소유 관리" ? "tag--yellow" : card.management === "팀 소속 협업" ? "tag--red" : "tag--blue"}`}>#{card.management}</span> : <span className="info-label">Growth Bid</span>}
                       <div className="info-price">
                         <img src="/images/0/cluster 3/icon/dia.png" alt="dia" className="dia-icon" />
-                        <span className="price-value">{card.rating ? `${card.rating}/10` : "0.99"}</span>
+                        <span className="price-value">{card.rating ? `${card.rating}/10` : "- / 10"}</span>
                       </div>
                     </div>
                   </div>
@@ -2474,7 +2612,7 @@ const Cluster3Content = () => {
               </button>
               <div className="modal-header-top">
                 <img src="/images/0/write.png" alt="write" style={{ width: "72px", height: "72px", objectFit: "contain" }} />
-                <h3>Portfolio Output Top 5 [{currentCardIndex + 1}]</h3>
+                <h3>Portfolio Channel [{currentCardIndex + 1}]</h3>
               </div>
               {isEditMode && (
                 <p className="modal-subtitle">
@@ -2765,7 +2903,8 @@ const Cluster3Content = () => {
                       </button>
                       <button
                         className="modal-save-btn"
-                        onClick={() => {
+                        disabled={isSavingChannelCard}
+                        onClick={async () => {
                           const card = channelCards[currentCardIndex];
                           const missing: string[] = [];
                           if (!card.channelName?.trim()) missing.push("channelName");
@@ -2793,18 +2932,35 @@ const Cluster3Content = () => {
                           }
 
                           if (!window.confirm("저장하시겠습니까?")) return;
+
+                          // 빈 슬롯 뒤로 정렬
                           const compactImages = (card.images || []).filter((img) => img !== null);
                           const reorderedImages = [...compactImages, ...Array(5 - compactImages.length).fill(null)];
-                          const updated = [...channelCards];
-                          updated[currentCardIndex] = { ...card, images: reorderedImages };
-                          setChannelCards(updated);
+                          const cardToSave = { ...card, images: reorderedImages };
+
+                          if (isDemoMode) {
+                            const updated = [...channelCards];
+                            updated[currentCardIndex] = cardToSave;
+                            setChannelCards(updated);
+                            alert("저장되었어요!");
+                            setCardSnapshot(JSON.parse(JSON.stringify(updated[currentCardIndex])));
+                            setIsEditMode(false);
+                            setSection3FooterNotice("default");
+                            return;
+                          }
+
+                          const finalCard = await saveChannelCard(currentCardIndex + 1, cardToSave);
+                          if (!finalCard) return;
+
+                          // saveChannelCard 내부에서 channelCards가 이미 갱신됨 (업로드된 URL 반영)
+                          // 스냅샷에는 동일한 finalCard를 동기화
+                          setCardSnapshot(JSON.parse(JSON.stringify({ ...channelCards[currentCardIndex], ...finalCard })));
                           alert("저장되었어요!");
-                          setCardSnapshot(JSON.parse(JSON.stringify(updated[currentCardIndex])));
                           setIsEditMode(false);
                           setSection3FooterNotice("default");
                         }}
                       >
-                        저장
+                        {isSavingChannelCard ? "저장 중..." : "저장"}
                       </button>
                     </>
                   )}
