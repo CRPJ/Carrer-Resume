@@ -1623,6 +1623,36 @@ svg {
   -webkit-backdrop-filter: none !important;
 }
 
+// ★ Zone A (<1920): 모달 오버레이 내부 가로 스크롤
+// position:fixed 유지(화면 고정) + 오버레이 자체를 가로 스크롤 컨테이너로 사용.
+// 모달 본문이 오버레이 폭을 초과하면 오버레이 안에서 자연스럽게 스크롤 발생.
+// (Zone B/C는 본 미디어쿼리에 매칭되지 않음 → 영향 없음)
+// cluster2/cluster3의 기존 개별 Zone A 미디어쿼리는 중복이지만 회귀 위험으로 유지.
+@media (max-width: 1919px) {
+  [class*="modal-overlay"] {
+    // position/width/height는 기존값(fixed, 100%, 100%/100vh) 유지 — 건드리지 않음
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    display: block !important;     // flex → block (내부 콘텐츠가 오버레이 폭 초과 가능)
+  }
+
+  // .modal-scroll-content 래퍼가 있는 모달(cluster2/3) — 래퍼가 1920 폭 + flex center 담당
+  [class*="modal-overlay"] > .modal-scroll-content {
+    min-width: 1920px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  // .modal-scroll-content 래퍼가 없는 모달(cluster4, Sidebar 등)
+  // 모달 본문 자체에 flex-shrink: 0 → 오버레이 폭에 맞춰 축소되지 않게
+  [class*="modal-overlay"] > [class*="-modal"]:not(.modal-scroll-content) {
+    flex-shrink: 0;
+  }
+}
+
 /* ====
  --------- (2.04) global modal styles end ---------
  ==== */

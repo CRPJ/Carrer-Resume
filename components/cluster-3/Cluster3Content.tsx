@@ -2170,22 +2170,15 @@ const Cluster3Content = () => {
               snsImage = snsIconOrder[cardIndex] || snsIconOrder[snsIconOrder.length - 1];
             }
             const isEtcIcon = snsImage.includes("etc");
-            if (!isUnlocked) {
-              return (
-                <div key={card.id} className="channel-card locked">
-                  <div className="card-locked-placeholder">
-                    <i className="ti ti-lock"></i>
-                    <span>이전 카드를 먼저 완성해주세요</span>
-                  </div>
-                </div>
-              );
-            }
+            const isLocked = !isUnlocked;
+            const isComplete = isCardComplete(card);
             return (
               <div
                 key={card.id}
-                className={`channel-card${card.link ? " has-link" : ""}`}
-                style={{ cursor: "pointer" }}
+                className={`channel-card${card.link ? " has-link" : ""}${isLocked ? " locked" : ""}`}
+                style={{ cursor: isLocked ? "not-allowed" : "pointer", opacity: !isComplete ? 0.4 : 1 }}
                 onClick={() => {
+                  if (isLocked) return;
                   setCurrentCardIndex(actualIndex);
                   setSection3ModalOpen(true);
                 }}
@@ -2474,7 +2467,7 @@ const Cluster3Content = () => {
       {section3ModalOpen && (
         <div className="section-modal-overlay">
           <div className="modal-scroll-content">
-          <div className="section-modal">
+          <div className={`section-modal${!isEditMode && (() => { const c = channelCards[currentCardIndex]; if (!c) return false; return !c.channelName?.trim() && !c.platform && !c.management && !c.startYear && !c.rating && !c.status && !c.link?.trim() && (c.images || []).filter((img) => img).length === 0 && !c.insight?.trim() && !c.experience?.trim() && !c.metrics?.trim(); })() ? " modal-dimmed" : ""}`}>
             <div className="section-modal-header">
               <button className="modal-close-btn" onClick={handleCloseModal}>
                 <i className="ti ti-x"></i>
@@ -2581,7 +2574,7 @@ const Cluster3Content = () => {
                             {isEditMode && (
                               <div className="custom-dropdown small">
                                 <div className="dropdown-selected" onClick={(e) => toggleDropdown("rating", e)}>
-                                  <span>{card.rating || "선택"}</span>
+                                  <span>{card.rating || "-"}</span>
                                   <i className="ti ti-chevron-down"></i>
                                 </div>
                               </div>

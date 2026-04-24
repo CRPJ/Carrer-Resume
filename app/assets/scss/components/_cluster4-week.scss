@@ -3109,6 +3109,14 @@
         }
       }
 
+      .work-ability-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 920px;
+        max-width: 100%;
+      }
+
       .work-ability-card {
         position: relative;
         background: #232323;
@@ -5850,328 +5858,434 @@
       }
     }
 
-    // 주차 평판 상세보기 모달
+    // 주차 평판 상세보기 모달 — 가로형_중 979×570, 보기 전용, 푸터 없음
+    // 공유 셀렉터(.workinfo-view-modal, .workexp-view-modal…) 추가 안 함 — 979×570 vs 1468×855 충돌 방지
+    // 인적사항은 .workinfo-personal-card 클래스 재사용 (이 블록 내부에 독립 선언)
     &.reputation-view-modal {
-      width: 540px;
-      height: 640px;
-      max-height: 640px;
+      width: 979px !important;
+      max-width: 979px !important;
+      height: 570px !important;
+      max-height: 570px !important;
+      display: flex;
+      flex-direction: column;
 
+      // ── 헤더 (110px) — cluster3/workInfo 패턴 ──
       .section-modal-header {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        height: auto;
+        min-height: 110px;
+        max-height: none;
+        padding: 8px 24px 16px;
+        position: relative;
+        overflow: visible;
+        border-bottom: none;
+        background: transparent;
 
-        .header-right {
+        .modal-header-top {
           display: flex;
-          align-items: flex-end;
-          align-self: flex-start;
-          margin-top: 16px;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-items: center;
           gap: 8px;
-          flex-shrink: 0;
+          width: 100%;
 
-          * {
-            transition: none !important;
-            animation: none !important;
+          img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            flex-shrink: 0;
           }
 
-          .intro-edit-btn {
-            padding: 6px 14px;
-            background: #faab07;
-            border: none;
-            color: #000;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            &:hover {
-              background: #ffa500;
-            }
+          h3 {
+            font-family: "Pretendard", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #faab07;
+            margin: 0;
           }
+        }
 
-          .cancel-edit-btn {
-            padding: 6px 14px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #999;
-            font-size: 0.875rem;
-            cursor: pointer;
-            white-space: nowrap;
-            &:hover {
-              border-color: #fff;
-              color: #fff;
-            }
-          }
-
-          .save-edit-btn {
-            padding: 6px 14px;
-            background: #ffa500;
-            border: none;
-            color: #000;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            &:hover {
-              box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
-            }
-          }
-
-          .modal-close-btn {
-            align-self: auto !important;
-            margin-top: 0 !important;
-          }
+        .modal-subtitle {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.6);
+          margin: 4px 67px 0 80px; // 좌 80(아이콘+gap) / 우 67(close-btn 영역)
+          max-width: calc(100% - 147px);
+          min-width: 0;
+          white-space: normal !important;
+          overflow-wrap: break-word !important;
+          word-break: normal !important;
+          overflow: visible !important;
+          text-overflow: unset !important;
+          box-sizing: border-box !important;
+          transform: translateX(-95px);
         }
 
         .modal-close-btn {
-          background: none;
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: transparent;
           border: none;
           color: rgba(255, 255, 255, 0.6);
-          font-size: 2rem;
           cursor: pointer;
-          padding: 0;
+          padding: 4px;
           line-height: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          align-self: flex-start;
-          margin-top: 16px;
+
+          i {
+            font-size: 20px;
+          }
 
           &:hover {
-            color: #fff;
+            color: #faab07;
           }
         }
       }
 
-      .section-modal-body {
-        padding: 24px;
+      // ── 미드 (460px) — 1열 세로 배치 ──
+      .section-modal-body.reputation-body {
+        height: auto;
+        min-height: 0;
+        flex: 1 1 auto;
+        padding: 16px 24px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
+        overflow-y: auto;
+        box-sizing: border-box;
       }
 
-      .reputation-view-profile {
+      // ── 인적사항 카드 — L9014 공유 셀렉터 스타일 복제 (reputation 독립 스코프) ──
+      .workinfo-personal-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 7px 12px;
+        flex-shrink: 0;
         display: flex;
-        align-items: center;
-        gap: 14px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        align-items: center; // 인적사항 전체 세로 중앙 정렬
 
-        .profile-image {
-          width: 60px;
-          height: 60px;
+        .personal-grid {
+          width: 100%;
+          display: grid;
+          grid-template-columns: auto 1fr; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
+          grid-template-rows: auto;
+          gap: 3px 12px;
+          align-items: center; // 그리드 각 셀도 세로 중앙 정렬
+        }
+
+        .personal-photo {
+          grid-column: 1;
+          grid-row: 1;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
-          background: #ccc;
+          align-self: center;
 
           img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-          }
-
-          .profile-placeholder {
-            width: 100%;
-            height: 100%;
-            background: #ccc;
+            display: block;
           }
         }
 
-        .profile-info {
-          flex: 1;
+        .personal-info {
+          grid-column: 2;
+          grid-row: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+
+        .personal-row-1,
+        .personal-row-2,
+        .personal-row-3 {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px !important; // 인적사항 본문 pt 통일
+          line-height: 1.14;
+          color: #ddd;
+          min-width: 0;
+        }
+
+        // row-1 안에 태그 가로 배치 — 우측 정렬
+        .personal-row-1 {
+          display: flex !important;
+          align-items: center !important;
+          gap: 8px;
+
+          .personal-tags {
+            margin-left: auto !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px !important;
+            flex-shrink: 0;
+          }
+        }
+
+        .personal-row-2,
+        .personal-row-3 {
+          display: grid;
+          grid-template-columns: minmax(0, 160px) 40px 20px minmax(0, 160px) 40px;
+          align-items: center;
+          column-gap: 0;
+          white-space: normal !important;
           min-width: 0;
 
-          .text {
-            color: #fff;
-            font-family: "Pretendard", sans-serif;
-            font-weight: 700;
-          }
-
-          .label {
-            color: #999;
-            font-size: 0.875rem;
-          }
-
-          .profile-name {
-            font-size: 1.125rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 2px;
-
-            .text {
-              font-size: 1.125rem;
-              font-weight: 700;
-              color: #fff;
-              font-family: "Pretendard", sans-serif;
-            }
-          }
-
-          .profile-details {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
-            line-height: 1.2;
-
-            .detail-line {
-              margin-bottom: 1px;
-              white-space: nowrap;
-              font-size: 0.875rem;
-              display: flex;
-              align-items: baseline;
-              overflow: hidden;
-
-              .text {
-                font-size: 0.875rem;
-                color: #fff;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-                flex: 0 1 auto;
-              }
-
-              .label {
-                font-size: 0.875rem;
-                color: #999;
-                font-family: "Pretendard", sans-serif;
-                flex-shrink: 0;
-              }
-
-              .nickname {
-                font-size: 0.875rem;
-                color: #faab07;
-                font-family: "Pretendard", sans-serif;
-                font-weight: 700;
-              }
-            }
+          > .personal-field {
+            display: contents;
           }
         }
-      }
 
-      .reputation-view-rating,
-      .reputation-view-content,
-      .reputation-view-fm,
-      .reputation-view-keyword {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-
-        > div:first-child {
-          width: 50px;
+        .personal-separator {
+          color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #ffa500;
-          font-family: "Pretendard", sans-serif;
+          padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
+          font-size: 13px !important; // 본문 pt 통일
         }
-      }
 
-      .reputation-view-rating {
-        .rating-content {
+        .personal-name {
+          min-width: 64px;
           display: flex;
           align-items: center;
+          width: 150px;
+          height: 32px;
+          padding: 4px 10px;
+          margin: 0;
+          border: 1px solid rgba(255, 165, 0, 0.3);
+          background: rgb(26, 26, 46);
+          white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
+        }
+        .personal-gender {
+          min-width: 16px;
+          display: inline-block;
+          white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
+        }
+        .personal-age {
+          min-width: 48px;
+          display: inline-block;
+          white-space: nowrap;
+          font-size: 13px !important; // 본문 pt 통일
+        }
+
+        // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
+        .personal-tags {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
           gap: 8px;
-
-          .stars {
-            display: flex;
-            gap: 1px;
-
-            img.star {
-              width: 14px;
-              height: 14px;
-            }
-
-            .star.half {
-              position: relative;
-              width: 14px;
-              height: 14px;
-              display: inline-block;
-
-              img {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 14px;
-                height: 14px;
-              }
-
-              .star-half-filled {
-                clip-path: inset(0 50% 0 0);
-                z-index: 2;
-              }
-
-              .star-half-empty {
-                z-index: 1;
-              }
-            }
-          }
-
-          .rating-count {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #faab07;
-            font-family: "Pretendard", sans-serif;
-          }
+          width: auto;
+          flex-shrink: 0;
         }
-      }
 
-      .reputation-view-content {
-        .content-text {
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.9);
+        .tag-badge {
+          padding: 3px 11px !important; // 태그 패딩 통일
+          border-radius: 4px;
           font-family: "Pretendard", sans-serif;
-          line-height: 1.6;
-          background: rgba(255, 255, 255, 0.05);
-          padding: 12px 16px;
-          border-radius: 8px;
-          border-left: 3px solid #faab07;
+          font-size: 13px !important; // 태그 pt 통일
+          line-height: 1.14;
+          font-weight: 600;
+          white-space: normal !important;
+          text-align: center;
+          width: 170px; // fixed tag width
+          min-width: 170px;
+          flex-shrink: 0;
+          overflow: visible !important;
+          overflow-wrap: break-word !important;
+          text-overflow: unset !important;
+          display: block;
+          box-sizing: border-box;
+        }
+
+        .personal-tags .tag-badge {
+          width: 170px;
+          box-sizing: border-box;
+          flex-shrink: 0;
+        }
+
+        .personal-tags .tag-badge.tag-role,
+        .personal-tags .tag-badge.tag-keyword {
+          width: 170px;
+          text-align: center;
+        }
+
+        .tag-role {
+          background: rgba(250, 171, 7, 0.15);
+          color: #faab07;
+          border: 1px solid rgba(250, 171, 7, 0.3);
+        }
+
+        .tag-keyword {
+          background: rgba(135, 206, 250, 0.15);
+          color: #87ceeb;
+          border: 1px solid rgba(135, 206, 250, 0.3);
+        }
+
+        .personal-field {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 4px;
+          flex-shrink: 0;
+
+          .field-value {
+            font-family: "Pretendard", sans-serif;
+            font-size: 13px !important; // 필드값 pt 통일
+            line-height: 1.14;
+            color: #ddd;
+            display: block;
+            min-width: 0;
+            white-space: normal !important;
+            overflow: visible !important;
+            overflow-wrap: break-word !important;
+            text-overflow: unset !important;
+          }
+
+          .field-label {
+            font-family: "Pretendard", sans-serif;
+            font-size: 13px !important; // 필드 라벨 pt 통일
+            line-height: 1.14;
+            color: rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            min-width: 28px;
+            display: block;
+            white-space: nowrap;
+            margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
+          }
         }
       }
 
-      .reputation-view-footer {
+      // ── 중단: 키워드(tag.tag--색상 재사용) + 내용 ──
+      .reputation-content-section {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+
+        // .tag.tag--pink 등은 최상위 .tag 셀렉터(L30) 스타일 그대로 사용
+        > .tag {
+          align-self: flex-start; // 키워드 너비만큼만 차지
+          font-size: 15.6px !important;
+          white-space: normal !important;
+          overflow: visible !important;
+          overflow-wrap: break-word !important;
+          text-overflow: unset !important;
+        }
+
+        .reputation-content-box {
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          min-height: 72px;
+          max-height: 120px;
+          overflow-y: auto;
+
+          .reputation-content-text {
+            font-family: "Pretendard", sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ddd;
+            white-space: pre-wrap !important;
+            overflow-wrap: break-word !important;
+            text-overflow: unset !important;
+            margin: 0;
+          }
+        }
+      }
+
+      // ── 하단: 평점 + FM ──
+      .reputation-stats-row {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 40px;
+        padding: 4px 0;
+        flex-shrink: 0;
 
-        .footer-item {
+        .reputation-rating,
+        .reputation-fm {
           display: flex;
           align-items: center;
           gap: 8px;
+        }
 
-          .footer-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #faab07;
-            font-family: "Pretendard", sans-serif;
-          }
+        .stats-label {
+          font-family: "Pretendard", sans-serif;
+          font-size: 18px !important; // 사용자 요청: 13 → 18
+          font-weight: 700;
+          color: #ddd;
+        }
 
-          .footer-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #fff;
-            font-family: "Pretendard", sans-serif;
-          }
+        .rating-stars {
+          display: flex;
+          gap: 2px;
 
-          .tag {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            font-family: "Pretendard", sans-serif;
+          .rating-star {
+            font-size: 24px !important; // 사용자 요청: 18 → 24
+            line-height: 1;
+
+            &.star-empty {
+              color: rgba(255, 255, 255, 0.2);
+            }
+            &.star-full {
+              color: #faab07;
+            }
+            &.star-half {
+              background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.2) 50%);
+              -webkit-background-clip: text;
+              background-clip: text;
+              -webkit-text-fill-color: transparent;
+              color: transparent;
+            }
           }
         }
 
-        .footer-divider {
-          color: rgba(255, 255, 255, 0.3);
-          font-size: 0.875rem;
+        .rating-value {
+          font-family: "Pretendard", sans-serif;
+          font-size: 18px !important; // 사용자 요청: 13 → 18
+          font-weight: 700;
+          color: #faab07;
+          min-width: 48px;
+        }
+
+        .fm-value {
+          font-family: "Pretendard", sans-serif;
+          font-size: 24px !important; // 사용자 요청: 18 → 24
+          font-weight: 700;
+          color: #ddd;
+          min-width: 28px; // 2자리수(10) 고정 — 24px 기준 확대
         }
       }
 
-      .section-modal-footer {
-        justify-content: center;
+      // ── 최하단: 타임스탬프 (우측 정렬, 하단 붙음) ──
+      .reputation-timestamp {
+        display: flex;
+        justify-content: flex-end;
+        padding: 4px 0;
+        margin-top: auto;
+        flex-shrink: 0;
+
+        span {
+          font-family: "Pretendard", sans-serif;
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+      }
+
+      .section-modal-header h3,
+      .reputation-content-text,
+      .personal-field .field-value {
+        text-overflow: unset !important;
+        overflow-wrap: break-word !important;
       }
     }
 
@@ -8595,5 +8709,2149 @@
   .main-desc,
   .sub-desc {
     word-break: break-all !important;
+  }
+}
+
+// ============================================================================
+// workInfo View Modal — 가로형_대 1468×855 (1차: 헤더/푸터/state)
+// ----------------------------------------------------------------------------
+// 대상: workInfo 보기/편집 모달만. workAbility/workExp/workCareer view 모달과
+// section-modal-work-edit(9카드 일괄)은 영향 없음.
+// 식별자: .workinfo-view-modal (TSX에서 work-view-modal과 함께 부여)
+// 기준: cluster2 가로형_대 헤더 + cluster3 output-modal-footer Type B
+// workExp 모달도 동일 스타일 공유 (.workexp-view-modal)
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+  width: 1468px !important;
+  max-width: 1468px !important;
+  height: 855px !important;
+  max-height: 855px !important;
+
+  // ── 헤더 (110px) — cluster3 .section-modal .section-modal-header 패턴 정확 통일 ──
+  // 참조: app/assets/scss/components/_cluster3.scss L2710-2814
+  .section-modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+    padding: 8px 24px 16px;
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      position: relative;
+      margin-top: 12px;
+
+      // img width/height/object-fit는 workInfo 1차 spec(write.png 72×72)으로 유지 — cluster3 미명시
+      img[alt="write"] {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+      }
+    }
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffa500;
+      font-family: "Pretendard", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      padding-left: 80px;
+      margin: 0;
+      flex: 1;
+      // 말줄임 차단 — 카테고리 전체 표시 (workInfo + workExp 공통)
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      white-space: normal !important;
+
+      // 라인/카테고리 텍스트 — 말줄임 제거, 전체 표시 (workInfo + workExp 공통)
+      .line-name-text {
+        color: #ffa500;
+        max-width: none !important;
+        display: inline-block;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        white-space: normal !important;
+        vertical-align: bottom;
+      }
+    }
+
+    .modal-subtitle {
+      width: 100%;
+      padding-left: 80px;
+      padding-right: 67px;
+      margin: 0;
+      color: #fff;
+      font-family: "Pretendard", sans-serif;
+      font-size: 1.3125rem;
+      font-weight: 400;
+      text-align: left;
+      order: 3;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      background: none;
+      border: none;
+      color: #999;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      i {
+        display: inline-block;
+        transition: transform 0.4s ease;
+      }
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  // ── 미드 (637px = 855 - 100 - 118) — 2차: 좌우 2열 ──
+  .section-modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 16px 28px 20px;
+    box-sizing: border-box;
+  }
+
+  // ── 2차 미드 콘텐츠 ──
+  .workinfo-content-layout {
+    display: flex;
+    gap: 12px !important;
+    height: 100%;
+    box-sizing: border-box;
+    align-items: stretch !important; // 좌우 동일 높이 — 평점 bottom = growth box bottom
+
+    .workinfo-left {
+      // 사용자 요청: 좌측 고정폭 + 우측 확대 (3cm≈114px 축소 → 우측 120px 확대)
+      // 540 = 우측 폭, 24 = .workinfo-content-layout의 gap
+      flex: none !important;
+      width: calc(100% - 540px - 24px) !important;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px; // 미드 내부 요소 간 여유 확보
+      overflow-y: auto;
+      padding-right: 8px;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(250, 171, 7, 0.4);
+        border-radius: 2px;
+      }
+      scrollbar-width: thin;
+      scrollbar-color: rgba(250, 171, 7, 0.4) transparent;
+
+      // ★ 좌측 자식 섹션 모두 동일 폭 — 우측 끝 x좌표 정렬
+      > .workinfo-personal-card,
+      > .workinfo-mid-section,
+      > .workinfo-text-section {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    .workinfo-right {
+      width: 552px !important; // 사용자 요청: 420 → 540 (약 120px 확대)
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: auto !important;
+      max-height: none !important;
+      align-self: stretch !important; // 좌측 전체 높이에 맞춰 확장
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+  }
+
+  // ── 우측: 이미지 2×2 그리드 (1·2번 필수, 순차 업로드, 캡션 — cluster3 패턴) ──
+  // 그리드 순서: 좌상=1, 우상=2, 좌하=3, 우하=4
+  .workinfo-image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    // 4개 모달 공통: 우측 컬럼 남은 공간 전부 차지 (520px 고정 해제 — 좌측 전체 높이와 연동)
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    align-self: stretch;
+
+    // cluster3 .image-slot 실측값 (border 1px solid rgba(255,165,0,0.3), border-radius 0)
+    .workinfo-image-slot {
+      border: 1px solid rgba(255, 165, 0, 0.3) !important;
+      border-radius: 0 !important;
+      position: relative;
+      overflow: hidden;
+
+      &.disabled {
+        .image-preview {
+          opacity: 0.3;
+        }
+        .image-actions-overlay .image-action-btn {
+          opacity: 0.3;
+          pointer-events: none;
+        }
+      }
+    }
+
+    // 이미지 1·2번 필수 표시 (편집 모드 전용, TSX 조건부 렌더)
+    .image-required-mark {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      color: #ff4444;
+      font-size: 16px;
+      font-weight: 700;
+      z-index: 3;
+      line-height: 1;
+    }
+
+    // cluster3 .image-preview 값 그대로 (border, cursor, overflow, w/h 100%, img object-fit cover)
+    .image-preview {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      overflow: hidden;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover !important;
+      }
+    }
+
+    // cluster3 .empty-slot 값 그대로 (_cluster3.scss:3310)
+    .empty-slot {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+
+      i {
+        font-size: 32px;
+        color: rgba(255, 165, 0, 0.4);
+      }
+    }
+
+    // cluster3 .image-actions-overlay 패턴 그대로 (top 4 right 4 — 항상 표시, hover 의존 없음)
+    .image-actions-overlay {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      z-index: 2;
+
+      .image-action-btn {
+        width: 28px;
+        height: 28px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 165, 0, 0.5);
+        color: #faab07;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        padding: 0;
+
+        &:hover:not(:disabled) {
+          background: rgba(0, 0, 0, 0.8);
+          border-color: #faab07;
+        }
+        &:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+        &.image-delete-btn:hover {
+          color: #ff4444;
+          border-color: #ff4444;
+        }
+      }
+    }
+
+    .image-empty-slot {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: rgba(255, 255, 255, 0.4);
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+
+      i {
+        font-size: 24px;
+      }
+      &:hover {
+        color: #faab07;
+      }
+    }
+
+    .empty-placeholder {
+      color: rgba(255, 255, 255, 0.2);
+      font-family: "Pretendard", sans-serif;
+      font-size: 20px;
+    }
+
+    .slot-number {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    // cluster3 image-caption-btn 실측값 (transparent, no border, white 16px, absolute bottom/right 8px)
+    .image-action-btn.image-caption-btn {
+      background: transparent !important;
+      border: none !important;
+      color: rgb(255, 255, 255) !important;
+      font-size: 16px !important;
+      position: absolute !important;
+      right: 8px !important;
+      bottom: 8px !important;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: #faab07 !important;
+      }
+    }
+
+    // 캡션 오버레이 — cluster3 실측값 (이미지/빈 슬롯 무관 항상 렌더)
+    .image-caption-overlay {
+      background: rgba(0, 0, 0, 0.6) !important;
+      border: none !important;
+      height: 24px !important;
+      min-height: 24px !important;
+      padding: 4px 6px !important;
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 2 !important;
+      opacity: 1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+
+      .caption-text {
+        color: rgb(255, 255, 255) !important;
+        font-size: 7pt !important;
+        font-family: "Pretendard", sans-serif;
+        display: block;
+        text-align: center;
+      }
+
+      .caption-input {
+        width: 100%;
+        background: transparent !important;
+        border: none !important;
+        color: rgb(255, 255, 255) !important;
+        font-size: 7pt !important;
+        font-family: "Pretendard", sans-serif;
+        text-align: center;
+        outline: none;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+          font-size: 7pt;
+        }
+      }
+    }
+  }
+
+  // 좌상단: 인적사항 카드 — 5열 그리드 (1열 사진 rowspan 3 + 2열 3행)
+  .workinfo-personal-card {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    flex-shrink: 0;
+    margin-top: 0 !important; // 박스 위치 원복 (내부 텍스트만 별도 조정)
+
+    .personal-grid {
+      display: grid;
+      grid-template-columns: auto 1fr !important; // 2열: 사진 | 정보 (태그는 row-1 내부로 이동)
+      grid-template-rows: auto;
+      gap: 0 18px;
+      align-items: center !important; // 사진/정보 세로 중앙 균형
+      position: relative;
+
+      &::before {
+        content: "";
+        grid-column: 1 / 3;
+        grid-row: 1;
+        align-self: stretch;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+        z-index: 0;
+      }
+    }
+
+    // 1열: 사진
+    .personal-photo {
+      grid-column: 1;
+      grid-row: 1;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: center !important; // 세로 중앙
+      // 인적사항 ↓ 0.5cm — margin-top으로 처리해 grid row가 실제로 확장되도록 함 (border ::before 포함)
+      margin: 21px 0 2px 10px;
+      margin-top: -3px !important; // 사진만 위로 (현재보다 0.1cm 아래로: -7 → -3)
+      position: relative;
+      z-index: 1;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    // 2열: 인적사항 텍스트 stack (3행)
+    .personal-info {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+      padding: 3px 8px 3px 0;
+      position: relative;
+      z-index: 1;
+      align-self: center !important; // 세로 중앙
+      margin-top: 0 !important; // -6px 원복
+    }
+
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3 {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px !important; // 인적사항 본문 pt 통일
+      line-height: 1.14;
+      color: #ddd;
+      min-width: 0;
+    }
+
+    // row-1 안에 태그 가로 배치 — 우측 정렬
+    .personal-row-1 {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px;
+
+      .personal-tags {
+        margin-left: auto !important; // row-1 내부 우측 정렬
+        display: flex !important;
+        flex-direction: row !important; // 가로 배치
+        gap: 8px !important;
+        flex-shrink: 0;
+      }
+    }
+
+    .personal-row-2,
+    .personal-row-3 {
+      display: grid;
+      grid-template-columns: 174px 32px 14px 174px 32px;
+      align-items: center;
+      column-gap: 0;
+      white-space: nowrap;
+
+      > .personal-field {
+        display: contents;
+      }
+    }
+
+    .personal-separator {
+      color: rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+      padding-left: 6px !important; // 라벨과 | 구분자 사이 여백
+      font-size: 13px !important; // 본문 pt 통일
+    }
+
+    // 1행 — 고정폭 (말줄임 없음, 최대 글자수 입력 차단으로 보장)
+    .personal-name {
+      min-width: 64px; // 4자 × 16px
+      display: flex;
+      align-items: center;
+      width: 150px;
+      height: 24px;
+      padding: 2px 8px;
+      margin: 0;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      background: rgb(26, 26, 46);
+      white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
+    }
+    .personal-gender {
+      min-width: 16px; // 1자
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
+    }
+    .personal-age {
+      min-width: 48px; // "22 세"
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 13px !important; // 본문 pt 통일
+    }
+
+    // 역할/키워드 태그 — row-1 내부 가로 배치 (세부 override는 .personal-row-1 .personal-tags)
+    .personal-tags {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      width: auto;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    // 기존 personal-tags 위치: 강화 상태 표시
+    .personal-line-status {
+      --enhance-color: 255, 107, 154;
+      grid-column: 3;
+      grid-row: 1;
+      align-self: start;
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 180px;
+      padding-left: 16px;
+      transform: translateX(-19px) translateY(-8px); // 현재 대비 오른쪽 0.5cm + 위로 0.2cm (-38 → -19, 0 → -8)
+
+      &:has(.enhance-success) {
+        --enhance-color: 255, 107, 154;
+      }
+
+      &:has(.enhance-wait),
+      &:has(.enhance-waiting) {
+        --enhance-color: 107, 203, 119;
+      }
+
+      &:has(.enhance-fail),
+      &:has(.enhance-failed) {
+        --enhance-color: 77, 171, 247;
+      }
+
+      &:has(.enhance-none),
+      &:has(.enhance-not_applicable) {
+        --enhance-color: 160, 132, 220;
+      }
+
+      .line-enhance-icon {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      .line-status-icon {
+        font-size: 60px;
+        line-height: 1;
+        color: rgb(var(--enhance-color));
+        flex-shrink: 0;
+      }
+
+      .line-enhance-status {
+        margin-left: 0;
+        font-size: 20px !important; // 가독성 확보 (9px 너무 작음)
+        font-weight: 600 !important;
+        // CSS 변수로 배지 아이콘 색상과 동기화 — 상태 클래스가 --enhance-color 덮어씀
+        color: rgb(var(--enhance-color, 255, 107, 154));
+        text-shadow:
+          0 0 4px rgba(var(--enhance-color, 255, 107, 154), 0.6),
+          0 0 8px rgba(var(--enhance-color, 255, 107, 154), 0.4);
+
+        &.enhance-success {
+          --enhance-color: 255, 107, 154;
+        }
+
+        &.enhance-wait,
+        &.enhance-waiting {
+          --enhance-color: 107, 203, 119;
+        }
+
+        &.enhance-fail,
+        &.enhance-failed {
+          --enhance-color: 77, 171, 247;
+        }
+
+        &.enhance-none,
+        &.enhance-not_applicable {
+          --enhance-color: 160, 132, 220;
+        }
+      }
+    }
+
+    .tag-badge {
+      padding: 3px 11px !important; // 태그 패딩 통일
+      border-radius: 4px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px !important; // 태그 pt 통일
+      line-height: 1.14;
+      font-weight: 600;
+      white-space: nowrap !important;
+      text-align: center;
+      min-width: 170px;
+      width: 170px;
+      flex-shrink: 0;
+      overflow: visible !important;
+      overflow-wrap: break-word !important;
+      text-overflow: unset !important;
+      display: block;
+      box-sizing: border-box;
+    }
+
+    .personal-tags .tag-badge {
+      width: 170px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .personal-tags .tag-badge.tag-role,
+    .personal-tags .tag-badge.tag-keyword {
+      width: 170px;
+      text-align: center;
+    }
+
+    .tag-role {
+      background: rgba(250, 171, 7, 0.15);
+      color: #faab07;
+      border: 1px solid rgba(250, 171, 7, 0.3);
+    }
+
+    .tag-keyword {
+      background: rgba(135, 206, 250, 0.15);
+      color: #87ceeb;
+      border: 1px solid rgba(135, 206, 250, 0.3);
+    }
+
+    // 2·3행 — 필드명/값 분리 (값은 고정폭, 라벨은 작은 폰트 + 연한 색)
+    .personal-field {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-shrink: 0;
+
+      .field-value {
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px !important; // 필드값 pt 통일
+        line-height: 1.14;
+        color: #ddd;
+        display: block;
+        white-space: nowrap;
+        overflow: visible;
+      }
+
+      .field-label {
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px !important; // 필드 라벨 pt 통일
+        line-height: 1.14;
+        color: rgba(255, 255, 255, 0.4);
+        flex-shrink: 0;
+        min-width: 28px;
+        display: block;
+        white-space: nowrap;
+        margin-right: 6px !important; // 라벨과 | 구분자 사이 여백
+      }
+    }
+  }
+
+  // 좌중단: 2열 (시즌/주차/카테고리/상태 + Output Link 5개)
+  .workinfo-mid-section {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 122px;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
+    .workinfo-mid-col1 {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    .workinfo-mid-col2 {
+      flex: none !important;
+      width: 360px !important; // Output Link 영역 고정폭 (220 + 76 ≈ 2cm 확장)
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+      box-sizing: border-box;
+      margin-top: 20px !important; // 강화 상태 행과 수직 겹침 방지
+    }
+  }
+
+  .workinfo-date-badge {
+    display: flex !important;
+    flex-direction: row !important; // column → row 강제 (다른 셀렉터 override 방지)
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: nowrap; // 줄바꿈 안 함
+
+    .date-badge-text {
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #faab07;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .date-range-text {
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  }
+
+  .workinfo-line-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+
+    .line-info-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      line-height: 1;
+      color: #ddd;
+      margin: 0;
+      width: 100%; // 행1(.line-name min-width 560px)과 행2 우측 끝 x좌표 정렬
+    }
+
+    // 행1: 컴팩트 행 — 주변 요소 위치 불변
+    .line-info-row:nth-child(1) {
+      height: 44px !important; // 아이콘 40px + 여유
+      min-height: 44px !important;
+      max-height: 44px !important;
+      overflow: visible;
+      align-items: center;
+    }
+
+    // 행2: 강화 상태가 남은 공간 차지 + 라인코드는 우측 끝에 고정
+    // → 라인코드 우측 끝 = 라인명 20자 기준 우측 끝
+    .line-info-row:nth-child(2) {
+      .line-enhance-status {
+        flex: 1;
+      }
+    }
+
+    .line-status-icon {
+      font-size: 9px;
+      flex-shrink: 0;
+      color: #faab07;
+    }
+
+    // 활동 카테고리 아이콘 (selectedWorkInfoCard.icon — activityTypeConfig.icon)
+    .line-activity-icon {
+      width: 40px !important; // 32 → 40
+      height: 40px !important;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    // 강화 상태 아이콘 (selectedWorkInfoCard.statusIcon — enhancementStatusIcons[status])
+    // 사용자 요청: 3배 확대 (24 → 72)
+    .line-enhance-icon {
+      width: 32px !important;
+      height: 32px !important;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    // 라인명은 최대 20자 제한 → min-width로 line-code 시작 x 좌표 고정 (20자 × 28px ≈ 560px)
+    .line-name {
+      display: inline-block;
+      min-width: 560px;
+      white-space: nowrap;
+      font-size: 20px !important; // 16 → 20
+      line-height: 1;
+    }
+
+    .line-enhance-status {
+      white-space: nowrap;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    // badge-status.yellow 스타일 준용
+    .line-code {
+      padding: 4px 7.2px;
+      background: rgba(250, 171, 7, 0.1);
+      border-radius: 4px;
+      font-size: 15px;
+      font-family: "Pretendard", sans-serif;
+      font-weight: 600;
+      line-height: 15px;
+      color: rgb(250, 171, 7);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto; // 우측 끝으로 밀기 (라인명 20자 기준 끝 x좌표와 정렬)
+      margin-right: 0;
+    }
+  }
+
+  // .badge-status.yellow 스타일 그대로 적용
+  .image-line-code {
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin: 0 5px 0 0; // badge-status margin (left 0 유지)
+    background: #faab07;
+    color: #111111;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: "Pretendard", sans-serif;
+    font-size: 0.625rem; // 10px
+    font-weight: 600;
+    line-height: 15px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .line-code.image-line-code {
+    all: unset;
+    display: inline-flex;
+    width: fit-content;
+    max-width: max-content;
+    padding: 4px 7.2px;
+    background: rgba(250, 171, 7, 0.1);
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: "Pretendard", sans-serif;
+    font-weight: 600;
+    line-height: 15px;
+    color: #faab07;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+
+  // Output Link — cluster3 output modal 패턴 준용 (link-dot + input/text + open-btn)
+  // (cluster3 _cluster3.scss L4806 .output-links-section의 시각 스타일을 workInfo 스코프에 복제)
+  .workinfo-output-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 54%;
+    width: 54%;
+    max-width: 270px;
+    min-width: 0;
+    box-sizing: border-box;
+    transform: translateY(-57px); // 전체 ↑ 1.5cm
+
+    .output-link-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      padding-left: 10px;
+      box-sizing: border-box;
+    }
+
+    .admin-badge {
+      background: #faab07;
+      color: #1a1a1a;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      line-height: 1;
+    }
+
+    // cluster3 .link-dot 패턴
+    .link-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    // cluster3 .output-link-text 스타일 그대로
+    .output-link-text {
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      &.output-link-empty {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    // cluster3 .output-link-input 스타일 — 편집 모드 폰트/높이 축소 (5행 누적 높이로 인한 아래 영역 밀림 방지)
+    .output-link-input {
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      font-size: 11px !important;
+      color: #fff;
+      font-family: "Pretendard", sans-serif;
+      background: transparent;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      padding: 3px 6px !important;
+      height: 24px;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #faab07;
+      }
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    // cluster3 .link-open-btn 스타일 그대로
+    .link-open-btn {
+      width: 28px;
+      height: 28px;
+      background: #faab07;
+      border: none;
+      color: #1a1a1a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      padding: 0;
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    // 삭제 버튼 (편집 모드 전용 — workInfo 추가 기능, cluster3에는 없음)
+    .output-link-delete {
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: #ff4444;
+        border-color: #ff4444;
+      }
+      i {
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 좌하단: Main Title / Sub Title / Growth Point
+  // 사용자 요청: Main Title 0.5cm(≈ -19px) 위로 — text-section만 추가 보정
+  .workinfo-text-section {
+    margin-top: -73px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px !important;
+
+    .workinfo-text-block {
+      display: flex;
+      flex-direction: column;
+
+      .text-block-title {
+        font-family: "Pretendard", sans-serif;
+        font-size: 16px;
+        line-height: 1;
+        font-weight: 600;
+        color: #ddd;
+        margin: 0 0 9px 0;
+        padding: 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .text-block-content {
+        font-family: "Pretendard", sans-serif;
+        color: #ddd;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: pre-wrap;
+        min-height: auto;
+        font-size: 10px;
+        line-height: 1.35;
+        box-sizing: border-box;
+      }
+
+      // Main Title — 운영진 read-only
+      .main-title-readonly {
+        background: rgba(250, 171, 7, 0.05);
+        border-color: rgba(250, 171, 7, 0.15);
+        color: rgba(255, 255, 255, 0.55);
+        font-style: italic;
+      }
+
+      .text-block-edit {
+        position: relative;
+        margin: 0;
+      }
+
+      .text-block-textarea {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ddd;
+        font-family: "Pretendard", sans-serif;
+        font-size: 10px;
+        line-height: 1.35;
+        resize: vertical;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #faab07;
+        }
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      .char-count {
+        position: absolute;
+        bottom: 6px;
+        right: 10px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+      }
+    }
+
+    // 텍스트 3종 글자수 기반 박스 크기 (font 11px line-height 1.5 ≈ 16.5px/줄 기준)
+    // Main Title: 74px 고정 박스 + 18px/700 폰트 + 1.6 line-height → 2줄 가독성 확보
+    .text-block-main {
+      .main-title-readonly {
+        height: 59px !important; // 78 → 59 (-19px, 0.5cm 축소)
+        min-height: 59px !important;
+        max-height: 59px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 1.6 !important;
+        overflow-y: auto;
+        padding: 3px 12px 8px 12px !important; // 사용자 요청: padding-top 8 → 3
+        // 사용자 요청: 텍스트 상단 정렬 (4개 모달 공통)
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+      }
+
+      .text-block-content {
+        height: 44px;
+        min-height: 44px;
+        max-height: 44px;
+        overflow-y: auto;
+      }
+    }
+    // Sub Title: 200자 → 보기/편집 동일 높이 75px (사용자 요청: 300→200자, 90→75px)
+    .text-block-sub {
+      .sub-title-input {
+        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        min-height: 111px !important;
+        max-height: 111px !important;
+        font-size: 14px !important;
+        line-height: 1.35;
+        padding-top: 3px !important;
+        vertical-align: top;
+        resize: none;
+        overflow-y: auto;
+      }
+      .text-block-content {
+        height: 111px !important; // 130 → 111 (-19px, 0.5cm 축소)
+        min-height: 111px !important;
+        max-height: 111px !important;
+        overflow-y: auto !important;
+        font-size: 14px !important;
+      }
+    }
+    // Growth Point: 100자 → 보기/편집 동일 높이 45px (사용자 요청: 200→100자, 60→45px)
+    .text-block-growth {
+      .growth-point-input {
+        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        min-height: 71px !important;
+        max-height: 71px !important;
+        font-size: 14px !important;
+        line-height: 1.35;
+        padding-top: 3px !important;
+        vertical-align: top;
+        resize: none;
+        overflow-y: auto;
+      }
+      .text-block-content {
+        height: 71px !important; // 90 → 71 (-19px, 0.5cm 축소)
+        min-height: 71px !important;
+        max-height: 71px !important;
+        overflow-y: auto !important;
+        font-size: 14px !important;
+      }
+    }
+  }
+
+  // ── 사용자 요청: 편집 가능 영역 폰트 일괄 축소 (헤더/인적사항 제외) ──
+  // 위 개별 규칙들과 중복되지만 cascade 마지막에 두어 확실히 override
+  .text-block-textarea,
+  textarea.text-block-textarea {
+    font-size: 10px !important;
+    line-height: 1.35;
+  }
+  .text-block-content {
+    font-size: 10px !important;
+    line-height: 1.35;
+  }
+  .output-link-input {
+    font-size: 11px !important;
+  }
+  .char-count {
+    font-size: 9px !important;
+  }
+
+  // ── 푸터 (118px) Type B — 2행 구조 (cluster2/3 표준) ──
+  .workinfo-text-section {
+    .workinfo-text-block > .text-block-title {
+      font-size: 16px !important;
+      line-height: 1 !important;
+      margin-bottom: 9px !important;
+      padding-bottom: 0 !important;
+
+      .required-mark {
+        font-size: inherit !important;
+        line-height: inherit !important;
+        vertical-align: baseline;
+      }
+    }
+
+    .text-block-main {
+      .main-title-readonly {
+        font-size: 14px !important;
+        font-weight: 700 !important;
+      }
+    }
+
+    .text-block-sub {
+      .text-block-content,
+      .sub-title-input,
+      textarea.sub-title-input {
+        font-size: 14px !important;
+      }
+    }
+
+    .text-block-growth {
+      .text-block-content,
+      .growth-point-input,
+      textarea.growth-point-input {
+        font-size: 14px !important;
+      }
+    }
+  }
+
+  .section-modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 28px;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    box-sizing: border-box;
+    border-top: none;
+    background: transparent;
+
+    // ── 행 1: 🔎 좌 + 버튼 우 ──
+    .modal-footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+
+      .modal-help-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 36px;
+        font-size: 20px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 46px;
+          height: 46px;
+          background: rgba(0, 0, 0, 0.6);
+          border: none;
+          border-radius: 0;
+          z-index: -1;
+        }
+      }
+
+      .modal-footer-right {
+        flex-shrink: 0;
+        min-width: 160px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    // ── 행 2: 안내문 우측 정렬 (visibility 토글 — display:none 금지, 공간 유지) ──
+    .modal-footer-bottom {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      border: none;
+
+      .modal-notice {
+        font-family: "Pretendard", sans-serif;
+        font-size: 15px;
+        color: #faab07;
+        text-align: right;
+        margin: 0;
+      }
+    }
+
+    .modal-edit-btn,
+    .modal-save-btn {
+      padding: 8px 20px;
+      background: #faab07;
+      border: 1px solid transparent;
+      color: #1a1a1a;
+      border-radius: 0;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: #ffb820;
+      }
+    }
+
+    .modal-cancel-btn {
+      padding: 8px 20px;
+      border: 1px solid #888;
+      background: transparent;
+      color: #888;
+      border-radius: 0;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: rgba(136, 136, 136, 0.1);
+        color: #aaa;
+      }
+    }
+
+    .modal-reset-btn {
+      padding: 8px 20px;
+      border: 1px solid #4caf50;
+      background: transparent;
+      color: #4caf50;
+      border-radius: 0;
+      font-size: 14px;
+      font-family: "Pretendard", sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
+    }
+  }
+
+  // 필수필드 표시 — 제목 옆 빨간색 *
+  .required-mark {
+    color: #ff4444;
+    margin-left: 2px;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+    font-weight: 700;
+  }
+}
+
+// ============================================================================
+// reputation view 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// ============================================================================
+// workInfo 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// ============================================================================
+// workAbility 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// ============================================================================
+// workCareer 전용 — 인적사항은 편집 대상이 아닌 표시 전용 UI
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 4단계: 후원/제휴사 카드 (이미지 그리드 4번째 슬롯) — 항상 읽기전용
+  // 필드 고정 위치 원칙 적용: min-width 지정, 말줄임 제거 (인적사항과 동일 원칙)
+  // 카드 슬롯 폭 ~210px (workinfo-right 420px / 2) 안에 수용되도록 폰트 10px, min-width 90px 기준
+  // ──────────────────────────────────────────────────────────────────────
+  .sponsor-card-slot {
+    cursor: default !important;
+
+    // 편집 모드에서도 업로드/삭제 버튼이나 hover 효과 없음
+    &:hover {
+      border-color: rgba(255, 165, 0, 0.3) !important;
+    }
+  }
+
+  .sponsor-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.02);
+    gap: 12px !important; // 사용자 요청: 8 → 12 (카드 전체 행간)
+    overflow: hidden; // 카드 밖으로 텍스트 넘침 방지
+
+    // 1행: 기업 로고 + 기업명 (사용자 요청: 아래 구분선 추가)
+    .sponsor-company {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      min-width: 0;
+      padding-bottom: 10px; // 사용자 요청: 8 → 10
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 10px; // 사용자 요청: 8 → 10
+
+      .sponsor-company-logo {
+        width: 56px !important; // 사용자 요청: 32 → 56 (로고 확대)
+        height: 56px !important;
+        flex-shrink: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .logo-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 8px;
+          color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.05);
+          text-align: center;
+          line-height: 1.1;
+        }
+      }
+
+      // 기업명: min-width 고정 제거, 카드 폭에 맞춰 ellipsis
+      .sponsor-company-name {
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px !important; // 사용자 요청: 폰트 확대 (우측 폭 확대로 수용 가능)
+        font-weight: 600;
+        color: rgb(255, 107, 107) !important; // 사용자 요청: link-dot 빨간색
+        min-width: unset !important;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+    }
+
+    // 2~4행: 사진+Supervised By(같은 행, 우측 정렬) → 이름|직무 → 회사|직책 (독립 행, 카드 전체 폭 사용)
+    .sponsor-supervisor {
+      display: flex;
+      flex-direction: column;
+      gap: 10px !important; // 사용자 요청: 6 → 10 (2↔3↔4행 간격)
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+
+      // 2행: 사진 좌측 + 라벨 우측
+      .supervisor-row-2 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .sponsor-supervisor-photo {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          overflow: hidden;
+          flex-shrink: 0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+          }
+        }
+
+        // Supervised By — 하이라이터 스타일 (사용자 요청)
+        .supervisor-label {
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px !important; // 사용자 요청: 우측 라벨 확대
+          font-style: italic;
+          color: rgb(78, 205, 196) !important; // link-dot 청록색
+          background-color: rgba(78, 205, 196, 0.3) !important; // 하이라이터 반투명 배경
+          padding: 2px 6px !important;
+          padding-right: 8px !important; // 사용자 요청: 우측 'y' 잘림 방지 여유
+          border-radius: 2px;
+          text-align: right;
+        }
+      }
+
+      // 3·4행: 독립 행으로 카드 전체 폭 사용 — 폰트 13px 수용 가능
+      .supervisor-details {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px !important;
+        color: #ddd;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+
+        .supervisor-separator {
+          color: rgba(255, 255, 255, 0.3);
+          flex-shrink: 0;
+          font-size: 13px !important;
+        }
+
+        .supervisor-name,
+        .supervisor-dept,
+        .supervisor-company,
+        .supervisor-position {
+          min-width: unset !important;
+          max-width: none;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 13px !important;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .supervisor-name {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 5단계: 라인 평점 (S/A/B/C/D) — 관리자만 설정, 사용자 읽기전용
+  // 이미지 그리드 아래 배치 (workExp의 rating-section 위치 동일 개념)
+  // grade/grade-row 원형 스타일은 L6732의 .work-view-title-section 스코프와 분리되어 있으므로
+  // 여기서 동일 스펙으로 재선언한다 (타 영역 영향 없음)
+  // ──────────────────────────────────────────────────────────────────────
+  .workcareer-grade-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
+    gap: 8px;
+    width: 100%;
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;          // 모든 margin 리셋
+    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important;          // 모든 padding 리셋
+    flex-shrink: 0 !important;
+
+    .grade-label {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 14px !important;          // 13 → 14 (통일)
+      font-weight: 700 !important;         // 600 → 700 (통일)
+      color: #ddd !important;
+      white-space: nowrap;
+    }
+
+    .grade-row {
+      display: flex;
+      gap: 6px;
+
+      .grade {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        font-weight: 400;
+        color: #9c9c9c;
+        background: linear-gradient(145deg, #d4d4d4, #a8a8a8);
+        font-family: "Black Ops One", sans-serif;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
+        cursor: default; // 사용자는 선택 불가
+        box-shadow:
+          4px 4px 10px rgba(0, 0, 0, 0.5),
+          -2px -2px 6px rgba(255, 255, 255, 0.15),
+          inset 2px 2px 3px rgba(255, 255, 255, 0.35),
+          inset -2px -2px 3px rgba(0, 0, 0, 0.15);
+
+        &.active {
+          background: linear-gradient(145deg, #ffbc1a, #d99200);
+          color: #fff;
+          text-shadow:
+            1px 1px 3px rgba(0, 0, 0, 0.35),
+            0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(255, 220, 100, 0.7),
+            0 0 30px rgba(255, 200, 50, 0.5);
+          box-shadow:
+            4px 4px 12px rgba(0, 0, 0, 0.4),
+            -2px -2px 6px rgba(255, 200, 50, 0.3),
+            inset 2px 2px 3px rgba(255, 255, 255, 0.5),
+            inset -2px -2px 3px rgba(0, 0, 0, 0.15),
+            0 0 15px rgba(255, 180, 0, 0.4);
+        }
+      }
+    }
+  }
+
+  // 우측 컬럼이 좌측 전체 높이에 맞춰 stretch (workexp와 통일)
+  .workinfo-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: auto !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
+}
+
+// ============================================================================
+// workExp 전용 — 우측 이미지 그리드 하단에 라인 평점 영역 추가 (workInfo 영향 없음)
+// ============================================================================
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
+  // 인적사항은 편집 대상이 아닌 표시 전용 UI다. workInfo 공용 스타일에서
+  // 이름에 입력 박스처럼 보이는 배경/테두리가 들어가므로 workExp에서만 제거한다.
+  .workinfo-personal-card {
+    .personal-info {
+      cursor: default;
+    }
+
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-field,
+    .field-value,
+    .field-label {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      cursor: default !important;
+    }
+
+    .personal-name {
+      display: inline-block;
+      width: auto;
+      min-width: 64px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      line-height: 1.14;
+    }
+
+    .personal-name:hover,
+    .personal-name:focus,
+    .personal-name:focus-visible,
+    .field-value:hover,
+    .field-value:focus,
+    .field-value:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .workinfo-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: auto !important;
+    max-height: none !important;
+    align-self: stretch !important;  // 좌측 전체 높이에 맞춤
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  // (이미지 그리드 규칙은 공용 scope L8910에 정의 — workInfo 기준 통일. 중복 제거)
+
+  .workexp-rating-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end !important; // 우측 정렬 (이미지 그리드 종료 x좌표 일치)
+    gap: 8px;
+    width: 100%;
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;          // 모든 margin 리셋
+    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important;          // 모든 padding 리셋
+    flex-shrink: 0 !important;
+
+    .rating-label {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 14px !important;          // 13 → 14 (통일)
+      font-weight: 700 !important;         // 600 → 700 (통일)
+      color: #ddd !important;
+      white-space: nowrap;
+    }
+
+    .rating-stars {
+      display: flex;
+      gap: 2px;
+
+      .rating-star {
+        font-size: 18px;
+        line-height: 1;
+
+        &.star-empty {
+          color: rgba(255, 255, 255, 0.2);
+        }
+        &.star-half {
+          background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.2) 50%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          color: transparent;
+        }
+        &.star-full {
+          color: #faab07;
+        }
+      }
+    }
+
+    .rating-number-input {
+      width: 48px;
+      height: 28px;
+      padding: 2px 6px;
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      background: rgb(26, 26, 46);
+      color: #faab07;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+
+      &:focus {
+        border-color: #faab07;
+      }
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+
+    .rating-max {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      min-width: 30px; // "/ 10" 고정폭
+      display: inline-block;
+    }
+
+    .rating-display {
+      font-size: 14px;
+      font-weight: 700;
+      color: #faab07;
+      min-width: 44px; // select와 동일 고정폭
+      display: inline-block;
+      text-align: center;
+    }
+  }
+}
+
+// ============================================================================
+// 이미지 확대 2차 모달 — cluster3 Cluster3Content.tsx:3049-3057 실측값 준용
+// Overlay: rgba(0,0,0,0.7), z-index 100002 (help-modal 100001보다 위)
+// Modal: 1020×794, #1a1a2e, border rgba(255,165,0,0.3), box-shadow 60px glow
+// ============================================================================
+.image-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100002;
+}
+
+.image-preview-modal {
+  width: 1020px;
+  height: 794px;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  padding: 0;
+  box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+// ============================================================================
+// 도움말 모달 (workinfo-view-modal 위에 표시)
+// workinfo overlay z-index 99999보다 높게 → 100001
+// cluster2.scss .help-modal-overlay는 .cluster2-content 스코프라 cluster4에선 상속 불가
+// ============================================================================
+.help-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100001 !important;
+}
+
+.help-modal {
+  width: 1024px;
+  height: 794px;
+  background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+  border: 1px solid #ffa500;
+  box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #ffa500;
+    border-style: solid;
+    border-width: 2px 0 0 2px;
+    top: -1px;
+    left: -1px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #ffa500;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    bottom: -1px;
+    right: -1px;
+  }
+
+  .help-modal-header {
+    height: 126px;
+    min-height: 126px;
+    max-height: 126px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+
+    .modal-header-top {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    h3 {
+      margin: 0;
+      color: #faab07;
+      font-family: "Pretendard", sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      flex: 1;
+
+      &::before {
+        content: none;
+      }
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .help-modal-body {
+    flex: 1;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: "Pretendard", sans-serif;
+    font-size: 15px;
+  }
+}
+
+// ============================================================================
+// 4개 모달(workInfo/workAbility/workCareer/workExp) + reputation-view-modal 공유
+// 인적사항 내부 글자 전부 동일 pt(13px)로 통일
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal,
+.cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
+  .workinfo-personal-card {
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3,
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-separator,
+    .field-value,
+    .field-label,
+    .tag-badge {
+      font-size: 13px !important;
+    }
+
+    .tag-badge {
+      padding: 3px 10px !important;
+    }
   }
 }

@@ -310,6 +310,24 @@ body {
   }
 }
 
+// ===== Zone A (<1920) 대응 =====
+// 정책: 축소/zoom 없음. 1920×1080 baseline 그대로 표시 + 가로 스크롤로 자연 노출.
+// (Zone B/C는 본 미디어쿼리에 매칭되지 않으므로 영향 없음.)
+@media (max-width: 1919px) {
+  html {
+    overflow-x: auto !important;  // 가로 스크롤 허용
+    min-width: 1920px;            // viewport보다 작아도 최소 1920px 보장
+  }
+
+  body {
+    min-width: 1920px;
+    width: 1920px;
+    max-width: 1920px;            // base의 --content-max-width(1900) override
+    transform: none !important;   // 축소 transform 잔여 제거 (방어)
+    zoom: 1 !important;           // 축소 zoom 잔여 제거 (방어)
+  }
+}
+
 // ===== 2560px 이상 대응 =====
 @media (min-width: 1921px) {
   :root {

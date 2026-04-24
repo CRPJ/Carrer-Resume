@@ -1543,13 +1543,9 @@
   }
 }
 
-// 1920 미만에서 sidebar shell이 카드(489px)보다 좁아지는 현상 방지
-// 1920×1080에서의 shell width(583px)를 최소값으로 고정
-@media (max-width: 1919px) {
-  .sidebar-card-shell {
-    min-width: 583px !important;
-  }
-}
+// ★ Zone A 정책 변경(1920 baseline + 가로 스크롤): 강제 shell 583px floor 제거.
+//   Sidebar.tsx가 cardScale을 자연 계산(Zone B와 동일 로직)하여 inline width로 적용하므로
+//   여기서 별도의 min-width를 강제하지 않는다. (Zone B/C는 영향 없음)
 
 // PX Theme - Green color scheme
 .resume-card.px-theme {
