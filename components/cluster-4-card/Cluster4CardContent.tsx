@@ -6097,8 +6097,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         <div className="section-modal-overlay">
           <div className="section-modal section-modal-reputation-form">
             <div className="section-modal-header">
-              <h3>주차 평판</h3>
-              <span className="modal-subtitle">해당 크루에게 평판을 남겨주세요</span>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  setHeaderModalOpen(false);
+                  setReputationSaveError(null);
+                  setReputationSaveSuccess(false);
+                }}
+              >
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                <h3>위클리 평판 (Weekly Reputation)</h3>
+              </div>
+              <p className="modal-subtitle">
+                혼자 하는 성장이 그 찰나에는 빠를 수 있지만, 멀리, 굳건히, 확실히 가려면 '함께' 가야 합니다! 😊
+                <br />
+                나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 <span className="tagsanjiseok-highlight">타산지석</span>으로 삼아보자구요!
+              </p>
             </div>
             <div className="section-modal-body">
               <div className="modal-card-item modal-card-header-edit reputation-form-modal">
