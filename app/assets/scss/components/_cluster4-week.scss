@@ -1951,6 +1951,52 @@
       flex-direction: column;
       gap: 8px;
 
+      // 작업 6: 빈 카드 dim + waiting.png + "주차 평판 카드 작성 대기 중..😊"
+      &.reputation-card-empty {
+        opacity: 0.4;
+        filter: grayscale(60%);
+        pointer-events: none;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        gap: 0;
+        justify-content: center;
+
+        .empty-content {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 100%;
+          gap: 12px;
+          padding: 8px 4px;
+        }
+
+        .empty-text {
+          color: rgba(255, 255, 255, 0.55);
+          font-family: "Pretendard", sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          line-height: 1.5;
+          flex: 1;
+          text-align: left;
+        }
+
+        .empty-image {
+          width: 72px;
+          height: 72px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.8;
+          }
+        }
+      }
+
       .card-profile {
         display: flex;
         align-items: center;
@@ -7210,6 +7256,13 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      // Zone A(<1920)에서 overlay display:block override로 flex 중앙 정렬 무효
+      // → 모달 자체를 absolute로 viewport 중앙 배치 (reputation-form/reputation-view-modal 동일 패턴)
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      margin: 0 !important;
 
       // ── 헤더 (110px) — reputation-view-modal 패턴 준용 ──
       .section-modal-header {
@@ -7264,26 +7317,41 @@
           overflow: visible !important;
         }
 
-        .modal-delete-btn {
+        // 【수정 3 (2차)】 삭제 버튼 — reputation-form modal-footer-right + modal-edit-btn 패턴
+        .modal-footer-right.modal-header-right {
           position: absolute;
           top: 16px;
-          right: 56px; // X 버튼(right 16px, ~20px) 왼쪽으로 충분한 간격
-          padding: 6px 14px;
-          background: rgba(231, 76, 60, 0.15);
-          border: 1px solid rgba(231, 76, 60, 0.4);
-          color: #e74c3c;
-          font-family: "Pretendard", sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          border-radius: 4px;
+          right: 56px; // X 버튼(right 16px + width ~20px + gap) 왼쪽
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .modal-edit-btn.modal-delete-btn {
+          padding: 8px 20px !important;
+          background: #faab07 !important;
+          color: #1a1a1a !important;
+          border: 1px solid transparent !important;
+          border-radius: 0 !important;
+          font-family: "Pretendard", sans-serif !important;
+          font-size: 14px !important;
+          font-weight: 600 !important;
+          white-space: nowrap;
           cursor: pointer;
-          transition: all 0.15s;
           line-height: 1;
+          transition: all 0.15s;
 
           &:hover {
-            background: rgba(231, 76, 60, 0.3);
-            border-color: #e74c3c;
+            background: #ffb820 !important;
           }
+        }
+
+        // 【수정 2 (2차)】 h3 앞 ✦ 제거 (_cluster4-season.scss 전역 ::before 오버라이드)
+        .modal-header-top h3::before {
+          content: none !important;
+          display: none !important;
         }
 
         .modal-close-btn {
@@ -7382,10 +7450,22 @@
       }
 
       // ── 미드 바디 레이아웃 (작업 2~6) ──
+      // 【수정 4 (2차)】 body 좌우 padding 0 → 자식에 margin 24 분산, 하단 섹션만 풀폭
       .section-modal-body.colleague-body {
         display: flex;
         flex-direction: column;
         gap: 14px;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      // 일반 콘텐츠는 좌우 24px margin (기존 body padding 대체)
+      .section-modal-body.colleague-body > .colleague-thanks-text,
+      .section-modal-body.colleague-body > .workinfo-personal-card,
+      .section-modal-body.colleague-body > .colleague-fromto,
+      .section-modal-body.colleague-body > .colleague-honor-section {
+        margin-left: 24px !important;
+        margin-right: 24px !important;
       }
 
       // 작업 2: 최상단 감사 텍스트
@@ -7448,42 +7528,51 @@
           align-items: center !important;
           gap: 6px;
           font-family: "Pretendard", sans-serif;
-          font-size: 12px !important;
+          font-size: 15px !important; // 【수정 1】 12 → 15
           color: #ddd;
 
+          // 【수정 2】 이름 박스(오렌지 border + 남색 bg + 26px 높이) 제거 — 보기전용 텍스트화
           .personal-name {
             display: inline-flex;
             align-items: center;
-            height: 26px;
-            padding: 2px 8px;
-            border: 1px solid rgba(255, 165, 0, 0.3);
-            background: rgb(26, 26, 46);
+            height: auto !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
             color: #fff;
             white-space: nowrap;
-            font-size: 12px !important;
+            font-size: 15px !important; // 【수정 1】 12 → 15
+            font-weight: 700;
           }
 
           .personal-gender,
           .personal-age {
             white-space: nowrap;
-            font-size: 12px !important;
+            font-size: 15px !important; // 【수정 1】 12 → 15
           }
 
+          // 【수정 3】 margin-left:auto 제거 → 이름|성별|나이 바로 오른쪽 인접 (gap 12px)
           .personal-tags {
-            margin-left: auto !important;
+            margin-left: 12px !important;
             display: flex !important;
             flex-direction: row !important;
             gap: 6px !important;
             flex-shrink: 0;
 
             .tag-badge {
-              font-size: 11px !important;
-              padding: 3px 10px !important;
-              max-width: 110px;
+              // 【수정 1 (2차)】 min = width = max 고정 → 글자수 무관 넉넉한 직사각형
+              min-width: 64px !important;
+              width: 64px !important;
+              max-width: 64px !important;
+              box-sizing: border-box !important;
+              padding: 4px 10px !important;
+              font-size: 13px !important;
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              border-radius: 9999px;
+              text-align: center !important;
+              border-radius: 0 !important;
               font-family: "Pretendard", sans-serif;
               font-weight: 600;
 
@@ -7509,7 +7598,7 @@
           align-items: center;
           column-gap: 6px;
           font-family: "Pretendard", sans-serif;
-          font-size: 12px !important;
+          font-size: 15px !important; // 【수정 1】 12 → 15
           color: #ddd;
           min-width: 0;
 
@@ -7520,7 +7609,7 @@
           .field-value {
             color: #fff;
             font-weight: 700;
-            font-size: 12px !important;
+            font-size: 15px !important; // 【수정 1】 12 → 15
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -7528,14 +7617,14 @@
 
           .field-label {
             color: #999;
-            font-size: 10px !important;
+            font-size: 13px !important; // 【수정 1】 10 → 13
           }
         }
 
         .personal-separator {
           color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
-          font-size: 12px !important;
+          font-size: 15px !important; // 【수정 1】 12 → 15
         }
       }
 
@@ -7601,23 +7690,20 @@
         }
       }
 
-      // 작업 6: 하단 구분선 + 타임스탬프 (reputation-view-modal 준용)
+      // 작업 6 / 【수정 4 (2차)】 — 하단 구분선: body padding 0 상태에서 풀폭 border-top
       .reputation-bottom-section {
         margin-top: auto;
-        margin-left: -24px !important;
-        margin-right: -24px !important;
-        padding-top: 12px;
-        padding-left: 24px !important;
-        padding-right: 24px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        padding: 12px 24px 0 !important;
+        border-top: 1px solid rgba(255, 165, 0, 0.2) !important;
         flex-shrink: 0;
+        box-sizing: border-box;
 
+        // 기존 divider element 숨김 (section border-top로 대체)
         .reputation-bottom-divider {
-          height: 1px;
-          background: rgba(255, 165, 0, 0.2);
-          margin-left: 0 !important;
-          margin-right: 0 !important;
-          width: 100% !important;
-          margin-bottom: 10px;
+          display: none !important;
         }
 
         .reputation-timestamp {

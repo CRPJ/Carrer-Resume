@@ -4550,7 +4550,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 return (
                   <div
                     key={user.id}
-                    className={`reputation-card ${isEmpty ? "empty" : ""}`}
+                    className={`reputation-card ${isEmpty ? "empty reputation-card-empty" : ""}`}
                     onClick={() => {
                       if (!isEmpty) {
                         setSelectedReputationCard(user);
@@ -4559,6 +4559,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     }}
                     style={{ cursor: isEmpty ? "default" : "pointer" }}
                   >
+                    {isEmpty ? (
+                      <div className="empty-content">
+                        <div className="empty-text">
+                          주차 평판 카드<br />작성 대기 중..😊
+                        </div>
+                        <div className="empty-image">
+                          <img src="/images/0/waiting.png" alt="대기 중" />
+                        </div>
+                      </div>
+                    ) : (
+                    <>
                     <div className="card-profile">
                       <div className="profile-image">{!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
                       <div className="profile-info">
@@ -4697,6 +4708,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isEmpty ? "-" : truncate(user.tagText, 10)}
                       </span>
                     </div>
+                    </>
+                    )}
                   </div>
                 );
               })}
@@ -6919,9 +6932,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <h3>연계 동료</h3>
               </div>
               <p className="modal-subtitle">저와 함께한 동료입니다. 😊</p>
-              <button className="modal-delete-btn" onClick={() => setShowDeleteConfirm(true)}>
-                삭제
-              </button>
+              <div className="modal-footer-right modal-header-right">
+                <button className="modal-edit-btn modal-delete-btn" onClick={() => setShowDeleteConfirm(true)}>
+                  삭제
+                </button>
+              </div>
               <button className="modal-close-btn" onClick={() => setColleagueViewModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
