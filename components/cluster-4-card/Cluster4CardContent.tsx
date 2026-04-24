@@ -2866,10 +2866,46 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setHeaderModalOpen(true);
   };
 
-  // [삭제] — 작업 5에서 완성. 작업 1에서는 placeholder (클릭 시 안내만).
-  // TODO: [백엔드 작업 필요] DELETE /api/weekly-reputations/:id 엔드포인트 확인/생성 → 작업 5에서 연동
-  const handleReputationDeleteClick = () => {
-    window.alert("삭제 기능은 준비 중입니다. (작업 5에서 구현)");
+  // [삭제] — 작업 5: 확인 팝업 → 데모/일반 분기 → 성공 시 view 닫기 + 자동 재정렬(useMemo 재계산)
+  // TODO: [백엔드 작업 필요] DELETE /api/weekly-reputations/:id 엔드포인트 확인/생성
+  const handleReputationDeleteClick = async () => {
+    if (!selectedReputationCard) return;
+
+    // 관리자 승인 체크 (데모=통과, 일반=기존 canEditReputation)
+    if (!canEditReputation) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+
+    const ok = window.confirm("이 평판을 삭제하시겠습니까?");
+    if (!ok) return;
+
+    const repId = selectedReputationCard.id;
+
+    try {
+      if (isDemoMode) {
+        // 데모 모드: 로컬 filter로 weeklyReputations에서 제거
+        setWeeklyReputations((prev) => prev.filter((r) => r.id !== repId));
+      } else {
+        // 일반 모드: DELETE API 호출 후 재조회
+        const res = await fetch(`/api/weekly-reputations/${repId}`, { method: "DELETE" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        await fetchWeeklyReputations();
+      }
+
+      // sentReputationsThisWeek 정합성 — 타인 페이지(isOwner=false)에서 내가 보낸 평판 삭제 시
+      // 로컬 state에서 제거하여 재작성 가능하도록 (best-effort)
+      if (!isOwner && urlUserId && weekId) {
+        setSentReputationsThisWeek((prev) => prev.filter((r) => !(r.targetUserId === urlUserId && r.weekCardId === weekId)));
+      }
+
+      // view 모달 닫기 — 재정렬은 reputationData useMemo 자동 재계산(작업 4 연계)
+      setReputationViewModalOpen(false);
+      setSelectedReputationCard(null);
+    } catch (err) {
+      console.error("평판 삭제 실패:", err);
+      window.alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   // isDirty — 스냅샷 대비 변경 여부
