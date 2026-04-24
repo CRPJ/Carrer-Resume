@@ -5914,6 +5914,7 @@
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
           margin: 4px 67px 0 80px; // 좌 80(아이콘+gap) / 우 67(close-btn 영역)
+          padding-left: 19px !important; // 사용자 요청: 오른쪽으로 0.5cm
           max-width: calc(100% - 147px);
           min-width: 0;
           white-space: normal !important;
@@ -5922,7 +5923,8 @@
           overflow: visible !important;
           text-overflow: unset !important;
           box-sizing: border-box !important;
-          transform: translateX(-95px);
+          transform: none !important; // 사용자 요청: translateX(-95px) 제거 (왼쪽으로 밀림 해소)
+          margin-left: 80px !important; // margin shorthand의 좌측값 명시 유지
         }
 
         .modal-close-btn {
@@ -6186,8 +6188,9 @@
           padding: 12px 16px;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          min-height: 72px;
-          max-height: 120px;
+          height: 80px !important; // 사용자 요청: 100자 기준 재계산 (150 → 80)
+          min-height: 80px !important;
+          max-height: 80px !important;
           overflow-y: auto;
 
           .reputation-content-text {
@@ -6206,7 +6209,7 @@
       // ── 하단: 평점 + FM ──
       .reputation-stats-row {
         display: flex;
-        align-items: center;
+        align-items: flex-end !important; // 사용자 요청: 별/라벨/값 하단 y좌표 일치
         gap: 40px;
         padding: 4px 0;
         flex-shrink: 0;
@@ -6228,10 +6231,17 @@
         .rating-stars {
           display: flex;
           gap: 2px;
+          transform: translateY(5px) !important; // 사용자 요청: 별만 0.3cm 아래로
+          line-height: 1.4 !important; // 사용자 요청: ★ glyph 상단 잘림 방지
+          height: auto !important;
+          overflow: visible !important;
 
           .rating-star {
+            display: inline-block;
             font-size: 24px !important; // 사용자 요청: 18 → 24
-            line-height: 1;
+            line-height: 1.4 !important; // 사용자 요청: 1 → 1.4 (glyph 잘림 해소)
+            overflow: visible !important;
+            vertical-align: middle;
 
             &.star-empty {
               color: rgba(255, 255, 255, 0.2);
@@ -6266,12 +6276,31 @@
         }
       }
 
-      // ── 최하단: 타임스탬프 (우측 정렬, 하단 붙음) ──
+      // ── 최하단: 구분선 + 타임스탬프 wrapper (사용자 요청: 하단 1.5cm 지점 구분선) ──
+      .reputation-bottom-section {
+        margin-top: auto;
+        margin-left: -24px !important; // 사용자 요청: body padding 상쇄
+        margin-right: -24px !important;
+        padding-top: 16px;
+        padding-left: 24px !important; // timestamp는 패딩 안쪽 유지
+        padding-right: 24px !important;
+        flex-shrink: 0;
+
+        .reputation-bottom-divider {
+          height: 1px;
+          background: rgba(255, 165, 0, 0.2); // 사용자 요청: 헤더와 동일 오렌지 투명
+          margin-left: -48px !important; // 사용자 요청: -24 → -48 (모달 좌우 끝까지 추가 확장)
+          margin-right: -48px !important;
+          width: calc(100% + 96px) !important;
+          margin-bottom: 12px;
+        }
+      }
+
+      // ── 최하단: 타임스탬프 (우측 정렬) ──
       .reputation-timestamp {
         display: flex;
         justify-content: flex-end;
         padding: 4px 0;
-        margin-top: auto;
         flex-shrink: 0;
 
         span {
@@ -10304,6 +10333,7 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
+    padding-top: 18px !important; // 사용자 요청: 내부 전체 그룹 0.2cm(8px) 아래로
     box-sizing: border-box;
     background: rgba(255, 255, 255, 0.02);
     gap: 12px !important; // 사용자 요청: 8 → 12 (카드 전체 행간)
@@ -10312,17 +10342,19 @@
     // 1행: 기업 로고 + 기업명 (사용자 요청: 아래 구분선 추가)
     .sponsor-company {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      align-items: flex-start !important;
+      gap: 12px !important; // 사용자 요청: 6 → 12 (로고/기업명 간격 확대)
       flex-shrink: 0;
       min-width: 0;
       padding-bottom: 10px; // 사용자 요청: 8 → 10
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      border-bottom: 1px solid #faab07 !important; // 사용자 요청: 노란색 구분선
       margin-bottom: 10px; // 사용자 요청: 8 → 10
 
       .sponsor-company-logo {
-        width: 56px !important; // 사용자 요청: 32 → 56 (로고 확대)
-        height: 56px !important;
+        width: 50% !important; // 사용자 요청: 60 → 50
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        max-width: none !important;
         flex-shrink: 0;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -10347,18 +10379,25 @@
         }
       }
 
-      // 기업명: min-width 고정 제거, 카드 폭에 맞춰 ellipsis
+      // 기업명: 최대 3줄 줄바꿈, 말줄임 제거 (사용자 요청)
       .sponsor-company-name {
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important; // 사용자 요청: 폰트 확대 (우측 폭 확대로 수용 가능)
+        font-size: 16px !important; // 사용자 요청: 13 → 16 (94px × 3줄 기준)
         font-weight: 600;
         color: rgb(255, 107, 107) !important; // 사용자 요청: link-dot 빨간색
         min-width: unset !important;
         max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: normal !important;
+        word-break: keep-all !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        line-height: 1.3 !important; // 사용자 요청: 1.4 → 1.3
         flex: 1;
+        align-self: flex-start !important;
+        margin-top: 0 !important;
       }
     }
 
@@ -10374,12 +10413,13 @@
       // 2행: 사진 좌측 + 라벨 우측
       .supervisor-row-2 {
         display: flex;
-        align-items: center;
+        align-items: flex-end !important; // 사용자 요청: 사진/라벨 하단 y좌표 일치
         justify-content: space-between;
 
         .sponsor-supervisor-photo {
-          width: 36px;
-          height: 36px;
+          width: 54px !important; // 사용자 요청: 36 → 54 (1.5배)
+          height: 54px !important;
+          margin-left: 19px !important; // 사용자 요청: 오른쪽으로 0.5cm
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
@@ -10401,24 +10441,30 @@
         // Supervised By — 하이라이터 스타일 (사용자 요청)
         .supervisor-label {
           font-family: "Pretendard", sans-serif;
-          font-size: 13px !important; // 사용자 요청: 우측 라벨 확대
+          font-size: 18px !important; // 사용자 요청: 13 → 18 (+5pt)
           font-style: italic;
           color: rgb(78, 205, 196) !important; // link-dot 청록색
           background-color: rgba(78, 205, 196, 0.3) !important; // 하이라이터 반투명 배경
           padding: 2px 6px !important;
           padding-right: 8px !important; // 사용자 요청: 우측 'y' 잘림 방지 여유
+          margin-right: 19px !important; // 사용자 요청: 왼쪽으로 0.5cm
           border-radius: 2px;
           text-align: right;
+          text-decoration: underline !important; // 사용자 요청: 밑줄
         }
       }
 
-      // 3·4행: 독립 행으로 카드 전체 폭 사용 — 폰트 13px 수용 가능
+      // 3·4행: grid 레이아웃 — name(80px) | sep(12px) | dept/position(1fr)
       .supervisor-details {
-        display: flex;
-        align-items: center;
+        display: grid !important; // 사용자 요청: flex → grid
+        grid-template-columns: 80px 12px 1fr !important;
         gap: 8px;
+        align-items: center;
+        margin-left: 11px !important; // 사용자 요청: 우측 이동 (여유 11px 활용)
+        margin-right: 0 !important;
+        width: calc(100% - 11px) !important;
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important;
+        font-size: 14px !important;
         color: #ddd;
         white-space: nowrap;
         max-width: 100%;
@@ -10427,25 +10473,35 @@
         .supervisor-separator {
           color: rgba(255, 255, 255, 0.3);
           flex-shrink: 0;
-          font-size: 13px !important;
-        }
-
-        .supervisor-name,
-        .supervisor-dept,
-        .supervisor-company,
-        .supervisor-position {
-          min-width: unset !important;
-          max-width: none;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-size: 13px !important;
-          flex: 1;
-          min-width: 0;
+          font-size: 14px !important;
+          text-align: center;
         }
 
         .supervisor-name {
           font-weight: 600;
+          font-size: 14px !important;
+          max-width: 80px;
+          overflow: hidden;
+
+          .honorific {
+            margin-left: 2px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px !important; // 사용자 요청: 이름 14px보다 작게
+          }
+        }
+
+        .supervisor-dept,
+        .supervisor-position {
+          font-size: 14px !important;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: unset !important;
+          white-space: nowrap;
+        }
+
+        .supervisor-company-placeholder {
+          min-width: 0;
+          overflow: hidden;
         }
       }
     }
@@ -10465,15 +10521,15 @@
     width: 100%;
     border: none !important;
     background: transparent !important;
-    margin: 0 !important;          // 모든 margin 리셋
-    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
-    padding: 0 !important;          // 모든 padding 리셋
+    margin: 0 !important; // 모든 margin 리셋
+    margin-top: -31px !important; // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important; // 모든 padding 리셋
     flex-shrink: 0 !important;
 
     .grade-label {
       font-family: "Pretendard", sans-serif !important;
-      font-size: 14px !important;          // 13 → 14 (통일)
-      font-weight: 700 !important;         // 600 → 700 (통일)
+      font-size: 14px !important; // 13 → 14 (통일)
+      font-weight: 700 !important; // 600 → 700 (통일)
       color: #ddd !important;
       white-space: nowrap;
     }
@@ -10589,7 +10645,7 @@
     gap: 8px;
     height: auto !important;
     max-height: none !important;
-    align-self: stretch !important;  // 좌측 전체 높이에 맞춤
+    align-self: stretch !important; // 좌측 전체 높이에 맞춤
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
   }
@@ -10604,15 +10660,15 @@
     width: 100%;
     border: none !important;
     background: transparent !important;
-    margin: 0 !important;          // 모든 margin 리셋
-    margin-top: -31px !important;  // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
-    padding: 0 !important;          // 모든 padding 리셋
+    margin: 0 !important; // 모든 margin 리셋
+    margin-top: -31px !important; // 평점 top = 라인코드 top 정렬 (실측 31px 상향)
+    padding: 0 !important; // 모든 padding 리셋
     flex-shrink: 0 !important;
 
     .rating-label {
       font-family: "Pretendard", sans-serif !important;
-      font-size: 14px !important;          // 13 → 14 (통일)
-      font-weight: 700 !important;         // 600 → 700 (통일)
+      font-size: 14px !important; // 13 → 14 (통일)
+      font-weight: 700 !important; // 600 → 700 (통일)
       color: #ddd !important;
       white-space: nowrap;
     }
@@ -10853,5 +10909,200 @@
     .tag-badge {
       padding: 3px 10px !important;
     }
+  }
+}
+
+// ============================================================================
+// reputation-view-modal 인적사항 원복 — 4개 모달 공유 스타일/내부 조정으로 커진
+// 폰트·태그 크기를 초기 상태(commit 325fbc8)로 복원.
+// workInfo/workExp/workAbility/workCareer 4개 모달에는 영향 없음.
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal {
+  .workinfo-personal-card {
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3,
+    .personal-name,
+    .personal-gender,
+    .personal-age,
+    .personal-separator,
+    .personal-field .field-value {
+      font-size: 11px !important;
+    }
+
+    .personal-field .field-label {
+      font-size: 9px !important;
+      margin-right: 0 !important;
+    }
+
+    .personal-separator {
+      padding-left: 0 !important;
+    }
+
+    .tag-badge {
+      font-size: 10px !important;
+      padding: 4px 7px !important;
+      width: 140px !important;
+      min-width: 140px !important;
+    }
+
+    .personal-tags,
+    .personal-row-1 .personal-tags {
+      width: 140px !important;
+      min-width: 140px !important;
+      max-width: 140px !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+      margin-left: auto !important;
+    }
+
+    .personal-tags .tag-badge,
+    .personal-tags .tag-badge.tag-role,
+    .personal-tags .tag-badge.tag-keyword {
+      width: 100% !important;
+    }
+  }
+}
+
+// ============================================================================
+// reputation-view-modal 인적사항 미세 조정 (4개 모달 영향 없음)
+//  · personal-photo 위로 0.2cm(translateY -8px) — 레이아웃 영향 없음
+//  · personal-info 폰트 +4pt (11px→15px, field-label 9px→13px)
+//  · personal-tags grid 3열 독립 배치 + 왼쪽 40px 이동(우측 여유 20px)
+//  · tag-badge 폰트 +4pt + padding 비례 확대
+// ============================================================================
+.cluster4-card-content .section-modal.reputation-view-modal {
+  .workinfo-personal-card {
+    // 사진: 위로 0.2cm 이동 (transform은 레이아웃에 영향 없음)
+    .personal-photo {
+      margin-top: 0 !important;
+      transform: translateY(-8px) !important;
+    }
+
+    // 인적사항 폰트 +4pt
+    .personal-info {
+      .personal-row-1,
+      .personal-row-2,
+      .personal-row-3,
+      .personal-name,
+      .personal-gender,
+      .personal-age,
+      .personal-separator,
+      .personal-field .field-value {
+        font-size: 15px !important;
+      }
+
+      .personal-field .field-label {
+        font-size: 13px !important;
+      }
+    }
+
+    // 태그 블록 — grid 3열에 독립 배치 + 세로 2행
+    // (TSX에서 .personal-tags를 .personal-info 밖, .personal-grid 직접 자식으로 이동 완료)
+    .personal-grid {
+      display: grid !important;
+      grid-template-columns: auto 1fr auto !important;
+      align-items: center !important;
+    }
+
+    .personal-photo {
+      grid-column: 1 !important;
+    }
+
+    .personal-info {
+      grid-column: 2 !important;
+    }
+
+    .personal-tags {
+      grid-column: 3 !important;
+      grid-row: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      align-items: flex-end !important;
+      justify-self: end !important;
+      margin: 0 20px 0 -80px !important; // 사용자 요청: -40 → -80 (태그 확대분 보상)
+      width: 192px !important; // 사용자 요청: 140 → 192 (10글자 + padding 수용)
+      min-width: 192px !important;
+      max-width: 192px !important;
+    }
+
+    // 태그 박스 폰트 +4pt + padding 비례 확대 + 고정폭 192px
+    .tag-badge,
+    .personal-tags .tag-badge,
+    .personal-tags .tag-badge.tag-role,
+    .personal-tags .tag-badge.tag-keyword {
+      font-size: 16px !important;
+      padding: 6px 16px !important;
+      width: 192px !important; // 사용자 요청: 10글자 + padding 고정폭
+      min-width: 192px !important;
+      max-width: 192px !important;
+      box-sizing: border-box !important;
+      text-align: center;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 하단 구분선 + 타임스탬프 가시성 강화 (사용자 문제 3)
+  // body overflow-y: auto 환경에서 스크롤 아래로 밀리지 않도록
+  // body 자체의 padding-bottom 확보 + 요소 명시적 visibility
+  // ──────────────────────────────────────────────────────────────────────
+  .section-modal-body.reputation-body {
+    padding-bottom: 16px !important;
+  }
+
+  .reputation-bottom-section {
+    position: relative !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-top: auto !important;
+    padding-top: 16px !important;
+    flex-shrink: 0 !important;
+    z-index: 10;
+    // 사용자 요청: body padding(24px 좌우) 만큼 확장하여 모달 끝까지 divider 표시
+    overflow: visible !important;
+    margin-left: -24px !important;
+    margin-right: -24px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: calc(100% + 48px) !important;
+  }
+
+  .reputation-bottom-divider {
+    display: block !important;
+    visibility: visible !important;
+    height: 1px !important;
+    background: rgba(255, 165, 0, 0.2) !important; // 사용자 요청: 헤더와 동일 오렌지 투명
+    background-color: rgba(255, 165, 0, 0.2) !important;
+    margin: 0 0 12px 0 !important; // 사용자 요청: divider는 section 전체 폭 사용
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .reputation-timestamp {
+    display: flex !important;
+    justify-content: flex-end !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateX(20px) !important; // 사용자 요청: 우측 1.5cm 이동 (레이아웃 영향 없음)
+    padding-left: 24px !important; // 사용자 요청: 타임스탬프는 원래 안쪽 위치 유지
+    padding-right: 24px !important;
+
+    span {
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px !important; // 사용자 요청: 11 → 13 (+2pt)
+      color: rgba(255, 255, 255, 0.4) !important;
+      text-align: right;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // 키워드 태그(#힘 등) 위아래 여백 확보 (사용자 요청)
+  // TSX: <span className="tag tag--pink"> → .reputation-content-section > .tag
+  // ──────────────────────────────────────────────────────────────────────
+  .reputation-content-section > .tag {
+    margin-top: 16px !important;
+    margin-bottom: 12px !important;
   }
 }

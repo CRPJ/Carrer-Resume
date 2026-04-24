@@ -1483,6 +1483,11 @@
                     border-radius: 8px;
                     object-fit: contain;
                   }
+
+                  &.sns-icon-empty {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px dashed rgba(255, 255, 255, 0.1);
+                  }
                 }
 
                 // 8번째 카드 SNS 아이콘 그라데이션

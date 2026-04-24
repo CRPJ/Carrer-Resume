@@ -675,9 +675,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // reputation-view-modal 최하단 타임스탬프 — YY. MM. DD(요일)  HH:MM
   // TODO: [백엔드 작업 필요] weeklyReputations에 created_at 필드 추가 시 자동 동작
   const formatReputationTime = (timestamp: string | undefined | null): string => {
-    if (!timestamp) return "";
+    const placeholder = "00. 00. 00(0)  00:00"; // 사용자 요청: 데이터 없을 때 공간 유지
+    if (!timestamp) return placeholder;
     const d = new Date(timestamp);
-    if (isNaN(d.getTime())) return "";
+    if (isNaN(d.getTime())) return placeholder;
     const days = ["일", "월", "화", "수", "목", "금", "토"];
     const yy = String(d.getFullYear()).slice(-2);
     const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -6251,10 +6252,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="personal-age">
                         {mask.age(selectedReputationCard.age) || "—"} 세
                       </span>
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
-                        <span className="tag-badge tag-keyword">{selectedReputationCard.nickname || selectedReputationCard.keyword || "키워드"}</span>
-                      </div>
                     </div>
 
                     <div className="personal-row-2">
@@ -6280,6 +6277,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <span className="field-label">파트</span>
                       </span>
                     </div>
+                  </div>
+
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
+                    <span className="tag-badge tag-keyword">{selectedReputationCard.nickname || selectedReputationCard.keyword || "키워드"}</span>
                   </div>
                 </div>
               </div>
@@ -6319,9 +6321,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
 
-              {/* 최하단: 타임스탬프 (우측 정렬) — 백엔드 created_at 없으면 빈 문자열 */}
-              <div className="reputation-timestamp">
-                <span>{formatReputationTime(selectedReputationCard.createdAt)}</span>
+              {/* 최하단: 구분선 + 타임스탬프 (우측 정렬) — 백엔드 created_at 없으면 빈 문자열 */}
+              <div className="reputation-bottom-section">
+                <div className="reputation-bottom-divider"></div>
+                <div className="reputation-timestamp">
+                  <span>{formatReputationTime(selectedReputationCard.createdAt)}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -7972,15 +7977,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 </div>
                                 <span className="supervisor-label">Supervised By</span>
                               </div>
-                              {/* 3행: 이름 | 직무 */}
+                              {/* 3행: 이름 님 | 부서 */}
                               <div className="supervisor-details">
-                                <span className="supervisor-name">{selectedWorkCareerCard.supervisorName || "-"}</span>
+                                <span className="supervisor-name">
+                                  {selectedWorkCareerCard.supervisorName || "-"}
+                                  <span className="honorific"> 님</span>
+                                </span>
                                 <span className="supervisor-separator">|</span>
                                 <span className="supervisor-dept">{selectedWorkCareerCard.supervisorDept || "-"}</span>
                               </div>
-                              {/* 4행: 회사 | 직책 */}
+                              {/* 4행: 직책 (company 숨김, divider는 visible 유지 → x좌표 grid 일치) */}
                               <div className="supervisor-details">
-                                <span className="supervisor-company">{selectedWorkCareerCard.supervisorCompany || "-"}</span>
+                                <span className="supervisor-company-placeholder" style={{ visibility: "hidden" }}>-</span>
                                 <span className="supervisor-separator">|</span>
                                 <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
                               </div>
