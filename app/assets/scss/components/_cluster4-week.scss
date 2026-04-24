@@ -1989,13 +1989,9 @@
       flex-direction: column;
       gap: 8px;
 
-      // 작업 6 재구현: 1~3개 상태의 빈 슬롯 — 단순 플레이스홀더만 (waiting 이미지/텍스트 없음)
-      &.reputation-card-empty {
-        opacity: 0.4;
-        pointer-events: none;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px dashed rgba(255, 255, 255, 0.15);
-      }
+      // 작업 6 재구현(3차): 1~3개 상태의 빈 슬롯은 pre-6단계와 동일 — 카드 골격 그대로 + 내부 값만 "-" placeholder
+      // 별도 SCSS 오버라이드 없음. .empty 클래스는 TSX의 isEmpty 분기용 마커로만 사용 (현재 CSS 효과 없음)
+      // ⚠️ dim/grayscale 제거 — 빈 슬롯도 정상 카드와 동일한 외관 (값만 비어있는 상태)
 
       .card-profile {
         display: flex;

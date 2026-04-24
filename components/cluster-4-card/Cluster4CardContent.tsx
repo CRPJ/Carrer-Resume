@@ -4561,21 +4561,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="reputation-cards-grid">
                   {reputationData.map((user, index) => {
                     const isEmpty = user.isEmpty || isRestMode;
-                    // 1~3개 상태의 빈 슬롯: 단순 플레이스홀더 (waiting 이미지/텍스트 없음)
-                    if (isEmpty) {
-                      return <div key={user.id} className="reputation-card reputation-card-empty" />;
-                    }
+                    // 1~3개 상태의 빈 슬롯: 카드 골격 + 내부 자리(프로필/별/코멘트/FM) 유지 + 각 자리의 값만 placeholder
+                    // (pre-6단계 원래 구조: 같은 .reputation-card에 isEmpty 조건부 "-" 값)
                     return (
                   <div
                     key={user.id}
-                    className="reputation-card"
+                    className={`reputation-card ${isEmpty ? "empty" : ""}`}
                     onClick={() => {
-                      setSelectedReputationCard(user);
-                      setReputationViewModalOpen(true);
+                      if (!isEmpty) {
+                        setSelectedReputationCard(user);
+                        setReputationViewModalOpen(true);
+                      }
                     }}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: isEmpty ? "default" : "pointer" }}
                   >
-                    <>
                     <div className="card-profile">
                       <div className="profile-image">{!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
                       <div className="profile-info">
@@ -4714,7 +4713,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {isEmpty ? "-" : truncate(user.tagText, 10)}
                       </span>
                     </div>
-                    </>
                   </div>
                 );
               })}
@@ -6811,19 +6809,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {reputationViewModalOpen && selectedReputationCard && (
         <div className="section-modal-overlay">
           <div className="section-modal reputation-view-modal">
-            {/* ── 헤더 (110px) — workInfo/workExp 패턴 준용 + [삭제][수정][X] 3버튼 ── */}
+            {/* ── 헤더 (110px) — workInfo/workExp 패턴 준용 ── */}
             <div className="section-modal-header">
               <div className="modal-header-top">
                 <img src="/images/0/write.png" alt="write" />
                 <h3>위클리 평판 (Weekly Reputation)</h3>
               </div>
               <p className="modal-subtitle">저는 당신의 한 주를 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊</p>
-              <button className="modal-delete-btn" onClick={handleReputationDeleteClick}>
-                삭제
-              </button>
-              <button className="modal-edit-btn" onClick={handleReputationEditClick}>
-                수정
-              </button>
               <button className="modal-close-btn" onClick={() => setReputationViewModalOpen(false)}>
                 <i className="ti ti-x"></i>
               </button>
