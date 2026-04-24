@@ -6328,114 +6328,111 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 <span className="tagsanjiseok-highlight">타산지석</span>으로 삼아보자구요!
               </p>
             </div>
-            <div className="section-modal-body">
-              <div className="modal-card-item modal-card-header-edit reputation-form-modal">
-                {/* 평판 작성 폼 */}
-                <div className="reputation-form">
-                  {/* 평점 */}
-                  <div className="form-field">
-                    <label>평점</label>
-                    <div className="rating-row">
-                      <div className="star-rating-sm">
-                        {[1, 2, 3, 4, 5].map((starIndex) => {
-                          const fullValue = starIndex * 2;
-                          const halfValue = starIndex * 2 - 1;
-                          const currentRating = reputationEditData.rating;
-                          const isHalf = currentRating >= halfValue && currentRating < fullValue;
-                          const isFull = currentRating >= fullValue;
+            {/* ── 미드 (342px) — 2열 레이아웃 (평점 + 키워드) + 내용 textarea ── */}
+            <div className="section-modal-body reputation-form-body">
+              <div className="reputation-form-top">
+                {/* 1열: 평점 */}
+                <div className="form-rating-section">
+                  <h4>
+                    ■ 평점을 입력해주세요.
+                  </h4>
+                  <div className="rating-input">
+                    <div className="rating-stars">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const halfValue = reputationEditData.rating / 2;
+                        let starClass = "star-empty";
+                        if (halfValue >= star) starClass = "star-full";
+                        else if (halfValue >= star - 0.5) starClass = "star-half";
 
-                          return (
-                            <div key={starIndex} className="star-wrapper">
-                              {/* 배경 별 (빈 별) */}
-                              <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                              </svg>
-                              {/* 반개 채움 */}
-                              {isHalf && (
-                                <svg className="star-half-fill" viewBox="0 0 24 24">
-                                  <defs>
-                                    <clipPath id={`halfClip${starIndex}`}>
-                                      <rect x="0" y="0" width="12" height="24" />
-                                    </clipPath>
-                                  </defs>
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#halfClip${starIndex})`} />
-                                </svg>
-                              )}
-                              {/* 전체 채움 */}
-                              {isFull && (
-                                <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                </svg>
-                              )}
-                              {/* 클릭 영역 */}
-                              <button className="star-click-area star-click-left" type="button" onClick={() => setReputationEditData((prev) => ({ ...prev, rating: halfValue }))} />
-                              <button className="star-click-area star-click-right" type="button" onClick={() => setReputationEditData((prev) => ({ ...prev, rating: fullValue }))} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <span className="rating-value">{reputationEditData.rating} / 10</span>
+                        return (
+                          <span
+                            key={star}
+                            className={`rating-star clickable ${starClass}`}
+                            onClick={(e) => {
+                              const rect = (e.currentTarget as HTMLSpanElement).getBoundingClientRect();
+                              const clickX = e.clientX - rect.left;
+                              const isLeftHalf = clickX < rect.width / 2;
+                              const newRating = star * 2 - (isLeftHalf ? 1 : 0);
+                              handleRatingClick(newRating);
+                            }}
+                          >
+                            ★
+                          </span>
+                        );
+                      })}
                     </div>
-                  </div>
-
-                  {/* 내용 */}
-                  <div className="form-field">
-                    <label>
-                      내용 <span className="char-limit">(최대 100자)</span>
-                    </label>
-                    <div className="textarea-wrapper">
-                      <textarea
-                        placeholder="해당 크루에 대한 평가 내용을 작성해주세요..."
-                        maxLength={100}
-                        rows={3}
-                        value={reputationEditData.content}
-                        onChange={(e) => {
-                          if (e.target.value.length > 100) {
-                            alert("최대 100자까지 입력할 수 있습니다.");
-                            return;
-                          }
-                          setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
-                        }}
-                      ></textarea>
-                      <span className="char-counter">{reputationEditData.content.length} / 100</span>
-                    </div>
-                  </div>
-
-                  {/* 키워드 */}
-                  <div className="form-field">
-                    <label>
-                      키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 7자)</span>
-                    </label>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
-                      <input
-                        type="text"
-                        placeholder="키워드를 입력하세요"
-                        maxLength={7}
-                        value={reputationEditData.keyword}
-                        onChange={(e) => {
-                          if (e.target.value.length > 7) {
-                            alert("최대 7자까지 입력할 수 있습니다.");
-                            return;
-                          }
-                          setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
-                        }}
-                        style={{
-                          display: "block",
-                          width: "100%",
-                          height: "48px",
-                          padding: "12px 14px",
-                          background: "#1a1f2e",
-                          border: "1px solid #FFA500",
-                          borderRadius: "0",
-                          color: "#fff",
-                          fontSize: "14px",
-                          outline: "none",
-                        }}
-                      />
-                    </div>
+                    <span className="rating-value">{reputationEditData.rating} / 10</span>
                   </div>
                 </div>
+
+                {/* 2열: 키워드 */}
+                <div className="form-keyword-section">
+                  <h4>
+                    ■ 키워드를 입력해주세요. <span className="limit-hint">(최대 10자)</span>
+                  </h4>
+                  <div className="keyword-mode-select">
+                    <label>
+                      <input
+                        type="radio"
+                        name="keywordMode"
+                        value="select"
+                        checked={formKeywordMode === "select"}
+                        onChange={() => handleKeywordModeChange("select")}
+                      />
+                      선택
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="keywordMode"
+                        value="write"
+                        checked={formKeywordMode === "write"}
+                        onChange={() => handleKeywordModeChange("write")}
+                      />
+                      작성
+                    </label>
+                  </div>
+                  <div className="keyword-input-wrapper">
+                    <span className="keyword-hash">#</span>
+                    <input
+                      type="text"
+                      className="keyword-input"
+                      value={reputationEditData.keyword}
+                      onChange={(e) => {
+                        if (formKeywordMode === "write") {
+                          setReputationEditData((prev) => ({ ...prev, keyword: e.target.value.slice(0, 10) }));
+                          setSaveAttemptFailed(false);
+                        }
+                      }}
+                      placeholder={formKeywordMode === "write" ? "해당 크루의 한 주 활동의 특징을 키워드로 입력해주세요." : "선택 버튼을 눌러 키워드를 선택하세요"}
+                      maxLength={10}
+                      readOnly={formKeywordMode === "select"}
+                      onKeyDown={(e) => {
+                        if (formKeywordMode === "select") {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 하단: 내용 */}
+              <div className="form-content-section">
+                <h4>
+                  ■ 내용을 입력해주세요. <span className="limit-hint">(최대 100자)</span>
+                </h4>
+                <textarea
+                  className="form-content-textarea"
+                  value={reputationEditData.content}
+                  onChange={(e) => {
+                    setReputationEditData((prev) => ({ ...prev, content: e.target.value.slice(0, 100) }));
+                    setSaveAttemptFailed(false);
+                  }}
+                  placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요."
+                  maxLength={100}
+                />
+                <div className="char-count">{reputationEditData.content.length}/100</div>
               </div>
             </div>
             <div className="section-modal-footer">
