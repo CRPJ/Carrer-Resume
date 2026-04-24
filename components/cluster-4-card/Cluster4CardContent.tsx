@@ -4544,31 +4544,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
             </div>
-            <div className="reputation-cards-grid">
-              {reputationData.map((user, index) => {
-                const isEmpty = user.isEmpty || isRestMode;
+            {(() => {
+              // 카드 0개(또는 휴식 주차): 4슬롯 전체 영역을 통합 대기 영역으로 표시
+              const filledCount = isRestMode ? 0 : reputationData.filter((c: any) => c && !c.isEmpty).length;
+              if (filledCount === 0) {
                 return (
+                  <div className="reputation-cards-grid reputation-all-empty">
+                    <div className="reputation-waiting-full">
+                      <img src="/images/0/waiting.png" alt="waiting" />
+                      <p>주차 평판 카드 작성 대기 중.. 😊</p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className="reputation-cards-grid">
+                  {reputationData.map((user, index) => {
+                    const isEmpty = user.isEmpty || isRestMode;
+                    // 1~3개 상태의 빈 슬롯: 단순 플레이스홀더 (waiting 이미지/텍스트 없음)
+                    if (isEmpty) {
+                      return <div key={user.id} className="reputation-card reputation-card-empty" />;
+                    }
+                    return (
                   <div
                     key={user.id}
-                    className={`reputation-card ${isEmpty ? "empty reputation-card-empty" : ""}`}
+                    className="reputation-card"
                     onClick={() => {
-                      if (!isEmpty) {
-                        setSelectedReputationCard(user);
-                        setReputationViewModalOpen(true);
-                      }
+                      setSelectedReputationCard(user);
+                      setReputationViewModalOpen(true);
                     }}
-                    style={{ cursor: isEmpty ? "default" : "pointer" }}
+                    style={{ cursor: "pointer" }}
                   >
-                    {isEmpty ? (
-                      <div className="empty-content">
-                        <div className="empty-text">
-                          주차 평판 카드<br />작성 대기 중..😊
-                        </div>
-                        <div className="empty-image">
-                          <img src="/images/0/waiting.png" alt="대기 중" />
-                        </div>
-                      </div>
-                    ) : (
                     <>
                     <div className="card-profile">
                       <div className="profile-image">{!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
@@ -4709,11 +4715,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </span>
                     </div>
                     </>
-                    )}
                   </div>
                 );
               })}
-            </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* 연계 동료 */}

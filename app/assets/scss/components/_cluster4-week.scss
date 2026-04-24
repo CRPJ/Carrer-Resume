@@ -1940,6 +1940,44 @@
     width: calc(100% + 21px);
     max-width: none;
 
+    // 작업 6 재구현: 카드 0개일 때 4슬롯 전체를 통합 대기 영역으로 전환
+    // (grid → flex 전환, 대기 이미지 + 텍스트 중앙 배치, 기존 4카드 그리드 높이 유지)
+    &.reputation-all-empty {
+      display: flex !important;
+      grid-template-columns: none !important;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px; // 4카드 2×2 그리드 총 높이 근사치 (실측 후 조정 가능)
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+
+    .reputation-waiting-full {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+
+      img {
+        width: 180px;
+        height: auto;
+        opacity: 0.8;
+      }
+
+      p {
+        font-family: "Pretendard", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+        text-align: center;
+      }
+    }
+
     .reputation-card {
       width: 100%;
       background: #232323;
@@ -1951,50 +1989,12 @@
       flex-direction: column;
       gap: 8px;
 
-      // 작업 6: 빈 카드 dim + waiting.png + "주차 평판 카드 작성 대기 중..😊"
+      // 작업 6 재구현: 1~3개 상태의 빈 슬롯 — 단순 플레이스홀더만 (waiting 이미지/텍스트 없음)
       &.reputation-card-empty {
         opacity: 0.4;
-        filter: grayscale(60%);
         pointer-events: none;
         background: rgba(255, 255, 255, 0.03);
         border: 1px dashed rgba(255, 255, 255, 0.15);
-        gap: 0;
-        justify-content: center;
-
-        .empty-content {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 100%;
-          gap: 12px;
-          padding: 8px 4px;
-        }
-
-        .empty-text {
-          color: rgba(255, 255, 255, 0.55);
-          font-family: "Pretendard", sans-serif;
-          font-size: 14px;
-          font-weight: 500;
-          line-height: 1.5;
-          flex: 1;
-          text-align: left;
-        }
-
-        .empty-image {
-          width: 72px;
-          height: 72px;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            opacity: 0.8;
-          }
-        }
       }
 
       .card-profile {
@@ -4919,7 +4919,7 @@
 
         .modal-subtitle {
           margin: 4px 67px 0 80px;
-          padding-left: 19px;
+          padding-left: 0 !important; // 사용자 요청: h3 시작 x좌표와 일치 (기존 +19 제거)
           max-width: calc(100% - 147px);
           min-width: 0;
           font-family: "Pretendard", sans-serif;
@@ -5722,10 +5722,10 @@
         line-height: 1.6;
         padding-top: 8px;
 
+        // 사용자 요청: 헤더 h3 앞 ✦ 제거
         &::before {
-          content: "✦";
-          font-size: 0.875rem;
-          color: #faab07;
+          content: none !important;
+          display: none !important;
         }
       }
 
@@ -6788,6 +6788,12 @@
             font-weight: 700;
             color: #faab07;
             margin: 0;
+
+            // 사용자 요청: 헤더 h3 앞 ✦ 제거 (_cluster4-season.scss 전역 ::before 오버라이드)
+            &::before {
+              content: none !important;
+              display: none !important;
+            }
           }
         }
 
@@ -6796,7 +6802,7 @@
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
           margin: 4px 67px 0 80px; // 좌 80(아이콘+gap) / 우 67(close-btn 영역)
-          padding-left: 19px !important; // 사용자 요청: 오른쪽으로 0.5cm
+          padding-left: 0 !important; // 사용자 요청: h3 시작 x와 일치 (기존 +19 제거)
           max-width: calc(100% - 147px);
           min-width: 0;
           white-space: normal !important;
