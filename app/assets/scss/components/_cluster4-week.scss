@@ -1,5 +1,16 @@
 // Cluster 4 - Club Challenge Growth Styles
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+// reputation-form 전용 필드 깜빡임 키프레임 (cluster3의 border-blink와 동일 컨셉, outline 기반으로 레이아웃 shift 없음)
+@keyframes reputation-field-blink {
+  0%,
+  100% {
+    outline: 2px solid transparent;
+  }
+  50% {
+    outline: 2px solid #ff4444;
+  }
+}
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Azeret+Mono:wght@400&family=Poppins:wght@400;700&display=block");
 
 @font-face {
@@ -4801,6 +4812,14 @@
       max-height: 570px !important;
       display: flex;
       flex-direction: column;
+      // 사용자 요청: Zone A(<1920)에서 overlay가 display:block으로 override되어 flex 중앙 정렬 무효
+      // → 모달 자체를 absolute로 viewport 중앙 배치 (Zone B/C에도 영향 없음, 결과 동일 중앙)
+      // position: absolute는 confirm-popup-overlay(내부 absolute, inset:0)의 기준점 역할도 겸함
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      margin: 0 !important;
 
       // 타산지석 하이라이터
       .tagsanjiseok-highlight {
@@ -4811,9 +4830,82 @@
         font-weight: 600;
       }
 
+      .section-modal-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        height: auto;
+        min-height: 110px;
+        max-height: none;
+        padding: 8px 24px 16px;
+        position: relative;
+        overflow: visible;
+        border-bottom: none;
+        background: transparent;
+
+        .modal-header-top {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+
+          img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            flex-shrink: 0;
+          }
+
+          h3 {
+            margin: 0;
+            font-family: "Pretendard", sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #faab07;
+            line-height: 1.4;
+            padding-top: 0;
+          }
+        }
+
+        .modal-subtitle {
+          margin: 4px 67px 0 80px;
+          padding-left: 19px;
+          max-width: calc(100% - 147px);
+          min-width: 0;
+          font-family: "Pretendard", sans-serif;
+          font-size: 13px;
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal-close-btn {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          padding: 4px;
+          line-height: 1;
+
+          i {
+            font-size: 20px;
+          }
+
+          &:hover {
+            color: #faab07;
+          }
+        }
+      }
+
       // ── 미드 (342px) — 2열 레이아웃 + 내용 textarea (4단계) ──
       .reputation-form-body {
-        padding: 24px;
+        padding: 12px 24px 24px; // 사용자 요청: top 24 → 12 (평점/키워드 행 위로 이동)
         flex: 1 1 auto;
         overflow-y: auto;
         box-sizing: border-box;
@@ -4823,10 +4915,10 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 32px;
-        margin-bottom: 24px;
+        margin-bottom: 12px; // 사용자 요청: 평점/키워드 ↔ 내용 간격 유지 (이미 축소된 값)
       }
 
-      // 공통 섹션 h4 + .limit-hint
+      // 공통 섹션 h4 + .limit-hint + .required-mark
       .form-rating-section,
       .form-keyword-section,
       .form-content-section {
@@ -4837,6 +4929,14 @@
           color: #ddd;
           margin: 0 0 12px 0;
 
+          .required-mark {
+            color: #e74c3c !important;
+            font-weight: 700 !important;
+            font-size: 16px !important;
+            margin-left: 4px;
+            margin-right: 4px;
+          }
+
           .limit-hint {
             font-size: 12px;
             font-weight: 400;
@@ -4846,25 +4946,111 @@
         }
       }
 
+      // 사용자 요청: char-count absolute 기준점 — form-content-section 전용 position: relative
+      .form-content-section {
+        position: relative;
+      }
+
+      // 사용자 요청: 필수필드 검증 실패 시 빨간 테두리 하이라이트
+      .field-error {
+        border-color: #e74c3c !important;
+        box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+
+        &.flash {
+          animation: field-error-flash 0.3s ease-in-out 2 !important;
+        }
+      }
+
+      .rating-stars.field-error {
+        // 별점 영역은 border 대신 배경 연하게 + outline-style 테두리 (레이아웃 shift 없음)
+        background: rgba(231, 76, 60, 0.05);
+        border: 1px solid rgba(231, 76, 60, 0.3) !important;
+        box-shadow: none !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+
+        &.flash {
+          animation: field-error-flash 0.3s ease-in-out 2 !important;
+        }
+      }
+
+      @keyframes field-error-flash {
+        0%,
+        100% {
+          border-color: #e74c3c;
+          box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+        }
+        50% {
+          border-color: #ff6b6b;
+          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
+        }
+      }
+
       // 1열: 평점
       .rating-input {
         display: flex;
         align-items: center;
         gap: 12px;
+        margin-left: 19px;
+
+        // cluster3 패턴 적용: field-missing 시 outline 빨간 깜빡임 (stars는 span이라 border-blink 대상 아님)
+        &.field-missing {
+          animation: reputation-field-blink 0.3s ease-in-out 3;
+          outline-offset: 4px;
+        }
+
+        .rating-select {
+          padding: 6px 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ddd;
+          font-family: "Pretendard", sans-serif;
+          font-size: 14px;
+          border-radius: 4px;
+          cursor: pointer;
+
+          &:focus {
+            outline: none;
+            border-color: #faab07;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+
+          &.field-error {
+            border-color: rgba(231, 76, 60, 0.6) !important;
+            background: rgba(231, 76, 60, 0.05);
+          }
+        }
 
         .rating-stars {
           display: flex;
           gap: 4px;
+          margin-top: 11px !important; // y좌표 0.3cm 아래로
 
           .rating-star {
             font-size: 32px;
             line-height: 1;
-            cursor: pointer;
+            cursor: default;
             transition: transform 0.1s;
             user-select: none;
 
-            &:hover {
+            &.clickable {
+              cursor: pointer;
+            }
+
+            &.clickable:hover {
               transform: scale(1.1);
+            }
+
+            &.readonly {
+              cursor: default;
+
+              &:hover {
+                transform: none;
+              }
             }
 
             &.star-empty {
@@ -4896,7 +5082,7 @@
       .keyword-mode-select {
         display: flex;
         gap: 24px;
-        margin-bottom: 12px;
+        margin-bottom: 8px !important;
 
         label {
           display: flex;
@@ -4947,7 +5133,7 @@
           }
 
           &[readonly] {
-            cursor: not-allowed;
+            cursor: default;
             background: rgba(255, 255, 255, 0.08);
           }
         }
@@ -4958,6 +5144,7 @@
         width: 100%;
         height: 100px;
         padding: 12px 16px;
+        padding-bottom: 24px !important; // 사용자 요청: 카운터 영역 확보
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.15);
         color: #ddd;
@@ -4979,17 +5166,65 @@
         }
       }
 
+      // 사용자 요청: 카운터를 textarea 내부 우하단 absolute 배치 + 10px 축소
       .char-count {
-        text-align: right;
+        position: absolute !important;
+        bottom: 6px !important;
+        right: 10px !important;
         font-family: "Pretendard", sans-serif;
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.4);
-        margin-top: 4px;
+        font-size: 10px !important;
+        color: rgba(255, 255, 255, 0.4) !important;
+        background: transparent !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        pointer-events: none;
+        margin: 0 !important;
+        z-index: 2;
       }
 
       // ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] (5단계) ──
       // 4개 모달(work-view-modal)의 .section-modal-footer 규칙과 동일 값 — reputation-form 전용 스코프에 복제
       // reputation-form은 편집 전용 모달이므로 [수정] 버튼 없음 ([취소][초기화][저장])
+      .reputation-form-body {
+        padding-top: 8px !important;
+      }
+
+      .form-rating-section h4,
+      .form-keyword-section h4,
+      .form-content-section h4 {
+        margin-bottom: 4px !important;
+      }
+
+      .rating-input {
+        margin-top: 0 !important;
+      }
+
+      .keyword-mode-select {
+        margin-top: 0 !important;
+        margin-bottom: 4px !important;
+      }
+
+      .reputation-form-top {
+        margin-bottom: 0 !important;
+      }
+
+      .form-content-textarea {
+        margin-top: 0 !important;
+        height: 90px !important;
+        min-height: 90px !important;
+        max-height: 90px !important;
+        padding-bottom: 20px !important;
+      }
+
+      .form-content-section {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
+
+      .keyword-input-wrapper {
+        margin-bottom: 0 !important;
+      }
+
       .section-modal-footer {
         flex-shrink: 0;
         display: flex;
@@ -5120,6 +5355,294 @@
           white-space: nowrap;
           &:hover {
             background: rgba(76, 175, 80, 0.1);
+          }
+        }
+
+        .modal-edit-btn {
+          padding: 8px 20px;
+          background: #faab07;
+          border: 1px solid transparent;
+          color: #1a1a1a;
+          border-radius: 0;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+
+          &:hover {
+            background: #ffb820;
+          }
+        }
+      }
+
+      // ── 키워드 선택 중첩 모달 — section-modal 패턴 (가로형_중 979×570) ──
+      // 사용자 요청: reputation-view-modal 헤더 패턴 + 7-col grid + ★ 선택 표식
+      .keyword-select-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.68);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100002;
+      }
+
+      .keyword-select-modal {
+        width: 979px !important;
+        max-width: 979px !important;
+        height: 570px !important;
+        max-height: 570px !important;
+        background: #121212;
+        border: 1px solid rgba(250, 171, 7, 0.24);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .section-modal-header {
+          height: 110px;
+          min-height: 110px;
+          max-height: 110px;
+          padding: 16px 24px 4px;
+          position: relative;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          box-sizing: border-box;
+          border-bottom: none;
+          background: transparent;
+
+          .modal-header-top {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+
+            img {
+              width: 72px;
+              height: 72px;
+              object-fit: contain;
+              flex-shrink: 0;
+            }
+
+            h3 {
+              font-family: "Pretendard", sans-serif;
+              font-size: 20px;
+              font-weight: 700;
+              color: #faab07;
+              margin: 0;
+            }
+          }
+
+          .modal-close-btn {
+            position: absolute;
+            top: 40px;
+            right: 24px;
+            z-index: 2; // modal-header-top 위에 clickable하도록
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+
+            i {
+              font-size: 20px;
+            }
+
+            &:hover {
+              color: #faab07;
+            }
+          }
+
+          .btn-select-header {
+            position: absolute;
+            top: 40px;
+            right: 80px;
+            z-index: 2; // modal-header-top 위에 clickable하도록 (사용자 버그 수정)
+            padding: 8px 20px;
+            background: #faab07;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 4px;
+            font-family: "Pretendard", sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+
+            &:disabled {
+              opacity: 0.3;
+              cursor: not-allowed;
+            }
+          }
+        }
+
+        .keyword-select-body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 16px 24px;
+          box-sizing: border-box;
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+          &::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+          }
+          &::-webkit-scrollbar-thumb {
+            background: rgba(250, 171, 7, 0.5);
+            border-radius: 4px;
+            &:hover {
+              background: #faab07;
+            }
+          }
+        }
+
+        .keyword-group {
+          margin-bottom: 24px;
+
+          .group-title {
+            font-family: "Pretendard", sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ddd;
+            margin: 0 0 4px 0 !important;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+            .group-count {
+              font-size: 11px;
+              font-weight: 400;
+              color: #faab07;
+              margin-left: 8px;
+            }
+          }
+
+          &.group-blue .group-title {
+            border-bottom-color: rgba(82, 167, 255, 0.6);
+          }
+          &.group-green .group-title {
+            border-bottom-color: rgba(91, 209, 130, 0.6);
+          }
+          &.group-yellow .group-title {
+            border-bottom-color: rgba(255, 203, 70, 0.6);
+          }
+          &.group-orange .group-title {
+            border-bottom-color: rgba(255, 149, 63, 0.6);
+          }
+          &.group-red .group-title {
+            border-bottom-color: rgba(255, 99, 99, 0.6);
+          }
+        }
+
+        .keyword-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 8px;
+        }
+
+        .keyword-chip {
+          padding: 8px 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ddd;
+          font-family: "Pretendard", sans-serif;
+          font-size: 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 165, 0, 0.5);
+          }
+
+          &.selected {
+            background: rgba(250, 171, 7, 0.2);
+            border: 2px solid #faab07;
+            color: #faab07;
+            font-weight: 700;
+            position: relative;
+
+            &::after {
+              content: "★";
+              position: absolute;
+              top: -4px;
+              right: -4px;
+              color: #e74c3c;
+              font-size: 16px;
+            }
+          }
+        }
+      }
+
+      .confirm-popup-overlay {
+        position: absolute !important; // 사용자 요청: fixed → absolute (팝업을 모달 중심에 배치)
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.6); // 모달 내부만 어둡게
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 100003;
+      }
+
+      .confirm-popup {
+        width: 400px;
+        padding: 28px 24px 24px;
+        background: #1a1a1a;
+        border: 1px solid rgba(250, 171, 7, 0.35);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        text-align: center !important; // 사용자 요청: 팝업 내부 전체 가운데 정렬
+
+        p,
+        h3,
+        h4,
+        span {
+          text-align: center !important;
+        }
+
+        p {
+          margin: 0 0 20px;
+          font-family: "Pretendard", sans-serif;
+          font-size: 16px;
+          font-weight: 600;
+          color: #fff;
+          line-height: 1.6;
+        }
+
+        .popup-buttons {
+          display: flex !important;
+          flex-direction: row !important;
+          justify-content: center !important; // 사용자 요청: 버튼 영역 가운데 정렬
+          align-items: center !important;
+          gap: 12px;
+          width: 100%;
+          margin: 0 auto;
+
+          button {
+            min-width: 88px;
+            width: auto !important; // 버튼 stretch 방지 (flex: 1 등 상위 영향 차단)
+            flex: 0 0 auto !important;
+            height: 38px;
+            padding: 0 18px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: transparent;
+            color: #ddd;
+            font-family: "Pretendard", sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center !important; // 버튼 내 텍스트 가운데
+          }
+
+          .btn-confirm {
+            border-color: transparent;
+            background: #faab07;
+            color: #1a1a1a;
           }
         }
       }
@@ -5963,7 +6486,7 @@
 
         .modal-card-content {
           .modal-input-group {
-            margin-bottom: 12px;
+            margin-bottom: 6px !important;
 
             &:last-child {
               margin-bottom: 0;
@@ -6173,6 +6696,14 @@
       max-height: 570px !important;
       display: flex;
       flex-direction: column;
+      // 사용자 요청: Zone A(<1920)에서 overlay가 display:block으로 override되어 flex 중앙 정렬 무효
+      // → 모달 자체를 absolute로 viewport 중앙 배치 (Zone B/C에도 영향 없음, 결과 동일 중앙)
+      // reputation-form과 동일 패턴
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      margin: 0 !important;
 
       // ── 헤더 (110px) — cluster3/workInfo 패턴 ──
       .section-modal-header {
@@ -6490,6 +7021,7 @@
         }
 
         .reputation-content-box {
+          margin-top: 0 !important;
           padding: 12px 16px;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);

@@ -1567,7 +1567,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [showWriteConfirm, setShowWriteConfirm] = useState(false);
   const [showSelectConfirm, setShowSelectConfirm] = useState(false);
   const [formSnapshot, setFormSnapshot] = useState<{ rating: number; content: string; keyword: string } | null>(null);
+  const [isReputationFormEditing, setIsReputationFormEditing] = useState(false);
   const [saveAttemptFailed, setSaveAttemptFailed] = useState(false);
+  const [fieldErrorFlash, setFieldErrorFlash] = useState(false); // 필수필드 미입력 시 테두리 깜빡임 트리거
+  const [showResetConfirm, setShowResetConfirm] = useState(false); // cluster3 패턴: 초기화 확인 팝업
 
   // 주차 평판 데이터 (API에서 가져옴)
   const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
@@ -2687,58 +2690,113 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 별 클릭 → 평점 업데이트 (1~10 자연수, 반개 가능)
   const handleRatingClick = (value: number) => {
     setReputationEditData((prev) => ({ ...prev, rating: value }));
-    setSaveAttemptFailed(false);
+    if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시작 시 에러 자동 해제
   };
 
-  // 키워드 모드 전환 (select ↔ write)
+  // 안내문 자동 복원 — cluster3 패턴 (모든 필드 유효해지면 에러 해제)
+  useEffect(() => {
+    if (!isReputationFormEditing || !saveAttemptFailed) return;
+    if (isFormValid()) setSaveAttemptFailed(false);
+  }, [reputationEditData, isReputationFormEditing, saveAttemptFailed]);
+
+  // 키워드 모드 전환 (select ↔ write) — 사용자 요청: 브라우저 기본 confirm 사용
   const handleKeywordModeChange = (mode: "select" | "write") => {
-    if (mode === "write") {
-      // 작성 모드로 전환: 확인 팝업
-      setShowWriteConfirm(true);
-    } else if (mode === "select") {
-      // 선택 모드로 전환: 중첩 모달 열기
+    if (mode === "select") {
       setSelectedKeywordTemp("");
       setKeywordModalOpen(true);
+    } else if (mode === "write") {
+      const ok = window.confirm("키워드를 직접 작성하시겠습니까?");
+      if (ok) {
+        setReputationEditData((prev) => ({ ...prev, keyword: "" }));
+        setFormKeywordMode("write");
+      }
     }
   };
 
-  // 작성 모드 확인 → 키워드 초기화 + write 모드 전환
+  // 작성 모드 확인 (구 팝업 연동용 — window.confirm 전환 후 미사용, 호환성 유지)
   const handleWriteConfirmYes = () => {
+    if (!isReputationFormEditing) return;
     setReputationEditData((prev) => ({ ...prev, keyword: "" }));
     setFormKeywordMode("write");
-    setShowWriteConfirm(false);
   };
 
   // 중첩 모달 내 임시 선택
   const handleKeywordSelect = (keyword: string) => {
+    if (!isReputationFormEditing) return;
     setSelectedKeywordTemp(keyword);
   };
 
-  // 중첩 모달 [선택] 버튼 → 확인 팝업 열기
+  // 중첩 모달 [선택] 버튼 → window.confirm으로 최종 선택 확인
   const handleKeywordSelectConfirm = () => {
     if (!selectedKeywordTemp) return;
-    setShowSelectConfirm(true);
+    const ok = window.confirm(`"${selectedKeywordTemp}"을(를) 선택하시겠습니까?`);
+    if (ok) {
+      handleKeywordSelectFinal();
+    }
   };
 
-  // 선택 확인 팝업 → 최종 저장 + 중첩 모달 닫기
+  // 선택 확인 후 최종 저장 + 중첩 모달 닫기
   const handleKeywordSelectFinal = () => {
     setReputationEditData((prev) => ({ ...prev, keyword: selectedKeywordTemp }));
     setFormKeywordMode("select");
     setKeywordModalOpen(false);
-    setShowSelectConfirm(false);
     setSaveAttemptFailed(false);
   };
 
-  // 취소 — reputation-form은 편집 전용이므로 모달 닫기 (옵션 A)
+  // 취소 — cluster3 패턴: 편집 → 보기 전환 (스냅샷 복원, 모달 닫기 아님)
   const handleFormCancel = () => {
-    setHeaderModalOpen(false);
+    if (!isReputationFormEditing) return;
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    }
+    setIsReputationFormEditing(false);
+    setKeywordModalOpen(false);
+    setShowSelectConfirm(false);
+    setShowWriteConfirm(false);
+    setShowResetConfirm(false);
     setReputationSaveError(null);
     setReputationSaveSuccess(false);
     setSaveAttemptFailed(false);
   };
 
-  // 초기화 — 스냅샷 복원
+  // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
+  const handleEditMode = () => {
+    setFormSnapshot({
+      rating: reputationEditData.rating,
+      content: reputationEditData.content,
+      keyword: reputationEditData.keyword,
+    });
+    setIsReputationFormEditing(true);
+    setReputationSaveError(null);
+    setReputationSaveSuccess(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 구형 별칭 — 기존 참조 호환 (제거 대비)
+  const handleFormEditStart = handleEditMode;
+
+  // 초기화 버튼 → 사용자 요청: window.confirm 사용 (cluster3 동일 패턴)
   const handleFormReset = () => {
+    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    if (!ok) return;
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    } else {
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
+    setSaveAttemptFailed(false);
+  };
+
+  // 초기화 확인 (구 팝업 연동용 — window.confirm 전환 후 미사용, 호환성 유지)
+  const handleResetConfirm = () => {
     if (formSnapshot) {
       setReputationEditData({
         rating: formSnapshot.rating,
@@ -2778,10 +2836,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   };
 
-  // 저장 — 유효성 검사 후 saveWeeklyReputation 호출
+  // 저장 — 사용자 요청: 클릭 시 바로 검증 → 실패 시 안내문 + 필드 하이라이트 표시
   const handleFormSave = () => {
     if (!isFormValid()) {
       setSaveAttemptFailed(true);
+      setFieldErrorFlash(true);
+      setTimeout(() => setFieldErrorFlash(false), 600);
       return;
     }
     setSaveAttemptFailed(false);
@@ -4190,6 +4250,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   setFormSnapshot(initial);
                   setFormKeywordMode("select");
                   setSelectedKeywordTemp("");
+                  setIsReputationFormEditing(false); // 사용자 요청: 기본 보기 모드 ([수정] 버튼 표시)
                   setSaveAttemptFailed(false);
                   fetchCrewListIfNeeded();
                   fetchKeywordsIfNeeded();
@@ -5453,6 +5514,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -6312,6 +6374,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 className="modal-close-btn"
                 onClick={() => {
                   setHeaderModalOpen(false);
+                  setIsReputationFormEditing(false);
                   setReputationSaveError(null);
                   setReputationSaveSuccess(false);
                 }}
@@ -6325,7 +6388,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <p className="modal-subtitle">
                 혼자 하는 성장이 그 찰나에는 빠를 수 있지만, 멀리, 굳건히, 확실히 가려면 '함께' 가야 합니다! 😊
                 <br />
-                나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 <span className="tagsanjiseok-highlight">타산지석</span>으로 삼아보자구요!
+                나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 타산지석으로 삼아보자구요!
               </p>
             </div>
             {/* ── 미드 (342px) — 2열 레이아웃 (평점 + 키워드) + 내용 textarea ── */}
@@ -6334,41 +6397,49 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* 1열: 평점 */}
                 <div className="form-rating-section">
                   <h4>
-                    ■ 평점을 입력해주세요.
+                    ■ 평점을 입력해주세요. <span className="required-mark">*</span>
                   </h4>
-                  <div className="rating-input">
-                    <div className="rating-stars">
+                  <div className="rating-input" data-field="rating">
+                    <select
+                      className={`rating-select ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? "field-error" : ""}`}
+                      value={reputationEditData.rating || 0}
+                      disabled={!isReputationFormEditing}
+                      onChange={(e) => {
+                        if (!isReputationFormEditing) return;
+                        const val = parseInt(e.target.value, 10);
+                        setReputationEditData((prev) => ({ ...prev, rating: val }));
+                        if (saveAttemptFailed) setSaveAttemptFailed(false);
+                      }}
+                    >
+                      <option value={0}>-</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                    <div className={`rating-stars ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}>
                       {[1, 2, 3, 4, 5].map((star) => {
-                        const halfValue = reputationEditData.rating / 2;
+                        const halfValue = (reputationEditData.rating || 0) / 2;
                         let starClass = "star-empty";
                         if (halfValue >= star) starClass = "star-full";
                         else if (halfValue >= star - 0.5) starClass = "star-half";
 
                         return (
-                          <span
-                            key={star}
-                            className={`rating-star clickable ${starClass}`}
-                            onClick={(e) => {
-                              const rect = (e.currentTarget as HTMLSpanElement).getBoundingClientRect();
-                              const clickX = e.clientX - rect.left;
-                              const isLeftHalf = clickX < rect.width / 2;
-                              const newRating = star * 2 - (isLeftHalf ? 1 : 0);
-                              handleRatingClick(newRating);
-                            }}
-                          >
+                          <span key={star} className={`rating-star readonly ${starClass}`}>
                             ★
                           </span>
                         );
                       })}
                     </div>
-                    <span className="rating-value">{reputationEditData.rating} / 10</span>
+                    <span className="rating-value">{reputationEditData.rating || 0} / 10</span>
                   </div>
                 </div>
 
                 {/* 2열: 키워드 */}
                 <div className="form-keyword-section">
                   <h4>
-                    ■ 키워드를 입력해주세요. <span className="limit-hint">(최대 10자)</span>
+                    ■ 키워드를 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 10자)</span>
                   </h4>
                   <div className="keyword-mode-select">
                     <label>
@@ -6377,7 +6448,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         name="keywordMode"
                         value="select"
                         checked={formKeywordMode === "select"}
+                        disabled={!isReputationFormEditing}
                         onChange={() => handleKeywordModeChange("select")}
+                        onClick={() => {
+                          // 이미 select 상태에서도 재클릭 시 중첩 모달 재오픈 가능 (사용자 요청)
+                          if (isReputationFormEditing && formKeywordMode === "select") {
+                            handleKeywordModeChange("select");
+                          }
+                        }}
                       />
                       선택
                     </label>
@@ -6387,28 +6465,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         name="keywordMode"
                         value="write"
                         checked={formKeywordMode === "write"}
+                        disabled={!isReputationFormEditing}
                         onChange={() => handleKeywordModeChange("write")}
                       />
                       작성
                     </label>
                   </div>
-                  <div className="keyword-input-wrapper">
+                  <div className="keyword-input-wrapper" data-field="keyword">
                     <span className="keyword-hash">#</span>
                     <input
                       type="text"
-                      className="keyword-input"
+                      className={`keyword-input ${saveAttemptFailed && (!reputationEditData.keyword || reputationEditData.keyword.trim().length < 7) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}
                       value={reputationEditData.keyword}
                       onChange={(e) => {
-                        if (formKeywordMode === "write") {
+                        if (isReputationFormEditing && formKeywordMode === "write") {
                           setReputationEditData((prev) => ({ ...prev, keyword: e.target.value.slice(0, 10) }));
-                          setSaveAttemptFailed(false);
+                          if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시 에러 자동 해제
                         }
                       }}
                       placeholder={formKeywordMode === "write" ? "해당 크루의 한 주 활동의 특징을 키워드로 입력해주세요." : "선택 버튼을 눌러 키워드를 선택하세요"}
                       maxLength={10}
-                      readOnly={formKeywordMode === "select"}
+                      readOnly={!isReputationFormEditing || formKeywordMode === "select"}
                       onKeyDown={(e) => {
-                        if (formKeywordMode === "select") {
+                        if (!isReputationFormEditing || formKeywordMode === "select") {
                           e.preventDefault();
                         }
                       }}
@@ -6418,16 +6497,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
 
               {/* 하단: 내용 */}
-              <div className="form-content-section">
+              <div className="form-content-section" data-field="content">
                 <h4>
-                  ■ 내용을 입력해주세요. <span className="limit-hint">(최대 100자)</span>
+                  ■ 내용을 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 100자)</span>
                 </h4>
                 <textarea
-                  className="form-content-textarea"
+                  className={`form-content-textarea ${saveAttemptFailed && !reputationEditData.content.trim() ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}
                   value={reputationEditData.content}
+                  readOnly={!isReputationFormEditing}
                   onChange={(e) => {
+                    if (!isReputationFormEditing) return;
                     setReputationEditData((prev) => ({ ...prev, content: e.target.value.slice(0, 100) }));
-                    setSaveAttemptFailed(false);
+                    if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시 에러 자동 해제
                   }}
                   placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요."
                   maxLength={100}
@@ -6443,32 +6524,99 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  <button className="modal-cancel-btn" onClick={handleFormCancel}>
-                    취소
-                  </button>
-                  <button className="modal-reset-btn" onClick={handleFormReset}>
-                    초기화
-                  </button>
-                  <button
-                    className="modal-save-btn"
-                    onClick={handleFormSave}
-                    disabled={!isFormDirty() || !isFormValid() || reputationSaving || reputationSaveSuccess}
-                  >
-                    {reputationSaving ? "저장 중..." : "저장"}
-                  </button>
+                  {!isReputationFormEditing ? (
+                    <button className="modal-edit-btn" onClick={handleEditMode}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button className="modal-cancel-btn" onClick={handleFormCancel}>
+                        취소
+                      </button>
+                      <button className="modal-reset-btn" onClick={handleFormReset}>
+                        초기화
+                      </button>
+                      <button
+                        className="modal-save-btn"
+                        onClick={handleFormSave}
+                        disabled={reputationSaving}
+                      >
+                        {reputationSaving ? "저장 중..." : "저장"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* 행 2 — visibility 토글로 공간 유지 (cluster2/3 표준: 우측 정렬) */}
+              {/* 행 2 — cluster3 패턴: 편집 모드에서 항상 표시, 에러 시 빨간색 + 텍스트 변경 */}
               <div className="modal-footer-bottom">
                 <span
                   className={`modal-notice modal-footer-notice ${saveAttemptFailed ? "notice-error" : ""}`}
-                  style={{ visibility: saveAttemptFailed ? "visible" : "hidden" }}
+                  style={{ visibility: isReputationFormEditing ? "visible" : "hidden" }}
                 >
-                  필수 사항이 누락되었어요! 확인 부탁드려요! 😊
+                  {saveAttemptFailed ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
                 </span>
               </div>
             </div>
+
+            {keywordModalOpen && (
+              <div className="section-modal-overlay keyword-select-overlay">
+                <div className="section-modal keyword-select-modal">
+                  <div className="section-modal-header">
+                    <button
+                      type="button"
+                      className="modal-close-btn"
+                      onClick={() => {
+                        setKeywordModalOpen(false);
+                        setSelectedKeywordTemp("");
+                      }}
+                      aria-label="키워드 선택 모달 닫기"
+                    >
+                      <i className="ti ti-x"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn-select-header"
+                      onClick={handleKeywordSelectConfirm}
+                      disabled={!selectedKeywordTemp}
+                    >
+                      선택
+                    </button>
+
+                    <div className="modal-header-top">
+                      <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                      <h3>키워드를 선택해주세요. 😊</h3>
+                    </div>
+                  </div>
+
+                  <div className="section-modal-body keyword-select-body">
+                    {KEYWORD_GROUPS.map((group, gIdx) => (
+                      <div key={group.id} className={`keyword-group group-${group.color}`}>
+                        <h4 className="group-title">
+                          [군락 {gIdx + 1}] {group.title}
+                          <span className="group-count">({group.count}개)</span>
+                        </h4>
+                        <div className="keyword-grid">
+                          {group.keywords.map((keyword) => (
+                            <button
+                              key={`${group.id}-${keyword}`}
+                              type="button"
+                              className={`keyword-chip ${selectedKeywordTemp === keyword ? "selected" : ""}`}
+                              onClick={() => handleKeywordSelect(keyword)}
+                            >
+                              {keyword}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 사용자 요청: 3개 custom confirm-popup(showSelectConfirm/showWriteConfirm/showResetConfirm)은 브라우저 기본 window.confirm으로 대체 */}
           </div>
         </div>
       )}
@@ -6606,44 +6754,89 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
-              {/* To. 뱃지 + 날짜 */}
-              <div className="colleague-header-row">
-                <div className="colleague-to-badge">
-                  <span className="to-text">To.</span>
-                  <span className="rank-number">
-                    {selectedColleagueIndex + 1}
-                    {selectedColleagueIndex === 0 ? "st" : selectedColleagueIndex === 1 ? "nd" : "rd"}
-                  </span>
-                </div>
-                <div className="colleague-view-date">
-                  <span className="date-value">{selectedColleagueCard.date}</span>
-                </div>
-              </div>
+            <div className="section-modal-body colleague-body">
+              {/* 최상단 감사 텍스트 */}
+              <div className="colleague-thanks-text">함께 해주셔서 마음 깊이 감사드려요. 😊</div>
 
-              {/* 프로필 */}
-              <div className="colleague-view-profile">
-                <div className="profile-image">{selectedColleagueCard.profileImg ? <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} /> : <div className="profile-placeholder"></div>}</div>
-                <div className="profile-info">
-                  <div className="profile-name">
-                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{mask.age(selectedColleagueCard.age)}세</span>
+              {/* 인적사항 카드 — reputation-view-modal .workinfo-personal-card 구조 재사용 */}
+              <div className="workinfo-personal-card">
+                <div className="personal-grid">
+                  <div className="personal-photo">
+                    {selectedColleagueCard.profileImg ? (
+                      <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} />
+                    ) : (
+                      <img src="/images/0/crew profile/남 1.webp" alt="profile" />
+                    )}
                   </div>
-                  <div className="profile-details">
-                    <div className="detail-line">
-                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span>
-                      <span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span>
-                      <span className="label">학과</span> | <span className="text">{selectedColleagueCard.team || "-"}</span>
-                      <span className="label">팀</span> | <span className="text">{selectedColleagueCard.part || "-"}</span>
-                      <span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+
+                  <div className="personal-info">
+                    <div className="personal-row-1">
+                      <span className="personal-name">{selectedColleagueCard.name || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-gender">{selectedColleagueCard.gender || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-age">{mask.age(selectedColleagueCard.age) || "—"} 세</span>
+                      <div className="personal-tags">
+                        <span className="tag-badge tag-role">{selectedColleagueCard.role || "일반"}</span>
+                        <span className="tag-badge tag-keyword">{selectedColleagueCard.nickname || selectedColleagueCard.keyword || "—"}</span>
+                      </div>
+                    </div>
+
+                    <div className="personal-row-2">
+                      <span className="personal-field">
+                        <span className="field-value">{formatSchool(mask.school(selectedColleagueCard.university)) || "—"}</span>
+                        <span className="field-label">학교</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{formatMajor(mask.major(selectedColleagueCard.major)) || "—"}</span>
+                        <span className="field-label">학과</span>
+                      </span>
+                    </div>
+
+                    <div className="personal-row-3">
+                      <span className="personal-field">
+                        <span className="field-value">{selectedColleagueCard.team || "—"}</span>
+                        <span className="field-label">팀</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{selectedColleagueCard.part || "—"}</span>
+                        <span className="field-label">파트</span>
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Thank you message */}
-              <div className="colleague-view-message">
-                <div className="message-label">Thank you message</div>
-                <div className="message-content">{selectedColleagueCard.message}</div>
+              {/* From / To */}
+              {/* TODO: [백엔드 작업 필요] From/To 사용자 이름 필드 확정 후 연동
+                  fromName: 카드 보내는 사용자 (평판 작성자)
+                  toName: 카드 받는 사용자 (대상자) */}
+              <div className="colleague-fromto">
+                <span className="fromto-label">From</span>
+                <span className="fromto-name">{selectedColleagueCard.fromName || session?.user?.name || "-"}</span>
+                <span className="fromto-suffix">님</span>
+                <span className="fromto-arrow">→</span>
+                <span className="fromto-label">To</span>
+                <span className="fromto-name">{selectedColleagueCard.toName || selectedColleagueCard.name || "-"}</span>
+                <span className="fromto-suffix">님</span>
+              </div>
+
+              {/* Honor & Thank you */}
+              <div className="colleague-honor-section">
+                <h4 className="honor-label">Honor &amp; Thank you</h4>
+                <div className="honor-content-box">
+                  <p className="honor-content-text">{selectedColleagueCard.message || selectedColleagueCard.content || "-"}</p>
+                </div>
+              </div>
+
+              {/* 하단 구분선 + 타임스탬프 (reputation-view-modal 패턴 준용) */}
+              <div className="reputation-bottom-section">
+                <div className="reputation-bottom-divider"></div>
+                <div className="reputation-timestamp">
+                  <span>{formatReputationTime(selectedColleagueCard.created_at || selectedColleagueCard.createdAt)}</span>
+                </div>
               </div>
             </div>
 
