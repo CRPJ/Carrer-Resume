@@ -3266,8 +3266,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           })
         : dummyReputations; // 데이터 없으면 더미 데이터 폴백
 
-    // 최대 4개까지, 빈 슬롯 채우기
-    const result = [...apiData];
+    // 작업 4: created_at 오름차순 정렬 (오래된 것이 1번 슬롯 → 가장 최신이 4번)
+    // null/undefined createdAt는 Infinity로 취급해 뒤로 밀어냄 (안정 정렬로 원래 순서 보존)
+    const sorted = [...apiData].sort((a, b) => {
+      const timeA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : Infinity;
+      const timeB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : Infinity;
+      return timeA - timeB;
+    });
+
+    // 최대 4개까지, 빈 슬롯 채우기 (삭제 시 재정렬은 useMemo 재계산으로 자연 달성)
+    const result = [...sorted];
     while (result.length < 4) {
       result.push({
         id: `empty-${result.length}`,
