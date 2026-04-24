@@ -504,6 +504,8 @@ const Cluster3Content = () => {
   const [isSavingArchives, setIsSavingArchives] = useState(false);
   // 채널 카드 16개 풀 데이터 저장 (cluster-3 Channel 모달)
   const [isSavingChannelCard, setIsSavingChannelCard] = useState(false);
+  // Output Top 5 + Detail 10 풀 데이터 저장 (cluster-3 World Of Top Works)
+  const [isSavingTopCard, setIsSavingTopCard] = useState(false);
 
   // 포트폴리오 Output 데이터 (DB 저장용)
   const [portfolioOutputs, setPortfolioOutputs] = useState<string[]>(Array(5).fill(""));
@@ -1273,7 +1275,14 @@ const Cluster3Content = () => {
     insight: "",
     links: ["", "", ""],
   });
-  const createInitialOutputCards = (): OutputCard[] => [emptyOutputCard(1), emptyOutputCard(2), emptyOutputCard(3), emptyOutputCard(4), emptyOutputCard(5)];
+  // 1번 카드는 샘플 데이터로 시작 (채널 카드와 동일 패턴 — 활성 표시 + 다음 카드 unlock 트리거)
+  const createInitialOutputCards = (): OutputCard[] => [
+    { ...OUTPUT_CARD_1_DEFAULT } as OutputCard,
+    emptyOutputCard(2),
+    emptyOutputCard(3),
+    emptyOutputCard(4),
+    emptyOutputCard(5),
+  ];
   const [outputCards, setOutputCards] = useState<OutputCard[]>(isDemoMode ? (CLUSTER3_DUMMY_OUTPUT_CARDS as OutputCard[]) : createInitialOutputCards());
   const [currentOutputIndex, setCurrentOutputIndex] = useState(0);
   const [isOutputEditMode, setIsOutputEditMode] = useState(false);
@@ -1316,7 +1325,11 @@ const Cluster3Content = () => {
     insight: "",
     links: ["", "", ""],
   });
-  const createInitialDetailCards = (): OutputCard[] => Array.from({ length: MAX_DETAIL_CARDS }, (_, i) => emptyDetailCard(i + 1));
+  // 1번 카드는 샘플 데이터로 시작 (활성 표시 + 다음 카드 unlock 트리거)
+  const createInitialDetailCards = (): OutputCard[] => [
+    { ...DETAIL_CARD_1_DEFAULT } as OutputCard,
+    ...Array.from({ length: MAX_DETAIL_CARDS - 1 }, (_, i) => emptyDetailCard(i + 2)),
+  ];
   const [detailCards, setDetailCards] = useState<OutputCard[]>(
     isDemoMode ? (createInitialDetailCardsWithDefault() as OutputCard[]) : createInitialDetailCards(),
   );
@@ -1591,7 +1604,9 @@ const Cluster3Content = () => {
 
   const handleNextOutput = () => {
     if (isOutputEditMode) return;
-    if (currentOutputIndex < MAX_OUTPUT_CARDS - 1) setCurrentOutputIndex((p) => p + 1);
+    // 순차 잠금: unlockedOutputCount를 넘어가는 카드는 이동 불가
+    const limit = Math.min(MAX_OUTPUT_CARDS, unlockedOutputCount);
+    if (currentOutputIndex < limit - 1) setCurrentOutputIndex((p) => p + 1);
   };
 
   const handleCancelOutput = () => {
@@ -1661,7 +1676,169 @@ const Cluster3Content = () => {
     return { ...card, links: compactLinks, metrics: compactMetrics };
   };
 
-  const handleSaveOutput = () => {
+  // Output Top 5 + Detail 10 통합 저장: blob URL 이미지 업로드 → 카드 PUT
+  // 성공 시 업로드된 URL이 반영된 OutputCard 반환, 실패 시 null
+  const saveTopCard = async (
+    cardType: "output" | "detail",
+    cardIndex: number,
+    card: OutputCard
+  ): Promise<OutputCard | null> => {
+    if (isDemoMode) return card;
+    setIsSavingTopCard(true);
+    try {
+      // main 이미지 업로드 (blob URL인 경우만)
+      let uploadedMain: string | null = card.mainImage ?? null;
+      if (uploadedMain && uploadedMain.startsWith("blob:")) {
+        const blob = await fetch(uploadedMain).then((r) => r.blob());
+        const mime = blob.type || "image/jpeg";
+        const ext = mime.split("/")[1] || "jpg";
+        const file = new File([blob], `main.${ext}`, { type: mime });
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("cardType", cardType);
+        fd.append("cardIndex", String(cardIndex));
+        fd.append("imageType", "main");
+        const res = await fetch(apiUrl("/api/portfolio-top-cards/upload"), { method: "POST", body: fd });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error || "메인 이미지 업로드 실패");
+        uploadedMain = json.url;
+      }
+
+      // sub 이미지 2장
+      const rawSubs: (string | null)[] = Array.isArray(card.subImages) ? card.subImages.slice(0, 2) : [];
+      while (rawSubs.length < 2) rawSubs.push(null);
+      const uploadedSubs: (string | null)[] = [];
+      for (let slot = 0; slot < 2; slot++) {
+        const img = rawSubs[slot];
+        if (!img) {
+          uploadedSubs.push(null);
+          continue;
+        }
+        if (typeof img === "string" && img.startsWith("blob:")) {
+          const blob = await fetch(img).then((r) => r.blob());
+          const mime = blob.type || "image/jpeg";
+          const ext = mime.split("/")[1] || "jpg";
+          const file = new File([blob], `sub-${slot}.${ext}`, { type: mime });
+          const fd = new FormData();
+          fd.append("file", file);
+          fd.append("cardType", cardType);
+          fd.append("cardIndex", String(cardIndex));
+          fd.append("imageType", `sub-${slot}`);
+          const res = await fetch(apiUrl("/api/portfolio-top-cards/upload"), { method: "POST", body: fd });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json?.error || `서브 이미지 ${slot + 1} 업로드 실패`);
+          uploadedSubs.push(json.url);
+        } else {
+          uploadedSubs.push(img);
+        }
+      }
+
+      const putRes = await fetch(apiUrl("/api/portfolio-top-cards"), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cardType,
+          cardIndex,
+          mainTitle: card.mainTitle ?? "",
+          subTitle: card.subTitle ?? "",
+          roleDescription: card.roleDescription ?? "",
+          report: card.report ?? "",
+          insight: card.insight ?? "",
+          platform: card.platform ?? "",
+          contribution: card.contribution ?? 0,
+          periodStartYear: card.periodStartYear,
+          periodStartMonth: card.periodStartMonth,
+          periodStartDay: card.periodStartDay,
+          periodEndYear: card.periodEndYear,
+          periodEndMonth: card.periodEndMonth,
+          periodEndDay: card.periodEndDay,
+          roles: card.roles || [],
+          tools: card.tools || [],
+          mainImage: uploadedMain,
+          subImages: uploadedSubs,
+          mainImageCaption: card.mainImageCaption ?? "",
+          subImageCaptions: card.subImageCaptions || ["", ""],
+          metrics: card.metrics || ["", "", "", "", "", ""],
+          links: card.links || ["", "", ""],
+        }),
+      });
+      const putJson = await putRes.json();
+      if (!putRes.ok) {
+        console.error("탑 카드 저장 실패:", putJson);
+        alert(putJson?.error || "저장에 실패했습니다.");
+        return null;
+      }
+
+      return { ...card, mainImage: uploadedMain, subImages: uploadedSubs as (string | null)[] };
+    } catch (e) {
+      console.error("탑 카드 저장 오류:", e);
+      alert(e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.");
+      return null;
+    } finally {
+      setIsSavingTopCard(false);
+    }
+  };
+
+  // 마운트 시 Output 5 + Detail 10 풀 데이터 한 번에 로드
+  useEffect(() => {
+    if (isDemoMode) return;
+    const fetchTopCards = async () => {
+      try {
+        const url = urlUserId
+          ? `/api/portfolio-top-cards?userId=${urlUserId}`
+          : "/api/portfolio-top-cards";
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const result = await response.json();
+        if (!result?.success || !Array.isArray(result.cards) || result.cards.length === 0) return;
+
+        const outputByIndex = new Map<number, any>();
+        const detailByIndex = new Map<number, any>();
+        for (const c of result.cards) {
+          if (c.cardType === "output") outputByIndex.set(Number(c.cardIndex), c);
+          else if (c.cardType === "detail") detailByIndex.set(Number(c.cardIndex), c);
+        }
+
+        const apply = (prev: OutputCard[], byIndex: Map<number, any>): OutputCard[] =>
+          prev.map((card, i) => {
+            const saved = byIndex.get(i + 1);
+            if (!saved) return card;
+            return {
+              ...card,
+              mainTitle: saved.mainTitle ?? "",
+              subTitle: saved.subTitle ?? "",
+              roleDescription: saved.roleDescription ?? "",
+              report: saved.report ?? "",
+              insight: saved.insight ?? "",
+              platform: saved.platform ?? "",
+              contribution: saved.contribution ?? 0,
+              periodStartYear: saved.periodStartYear ?? null,
+              periodStartMonth: saved.periodStartMonth ?? null,
+              periodStartDay: saved.periodStartDay ?? null,
+              periodEndYear: saved.periodEndYear ?? null,
+              periodEndMonth: saved.periodEndMonth ?? null,
+              periodEndDay: saved.periodEndDay ?? null,
+              roles: Array.isArray(saved.roles) ? saved.roles : [],
+              tools: Array.isArray(saved.tools) ? saved.tools : [],
+              mainImage: saved.mainImage ?? null,
+              subImages: Array.isArray(saved.subImages) ? saved.subImages : [null, null],
+              mainImageCaption: saved.mainImageCaption ?? "",
+              subImageCaptions: Array.isArray(saved.subImageCaptions) ? saved.subImageCaptions : ["", ""],
+              metrics: Array.isArray(saved.metrics) ? saved.metrics : ["", "", "", "", "", ""],
+              links: Array.isArray(saved.links) ? saved.links : ["", "", ""],
+            };
+          });
+
+        if (outputByIndex.size > 0) setOutputCards((prev) => apply(prev, outputByIndex));
+        if (detailByIndex.size > 0) setDetailCards((prev) => apply(prev, detailByIndex));
+      } catch (error) {
+        console.error("탑 카드 로드 오류:", error);
+      }
+    };
+    fetchTopCards();
+  }, [session?.user?.email, urlUserId, isDemoMode]);
+
+  const handleSaveOutput = async () => {
     const current = outputCards[currentOutputIndex];
     const errors = validateOutputCard(current);
     if (errors.length > 0) {
@@ -1671,11 +1848,24 @@ const Cluster3Content = () => {
     }
     if (!window.confirm("저장하시겠습니까?")) return;
     const compacted = compactOutputCard(current);
+
+    if (isDemoMode) {
+      const updated = [...outputCards];
+      updated[currentOutputIndex] = compacted;
+      setOutputCards(updated);
+      setOutputSnapshot(JSON.parse(JSON.stringify(compacted)));
+      setIsOutputEditMode(false);
+      setOutputFooterNotice("default");
+      return;
+    }
+
+    const finalCard = await saveTopCard("output", currentOutputIndex + 1, compacted);
+    if (!finalCard) return;
+
     const updated = [...outputCards];
-    updated[currentOutputIndex] = compacted;
+    updated[currentOutputIndex] = finalCard;
     setOutputCards(updated);
-    console.log("TODO: 저장 API 호출", updated);
-    setOutputSnapshot(JSON.parse(JSON.stringify(compacted)));
+    setOutputSnapshot(JSON.parse(JSON.stringify(finalCard)));
     setIsOutputEditMode(false);
     setOutputFooterNotice("default");
   };
@@ -1715,7 +1905,9 @@ const Cluster3Content = () => {
 
   const handleNextDetail = () => {
     if (isDetailEditMode) return;
-    if (currentDetailIndex < MAX_DETAIL_CARDS - 1) setCurrentDetailIndex((p) => p + 1);
+    // 순차 잠금: unlockedDetailCount를 넘어가는 카드는 이동 불가
+    const limit = Math.min(MAX_DETAIL_CARDS, unlockedDetailCount);
+    if (currentDetailIndex < limit - 1) setCurrentDetailIndex((p) => p + 1);
   };
 
   const handleCancelDetail = () => {
@@ -1742,7 +1934,7 @@ const Cluster3Content = () => {
     }
   };
 
-  const handleSaveDetail = () => {
+  const handleSaveDetail = async () => {
     const current = detailCards[currentDetailIndex];
     const errors = validateOutputCard(current);
     if (errors.length > 0) {
@@ -1752,11 +1944,24 @@ const Cluster3Content = () => {
     }
     if (!window.confirm("저장하시겠습니까?")) return;
     const compacted = compactOutputCard(current);
+
+    if (isDemoMode) {
+      const updated = [...detailCards];
+      updated[currentDetailIndex] = compacted;
+      setDetailCards(updated);
+      setDetailSnapshot(JSON.parse(JSON.stringify(compacted)));
+      setIsDetailEditMode(false);
+      setDetailFooterNotice("default");
+      return;
+    }
+
+    const finalCard = await saveTopCard("detail", currentDetailIndex + 1, compacted);
+    if (!finalCard) return;
+
     const updated = [...detailCards];
-    updated[currentDetailIndex] = compacted;
+    updated[currentDetailIndex] = finalCard;
     setDetailCards(updated);
-    console.log("TODO: 저장 API 호출 (detail)", updated);
-    setDetailSnapshot(JSON.parse(JSON.stringify(compacted)));
+    setDetailSnapshot(JSON.parse(JSON.stringify(finalCard)));
     setIsDetailEditMode(false);
     setDetailFooterNotice("default");
   };
@@ -1807,6 +2012,31 @@ const Cluster3Content = () => {
   }, [channelCards, currentCardIndex, isEditMode, section3FooterNotice]);
 
   // 순차 입력: 연속으로 완성된 카드 수 + 1 = 입력 가능 카드 수
+  const unlockedOutputCount = (() => {
+    const MAX = 5;
+    let count = 1;
+    for (let i = 0; i < outputCards.length; i++) {
+      if (validateOutputCard(outputCards[i]).length === 0) {
+        count = Math.max(count, i + 2);
+      } else {
+        break;
+      }
+    }
+    return Math.min(count, MAX);
+  })();
+
+  const unlockedDetailCount = (() => {
+    let count = 1;
+    for (let i = 0; i < detailCards.length; i++) {
+      if (validateOutputCard(detailCards[i]).length === 0) {
+        count = Math.max(count, i + 2);
+      } else {
+        break;
+      }
+    }
+    return Math.min(count, MAX_DETAIL_CARDS);
+  })();
+
   const unlockedCardCount = (() => {
     let count = 1;
     for (let i = 0; i < channelCards.length; i++) {
@@ -2462,11 +2692,14 @@ const Cluster3Content = () => {
             if (position > 2) position -= totalSlides;
             if (position < -2) position += totalSlides;
 
-            const isVoidCard = index >= 1 && !outputCards[index]?.mainTitle;
+            // 순차 잠금: 카드 N을 완성해야 카드 N+1 unlock (channel 카드와 동일 패턴)
+            const isVoidCard = index >= unlockedOutputCount;
+            // 작성된(검증 통과) 카드만 선명 — 미완성 unlock 카드는 채널과 동일하게 dim
+            const isOutputComplete = !isVoidCard && validateOutputCard(outputCards[index]).length === 0;
             return (
               <div
                 key={slide.id}
-                className={`slider-item position-${position}${slide.link ? " has-link" : ""}${isVoidCard ? " void-card" : ""}`}
+                className={`slider-item position-${position}${isOutputComplete ? " has-link" : ""}${isVoidCard ? " void-card" : ""}`}
                 data-position={position}
                 onClick={() => {
                   if (position !== 0) return;
@@ -2474,13 +2707,15 @@ const Cluster3Content = () => {
                   setCurrentOutputIndex(index);
                   setSection4ModalOpen(true);
                 }}
-                style={{ cursor: position === 0 && !isVoidCard ? "pointer" : "default", opacity: isVoidCard ? 0.4 : 1 }}
+                style={{ cursor: position === 0 && !isVoidCard ? "pointer" : "default", opacity: isVoidCard ? 0.4 : (isOutputComplete ? 1 : 0.4) }}
               >
                 <img src={`/images/0/cluster 3/image/2-${slide.id}.png`} alt={`Work ${slide.id}`} />
                 <div className="card-overlay">
                   <div className="card-top">
                     <div className="info-author">
-                      {!channelIcon ? <div className="sns-icon sns-gradient"></div> : <img src={channelIcon} alt="SNS" className="sns-icon" />}
+                      {outputCards[index]?.platform && PLATFORM_ICONS[outputCards[index].platform] && (
+                        <img src={PLATFORM_ICONS[outputCards[index].platform]} alt={outputCards[index].platform} className="sns-icon" />
+                      )}
                       <div className="author-text">
                         <span className="info-label">Posted by :</span>
                         <span className="author-name">{engName || "Unknown"}</span>
@@ -2565,18 +2800,20 @@ const Cluster3Content = () => {
               const selectedChannel = portfolioDetailChannels[index];
               const channelOption = channelOptions.find((opt) => opt.value === selectedChannel);
               const channelIcon = channelOption?.icon || "";
-              const isVoidDetail = index >= 1 && !detailCards[index]?.mainTitle;
+              const isVoidDetail = index >= unlockedDetailCount;
+              // 작성된 카드만 선명 (채널과 동일 패턴)
+              const isDetailComplete = !isVoidDetail && validateOutputCard(detailCards[index]).length === 0;
 
               return (
                 <div
                   key={thumb.id}
-                  className={`detail-item${thumb.link ? " has-link" : ""}${isVoidDetail ? " void-card" : ""}`}
+                  className={`detail-item${isDetailComplete ? " has-link" : ""}${isVoidDetail ? " void-card" : ""}`}
                   onClick={() => {
                     if (isVoidDetail) return;
                     setCurrentDetailIndex(index);
                     setIsDetailModalOpen(true);
                   }}
-                  style={{ cursor: isVoidDetail ? "default" : "pointer", opacity: isVoidDetail ? 0.4 : 1 }}
+                  style={{ cursor: isVoidDetail ? "default" : "pointer", opacity: isVoidDetail ? 0.4 : (isDetailComplete ? 1 : 0.4) }}
                 >
                   <img src={`/images/0/cluster 3/image/3-${thumb.id}.png`} alt={`Detail ${thumb.id}`} />
                   <div className="item-overlay">
@@ -2587,7 +2824,9 @@ const Cluster3Content = () => {
                       <span>99 Like</span>
                     </div>
                     <div className="item-bottom">
-                      {!channelIcon ? <div className="sns-icon sns-gradient"></div> : <img src={channelIcon} alt="SNS" className="sns-icon" />}
+                      {detailCards[index]?.platform && PLATFORM_ICONS[detailCards[index].platform] && (
+                        <img src={PLATFORM_ICONS[detailCards[index].platform]} alt={detailCards[index].platform} className="sns-icon" />
+                      )}
                       <div className="item-info">
                         <span className="item-tags">#Detail, #Micro</span>
                         <span className="item-author">@{engName || "Unknown"}</span>
@@ -3982,7 +4221,7 @@ const Cluster3Content = () => {
                   <button className="nav-btn prev" onClick={handlePrevOutput} disabled={isOutputEditMode || currentOutputIndex === 0} title={isOutputEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-left"></i>
                   </button>
-                  <button className="nav-btn next" onClick={handleNextOutput} disabled={isOutputEditMode || currentOutputIndex >= MAX_OUTPUT_CARDS - 1} title={isOutputEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
+                  <button className="nav-btn next" onClick={handleNextOutput} disabled={isOutputEditMode || currentOutputIndex >= unlockedOutputCount - 1 || currentOutputIndex >= MAX_OUTPUT_CARDS - 1} title={isOutputEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-right"></i>
                   </button>
                 </div>
@@ -4008,8 +4247,8 @@ const Cluster3Content = () => {
                       <button className="modal-reset-btn" onClick={handleResetOutput}>
                         초기화
                       </button>
-                      <button className="modal-save-btn" onClick={handleSaveOutput}>
-                        저장
+                      <button className="modal-save-btn" onClick={handleSaveOutput} disabled={isSavingTopCard}>
+                        {isSavingTopCard ? "저장 중..." : "저장"}
                       </button>
                     </>
                   )}
@@ -4734,7 +4973,7 @@ const Cluster3Content = () => {
                   <button className="nav-btn prev" onClick={handlePrevDetail} disabled={isDetailEditMode || currentDetailIndex === 0} title={isDetailEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-left"></i>
                   </button>
-                  <button className="nav-btn next" onClick={handleNextDetail} disabled={isDetailEditMode || currentDetailIndex >= MAX_DETAIL_CARDS - 1} title={isDetailEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
+                  <button className="nav-btn next" onClick={handleNextDetail} disabled={isDetailEditMode || currentDetailIndex >= unlockedDetailCount - 1 || currentDetailIndex >= MAX_DETAIL_CARDS - 1} title={isDetailEditMode ? "편집 중에는 이동할 수 없습니다" : ""}>
                     <i className="ti ti-chevron-right"></i>
                   </button>
                 </div>
@@ -4760,8 +4999,8 @@ const Cluster3Content = () => {
                       <button className="modal-reset-btn" onClick={handleResetDetail}>
                         초기화
                       </button>
-                      <button className="modal-save-btn" onClick={handleSaveDetail}>
-                        저장
+                      <button className="modal-save-btn" onClick={handleSaveDetail} disabled={isSavingTopCard}>
+                        {isSavingTopCard ? "저장 중..." : "저장"}
                       </button>
                     </>
                   )}
