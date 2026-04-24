@@ -1580,6 +1580,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setCanEditReputation(isDemoMode);
   }, [isDemoMode]);
 
+  // 작업 3: 이번 주 내가 보낸 평판 리스트 (중복 방지 + 7명 제한 체크용 — best-effort)
+  // TODO: [백엔드 작업 필요]
+  //   1. GET /api/weekly-reputations/sent-by-me?weekCardId=... 엔드포인트 추가
+  //   2. 현재 로컬 state는 페이지 새로고침 시 리셋됨 (한계)
+  //   3. 엔드포인트 생성 후 마운트 시점 fetch 로직 추가 → setSentReputationsThisWeek로 교체
+  //   4. 받기 4명 제한은 서버 POST 시 검증 (프론트는 slice(0,4)만)
+  const [sentReputationsThisWeek, setSentReputationsThisWeek] = useState<Array<{ targetUserId: string; weekCardId: string; createdAt: string }>>([]);
+  // 주차 변경 시 로컬 리스트 리셋 (주차별 독립 카운터)
+  useEffect(() => {
+    setSentReputationsThisWeek([]);
+  }, [weekId]);
+
   // 주차 평판 데이터 (API에서 가져옴)
   const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
 
@@ -2887,8 +2899,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   };
 
-  // 저장 — 작업 2: 저장 → view 데이터 갱신 → 리스트 재조회 → 편집 진입 경로면 view 복귀
+  // 작업 3: 같은 주차 + 같은 대상에게 이미 보냈는지 체크 (best-effort, 로컬 state 기반)
+  const checkAlreadySent = (targetUserId: string, weekCardId: string): boolean => {
+    return sentReputationsThisWeek.some((r) => r.targetUserId === targetUserId && r.weekCardId === weekCardId);
+  };
+
+  // 작업 3: 해당 주차에 내가 보낸 평판 수 (최대 7명 제한 체크용)
+  const getSentCountThisWeek = (weekCardId: string): number => {
+    return sentReputationsThisWeek.filter((r) => r.weekCardId === weekCardId).length;
+  };
+
+  // 저장 — 작업 2+3: 검증 → 중복/제한 체크 → 저장 → view 갱신/재조회 → 편집 경로면 view 복귀
   const handleFormSave = async () => {
+    // 1. 필수필드 검증
     if (!isFormValid()) {
       setSaveAttemptFailed(true);
       setFieldErrorFlash(true);
@@ -2900,10 +2923,45 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // 편집 진입 경로 여부 — view에서 [수정] 클릭 시 selectedReputationCard 유지됨, 신규 진입 시 null
     const wasEditEntry = !!selectedReputationCard;
 
+    // 2. 작업 3: 신규 작성 경로에서만 중복/7명 제한 체크 (편집은 기존 수정이므로 skip)
+    if (!wasEditEntry) {
+      const targetUid = urlUserId || "";
+      const wkId = weekId || "";
+      if (!targetUid || !wkId) {
+        alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+        return;
+      }
+      // 2-a. 중복 체크 — 같은 대상에게 이미 보냈는지
+      if (checkAlreadySent(targetUid, wkId)) {
+        window.alert("해당 크루에게 이미 평판을 드렸습니다.");
+        return;
+      }
+      // 2-b. 최대 7명 체크
+      if (getSentCountThisWeek(wkId) >= 7) {
+        window.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
+        return;
+      }
+    }
+
+    // 3. 저장
     const saved = await saveWeeklyReputation();
     if (!saved) return; // 저장 실패 — 폼 유지
 
-    // 편집 진입 경로에서만 view 데이터 즉시 갱신 (reputationData useMemo 재계산 전 낙관적 업데이트)
+    // 4. 작업 3: 신규 작성 성공 시 로컬 sentReputationsThisWeek에 append (다음 중복 체크 대비)
+    if (!wasEditEntry) {
+      const targetUid = urlUserId || "";
+      const wkId = weekId || "";
+      setSentReputationsThisWeek((prev) => [
+        ...prev,
+        {
+          targetUserId: targetUid,
+          weekCardId: wkId,
+          createdAt: saved.created_at,
+        },
+      ]);
+    }
+
+    // 5. 편집 진입 경로에서만 view 데이터 즉시 갱신 (낙관적 업데이트)
     if (wasEditEntry && selectedReputationCard) {
       setSelectedReputationCard({
         ...selectedReputationCard,
@@ -2915,12 +2973,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
     }
 
-    // 일반 모드: DB 재조회로 reputation-section 최신화 (데모는 saveWeeklyReputation에서 이미 로컬 append)
+    // 6. 일반 모드: DB 재조회로 reputation-section 최신화 (데모는 saveWeeklyReputation에서 이미 로컬 append)
     if (!isDemoMode) {
       await fetchWeeklyReputations();
     }
 
-    // 스냅샷 업데이트 — 저장 직후 isDirty false 보장
+    // 7. 스냅샷 업데이트 — 저장 직후 isDirty false 보장
     setFormSnapshot({
       rating: reputationEditData.rating,
       content: reputationEditData.content,
