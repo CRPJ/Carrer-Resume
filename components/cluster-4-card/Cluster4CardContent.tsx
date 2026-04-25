@@ -1565,13 +1565,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [formKeywordMode, setFormKeywordMode] = useState<"select" | "write">("select");
   const [keywordModalOpen, setKeywordModalOpen] = useState(false);
   const [selectedKeywordTemp, setSelectedKeywordTemp] = useState<string>("");
-  const [showWriteConfirm, setShowWriteConfirm] = useState(false);
-  const [showSelectConfirm, setShowSelectConfirm] = useState(false);
   const [formSnapshot, setFormSnapshot] = useState<{ rating: number; content: string; keyword: string } | null>(null);
   const [isReputationFormEditing, setIsReputationFormEditing] = useState(false);
   const [saveAttemptFailed, setSaveAttemptFailed] = useState(false);
   const [fieldErrorFlash, setFieldErrorFlash] = useState(false); // 필수필드 미입력 시 테두리 깜빡임 트리거
-  const [showResetConfirm, setShowResetConfirm] = useState(false); // cluster3 패턴: 초기화 확인 팝업
 
   // 커스텀 별점 드롭다운 (reputation-form)
   const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
@@ -1595,11 +1592,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
   // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
-  // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditReputation으로 반영
   const [canEditReputation, setCanEditReputation] = useState<boolean>(isDemoMode);
   useEffect(() => {
     setCanEditReputation(isDemoMode);
   }, [isDemoMode]);
+
+  // 연계 동료 — 평판/주차 리뷰와 동일하게 데모 모드에서 true, 일반 모드에서 승인 상태 따름
+  const [canEditColleague, setCanEditColleague] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    setCanEditColleague(isDemoMode);
+  }, [isDemoMode]);
+
+  // 일반 모드 백엔드 승인 상태 → 모든 canEdit* 플래그에 일괄 반영
+  useEffect(() => {
+    if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
+    let cancelled = false;
+    (async () => {
+      const approved = await checkApprovalStatus();
+      if (cancelled) return;
+      setCanEditReputation(approved);
+      setCanEditColleague(approved);
+      setCanEditWorkInfo(approved);
+      setCanEditWorkAbility(approved);
+      setCanEditWorkExp(approved);
+      setCanEditWorkCareer(approved);
+    })();
+    return () => { cancelled = true; };
+  }, [isDemoMode, session]);
 
   // 작업 3: 이번 주 내가 보낸 평판 리스트 (중복 방지 + 7명 제한 체크용 — best-effort)
   // TODO: [백엔드 작업 필요]
@@ -1645,6 +1664,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [selectedColleagueIndex, setSelectedColleagueIndex] = useState<number>(0);
 
   const handleDeleteColleague = async () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!selectedColleagueCard) return;
     // TODO: [백엔드 작업 필요] 일반 모드 — DB 삭제 API 호출
     //   엔드포인트: DELETE /api/weekly-colleagues/[id] (현재 route.ts 미구현)
@@ -1890,6 +1913,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkInfo = () => {
+    if (!isDemoMode && !canEditWorkInfo) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 편집 모드 유지. confirm 후 스냅샷 복원.
     const snap = workInfoSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
@@ -1902,6 +1929,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkInfo = () => {
+    if (!isDemoMode && !canEditWorkInfo) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 필수필드 검증: Sub Title / Growth Point / 이미지 1·2번
     // cluster2/cluster3 표준 패턴: footerNotice + field-missing 깜빡임 + scrollIntoView
     const missing: string[] = [];
@@ -2100,6 +2131,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkAbility = () => {
+    if (!isDemoMode && !canEditWorkAbility) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workAbilitySnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingAbilitySubTitle(snap.subTitle || "");
@@ -2111,6 +2146,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkAbility = () => {
+    if (!isDemoMode && !canEditWorkAbility) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingAbilitySubTitle.trim()) missing.push("subTitle");
     if (!editingAbilityGrowthPoint.trim()) missing.push("growthPoint");
@@ -2317,6 +2356,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkExp = () => {
+    if (!isDemoMode && !canEditWorkExp) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workExpSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingExpSubTitle(snap.subTitle || "");
@@ -2329,6 +2372,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkExp = () => {
+    if (!isDemoMode && !canEditWorkExp) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingExpSubTitle.trim()) missing.push("subTitle");
     if (!editingExpGrowthPoint.trim()) missing.push("growthPoint");
@@ -2521,6 +2568,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkCareer = () => {
+    if (!isDemoMode && !canEditWorkCareer) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workCareerSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingCareerSubTitle(snap.subTitle || "");
@@ -2532,6 +2583,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkCareer = () => {
+    if (!isDemoMode && !canEditWorkCareer) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingCareerSubTitle.trim()) missing.push("subTitle");
     if (!editingCareerGrowthPoint.trim()) missing.push("growthPoint");
@@ -2757,6 +2812,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleColleagueEditReset = () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
     if (!ok) return;
     if (colleagueFormSnapshot) {
@@ -2773,6 +2832,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleColleagueEditSave = async () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!isColleagueEditFormValid()) {
       setColleagueSaveAttemptFailed(true);
       setColleagueFieldErrorFlash(true);
@@ -2975,13 +3038,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 작성 모드 확인 (구 팝업 연동용 — window.confirm 전환 후 미사용, 호환성 유지)
-  const handleWriteConfirmYes = () => {
-    if (!isReputationFormEditing) return;
-    setReputationEditData((prev) => ({ ...prev, keyword: "" }));
-    setFormKeywordMode("write");
-  };
-
   // 중첩 모달 내 임시 선택
   const handleKeywordSelect = (keyword: string) => {
     if (!isReputationFormEditing) return;
@@ -3017,9 +3073,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     setIsReputationFormEditing(false);
     setKeywordModalOpen(false);
-    setShowSelectConfirm(false);
-    setShowWriteConfirm(false);
-    setShowResetConfirm(false);
     setReputationSaveError(null);
     setReputationSaveSuccess(false);
     setSaveAttemptFailed(false);
@@ -3243,6 +3296,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleWeeklyReviewReset = () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
     if (weeklyReviewFormSnapshot) {
       setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
@@ -3254,6 +3311,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleWeeklyReviewSave = async () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!isWeeklyReviewValid()) {
       setWeeklyReviewSaveAttemptFailed(true);
       setWeeklyReviewFieldErrorFlash(true);
@@ -3313,6 +3374,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 초기화 버튼 → 사용자 요청: window.confirm 사용 (cluster3 동일 패턴)
   const handleFormReset = () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
     if (!ok) return;
     if (formSnapshot) {
@@ -3459,6 +3524,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 저장 — 작업 2+3: 검증 → 중복/제한 체크 → 저장 → view 갱신/재조회 → 편집 경로면 view 복귀
   const handleFormSave = async () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 1. 필수필드 검증
     if (!isFormValid()) {
       setSaveAttemptFailed(true);
@@ -7109,7 +7178,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!isColleagueEditing ? (
-                    <button type="button" className="modal-edit-btn" onClick={() => setIsColleagueEditing(true)}>
+                    <button type="button" className="modal-edit-btn" onClick={() => handleEditClick(() => setIsColleagueEditing(true))}>
                       수정
                     </button>
                   ) : (
@@ -7389,7 +7458,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
             )}
 
-            {/* 사용자 요청: 3개 custom confirm-popup(showSelectConfirm/showWriteConfirm/showResetConfirm)은 브라우저 기본 window.confirm으로 대체 */}
           </div>
         </div>
       )}
@@ -7789,13 +7857,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="workinfo-text-section">
                     {/* Main Title — 항상 보기 전용 (관리자가 어드민에서 입력) */}
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "준비 중입니다"}</div>
                     </div>
 
                     {/* Sub Title — 사용자 입력 200자 (필수) */}
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workInfoViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workInfoViewIsEditing ? (
@@ -7820,6 +7892,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {/* TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 + API 확장 후, sub_title과 동일 패턴으로 데이터 연결 */}
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workInfoViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workInfoViewIsEditing ? (
@@ -8197,12 +8270,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 좌하단: Main Title + Sub Title + Growth Point */}
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{lookupWorkExpMapping(selectedWorkExpCard.code)?.mainTitle || (selectedWorkExpCard.title && selectedWorkExpCard.title !== "-" ? selectedWorkExpCard.title : "준비 중입니다")}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workExpViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workExpViewIsEditing ? (
@@ -8225,6 +8302,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workExpViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workExpViewIsEditing ? (
@@ -8643,11 +8721,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkAbilityCard.title && selectedWorkAbilityCard.title !== "-" ? selectedWorkAbilityCard.title : "준비 중입니다"}</div>
                     </div>
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workAbilityViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workAbilityViewIsEditing ? (
@@ -8669,6 +8751,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workAbilityViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workAbilityViewIsEditing ? (
@@ -8977,12 +9060,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 좌하단: Main Title(읽기전용) + Sub Title + Growth Point */}
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkCareerCard.title && selectedWorkCareerCard.title !== "-" ? selectedWorkCareerCard.title : "준비 중입니다"}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workCareerViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workCareerViewIsEditing ? (
@@ -9005,6 +9092,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workCareerViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workCareerViewIsEditing ? (

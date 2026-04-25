@@ -5425,7 +5425,6 @@
       flex-direction: column;
       // ?ъ슜???붿껌: Zone A(<1920)?먯꽌 overlay媛 display:block?쇰줈 override?섏뼱 flex 以묒븰 ?뺣젹 臾댄슚
       // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (Zone B/C?먮룄 ?곹뼢 ?놁쓬, 寃곌낵 ?숈씪 以묒븰)
-      // position: absolute??confirm-popup-overlay(?대? absolute, inset:0)??湲곗?????븷??寃명븿
       position: absolute !important;
       left: 50% !important;
       top: 50% !important;
@@ -6204,73 +6203,6 @@
               align-items: center !important;
               justify-content: center !important;
             }
-          }
-        }
-      }
-
-      .confirm-popup-overlay {
-        position: absolute !important; // ?ъ슜???붿껌: fixed ??absolute (?앹뾽??紐⑤떖 以묒떖??諛곗튂)
-        inset: 0 !important;
-        background: rgba(0, 0, 0, 0.6); // 紐⑤떖 ?대?留??대몼寃?
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        z-index: 100003;
-      }
-
-      .confirm-popup {
-        width: 400px;
-        padding: 28px 24px 24px;
-        background: #1a1a1a;
-        border: 1px solid rgba(250, 171, 7, 0.35);
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-        text-align: center !important; // ?ъ슜???붿껌: ?앹뾽 ?대? ?꾩껜 媛?대뜲 ?뺣젹
-
-        p,
-        h3,
-        h4,
-        span {
-          text-align: center !important;
-        }
-
-        p {
-          margin: 0 0 20px;
-          font-family: "Pretendard", sans-serif;
-          font-size: 16px;
-          font-weight: 600;
-          color: #fff;
-          line-height: 1.6;
-        }
-
-        .popup-buttons {
-          display: flex !important;
-          flex-direction: row !important;
-          justify-content: center !important; // ?ъ슜???붿껌: 踰꾪듉 ?곸뿭 媛?대뜲 ?뺣젹
-          align-items: center !important;
-          gap: 12px;
-          width: 100%;
-          margin: 0 auto;
-
-          button {
-            min-width: 88px;
-            width: auto !important; // 踰꾪듉 stretch 諛⑹? (flex: 1 ???곸쐞 ?곹뼢 李⑤떒)
-            flex: 0 0 auto !important;
-            height: 38px;
-            padding: 0 18px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: transparent;
-            color: #ddd;
-            font-family: "Pretendard", sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center !important; // 踰꾪듉 ???띿뒪??媛?대뜲
-          }
-
-          .btn-confirm {
-            border-color: transparent;
-            background: #faab07;
-            color: #1a1a1a;
           }
         }
       }
@@ -7582,7 +7514,7 @@
           border: 1px solid rgba(255, 165, 0, 0.3);
           background: rgb(26, 26, 46);
           white-space: nowrap;
-          font-size: 13px !important; // 蹂몃Ц pt ?듭씪
+          font-size: 14px !important; // 蹂몃Ц pt ?듭씪 (13 ??14, +1pt)
         }
         .personal-gender {
           min-width: 16px;
@@ -7971,71 +7903,6 @@
           }
         }
       }
-
-      // ??젣 ?뺤씤 ?앹뾽 ??紐⑤떖 ?대? ?ㅻ쾭?덉씠
-      .confirm-popup-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 100;
-
-        .confirm-popup {
-          background: #1a1a1a;
-          border: 1px solid rgba(255, 165, 0, 0.4);
-          border-radius: 6px;
-          padding: 24px;
-          min-width: 280px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-
-          p {
-            font-family: "Pretendard", sans-serif;
-            font-size: 14px;
-            color: #fff;
-            text-align: center;
-            margin: 0 0 20px 0;
-          }
-
-          .popup-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-
-            button {
-              padding: 8px 20px;
-              font-family: "Pretendard", sans-serif;
-              font-size: 13px;
-              font-weight: 600;
-              border-radius: 4px;
-              cursor: pointer;
-              background: transparent;
-              border: 1px solid rgba(255, 255, 255, 0.3);
-              color: #ddd;
-              transition: all 0.15s;
-
-              &:hover {
-                border-color: #fff;
-                color: #fff;
-              }
-
-              &.btn-danger {
-                background: #e74c3c;
-                color: #fff;
-                border: 1px solid #e74c3c;
-                font-weight: 700;
-
-                &:hover {
-                  background: #c0392b;
-                  border-color: #c0392b;
-                }
-              }
-            }
-          }
-        }
-      }
-
       .section-modal-body {
         padding: 24px;
         display: flex;
@@ -11477,7 +11344,7 @@
 
       .text-block-title {
         font-family: "Pretendard", sans-serif;
-        font-size: 16px;
+        font-size: 19px; // 16 ??19 (+3px ??+2pt)
         line-height: 1;
         font-weight: 600;
         color: #ddd;
@@ -11485,6 +11352,23 @@
         padding: 0;
         text-decoration: underline;
         text-underline-offset: 3px;
+        text-decoration: none;
+        display: flex; // 湲섎㉧由?ti ?꾩씠肄?? ?띿뒪???뺣젹
+        align-items: center;
+        gap: 6px;
+
+        i.ti {
+          font-size: 16px;
+          color: #faab07;
+          flex-shrink: 0;
+          text-decoration: none !important;
+        }
+
+        .required-mark {
+          margin-left: 4px;
+          color: #e74c3c;
+          text-decoration: none !important;
+        }
       }
 
       .text-block-content {
@@ -11505,7 +11389,6 @@
         background: rgba(250, 171, 7, 0.05);
         border-color: rgba(250, 171, 7, 0.15);
         color: rgba(255, 255, 255, 0.55);
-        font-style: italic;
       }
 
       .text-block-edit {

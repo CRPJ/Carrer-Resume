@@ -308,7 +308,11 @@ const Cluster4Content = () => {
   } | null>(null);
   const [seasonReputationSaveAttemptFailed, setSeasonReputationSaveAttemptFailed] = useState(false);
   const [seasonReputationFieldErrorFlash, setSeasonReputationFieldErrorFlash] = useState(false);
-  const [canEditSeasonReputation, setCanEditSeasonReputation] = useState(true);
+  // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditSeasonReputation으로 반영
+  const [canEditSeasonReputation, setCanEditSeasonReputation] = useState(isDemoMode);
+  useEffect(() => {
+    setCanEditSeasonReputation(isDemoMode);
+  }, [isDemoMode]);
   const [seasonReputationSuccess, setSeasonReputationSuccess] = useState(false);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>("");
 
@@ -409,7 +413,23 @@ const Cluster4Content = () => {
   const [seasonReviewRatingDropdownOpen, setSeasonReviewRatingDropdownOpen] = useState(false);
   const [seasonReviewRatingDropdownPos, setSeasonReviewRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const seasonReviewRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
-  const [canEditSeasonReview] = useState(true);
+  const [canEditSeasonReview, setCanEditSeasonReview] = useState(isDemoMode);
+  useEffect(() => {
+    setCanEditSeasonReview(isDemoMode);
+  }, [isDemoMode]);
+
+  // 일반 모드 백엔드 승인 상태 → canEditSeasonReputation / canEditSeasonReview 일괄 반영
+  useEffect(() => {
+    if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
+    let cancelled = false;
+    (async () => {
+      const approved = await checkApprovalStatus();
+      if (cancelled) return;
+      setCanEditSeasonReputation(approved);
+      setCanEditSeasonReview(approved);
+    })();
+    return () => { cancelled = true; };
+  }, [isDemoMode, session]);
 
   // season-reputation view 모달 핸들러
   const handleSeasonReputationViewClose = () => {
@@ -617,6 +637,10 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonReputationReset = () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
     if (seasonReputationFormSnapshot) {
       setSeasonReputationEditData({ rating: seasonReputationFormSnapshot.rating, content: seasonReputationFormSnapshot.content, keyword1: seasonReputationFormSnapshot.keyword1, keyword2: seasonReputationFormSnapshot.keyword2, keyword3: seasonReputationFormSnapshot.keyword3 });
@@ -665,6 +689,10 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonReputationSave = async () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!isSeasonReputationValid()) {
       setSeasonReputationSaveAttemptFailed(true);
       setSeasonReputationFieldErrorFlash(true);
@@ -1877,6 +1905,10 @@ const Cluster4Content = () => {
 
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (isDemoMode) {
       // seasonReputations에 새 평판 추가 (UI 즉시 반영)
       setSeasonReputations((prev) => [
@@ -2048,6 +2080,10 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonReviewReset = () => {
+    if (!isDemoMode && !canEditSeasonReview) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
     if (seasonReviewFormSnapshot) {
       setSeasonReviewEditData({ rating: seasonReviewFormSnapshot.rating, review: seasonReviewFormSnapshot.review, link: seasonReviewFormSnapshot.link });
@@ -2064,6 +2100,10 @@ const Cluster4Content = () => {
   };
 
   const handleSaveSeasonReview = async () => {
+    if (!isDemoMode && !canEditSeasonReview) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     if (!isSeasonReviewValid()) {
       setSeasonReviewSaveAttemptFailed(true);
       setSeasonReviewFieldErrorFlash(true);
@@ -2754,15 +2794,11 @@ const Cluster4Content = () => {
                     className="edit-icon"
                     style={{ cursor: 'pointer', flexShrink: 0 }}
                     onClick={() => {
-                      if (isDemoMode) {
-                        openSeasonReputationModal();
+                      if (!isDemoMode && isOwner) {
+                        alert("시즌 평판은 타 크루끼리 작성합니다.");
                         return;
                       }
-                      if (isOwner) {
-                        alert("시즌 평판은 타 크루끼리 작성합니다.");
-                      } else {
-                        openSeasonReputationModal();
-                      }
+                      handleEditClick(openSeasonReputationModal);
                     }}
                   >
                     <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }} />
