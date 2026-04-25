@@ -1453,9 +1453,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!urlUserId) fetchWeeklyReputations();
   }, [urlUserId, weekId]);
 
-  // 크루 목록 가져오기 (모달 열릴 때 lazy load)
+  // 크루 목록 가져오기 (모달 열릴 때 lazy load) — 데모 모드에서도 실제 API 호출
   const fetchCrewListIfNeeded = async () => {
-    if (isDemoMode) return; // 더미 모드: API 스킵
     if (allCrewList.length > 0) return; // 이미 로드됨
     try {
       const excludeId = urlUserId || session?.user?.id || "";
@@ -1950,6 +1949,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
     // sub_title + output_links 저장 (weekActivityDetails + selectedWorkInfoCard 동시 갱신)
     // TODO: [백엔드 작업 필요] growth_point + image_urls 컬럼 추가 후 sub_title과 동일 패턴으로 저장. blob: URL은 서버 업로드 → 영구 URL 교체 필요.
     if (selectedWorkInfoCard?.activityType) {
@@ -1977,6 +1978,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkInfoFooterNotice("default");
     setWorkInfoViewIsEditing(false);
   };
@@ -2165,6 +2167,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     if (selectedWorkAbilityCard?.activityTypeId) {
       const newSubTitle = editingAbilitySubTitle.trim() || null;
       const newOutputLinks = editingAbilityOutputLinks;
@@ -2199,6 +2202,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingAbilityImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkAbilityFooterNotice("default");
     setWorkAbilityViewIsEditing(false);
   };
@@ -2392,6 +2396,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     if (selectedWorkExpCard?.activityTypeId) {
       const newSubTitle = editingExpSubTitle.trim() || null;
       const newOutputLinks = editingExpOutputLinks;
@@ -2419,6 +2424,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: editingExpRating,
       };
     }
+    alert("저장되었습니다.");
     setWorkExpFooterNotice("default");
     setWorkExpViewIsEditing(false);
   };
@@ -2602,6 +2608,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
     if (activityType) {
       const newSubTitle = editingCareerSubTitle.trim() || null;
@@ -2628,6 +2635,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingCareerImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkCareerFooterNotice("default");
     setWorkCareerViewIsEditing(false);
   };
@@ -2807,6 +2815,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleColleagueEditCancel = () => {
+    // X / 취소 공용 — 편집 모드에서 dirty 시 confirm
+    if (isColleagueEditing) {
+      const dirty = colleagueFormSnapshot
+        ? colleagueEditData.selectedColleague?.id !== colleagueFormSnapshot.selectedColleague?.id ||
+          colleagueEditData.content !== colleagueFormSnapshot.content
+        : !!colleagueEditData.selectedColleague || colleagueEditData.content.trim().length > 0;
+      if (dirty && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    }
     setIsColleagueEditing(false);
     setHeaderModalOpen(false);
   };
@@ -2843,6 +2859,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
 
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
     const picked = colleagueEditData.selectedColleague!;
     // 다음 rank 할당 (기존 selectedColleagues의 빈 rank 자리를 채움)
     const usedRanks = new Set(selectedColleagues.map((c) => c.rank));
@@ -2875,6 +2894,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setSelectedColleagues(updatedList);
 
     if (isDemoMode) {
+      alert("저장되었습니다.");
       setIsColleagueEditing(false);
       setHeaderModalOpen(false);
       return;
@@ -2889,6 +2909,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
       });
       if (!res.ok) throw new Error("저장 실패");
+      alert("저장되었습니다.");
       setIsColleagueEditing(false);
       setHeaderModalOpen(false);
     } catch (err) {
@@ -3300,12 +3321,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
-    if (weeklyReviewFormSnapshot) {
-      setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
-    } else {
-      setWeeklyReviewData({ rating: 0, content: "" });
-    }
+    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
+    setWeeklyReviewData({ rating: 0, content: "" });
     setWeeklyReviewSaveAttemptFailed(false);
     setWeeklyReviewFieldErrorFlash(false);
   };
@@ -3321,6 +3339,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setTimeout(() => setWeeklyReviewFieldErrorFlash(false), 600);
       return;
     }
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
     setWeeklyReviewSaving(true);
     try {
       const savedRecord = await saveWeeklyReview();
@@ -3333,6 +3353,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: weeklyReviewData.rating, content: weeklyReviewData.content,
         created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
       });
+      alert("저장되었습니다.");
       setWeeklyReviewModalOpen(false);
       setIsWeeklyReviewEditing(false);
       setWeeklyReviewSaveAttemptFailed(false);
@@ -3501,12 +3522,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     );
   };
 
-  // 필수필드 유효성 검사 — 평점>0 + 키워드 7~10자 + 내용>0
+  // 필수필드 유효성 검사 — 평점>0 + 키워드 1~10자 (UI 힌트 "최대 10자" 와 일치, 최소값 1로 완화) + 내용>0
   const isFormValid = (): boolean => {
     const keywordLen = reputationEditData.keyword.trim().length;
     return (
       reputationEditData.rating > 0 &&
-      keywordLen >= 7 &&
+      keywordLen >= 1 &&
       keywordLen <= 10 &&
       reputationEditData.content.trim().length > 0
     );
@@ -3542,23 +3563,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 2. 작업 3: 신규 작성 경로에서만 중복/7명 제한 체크 (편집은 기존 수정이므로 skip)
     if (!wasEditEntry) {
-      const targetUid = urlUserId || "";
-      const wkId = weekId || "";
-      if (!targetUid || !wkId) {
-        alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
-        return;
-      }
-      // 2-a. 중복 체크 — 같은 대상에게 이미 보냈는지
-      if (checkAlreadySent(targetUid, wkId)) {
-        window.alert("해당 크루에게 이미 평판을 드렸습니다.");
-        return;
-      }
-      // 2-b. 최대 7명 체크
-      if (getSentCountThisWeek(wkId) >= 7) {
-        window.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
-        return;
+      // 데모 모드는 URL(userId/weekId) 가드 스킵 — UI 테스트 시 자기 프로필 보기 등에서 신규 저장 가능하도록
+      if (!isDemoMode) {
+        const targetUid = urlUserId || "";
+        const wkId = weekId || "";
+        if (!targetUid || !wkId) {
+          alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+          return;
+        }
+        // 2-a. 중복 체크 — 같은 대상에게 이미 보냈는지
+        if (checkAlreadySent(targetUid, wkId)) {
+          window.alert("해당 크루에게 이미 평판을 드렸습니다.");
+          return;
+        }
+        // 2-b. 최대 7명 체크
+        if (getSentCountThisWeek(wkId) >= 7) {
+          window.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
+          return;
+        }
       }
     }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
 
     // 3. 저장
     const saved = await saveWeeklyReputation();
@@ -7092,7 +7119,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="crew-divider">|</span>
                       <span className="crew-team">{colleagueEditData.selectedColleague.team || "-"}</span>
                     </div>
-                    <button className="btn-deselect" title="선택 해제" onClick={handleDeselectColleague}>
+                    <button className="btn-deselect" title="선택 해제" onClick={handleDeselectColleague} disabled={!isColleagueEditing}>
                       <i className="ti ti-x"></i>
                     </button>
                   </div>
@@ -7119,6 +7146,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         }}
                         placeholder="크루 이름을 입력하세요 (예: 김, 김ㅎ)"
                         autoFocus
+                        disabled={!isColleagueEditing}
                       />
                       <i className="ti ti-search search-icon"></i>
                     </div>
@@ -7134,7 +7162,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span className="crew-divider">|</span>
                               <span className="crew-team">{crew.team || "-"}</span>
                             </div>
-                            <button className="btn-select" title="이 크루 선택" onClick={() => handleSelectColleagueCandidate(crew)}>
+                            <button className="btn-select" title="이 크루 선택" onClick={() => handleSelectColleagueCandidate(crew)} disabled={!isColleagueEditing}>
                               <i className="ti ti-check"></i>
                             </button>
                           </div>
@@ -7164,6 +7192,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     }}
                     placeholder="연계 동료에게 전하고 싶은 말을 100자 이내로 작성해주세요."
                     maxLength={100}
+                    disabled={!isColleagueEditing}
                   />
                   <div className="char-count">{colleagueEditData.content.length}/100</div>
                 </div>
@@ -7217,6 +7246,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <button
                 className="modal-close-btn"
                 onClick={() => {
+                  if (isReputationFormEditing && isFormDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
                   setHeaderModalOpen(false);
                   setIsReputationFormEditing(false);
                   setReputationSaveError(null);

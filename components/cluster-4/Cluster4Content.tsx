@@ -706,6 +706,9 @@ const Cluster4Content = () => {
       return;
     }
 
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
     // TODO: 1주 보내기 10개 제한 — sentSeasonReputations state + 백엔드 카운트 API 도입 후 활성화
     // const isUpdate = !!selectedReputation?.id;
     // if (!isUpdate && sentThisWeekCount >= 10) {
@@ -720,6 +723,7 @@ const Cluster4Content = () => {
         alert("저장에 실패했습니다. 다시 시도해주세요.");
         return;
       }
+      alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
     } catch (err) {
       console.error("[season-reputation] 저장 실패:", err);
@@ -1415,7 +1419,7 @@ const Cluster4Content = () => {
     fetchSeasonReputations(targetId, currentSeason.id);
   }, [urlUserId, session?.user?.id, currentSeason?.id]);
 
-  // 데모 모드일 때 더미 데이터 일괄 적용
+  // 데모 모드일 때 더미 데이터 일괄 적용 — searchParams 의존성 제거: useSearchParams 가 매 렌더마다 새 ref 반환해 useEffect 가 반복 발화하면서 신규 저장한 record 를 dummy 로 덮어쓰는 race condition 차단
   useEffect(() => {
     if (isDemoMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1423,9 +1427,9 @@ const Cluster4Content = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setSeasonHistories(DUMMY_SEASON_HISTORIES as any);
     }
-  }, [isDemoMode, searchParams]);
+  }, [isDemoMode]);
 
-  // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신
+  // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신 — 동일 이유로 searchParams 의존성 제거
   useEffect(() => {
     if (!isDemoMode) return;
     const currentHistory = DUMMY_SEASON_HISTORIES[section3Page];
@@ -1435,7 +1439,7 @@ const Cluster4Content = () => {
     } else {
       setSeasonReputations([]);
     }
-  }, [section3Page, isDemoMode, searchParams]);
+  }, [section3Page, isDemoMode]);
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
@@ -2084,12 +2088,9 @@ const Cluster4Content = () => {
       alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
-    if (seasonReviewFormSnapshot) {
-      setSeasonReviewEditData({ rating: seasonReviewFormSnapshot.rating, review: seasonReviewFormSnapshot.review, link: seasonReviewFormSnapshot.link });
-    } else {
-      setSeasonReviewEditData({ rating: 0, review: "", link: "" });
-    }
+    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
+    setSeasonReviewEditData({ rating: 0, review: "", link: "" });
     setSeasonReviewSaveAttemptFailed(false);
     setSeasonReviewFieldErrorFlash(false);
   };
@@ -2114,6 +2115,9 @@ const Cluster4Content = () => {
       }, 100);
       return;
     }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
 
     setSeasonReviewSaving(true);
     setSeasonReviewError(null);
