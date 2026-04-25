@@ -374,6 +374,16 @@ const Cluster4Content = () => {
   }
   const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
 
+  const getDemoSeasonReputations = (reputations: any[]) => {
+    if (searchParams.get("admin") !== "true") return reputations;
+
+    const raw = searchParams.get("repCount");
+    if (raw === null) return reputations;
+
+    const count = Math.max(0, Math.min(reputations.length, parseInt(raw, 10) || 0));
+    return reputations.slice(0, count);
+  };
+
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
   const [selectedReputation, setSelectedReputation] = useState<SeasonReputationData | null>(null);
@@ -1334,11 +1344,11 @@ const Cluster4Content = () => {
   useEffect(() => {
     if (isDemoMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setSeasonReputations(DUMMY_SEASON_DATA.seasonReputations as any);
+      setSeasonReputations(getDemoSeasonReputations(DUMMY_SEASON_DATA.seasonReputations as any) as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setSeasonHistories(DUMMY_SEASON_HISTORIES as any);
     }
-  }, [isDemoMode]);
+  }, [isDemoMode, searchParams]);
 
   // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신
   useEffect(() => {
@@ -1346,11 +1356,11 @@ const Cluster4Content = () => {
     const currentHistory = DUMMY_SEASON_HISTORIES[section3Page];
     if (currentHistory) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setSeasonReputations(currentHistory.seasonReputations as any);
+      setSeasonReputations(getDemoSeasonReputations(currentHistory.seasonReputations as any) as any);
     } else {
       setSeasonReputations([]);
     }
-  }, [section3Page, isDemoMode]);
+  }, [section3Page, isDemoMode, searchParams]);
 
   // 역할 라벨 매핑
   const roleLabels: { [key: string]: string } = {
@@ -2713,11 +2723,13 @@ const Cluster4Content = () => {
                 </div>
                 <div style={{ position: "relative" }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
-                    {(() => {
-                      const minCount = Math.min(7, Math.max(3, seasonReputations.length));
-                      return Array.from({ length: minCount }).map((_, idx) => {
-                        const reputation = seasonReputations[idx] as any;
-                        if (reputation) {
+                    {seasonReputations.length === 0 ? (
+                      <div className="profile-card season-reputation-waiting">
+                        <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
+                        <p className="waiting-message">시즌 평판 대기 중... 😊</p>
+                      </div>
+                    ) : (
+                      seasonReputations.map((reputation: any) => {
                           const reviewer = reputation.reviewer;
                           const currentYear = new Date().getFullYear();
                           const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
@@ -2810,43 +2822,8 @@ const Cluster4Content = () => {
                               </div>
                             </div>
                           );
-                        }
-                        return (
-                          <div className="profile-card empty" key={`empty-${idx}`} style={{ cursor: "default" }}>
-                            <div className="corner top-left"></div>
-                            <div className="corner top-right"></div>
-                            <div className="corner bottom-left"></div>
-                            <div className="corner bottom-right"></div>
-                            <div className="card-top">
-                              <div className="avatar">
-                                <div style={{ width: "100%", height: "100%", background: "#777", borderRadius: "50%" }} />
-                              </div>
-                              <div className="info">
-                                <div className="row1">
-                                  <span style={{ display: 'inline-block', minWidth: '48px', maxWidth: '48px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '18px', maxWidth: '18px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '100px', maxWidth: '100px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '100px', maxWidth: '100px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
-                                </div>
-                                <div className="row2">
-                                  <span style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="tags" />
-                            <div className="comment" style={{ cursor: "default" }}>
-                              <span className="comment-text">-</span>
-                            </div>
-                            <div className="stats">
-                              <span className="pm">FM : <span style={{ display: 'inline-block', minWidth: '4ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif" }}>-</span></span>
-                              <span className="rating">
-                                {[...Array(5)].map((_, i) => (
-                                  <img key={`empty-star-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                ))}
-                                <span className="rating-score"><span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>-</span>{" "}/{" "}10</span>
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      });
-                    })()}
+                      })
+                    )}
                   </div>
                   {/* 커스텀 스크롤바 (area-9) */}
                   <div style={{ position: "absolute", right: 0, top: 0, width: "2px", height: "100%", background: "rgba(255,227,170,0.15)", borderRadius: "2px" }}>

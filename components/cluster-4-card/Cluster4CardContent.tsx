@@ -1633,6 +1633,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [colleagueFormSnapshot, setColleagueFormSnapshot] = useState<{ selectedColleague: any | null; content: string } | null>(null);
   const [colleagueSaveAttemptFailed, setColleagueSaveAttemptFailed] = useState(false);
   const [colleagueFieldErrorFlash, setColleagueFieldErrorFlash] = useState(false);
+  const [isColleagueEditing, setIsColleagueEditing] = useState(false);
 
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
@@ -1642,13 +1643,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [colleagueViewModalOpen, setColleagueViewModalOpen] = useState(false);
   const [selectedColleagueCard, setSelectedColleagueCard] = useState<any>(null);
   const [selectedColleagueIndex, setSelectedColleagueIndex] = useState<number>(0);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDeleteColleague = async () => {
-    // TODO: [백엔드 작업 필요] 연계동료 삭제 API 호출
-    // await deleteColleague(selectedColleagueCard.id);
-    setShowDeleteConfirm(false);
+    if (!selectedColleagueCard) return;
+    // TODO: [백엔드 작업 필요] 일반 모드 — DB 삭제 API 호출
+    //   엔드포인트: DELETE /api/weekly-colleagues/[id] (현재 route.ts 미구현)
+    //   구현 후 아래 활성화:
+    // if (!isDemoMode) {
+    //   try {
+    //     await fetch(`/api/weekly-colleagues/${selectedColleagueCard.id}`, { method: "DELETE" });
+    //   } catch (err) {
+    //     console.error("[colleague] 삭제 API 실패:", err);
+    //     alert("삭제에 실패했습니다.");
+    //     return;
+    //   }
+    // }
+    setSelectedColleagues((prev) => prev.filter((c) => c.id !== selectedColleagueCard.id));
     setColleagueViewModalOpen(false);
+    setSelectedColleagueCard(null);
   };
 
   // 실무 정보 카드 상세보기 모달 상태
@@ -2703,7 +2715,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const colleagueSearchResults = useMemo(
-    () => searchColleagueCandidates(colleagueSearchQuery, allCrewList),
+    () => searchColleagueCandidates(colleagueSearchQuery, allCrewList).slice(0, 5),
     [colleagueSearchQuery, allCrewList, selectedColleagues]
   );
 
@@ -2740,6 +2752,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleColleagueEditCancel = () => {
+    setIsColleagueEditing(false);
     setHeaderModalOpen(false);
   };
 
@@ -2799,6 +2812,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setSelectedColleagues(updatedList);
 
     if (isDemoMode) {
+      setIsColleagueEditing(false);
       setHeaderModalOpen(false);
       return;
     }
@@ -2812,6 +2826,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
       });
       if (!res.ok) throw new Error("저장 실패");
+      setIsColleagueEditing(false);
       setHeaderModalOpen(false);
     } catch (err) {
       console.error("연계 동료 저장 실패:", err);
@@ -2820,6 +2835,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setColleagueSaving(false);
     }
   };
+
+  useEffect(() => {
+    if (!headerModalOpen) setIsColleagueEditing(false);
+  }, [headerModalOpen]);
 
   // 동료 삭제 함수
   const removeColleague = (id: number) => {
@@ -3951,7 +3970,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             created_at: c.createdAt || null, // 작업 6에서 reputation-timestamp 표시용
             isEmpty: false,
           }))
-        : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
+        : (() => {
+            // 테스트용: ?admin=true&colCount=N (N: 0~3) — 데모 모드에서만 더미 개수 조절
+            if (isDemoMode && searchParams.get("admin") === "true") {
+              const raw = searchParams.get("colCount");
+              if (raw !== null) {
+                const n = Math.max(0, Math.min(3, parseInt(raw, 10) || 0));
+                return dummyColleagues.slice(0, n);
+              }
+            }
+            return dummyColleagues;
+          })(); // 데이터 없으면 더미 데이터 폴백
 
     // createdAt 오름차순 정렬 (reputation 패턴 동일)
     apiData.sort((a: any, b: any) => {
@@ -3983,7 +4012,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     return result.slice(0, 3); // 최대 3개만 반환
-  }, [selectedColleagues, isRestMode]);
+  }, [selectedColleagues, isRestMode, isDemoMode, searchParams]);
 
   // 실무 정보 activity_type_id → UI 매핑
   const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
@@ -5114,7 +5143,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             {(() => {
               // 카드 0개(또는 휴식 주차): 4슬롯 전체 영역을 통합 대기 영역으로 표시
               const filledCount = isRestMode ? 0 : reputationData.filter((c: any) => c && !c.isEmpty).length;
-              if (filledCount === 0) {
+              if (false && filledCount === 0) {
                 return (
                   <div className="reputation-cards-grid reputation-all-empty">
                     <div className="reputation-waiting-full">
@@ -5128,6 +5157,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="reputation-cards-grid">
                   {reputationData.map((user, index) => {
                     const isEmpty = user.isEmpty || isRestMode;
+                    if (isEmpty) {
+                      return (
+                        <div key={user.id} className="reputation-card reputation-waiting-card">
+                          <div className="reputation-waiting-content">
+                            <img src="/images/0/waiting.png" alt="waiting" />
+                            <p>주차 평판 대기 중... 😊</p>
+                          </div>
+                        </div>
+                      );
+                    }
                     // 1~3개 상태의 빈 슬롯: 카드 골격 + 내부 자리(프로필/별/코멘트/FM) 유지 + 각 자리의 값만 placeholder
                     // (pre-6단계 원래 구조: 같은 .reputation-card에 isEmpty 조건부 "-" 값)
                     return (
@@ -5319,22 +5358,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="count-num">{selectedColleagues.length}</span>/3
               </span>
             </div>
-            {(() => {
-              const filledCount = isRestMode ? 0 : colleagueData.filter((c: any) => c && !c.isEmpty).length;
-              if (filledCount === 0) {
-                return (
-                  <div className="colleague-cards colleague-all-empty">
-                    <div className="colleague-waiting-full">
-                      <img src="/images/0/waiting.png" alt="waiting" />
-                      <p>연계 동료 등록 대기 중..😊</p>
-                    </div>
-                  </div>
-                );
-              }
-              return (
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
                 const isEmpty = user.isEmpty;
+                if (isEmpty) {
+                  return (
+                    <div key={user.id} className="colleague-card colleague-card-empty">
+                      <img src="/images/0/colleague.png" alt="동료 대기" className="empty-colleague-image" />
+                      <p className="empty-colleague-message">나의 동료가 되어줄래..? (수줍)😍</p>
+                    </div>
+                  );
+                }
                 return (
                   <div
                     key={user.id}
@@ -5475,8 +5509,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 );
               })}
             </div>
-              );
-            })()}
           </div>
         </div>
       </div>
@@ -6966,7 +6998,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <h3>연계 동료</h3>
               </div>
               <p className="modal-subtitle">
-                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나 기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
+                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나<br/>기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
               </p>
               <button className="modal-close-btn" onClick={handleColleagueEditCancel}>
                 <i className="ti ti-x"></i>
@@ -7076,15 +7108,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  <button className="modal-cancel-btn" onClick={handleColleagueEditCancel}>
-                    취소
-                  </button>
-                  <button className="modal-reset-btn" onClick={handleColleagueEditReset}>
-                    초기화
-                  </button>
-                  <button className="modal-save-btn" onClick={handleColleagueEditSave} disabled={colleagueSaving}>
-                    {colleagueSaving ? "저장 중..." : "저장"}
-                  </button>
+                  {!isColleagueEditing ? (
+                    <button type="button" className="modal-edit-btn" onClick={() => setIsColleagueEditing(true)}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button type="button" className="modal-cancel-btn" onClick={handleColleagueEditCancel}>
+                        취소
+                      </button>
+                      <button type="button" className="modal-reset-btn" onClick={handleColleagueEditReset}>
+                        초기화
+                      </button>
+                      <button type="button" className="modal-save-btn" onClick={handleColleagueEditSave} disabled={colleagueSaving}>
+                        {colleagueSaving ? "저장 중..." : "저장"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="modal-footer-bottom">
@@ -7481,7 +7521,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
               <p className="modal-subtitle">저와 함께한 동료입니다. 😊</p>
               <div className="modal-footer-right modal-header-right">
-                <button className="modal-edit-btn modal-delete-btn" onClick={() => setShowDeleteConfirm(true)}>
+                <button
+                  className="modal-edit-btn modal-delete-btn"
+                  onClick={() => {
+                    if (!window.confirm("이 동료를 삭제하시겠습니까?")) return;
+                    handleDeleteColleague();
+                  }}
+                >
                   삭제
                 </button>
               </div>
@@ -7549,13 +7595,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   fromName: 카드 보내는 사용자 (평판 작성자)
                   toName: 카드 받는 사용자 (대상자) */}
               <div className="colleague-fromto">
-                <span className="fromto-label">From</span>
-                <span className="fromto-name">{selectedColleagueCard.fromName || session?.user?.name || "-"}</span>
-                <span className="fromto-suffix">님</span>
+                <span className="fromto-block fromto-from">
+                  <span className="fromto-label">From -</span>
+                  <span className="fromto-name">{selectedColleagueCard.fromName || session?.user?.name || "-"}</span>
+                  <span className="fromto-suffix">님</span>
+                </span>
                 <span className="fromto-arrow">→</span>
-                <span className="fromto-label">To</span>
-                <span className="fromto-name">{selectedColleagueCard.toName || selectedColleagueCard.name || "-"}</span>
-                <span className="fromto-suffix">님</span>
+                <span className="fromto-block fromto-to">
+                  <span className="fromto-label">To -</span>
+                  <span className="fromto-name">{selectedColleagueCard.toName || selectedColleagueCard.name || "-"}</span>
+                  <span className="fromto-suffix">님</span>
+                </span>
               </div>
 
               {/* Honor & Thank you */}
@@ -7575,18 +7625,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
             </div>
 
-            {/* 삭제 확인 팝업 */}
-            {showDeleteConfirm && (
-              <div className="confirm-popup-overlay">
-                <div className="confirm-popup">
-                  <p>연계동료를 삭제하시겠습니까?</p>
-                  <div className="popup-buttons">
-                    <button onClick={() => setShowDeleteConfirm(false)}>취소</button>
-                    <button className="btn-danger" onClick={handleDeleteColleague}>확인</button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

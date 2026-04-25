@@ -1993,6 +1993,39 @@
       // 蹂꾨룄 SCSS ?ㅻ쾭?쇱씠???놁쓬. .empty ?대옒?ㅻ뒗 TSX??isEmpty 遺꾧린??留덉빱濡쒕쭔 ?ъ슜 (?꾩옱 CSS ?④낵 ?놁쓬)
       // ?좑툘 dim/grayscale ?쒓굅 ??鍮??щ’???뺤긽 移대뱶? ?숈씪???멸? (媛믩쭔 鍮꾩뼱?덈뒗 ?곹깭)
 
+      &.reputation-waiting-card {
+        min-height: 245px;
+        height: 245px;
+        align-items: center;
+        justify-content: center;
+        cursor: default;
+
+        .reputation-waiting-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          height: 100%;
+
+          img {
+            width: 82px;
+            height: auto;
+            opacity: 0.8;
+          }
+
+          p {
+            margin: 0;
+            font-family: "Pretendard", sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+          }
+        }
+      }
+
       .card-profile {
         display: flex;
         align-items: center;
@@ -2237,41 +2270,6 @@
     width: calc(100% + 21px);
     max-width: none;
 
-    &.colleague-all-empty {
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      min-height: 420px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 32px;
-      box-sizing: border-box;
-    }
-
-    .colleague-waiting-full {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-
-      img {
-        width: 180px;
-        height: auto;
-        opacity: 0.8;
-      }
-
-      p {
-        font-family: "Pretendard", sans-serif;
-        font-size: 18px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.6);
-        margin: 0;
-        text-align: center;
-      }
-    }
-
     .colleague-card {
       width: 100%;
       background: #232323;
@@ -2413,6 +2411,52 @@
             }
           }
         }
+      }
+    }
+
+    .colleague-card-empty {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px 14px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      min-height: 84px;
+      height: 84px;
+      cursor: default;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .empty-colleague-message {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        text-align: right;
+        white-space: nowrap;
+        position: relative;
+        z-index: 2;
+        margin-right: -32px;
+        margin-top: 32px;
+      }
+
+      .empty-colleague-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center 30%;
+        opacity: 0.85;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
       }
     }
   }
@@ -4939,9 +4983,9 @@
           font-family: "Pretendard", sans-serif;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
-          margin: 4px 67px 0 80px;
+          margin: 4px 24px 0 80px !important;
           padding-left: 0 !important;
-          max-width: calc(100% - 147px);
+          max-width: calc(100% - 104px) !important;
           min-width: 0;
           white-space: normal !important;
           overflow-wrap: break-word !important;
@@ -4997,6 +5041,10 @@
             margin-left: 4px;
           }
         }
+      }
+
+      .colleague-select-section {
+        overflow: visible !important;
       }
 
       // 영역 1-B: 선택된 동료 카드
@@ -5089,7 +5137,7 @@
         background: rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 4px;
-        max-height: 180px;
+        max-height: 220px;
         overflow-y: auto;
 
         .search-result-item {
@@ -5344,6 +5392,20 @@
           cursor: pointer;
           white-space: nowrap;
           &:hover { background: rgba(76, 175, 80, 0.1); }
+        }
+
+        .modal-edit-btn {
+          padding: 8px 20px;
+          background: #faab07;
+          border: 1px solid transparent;
+          color: #1a1a1a;
+          border-radius: 0;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: "Pretendard", sans-serif;
+          cursor: pointer;
+          white-space: nowrap;
+          &:hover { background: #ffb820; }
         }
       }
 
@@ -7643,9 +7705,9 @@
           padding: 12px 16px;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          height: 80px !important; // ?ъ슜???붿껌: 100??湲곗? ?ш퀎??(150 ??80)
-          min-height: 80px !important;
-          max-height: 80px !important;
+          height: 124px !important; // ?ъ슜???붿껌: 100??湲곗? ?ш퀎??(150 ??80) + 3cm(114px)
+          min-height: 124px !important;
+          max-height: 124px !important;
           overflow-y: auto;
 
           .reputation-content-text {
@@ -8259,6 +8321,29 @@
         font-family: "Pretendard", sans-serif;
         font-size: 13px;
         color: #ddd;
+
+        .fromto-block {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 10px;
+          border-radius: 4px;
+          font-weight: 600;
+
+          &.fromto-from {
+            background: rgba(135, 206, 235, 0.3);
+          }
+
+          &.fromto-to {
+            background: rgba(157, 250, 7, 0.3);
+          }
+
+          .fromto-label,
+          .fromto-name,
+          .fromto-suffix {
+            color: #ffffff !important;
+          }
+        }
 
         .fromto-label {
           color: #faab07;
@@ -13086,7 +13171,7 @@
 
     .week-info-text {
       font-family: "Pretendard", sans-serif;
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 600;
       color: #faab07;
       line-height: 1.4;
