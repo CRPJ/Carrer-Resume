@@ -1585,6 +1585,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reviewRatingDropdownOpen, setReviewRatingDropdownOpen] = useState(false);
   const [reviewRatingDropdownPos, setReviewRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const reviewRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+  const [weeklyReviewSaving, setWeeklyReviewSaving] = useState(false);
+  const [weeklyReviewSaveAttemptFailed, setWeeklyReviewSaveAttemptFailed] = useState(false);
+  const [weeklyReviewFormSnapshot, setWeeklyReviewFormSnapshot] = useState<{ rating: number; content: string } | null>(null);
+  const [weeklyReviewFieldErrorFlash, setWeeklyReviewFieldErrorFlash] = useState(false);
+  const [weeklyReviewFromDB, setWeeklyReviewFromDB] = useState<{
+    id?: string; weekCardId?: string; rating: number; content: string; created_at?: string; updated_at?: string;
+  } | null>(null);
 
   // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
   // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
@@ -1649,7 +1656,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [selectedWorkInfoCard, setSelectedWorkInfoCard] = useState<any>(null);
 
   // 도움말 모달 (workInfo 푸터 🔎 공용)
-  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [helpModalKind, setHelpModalKind] = useState<
+    'colleague' | 'workInfo' | 'reputation' | 'weeklyReview' | null
+  >(null);
 
   // 실무 역량 카드 상세보기 모달 상태
   const [workAbilityViewModalOpen, setWorkAbilityViewModalOpen] = useState(false);
@@ -3070,13 +3079,195 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
   }, [reviewRatingDropdownOpen]);
 
-  // 임시 트리거 (테스트용 — 작업 5에서 제거)
+  // 주차 리뷰 — 페이지 로드 시 데이터 초기화
+  const fetchWeeklyReview = async () => {
+    if (isDemoMode) {
+      setWeeklyReviewFromDB({
+        id: "demo-weekly-review-init",
+        weekCardId: weekId,
+        rating: 8,
+        content: "이번 주차에는 새로운 프로젝트를 시작하면서 팀워크의 중요성을 다시 한번 느꼈습니다. 협업 도구를 적극 활용하여 효율적으로 진행했고, 동료들의 피드백을 통해 많이 성장할 수 있었습니다.",
+        created_at: new Date().toISOString(),
+      });
+      return;
+    }
+
+    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
+    try {
+      const res = await fetch(`/api/weekly-reviews?weekCardId=${weekId}`);
+      if (!res.ok) {
+        setWeeklyReviewFromDB(null);
+        return;
+      }
+      const data = await res.json();
+      let record = null;
+      if (Array.isArray(data)) {
+        record = data.length > 0 ? data[0] : null;
+      } else if (data && data.id) {
+        record = data;
+      }
+      if (record) {
+        setWeeklyReviewFromDB({
+          id: record.id, weekCardId: record.weekCardId || weekId,
+          rating: record.rating, content: record.content,
+          created_at: record.created_at, updated_at: record.updated_at,
+        });
+      } else {
+        setWeeklyReviewFromDB(null);
+      }
+    } catch (err) {
+      console.error("[weekly-review] fetch 예외:", err);
+      setWeeklyReviewFromDB(null);
+    }
+  };
+
   useEffect(() => {
-    (window as any).__openWeeklyReviewModal = () => {
-      setWeeklyReviewModalOpen(true);
-      setIsWeeklyReviewEditing(true);
-    };
-  }, []);
+    if (!weekId) return;
+    fetchWeeklyReview();
+  }, [weekId, isDemoMode]);
+
+  // 주차 리뷰 — 검증 함수
+  const isWeeklyReviewValid = (): boolean => {
+    return weeklyReviewData.rating > 0 && weeklyReviewData.content.trim().length > 0;
+  };
+
+  const isWeeklyReviewDirty = (): boolean => {
+    if (!weeklyReviewFormSnapshot) {
+      return weeklyReviewData.rating > 0 || weeklyReviewData.content.length > 0;
+    }
+    return weeklyReviewData.rating !== weeklyReviewFormSnapshot.rating || weeklyReviewData.content !== weeklyReviewFormSnapshot.content;
+  };
+
+  // 주차 리뷰 — 저장 함수
+  const saveWeeklyReview = async (): Promise<{ id: string; weekCardId?: string; created_at: string; updated_at?: string } | null> => {
+    const isUpdate = !!weeklyReviewFromDB?.id;
+
+    if (isDemoMode) {
+      const now = new Date().toISOString();
+      if (isUpdate && weeklyReviewFromDB) {
+        return { id: weeklyReviewFromDB.id!, weekCardId: weeklyReviewFromDB.weekCardId, created_at: weeklyReviewFromDB.created_at || now, updated_at: now };
+      }
+      return { id: `demo-weekly-review-${Date.now()}`, weekCardId: weekId, created_at: now };
+    }
+
+    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
+    try {
+      const endpoint = isUpdate ? `/api/weekly-reviews/${weeklyReviewFromDB?.id}` : "/api/weekly-reviews";
+      const method = isUpdate ? "PUT" : "POST";
+      const res = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekCardId: weekId, rating: weeklyReviewData.rating, content: weeklyReviewData.content }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return { id: data.id, weekCardId: data.weekCardId, created_at: data.created_at, updated_at: data.updated_at };
+    } catch (err) {
+      console.error("[weekly-review] API 예외:", err);
+      return null;
+    }
+  };
+
+  // 주차 리뷰 — 모달 열릴 때 초기화
+  useEffect(() => {
+    if (!weeklyReviewModalOpen) return;
+    if (weeklyReviewFromDB) {
+      setWeeklyReviewData({ rating: weeklyReviewFromDB.rating, content: weeklyReviewFromDB.content });
+    } else {
+      setWeeklyReviewData({ rating: 0, content: "" });
+    }
+    setIsWeeklyReviewEditing(false);
+    setWeeklyReviewFormSnapshot(null);
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+  }, [weeklyReviewModalOpen, weeklyReviewFromDB]);
+
+  // 주차 리뷰 — 모달 닫기 (isDirty 체크)
+  const handleWeeklyReviewClose = () => {
+    if (isWeeklyReviewEditing && isWeeklyReviewDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    }
+    setWeeklyReviewModalOpen(false);
+  };
+
+  // 주차 리뷰 — 푸터 핸들러
+  const handleWeeklyReviewEditClick = () => {
+    if (!canEditReputation) {
+      alert("관리자 승인이 필요합니다");
+      return;
+    }
+    setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+    setIsWeeklyReviewEditing(true);
+  };
+
+  const handleWeeklyReviewCancel = () => {
+    if (isWeeklyReviewDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+    }
+    if (weeklyReviewFormSnapshot) {
+      setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
+    } else if (weeklyReviewFromDB) {
+      setWeeklyReviewData({ rating: weeklyReviewFromDB.rating, content: weeklyReviewFromDB.content });
+    } else {
+      setWeeklyReviewData({ rating: 0, content: "" });
+    }
+    setIsWeeklyReviewEditing(false);
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+    setWeeklyReviewFormSnapshot(null);
+  };
+
+  const handleWeeklyReviewHelp = () => {
+    setHelpModalKind('weeklyReview');
+  };
+
+  const handleWeeklyReviewReset = () => {
+    if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
+    if (weeklyReviewFormSnapshot) {
+      setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
+    } else {
+      setWeeklyReviewData({ rating: 0, content: "" });
+    }
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+  };
+
+  const handleWeeklyReviewSave = async () => {
+    if (!isWeeklyReviewValid()) {
+      setWeeklyReviewSaveAttemptFailed(true);
+      setWeeklyReviewFieldErrorFlash(true);
+      setTimeout(() => setWeeklyReviewFieldErrorFlash(false), 600);
+      return;
+    }
+    setWeeklyReviewSaving(true);
+    try {
+      const savedRecord = await saveWeeklyReview();
+      if (!savedRecord) {
+        alert("저장에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+      setWeeklyReviewFromDB({
+        id: savedRecord.id, weekCardId: savedRecord.weekCardId,
+        rating: weeklyReviewData.rating, content: weeklyReviewData.content,
+        created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
+      });
+      setIsWeeklyReviewEditing(false);
+      setWeeklyReviewSaveAttemptFailed(false);
+      setWeeklyReviewFieldErrorFlash(false);
+      setWeeklyReviewFormSnapshot(null);
+    } catch (err) {
+      console.error("[weekly-review] 저장 실패:", err);
+      alert("저장 중 오류가 발생했습니다.");
+    } finally {
+      setWeeklyReviewSaving(false);
+    }
+  };
+
+  const handleReputationHelp = () => {
+    setHelpModalKind('reputation');
+  };
 
   // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
   const handleEditMode = () => {
@@ -4796,7 +4987,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <h3 className="review-title">Weekly Review</h3>
                 <button
                   className="review-view-btn"
-                  onClick={() => {/* 작업 3에서 추가 */}}
+                  onClick={() => setWeeklyReviewModalOpen(true)}
                   aria-label="더보기"
                 >
                   <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
@@ -4804,17 +4995,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
               <div className="weekly-review-mid">
                 <p className="review-content">
-                  몇자가 들어갈지 모르니, 공간을 정하고, 거기에 맞추자구요. 일단은 2줄이 들어가고, 끝날 때는 ... 으로 하는거는
+                  {weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}
                 </p>
               </div>
               <div className="weekly-review-footer">
                 <div className="review-rating-group">
                   <div className="review-stars">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <i key={i} className={`ti ti-star${i <= 4 ? "-filled" : ""}`}></i>
-                    ))}
+                    {[1, 2, 3, 4, 5].map((i) => {
+                      const r = (weeklyReviewFromDB?.rating || 0) / 2;
+                      let cls = "ti-star";
+                      if (r >= i) cls = "ti-star-filled";
+                      else if (r >= i - 0.5) cls = "ti-star-half-filled";
+                      return <i key={i} className={`ti ${cls}`}></i>;
+                    })}
                   </div>
-                  <span className="review-score">8 / 10</span>
+                  <span className="review-score">{weeklyReviewFromDB?.rating || 0} / 10</span>
                 </div>
               </div>
             </div>
@@ -6876,7 +7071,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             {/* ── 푸터 (118px) Type B ── */}
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('colleague')} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -7057,7 +7252,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-footer">
               {/* 행 1 */}
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={handleReputationHelp} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -7762,7 +7957,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-footer">
               {/* 행 1 */}
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('workInfo')} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -9088,14 +9283,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       )}
 
       {/* 도움말 모달 (cluster2 패턴 준용) */}
-      {showHelpModal && (
-        <div className="help-modal-overlay" onClick={() => setShowHelpModal(false)}>
+      {helpModalKind && (
+        <div className="help-modal-overlay" onClick={() => setHelpModalKind(null)}>
           <div className="help-modal" onClick={(e) => e.stopPropagation()}>
             <div className="help-modal-header">
               <div className="modal-header-top">
                 <span style={{ fontSize: "20px" }}>🔎</span>
                 <h3>도움말</h3>
-                <button className="modal-close-btn" onClick={() => setShowHelpModal(false)}>
+                <button className="modal-close-btn" onClick={() => setHelpModalKind(null)}>
                   <i className="ti ti-x"></i>
                 </button>
               </div>
@@ -9108,11 +9303,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       {weeklyReviewModalOpen &&
         typeof document !== "undefined" &&
         createPortal(
-          <div className="section-modal-overlay" onClick={() => setWeeklyReviewModalOpen(false)}>
-            <div className="section-modal section-modal-weekly-review-form" onClick={(e) => e.stopPropagation()}>
+          <div className="section-modal-overlay">
+            <div className="section-modal section-modal-weekly-review-form">
               {/* 헤더 */}
               <div className="section-modal-header">
-                <button className="modal-close-btn" onClick={() => setWeeklyReviewModalOpen(false)} aria-label="닫기">
+                <button className="modal-close-btn" onClick={handleWeeklyReviewClose} aria-label="닫기">
                   <i className="ti ti-x"></i>
                 </button>
                 <div className="modal-header-top">
@@ -9140,7 +9335,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <h4>
                       ■ 리뷰 평점 <span className="required-mark">*</span>
                     </h4>
-                    <div className="rating-field" style={{ flex: "1 1 0%" }} data-field="review-rating">
+                    <div className={`rating-field ${weeklyReviewSaveAttemptFailed && weeklyReviewData.rating === 0 ? `field-error ${weeklyReviewFieldErrorFlash ? "flash" : ""}` : ""}`} style={{ flex: "1 1 0%" }} data-field="review-rating">
                       <span className="star-rating">
                         {(() => {
                           const r = weeklyReviewData.rating || 0;
@@ -9231,7 +9426,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </h4>
                     <div className="review-content-wrapper">
                       <textarea
-                        className="review-content-textarea"
+                        className={`review-content-textarea ${weeklyReviewSaveAttemptFailed && weeklyReviewData.content.trim().length === 0 ? `field-error ${weeklyReviewFieldErrorFlash ? "flash" : ""}` : ""}`}
                         value={weeklyReviewData.content}
                         onChange={(e) => {
                           const v = e.target.value.slice(0, 200);
@@ -9249,7 +9444,41 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
 
               {/* 작업 3에서 푸터 추가 예정 */}
-              <div className="section-modal-footer-placeholder" style={{ minHeight: 60 }}></div>
+              {/* 푸터 Type B (reputation-form 준용) */}
+              <div className="section-modal-footer">
+                <div className="modal-footer-top">
+                  <button type="button" className="modal-help-icon" onClick={handleWeeklyReviewHelp} aria-label="도움말">
+                    🔎
+                  </button>
+                  <div className="modal-footer-right">
+                    {!isWeeklyReviewEditing ? (
+                      <button type="button" className="modal-edit-btn" onClick={handleWeeklyReviewEditClick}>
+                        수정
+                      </button>
+                    ) : (
+                      <>
+                        <button type="button" className="modal-cancel-btn" onClick={handleWeeklyReviewCancel}>
+                          취소
+                        </button>
+                        <button type="button" className="modal-reset-btn" onClick={handleWeeklyReviewReset}>
+                          초기화
+                        </button>
+                        <button type="button" className="modal-save-btn" onClick={handleWeeklyReviewSave} disabled={weeklyReviewSaving}>
+                          {weeklyReviewSaving ? "저장 중..." : "저장"}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="modal-footer-bottom">
+                  <p
+                    className={`modal-footer-notice ${weeklyReviewSaveAttemptFailed ? "notice-error" : ""}`}
+                    style={{ visibility: weeklyReviewSaveAttemptFailed ? "visible" : "hidden" }}
+                  >
+                    필수 항목을 모두 입력해주세요.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>,
           document.body
