@@ -106,7 +106,8 @@
       "Bash(python3 -c ' *)",
       "Bash(python3)",
       "PowerShell([System.Text.Encoding]::GetEncoding\\(949\\); $bytes = [System.IO.File]::ReadAllBytes\\(\"app\\\\assets\\\\scss\\\\components\\\\_cluster4-week.scss\"\\); $text = [System.Text.Encoding]::GetEncoding\\(949\\).GetString\\($bytes\\); $lines = $text -split \"`r?`n\"; $lines[4849..4864] -join \"`n\")",
-      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"app\\\\assets\\\\scss\\\\components\\\\_cluster4-week.scss\"\\); $utf8Text = [System.Text.Encoding]::UTF8.GetString\\($bytes\\); $cp949Bytes = [System.Text.Encoding]::GetEncoding\\(949\\).GetBytes\\($utf8Text\\); $recovered = [System.Text.Encoding]::UTF8.GetString\\($cp949Bytes\\); $lines = $recovered -split \"`r?`n\"; $lines[4849..4856] -join \"`n\")"
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"app\\\\assets\\\\scss\\\\components\\\\_cluster4-week.scss\"\\); $utf8Text = [System.Text.Encoding]::UTF8.GetString\\($bytes\\); $cp949Bytes = [System.Text.Encoding]::GetEncoding\\(949\\).GetBytes\\($utf8Text\\); $recovered = [System.Text.Encoding]::UTF8.GetString\\($cp949Bytes\\); $lines = $recovered -split \"`r?`n\"; $lines[4849..4856] -join \"`n\")",
+      "Bash(xxd)"
     ],
     "deny": [],
     "ask": []

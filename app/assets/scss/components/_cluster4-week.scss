@@ -2237,6 +2237,41 @@
     width: calc(100% + 21px);
     max-width: none;
 
+    &.colleague-all-empty {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+
+    .colleague-waiting-full {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+
+      img {
+        width: 180px;
+        height: auto;
+        opacity: 0.8;
+      }
+
+      p {
+        font-family: "Pretendard", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+        text-align: center;
+      }
+    }
+
     .colleague-card {
       width: 100%;
       background: #232323;
@@ -4841,10 +4876,10 @@
     }
 
     &.section-modal-colleague-edit {
-      width: 540px !important;
-      max-width: 540px !important;
-      height: 640px !important;
-      max-height: 640px !important;
+      width: 674px !important;
+      max-width: 674px !important;
+      height: 826px !important;
+      max-height: 826px !important;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -5123,7 +5158,7 @@
         .content-textarea {
           width: 100%;
           height: 130px;
-          padding: 12px 16px 24px;
+          padding: 12px 16px 28px;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.15);
           color: #ddd;
@@ -5142,11 +5177,13 @@
 
         .char-count {
           position: absolute !important;
-          bottom: 6px !important;
-          right: 10px !important;
+          top: auto !important;
+          bottom: 8px !important;
+          right: 12px !important;
+          left: auto !important;
           font-family: "Pretendard", sans-serif;
-          font-size: 10px !important;
-          color: rgba(255, 255, 255, 0.4) !important;
+          font-size: 12px !important;
+          color: rgba(255, 255, 255, 0.5) !important;
           background: transparent !important;
           padding: 0 !important;
           margin: 0 !important;
@@ -6079,14 +6116,28 @@
             color: #faab07;
             font-weight: 700;
             position: relative;
+            padding-right: 32px !important;
 
             &::after {
-	              content: "•";
-              position: absolute;
-              top: -4px;
-              right: -4px;
-              color: #e74c3c;
-              font-size: 16px;
+              content: '✓' !important;
+              position: absolute !important;
+              right: 8px !important;
+              top: 50% !important;
+              transform: translateY(-50%) !important;
+
+              width: 18px !important;
+              height: 18px !important;
+              border-radius: 50% !important;
+
+              background: #faab07 !important;
+              color: #1a1a1a !important;
+              font-size: 11px !important;
+              font-weight: 700 !important;
+              line-height: 1 !important;
+
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
             }
           }
         }
@@ -7786,12 +7837,15 @@
           font-size: 13px;
           color: rgba(255, 255, 255, 0.6);
           margin: 4px 67px 0 80px;
+          padding-left: 0 !important;
           max-width: calc(100% - 147px);
           min-width: 0;
           white-space: normal !important;
           overflow-wrap: break-word !important;
           word-break: normal !important;
           overflow: visible !important;
+          line-height: 1.5;
+          box-sizing: border-box !important;
         }
 
         // ?먯닔??3 (2李?????젣 踰꾪듉 ??reputation-form modal-footer-right + modal-edit-btn ?⑦꽩
@@ -7808,9 +7862,9 @@
 
         .modal-edit-btn.modal-delete-btn {
           padding: 8px 20px !important;
-          background: #faab07 !important;
-          color: #1a1a1a !important;
-          border: 1px solid transparent !important;
+          background: rgba(231, 76, 60, 0.15) !important;
+          color: #E74C3C !important;
+          border: 1px solid rgba(231, 76, 60, 0.4) !important;
           border-radius: 0 !important;
           font-family: "Pretendard", sans-serif !important;
           font-size: 14px !important;
@@ -7821,7 +7875,8 @@
           transition: all 0.15s;
 
           &:hover {
-            background: #ffb820 !important;
+            background: rgba(231, 76, 60, 0.25) !important;
+            border-color: rgba(231, 76, 60, 0.6) !important;
           }
         }
 
@@ -8031,7 +8086,7 @@
 
           // ?먯닔??3??margin-left:auto ?쒓굅 ???대쫫|?깅퀎|?섏씠 諛붾줈 ?ㅻⅨ履??몄젒 (gap 12px)
 	          .personal-tags {
-	            margin-left: 12px !important;
+	            margin-left: auto !important;
 	            display: flex !important;
 	            flex-direction: row !important;
 	            gap: 6px !important;
@@ -8053,6 +8108,18 @@
 	              overflow: hidden !important;
 	              text-overflow: ellipsis !important;
 	              box-sizing: border-box !important;
+
+	              &.tag-role {
+	                background: rgba(250, 171, 7, 0.15) !important;
+	                border: 1px solid rgba(250, 171, 7, 0.3) !important;
+	                color: rgb(250, 171, 7) !important;
+	              }
+
+	              &.tag-keyword {
+	                background: rgba(135, 206, 250, 0.15) !important;
+	                border: 1px solid rgba(135, 206, 250, 0.3) !important;
+	                color: rgb(135, 206, 235) !important;
+	              }
 	            }
 	          }
 	        }
@@ -12545,5 +12612,686 @@
   .reputation-content-section > .tag {
     margin-top: 16px !important;
     margin-bottom: 12px !important;
+  }
+}
+
+// =====================================================
+// Weekly Review Box (cluster4-card 신규 추가)
+// 위치: .main-image-container 자식, 좌하단 absolute
+// =====================================================
+.weekly-review-box {
+  position: absolute;
+  left: 16px;                                        // [수정1] 좌측 여유
+  bottom: 16px;
+  width: 349px !important;                           // 380 → 349 (-31px) star 아이콘 우측과 정렬
+  height: 152px;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  background: linear-gradient(
+    135deg,
+    rgba(35, 25, 20, 0.45) 0%,
+    rgba(20, 15, 25, 0.5) 100%
+  ) !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  border-radius: 16px !important;
+
+  // [수정3] 외부 골드 글로우 제거 — 검은 그림자만 + 사방 골드 테두리
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+
+  border: 1px solid rgba(250, 171, 7, 0.25) !important;
+
+  // [수정2] unfurl 애니메이션: clip-path 종이 펼침 (round 16px = border-radius 통일)
+  clip-path: inset(0 100% 0 0 round 16px) !important;
+  opacity: 0;
+  transform: rotate(-0.3deg);
+
+  transition:
+    clip-path 0.9s cubic-bezier(0.16, 0.84, 0.44, 1),
+    opacity 0.4s ease 0.1s,
+    transform 0.9s cubic-bezier(0.16, 0.84, 0.44, 1);
+
+  &.unfurled {
+    clip-path: inset(0 round 16px) !important;
+    opacity: 1;
+    transform: none;
+    animation: weekly-review-float 4s ease-in-out infinite;
+  }
+
+  // === 헤더 (30%) === [수정5]
+  .weekly-review-header {
+    height: 30%;
+    min-height: 42px;
+    padding: 8px 14px 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: linear-gradient(
+      180deg,
+      rgba(250, 171, 7, 0.05) 0%,
+      rgba(250, 171, 7, 0.01) 100%
+    ) !important;
+    border-bottom: 1px solid rgba(250, 171, 7, 0.25) !important;
+
+    .review-book-icon {
+      width: 22px;                                   // [수정5] 18 → 22
+      height: 22px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .review-title {
+      flex: 1;
+      margin: 0;
+      font-family: Pretendard, sans-serif;
+      font-size: 16px;                               // [수정5] 14 → 16
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.2px;
+    }
+
+    .review-view-btn {
+      flex-shrink: 0;
+      width: 28px;                                   // [수정5] 24 → 28
+      height: 28px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.15s;
+
+      &:hover { opacity: 0.7; }
+
+      .view-icon {
+        width: 22px;                                 // [수정5] 18 → 22
+        height: 22px;
+        object-fit: contain;
+      }
+    }
+  }
+
+  // === 미드 (40%) === [수정5]
+  .weekly-review-mid {
+    height: 40%;
+    padding: 6px 16px;
+    overflow: hidden;
+
+    .review-content {
+      margin: 0;
+      font-family: Pretendard, sans-serif;
+      font-size: 13px;                               // [수정5] 12 → 13
+      line-height: 1.35;                             // [수정5] 1.4 → 1.35
+      color: rgba(255, 255, 255, 0.85);
+
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: keep-all;
+    }
+  }
+
+  // === 푸터 (30%) === [수정5]
+  .weekly-review-footer {
+    height: 30%;
+    min-height: 42px;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;                       // [수정4] 우측 정렬
+    gap: 8px;
+
+    background: linear-gradient(
+      0deg,
+      rgba(250, 171, 7, 0.05) 0%,
+      rgba(250, 171, 7, 0.01) 100%
+    ) !important;
+    border-top: 1px solid rgba(250, 171, 7, 0.25) !important;
+
+    // [수정4] 별점+카운터 그룹 wrapper
+    .review-rating-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .review-stars {
+      display: flex;
+      gap: 2px;
+
+      i {
+        font-size: 16px;                             // [수정5] 14 → 16
+        color: rgba(255, 255, 255, 0.3);
+
+        &.ti-star-filled {
+          color: #FAAB07;
+        }
+      }
+    }
+
+    .review-score {
+      font-family: Pretendard, sans-serif;
+      font-size: 15px;                               // [수정5] 13 → 15
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+    }
+  }
+}
+
+// 부유 애니메이션 — .weekly-review-box.unfurled 전용
+@keyframes weekly-review-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-0.2deg);
+  }
+}
+
+// =====================================================
+// 별점 드롭다운 — reputation-form 전용 (cluster3 .rating-field 패턴 복제)
+// =====================================================
+.section-modal.section-modal-reputation-form {
+  .rating-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .star-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-family: Pretendard, sans-serif !important;
+    height: 36px;
+    min-height: 36px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+
+    i {
+      color: #faab07;
+      font-size: 16px;
+    }
+
+    .rating-text {
+      margin-left: 6px;
+      color: #faab07;
+      font-size: 16px !important;
+      font-family: Pretendard, sans-serif !important;
+      font-weight: 600;
+      background: none;
+      padding: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .custom-dropdown.small {
+    position: relative;
+
+    .dropdown-selected {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 6px 10px;
+      min-width: 55px;
+
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+
+      font-family: Pretendard, sans-serif;
+      font-size: 16px;
+      color: #fff;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+
+      &:hover:not(.disabled) {
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      i.ti-chevron-down {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
+// ============================================
+// 주차 리뷰 모달 (신규)
+// reputation-form 패턴 준용, 3행 세로 배치
+// ============================================
+.section-modal-weekly-review-form {
+  width: 979px !important;
+  max-width: 979px !important;
+  height: 570px !important;
+  max-height: 570px !important;
+
+  display: flex;
+  flex-direction: column;
+
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+
+  // === 헤더 (reputation-form 동일) ===
+  .section-modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: auto;
+    min-height: 110px;
+    max-height: none;
+    padding: 8px 24px 16px;
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      h3 {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #faab07;
+        line-height: 1.4;
+        padding-top: 0;
+      }
+
+      h3::before {
+        content: none !important;
+        display: none !important;
+      }
+    }
+
+    .modal-subtitle {
+      margin: 4px 67px 0 80px;
+      padding-left: 0 !important;
+      max-width: calc(100% - 147px);
+      min-width: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+
+      i { font-size: 20px; }
+      &:hover { color: #faab07; }
+    }
+  }
+
+  // === 미드 ===
+  .section-modal-body.weekly-review-body {
+    padding: 12px 24px 24px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // === 미드 1행 — 2열 그리드 ===
+  .weekly-review-row-1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .review-week-info {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    .week-info-text {
+      font-family: "Pretendard", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #faab07;
+      line-height: 1.4;
+    }
+  }
+
+  .review-rating-section {
+    h4 {
+      font-family: "Pretendard", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ddd;
+      margin: 0 0 12px 0;
+
+      .required-mark {
+        color: #e74c3c !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        margin-left: 4px;
+      }
+    }
+
+    // cluster3 .rating-field 패턴 복제
+    .rating-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .star-rating {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-family: Pretendard, sans-serif !important;
+      height: 36px;
+      min-height: 36px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+
+      i {
+        color: #faab07;
+        font-size: 16px;
+      }
+
+      .rating-text {
+        margin-left: 6px;
+        color: #faab07;
+        font-size: 16px !important;
+        font-family: Pretendard, sans-serif !important;
+        font-weight: 600;
+        background: none;
+        padding: 0;
+        white-space: nowrap;
+      }
+    }
+
+    .custom-dropdown.small {
+      position: relative;
+
+      .dropdown-selected {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 6px 10px;
+        min-width: 55px;
+
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+
+        font-family: Pretendard, sans-serif;
+        font-size: 16px;
+        color: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+
+        &:hover:not(.disabled) {
+          border-color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        i.ti-chevron-down {
+          font-size: 12px;
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+
+  // === 미드 2행 — 인적사항 카드 ===
+  .weekly-review-row-2 {
+    display: block;
+  }
+
+  .workinfo-personal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+
+    .personal-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .personal-photo {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .personal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+
+      .personal-row-1,
+      .personal-row-2,
+      .personal-row-3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        color: #ddd;
+      }
+
+      .personal-row-1 {
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .personal-name {
+        white-space: nowrap;
+      }
+
+      .personal-separator {
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .personal-field {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 4px;
+
+        .field-value {
+          color: #ddd;
+          font-weight: 600;
+        }
+
+        .field-label {
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 12px;
+        }
+      }
+    }
+
+    .personal-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-self: center;
+
+      .tag-badge {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+
+        &.tag-role {
+          background: rgba(250, 171, 7, 0.15);
+          border: 1px solid rgba(250, 171, 7, 0.3);
+          color: rgb(250, 171, 7);
+        }
+
+        &.tag-keyword {
+          background: rgba(135, 206, 250, 0.15);
+          border: 1px solid rgba(135, 206, 250, 0.3);
+          color: rgb(135, 206, 235);
+        }
+      }
+    }
+  }
+
+  // === 미드 3행 — 리뷰 textarea ===
+  .weekly-review-row-3 {
+    display: block;
+  }
+
+  .review-content-section {
+    h4 {
+      font-family: "Pretendard", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ddd;
+      margin: 0 0 8px 0;
+
+      .required-mark {
+        color: #e74c3c !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+
+      .limit-hint {
+        font-size: 12px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .review-content-wrapper {
+    position: relative;
+
+    textarea.review-content-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 16px 28px;
+      box-sizing: border-box;
+
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #ddd;
+      resize: vertical;
+
+      &::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+      &:focus {
+        outline: none;
+        border-color: rgba(250, 171, 7, 0.5);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      &::-webkit-scrollbar { width: 4px; }
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+      }
+    }
+
+    .char-count {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+  }
+
+  // 필수필드 검증 실패 (작업 4 연동)
+  textarea.review-content-textarea.field-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+
+    &.flash {
+      animation: colleague-edit-field-flash 0.3s ease-in-out 2 !important;
+    }
   }
 }

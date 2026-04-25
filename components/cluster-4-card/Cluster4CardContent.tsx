@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -1572,6 +1573,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [fieldErrorFlash, setFieldErrorFlash] = useState(false); // 필수필드 미입력 시 테두리 깜빡임 트리거
   const [showResetConfirm, setShowResetConfirm] = useState(false); // cluster3 패턴: 초기화 확인 팝업
 
+  // 커스텀 별점 드롭다운 (reputation-form)
+  const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
+  const [ratingDropdownPos, setRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const ratingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+
+  // 주차 리뷰 모달 (신규)
+  const [weeklyReviewModalOpen, setWeeklyReviewModalOpen] = useState(false);
+  const [weeklyReviewData, setWeeklyReviewData] = useState({ rating: 0, content: "" });
+  const [isWeeklyReviewEditing, setIsWeeklyReviewEditing] = useState(false);
+  const [reviewRatingDropdownOpen, setReviewRatingDropdownOpen] = useState(false);
+  const [reviewRatingDropdownPos, setReviewRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const reviewRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+
   // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
   // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
   // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditReputation으로 반영
@@ -1745,10 +1759,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!workCareerViewIsEditing) setActiveCareerCaptionIdx(null);
   }, [workCareerViewIsEditing]);
   const [showCareerHelpModal, setShowCareerHelpModal] = useState(false);
+
+  // Weekly Review 박스 — unfurl 애니메이션 (작업 0~2)
+  const weeklyReviewRef = useRef<HTMLDivElement>(null);
+  const [isReviewUnfurled, setIsReviewUnfurled] = useState(false);
+
   const [canEditWorkCareer, setCanEditWorkCareer] = useState<boolean>(isDemoMode);
   useEffect(() => {
     setCanEditWorkCareer(isDemoMode);
   }, [isDemoMode]);
+
+  // Weekly Review 박스 — scroll + getBoundingClientRect (1회성 unfurl)
+  // clip-path: inset(0 100% 0 0)로 IntersectionObserver dead-lock 회피
+  useEffect(() => {
+    const target = weeklyReviewRef.current;
+    if (!target) return;
+    if (isReviewUnfurled) return;
+
+    const checkVisible = () => {
+      const r = target.getBoundingClientRect();
+      const isVisible = r.top < window.innerHeight && r.bottom > 0;
+      if (isVisible) {
+        setIsReviewUnfurled(true);
+        window.removeEventListener("scroll", checkVisible);
+        window.removeEventListener("resize", checkVisible);
+      }
+    };
+
+    const initialTimer = setTimeout(checkVisible, 100);
+
+    window.addEventListener("scroll", checkVisible, { passive: true });
+    window.addEventListener("resize", checkVisible, { passive: true });
+
+    return () => {
+      clearTimeout(initialTimer);
+      window.removeEventListener("scroll", checkVisible);
+      window.removeEventListener("resize", checkVisible);
+    };
+  }, [isReviewUnfurled]);
 
   // workInfo View 모달 — 스냅샷 vs 현재값 비교 (정밀 isDirty)
   const isWorkInfoDirty = (): boolean => {
@@ -2672,6 +2720,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setColleagueSearchQuery("");
   };
 
+  // colleague-view-modal [수정] — 관리자 승인 검증 후 편집 모달 진입
+  const handleColleagueEditClick = () => {
+    if (!isDemoMode) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+    setColleagueViewModalOpen(false);
+    handleOpenColleagueEdit();
+  };
+
   const handleColleagueEditCancel = () => {
     setHeaderModalOpen(false);
   };
@@ -2939,8 +2997,95 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setSaveAttemptFailed(false);
   };
 
+  // 커스텀 별점 드롭다운 — 외부 클릭 + ESC 닫기
+  useEffect(() => {
+    if (!ratingDropdownOpen) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".dropdown-selected") && !target.closest(".dropdown-options-fixed")) {
+        setRatingDropdownOpen(false);
+      }
+    };
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setRatingDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [ratingDropdownOpen]);
+
+  const openRatingDropdown = () => {
+    if (!isReputationFormEditing) return;
+    const trigger = ratingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setRatingDropdownOpen(true);
+  };
+
+  const handleRatingSelect = (value: number) => {
+    setReputationEditData((prev) => ({ ...prev, rating: value }));
+    setRatingDropdownOpen(false);
+    if (saveAttemptFailed) setSaveAttemptFailed(false);
+  };
+
+  // 주차 리뷰 — 평점 드롭다운 핸들러
+  const openReviewRatingDropdown = () => {
+    if (!isWeeklyReviewEditing) return;
+    const trigger = reviewRatingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setReviewRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setReviewRatingDropdownOpen(true);
+  };
+
+  const handleReviewRatingSelect = (value: number) => {
+    setWeeklyReviewData((prev) => ({ ...prev, rating: value }));
+    setReviewRatingDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    if (!reviewRatingDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".review-rating-section .dropdown-selected") && !target.closest(".review-rating-dropdown-options")) {
+        setReviewRatingDropdownOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setReviewRatingDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [reviewRatingDropdownOpen]);
+
+  // 임시 트리거 (테스트용 — 작업 5에서 제거)
+  useEffect(() => {
+    (window as any).__openWeeklyReviewModal = () => {
+      setWeeklyReviewModalOpen(true);
+      setIsWeeklyReviewEditing(true);
+    };
+  }, []);
+
   // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
   const handleEditMode = () => {
+    // 승인 체크 — reputation-view-modal [수정] (L3031)과 동일 패턴
+    if (!canEditReputation) {
+      alert("관리자 승인이 필요합니다");
+      return;
+    }
+
     setFormSnapshot({
       rating: reputationEditData.rating,
       content: reputationEditData.content,
@@ -3615,6 +3760,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             isEmpty: false,
           }))
         : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
+
+    // createdAt 오름차순 정렬 (reputation 패턴 동일)
+    apiData.sort((a: any, b: any) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : Infinity;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : Infinity;
+      return timeA - timeB;
+    });
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
@@ -4633,6 +4785,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <i className="ti ti-heart"></i>
               </div>
             </div>
+
+            {/* Weekly Review 박스 (작업 0~2: 정적 더미 + unfurl 애니메이션) */}
+            <div
+              ref={weeklyReviewRef}
+              className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}
+            >
+              <div className="weekly-review-header">
+                <img src="/images/0/book.png" alt="book" className="review-book-icon" />
+                <h3 className="review-title">Weekly Review</h3>
+                <button
+                  className="review-view-btn"
+                  onClick={() => {/* 작업 3에서 추가 */}}
+                  aria-label="더보기"
+                >
+                  <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
+                </button>
+              </div>
+              <div className="weekly-review-mid">
+                <p className="review-content">
+                  몇자가 들어갈지 모르니, 공간을 정하고, 거기에 맞추자구요. 일단은 2줄이 들어가고, 끝날 때는 ... 으로 하는거는
+                </p>
+              </div>
+              <div className="weekly-review-footer">
+                <div className="review-rating-group">
+                  <div className="review-stars">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <i key={i} className={`ti ti-star${i <= 4 ? "-filled" : ""}`}></i>
+                    ))}
+                  </div>
+                  <span className="review-score">8 / 10</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4938,6 +5123,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="count-num">{selectedColleagues.length}</span>/3
               </span>
             </div>
+            {(() => {
+              const filledCount = isRestMode ? 0 : colleagueData.filter((c: any) => c && !c.isEmpty).length;
+              if (filledCount === 0) {
+                return (
+                  <div className="colleague-cards colleague-all-empty">
+                    <div className="colleague-waiting-full">
+                      <img src="/images/0/waiting.png" alt="waiting" />
+                      <p>연계 동료 등록 대기 중..😊</p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
                 const isEmpty = user.isEmpty;
@@ -5081,6 +5279,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 );
               })}
             </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -6738,40 +6938,38 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <h4>
                     ■ 평점을 입력해주세요. <span className="required-mark">*</span>
                   </h4>
-                  <div className="rating-input" data-field="rating">
-                    <select
-                      className={`rating-select ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? "field-error" : ""}`}
-                      value={reputationEditData.rating || 0}
-                      disabled={!isReputationFormEditing}
-                      onChange={(e) => {
-                        if (!isReputationFormEditing) return;
-                        const val = parseInt(e.target.value, 10);
-                        setReputationEditData((prev) => ({ ...prev, rating: val }));
-                        if (saveAttemptFailed) setSaveAttemptFailed(false);
-                      }}
-                    >
-                      <option value={0}>-</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
-                    <div className={`rating-stars ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}>
-                      {[1, 2, 3, 4, 5].map((star) => {
-                        const halfValue = (reputationEditData.rating || 0) / 2;
-                        let starClass = "star-empty";
-                        if (halfValue >= star) starClass = "star-full";
-                        else if (halfValue >= star - 0.5) starClass = "star-half";
-
+                  <div className={`rating-input rating-field ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
+                    <span className="star-rating">
+                      {(() => {
+                        const r = reputationEditData.rating || 0;
+                        const fullStars = Math.floor(r / 2);
+                        const hasHalf = r % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
                         return (
-                          <span key={star} className={`rating-star readonly ${starClass}`}>
-                            ★
-                          </span>
+                          <>
+                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {hasHalf && <i className="ti ti-star-half-filled" />}
+                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                          </>
                         );
-                      })}
+                      })()}
+                      <span className="rating-text">{reputationEditData.rating || 0}/10</span>
+                    </span>
+
+                    <div className="custom-dropdown small">
+                      <div
+                        ref={ratingDropdownTriggerRef}
+                        className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`}
+                        onClick={openRatingDropdown}
+                        role="button"
+                        tabIndex={isReputationFormEditing ? 0 : -1}
+                        aria-haspopup="listbox"
+                        aria-expanded={ratingDropdownOpen}
+                      >
+                        <span>{reputationEditData.rating || "-"}</span>
+                        <i className="ti ti-chevron-down"></i>
+                      </div>
                     </div>
-                    <span className="rating-value">{reputationEditData.rating || 0} / 10</span>
                   </div>
                 </div>
 
@@ -8906,6 +9104,218 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           </div>
         </div>
       )}
+      {/* ========== 주차 리뷰 모달 (신규 — Portal) ========== */}
+      {weeklyReviewModalOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="section-modal-overlay" onClick={() => setWeeklyReviewModalOpen(false)}>
+            <div className="section-modal section-modal-weekly-review-form" onClick={(e) => e.stopPropagation()}>
+              {/* 헤더 */}
+              <div className="section-modal-header">
+                <button className="modal-close-btn" onClick={() => setWeeklyReviewModalOpen(false)} aria-label="닫기">
+                  <i className="ti ti-x"></i>
+                </button>
+                <div className="modal-header-top">
+                  <img src="/images/0/write.png" alt="write" />
+                  <h3>주차 리뷰</h3>
+                </div>
+                <p className="modal-subtitle">
+                  이번 주차에 이렇게 경험하고, 성찰하고 성장했습니다. 😊
+                </p>
+              </div>
+
+              {/* 미드 — 3행 세로 배치 */}
+              <div className="section-modal-body weekly-review-body">
+                {/* 미드 1행 — 2열: 주차 정보 + 평점 */}
+                <div className="weekly-review-row weekly-review-row-1">
+                  {/* 1열: 주차 정보 */}
+                  <div className="review-week-info">
+                    <span className="week-info-text">
+                      {weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}
+                    </span>
+                  </div>
+
+                  {/* 2열: 리뷰 평점 */}
+                  <div className="review-rating-section">
+                    <h4>
+                      ■ 리뷰 평점 <span className="required-mark">*</span>
+                    </h4>
+                    <div className="rating-field" style={{ flex: "1 1 0%" }} data-field="review-rating">
+                      <span className="star-rating">
+                        {(() => {
+                          const r = weeklyReviewData.rating || 0;
+                          const fullStars = Math.floor(r / 2);
+                          const hasHalf = r % 2 === 1;
+                          const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                          return (
+                            <>
+                              {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                              {hasHalf && <i className="ti ti-star-half-filled" />}
+                              {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                            </>
+                          );
+                        })()}
+                        <span className="rating-text">{weeklyReviewData.rating || 0}/10</span>
+                      </span>
+                      <div className="custom-dropdown small">
+                        <div
+                          ref={reviewRatingDropdownTriggerRef}
+                          className={`dropdown-selected ${!isWeeklyReviewEditing ? "disabled" : ""}`}
+                          onClick={openReviewRatingDropdown}
+                          role="button"
+                          tabIndex={isWeeklyReviewEditing ? 0 : -1}
+                          aria-haspopup="listbox"
+                          aria-expanded={reviewRatingDropdownOpen}
+                        >
+                          <span>{weeklyReviewData.rating || "-"}</span>
+                          <i className="ti ti-chevron-down"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 작업 2에서 미드 2행/3행 추가 예정 */}
+                {/* 미드 2행 — 본인 인적사항 카드 */}
+                <div className="weekly-review-row weekly-review-row-2">
+                  <div className="workinfo-personal-card">
+                    <div className="personal-grid">
+                      <div className="personal-photo">
+                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="프로필" />
+                      </div>
+                      <div className="personal-info">
+                        <div className="personal-row-1">
+                          <span className="personal-name">{isDemoMode ? "홍길동" : session?.user?.name || "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                        </div>
+                        <div className="personal-row-2">
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-label">학교</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-label">학과</span>
+                          </span>
+                        </div>
+                        <div className="personal-row-3">
+                          <span className="personal-field">
+                            <span className="field-value">{teamName || (isDemoMode ? "마케팅" : "—")}</span>
+                            <span className="field-label">팀</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{partName || (isDemoMode ? "디자인" : "—")}</span>
+                            <span className="field-label">파트</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="personal-tags">
+                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "일반"}</span>
+                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 미드 3행 — 리뷰 200자 textarea */}
+                <div className="weekly-review-row weekly-review-row-3">
+                  <div className="review-content-section">
+                    <h4>
+                      ■ Weekly Review 내용 <span className="required-mark">*</span>
+                      <span className="limit-hint">(최대 200자)</span>
+                    </h4>
+                    <div className="review-content-wrapper">
+                      <textarea
+                        className="review-content-textarea"
+                        value={weeklyReviewData.content}
+                        onChange={(e) => {
+                          const v = e.target.value.slice(0, 200);
+                          setWeeklyReviewData((prev) => ({ ...prev, content: v }));
+                        }}
+                        placeholder="이번 주차에 어떤 경험을 하셨나요? 배운 점, 느낀 점, 성장한 점을 자유롭게 작성해주세요."
+                        maxLength={200}
+                        disabled={!isWeeklyReviewEditing}
+                        data-field="review-content"
+                      />
+                      <span className="char-count">{weeklyReviewData.content.length}/200</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 작업 3에서 푸터 추가 예정 */}
+              <div className="section-modal-footer-placeholder" style={{ minHeight: 60 }}></div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* 주차 리뷰 — 평점 드롭다운 옵션 패널 (Portal) */}
+      {reviewRatingDropdownOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="dropdown-options-fixed review-rating-dropdown-options"
+            style={{
+              position: "fixed",
+              top: reviewRatingDropdownPos.top,
+              left: reviewRatingDropdownPos.left,
+              width: Math.max(reviewRatingDropdownPos.width, 70),
+              zIndex: 100010,
+            }}
+            role="listbox"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div
+                key={n}
+                className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`}
+                onClick={() => handleReviewRatingSelect(n)}
+                role="option"
+                aria-selected={weeklyReviewData.rating === n}
+              >
+                {n}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
+
+      {/* 커스텀 별점 드롭다운 옵션 패널 — Portal (body 직속, cluster3 .dropdown-options-fixed 재사용) */}
+      {ratingDropdownOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="dropdown-options-fixed"
+            style={{
+              position: "fixed",
+              top: ratingDropdownPos.top,
+              left: ratingDropdownPos.left,
+              width: Math.max(ratingDropdownPos.width, 70),
+              zIndex: 100010,
+            }}
+            role="listbox"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div
+                key={n}
+                className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`}
+                onClick={() => handleRatingSelect(n)}
+                role="option"
+                aria-selected={reputationEditData.rating === n}
+              >
+                {n}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
