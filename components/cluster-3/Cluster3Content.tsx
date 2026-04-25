@@ -3083,8 +3083,9 @@ const Cluster3Content = () => {
                             </div>
                             {isOutputEditMode && (
                               <button
+                                type="button"
                                 ref={outputPeriodTriggerRef}
-                                className="period-trigger-btn"
+                                className="image-action-btn period-trigger-btn"
                                 onClick={() => {
                                   const range = getCardDateRange(outputCards[currentOutputIndex]);
                                   setOutputDateRange(range);
@@ -3094,7 +3095,7 @@ const Cluster3Content = () => {
                                   setOutputRangePickerOpen((open) => !open);
                                 }}
                               >
-                                ▽
+                                <i className="ti ti-chevron-down"></i>
                               </button>
                             )}
                           </div>
@@ -3454,8 +3455,8 @@ const Cluster3Content = () => {
                           })()}
                         </div>
                         {isOutputEditMode && (
-                          <button className="tool-dropdown-btn" onClick={(e) => toggleDropdown("tools", e)}>
-                            ▽
+                          <button type="button" className="image-action-btn tool-dropdown-btn" onClick={(e) => toggleDropdown("tools", e)}>
+                            <i className="ti ti-chevron-down"></i>
                           </button>
                         )}
                       </div>
@@ -3615,14 +3616,12 @@ const Cluster3Content = () => {
                             const col1Val = metrics[col1Index] || "";
                             const col2Val = metrics[col2Index] || "";
                             return (
-                              <div className="output-metric-row" key={rowIndex} style={rowIndex === 0 ? { position: "relative" } : undefined}>
+                              <div className="output-metric-row" key={rowIndex}>
                                 <span className="metric-bullet">·</span>
-                                {isOutputEditMode && rowIndex === 0 && (
-                                  <span className="required-mark" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", zIndex: 2 }}>
-                                    *
-                                  </span>
-                                )}
                                 <div className="metric-cell col-1">
+                                  {isOutputEditMode && rowIndex === 0 && (
+                                    <span className="required-mark">*</span>
+                                  )}
                                   <input
                                     type="text"
                                     className="output-metric-input"
@@ -3640,7 +3639,7 @@ const Cluster3Content = () => {
                                     disabled={!isOutputEditMode}
                                     readOnly={!isOutputEditMode}
                                     maxLength={8}
-                                    placeholder=""
+                                    placeholder={`지표명, ${rowIndex + 1}`}
                                   />
                                   {isOutputEditMode && <span className="metric-counter">{col1Val.length}/8</span>}
                                 </div>
@@ -3662,7 +3661,7 @@ const Cluster3Content = () => {
                                     disabled={!isOutputEditMode}
                                     readOnly={!isOutputEditMode}
                                     maxLength={10}
-                                    placeholder=""
+                                    placeholder="지표값을 써주세요."
                                   />
                                   {isOutputEditMode && <span className="metric-counter">{col2Val.length}/10</span>}
                                 </div>
@@ -3837,8 +3836,9 @@ const Cluster3Content = () => {
                             </div>
                             {isDetailEditMode && (
                               <button
+                                type="button"
                                 ref={detailPeriodTriggerRef}
-                                className="period-trigger-btn"
+                                className="image-action-btn period-trigger-btn"
                                 onClick={() => {
                                   const range = getCardDateRange(detailCards[currentDetailIndex]);
                                   setDetailDateRange(range);
@@ -3848,7 +3848,7 @@ const Cluster3Content = () => {
                                   setDetailRangePickerOpen((open) => !open);
                                 }}
                               >
-                                ▽
+                                <i className="ti ti-chevron-down"></i>
                               </button>
                             )}
                           </div>
@@ -4208,8 +4208,8 @@ const Cluster3Content = () => {
                           })()}
                         </div>
                         {isDetailEditMode && (
-                          <button className="tool-dropdown-btn" onClick={(e) => toggleDropdown("detailTools", e)}>
-                            ▽
+                          <button type="button" className="image-action-btn tool-dropdown-btn" onClick={(e) => toggleDropdown("detailTools", e)}>
+                            <i className="ti ti-chevron-down"></i>
                           </button>
                         )}
                       </div>
@@ -4369,14 +4369,12 @@ const Cluster3Content = () => {
                             const col1Val = metrics[col1Index] || "";
                             const col2Val = metrics[col2Index] || "";
                             return (
-                              <div className="output-metric-row" key={rowIndex} style={rowIndex === 0 ? { position: "relative" } : undefined}>
+                              <div className="output-metric-row" key={rowIndex}>
                                 <span className="metric-bullet">·</span>
-                                {isDetailEditMode && rowIndex === 0 && (
-                                  <span className="required-mark" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", zIndex: 2 }}>
-                                    *
-                                  </span>
-                                )}
                                 <div className="metric-cell col-1">
+                                  {isDetailEditMode && rowIndex === 0 && (
+                                    <span className="required-mark">*</span>
+                                  )}
                                   <input
                                     type="text"
                                     className="output-metric-input"
@@ -4394,7 +4392,7 @@ const Cluster3Content = () => {
                                     disabled={!isDetailEditMode}
                                     readOnly={!isDetailEditMode}
                                     maxLength={8}
-                                    placeholder=""
+                                    placeholder={`지표명, ${rowIndex + 1}`}
                                   />
                                   {isDetailEditMode && <span className="metric-counter">{col1Val.length}/8</span>}
                                 </div>
@@ -4416,7 +4414,7 @@ const Cluster3Content = () => {
                                     disabled={!isDetailEditMode}
                                     readOnly={!isDetailEditMode}
                                     maxLength={10}
-                                    placeholder=""
+                                    placeholder="지표값을 써주세요."
                                   />
                                   {isDetailEditMode && <span className="metric-counter">{col2Val.length}/10</span>}
                                 </div>

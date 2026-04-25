@@ -4176,11 +4176,11 @@
           flex: 0 0 24px;
           width: 24px;
           height: 24px;
-          background: transparent;
-          border: none;
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(255, 165, 0, 0.5);
           outline: none;
           color: #faab07;
-          font-size: 10px;
+          font-size: 14px;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -4189,7 +4189,8 @@
           line-height: 1;
 
           &:hover {
-            background: rgba(250, 171, 7, 0.1);
+            background: rgba(0, 0, 0, 0.8);
+            border-color: #faab07;
           }
         }
 
@@ -4754,18 +4755,19 @@
       .tool-dropdown-btn {
         width: 24px;
         height: 24px;
-        background: transparent;
-        border: none;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 165, 0, 0.5);
         outline: none;
         color: #faab07;
-        font-size: 10px;
+        font-size: 14px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
 
         &:hover {
-          background: rgba(250, 171, 7, 0.1);
+          background: rgba(0, 0, 0, 0.8);
+          border-color: #faab07;
         }
       }
     }
@@ -4994,9 +4996,19 @@
             &.col-1 {
               width: 110px;
 
+              .required-mark {
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                pointer-events: none;
+                z-index: 2;
+              }
+
               .output-metric-input {
                 color: #faab07;
                 font-weight: 700;
+                padding-left: 14px;
 
                 &::placeholder {
                   color: rgba(250, 171, 7, 0.35);
