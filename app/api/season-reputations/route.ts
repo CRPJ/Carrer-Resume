@@ -28,6 +28,7 @@ export async function GET(request: Request) {
         content,
         keyword_1,
         keyword_2,
+        keyword_3,
         created_at
       `)
       .order("created_at", { ascending: true });
@@ -164,7 +165,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { targetUserId, seasonHistoryId, rating, content, keyword1, keyword2 } = body;
+    const { targetUserId, seasonHistoryId, rating, content, keyword1, keyword2, keyword3 } = body;
 
     // 유효성 검사
     if (!targetUserId || !seasonHistoryId) {
@@ -174,9 +175,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (rating < 0 || rating > 10 || (rating * 2) % 1 !== 0) {
+    if (rating < 1 || rating > 10 || (rating * 2) % 1 !== 0) {
       return NextResponse.json(
-        { error: "평점은 0.0~10.0 사이의 0.5 단위여야 합니다." },
+        { error: "평점은 1~10 사이여야 합니다." },
         { status: 400 }
       );
     }
@@ -188,16 +189,31 @@ export async function POST(request: Request) {
       );
     }
 
-    if (content.length > 100) {
+    if (content.length > 300) {
       return NextResponse.json(
-        { error: "내용은 100자 이내로 작성해주세요." },
+        { error: "내용은 300자 이내로 작성해주세요." },
         { status: 400 }
       );
     }
 
-    if (!keyword1?.trim() && !keyword2?.trim()) {
+    if (!keyword1?.trim() || !keyword2?.trim() || !keyword3?.trim()) {
       return NextResponse.json(
-        { error: "키워드를 최소 1개 이상 입력해주세요." },
+        { error: "키워드 3개를 모두 입력해주세요." },
+        { status: 400 }
+      );
+    }
+
+    const keywords = [keyword1.trim(), keyword2.trim(), keyword3.trim()];
+    if (keywords.some((keyword) => keyword.length > 10)) {
+      return NextResponse.json(
+        { error: "키워드는 10자 이내로 입력해주세요." },
+        { status: 400 }
+      );
+    }
+
+    if (new Set(keywords).size !== keywords.length) {
+      return NextResponse.json(
+        { error: "키워드 3개는 모두 다른 값이어야 합니다." },
         { status: 400 }
       );
     }
@@ -280,6 +296,7 @@ export async function POST(request: Request) {
         content: content.trim(),
         keyword_1: keyword1?.trim() || null,
         keyword_2: keyword2?.trim() || null,
+        keyword_3: keyword3?.trim() || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

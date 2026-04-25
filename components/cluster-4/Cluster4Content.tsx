@@ -419,15 +419,57 @@ const Cluster4Content = () => {
 
   // season-reputation 검증 함수
   const isSeasonReputationValid = (): boolean => {
-    if (!seasonReputationEditData.rating || seasonReputationEditData.rating < 1) return false;
-    if (!seasonReputationEditData.content || !seasonReputationEditData.content.trim()) return false;
     const k1 = seasonReputationEditData.keyword1?.trim() || "";
     const k2 = seasonReputationEditData.keyword2?.trim() || "";
     const k3 = seasonReputationEditData.keyword3?.trim() || "";
-    if (k1.length < 7 || k1.length > 10) return false;
-    if (k2.length < 7 || k2.length > 10) return false;
-    if (k3.length < 7 || k3.length > 10) return false;
-    if (k1 === k2 || k1 === k3 || k2 === k3) return false;
+    const keywords = [k1, k2, k3];
+    const duplicateKeywords = keywords.filter((keyword, index) => keyword && keywords.indexOf(keyword) !== index);
+    const fieldResults = [
+      {
+        field: "rating",
+        value: seasonReputationEditData.rating,
+        valid: !!seasonReputationEditData.rating && seasonReputationEditData.rating >= 1,
+        reason: "rating must be selected",
+      },
+      {
+        field: "content",
+        value: seasonReputationEditData.content,
+        valid: !!seasonReputationEditData.content?.trim(),
+        reason: "content must not be empty",
+      },
+      ...keywords.map((keyword, index) => ({
+        field: `keyword${index + 1}`,
+        value: keyword,
+        mode: seasonKeywordModes[index],
+        valid: keyword.length > 0 && keyword.length <= 10 && !duplicateKeywords.includes(keyword),
+        reason:
+          keyword.length === 0
+            ? "keyword is required"
+            : keyword.length > 10
+              ? "keyword must be 10 characters or less"
+              : duplicateKeywords.includes(keyword)
+                ? "keyword must be unique"
+                : "ok",
+      })),
+    ];
+    const invalidFields = fieldResults.filter((result) => !result.valid);
+
+    if (invalidFields.length > 0) {
+      console.log("[season-reputation validation] failed", {
+        editData: seasonReputationEditData,
+        keywordModes: seasonKeywordModes,
+        invalidFields,
+      });
+      console.table(fieldResults);
+      return false;
+    }
+
+    console.log("[season-reputation validation] passed", {
+      rating: seasonReputationEditData.rating,
+      contentLength: seasonReputationEditData.content.trim().length,
+      keywords,
+      keywordModes: seasonKeywordModes,
+    });
     return true;
   };
 
@@ -466,6 +508,7 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonRatingSelect = (value: number) => {
+    console.log("[season-reputation rating] selected", value);
     setSeasonReputationEditData((prev) => ({ ...prev, rating: value }));
     setSeasonRatingDropdownOpen(false);
   };
@@ -480,6 +523,7 @@ const Cluster4Content = () => {
         if (slotIndex === 0) next.keyword1 = "";
         else if (slotIndex === 1) next.keyword2 = "";
         else if (slotIndex === 2) next.keyword3 = "";
+        console.log("[season-reputation keyword mode] write", { slotIndex, next });
         return next;
       });
       setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "write"; return next; });
@@ -509,6 +553,7 @@ const Cluster4Content = () => {
       if (slotIndex === 0) next.keyword1 = seasonKeywordTempSelection;
       else if (slotIndex === 1) next.keyword2 = seasonKeywordTempSelection;
       else if (slotIndex === 2) next.keyword3 = seasonKeywordTempSelection;
+      console.log("[season-reputation keyword select] confirmed", { slotIndex, keyword: seasonKeywordTempSelection, next });
       return next;
     });
     setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "select"; return next; });
@@ -539,6 +584,7 @@ const Cluster4Content = () => {
       if (slotIndex === 0) next.keyword1 = v;
       else if (slotIndex === 1) next.keyword2 = v;
       else if (slotIndex === 2) next.keyword3 = v;
+      console.log("[season-reputation keyword write] changed", { slotIndex, value: v, next });
       return next;
     });
   };
@@ -598,19 +644,20 @@ const Cluster4Content = () => {
       const endpoint = isUpdate ? `/api/season-reputations/${selectedReputation!.id}` : "/api/season-reputations";
       const method = isUpdate ? "PUT" : "POST";
       const body = {
-        reviewer_id: session?.user?.id,
-        target_user_id: urlUserId,
-        season_history_id: selectedSeasonId,
+        targetUserId: urlUserId,
+        seasonHistoryId: selectedSeasonId,
         rating: seasonReputationEditData.rating,
-        content: seasonReputationEditData.content,
-        keyword_1: seasonReputationEditData.keyword1,
-        keyword_2: seasonReputationEditData.keyword2,
-        keyword_3: seasonReputationEditData.keyword3,
+        content: seasonReputationEditData.content.trim(),
+        keyword1: seasonReputationEditData.keyword1.trim(),
+        keyword2: seasonReputationEditData.keyword2.trim(),
+        keyword3: seasonReputationEditData.keyword3.trim(),
       };
+      console.log("[season-reputation save] request body", body);
       const res = await fetch(endpoint, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) return null;
       const data = await res.json();
-      return { id: data.id, created_at: data.created_at, updated_at: data.updated_at };
+      const saved = data.data || data;
+      return { id: saved.id, created_at: saved.created_at, updated_at: saved.updated_at };
     } catch (err) {
       console.error("[season-reputation] API 예외:", err);
       return null;
@@ -2910,7 +2957,7 @@ const Cluster4Content = () => {
                     const slotValue = slotIndex === 0 ? seasonReputationEditData.keyword1 : slotIndex === 1 ? seasonReputationEditData.keyword2 : seasonReputationEditData.keyword3;
                     const allKw = [seasonReputationEditData.keyword1?.trim() || "", seasonReputationEditData.keyword2?.trim() || "", seasonReputationEditData.keyword3?.trim() || ""];
                     const sv = allKw[slotIndex];
-                    const slotInvalid = (sv.length > 0 && (sv.length < 7 || sv.length > 10)) || (sv.length === 0) || (sv.length > 0 && allKw.filter((k, i) => i !== slotIndex && k === sv).length > 0);
+                    const slotInvalid = sv.length === 0 || sv.length > 10 || (sv.length > 0 && allKw.filter((k, i) => i !== slotIndex && k === sv).length > 0);
                     const slotErrorClass = seasonReputationSaveAttemptFailed && slotInvalid ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : "";
                     return (
                       <div key={slotIndex} className={`season-keyword-row ${slotErrorClass}`} data-slot={slotIndex} data-field={`keyword-${slotIndex}`}>
@@ -3032,6 +3079,7 @@ const Cluster4Content = () => {
                     </div>
                   </div>
                   <div className="personal-tags">
+                    <span className="tag-badge tag-role">일반</span>
                     <span className="tag-badge tag-keyword">{selectedReputation.reviewer?.vision || "키워드"}</span>
                   </div>
                 </div>
@@ -3171,8 +3219,13 @@ const Cluster4Content = () => {
         <div className="help-modal-overlay" onClick={() => setHelpModalKind(null)}>
           <div className="help-modal" onClick={(e) => e.stopPropagation()}>
             <div className="help-modal-header">
-              <h3>도움말</h3>
-              <button className="help-modal-close" onClick={() => setHelpModalKind(null)} aria-label="닫기">×</button>
+              <div className="modal-header-top">
+                <span style={{ fontSize: "20px" }}>🔎</span>
+                <h3>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setHelpModalKind(null)} aria-label="닫기">
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
             </div>
             <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
           </div>
