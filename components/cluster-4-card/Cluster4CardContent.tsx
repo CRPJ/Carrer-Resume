@@ -3253,6 +3253,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: weeklyReviewData.rating, content: weeklyReviewData.content,
         created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
       });
+      setWeeklyReviewModalOpen(false);
       setIsWeeklyReviewEditing(false);
       setWeeklyReviewSaveAttemptFailed(false);
       setWeeklyReviewFieldErrorFlash(false);
@@ -7510,10 +7511,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="personal-gender">{selectedColleagueCard.gender || "—"}</span>
                       <span className="personal-separator">|</span>
                       <span className="personal-age">{mask.age(selectedColleagueCard.age) || "—"} 세</span>
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{selectedColleagueCard.role || "일반"}</span>
-                        <span className="tag-badge tag-keyword">{selectedColleagueCard.nickname || selectedColleagueCard.keyword || "—"}</span>
-                      </div>
                     </div>
 
                     <div className="personal-row-2">
@@ -7539,6 +7536,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <span className="field-label">파트</span>
                       </span>
                     </div>
+                  </div>
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">{selectedColleagueCard.role || "일반"}</span>
+                    <span className="tag-badge tag-keyword">{selectedColleagueCard.nickname || selectedColleagueCard.keyword || "—"}</span>
                   </div>
                 </div>
               </div>

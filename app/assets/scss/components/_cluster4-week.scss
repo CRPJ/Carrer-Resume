@@ -6104,6 +6104,9 @@
           cursor: pointer;
           transition: all 0.15s ease;
           text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
 
           &:hover {
             background: rgba(255, 255, 255, 0.1);
@@ -8162,6 +8165,91 @@
       }
 
       // ?묒뾽 4: From / To
+      .workinfo-personal-card {
+        .personal-grid {
+          grid-template-columns: 64px 1fr 140px !important;
+          gap: 3px 12px !important;
+        }
+
+        .personal-photo {
+          grid-column: auto;
+          grid-row: auto;
+          width: 64px !important;
+          height: 64px !important;
+        }
+
+        .personal-info {
+          grid-column: auto;
+          grid-row: auto;
+          gap: 0;
+        }
+
+        .personal-row-1 {
+          gap: 8px !important;
+          line-height: 17.1px !important;
+        }
+
+        .personal-row-2,
+        .personal-row-3 {
+          display: grid !important;
+          grid-template-columns: 128px 40px 20px 128px 40px !important;
+          grid-template-rows: 26px !important;
+          gap: 5px 0 !important;
+          font-size: 14px !important;
+
+          .field-value {
+            font-size: 14px !important;
+            color: #ddd !important;
+            font-weight: 400 !important;
+          }
+
+          .field-label {
+            font-size: 12px !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+          }
+        }
+
+        > .personal-grid > .personal-tags {
+          display: grid !important;
+          grid-template-columns: 140px;
+          grid-template-rows: repeat(2, 32px);
+          gap: 4px !important;
+          align-self: center;
+
+          .tag-badge {
+            width: 140px !important;
+            min-width: 140px !important;
+            max-width: 140px !important;
+            height: 32px !important;
+            padding: 4px 10px !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-family: "Pretendard", sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            border-radius: 4px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+
+            &.tag-role {
+              background: rgba(250, 171, 7, 0.15) !important;
+              border: 1px solid rgba(250, 171, 7, 0.3) !important;
+              color: rgb(250, 171, 7) !important;
+            }
+
+            &.tag-keyword {
+              background: rgba(135, 206, 250, 0.15) !important;
+              border: 1px solid rgba(135, 206, 250, 0.3) !important;
+              color: rgb(135, 206, 235) !important;
+            }
+          }
+        }
+      }
+
       .colleague-fromto {
         display: flex;
         align-items: center;
