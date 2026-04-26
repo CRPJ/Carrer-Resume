@@ -237,6 +237,63 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const isOwner = session?.user?.isAdmin || !urlUserId || session?.user?.id === urlUserId;
   const isAdmin = !!session?.user?.isAdmin;
 
+  // 로그인한 본인의 display_name (From 라벨 등에 사용)
+  const [myDisplayName, setMyDisplayName] = useState<string>("");
+  // 주차 리뷰 모달 인적사항 카드용 프로필 (페이지 주인 기준 — urlUserId 우선, 없으면 본인)
+  const [reviewerProfile, setReviewerProfile] = useState<{
+    displayName: string;
+    profilePhotoUrl: string;
+    gender: string;
+    age: number | null;
+    school: string;
+    major: string;
+    vision: string;
+  }>({ displayName: "", profilePhotoUrl: "", gender: "", age: null, school: "", major: "", vision: "" });
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const targetId = urlUserId || session.user.id;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [profileRes, eduRes] = await Promise.all([
+          fetch(`/api/profile/?userId=${targetId}`),
+          fetch(`/api/educations?userId=${targetId}`),
+        ]);
+        const profileJson = await profileRes.json().catch(() => null);
+        const eduJson = await eduRes.json().catch(() => null);
+        if (cancelled) return;
+
+        const p = profileJson?.data;
+        if (p?.display_name) setMyDisplayName(p.display_name);
+
+        const eduFirst = Array.isArray(eduJson?.data) && eduJson.data.length > 0 ? eduJson.data[0] : null;
+
+        let age: number | null = null;
+        if (p?.birth_date) {
+          const birthYear = new Date(p.birth_date).getFullYear();
+          const currentYear = new Date().getFullYear();
+          if (!Number.isNaN(birthYear)) age = currentYear - birthYear;
+        }
+
+        setReviewerProfile({
+          displayName: p?.display_name || "",
+          profilePhotoUrl: p?.profile_photo_url || "",
+          gender: p?.gender || "",
+          age,
+          school: eduFirst?.school || "",
+          major: eduFirst?.major1 && eduFirst.major1 !== "-" ? eduFirst.major1 : "",
+          vision: p?.vision || "",
+        });
+      } catch {
+        // 무시 — fallback으로 session.user.name 사용
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.id, urlUserId]);
+
   // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
   const apiUrl = (path: string) => {
     if (urlUserId && session?.user?.isAdmin) {
@@ -1742,19 +1799,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     if (!selectedColleagueCard) return;
-    // TODO: [백엔드 작업 필요] 일반 모드 — DB 삭제 API 호출
-    //   엔드포인트: DELETE /api/weekly-colleagues/[id] (현재 route.ts 미구현)
-    //   구현 후 아래 활성화:
-    // if (!isDemoMode) {
-    //   try {
-    //     await fetch(`/api/weekly-colleagues/${selectedColleagueCard.id}`, { method: "DELETE" });
-    //   } catch (err) {
-    //     console.error("[colleague] 삭제 API 실패:", err);
-    //     alert("삭제에 실패했습니다.");
-    //     return;
-    //   }
-    // }
-    setSelectedColleagues((prev) => prev.filter((c) => c.id !== selectedColleagueCard.id));
+
+    const remaining = selectedColleagues.filter((c) => c.id !== selectedColleagueCard.id);
+
+    // 일반 모드: API로 동기화 (POST가 주차 단위로 전체 교체)
+    if (!isDemoMode) {
+      try {
+        const payload = remaining.map((c) => ({ colleagueId: c.id, rank: c.rank, message: c.message || "" }));
+        const res = await fetch(apiUrl("/api/weekly-colleagues"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
+        });
+        if (!res.ok) throw new Error("삭제 실패");
+      } catch (err) {
+        console.error("[colleague] 삭제 API 실패:", err);
+        alert("삭제에 실패했습니다.");
+        return;
+      }
+    }
+
+    setSelectedColleagues(remaining);
     setColleagueViewModalOpen(false);
     setSelectedColleagueCard(null);
   };
@@ -1878,8 +1943,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [showCareerHelpModal, setShowCareerHelpModal] = useState(false);
 
   // Weekly Review 박스 — unfurl 애니메이션 (작업 0~2)
+  // [Fix] 초기값을 true로: viewport 감지 트리거 실패 케이스 회피 — 박스가 항상 보이도록
   const weeklyReviewRef = useRef<HTMLDivElement>(null);
-  const [isReviewUnfurled, setIsReviewUnfurled] = useState(false);
+  const [isReviewUnfurled, setIsReviewUnfurled] = useState(true);
 
   const [canEditWorkCareer, setCanEditWorkCareer] = useState<boolean>(isDemoMode);
   useEffect(() => {
@@ -1888,6 +1954,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // Weekly Review 박스 — scroll + getBoundingClientRect (1회성 unfurl)
   // clip-path: inset(0 100% 0 0)로 IntersectionObserver dead-lock 회피
+  // [Fix] window 스크롤이 박스 영역을 못 닿으면 unfurl이 영원히 안 일어나는 문제 — 마운트 후 200ms 안에 무조건 unfurl
   useEffect(() => {
     const target = weeklyReviewRef.current;
     if (!target) return;
@@ -1904,12 +1971,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const initialTimer = setTimeout(checkVisible, 100);
+    // viewport 감지 실패해도 마운트 후 일정 시간 뒤 무조건 unfurl
+    const fallbackTimer = setTimeout(() => setIsReviewUnfurled(true), 200);
 
     window.addEventListener("scroll", checkVisible, { passive: true });
     window.addEventListener("resize", checkVisible, { passive: true });
 
     return () => {
       clearTimeout(initialTimer);
+      clearTimeout(fallbackTimer);
       window.removeEventListener("scroll", checkVisible);
       window.removeEventListener("resize", checkVisible);
     };
@@ -3260,7 +3330,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     try {
-      const res = await fetch(`/api/weekly-reviews?weekCardId=${weekId}`);
+      // 페이지 주인의 리뷰를 가져와야 함 — urlUserId 우선, 없으면 본인
+      const ownerId = urlUserId || session?.user?.id;
+      const params = new URLSearchParams({ weekCardId: weekId });
+      if (ownerId) params.set("userId", ownerId);
+      const res = await fetch(`/api/weekly-reviews?${params.toString()}`);
       if (!res.ok) {
         setWeeklyReviewFromDB(null);
         return;
@@ -3285,7 +3359,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   useEffect(() => {
     if (!weekId) return;
     fetchWeeklyReview();
-  }, [weekId, isDemoMode]);
+    // urlUserId / session 변경 시에도 재조회 (페이지 주인이 바뀌면 다른 리뷰)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekId, isDemoMode, urlUserId, session?.user?.id]);
 
   // 주차 리뷰 — 검증 함수
   const isWeeklyReviewValid = (): boolean => {
@@ -3357,9 +3433,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 주차 리뷰 — 푸터 핸들러
+  // [임시] 주차 리뷰는 관리자 승인 가드 해제 — 본인 회고 영역이라 승인 게이트 없이 작성 허용
+  // 단, 본인 페이지(또는 어드민)에서만 수정 가능 — 타 크루 페이지에서는 열람만
   const handleWeeklyReviewEditClick = () => {
-    if (!canEditReputation) {
-      alert("관리자 승인이 필요합니다");
+    if (!isOwner) {
+      alert("본인 주차 리뷰만 수정할 수 있습니다.");
       return;
     }
     setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
@@ -3390,10 +3468,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleWeeklyReviewReset = () => {
-    if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
-      return;
-    }
     if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
     // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
     setWeeklyReviewData({ rating: 0, content: "" });
@@ -3402,8 +3476,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleWeeklyReviewSave = async () => {
-    if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+    if (!isOwner) {
+      alert("본인 주차 리뷰만 저장할 수 있습니다.");
       return;
     }
     if (!isWeeklyReviewValid()) {
@@ -7277,7 +7351,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {colleagueEditData.selectedColleague ? (
                   <div className={`selected-colleague ${colleagueSaveAttemptFailed && !colleagueEditData.selectedColleague ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
                     <div className="crew-info">
-                      <span className="crew-number">No.{colleagueEditData.selectedColleague.number ?? colleagueEditData.selectedColleague.id}</span>
+                      <span className="crew-number">{colleagueEditData.selectedColleague.number ?? colleagueEditData.selectedColleague.id}</span>
                       <span className="crew-divider">|</span>
                       <span className="crew-name">{colleagueEditData.selectedColleague.name || "-"}</span>
                       <span className="crew-divider">|</span>
@@ -7320,7 +7394,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {colleagueSearchResults.map((crew) => (
                           <div key={crew.id} className="search-result-item">
                             <div className="crew-info">
-                              <span className="crew-number">No.{crew.number ?? crew.id}</span>
+                              <span className="crew-number">{crew.number ?? crew.id}</span>
                               <span className="crew-divider">|</span>
                               <span className="crew-name">{crew.name || "-"}</span>
                               <span className="crew-divider">|</span>
@@ -7910,7 +7984,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="colleague-fromto">
                 <span className="fromto-block fromto-from">
                   <span className="fromto-label">From -</span>
-                  <span className="fromto-name">{selectedColleagueCard.fromName || session?.user?.name || "-"}</span>
+                  <span className="fromto-name">{selectedColleagueCard.fromName || myDisplayName || session?.user?.name || "-"}</span>
                   <span className="fromto-suffix">님</span>
                 </span>
                 <span className="fromto-arrow">→</span>
@@ -9742,30 +9816,49 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
 
-                {/* 작업 2에서 미드 2행/3행 추가 예정 */}
-                {/* 미드 2행 — 본인 인적사항 카드 */}
+                {/* 미드 2행 — 본인 인적사항 카드 (user_profiles + user_educations 실데이터) */}
                 <div className="weekly-review-row weekly-review-row-2">
                   <div className="workinfo-personal-card">
                     <div className="personal-grid">
                       <div className="personal-photo">
-                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="프로필" />
+                        <img
+                          src={
+                            isDemoMode
+                              ? "/images/0/crew profile/남 1.webp"
+                              : reviewerProfile.profilePhotoUrl || "/images/0/crew profile/남 1.webp"
+                          }
+                          alt="프로필"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/images/0/crew profile/남 1.webp";
+                          }}
+                        />
                       </div>
                       <div className="personal-info">
                         <div className="personal-row-1">
-                          <span className="personal-name">{isDemoMode ? "홍길동" : session?.user?.name || "—"}</span>
+                          <span className="personal-name">
+                            {isDemoMode ? "홍길동" : reviewerProfile.displayName || session?.user?.name || "—"}
+                          </span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-gender">
+                            {isDemoMode ? "남" : reviewerProfile.gender || "—"}
+                          </span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <span className="personal-age">
+                            {isDemoMode ? "22" : reviewerProfile.age ?? "—"} 세
+                          </span>
                         </div>
                         <div className="personal-row-2">
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-value">
+                              {isDemoMode ? "서울대" : reviewerProfile.school || "—"}
+                            </span>
                             <span className="field-label">학교</span>
                           </span>
                           <span className="personal-separator">|</span>
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-value">
+                              {isDemoMode ? "경영" : reviewerProfile.major || "—"}
+                            </span>
                             <span className="field-label">학과</span>
                           </span>
                         </div>
@@ -9782,8 +9875,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                       </div>
                       <div className="personal-tags">
-                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "일반"}</span>
-                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                        <span className="tag-badge tag-role">
+                          {isDemoMode ? "앰배서더" : roleLabel || "일반"}
+                        </span>
+                        <span className="tag-badge tag-keyword">
+                          {isDemoMode ? "엔비디아 구글 테슬라" : reviewerProfile.vision || "-"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -9824,7 +9921,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </button>
                   <div className="modal-footer-right">
                     {!isWeeklyReviewEditing ? (
-                      <button type="button" className="modal-edit-btn" onClick={handleWeeklyReviewEditClick}>
+                      <button
+                        type="button"
+                        className="modal-edit-btn"
+                        onClick={handleWeeklyReviewEditClick}
+                        disabled={!isOwner}
+                        style={!isOwner ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                        title={isOwner ? "수정" : "본인 주차 리뷰만 수정할 수 있습니다"}
+                      >
                         수정
                       </button>
                     ) : (
