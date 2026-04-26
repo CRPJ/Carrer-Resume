@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -121,6 +122,93 @@ const stripFieldLabel = (value: string | null | undefined, labels: string[]) => 
   const matchedLabel = labels.find((label) => text.endsWith(label));
   return matchedLabel ? text.slice(0, -matchedLabel.length).trim() || text : text;
 };
+
+// ============================================================================
+// reputation-form 중첩 모달 — 키워드 선택 (5군락 100개)
+// TODO: [백엔드 작업 필요] reputationKeywords DB를 5군락 구조로 매핑 후 대체
+// ============================================================================
+interface KeywordGroup {
+  id: string;
+  color: "blue" | "green" | "yellow" | "orange" | "red";
+  emoji: string;
+  title: string;
+  count: number;
+  keywords: string[];
+}
+
+const KEYWORD_GROUPS: KeywordGroup[] = [
+  {
+    id: "group1",
+    color: "blue",
+    emoji: "🔵",
+    title: "도구 · 기술 · 시스템 활용 역량",
+    count: 36,
+    keywords: [
+      "노션 유망주", "노션 마스터", "인스타 유망주", "인스타 마스터",
+      "유튜브 유망주", "유튜브 마스터", "AI 유망주", "AI 마스터",
+      "블로그 유망주", "블로그 마스터", "미드저니 유망주", "미드저니 마스터",
+      "깃업 유망주", "깃업 마스터", "노코드 유망주", "노코드 마스터",
+      "옵시디언 유망주", "옵시디언 마스터", "파워포인트", "엑셀 유망주",
+      "엑셀 마스터", "카카오 생태계", "네이버 생태계", "구글 생태계",
+      "퍼블리싱", "UI / UX 기획", "웹 develop", "앱 develop",
+      "서버 관리", "데이터 처리", "데이터 분석", "데이터 해석",
+      "AI 프롬프트", "시스템 구축력", "도구 사용력", "기술 습득력",
+    ],
+  },
+  {
+    id: "group2",
+    color: "green",
+    emoji: "🟢",
+    title: "콘텐츠 · 표현 · 메시지 생산 역량",
+    count: 16,
+    keywords: [
+      "콘텐츠", "카드 콘텐츠", "텍스트 콘텐츠", "스토리텔링",
+      "동영상 숏폼", "동영상 롱폼", "릴스 특화", "쇼츠 특화",
+      "캐치프레이즈", "슬로건", "표현력", "언어 능력",
+      "설득력", "상상력", "유머와 재미", "창의성",
+    ],
+  },
+  {
+    id: "group3",
+    color: "yellow",
+    emoji: "🟡",
+    title: "마케팅 · 확산 · 영향력 설계",
+    count: 10,
+    keywords: [
+      "퍼포먼스", "브랜딩 마케팅", "바이럴 마케팅", "커뮤니티",
+      "연관 검색어", "구글 트렌드", "정보력", "사회성",
+      "소통력", "공감력",
+    ],
+  },
+  {
+    id: "group4",
+    color: "orange",
+    emoji: "🟠",
+    title: "사고 · 분석 · 구조화 역량",
+    count: 16,
+    keywords: [
+      "인지력", "관찰력", "이해력", "논리력",
+      "상황 추론력", "문제 정의력", "연구력", "업무 분석력",
+      "업무 기획력", "계획력", "구조화", "도식화",
+      "범위화", "항목화", "자료화", "변칙성",
+    ],
+  },
+  {
+    id: "group5",
+    color: "red",
+    emoji: "🔴",
+    title: "태도 · 실행 · 지속성 기반 역량",
+    count: 22,
+    keywords: [
+      "지속성", "기민성", "신뢰성", "성장성",
+      "유연성", "안정성", "위기 대응성", "학습력",
+      "지도력", "소속감", "적극성", "자신감",
+      "헌신성", "행동력", "회복력", "몰입력",
+      "잠재력", "업무 진행력", "업무 관리력", "수용력",
+      "지구력", "강인한 체력",
+    ],
+  },
+];
 
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
@@ -694,9 +782,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // reputation-view-modal 최하단 타임스탬프 — YY. MM. DD(요일)  HH:MM
   // TODO: [백엔드 작업 필요] weeklyReputations에 created_at 필드 추가 시 자동 동작
   const formatReputationTime = (timestamp: string | undefined | null): string => {
-    if (!timestamp) return "";
+    const placeholder = "00. 00. 00(0)  00:00"; // 사용자 요청: 데이터 없을 때 공간 유지
+    if (!timestamp) return placeholder;
     const d = new Date(timestamp);
-    if (isNaN(d.getTime())) return "";
+    if (isNaN(d.getTime())) return placeholder;
     const days = ["일", "월", "화", "수", "목", "금", "토"];
     const yy = String(d.getFullYear()).slice(-2);
     const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -1437,9 +1526,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!urlUserId) fetchWeeklyReputations();
   }, [urlUserId, weekId]);
 
-  // 크루 목록 가져오기 (모달 열릴 때 lazy load)
+  // 크루 목록 가져오기 (모달 열릴 때 lazy load) — 데모 모드에서도 실제 API 호출
   const fetchCrewListIfNeeded = async () => {
-    if (isDemoMode) return; // 더미 모드: API 스킵
     if (allCrewList.length > 0) return; // 이미 로드됨
     try {
       const excludeId = urlUserId || session?.user?.id || "";
@@ -1545,6 +1633,77 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [reputationSaveSuccess, setReputationSaveSuccess] = useState(false);
   const [reputationSaveError, setReputationSaveError] = useState<string | null>(null);
 
+  // reputation-form 리디자인 2단계 — UI 상태 관리용 신규 state (DB 전송 X)
+  const [formKeywordMode, setFormKeywordMode] = useState<"select" | "write">("select");
+  const [keywordModalOpen, setKeywordModalOpen] = useState(false);
+  const [selectedKeywordTemp, setSelectedKeywordTemp] = useState<string>("");
+  const [formSnapshot, setFormSnapshot] = useState<{ rating: number; content: string; keyword: string } | null>(null);
+  const [isReputationFormEditing, setIsReputationFormEditing] = useState(false);
+  const [saveAttemptFailed, setSaveAttemptFailed] = useState(false);
+  const [fieldErrorFlash, setFieldErrorFlash] = useState(false); // 필수필드 미입력 시 테두리 깜빡임 트리거
+
+  // 커스텀 별점 드롭다운 (reputation-form)
+  const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
+  const [ratingDropdownPos, setRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const ratingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+
+  // 주차 리뷰 모달 (신규)
+  const [weeklyReviewModalOpen, setWeeklyReviewModalOpen] = useState(false);
+  const [weeklyReviewData, setWeeklyReviewData] = useState({ rating: 0, content: "" });
+  const [isWeeklyReviewEditing, setIsWeeklyReviewEditing] = useState(false);
+  const [reviewRatingDropdownOpen, setReviewRatingDropdownOpen] = useState(false);
+  const [reviewRatingDropdownPos, setReviewRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const reviewRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+  const [weeklyReviewSaving, setWeeklyReviewSaving] = useState(false);
+  const [weeklyReviewSaveAttemptFailed, setWeeklyReviewSaveAttemptFailed] = useState(false);
+  const [weeklyReviewFormSnapshot, setWeeklyReviewFormSnapshot] = useState<{ rating: number; content: string } | null>(null);
+  const [weeklyReviewFieldErrorFlash, setWeeklyReviewFieldErrorFlash] = useState(false);
+  const [weeklyReviewFromDB, setWeeklyReviewFromDB] = useState<{
+    id?: string; weekCardId?: string; rating: number; content: string; created_at?: string; updated_at?: string;
+  } | null>(null);
+
+  // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
+  // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
+  const [canEditReputation, setCanEditReputation] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    setCanEditReputation(isDemoMode);
+  }, [isDemoMode]);
+
+  // 연계 동료 — 평판/주차 리뷰와 동일하게 데모 모드에서 true, 일반 모드에서 승인 상태 따름
+  const [canEditColleague, setCanEditColleague] = useState<boolean>(isDemoMode);
+  useEffect(() => {
+    setCanEditColleague(isDemoMode);
+  }, [isDemoMode]);
+
+  // 일반 모드 백엔드 승인 상태 → 모든 canEdit* 플래그에 일괄 반영
+  useEffect(() => {
+    if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
+    let cancelled = false;
+    (async () => {
+      const approved = await checkApprovalStatus();
+      if (cancelled) return;
+      setCanEditReputation(approved);
+      setCanEditColleague(approved);
+      setCanEditWorkInfo(approved);
+      setCanEditWorkAbility(approved);
+      setCanEditWorkExp(approved);
+      setCanEditWorkCareer(approved);
+    })();
+    return () => { cancelled = true; };
+  }, [isDemoMode, session]);
+
+  // 작업 3: 이번 주 내가 보낸 평판 리스트 (중복 방지 + 7명 제한 체크용 — best-effort)
+  // TODO: [백엔드 작업 필요]
+  //   1. GET /api/weekly-reputations/sent-by-me?weekCardId=... 엔드포인트 추가
+  //   2. 현재 로컬 state는 페이지 새로고침 시 리셋됨 (한계)
+  //   3. 엔드포인트 생성 후 마운트 시점 fetch 로직 추가 → setSentReputationsThisWeek로 교체
+  //   4. 받기 4명 제한은 서버 POST 시 검증 (프론트는 slice(0,4)만)
+  const [sentReputationsThisWeek, setSentReputationsThisWeek] = useState<Array<{ targetUserId: string; weekCardId: string; createdAt: string }>>([]);
+  // 주차 변경 시 로컬 리스트 리셋 (주차별 독립 카운터)
+  useEffect(() => {
+    setSentReputationsThisWeek([]);
+  }, [weekId]);
+
   // 주차 평판 데이터 (API에서 가져옴)
   const [weeklyReputations, setWeeklyReputations] = useState<any[]>([]);
 
@@ -1555,6 +1714,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [colleagueSaving, setColleagueSaving] = useState(false);
   const [colleagueSaveSuccess, setColleagueSaveSuccess] = useState(false);
   const [colleagueSaveError, setColleagueSaveError] = useState<string | null>(null);
+
+  // 연계 동료 편집 모달 — 1명 선택 + 코멘트 (자동완성 패턴)
+  const [colleagueEditData, setColleagueEditData] = useState<{ selectedColleague: any | null; content: string }>({
+    selectedColleague: null,
+    content: "",
+  });
+  const [colleagueSearchQuery, setColleagueSearchQuery] = useState<string>("");
+  const [colleagueFormSnapshot, setColleagueFormSnapshot] = useState<{ selectedColleague: any | null; content: string } | null>(null);
+  const [colleagueSaveAttemptFailed, setColleagueSaveAttemptFailed] = useState(false);
+  const [colleagueFieldErrorFlash, setColleagueFieldErrorFlash] = useState(false);
+  const [isColleagueEditing, setIsColleagueEditing] = useState(false);
 
   // 주차 평판 카드 상세보기 모달 상태
   const [reputationViewModalOpen, setReputationViewModalOpen] = useState(false);
@@ -1567,12 +1737,37 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [selectedColleagueCard, setSelectedColleagueCard] = useState<any>(null);
   const [selectedColleagueIndex, setSelectedColleagueIndex] = useState<number>(0);
 
+  const handleDeleteColleague = async () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!selectedColleagueCard) return;
+    // TODO: [백엔드 작업 필요] 일반 모드 — DB 삭제 API 호출
+    //   엔드포인트: DELETE /api/weekly-colleagues/[id] (현재 route.ts 미구현)
+    //   구현 후 아래 활성화:
+    // if (!isDemoMode) {
+    //   try {
+    //     await fetch(`/api/weekly-colleagues/${selectedColleagueCard.id}`, { method: "DELETE" });
+    //   } catch (err) {
+    //     console.error("[colleague] 삭제 API 실패:", err);
+    //     alert("삭제에 실패했습니다.");
+    //     return;
+    //   }
+    // }
+    setSelectedColleagues((prev) => prev.filter((c) => c.id !== selectedColleagueCard.id));
+    setColleagueViewModalOpen(false);
+    setSelectedColleagueCard(null);
+  };
+
   // 실무 정보 카드 상세보기 모달 상태
   const [workInfoViewModalOpen, setWorkInfoViewModalOpen] = useState(false);
   const [selectedWorkInfoCard, setSelectedWorkInfoCard] = useState<any>(null);
 
   // 도움말 모달 (workInfo 푸터 🔎 공용)
-  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [helpModalKind, setHelpModalKind] = useState<
+    'colleague' | 'workInfo' | 'reputation' | 'weeklyReview' | null
+  >(null);
 
   // 실무 역량 카드 상세보기 모달 상태
   const [workAbilityViewModalOpen, setWorkAbilityViewModalOpen] = useState(false);
@@ -1682,10 +1877,44 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!workCareerViewIsEditing) setActiveCareerCaptionIdx(null);
   }, [workCareerViewIsEditing]);
   const [showCareerHelpModal, setShowCareerHelpModal] = useState(false);
+
+  // Weekly Review 박스 — unfurl 애니메이션 (작업 0~2)
+  const weeklyReviewRef = useRef<HTMLDivElement>(null);
+  const [isReviewUnfurled, setIsReviewUnfurled] = useState(false);
+
   const [canEditWorkCareer, setCanEditWorkCareer] = useState<boolean>(isDemoMode);
   useEffect(() => {
     setCanEditWorkCareer(isDemoMode);
   }, [isDemoMode]);
+
+  // Weekly Review 박스 — scroll + getBoundingClientRect (1회성 unfurl)
+  // clip-path: inset(0 100% 0 0)로 IntersectionObserver dead-lock 회피
+  useEffect(() => {
+    const target = weeklyReviewRef.current;
+    if (!target) return;
+    if (isReviewUnfurled) return;
+
+    const checkVisible = () => {
+      const r = target.getBoundingClientRect();
+      const isVisible = r.top < window.innerHeight && r.bottom > 0;
+      if (isVisible) {
+        setIsReviewUnfurled(true);
+        window.removeEventListener("scroll", checkVisible);
+        window.removeEventListener("resize", checkVisible);
+      }
+    };
+
+    const initialTimer = setTimeout(checkVisible, 100);
+
+    window.addEventListener("scroll", checkVisible, { passive: true });
+    window.addEventListener("resize", checkVisible, { passive: true });
+
+    return () => {
+      clearTimeout(initialTimer);
+      window.removeEventListener("scroll", checkVisible);
+      window.removeEventListener("resize", checkVisible);
+    };
+  }, [isReviewUnfurled]);
 
   // workInfo View 모달 — 스냅샷 vs 현재값 비교 (정밀 isDirty)
   const isWorkInfoDirty = (): boolean => {
@@ -1758,6 +1987,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkInfo = () => {
+    if (!isDemoMode && !canEditWorkInfo) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 편집 모드 유지. confirm 후 스냅샷 복원.
     const snap = workInfoSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
@@ -1770,6 +2003,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkInfo = () => {
+    if (!isDemoMode && !canEditWorkInfo) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 필수필드 검증: Sub Title / Growth Point / 이미지 1·2번
     // cluster2/cluster3 표준 패턴: footerNotice + field-missing 깜빡임 + scrollIntoView
     const missing: string[] = [];
@@ -1787,6 +2024,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
     // sub_title + output_links 저장 (weekActivityDetails + selectedWorkInfoCard 동시 갱신)
     // TODO: [백엔드 작업 필요] growth_point + image_urls 컬럼 추가 후 sub_title과 동일 패턴으로 저장. blob: URL은 서버 업로드 → 영구 URL 교체 필요.
     if (selectedWorkInfoCard?.activityType) {
@@ -1814,6 +2053,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkInfoFooterNotice("default");
     setWorkInfoViewIsEditing(false);
   };
@@ -1968,6 +2208,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkAbility = () => {
+    if (!isDemoMode && !canEditWorkAbility) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workAbilitySnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingAbilitySubTitle(snap.subTitle || "");
@@ -1979,6 +2223,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkAbility = () => {
+    if (!isDemoMode && !canEditWorkAbility) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingAbilitySubTitle.trim()) missing.push("subTitle");
     if (!editingAbilityGrowthPoint.trim()) missing.push("growthPoint");
@@ -1994,6 +2242,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     if (selectedWorkAbilityCard?.activityTypeId) {
       const newSubTitle = editingAbilitySubTitle.trim() || null;
       const newOutputLinks = editingAbilityOutputLinks;
@@ -2028,6 +2277,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingAbilityImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkAbilityFooterNotice("default");
     setWorkAbilityViewIsEditing(false);
   };
@@ -2185,6 +2435,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkExp = () => {
+    if (!isDemoMode && !canEditWorkExp) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workExpSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingExpSubTitle(snap.subTitle || "");
@@ -2197,6 +2451,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkExp = () => {
+    if (!isDemoMode && !canEditWorkExp) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingExpSubTitle.trim()) missing.push("subTitle");
     if (!editingExpGrowthPoint.trim()) missing.push("growthPoint");
@@ -2213,6 +2471,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     if (selectedWorkExpCard?.activityTypeId) {
       const newSubTitle = editingExpSubTitle.trim() || null;
       const newOutputLinks = editingExpOutputLinks;
@@ -2240,6 +2499,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: editingExpRating,
       };
     }
+    alert("저장되었습니다.");
     setWorkExpFooterNotice("default");
     setWorkExpViewIsEditing(false);
   };
@@ -2389,6 +2649,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkCareer = () => {
+    if (!isDemoMode && !canEditWorkCareer) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const snap = workCareerSnapshot.current;
     if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
       setEditingCareerSubTitle(snap.subTitle || "");
@@ -2400,6 +2664,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkCareer = () => {
+    if (!isDemoMode && !canEditWorkCareer) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     const missing: string[] = [];
     if (!editingCareerSubTitle.trim()) missing.push("subTitle");
     if (!editingCareerGrowthPoint.trim()) missing.push("growthPoint");
@@ -2415,6 +2683,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
+    if (!window.confirm("저장하시겠습니까?")) return;
     const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
     if (activityType) {
       const newSubTitle = editingCareerSubTitle.trim() || null;
@@ -2441,6 +2710,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingCareerImageCaptions],
       };
     }
+    alert("저장되었습니다.");
     setWorkCareerFooterNotice("default");
     setWorkCareerViewIsEditing(false);
   };
@@ -2544,6 +2814,190 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const timer = setTimeout(replaceDots, 100);
     return () => clearTimeout(timer);
   });
+
+  // ─── 연계 동료 편집 모달 — 한글 초성 매칭 + 자동완성 (스펙 작업 3) ───
+  const CHOSUNG_LIST = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+  const getInitialConsonant = (char: string): string => {
+    const code = char.charCodeAt(0) - 0xac00;
+    if (code < 0 || code > 11171) return char;
+    const idx = Math.floor(code / 588);
+    return CHOSUNG_LIST[idx];
+  };
+
+  // 스펙: 이름 startsWith + 마지막 글자가 자음이면 초성 매칭. 숫자 차단. 가나다 순. 최대 5개. 본인 및 이미 선택된 동료 제외.
+  const searchColleagueCandidates = (query: string, pool: any[]): any[] => {
+    const q = (query || "").trim();
+    if (!q) return [];
+    if (/^\d+$/.test(q)) return [];
+
+    const excludedIds = new Set(selectedColleagues.map((c) => c.id));
+
+    const filtered = pool.filter((crew) => {
+      if (!crew || !crew.name) return false;
+      if (excludedIds.has(crew.id)) return false;
+      const name: string = crew.name;
+      if (name.startsWith(q)) return true;
+      const lastChar = q[q.length - 1];
+      if (/[ㄱ-ㅎ]/.test(lastChar)) {
+        const prefix = q.slice(0, -1);
+        if (name.startsWith(prefix) && name.length > prefix.length) {
+          const nextChar = name[prefix.length];
+          if (getInitialConsonant(nextChar) === lastChar) return true;
+        }
+      }
+      return false;
+    });
+
+    return filtered.sort((a, b) => (a.name || "").localeCompare(b.name || "", "ko")).slice(0, 5);
+  };
+
+  const colleagueSearchResults = useMemo(
+    () => searchColleagueCandidates(colleagueSearchQuery, allCrewList).slice(0, 5),
+    [colleagueSearchQuery, allCrewList, selectedColleagues]
+  );
+
+  // 편집 모달 오픈 — 빈 상태로 초기화 + 스냅샷 캡처 + 크루 리스트 fetch
+  const handleOpenColleagueEdit = async () => {
+    setColleagueEditData({ selectedColleague: null, content: "" });
+    setColleagueSearchQuery("");
+    setColleagueSaveAttemptFailed(false);
+    setColleagueFormSnapshot({ selectedColleague: null, content: "" });
+    await fetchCrewListIfNeeded();
+    setHeaderModalType("본인");
+    setHeaderModalOpen(true);
+  };
+
+  const handleSelectColleagueCandidate = (crew: any) => {
+    setColleagueEditData((prev) => ({ ...prev, selectedColleague: crew }));
+    setColleagueSearchQuery("");
+    if (colleagueSaveAttemptFailed) setColleagueSaveAttemptFailed(false);
+  };
+
+  const handleDeselectColleague = () => {
+    setColleagueEditData((prev) => ({ ...prev, selectedColleague: null }));
+    setColleagueSearchQuery("");
+  };
+
+  // colleague-view-modal [수정] — 관리자 승인 검증 후 편집 모달 진입
+  const handleColleagueEditClick = () => {
+    if (!isDemoMode) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+    setColleagueViewModalOpen(false);
+    handleOpenColleagueEdit();
+  };
+
+  const handleColleagueEditCancel = () => {
+    // X / 취소 공용 — 편집 모드에서 dirty 시 confirm
+    if (isColleagueEditing) {
+      const dirty = colleagueFormSnapshot
+        ? colleagueEditData.selectedColleague?.id !== colleagueFormSnapshot.selectedColleague?.id ||
+          colleagueEditData.content !== colleagueFormSnapshot.content
+        : !!colleagueEditData.selectedColleague || colleagueEditData.content.trim().length > 0;
+      if (dirty && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    }
+    setIsColleagueEditing(false);
+    setHeaderModalOpen(false);
+  };
+
+  const handleColleagueEditReset = () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    if (!ok) return;
+    if (colleagueFormSnapshot) {
+      setColleagueEditData(colleagueFormSnapshot);
+    } else {
+      setColleagueEditData({ selectedColleague: null, content: "" });
+    }
+    setColleagueSearchQuery("");
+    setColleagueSaveAttemptFailed(false);
+  };
+
+  const isColleagueEditFormValid = (): boolean => {
+    return !!colleagueEditData.selectedColleague && colleagueEditData.content.trim().length > 0;
+  };
+
+  const handleColleagueEditSave = async () => {
+    if (!isDemoMode && !canEditColleague) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!isColleagueEditFormValid()) {
+      setColleagueSaveAttemptFailed(true);
+      setColleagueFieldErrorFlash(true);
+      setTimeout(() => setColleagueFieldErrorFlash(false), 600);
+      return;
+    }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
+    const picked = colleagueEditData.selectedColleague!;
+    // 다음 rank 할당 (기존 selectedColleagues의 빈 rank 자리를 채움)
+    const usedRanks = new Set(selectedColleagues.map((c) => c.rank));
+    let nextRank = 1;
+    for (let r = 1; r <= 3; r++) {
+      if (!usedRanks.has(r)) {
+        nextRank = r;
+        break;
+      }
+    }
+
+    const newEntry = {
+      id: picked.id,
+      name: picked.name || "-",
+      gender: picked.gender || "-",
+      age: picked.age || "-",
+      profileImg: picked.profileImg || "",
+      university: picked.university || "-",
+      major: picked.major || "-",
+      team: picked.team || "-",
+      part: picked.part || "-",
+      nickname: picked.nickname || "-",
+      role: picked.role || "",
+      rank: nextRank,
+      message: colleagueEditData.content.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedList = [...selectedColleagues, newEntry].sort((a, b) => a.rank - b.rank);
+    setSelectedColleagues(updatedList);
+
+    if (isDemoMode) {
+      alert("저장되었습니다.");
+      setIsColleagueEditing(false);
+      setHeaderModalOpen(false);
+      return;
+    }
+
+    setColleagueSaving(true);
+    try {
+      const payload = updatedList.map((c) => ({ colleagueId: c.id, rank: c.rank, message: c.message || "" }));
+      const res = await fetch("/api/weekly-colleagues", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
+      });
+      if (!res.ok) throw new Error("저장 실패");
+      alert("저장되었습니다.");
+      setIsColleagueEditing(false);
+      setHeaderModalOpen(false);
+    } catch (err) {
+      console.error("연계 동료 저장 실패:", err);
+      window.alert("저장에 실패했습니다.");
+    } finally {
+      setColleagueSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!headerModalOpen) setIsColleagueEditing(false);
+  }, [headerModalOpen]);
 
   // 동료 삭제 함수
   const removeColleague = (id: number) => {
@@ -2650,39 +3104,538 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 주차 평판 저장 함수
-  const saveWeeklyReputation = async () => {
+  // ========================================================================
+  // reputation-form 리디자인 2단계 — 핸들러
+  // ========================================================================
+
+  // 별 클릭 → 평점 업데이트 (1~10 자연수, 반개 가능)
+  const handleRatingClick = (value: number) => {
+    setReputationEditData((prev) => ({ ...prev, rating: value }));
+    if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시작 시 에러 자동 해제
+  };
+
+  // 안내문 자동 복원 — cluster3 패턴 (모든 필드 유효해지면 에러 해제)
+  useEffect(() => {
+    if (!isReputationFormEditing || !saveAttemptFailed) return;
+    if (isFormValid()) setSaveAttemptFailed(false);
+  }, [reputationEditData, isReputationFormEditing, saveAttemptFailed]);
+
+  // 키워드 모드 전환 (select ↔ write) — 사용자 요청: 브라우저 기본 confirm 사용
+  const handleKeywordModeChange = (mode: "select" | "write") => {
+    if (mode === "select") {
+      setSelectedKeywordTemp("");
+      setKeywordModalOpen(true);
+    } else if (mode === "write") {
+      const ok = window.confirm("키워드를 직접 작성하시겠습니까?");
+      if (ok) {
+        setReputationEditData((prev) => ({ ...prev, keyword: "" }));
+        setFormKeywordMode("write");
+      }
+    }
+  };
+
+  // 중첩 모달 내 임시 선택
+  const handleKeywordSelect = (keyword: string) => {
+    if (!isReputationFormEditing) return;
+    setSelectedKeywordTemp(keyword);
+  };
+
+  // 중첩 모달 [선택] 버튼 → window.confirm으로 최종 선택 확인
+  const handleKeywordSelectConfirm = () => {
+    if (!selectedKeywordTemp) return;
+    const ok = window.confirm(`"${selectedKeywordTemp}"을(를) 선택하시겠습니까?`);
+    if (ok) {
+      handleKeywordSelectFinal();
+    }
+  };
+
+  // 선택 확인 후 최종 저장 + 중첩 모달 닫기
+  const handleKeywordSelectFinal = () => {
+    setReputationEditData((prev) => ({ ...prev, keyword: selectedKeywordTemp }));
+    setFormKeywordMode("select");
+    setKeywordModalOpen(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 취소 — cluster3 패턴: 편집 → 보기 전환 (스냅샷 복원, 모달 닫기 아님)
+  const handleFormCancel = () => {
+    if (!isReputationFormEditing) return;
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    }
+    setIsReputationFormEditing(false);
+    setKeywordModalOpen(false);
+    setReputationSaveError(null);
+    setReputationSaveSuccess(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 커스텀 별점 드롭다운 — 외부 클릭 + ESC 닫기
+  useEffect(() => {
+    if (!ratingDropdownOpen) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".dropdown-selected") && !target.closest(".dropdown-options-fixed")) {
+        setRatingDropdownOpen(false);
+      }
+    };
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setRatingDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [ratingDropdownOpen]);
+
+  const openRatingDropdown = () => {
+    if (!isReputationFormEditing) return;
+    const trigger = ratingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setRatingDropdownOpen(true);
+  };
+
+  const handleRatingSelect = (value: number) => {
+    setReputationEditData((prev) => ({ ...prev, rating: value }));
+    setRatingDropdownOpen(false);
+    if (saveAttemptFailed) setSaveAttemptFailed(false);
+  };
+
+  // 주차 리뷰 — 평점 드롭다운 핸들러
+  const openReviewRatingDropdown = () => {
+    if (!isWeeklyReviewEditing) return;
+    const trigger = reviewRatingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setReviewRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setReviewRatingDropdownOpen(true);
+  };
+
+  const handleReviewRatingSelect = (value: number) => {
+    setWeeklyReviewData((prev) => ({ ...prev, rating: value }));
+    setReviewRatingDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    if (!reviewRatingDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".review-rating-section .dropdown-selected") && !target.closest(".review-rating-dropdown-options")) {
+        setReviewRatingDropdownOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setReviewRatingDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [reviewRatingDropdownOpen]);
+
+  // 주차 리뷰 — 페이지 로드 시 데이터 초기화
+  const fetchWeeklyReview = async () => {
     if (isDemoMode) {
-      // weeklyReputations에 새 평판 추가 (UI 즉시 반영)
-      setWeeklyReputations((prev) => [
-        ...prev,
-        {
-          id: `demo-${Date.now()}`,
-          rating: reputationEditData.rating,
-          content: reputationEditData.content.trim(),
-          keyword: reputationEditData.keyword,
-          reviewer: {
-            display_name: session?.user?.name || "데모 유저",
-            gender: "-",
-            birth_date: null,
-            profile_photo_url: session?.user?.image || "",
-            university: "-",
-            major_first: "-",
-            teamName: "-",
-            partName: "-",
-            vision: "-",
-            role: "",
-          },
-        },
-      ]);
-      alert("저장되었습니다.");
-      setHeaderModalOpen(false);
-      setReputationEditData({ rating: 0, content: "", keyword: "" });
+      setWeeklyReviewFromDB({
+        id: "demo-weekly-review-init",
+        weekCardId: weekId,
+        rating: 8,
+        content: "이번 주차에는 새로운 프로젝트를 시작하면서 팀워크의 중요성을 다시 한번 느꼈습니다. 협업 도구를 적극 활용하여 효율적으로 진행했고, 동료들의 피드백을 통해 많이 성장할 수 있었습니다.",
+        created_at: new Date().toISOString(),
+      });
       return;
     }
 
-    // 어드민 수정 모드
+    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
+    try {
+      const res = await fetch(`/api/weekly-reviews?weekCardId=${weekId}`);
+      if (!res.ok) {
+        setWeeklyReviewFromDB(null);
+        return;
+      }
+      const data = await res.json();
+      let record = null;
+      if (Array.isArray(data)) {
+        record = data.length > 0 ? data[0] : null;
+      } else if (data && data.id) {
+        record = data;
+      }
+      if (record) {
+        setWeeklyReviewFromDB({
+          id: record.id, weekCardId: record.weekCardId || weekId,
+          rating: record.rating, content: record.content,
+          created_at: record.created_at, updated_at: record.updated_at,
+        });
+      } else {
+        setWeeklyReviewFromDB(null);
+      }
+    } catch (err) {
+      console.error("[weekly-review] fetch 예외:", err);
+      setWeeklyReviewFromDB(null);
+    }
+  };
+
+  useEffect(() => {
+    if (!weekId) return;
+    fetchWeeklyReview();
+  }, [weekId, isDemoMode]);
+
+  // 주차 리뷰 — 검증 함수
+  const isWeeklyReviewValid = (): boolean => {
+    return weeklyReviewData.rating > 0 && weeklyReviewData.content.trim().length > 0;
+  };
+
+  const isWeeklyReviewDirty = (): boolean => {
+    if (!weeklyReviewFormSnapshot) {
+      return weeklyReviewData.rating > 0 || weeklyReviewData.content.length > 0;
+    }
+    return weeklyReviewData.rating !== weeklyReviewFormSnapshot.rating || weeklyReviewData.content !== weeklyReviewFormSnapshot.content;
+  };
+
+  // 주차 리뷰 — 저장 함수
+  const saveWeeklyReview = async (): Promise<{ id: string; weekCardId?: string; created_at: string; updated_at?: string } | null> => {
+    const isUpdate = !!weeklyReviewFromDB?.id;
+
+    if (isDemoMode) {
+      const now = new Date().toISOString();
+      if (isUpdate && weeklyReviewFromDB) {
+        return { id: weeklyReviewFromDB.id!, weekCardId: weeklyReviewFromDB.weekCardId, created_at: weeklyReviewFromDB.created_at || now, updated_at: now };
+      }
+      return { id: `demo-weekly-review-${Date.now()}`, weekCardId: weekId, created_at: now };
+    }
+
+    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
+    try {
+      const endpoint = isUpdate ? `/api/weekly-reviews/${weeklyReviewFromDB?.id}` : "/api/weekly-reviews";
+      const method = isUpdate ? "PUT" : "POST";
+      const res = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekCardId: weekId, rating: weeklyReviewData.rating, content: weeklyReviewData.content }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return { id: data.id, weekCardId: data.weekCardId, created_at: data.created_at, updated_at: data.updated_at };
+    } catch (err) {
+      console.error("[weekly-review] API 예외:", err);
+      return null;
+    }
+  };
+
+  // 주차 리뷰 — 모달 열릴 때 초기화
+  useEffect(() => {
+    if (!weeklyReviewModalOpen) return;
+    if (weeklyReviewFromDB) {
+      setWeeklyReviewData({ rating: weeklyReviewFromDB.rating, content: weeklyReviewFromDB.content });
+    } else {
+      setWeeklyReviewData({ rating: 0, content: "" });
+    }
+    setIsWeeklyReviewEditing(false);
+    setWeeklyReviewFormSnapshot(null);
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+  }, [weeklyReviewModalOpen, weeklyReviewFromDB]);
+
+  // 주차 리뷰 — 모달 닫기 (isDirty 체크)
+  const handleWeeklyReviewClose = () => {
+    if (isWeeklyReviewEditing && isWeeklyReviewDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    }
+    setWeeklyReviewModalOpen(false);
+  };
+
+  // 주차 리뷰 — 푸터 핸들러
+  const handleWeeklyReviewEditClick = () => {
+    if (!canEditReputation) {
+      alert("관리자 승인이 필요합니다");
+      return;
+    }
+    setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+    setIsWeeklyReviewEditing(true);
+  };
+
+  const handleWeeklyReviewCancel = () => {
+    if (isWeeklyReviewDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+    }
+    if (weeklyReviewFormSnapshot) {
+      setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
+    } else if (weeklyReviewFromDB) {
+      setWeeklyReviewData({ rating: weeklyReviewFromDB.rating, content: weeklyReviewFromDB.content });
+    } else {
+      setWeeklyReviewData({ rating: 0, content: "" });
+    }
+    setIsWeeklyReviewEditing(false);
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+    setWeeklyReviewFormSnapshot(null);
+  };
+
+  const handleWeeklyReviewHelp = () => {
+    setHelpModalKind('weeklyReview');
+  };
+
+  const handleWeeklyReviewReset = () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
+    setWeeklyReviewData({ rating: 0, content: "" });
+    setWeeklyReviewSaveAttemptFailed(false);
+    setWeeklyReviewFieldErrorFlash(false);
+  };
+
+  const handleWeeklyReviewSave = async () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!isWeeklyReviewValid()) {
+      setWeeklyReviewSaveAttemptFailed(true);
+      setWeeklyReviewFieldErrorFlash(true);
+      setTimeout(() => setWeeklyReviewFieldErrorFlash(false), 600);
+      return;
+    }
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+    setWeeklyReviewSaving(true);
+    try {
+      const savedRecord = await saveWeeklyReview();
+      if (!savedRecord) {
+        alert("저장에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+      setWeeklyReviewFromDB({
+        id: savedRecord.id, weekCardId: savedRecord.weekCardId,
+        rating: weeklyReviewData.rating, content: weeklyReviewData.content,
+        created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
+      });
+      alert("저장되었습니다.");
+      setWeeklyReviewModalOpen(false);
+      setIsWeeklyReviewEditing(false);
+      setWeeklyReviewSaveAttemptFailed(false);
+      setWeeklyReviewFieldErrorFlash(false);
+      setWeeklyReviewFormSnapshot(null);
+    } catch (err) {
+      console.error("[weekly-review] 저장 실패:", err);
+      alert("저장 중 오류가 발생했습니다.");
+    } finally {
+      setWeeklyReviewSaving(false);
+    }
+  };
+
+  const handleReputationHelp = () => {
+    setHelpModalKind('reputation');
+  };
+
+  // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
+  const handleEditMode = () => {
+    // 승인 체크 — reputation-view-modal [수정] (L3031)과 동일 패턴
+    if (!canEditReputation) {
+      alert("관리자 승인이 필요합니다");
+      return;
+    }
+
+    setFormSnapshot({
+      rating: reputationEditData.rating,
+      content: reputationEditData.content,
+      keyword: reputationEditData.keyword,
+    });
+    setIsReputationFormEditing(true);
+    setReputationSaveError(null);
+    setReputationSaveSuccess(false);
+    setSaveAttemptFailed(false);
+  };
+
+  // 구형 별칭 — 기존 참조 호환 (제거 대비)
+  const handleFormEditStart = handleEditMode;
+
+  // 초기화 버튼 → 사용자 요청: window.confirm 사용 (cluster3 동일 패턴)
+  const handleFormReset = () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    if (!ok) return;
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    } else {
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
+    setSaveAttemptFailed(false);
+  };
+
+  // 초기화 확인 (구 팝업 연동용 — window.confirm 전환 후 미사용, 호환성 유지)
+  const handleResetConfirm = () => {
+    if (formSnapshot) {
+      setReputationEditData({
+        rating: formSnapshot.rating,
+        content: formSnapshot.content,
+        keyword: formSnapshot.keyword,
+      });
+    } else {
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
+    setSaveAttemptFailed(false);
+  };
+
+  // ========================================================================
+  // reputation-view-modal [수정] / [삭제] 핸들러 (작업 1 — 관리자 승인)
+  // ========================================================================
+
+  // [수정] — 관리자 승인 검증 + 편집 모달 진입 + 기존 데이터 초기화
+  const handleReputationEditClick = () => {
+    if (!canEditReputation) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+    if (!selectedReputationCard) return;
+
+    // selectedReputationCard에서 reputation-form 데이터로 역매핑
+    // reputationData useMemo: rating /= 2, tagText = `#${keyword}`, description = content
+    const restoredRating = Math.round((selectedReputationCard.rating || 0) * 2); // 5점 만점 → 10점 만점 복원
+    const restoredContent = selectedReputationCard.description && selectedReputationCard.description !== "-" ? selectedReputationCard.description : "";
+    const restoredKeyword = selectedReputationCard.tagText ? String(selectedReputationCard.tagText).replace(/^#/, "") : "";
+
+    const initial = {
+      rating: restoredRating,
+      content: restoredContent,
+      keyword: restoredKeyword,
+    };
+    setReputationEditData(initial);
+    setFormSnapshot(initial);
+    // 키워드가 있으면 기본 select 모드(MD 스펙: readonly) — 신규 작성이 아닌 수정이므로
+    setFormKeywordMode(restoredKeyword ? "select" : "select");
+    setSelectedKeywordTemp("");
+    setIsReputationFormEditing(true); // [수정] 진입 시 바로 편집 모드
+    setSaveAttemptFailed(false);
+
+    // view 모달 닫고 form 모달 오픈
+    setReputationViewModalOpen(false);
+    setHeaderModalType("타크루");
+    setHeaderModalOpen(true);
+  };
+
+  // [삭제] — 작업 5: 확인 팝업 → 데모/일반 분기 → 성공 시 view 닫기 + 자동 재정렬(useMemo 재계산)
+  // TODO: [백엔드 작업 필요] DELETE /api/weekly-reputations/:id 엔드포인트 확인/생성
+  const handleReputationDeleteClick = async () => {
+    if (!selectedReputationCard) return;
+
+    // 관리자 승인 체크 (데모=통과, 일반=기존 canEditReputation)
+    if (!canEditReputation) {
+      window.alert("관리자 승인이 필요합니다.");
+      return;
+    }
+
+    const ok = window.confirm("이 평판을 삭제하시겠습니까?");
+    if (!ok) return;
+
+    const repId = selectedReputationCard.id;
+
+    try {
+      if (isDemoMode) {
+        // 데모 모드: 로컬 filter로 weeklyReputations에서 제거
+        setWeeklyReputations((prev) => prev.filter((r) => r.id !== repId));
+      } else {
+        // 일반 모드: DELETE API 호출 후 재조회
+        const res = await fetch(`/api/weekly-reputations/${repId}`, { method: "DELETE" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        await fetchWeeklyReputations();
+      }
+
+      // sentReputationsThisWeek 정합성 — 타인 페이지(isOwner=false)에서 내가 보낸 평판 삭제 시
+      // 로컬 state에서 제거하여 재작성 가능하도록 (best-effort)
+      if (!isOwner && urlUserId && weekId) {
+        setSentReputationsThisWeek((prev) => prev.filter((r) => !(r.targetUserId === urlUserId && r.weekCardId === weekId)));
+      }
+
+      // view 모달 닫기 — 재정렬은 reputationData useMemo 자동 재계산(작업 4 연계)
+      setReputationViewModalOpen(false);
+      setSelectedReputationCard(null);
+    } catch (err) {
+      console.error("평판 삭제 실패:", err);
+      window.alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
+  // isDirty — 스냅샷 대비 변경 여부
+  const isFormDirty = (): boolean => {
+    if (!formSnapshot) {
+      return (
+        reputationEditData.rating !== 0 ||
+        reputationEditData.content.trim() !== "" ||
+        reputationEditData.keyword !== ""
+      );
+    }
+    return (
+      reputationEditData.rating !== formSnapshot.rating ||
+      reputationEditData.content !== formSnapshot.content ||
+      reputationEditData.keyword !== formSnapshot.keyword
+    );
+  };
+
+  // 필수필드 유효성 검사 — 평점>0 + 키워드 1~10자 (UI 힌트 "최대 10자" 와 일치, 최소값 1로 완화) + 내용>0
+  const isFormValid = (): boolean => {
+    const keywordLen = reputationEditData.keyword.trim().length;
+    return (
+      reputationEditData.rating > 0 &&
+      keywordLen >= 1 &&
+      keywordLen <= 10 &&
+      reputationEditData.content.trim().length > 0
+    );
+  };
+
+  // 작업 3: 같은 주차 + 같은 대상에게 이미 보냈는지 체크 (best-effort, 로컬 state 기반)
+  const checkAlreadySent = (targetUserId: string, weekCardId: string): boolean => {
+    return sentReputationsThisWeek.some((r) => r.targetUserId === targetUserId && r.weekCardId === weekCardId);
+  };
+
+  // 작업 3: 해당 주차에 내가 보낸 평판 수 (최대 7명 제한 체크용)
+  const getSentCountThisWeek = (weekCardId: string): number => {
+    return sentReputationsThisWeek.filter((r) => r.weekCardId === weekCardId).length;
+  };
+
+  // 저장 — 작업 2+3: 검증 → 중복/제한 체크 → 저장 → view 갱신/재조회 → 편집 경로면 view 복귀
+  const handleFormSave = async () => {
+    if (!isDemoMode && !canEditReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    // 1. 필수필드 검증
+    if (!isFormValid()) {
+      setSaveAttemptFailed(true);
+      setFieldErrorFlash(true);
+      setTimeout(() => setFieldErrorFlash(false), 600);
+      return;
+    }
+    setSaveAttemptFailed(false);
+
+    // 어드민 수정 모드 — 기존 평판 PUT (POST/중복/7개 제한 우회)
     if (editingWeeklyReputationId && session?.user?.isAdmin) {
+      if (!window.confirm("저장하시겠습니까?")) return;
       setReputationSaving(true);
       try {
         const res = await fetch("/api/weekly-reputations", {
@@ -2700,12 +3653,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           alert(json.error || "수정에 실패했습니다.");
           return;
         }
-
-        fetchWeeklyReputations();
+        await fetchWeeklyReputations();
+        if (selectedReputationCard) {
+          setSelectedReputationCard({
+            ...selectedReputationCard,
+            rating: reputationEditData.rating / 2,
+            ratingCount: `${reputationEditData.rating} / 10`,
+            description: reputationEditData.content,
+            tagText: `#${reputationEditData.keyword}`,
+          });
+        }
         alert("수정되었습니다.");
         setHeaderModalOpen(false);
         setReputationEditData({ rating: 0, content: "", keyword: "" });
         setEditingWeeklyReputationId(null);
+        if (selectedReputationCard) setReputationViewModalOpen(true);
       } catch {
         alert("서버 오류가 발생했습니다.");
       } finally {
@@ -2714,36 +3676,121 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
 
+    // 편집 진입 경로 여부 — view에서 [수정] 클릭 시 selectedReputationCard 유지됨, 신규 진입 시 null
+    const wasEditEntry = !!selectedReputationCard;
+
+    // 2. 작업 3: 신규 작성 경로에서만 중복/7명 제한 체크 (편집은 기존 수정이므로 skip)
+    if (!wasEditEntry) {
+      // 데모 모드는 URL(userId/weekId) 가드 스킵 — UI 테스트 시 자기 프로필 보기 등에서 신규 저장 가능하도록
+      if (!isDemoMode) {
+        const targetUid = urlUserId || "";
+        const wkId = weekId || "";
+        if (!targetUid || !wkId) {
+          alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+          return;
+        }
+        // 2-a. 중복 체크 — 같은 대상에게 이미 보냈는지
+        if (checkAlreadySent(targetUid, wkId)) {
+          window.alert("해당 크루에게 이미 평판을 드렸습니다.");
+          return;
+        }
+        // 2-b. 최대 7명 체크
+        if (getSentCountThisWeek(wkId) >= 7) {
+          window.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
+          return;
+        }
+      }
+    }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
+    // 3. 저장
+    const saved = await saveWeeklyReputation();
+    if (!saved) return; // 저장 실패 — 폼 유지
+
+    // 4. 작업 3: 신규 작성 성공 시 로컬 sentReputationsThisWeek에 append (다음 중복 체크 대비)
+    if (!wasEditEntry) {
+      const targetUid = urlUserId || "";
+      const wkId = weekId || "";
+      setSentReputationsThisWeek((prev) => [
+        ...prev,
+        {
+          targetUserId: targetUid,
+          weekCardId: wkId,
+          createdAt: saved.created_at,
+        },
+      ]);
+    }
+
+    // 5. 편집 진입 경로에서만 view 데이터 즉시 갱신 (낙관적 업데이트)
+    if (wasEditEntry && selectedReputationCard) {
+      setSelectedReputationCard({
+        ...selectedReputationCard,
+        rating: reputationEditData.rating / 2, // 10점 만점 → 5점 만점 역변환 (별 표시용)
+        ratingCount: `${reputationEditData.rating} / 10`,
+        description: reputationEditData.content,
+        tagText: `#${reputationEditData.keyword}`,
+        createdAt: saved.created_at || selectedReputationCard.createdAt,
+      });
+    }
+
+    // 6. 일반 모드: DB 재조회로 reputation-section 최신화 (데모는 saveWeeklyReputation에서 이미 로컬 append)
+    if (!isDemoMode) {
+      await fetchWeeklyReputations();
+    }
+
+    // 7. 스냅샷 업데이트 — 저장 직후 isDirty false 보장
+    setFormSnapshot({
+      rating: reputationEditData.rating,
+      content: reputationEditData.content,
+      keyword: reputationEditData.keyword,
+    });
+
+    alert("저장되었습니다.");
+    setHeaderModalOpen(false);
+
+    if (wasEditEntry) {
+      // 편집 진입 경로: 갱신된 데이터로 view 모달 재오픈 (사용자가 결과 확인)
+      setReputationViewModalOpen(true);
+    } else {
+      // 신규 작성 경로: 폼 데이터 리셋
+      setReputationEditData({ rating: 0, content: "", keyword: "" });
+    }
+  };
+
+  // 주차 평판 저장 함수 — 결과 반환 형태로 리팩토링 (post-save 처리는 handleFormSave에서)
+  // 성공 시 { id, created_at } 반환, 실패 시 null. 모달/폼 상태 변경은 호출부에서 담당.
+  const saveWeeklyReputation = async (): Promise<{ id: string; created_at: string } | null> => {
+    if (isDemoMode) {
+      const now = new Date().toISOString();
+      const demoId = `demo-${Date.now()}`;
+      const newRecord = {
+        id: demoId,
+        rating: reputationEditData.rating,
+        content: reputationEditData.content.trim(),
+        keyword: reputationEditData.keyword,
+        created_at: now,
+        reviewer: {
+          display_name: session?.user?.name || "데모 유저",
+          gender: "-",
+          birth_date: null,
+          profile_photo_url: session?.user?.image || "",
+          university: "-",
+          major_first: "-",
+          teamName: "-",
+          partName: "-",
+          vision: "-",
+          role: "",
+        },
+      };
+      setWeeklyReputations((prev) => [...prev, newRecord]);
+      return { id: demoId, created_at: now };
+    }
+
     if (!urlUserId || !weekId) {
       alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
-      return;
-    }
-
-    if (reputationEditData.rating === 0) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(1)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-
-    if (!reputationEditData.content.trim()) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(2)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-
-    if (!reputationEditData.keyword) {
-      const el = document.querySelector(".reputation-form .form-field:nth-child(3)");
-      if (el) {
-        (el as HTMLElement).style.border = "1px solid #ff4444";
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
+      return null;
     }
 
     setReputationSaving(true);
@@ -2764,21 +3811,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       });
 
       const json = await res.json();
-
       if (!res.ok) {
         alert(json.error || "저장에 실패했습니다.");
-        return;
+        return null;
       }
-
-      // 주차 평판 데이터 새로고침
-      fetchWeeklyReputations();
-      alert("저장되었습니다.");
-      setHeaderModalOpen(false);
-      setReputationEditData({ rating: 0, content: "", keyword: "" });
-      setEditingWeeklyReputationId(null);
+      setReputationSaveSuccess(true);
+      return {
+        id: json.data?.id || "",
+        created_at: json.data?.created_at || new Date().toISOString(),
+      };
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
+      setReputationSaveError((error as Error)?.message || "서버 오류");
       alert("서버 오류가 발생했습니다.");
+      return null;
     } finally {
       setReputationSaving(false);
     }
@@ -2923,10 +3969,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               isEmpty: false,
             };
           })
-        : dummyReputations; // 데이터 없으면 더미 데이터 폴백
+        : (() => {
+            // 테스트용: ?admin=true&repCount=N (N: 0~4) — 데모 모드에서만 더미 개수 조절
+            if (isDemoMode && searchParams.get("admin") === "true") {
+              const raw = searchParams.get("repCount");
+              if (raw !== null) {
+                const n = Math.max(0, Math.min(4, parseInt(raw, 10) || 0));
+                return dummyReputations.slice(0, n);
+              }
+            }
+            return dummyReputations;
+          })(); // 데이터 없으면 더미 데이터 폴백
 
-    // 최대 4개까지, 빈 슬롯 채우기
-    const result = [...apiData];
+    // 작업 4: created_at 오름차순 정렬 (오래된 것이 1번 슬롯 → 가장 최신이 4번)
+    // null/undefined createdAt는 Infinity로 취급해 뒤로 밀어냄 (안정 정렬로 원래 순서 보존)
+    const sorted = [...apiData].sort((a, b) => {
+      const timeA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : Infinity;
+      const timeB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : Infinity;
+      return timeA - timeB;
+    });
+
+    // 최대 4개까지, 빈 슬롯 채우기 (삭제 시 재정렬은 useMemo 재계산으로 자연 달성)
+    const result = [...sorted];
     while (result.length < 4) {
       result.push({
         id: `empty-${result.length}`,
@@ -2952,7 +4016,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     return result.slice(0, 4); // 최대 4개만 반환
-  }, [weeklyReputations]);
+  }, [weeklyReputations, isDemoMode, searchParams]);
 
   // 검색 필터링된 크루 목록 (이름과 닉네임으로만 검색)
   const filteredCrewData = allCrewList
@@ -2988,6 +4052,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         role: "",
         date: "-",
         message: "",
+        created_at: null as string | null,
         isEmpty: true,
       }));
     }
@@ -3009,9 +4074,27 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             role: c.role || "일반",
             date: c.createdAt ? formatDate(c.createdAt) : "-",
             message: c.message || "",
+            created_at: c.createdAt || null, // 작업 6에서 reputation-timestamp 표시용
             isEmpty: false,
           }))
-        : dummyColleagues; // 데이터 없으면 더미 데이터 폴백
+        : (() => {
+            // 테스트용: ?admin=true&colCount=N (N: 0~3) — 데모 모드에서만 더미 개수 조절
+            if (isDemoMode && searchParams.get("admin") === "true") {
+              const raw = searchParams.get("colCount");
+              if (raw !== null) {
+                const n = Math.max(0, Math.min(3, parseInt(raw, 10) || 0));
+                return dummyColleagues.slice(0, n);
+              }
+            }
+            return dummyColleagues;
+          })(); // 데이터 없으면 더미 데이터 폴백
+
+    // createdAt 오름차순 정렬 (reputation 패턴 동일)
+    apiData.sort((a: any, b: any) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : Infinity;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : Infinity;
+      return timeA - timeB;
+    });
 
     // 최대 3개까지, 빈 슬롯 채우기
     const result = [...apiData];
@@ -3030,12 +4113,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         role: "",
         date: "-",
         message: "",
+        created_at: null,
         isEmpty: true,
       });
     }
 
     return result.slice(0, 3); // 최대 3개만 반환
-  }, [selectedColleagues, isRestMode]);
+  }, [selectedColleagues, isRestMode, isDemoMode, searchParams]);
 
   // 실무 정보 activity_type_id → UI 매핑
   const activityTypeConfig: { [key: string]: { category: string; tagColor: string; icon: string; isFruit: boolean } } = {
@@ -4088,6 +5172,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 handleEditClick(() => {
                   setHeaderModalType("타크루");
                   setHeaderModalOpen(true);
+                  // reputation-form 리디자인 2단계 — 초기 상태 + 스냅샷 캡처
+                  const initial = { rating: 0, content: "", keyword: "" };
+                  setReputationEditData(initial);
+                  setFormSnapshot(initial);
+                  setFormKeywordMode("select");
+                  setSelectedKeywordTemp("");
+                  setIsReputationFormEditing(false); // 사용자 요청: 기본 보기 모드 ([수정] 버튼 표시)
+                  setSaveAttemptFailed(false);
+                  setSelectedReputationCard(null); // 신규 작성 경로 — 편집 경로와 구분
                   fetchCrewListIfNeeded();
                   fetchKeywordsIfNeeded();
                 });
@@ -4115,6 +5208,43 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="badge-item heart-badge">
                 <span className="badge-count">99</span>
                 <i className="ti ti-heart"></i>
+              </div>
+            </div>
+
+            {/* Weekly Review 박스 (작업 0~2: 정적 더미 + unfurl 애니메이션) */}
+            <div
+              ref={weeklyReviewRef}
+              className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}
+            >
+              <div className="weekly-review-header">
+                <img src="/images/0/book.png" alt="book" className="review-book-icon" />
+                <h3 className="review-title">Weekly Review</h3>
+                <button
+                  className="review-view-btn"
+                  onClick={() => setWeeklyReviewModalOpen(true)}
+                  aria-label="더보기"
+                >
+                  <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
+                </button>
+              </div>
+              <div className="weekly-review-mid">
+                <p className="review-content">
+                  {weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}
+                </p>
+              </div>
+              <div className="weekly-review-footer">
+                <div className="review-rating-group">
+                  <div className="review-stars">
+                    {[1, 2, 3, 4, 5].map((i) => {
+                      const r = (weeklyReviewFromDB?.rating || 0) / 2;
+                      let cls = "ti-star";
+                      if (r >= i) cls = "ti-star-filled";
+                      else if (r >= i - 0.5) cls = "ti-star-half-filled";
+                      return <i key={i} className={`ti ${cls}`}></i>;
+                    })}
+                  </div>
+                  <span className="review-score">{weeklyReviewFromDB?.rating || 0} / 10</span>
+                </div>
               </div>
             </div>
           </div>
@@ -4211,13 +5341,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 주차 평판
               </span>
               <span className="section-count" style={{ fontSize: "17px" }}>
-                <span className="count-num">{weeklyReputations.length}</span>/3
+                <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
             </div>
-            <div className="reputation-cards-grid">
-              {reputationData.map((user, index) => {
-                const isEmpty = user.isEmpty || isRestMode;
+            {(() => {
+              // 카드 0개(또는 휴식 주차): 4슬롯 전체 영역을 통합 대기 영역으로 표시
+              const filledCount = isRestMode ? 0 : reputationData.filter((c: any) => c && !c.isEmpty).length;
+              if (false && filledCount === 0) {
                 return (
+                  <div className="reputation-cards-grid reputation-all-empty">
+                    <div className="reputation-waiting-full">
+                      <img src="/images/0/waiting.png" alt="waiting" />
+                      <p>주차 평판 카드 작성 대기 중.. 😊</p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div className="reputation-cards-grid">
+                  {reputationData.map((user, index) => {
+                    const isEmpty = user.isEmpty || isRestMode;
+                    if (isEmpty) {
+                      return (
+                        <div key={user.id} className="reputation-card reputation-waiting-card">
+                          <div className="reputation-waiting-content">
+                            <img src="/images/0/waiting.png" alt="waiting" />
+                            <p>주차 평판 대기 중... 😊</p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    // 1~3개 상태의 빈 슬롯: 카드 골격 + 내부 자리(프로필/별/코멘트/FM) 유지 + 각 자리의 값만 placeholder
+                    // (pre-6단계 원래 구조: 같은 .reputation-card에 isEmpty 조건부 "-" 값)
+                    return (
                   <div
                     key={user.id}
                     className={`reputation-card ${isEmpty ? "empty" : ""}`}
@@ -4370,7 +5526,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 );
               })}
-            </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* 연계 동료 */}
@@ -4386,9 +5544,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       return;
                     }
                     handleEditClick(() => {
-                      setHeaderModalType("본인");
-                      setHeaderModalOpen(true);
-                      fetchCrewListIfNeeded();
+                      handleOpenColleagueEdit();
                     });
                   }}
                   style={{ cursor: "pointer", marginTop: "8px" }}
@@ -4409,6 +5565,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="colleague-cards">
               {colleagueData.map((user, index) => {
                 const isEmpty = user.isEmpty;
+                if (isEmpty) {
+                  return (
+                    <div key={user.id} className="colleague-card colleague-card-empty">
+                      <img src="/images/0/colleague.png" alt="동료 대기" className="empty-colleague-image" />
+                      <p className="empty-colleague-message">나의 동료가 되어줄래..? (수줍)😍</p>
+                    </div>
+                  );
+                }
                 return (
                   <div
                     key={user.id}
@@ -5350,6 +6514,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -6026,175 +7191,156 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) ========== */}
+      {/* ========== 상단 섹션 본인 편집 모달 (연계 동료 편집) — 스펙: 1명 선택 + 코멘트 + Type B 푸터 ========== */}
       {headerModalOpen && headerModalType === "본인" && (
         <div className="section-modal-overlay">
           <div className="section-modal section-modal-colleague-edit">
+            {/* ── 헤더 (110px) ── */}
             <div className="section-modal-header">
-              <h3>연계 동료 편집</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                <h3>연계 동료</h3>
+              </div>
+              <p className="modal-subtitle">
+                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나<br/>기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
+              </p>
+              <button className="modal-close-btn" onClick={handleColleagueEditCancel}>
+                <i className="ti ti-x"></i>
+              </button>
             </div>
-            <div className="section-modal-body">
-              <div className="modal-card-item modal-card-header-edit">
-                {/* 안내 문구 */}
-                <div className="header-edit-section colleague-guide">
-                  <div className="guide-text">
-                    <p>
-                      이번 주차 동안 클럽에서 성장하며,
-                      <br />
-                      <span className="highlight">자신이 도움을 받았거나 기억에 남는 결과를 보여준 다른 크루를 선택해주세요.</span> <span className="guide-requirement">(최소 1명 필수)</span>
-                    </p>
-                  </div>
-                </div>
 
-                {/* 연계 동료 선택 */}
-                <div className="header-edit-section">
-                  <div className="header-edit-title">
-                    연계 동료 선택 <span className="count-badge">{selectedColleagues.length} / 3</span>
-                  </div>
+            {/* ── 미드 (412px) ── */}
+            <div className="section-modal-body colleague-edit-body">
+              {/* 영역 1: 연계 동료 선택 (자동완성) */}
+              <div className="colleague-select-section">
+                <h4>
+                  ■ 연계 동료 <span className="required-mark">*</span>
+                </h4>
 
-                  {/* 선택된 동료 목록 */}
-                  <div className="selected-colleagues">
-                    {selectedColleagues.map((colleague, index) => (
-                      <div key={colleague.id} className="selected-colleague-card">
-                        <div className="colleague-header">
-                          <div className="to-badge">
-                            <span className="to-text">To.</span>
-                            <span className="rank-number">
-                              {colleague.rank}
-                              {colleague.rank === 1 ? "st" : colleague.rank === 2 ? "nd" : "rd"}
-                            </span>
-                          </div>
-                          <button className="remove-btn" title="삭제" onClick={() => removeColleague(colleague.id)}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M18 6L6 18M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="colleague-profile-row">
-                          <div className="colleague-avatar">{colleague.profileImg ? <img src={colleague.profileImg} alt={colleague.name} /> : <div className="profile-placeholder"></div>}</div>
-                          <div className="colleague-info">
-                            <div className="colleague-name">
-                              {colleague.name} | {colleague.gender} | {mask.age(colleague.age)}세
-                            </div>
-                            <div className="colleague-details">
-                              {truncate(colleague.team)} 팀 | {truncate(colleague.part)} 파트 | {truncate(colleague.nickname)}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="colleague-message-section">
-                          <label>
-                            Thank you message <span className="char-limit">(최대 100자)</span>
-                          </label>
-                          <div className="message-input-wrapper">
-                            <textarea
-                              placeholder="이 크루에게 어떤 도움을 받았는지, 감사의 표현을 작성해주세요 :)"
-                              maxLength={100}
-                              rows={1}
-                              value={colleague.message}
-                              onChange={(e) => {
-                                if (e.target.value.length > 100) {
-                                  alert("최대 100자까지 입력할 수 있습니다.");
-                                  return;
-                                }
-                                updateColleagueMessage(colleague.id, e.target.value);
-                              }}
-                            ></textarea>
-                            <span className="char-counter">{colleague.message.length} / 100</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* 추가 버튼 (3명 미만일 때만 표시) */}
-                    {selectedColleagues.length < 3 && (
-                      <div className="add-colleague-card">
-                        <div className="add-colleague-placeholder">
-                          <div className="add-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M12 5v14M5 12h14" />
-                            </svg>
-                          </div>
-                          <span>아래에서 크루를 검색하고 추가하세요</span>
-                          <span className="add-sublabel">{3 - selectedColleagues.length}명 추가 가능</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 크루 검색 섹션 */}
-                <div className="header-edit-section">
-                  <div className="header-edit-title with-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="title-icon">
-                      <circle cx="11" cy="11" r="8" />
-                      <path d="M21 21l-4.35-4.35" />
-                    </svg>
-                    크루 검색
-                  </div>
-                  <div className="header-edit-row">
-                    <div className="edit-field full-width">
-                      <div className="search-input-wrapper">
-                        <input type="text" placeholder="크루 이름 또는 닉네임으로 검색..." value={crewSearchQuery} onChange={(e) => setCrewSearchQuery(e.target.value)} />
-                        <button className="search-btn">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="M21 21l-4.35-4.35" />
-                          </svg>
-                        </button>
-                      </div>
+                {/* B 영역: 선택 결과 (상단) */}
+                {colleagueEditData.selectedColleague ? (
+                  <div className={`selected-colleague ${colleagueSaveAttemptFailed && !colleagueEditData.selectedColleague ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
+                    <div className="crew-info">
+                      <span className="crew-number">No.{colleagueEditData.selectedColleague.number ?? colleagueEditData.selectedColleague.id}</span>
+                      <span className="crew-divider">|</span>
+                      <span className="crew-name">{colleagueEditData.selectedColleague.name || "-"}</span>
+                      <span className="crew-divider">|</span>
+                      <span className="crew-team">{colleagueEditData.selectedColleague.team || "-"}</span>
                     </div>
+                    <button className="btn-deselect" title="선택 해제" onClick={handleDeselectColleague} disabled={!isColleagueEditing}>
+                      <i className="ti ti-x"></i>
+                    </button>
                   </div>
+                ) : (
+                  <div className={`selected-colleague-empty ${colleagueSaveAttemptFailed ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
+                    아직 선택된 크루가 없습니다.
+                  </div>
+                )}
 
-                  {/* 검색 결과 목록 */}
-                  <div className="crew-search-results">
-                    {filteredCrewData.length === 0 ? (
-                      <div className="no-results">{selectedColleagues.length >= 3 ? "최대 3명까지만 선택 가능합니다." : "검색 결과가 없습니다."}</div>
-                    ) : (
-                      filteredCrewData.map((user) => (
-                        <div key={user.id} className="crew-search-item">
-                          <div className="crew-profile">
-                            <div className="crew-avatar">{user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
+                {/* A 영역: 검색 + 후보 (선택 전에만) */}
+                {!colleagueEditData.selectedColleague && (
+                  <>
+                    <div className="search-input-wrapper">
+                      <input
+                        type="text"
+                        className="search-input"
+                        value={colleagueSearchQuery}
+                        onChange={(e) => setColleagueSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && colleagueSearchResults.length > 0) {
+                            e.preventDefault();
+                            handleSelectColleagueCandidate(colleagueSearchResults[0]);
+                          }
+                        }}
+                        placeholder="크루 이름을 입력하세요 (예: 김, 김ㅎ)"
+                        autoFocus
+                        disabled={!isColleagueEditing}
+                      />
+                      <i className="ti ti-search search-icon"></i>
+                    </div>
+
+                    {colleagueSearchResults.length > 0 && (
+                      <div className="search-results">
+                        {colleagueSearchResults.map((crew) => (
+                          <div key={crew.id} className="search-result-item">
                             <div className="crew-info">
-                              <div className="crew-name">
-                                {user.name} | {user.gender} | {mask.age(user.age)}세
-                              </div>
-                              <div className="crew-details">
-                                {truncate(user.team)} 팀 | {truncate(user.part)} 파트 | {truncate(user.nickname)}
-                              </div>
+                              <span className="crew-number">No.{crew.number ?? crew.id}</span>
+                              <span className="crew-divider">|</span>
+                              <span className="crew-name">{crew.name || "-"}</span>
+                              <span className="crew-divider">|</span>
+                              <span className="crew-team">{crew.team || "-"}</span>
                             </div>
-                          </div>
-                          <div className="rank-select-buttons">
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 1) ? "disabled" : ""}`} title="1순위로 선택" onClick={() => addColleague(user, 1)} disabled={!!selectedColleagues.find((c) => c.rank === 1) || selectedColleagues.length >= 3}>
-                              1st
-                            </button>
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 2) ? "disabled" : ""}`} title="2순위로 선택" onClick={() => addColleague(user, 2)} disabled={!!selectedColleagues.find((c) => c.rank === 2) || selectedColleagues.length >= 3}>
-                              2nd
-                            </button>
-                            <button className={`rank-btn ${selectedColleagues.find((c) => c.rank === 3) ? "disabled" : ""}`} title="3순위로 선택" onClick={() => addColleague(user, 3)} disabled={!!selectedColleagues.find((c) => c.rank === 3) || selectedColleagues.length >= 3}>
-                              3rd
+                            <button className="btn-select" title="이 크루 선택" onClick={() => handleSelectColleagueCandidate(crew)} disabled={!isColleagueEditing}>
+                              <i className="ti ti-check"></i>
                             </button>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     )}
-                  </div>
+
+                    {colleagueSearchQuery.trim() && colleagueSearchResults.length === 0 && (
+                      <div className="search-no-results">일치하는 크루가 없습니다.</div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* 영역 2: 코멘트 작성 */}
+              <div className="colleague-content-section">
+                <h4>
+                  ■ 연계 내용 <span className="required-mark">*</span>
+                </h4>
+                <div className="content-wrapper">
+                  <textarea
+                    className={`content-textarea ${colleagueSaveAttemptFailed && !colleagueEditData.content.trim() ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}
+                    value={colleagueEditData.content}
+                    onChange={(e) => {
+                      setColleagueEditData((prev) => ({ ...prev, content: e.target.value.slice(0, 100) }));
+                      if (colleagueSaveAttemptFailed) setColleagueSaveAttemptFailed(false);
+                    }}
+                    placeholder="연계 동료에게 전하고 싶은 말을 100자 이내로 작성해주세요."
+                    maxLength={100}
+                    disabled={!isColleagueEditing}
+                  />
+                  <div className="char-count">{colleagueEditData.content.length}/100</div>
                 </div>
               </div>
             </div>
+
+            {/* ── 푸터 (118px) Type B ── */}
             <div className="section-modal-footer">
-              <button
-                className="cancel-btn"
-                onClick={() => {
-                  setHeaderModalOpen(false);
-                  setColleagueSaveError(null);
-                  setColleagueSaveSuccess(false);
-                }}
-              >
-                취소
-              </button>
-              <button className="save-btn" onClick={saveWeeklyColleagues} disabled={colleagueSaving || colleagueSaveSuccess}>
-                {colleagueSaving ? "저장 중..." : "저장"}
-              </button>
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('colleague')} style={{ cursor: "pointer" }}>
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  {!isColleagueEditing ? (
+                    <button type="button" className="modal-edit-btn" onClick={() => handleEditClick(() => setIsColleagueEditing(true))}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button type="button" className="modal-cancel-btn" onClick={handleColleagueEditCancel}>
+                        취소
+                      </button>
+                      <button type="button" className="modal-reset-btn" onClick={handleColleagueEditReset}>
+                        초기화
+                      </button>
+                      <button type="button" className="modal-save-btn" onClick={handleColleagueEditSave} disabled={colleagueSaving}>
+                        {colleagueSaving ? "저장 중..." : "저장"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <span
+                  className={`modal-notice ${colleagueSaveAttemptFailed ? "notice-error" : ""}`}
+                  style={{ visibility: colleagueSaveAttemptFailed ? "visible" : "hidden" }}
+                >
+                  필수 사항이 누락되었어요! 확인 부탁드려요! 😊
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -6205,134 +7351,251 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         <div className="section-modal-overlay">
           <div className="section-modal section-modal-reputation-form">
             <div className="section-modal-header">
-              <h3>주차 평판</h3>
-              <span className="modal-subtitle">해당 크루에게 평판을 남겨주세요</span>
-            </div>
-            <div className="section-modal-body">
-              <div className="modal-card-item modal-card-header-edit reputation-form-modal">
-                {/* 평판 작성 폼 */}
-                <div className="reputation-form">
-                  {/* 평점 */}
-                  <div className="form-field">
-                    <label>평점</label>
-                    <div className="rating-row">
-                      <div className="star-rating-sm">
-                        {[1, 2, 3, 4, 5].map((starIndex) => {
-                          const fullValue = starIndex * 2;
-                          const halfValue = starIndex * 2 - 1;
-                          const currentRating = reputationEditData.rating;
-                          const isHalf = currentRating >= halfValue && currentRating < fullValue;
-                          const isFull = currentRating >= fullValue;
-
-                          return (
-                            <div key={starIndex} className="star-wrapper">
-                              {/* 배경 별 (빈 별) */}
-                              <svg className="star-bg" viewBox="0 0 24 24" fill="none" stroke="#FFA500" strokeWidth="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                              </svg>
-                              {/* 반개 채움 */}
-                              {isHalf && (
-                                <svg className="star-half-fill" viewBox="0 0 24 24">
-                                  <defs>
-                                    <clipPath id={`halfClip${starIndex}`}>
-                                      <rect x="0" y="0" width="12" height="24" />
-                                    </clipPath>
-                                  </defs>
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FFA500" clipPath={`url(#halfClip${starIndex})`} />
-                                </svg>
-                              )}
-                              {/* 전체 채움 */}
-                              {isFull && (
-                                <svg className="star-full-fill" viewBox="0 0 24 24" fill="#FFA500">
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                </svg>
-                              )}
-                              {/* 클릭 영역 */}
-                              <button className="star-click-area star-click-left" type="button" onClick={() => setReputationEditData((prev) => ({ ...prev, rating: halfValue }))} />
-                              <button className="star-click-area star-click-right" type="button" onClick={() => setReputationEditData((prev) => ({ ...prev, rating: fullValue }))} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <span className="rating-value">{reputationEditData.rating} / 10</span>
-                    </div>
-                  </div>
-
-                  {/* 내용 */}
-                  <div className="form-field">
-                    <label>
-                      내용 <span className="char-limit">(최대 100자)</span>
-                    </label>
-                    <div className="textarea-wrapper">
-                      <textarea
-                        placeholder="해당 크루에 대한 평가 내용을 작성해주세요..."
-                        maxLength={100}
-                        rows={3}
-                        value={reputationEditData.content}
-                        onChange={(e) => {
-                          if (e.target.value.length > 100) {
-                            alert("최대 100자까지 입력할 수 있습니다.");
-                            return;
-                          }
-                          setReputationEditData((prev) => ({ ...prev, content: e.target.value }));
-                        }}
-                      ></textarea>
-                      <span className="char-counter">{reputationEditData.content.length} / 100</span>
-                    </div>
-                  </div>
-
-                  {/* 키워드 */}
-                  <div className="form-field">
-                    <label>
-                      키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 7자)</span>
-                    </label>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
-                      <input
-                        type="text"
-                        placeholder="키워드를 입력하세요"
-                        maxLength={7}
-                        value={reputationEditData.keyword}
-                        onChange={(e) => {
-                          if (e.target.value.length > 7) {
-                            alert("최대 7자까지 입력할 수 있습니다.");
-                            return;
-                          }
-                          setReputationEditData((prev) => ({ ...prev, keyword: e.target.value }));
-                        }}
-                        style={{
-                          display: "block",
-                          width: "100%",
-                          height: "48px",
-                          padding: "12px 14px",
-                          background: "#1a1f2e",
-                          border: "1px solid #FFA500",
-                          borderRadius: "0",
-                          color: "#fff",
-                          fontSize: "14px",
-                          outline: "none",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="section-modal-footer">
               <button
-                className="cancel-btn"
+                className="modal-close-btn"
                 onClick={() => {
+                  if (isReputationFormEditing && isFormDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
                   setHeaderModalOpen(false);
+                  setIsReputationFormEditing(false);
                   setReputationSaveError(null);
                   setReputationSaveSuccess(false);
                 }}
               >
-                취소
+                <i className="ti ti-x"></i>
               </button>
-              <button className="save-btn" onClick={saveWeeklyReputation} disabled={reputationSaving || reputationSaveSuccess || reputationEditData.rating === 0 || reputationEditData.content.trim() === "" || reputationEditData.keyword === ""}>
-                {reputationSaving ? "저장 중..." : "저장"}
-              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                <h3>위클리 평판 (Weekly Reputation)</h3>
+              </div>
+              <p className="modal-subtitle">
+                혼자 하는 성장이 그 찰나에는 빠를 수 있지만, 멀리, 굳건히, 확실히 가려면 '함께' 가야 합니다! 😊
+                <br />
+                나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 타산지석으로 삼아보자구요!
+              </p>
             </div>
+            {/* ── 미드 (342px) — 2열 레이아웃 (평점 + 키워드) + 내용 textarea ── */}
+            <div className="section-modal-body reputation-form-body">
+              <div className="reputation-form-top">
+                {/* 1열: 평점 */}
+                <div className="form-rating-section">
+                  <h4>
+                    ■ 평점을 입력해주세요. <span className="required-mark">*</span>
+                  </h4>
+                  <div className={`rating-input rating-field ${saveAttemptFailed && (!reputationEditData.rating || reputationEditData.rating === 0) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
+                    <span className="star-rating">
+                      {(() => {
+                        const r = reputationEditData.rating || 0;
+                        const fullStars = Math.floor(r / 2);
+                        const hasHalf = r % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                        return (
+                          <>
+                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {hasHalf && <i className="ti ti-star-half-filled" />}
+                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                          </>
+                        );
+                      })()}
+                      <span className="rating-text">{reputationEditData.rating || 0}/10</span>
+                    </span>
+
+                    <div className="custom-dropdown small">
+                      <div
+                        ref={ratingDropdownTriggerRef}
+                        className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`}
+                        onClick={openRatingDropdown}
+                        role="button"
+                        tabIndex={isReputationFormEditing ? 0 : -1}
+                        aria-haspopup="listbox"
+                        aria-expanded={ratingDropdownOpen}
+                      >
+                        <span>{reputationEditData.rating || "-"}</span>
+                        <i className="ti ti-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2열: 키워드 */}
+                <div className="form-keyword-section">
+                  <h4>
+                    ■ 키워드를 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 10자)</span>
+                  </h4>
+                  <div className="keyword-mode-select">
+                    <label>
+                      <input
+                        type="radio"
+                        name="keywordMode"
+                        value="select"
+                        checked={formKeywordMode === "select"}
+                        disabled={!isReputationFormEditing}
+                        onChange={() => handleKeywordModeChange("select")}
+                        onClick={() => {
+                          // 이미 select 상태에서도 재클릭 시 중첩 모달 재오픈 가능 (사용자 요청)
+                          if (isReputationFormEditing && formKeywordMode === "select") {
+                            handleKeywordModeChange("select");
+                          }
+                        }}
+                      />
+                      선택
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="keywordMode"
+                        value="write"
+                        checked={formKeywordMode === "write"}
+                        disabled={!isReputationFormEditing}
+                        onChange={() => handleKeywordModeChange("write")}
+                      />
+                      작성
+                    </label>
+                  </div>
+                  <div className="keyword-input-wrapper" data-field="keyword">
+                    <span className="keyword-hash">#</span>
+                    <input
+                      type="text"
+                      className={`keyword-input ${saveAttemptFailed && (!reputationEditData.keyword || reputationEditData.keyword.trim().length < 7) ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}
+                      value={reputationEditData.keyword}
+                      onChange={(e) => {
+                        if (isReputationFormEditing && formKeywordMode === "write") {
+                          setReputationEditData((prev) => ({ ...prev, keyword: e.target.value.slice(0, 10) }));
+                          if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시 에러 자동 해제
+                        }
+                      }}
+                      placeholder={formKeywordMode === "write" ? "해당 크루의 한 주 활동의 특징을 키워드로 입력해주세요." : "선택 버튼을 눌러 키워드를 선택하세요"}
+                      maxLength={10}
+                      readOnly={!isReputationFormEditing || formKeywordMode === "select"}
+                      onKeyDown={(e) => {
+                        if (!isReputationFormEditing || formKeywordMode === "select") {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 하단: 내용 */}
+              <div className="form-content-section" data-field="content">
+                <h4>
+                  ■ 내용을 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 100자)</span>
+                </h4>
+                <textarea
+                  className={`form-content-textarea ${saveAttemptFailed && !reputationEditData.content.trim() ? `field-error ${fieldErrorFlash ? "flash" : ""}` : ""}`}
+                  value={reputationEditData.content}
+                  readOnly={!isReputationFormEditing}
+                  onChange={(e) => {
+                    if (!isReputationFormEditing) return;
+                    setReputationEditData((prev) => ({ ...prev, content: e.target.value.slice(0, 100) }));
+                    if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시 에러 자동 해제
+                  }}
+                  placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요."
+                  maxLength={100}
+                />
+                <div className="char-count">{reputationEditData.content.length}/100</div>
+              </div>
+            </div>
+            {/* ── 푸터 (118px) Type B: 행1[🔎 + 버튼] / 행2[안내문 우측 visibility 토글] ── */}
+            <div className="section-modal-footer">
+              {/* 행 1 */}
+              <div className="modal-footer-top">
+                <div className="modal-help-icon" title="도움말" onClick={handleReputationHelp} style={{ cursor: "pointer" }}>
+                  🔎
+                </div>
+                <div className="modal-footer-right">
+                  {!isReputationFormEditing ? (
+                    <button className="modal-edit-btn" onClick={handleEditMode}>
+                      수정
+                    </button>
+                  ) : (
+                    <>
+                      <button className="modal-cancel-btn" onClick={handleFormCancel}>
+                        취소
+                      </button>
+                      <button className="modal-reset-btn" onClick={handleFormReset}>
+                        초기화
+                      </button>
+                      <button
+                        className="modal-save-btn"
+                        onClick={handleFormSave}
+                        disabled={reputationSaving}
+                      >
+                        {reputationSaving ? "저장 중..." : "저장"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 행 2 — cluster3 패턴: 편집 모드에서 항상 표시, 에러 시 빨간색 + 텍스트 변경 */}
+              <div className="modal-footer-bottom">
+                <span
+                  className={`modal-notice modal-footer-notice ${saveAttemptFailed ? "notice-error" : ""}`}
+                  style={{ visibility: isReputationFormEditing ? "visible" : "hidden" }}
+                >
+                  {saveAttemptFailed ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
+                </span>
+              </div>
+            </div>
+
+            {keywordModalOpen && (
+              <div className="section-modal-overlay keyword-select-overlay">
+                <div className="section-modal keyword-select-modal">
+                  <div className="section-modal-header">
+                    <button
+                      type="button"
+                      className="modal-close-btn"
+                      onClick={() => {
+                        setKeywordModalOpen(false);
+                        setSelectedKeywordTemp("");
+                      }}
+                      aria-label="키워드 선택 모달 닫기"
+                    >
+                      <i className="ti ti-x"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn-select-header"
+                      onClick={handleKeywordSelectConfirm}
+                      disabled={!selectedKeywordTemp}
+                    >
+                      선택
+                    </button>
+
+                    <div className="modal-header-top">
+                      <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain", flexShrink: 0 }} />
+                      <h3>키워드를 선택해주세요. 😊</h3>
+                    </div>
+                  </div>
+
+                  <div className="section-modal-body keyword-select-body">
+                    {KEYWORD_GROUPS.map((group, gIdx) => (
+                      <div key={group.id} className={`keyword-group group-${group.color}`}>
+                        <h4 className="group-title">
+                          [군락 {gIdx + 1}] {group.title}
+                          <span className="group-count">({group.count}개)</span>
+                        </h4>
+                        <div className="keyword-grid">
+                          {group.keywords.map((keyword) => (
+                            <button
+                              key={`${group.id}-${keyword}`}
+                              type="button"
+                              className={`keyword-chip ${selectedKeywordTemp === keyword ? "selected" : ""}`}
+                              onClick={() => handleKeywordSelect(keyword)}
+                            >
+                              {keyword}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}
@@ -6371,10 +7634,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="personal-age">
                         {mask.age(selectedReputationCard.age) || "—"} 세
                       </span>
-                      <div className="personal-tags">
-                        <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
-                        <span className="tag-badge tag-keyword">{selectedReputationCard.nickname || selectedReputationCard.keyword || "키워드"}</span>
-                      </div>
                     </div>
 
                     <div className="personal-row-2">
@@ -6400,6 +7659,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <span className="field-label">파트</span>
                       </span>
                     </div>
+                  </div>
+
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">{selectedReputationCard.role || "일반"}</span>
+                    <span className="tag-badge tag-keyword">{selectedReputationCard.nickname || selectedReputationCard.keyword || "키워드"}</span>
                   </div>
                 </div>
               </div>
@@ -6439,9 +7703,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
 
-              {/* 최하단: 타임스탬프 (우측 정렬) — 백엔드 created_at 없으면 빈 문자열 */}
-              <div className="reputation-timestamp">
-                <span>{formatReputationTime(selectedReputationCard.createdAt)}</span>
+              {/* 최하단: 구분선 + 타임스탬프 (우측 정렬) — 백엔드 created_at 없으면 빈 문자열 */}
+              <div className="reputation-bottom-section">
+                <div className="reputation-bottom-divider"></div>
+                <div className="reputation-timestamp">
+                  <span>{formatReputationTime(selectedReputationCard.createdAt)}</span>
+                </div>
               </div>
 
               {/* 어드민 전용: 수정/삭제 버튼 */}
@@ -6492,56 +7759,122 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
       )}
 
-      {/* ========== 연계 동료 카드 상세보기 모달 ========== */}
+      {/* ========== 연계 동료 카드 상세보기 모달 — 세로형_중 540×640, 보기 전용 ========== */}
       {colleagueViewModalOpen && selectedColleagueCard && (
         <div className="section-modal-overlay">
           <div className="section-modal colleague-view-modal">
+            {/* ── 헤더 (110px) — reputation-view-modal 패턴 준용 ── */}
             <div className="section-modal-header">
-              <h3>연계 동료</h3>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                <h3>연계 동료</h3>
+              </div>
+              <p className="modal-subtitle">저와 함께한 동료입니다. 😊</p>
+              <div className="modal-footer-right modal-header-right">
+                <button
+                  className="modal-edit-btn modal-delete-btn"
+                  onClick={() => {
+                    if (!window.confirm("이 동료를 삭제하시겠습니까?")) return;
+                    handleDeleteColleague();
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
               <button className="modal-close-btn" onClick={() => setColleagueViewModalOpen(false)}>
-                ×
+                <i className="ti ti-x"></i>
               </button>
             </div>
-            <div className="section-modal-body">
-              {/* To. 뱃지 + 날짜 */}
-              <div className="colleague-header-row">
-                <div className="colleague-to-badge">
-                  <span className="to-text">To.</span>
-                  <span className="rank-number">
-                    {selectedColleagueIndex + 1}
-                    {selectedColleagueIndex === 0 ? "st" : selectedColleagueIndex === 1 ? "nd" : "rd"}
-                  </span>
-                </div>
-                <div className="colleague-view-date">
-                  <span className="date-value">{selectedColleagueCard.date}</span>
-                </div>
-              </div>
+            <div className="section-modal-body colleague-body">
+              {/* 최상단 감사 텍스트 */}
+              <div className="colleague-thanks-text">함께 해주셔서 마음 깊이 감사드려요. 😊</div>
 
-              {/* 프로필 */}
-              <div className="colleague-view-profile">
-                <div className="profile-image">{selectedColleagueCard.profileImg ? <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} /> : <div className="profile-placeholder"></div>}</div>
-                <div className="profile-info">
-                  <div className="profile-name">
-                    <span className="text">{selectedColleagueCard.name}</span> | <span className="text">{selectedColleagueCard.gender}</span> | <span className="text">{mask.age(selectedColleagueCard.age)}세</span>
+              {/* 인적사항 카드 — reputation-view-modal .workinfo-personal-card 구조 재사용 */}
+              <div className="workinfo-personal-card">
+                <div className="personal-grid">
+                  <div className="personal-photo">
+                    {selectedColleagueCard.profileImg ? (
+                      <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} />
+                    ) : (
+                      <img src="/images/0/crew profile/남 1.webp" alt="profile" />
+                    )}
                   </div>
-                  <div className="profile-details">
-                    <div className="detail-line">
-                      <span className="text">{formatSchool(mask.school(selectedColleagueCard.university))}</span>
-                      <span className="label">학교</span> | <span className="text">{formatMajor(mask.major(selectedColleagueCard.major))}</span>
-                      <span className="label">학과</span> | <span className="text">{selectedColleagueCard.team || "-"}</span>
-                      <span className="label">팀</span> | <span className="text">{selectedColleagueCard.part || "-"}</span>
-                      <span className="label">파트</span> | <span className="nickname">{selectedColleagueCard.nickname}</span>
+
+                  <div className="personal-info">
+                    <div className="personal-row-1">
+                      <span className="personal-name">{selectedColleagueCard.name || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-gender">{selectedColleagueCard.gender || "—"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-age">{mask.age(selectedColleagueCard.age) || "—"} 세</span>
+                    </div>
+
+                    <div className="personal-row-2">
+                      <span className="personal-field">
+                        <span className="field-value">{formatSchool(mask.school(selectedColleagueCard.university)) || "—"}</span>
+                        <span className="field-label">학교</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{formatMajor(mask.major(selectedColleagueCard.major)) || "—"}</span>
+                        <span className="field-label">학과</span>
+                      </span>
+                    </div>
+
+                    <div className="personal-row-3">
+                      <span className="personal-field">
+                        <span className="field-value">{selectedColleagueCard.team || "—"}</span>
+                        <span className="field-label">팀</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{selectedColleagueCard.part || "—"}</span>
+                        <span className="field-label">파트</span>
+                      </span>
                     </div>
                   </div>
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">{selectedColleagueCard.role || "일반"}</span>
+                    <span className="tag-badge tag-keyword">{selectedColleagueCard.nickname || selectedColleagueCard.keyword || "—"}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Thank you message */}
-              <div className="colleague-view-message">
-                <div className="message-label">Thank you message</div>
-                <div className="message-content">{selectedColleagueCard.message}</div>
+              {/* From / To */}
+              {/* TODO: [백엔드 작업 필요] From/To 사용자 이름 필드 확정 후 연동
+                  fromName: 카드 보내는 사용자 (평판 작성자)
+                  toName: 카드 받는 사용자 (대상자) */}
+              <div className="colleague-fromto">
+                <span className="fromto-block fromto-from">
+                  <span className="fromto-label">From -</span>
+                  <span className="fromto-name">{selectedColleagueCard.fromName || session?.user?.name || "-"}</span>
+                  <span className="fromto-suffix">님</span>
+                </span>
+                <span className="fromto-arrow">→</span>
+                <span className="fromto-block fromto-to">
+                  <span className="fromto-label">To -</span>
+                  <span className="fromto-name">{selectedColleagueCard.toName || selectedColleagueCard.name || "-"}</span>
+                  <span className="fromto-suffix">님</span>
+                </span>
+              </div>
+
+              {/* Honor & Thank you */}
+              <div className="colleague-honor-section">
+                <h4 className="honor-label">Honor &amp; Thank you</h4>
+                <div className="honor-content-box">
+                  <p className="honor-content-text">{selectedColleagueCard.message || selectedColleagueCard.content || "-"}</p>
+                </div>
+              </div>
+
+              {/* 하단 구분선 + 타임스탬프 (reputation-view-modal 패턴 준용) */}
+              <div className="reputation-bottom-section">
+                <div className="reputation-bottom-divider"></div>
+                <div className="reputation-timestamp">
+                  <span>{formatReputationTime(selectedColleagueCard.created_at || selectedColleagueCard.createdAt)}</span>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
@@ -6706,13 +8039,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="workinfo-text-section">
                     {/* Main Title — 항상 보기 전용 (관리자가 어드민에서 입력) */}
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "준비 중입니다"}</div>
                     </div>
 
                     {/* Sub Title — 사용자 입력 200자 (필수) */}
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workInfoViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workInfoViewIsEditing ? (
@@ -6737,6 +8074,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {/* TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 + API 확장 후, sub_title과 동일 패턴으로 데이터 연결 */}
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workInfoViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workInfoViewIsEditing ? (
@@ -6913,7 +8251,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-footer">
               {/* 행 1 */}
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setShowHelpModal(true)} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('workInfo')} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -7114,12 +8452,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 좌하단: Main Title + Sub Title + Growth Point */}
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{lookupWorkExpMapping(selectedWorkExpCard.code)?.mainTitle || (selectedWorkExpCard.title && selectedWorkExpCard.title !== "-" ? selectedWorkExpCard.title : "준비 중입니다")}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workExpViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workExpViewIsEditing ? (
@@ -7142,6 +8484,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workExpViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workExpViewIsEditing ? (
@@ -7560,11 +8903,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkAbilityCard.title && selectedWorkAbilityCard.title !== "-" ? selectedWorkAbilityCard.title : "준비 중입니다"}</div>
                     </div>
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workAbilityViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workAbilityViewIsEditing ? (
@@ -7586,6 +8933,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workAbilityViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workAbilityViewIsEditing ? (
@@ -7894,12 +9242,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   {/* 좌하단: Main Title(읽기전용) + Sub Title + Growth Point */}
                   <div className="workinfo-text-section">
                     <div className="workinfo-text-block text-block-main">
-                      <h4 className="text-block-title">Main Title</h4>
+                      <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
+                        Main Title
+                      </h4>
                       <div className="text-block-content main-title-readonly">{selectedWorkCareerCard.title && selectedWorkCareerCard.title !== "-" ? selectedWorkCareerCard.title : "준비 중입니다"}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Sub Title {workCareerViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workCareerViewIsEditing ? (
@@ -7922,6 +9274,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
+                        <i className="ti ti-pin"></i>
                         Growth Point {workCareerViewIsEditing && <span className="required-mark">*</span>}
                       </h4>
                       {workCareerViewIsEditing ? (
@@ -8136,15 +9489,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 </div>
                                 <span className="supervisor-label">Supervised By</span>
                               </div>
-                              {/* 3행: 이름 | 직무 */}
+                              {/* 3행: 이름 님 | 부서 */}
                               <div className="supervisor-details">
-                                <span className="supervisor-name">{selectedWorkCareerCard.supervisorName || "-"}</span>
+                                <span className="supervisor-name">
+                                  {selectedWorkCareerCard.supervisorName || "-"}
+                                  <span className="honorific"> 님</span>
+                                </span>
                                 <span className="supervisor-separator">|</span>
                                 <span className="supervisor-dept">{selectedWorkCareerCard.supervisorDept || "-"}</span>
                               </div>
-                              {/* 4행: 회사 | 직책 */}
+                              {/* 4행: 직책 (company 숨김, divider는 visible 유지 → x좌표 grid 일치) */}
                               <div className="supervisor-details">
-                                <span className="supervisor-company">{selectedWorkCareerCard.supervisorCompany || "-"}</span>
+                                <span className="supervisor-company-placeholder" style={{ visibility: "hidden" }}>-</span>
                                 <span className="supervisor-separator">|</span>
                                 <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
                               </div>
@@ -8236,14 +9592,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       )}
 
       {/* 도움말 모달 (cluster2 패턴 준용) */}
-      {showHelpModal && (
-        <div className="help-modal-overlay" onClick={() => setShowHelpModal(false)}>
+      {helpModalKind && (
+        <div className="help-modal-overlay" onClick={() => setHelpModalKind(null)}>
           <div className="help-modal" onClick={(e) => e.stopPropagation()}>
             <div className="help-modal-header">
               <div className="modal-header-top">
                 <span style={{ fontSize: "20px" }}>🔎</span>
                 <h3>도움말</h3>
-                <button className="modal-close-btn" onClick={() => setShowHelpModal(false)}>
+                <button className="modal-close-btn" onClick={() => setHelpModalKind(null)}>
                   <i className="ti ti-x"></i>
                 </button>
               </div>
@@ -8252,6 +9608,252 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           </div>
         </div>
       )}
+      {/* ========== 주차 리뷰 모달 (신규 — Portal) ========== */}
+      {weeklyReviewModalOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="section-modal-overlay">
+            <div className="section-modal section-modal-weekly-review-form">
+              {/* 헤더 */}
+              <div className="section-modal-header">
+                <button className="modal-close-btn" onClick={handleWeeklyReviewClose} aria-label="닫기">
+                  <i className="ti ti-x"></i>
+                </button>
+                <div className="modal-header-top">
+                  <img src="/images/0/write.png" alt="write" />
+                  <h3>주차 리뷰</h3>
+                </div>
+                <p className="modal-subtitle">
+                  이번 주차에 이렇게 경험하고, 성찰하고 성장했습니다. 😊
+                </p>
+              </div>
+
+              {/* 미드 — 3행 세로 배치 */}
+              <div className="section-modal-body weekly-review-body">
+                {/* 미드 1행 — 2열: 주차 정보 + 평점 */}
+                <div className="weekly-review-row weekly-review-row-1">
+                  {/* 1열: 주차 정보 */}
+                  <div className="review-week-info">
+                    <span className="week-info-text">
+                      {weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}
+                    </span>
+                  </div>
+
+                  {/* 2열: 리뷰 평점 */}
+                  <div className="review-rating-section">
+                    <h4>
+                      ■ 리뷰 평점 <span className="required-mark">*</span>
+                    </h4>
+                    <div className={`rating-field ${weeklyReviewSaveAttemptFailed && weeklyReviewData.rating === 0 ? `field-error ${weeklyReviewFieldErrorFlash ? "flash" : ""}` : ""}`} style={{ flex: "1 1 0%" }} data-field="review-rating">
+                      <span className="star-rating">
+                        {(() => {
+                          const r = weeklyReviewData.rating || 0;
+                          const fullStars = Math.floor(r / 2);
+                          const hasHalf = r % 2 === 1;
+                          const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                          return (
+                            <>
+                              {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                              {hasHalf && <i className="ti ti-star-half-filled" />}
+                              {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                            </>
+                          );
+                        })()}
+                        <span className="rating-text">{weeklyReviewData.rating || 0}/10</span>
+                      </span>
+                      <div className="custom-dropdown small">
+                        <div
+                          ref={reviewRatingDropdownTriggerRef}
+                          className={`dropdown-selected ${!isWeeklyReviewEditing ? "disabled" : ""}`}
+                          onClick={openReviewRatingDropdown}
+                          role="button"
+                          tabIndex={isWeeklyReviewEditing ? 0 : -1}
+                          aria-haspopup="listbox"
+                          aria-expanded={reviewRatingDropdownOpen}
+                        >
+                          <span>{weeklyReviewData.rating || "-"}</span>
+                          <i className="ti ti-chevron-down"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 작업 2에서 미드 2행/3행 추가 예정 */}
+                {/* 미드 2행 — 본인 인적사항 카드 */}
+                <div className="weekly-review-row weekly-review-row-2">
+                  <div className="workinfo-personal-card">
+                    <div className="personal-grid">
+                      <div className="personal-photo">
+                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="프로필" />
+                      </div>
+                      <div className="personal-info">
+                        <div className="personal-row-1">
+                          <span className="personal-name">{isDemoMode ? "홍길동" : session?.user?.name || "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                        </div>
+                        <div className="personal-row-2">
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-label">학교</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-label">학과</span>
+                          </span>
+                        </div>
+                        <div className="personal-row-3">
+                          <span className="personal-field">
+                            <span className="field-value">{teamName || (isDemoMode ? "마케팅" : "—")}</span>
+                            <span className="field-label">팀</span>
+                          </span>
+                          <span className="personal-separator">|</span>
+                          <span className="personal-field">
+                            <span className="field-value">{partName || (isDemoMode ? "디자인" : "—")}</span>
+                            <span className="field-label">파트</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="personal-tags">
+                        <span className="tag-badge tag-role">{isDemoMode ? "앰배서더" : "일반"}</span>
+                        <span className="tag-badge tag-keyword">{isDemoMode ? "엔비디아 구글 테슬라" : "키워드"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 미드 3행 — 리뷰 200자 textarea */}
+                <div className="weekly-review-row weekly-review-row-3">
+                  <div className="review-content-section">
+                    <h4>
+                      ■ Weekly Review 내용 <span className="required-mark">*</span>
+                      <span className="limit-hint">(최대 200자)</span>
+                    </h4>
+                    <div className="review-content-wrapper">
+                      <textarea
+                        className={`review-content-textarea ${weeklyReviewSaveAttemptFailed && weeklyReviewData.content.trim().length === 0 ? `field-error ${weeklyReviewFieldErrorFlash ? "flash" : ""}` : ""}`}
+                        value={weeklyReviewData.content}
+                        onChange={(e) => {
+                          const v = e.target.value.slice(0, 200);
+                          setWeeklyReviewData((prev) => ({ ...prev, content: v }));
+                        }}
+                        placeholder="이번 주차에 어떤 경험을 하셨나요? 배운 점, 느낀 점, 성장한 점을 자유롭게 작성해주세요."
+                        maxLength={200}
+                        disabled={!isWeeklyReviewEditing}
+                        data-field="review-content"
+                      />
+                      <span className="char-count">{weeklyReviewData.content.length}/200</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 작업 3에서 푸터 추가 예정 */}
+              {/* 푸터 Type B (reputation-form 준용) */}
+              <div className="section-modal-footer">
+                <div className="modal-footer-top">
+                  <button type="button" className="modal-help-icon" onClick={handleWeeklyReviewHelp} aria-label="도움말">
+                    🔎
+                  </button>
+                  <div className="modal-footer-right">
+                    {!isWeeklyReviewEditing ? (
+                      <button type="button" className="modal-edit-btn" onClick={handleWeeklyReviewEditClick}>
+                        수정
+                      </button>
+                    ) : (
+                      <>
+                        <button type="button" className="modal-cancel-btn" onClick={handleWeeklyReviewCancel}>
+                          취소
+                        </button>
+                        <button type="button" className="modal-reset-btn" onClick={handleWeeklyReviewReset}>
+                          초기화
+                        </button>
+                        <button type="button" className="modal-save-btn" onClick={handleWeeklyReviewSave} disabled={weeklyReviewSaving}>
+                          {weeklyReviewSaving ? "저장 중..." : "저장"}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="modal-footer-bottom">
+                  <p
+                    className={`modal-footer-notice ${weeklyReviewSaveAttemptFailed ? "notice-error" : ""}`}
+                    style={{ visibility: weeklyReviewSaveAttemptFailed ? "visible" : "hidden" }}
+                  >
+                    필수 항목을 모두 입력해주세요.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* 주차 리뷰 — 평점 드롭다운 옵션 패널 (Portal) */}
+      {reviewRatingDropdownOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="dropdown-options-fixed review-rating-dropdown-options"
+            style={{
+              position: "fixed",
+              top: reviewRatingDropdownPos.top,
+              left: reviewRatingDropdownPos.left,
+              width: Math.max(reviewRatingDropdownPos.width, 70),
+              zIndex: 100010,
+            }}
+            role="listbox"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div
+                key={n}
+                className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`}
+                onClick={() => handleReviewRatingSelect(n)}
+                role="option"
+                aria-selected={weeklyReviewData.rating === n}
+              >
+                {n}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
+
+      {/* 커스텀 별점 드롭다운 옵션 패널 — Portal (body 직속, cluster3 .dropdown-options-fixed 재사용) */}
+      {ratingDropdownOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="dropdown-options-fixed"
+            style={{
+              position: "fixed",
+              top: ratingDropdownPos.top,
+              left: ratingDropdownPos.left,
+              width: Math.max(ratingDropdownPos.width, 70),
+              zIndex: 100010,
+            }}
+            role="listbox"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div
+                key={n}
+                className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`}
+                onClick={() => handleRatingSelect(n)}
+                role="option"
+                aria-selected={reputationEditData.rating === n}
+              >
+                {n}
+              </div>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

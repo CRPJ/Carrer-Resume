@@ -13,7 +13,7 @@ const Cluster4CardPage = () => {
     // ?admin=true이면 dw-01 더미 카드로 직행 (파라미터 유지로 DemoToggle 활성화도 그대로 작동)
     const params = new URLSearchParams(window.location.search);
     if (params.get('admin') === 'true') {
-      router.replace('/cluster-4-card/dw-01?admin=true');
+      router.replace(`/cluster-4-card/dw-01?${params.toString()}`);
       return;
     }
 

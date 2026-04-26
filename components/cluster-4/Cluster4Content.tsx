@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -142,6 +143,50 @@ const defaultSeasonData = {
   },
 };
 
+const formatSeasonReputationTime = (timestamp: string | null | undefined): string => {
+  if (!timestamp) return "00. 00. 00(0)  00:00";
+  try {
+    const d = new Date(timestamp);
+    const yy = String(d.getFullYear()).slice(2);
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    const day = days[d.getDay()];
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${yy}. ${mm}. ${dd}(${day})  ${hh}:${mi}`;
+  } catch {
+    return "00. 00. 00(0)  00:00";
+  }
+};
+
+// 데모 모드용 키워드 100개 폴백 (5군락)
+const SEASON_KEYWORDS_FALLBACK = [
+  ...[
+    "노션 유망주","노션 마스터","인스타 유망주","인스타 마스터","유튜브 유망주","유튜브 마스터",
+    "AI 유망주","AI 마스터","블로그 유망주","블로그 마스터","미드저니 유망주","미드저니 마스터",
+    "깃업 유망주","깃업 마스터","노코드 유망주","노코드 마스터","옵시디언 유망주","옵시디언 마스터",
+    "파워포인트","엑셀 유망주","엑셀 마스터","카카오 생태계","네이버 생태계","구글 생태계",
+    "퍼블리싱","UI / UX 기획","웹 develop","앱 develop","서버 관리","데이터 처리",
+    "데이터 분석","데이터 해석","AI 프롬프트","시스템 구축력","도구 사용력","기술 습득력",
+  ].map((kw, i) => ({ id: i + 1, cluster_number: 1, cluster_name: "도구 · 기술 · 시스템 활용 역량", cluster_color: "#3B82F6", keyword: kw })),
+  ...[
+    "콘텐츠","카드 콘텐츠","텍스트 콘텐츠","스토리텔링","동영상 숏폼","동영상 롱폼",
+    "릴스 특화","쇼츠 특화","캐치프레이즈","슬로건","표현력","언어 능력","설득력","상상력","유머와 재미","창의성",
+  ].map((kw, i) => ({ id: 37 + i, cluster_number: 2, cluster_name: "콘텐츠 · 표현 · 메시지 생산 역량", cluster_color: "#22C55E", keyword: kw })),
+  ...[
+    "퍼포먼스","브랜딩 마케팅","바이럴 마케팅","커뮤니티","연관 검색어","구글 트렌드","정보력","사회성","소통력","공감력",
+  ].map((kw, i) => ({ id: 53 + i, cluster_number: 3, cluster_name: "마케팅 · 확산 · 영향력 설계", cluster_color: "#EAB308", keyword: kw })),
+  ...[
+    "인지력","관찰력","이해력","논리력","상황 추론력","문제 정의력","연구력","업무 분석력",
+    "업무 기획력","계획력","구조화","도식화","범위화","항목화","자료화","변칙성",
+  ].map((kw, i) => ({ id: 63 + i, cluster_number: 4, cluster_name: "사고 · 분석 · 구조화 역량", cluster_color: "#F97316", keyword: kw })),
+  ...[
+    "지속성","기민성","신뢰성","성장성","유연성","안정성","위기 대응성","학습력","지도력","소속감",
+    "적극성","자신감","헌신성","행동력","회복력","몰입력","잠재력","업무 진행력","업무 관리력","수용력","지구력","강인한 체력",
+  ].map((kw, i) => ({ id: 79 + i, cluster_number: 5, cluster_name: "태도 · 실행 · 지속성 기반 역량", cluster_color: "#EF4444", keyword: kw })),
+];
+
 const Cluster4Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -263,8 +308,37 @@ const Cluster4Content = () => {
   }>({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
   const [seasonReputationSaving, setSeasonReputationSaving] = useState(false);
   const [seasonReputationError, setSeasonReputationError] = useState<string | null>(null);
+
+  // 별점 드롭다운 UI (season-reputation form)
+  const [seasonRatingDropdownOpen, setSeasonRatingDropdownOpen] = useState(false);
+  const [seasonRatingDropdownPos, setSeasonRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const seasonRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+
+  // 키워드 3슬롯 모드
+  const [seasonKeywordModes, setSeasonKeywordModes] = useState<Array<"select" | "write" | null>>([null, null, null]);
+
+  // 보기/편집 모드 토글
+  const [isSeasonReputationFormEditing, setIsSeasonReputationFormEditing] = useState(false);
+  const [seasonReputationFormSnapshot, setSeasonReputationFormSnapshot] = useState<{
+    rating: number; content: string; keyword1: string; keyword2: string; keyword3: string;
+  } | null>(null);
+  const [seasonReputationSaveAttemptFailed, setSeasonReputationSaveAttemptFailed] = useState(false);
+  const [seasonReputationFieldErrorFlash, setSeasonReputationFieldErrorFlash] = useState(false);
+  // TODO: [백엔드 작업 필요] 일반 모드에서 API 응답의 canEdit 값을 setCanEditSeasonReputation으로 반영
+  const [canEditSeasonReputation, setCanEditSeasonReputation] = useState(isDemoMode);
+  useEffect(() => {
+    setCanEditSeasonReputation(isDemoMode);
+  }, [isDemoMode]);
   const [seasonReputationSuccess, setSeasonReputationSuccess] = useState(false);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>("");
+
+  // 키워드 선택 중첩 모달
+  const [seasonKeywordModalOpen, setSeasonKeywordModalOpen] = useState(false);
+  const [seasonKeywordTargetSlot, setSeasonKeywordTargetSlot] = useState<number | null>(null);
+  const [seasonKeywordTempSelection, setSeasonKeywordTempSelection] = useState<string | null>(null);
+
+  // 도움말 모달
+  const [helpModalKind, setHelpModalKind] = useState<"seasonReputation" | "seasonReview" | null>(null);
 
   // 평판 키워드 목록
   interface ReputationKeyword {
@@ -320,6 +394,16 @@ const Cluster4Content = () => {
   }
   const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
 
+  const getDemoSeasonReputations = (reputations: any[]) => {
+    if (searchParams.get("admin") !== "true") return reputations;
+
+    const raw = searchParams.get("repCount");
+    if (raw === null) return reputations;
+
+    const count = Math.max(0, Math.min(reputations.length, parseInt(raw, 10) || 0));
+    return reputations.slice(0, count);
+  };
+
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
   const [selectedReputation, setSelectedReputation] = useState<SeasonReputationData | null>(null);
@@ -337,9 +421,400 @@ const Cluster4Content = () => {
   const [seasonReviewSaving, setSeasonReviewSaving] = useState(false);
   const [seasonReviewError, setSeasonReviewError] = useState<string | null>(null);
   const [seasonReviewSuccess, setSeasonReviewSuccess] = useState(false);
+  const [isSeasonReviewFormEditing, setIsSeasonReviewFormEditing] = useState(false);
+  const [seasonReviewFormSnapshot, setSeasonReviewFormSnapshot] = useState<{
+    rating: number;
+    review: string;
+    link: string;
+  } | null>(null);
+  const [seasonReviewSaveAttemptFailed, setSeasonReviewSaveAttemptFailed] = useState(false);
+  const [seasonReviewFieldErrorFlash, setSeasonReviewFieldErrorFlash] = useState(false);
+  const [seasonReviewRatingDropdownOpen, setSeasonReviewRatingDropdownOpen] = useState(false);
+  const [seasonReviewRatingDropdownPos, setSeasonReviewRatingDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const seasonReviewRatingDropdownTriggerRef = useRef<HTMLDivElement>(null);
+  const [canEditSeasonReview, setCanEditSeasonReview] = useState(isDemoMode);
+  useEffect(() => {
+    setCanEditSeasonReview(isDemoMode);
+  }, [isDemoMode]);
+
+  // 일반 모드 백엔드 승인 상태 → canEditSeasonReputation / canEditSeasonReview 일괄 반영
+  useEffect(() => {
+    if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
+    let cancelled = false;
+    (async () => {
+      const approved = await checkApprovalStatus();
+      if (cancelled) return;
+      setCanEditSeasonReputation(approved);
+      setCanEditSeasonReview(approved);
+    })();
+    return () => { cancelled = true; };
+  }, [isDemoMode, session]);
+
+  // season-reputation view 모달 핸들러
+  const handleSeasonReputationViewClose = () => {
+    setReputationDetailModalOpen(false);
+    setSelectedReputation(null);
+  };
+
+  // season-reputation 검증 함수
+  const isSeasonReputationValid = (): boolean => {
+    const k1 = seasonReputationEditData.keyword1?.trim() || "";
+    const k2 = seasonReputationEditData.keyword2?.trim() || "";
+    const k3 = seasonReputationEditData.keyword3?.trim() || "";
+    const keywords = [k1, k2, k3];
+    const duplicateKeywords = keywords.filter((keyword, index) => keyword && keywords.indexOf(keyword) !== index);
+    const fieldResults = [
+      {
+        field: "rating",
+        value: seasonReputationEditData.rating,
+        valid: !!seasonReputationEditData.rating && seasonReputationEditData.rating >= 1,
+        reason: "rating must be selected",
+      },
+      {
+        field: "content",
+        value: seasonReputationEditData.content,
+        valid: !!seasonReputationEditData.content?.trim(),
+        reason: "content must not be empty",
+      },
+      ...keywords.map((keyword, index) => ({
+        field: `keyword${index + 1}`,
+        value: keyword,
+        mode: seasonKeywordModes[index],
+        valid: keyword.length > 0 && keyword.length <= 10 && !duplicateKeywords.includes(keyword),
+        reason:
+          keyword.length === 0
+            ? "keyword is required"
+            : keyword.length > 10
+              ? "keyword must be 10 characters or less"
+              : duplicateKeywords.includes(keyword)
+                ? "keyword must be unique"
+                : "ok",
+      })),
+    ];
+    const invalidFields = fieldResults.filter((result) => !result.valid);
+
+    if (invalidFields.length > 0) {
+      console.log("[season-reputation validation] failed", {
+        editData: seasonReputationEditData,
+        keywordModes: seasonKeywordModes,
+        invalidFields,
+      });
+      console.table(fieldResults);
+      return false;
+    }
+
+    console.log("[season-reputation validation] passed", {
+      rating: seasonReputationEditData.rating,
+      contentLength: seasonReputationEditData.content.trim().length,
+      keywords,
+      keywordModes: seasonKeywordModes,
+    });
+    return true;
+  };
+
+  const isSeasonReputationDirty = (): boolean => {
+    if (!seasonReputationFormSnapshot) {
+      return seasonReputationEditData.rating > 0 || (seasonReputationEditData.content?.trim().length || 0) > 0 || (seasonReputationEditData.keyword1?.length || 0) > 0 || (seasonReputationEditData.keyword2?.length || 0) > 0 || (seasonReputationEditData.keyword3?.length || 0) > 0;
+    }
+    return seasonReputationEditData.rating !== seasonReputationFormSnapshot.rating || seasonReputationEditData.content !== seasonReputationFormSnapshot.content || seasonReputationEditData.keyword1 !== seasonReputationFormSnapshot.keyword1 || seasonReputationEditData.keyword2 !== seasonReputationFormSnapshot.keyword2 || seasonReputationEditData.keyword3 !== seasonReputationFormSnapshot.keyword3;
+  };
+
+  // season-reputation form 핸들러
+  const handleSeasonReputationEditClick = () => {
+    if (!canEditSeasonReputation) {
+      alert("관리자 승인이 필요합니다");
+      return;
+    }
+    setSeasonReputationFormSnapshot({
+      rating: seasonReputationEditData.rating,
+      content: seasonReputationEditData.content,
+      keyword1: seasonReputationEditData.keyword1,
+      keyword2: seasonReputationEditData.keyword2,
+      keyword3: seasonReputationEditData.keyword3,
+    });
+    setSeasonReputationSaveAttemptFailed(false);
+    setSeasonReputationFieldErrorFlash(false);
+    setIsSeasonReputationFormEditing(true);
+  };
+
+  const openSeasonRatingDropdown = () => {
+    if (!isSeasonReputationFormEditing) return;
+    const trigger = seasonRatingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setSeasonRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setSeasonRatingDropdownOpen(true);
+  };
+
+  const handleSeasonRatingSelect = (value: number) => {
+    console.log("[season-reputation rating] selected", value);
+    setSeasonReputationEditData((prev) => ({ ...prev, rating: value }));
+    setSeasonRatingDropdownOpen(false);
+  };
+
+  const handleSeasonKeywordModeChange = (slotIndex: number, mode: "select" | "write") => {
+    if (!isSeasonReputationFormEditing) return;
+
+    if (mode === "write") {
+      if (!window.confirm("키워드를 직접 작성하시겠습니까?")) return;
+      setSeasonReputationEditData((prev) => {
+        const next = { ...prev };
+        if (slotIndex === 0) next.keyword1 = "";
+        else if (slotIndex === 1) next.keyword2 = "";
+        else if (slotIndex === 2) next.keyword3 = "";
+        console.log("[season-reputation keyword mode] write", { slotIndex, next });
+        return next;
+      });
+      setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "write"; return next; });
+      return;
+    }
+
+    if (mode === "select") {
+      setSeasonKeywordTargetSlot(slotIndex);
+      setSeasonKeywordTempSelection(null);
+      setSeasonKeywordModalOpen(true);
+      return;
+    }
+  };
+
+  // 키워드 중첩 모달 핸들러
+  const handleSeasonKeywordTempSelect = (keyword: string) => {
+    setSeasonKeywordTempSelection(keyword);
+  };
+
+  const handleSeasonKeywordSelectConfirm = () => {
+    if (!seasonKeywordTempSelection) { alert("키워드를 먼저 선택해주세요."); return; }
+    if (!window.confirm(`'${seasonKeywordTempSelection}' 을 선택하시겠습니까?`)) return;
+    const slotIndex = seasonKeywordTargetSlot;
+    if (slotIndex === null) return;
+    setSeasonReputationEditData((prev) => {
+      const next = { ...prev };
+      if (slotIndex === 0) next.keyword1 = seasonKeywordTempSelection;
+      else if (slotIndex === 1) next.keyword2 = seasonKeywordTempSelection;
+      else if (slotIndex === 2) next.keyword3 = seasonKeywordTempSelection;
+      console.log("[season-reputation keyword select] confirmed", { slotIndex, keyword: seasonKeywordTempSelection, next });
+      return next;
+    });
+    setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "select"; return next; });
+    setSeasonKeywordModalOpen(false);
+    setSeasonKeywordTargetSlot(null);
+    setSeasonKeywordTempSelection(null);
+  };
+
+  const handleSeasonKeywordModalClose = () => {
+    setSeasonKeywordModalOpen(false);
+    setSeasonKeywordTargetSlot(null);
+    setSeasonKeywordTempSelection(null);
+  };
+
+  const getSeasonKeywordsUsedByOtherSlots = (currentSlot: number): string[] => {
+    const used: string[] = [];
+    if (currentSlot !== 0 && seasonReputationEditData.keyword1) used.push(seasonReputationEditData.keyword1);
+    if (currentSlot !== 1 && seasonReputationEditData.keyword2) used.push(seasonReputationEditData.keyword2);
+    if (currentSlot !== 2 && seasonReputationEditData.keyword3) used.push(seasonReputationEditData.keyword3);
+    return used;
+  };
+
+  const handleSeasonKeywordWrite = (slotIndex: number, value: string) => {
+    if (!isSeasonReputationFormEditing) return;
+    const v = value.slice(0, 10);
+    setSeasonReputationEditData((prev) => {
+      const next = { ...prev };
+      if (slotIndex === 0) next.keyword1 = v;
+      else if (slotIndex === 1) next.keyword2 = v;
+      else if (slotIndex === 2) next.keyword3 = v;
+      console.log("[season-reputation keyword write] changed", { slotIndex, value: v, next });
+      return next;
+    });
+  };
+
+  const handleSeasonReputationFormClose = () => {
+    if (isSeasonReputationFormEditing && isSeasonReputationDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    }
+    setSeasonReputationModalOpen(false);
+    setIsSeasonReputationFormEditing(false);
+    setSeasonReputationFormSnapshot(null);
+    setSeasonReputationSaveAttemptFailed(false);
+    setSeasonReputationFieldErrorFlash(false);
+  };
+
+  const handleSeasonReputationCancel = () => {
+    if (isSeasonReputationDirty()) {
+      if (!window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+    }
+    if (seasonReputationFormSnapshot) {
+      setSeasonReputationEditData({ rating: seasonReputationFormSnapshot.rating, content: seasonReputationFormSnapshot.content, keyword1: seasonReputationFormSnapshot.keyword1, keyword2: seasonReputationFormSnapshot.keyword2, keyword3: seasonReputationFormSnapshot.keyword3 });
+    } else {
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
+    }
+    setSeasonKeywordModes([null, null, null]);
+    setIsSeasonReputationFormEditing(false);
+    setSeasonReputationSaveAttemptFailed(false);
+    setSeasonReputationFieldErrorFlash(false);
+    setSeasonReputationFormSnapshot(null);
+  };
+
+  const handleSeasonReputationReset = () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
+    if (seasonReputationFormSnapshot) {
+      setSeasonReputationEditData({ rating: seasonReputationFormSnapshot.rating, content: seasonReputationFormSnapshot.content, keyword1: seasonReputationFormSnapshot.keyword1, keyword2: seasonReputationFormSnapshot.keyword2, keyword3: seasonReputationFormSnapshot.keyword3 });
+    } else {
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
+    }
+    setSeasonKeywordModes([null, null, null]);
+    setSeasonReputationSaveAttemptFailed(false);
+    setSeasonReputationFieldErrorFlash(false);
+  };
+
+  // season-reputation 저장 API
+  const saveSeasonReputation = async (): Promise<{ id: string; created_at: string; updated_at?: string } | null> => {
+    const isUpdate = !!selectedReputation?.id;
+
+    if (isDemoMode) {
+      const now = new Date().toISOString();
+      if (isUpdate && selectedReputation) {
+        return { id: selectedReputation.id, created_at: selectedReputation.created_at || now, updated_at: now };
+      }
+      return { id: `demo-season-reputation-${Date.now()}`, created_at: now };
+    }
+
+    try {
+      const endpoint = isUpdate ? `/api/season-reputations/${selectedReputation!.id}` : "/api/season-reputations";
+      const method = isUpdate ? "PUT" : "POST";
+      const body = {
+        targetUserId: urlUserId,
+        seasonHistoryId: selectedSeasonId,
+        rating: seasonReputationEditData.rating,
+        content: seasonReputationEditData.content.trim(),
+        keyword1: seasonReputationEditData.keyword1.trim(),
+        keyword2: seasonReputationEditData.keyword2.trim(),
+        keyword3: seasonReputationEditData.keyword3.trim(),
+      };
+      console.log("[season-reputation save] request body", body);
+      const res = await fetch(endpoint, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const saved = data.data || data;
+      return { id: saved.id, created_at: saved.created_at, updated_at: saved.updated_at };
+    } catch (err) {
+      console.error("[season-reputation] API 예외:", err);
+      return null;
+    }
+  };
+
+  const handleSeasonReputationSave = async () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!isSeasonReputationValid()) {
+      setSeasonReputationSaveAttemptFailed(true);
+      setSeasonReputationFieldErrorFlash(true);
+      setTimeout(() => setSeasonReputationFieldErrorFlash(false), 600);
+      const k1 = seasonReputationEditData.keyword1?.trim() || "";
+      const k2 = seasonReputationEditData.keyword2?.trim() || "";
+      const k3 = seasonReputationEditData.keyword3?.trim() || "";
+      if (k1 && k2 && k3 && (k1 === k2 || k1 === k3 || k2 === k3)) {
+        alert("키워드 3개는 모두 다른 값이어야 합니다.");
+      }
+      return;
+    }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
+    // TODO: 1주 보내기 10개 제한 — sentSeasonReputations state + 백엔드 카운트 API 도입 후 활성화
+    // const isUpdate = !!selectedReputation?.id;
+    // if (!isUpdate && sentThisWeekCount >= 10) {
+    //   alert('이번 주에 보낼 수 있는 시즌 평판은 최대 10개입니다.');
+    //   return;
+    // }
+
+    setSeasonReputationSaving(true);
+    try {
+      const savedRecord = await saveSeasonReputation();
+      if (!savedRecord) {
+        alert("저장에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+      alert("저장되었습니다.");
+      setSeasonReputationModalOpen(false);
+    } catch (err) {
+      console.error("[season-reputation] 저장 실패:", err);
+      alert("저장 중 오류가 발생했습니다.");
+    } finally {
+      setSeasonReputationSaving(false);
+    }
+  };
+
+  // 모달 닫을 때 state 리셋 (마운트 시 실행 방지)
+  const prevSeasonReputationModalOpen = useRef(seasonReputationModalOpen);
+  useEffect(() => {
+    if (prevSeasonReputationModalOpen.current && !seasonReputationModalOpen) {
+      setIsSeasonReputationFormEditing(false);
+      setSeasonReputationFormSnapshot(null);
+      setSeasonReputationSaveAttemptFailed(false);
+      setSeasonReputationFieldErrorFlash(false);
+      setSeasonKeywordModes([null, null, null]);
+      setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
+    }
+    prevSeasonReputationModalOpen.current = seasonReputationModalOpen;
+  }, [seasonReputationModalOpen]);
+
+  useEffect(() => {
+    if (!seasonRatingDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".form-rating-section .dropdown-selected") && !target.closest(".season-rating-dropdown-options")) {
+        setSeasonRatingDropdownOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSeasonRatingDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [seasonRatingDropdownOpen]);
+
+  useEffect(() => {
+    if (!seasonReviewRatingDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".season-review-rating-section .dropdown-selected") && !target.closest(".season-review-rating-dropdown-options")) {
+        setSeasonReviewRatingDropdownOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSeasonReviewRatingDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [seasonReviewRatingDropdownOpen]);
+
+  useEffect(() => {
+    if (seasonReviewModalOpen) return;
+    setIsSeasonReviewFormEditing(false);
+    setSeasonReviewFormSnapshot(null);
+    setSeasonReviewSaveAttemptFailed(false);
+    setSeasonReviewFieldErrorFlash(false);
+    setSeasonReviewRatingDropdownOpen(false);
+  }, [seasonReviewModalOpen]);
 
   // 모달 열릴 때 배경 스크롤 잠금
-  const anyModalOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen;
+  const anyModalOpen = seasonReputationModalOpen || reputationDetailModalOpen || seasonReviewModalOpen || seasonKeywordModalOpen;
   useModalScroll(anyModalOpen);
 
   // 활동 통계 (주차 성장률)
@@ -961,9 +1436,12 @@ const Cluster4Content = () => {
 
   // 컴포넌트 마운트 시 키워드 목록 가져오기
   useEffect(() => {
-    if (isDemoMode) return; // 더미 모드: API 호출 스킵
+    if (isDemoMode) {
+      setReputationKeywords(SEASON_KEYWORDS_FALLBACK as any);
+      return;
+    }
     fetchReputationKeywords();
-  }, []);
+  }, [isDemoMode]);
 
   // 시즌 평판 데이터 가져오기 (시즌 변경 시마다)
   useEffect(() => {
@@ -979,23 +1457,23 @@ const Cluster4Content = () => {
     fetchSeasonReputations(targetId, currentSeason.id);
   }, [urlUserId, session?.user?.id, currentSeason?.id]);
 
-  // 데모 모드일 때 더미 데이터 일괄 적용
+  // 데모 모드일 때 더미 데이터 일괄 적용 — searchParams 의존성 제거: useSearchParams 가 매 렌더마다 새 ref 반환해 useEffect 가 반복 발화하면서 신규 저장한 record 를 dummy 로 덮어쓰는 race condition 차단
   useEffect(() => {
     if (isDemoMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setSeasonReputations(DUMMY_SEASON_DATA.seasonReputations as any);
+      setSeasonReputations(getDemoSeasonReputations(DUMMY_SEASON_DATA.seasonReputations as any) as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setSeasonHistories(DUMMY_SEASON_HISTORIES as any);
     }
   }, [isDemoMode]);
 
-  // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신
+  // 데모 모드: 페이지네이션 변경 시 시즌 평판 갱신 — 동일 이유로 searchParams 의존성 제거
   useEffect(() => {
     if (!isDemoMode) return;
     const currentHistory = DUMMY_SEASON_HISTORIES[section3Page];
     if (currentHistory) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setSeasonReputations(currentHistory.seasonReputations as any);
+      setSeasonReputations(getDemoSeasonReputations(currentHistory.seasonReputations as any) as any);
     } else {
       setSeasonReputations([]);
     }
@@ -1469,6 +1947,10 @@ const Cluster4Content = () => {
 
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
+    if (!isDemoMode && !canEditSeasonReputation) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
     // 데모 모드: API 호출 없이 UI에만 반영
     if (isDemoMode) {
       setSeasonReputations((prev) => [
@@ -1546,13 +2028,13 @@ const Cluster4Content = () => {
 
     if (seasonReputationEditData.content.trim() === "") {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
     if (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") {
       const el = document.querySelector(".edit-modal-content input[placeholder='키워드를 입력하세요']");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
@@ -1615,7 +2097,101 @@ const Cluster4Content = () => {
   };
 
   // 시즌 리뷰 저장
+  const openSeasonReviewRatingDropdown = () => {
+    if (!isSeasonReviewFormEditing) return;
+    const trigger = seasonReviewRatingDropdownTriggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setSeasonReviewRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setSeasonReviewRatingDropdownOpen(true);
+  };
+
+  const handleSeasonReviewRatingSelect = (value: number) => {
+    setSeasonReviewEditData((prev) => ({ ...prev, rating: value }));
+    setSeasonReviewRatingDropdownOpen(false);
+    if (seasonReviewSaveAttemptFailed) setSeasonReviewSaveAttemptFailed(false);
+  };
+
+  const isSeasonReviewValid = (): boolean => {
+    if (!seasonReviewEditData.rating || seasonReviewEditData.rating < 1) return false;
+    if (!seasonReviewEditData.review || !seasonReviewEditData.review.trim()) return false;
+    return true;
+  };
+
+  const isSeasonReviewDirty = (): boolean => {
+    if (!seasonReviewFormSnapshot) {
+      return seasonReviewEditData.rating > 0 || (seasonReviewEditData.review?.trim().length || 0) > 0 || (seasonReviewEditData.link?.trim().length || 0) > 0;
+    }
+    return seasonReviewEditData.rating !== seasonReviewFormSnapshot.rating || seasonReviewEditData.review !== seasonReviewFormSnapshot.review || seasonReviewEditData.link !== seasonReviewFormSnapshot.link;
+  };
+
+  const handleSeasonReviewEditClick = () => {
+    if (!canEditSeasonReview) {
+      alert("관리자 확인이 필요합니다.");
+      return;
+    }
+    setSeasonReviewFormSnapshot({
+      rating: seasonReviewEditData.rating,
+      review: seasonReviewEditData.review,
+      link: seasonReviewEditData.link,
+    });
+    setSeasonReviewSaveAttemptFailed(false);
+    setSeasonReviewFieldErrorFlash(false);
+    setIsSeasonReviewFormEditing(true);
+  };
+
+  const handleSeasonReviewCancel = () => {
+    if (isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+    if (seasonReviewFormSnapshot) {
+      setSeasonReviewEditData({ rating: seasonReviewFormSnapshot.rating, review: seasonReviewFormSnapshot.review, link: seasonReviewFormSnapshot.link });
+    } else {
+      setSeasonReviewEditData({ rating: 0, review: "", link: "" });
+    }
+    setIsSeasonReviewFormEditing(false);
+    setSeasonReviewSaveAttemptFailed(false);
+    setSeasonReviewFieldErrorFlash(false);
+    setSeasonReviewFormSnapshot(null);
+  };
+
+  const handleSeasonReviewReset = () => {
+    if (!isDemoMode && !canEditSeasonReview) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
+    setSeasonReviewEditData({ rating: 0, review: "", link: "" });
+    setSeasonReviewSaveAttemptFailed(false);
+    setSeasonReviewFieldErrorFlash(false);
+  };
+
+  const handleSeasonReviewClose = () => {
+    if (isSeasonReviewFormEditing && isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    setSeasonReviewModalOpen(false);
+  };
+
   const handleSaveSeasonReview = async () => {
+    if (!isDemoMode && !canEditSeasonReview) {
+      alert("관리자 승인 후 수정할 수 있습니다.");
+      return;
+    }
+    if (!isSeasonReviewValid()) {
+      setSeasonReviewSaveAttemptFailed(true);
+      setSeasonReviewFieldErrorFlash(true);
+      setTimeout(() => setSeasonReviewFieldErrorFlash(false), 600);
+      setTimeout(() => {
+        const firstErrorField = document.querySelector(".section-modal-season-review .field-error");
+        firstErrorField?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+      return;
+    }
+
+    // 저장 직전 confirm — 사용자 의도 재확인
+    if (!window.confirm("저장하시겠습니까?")) return;
+
+    setSeasonReviewSaving(true);
+    setSeasonReviewError(null);
+
     if (isDemoMode) {
       // seasonHistories 업데이트 (UI 즉시 반영 — 현재 페이지 인덱스로 매칭)
       setSeasonHistories((prev) =>
@@ -1623,35 +2199,31 @@ const Cluster4Content = () => {
       );
       alert("저장되었습니다.");
       setSeasonReviewModalOpen(false);
+      setSeasonReviewSaving(false);
       return;
     }
 
     if (!currentSeason?.id) {
+      setSeasonReviewSaving(false);
       alert("시즌 정보를 찾을 수 없습니다.");
       return;
     }
 
     // 0.0~5.0 범위, 0.5 단위 검증
-    if (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 5 || (seasonReviewEditData.rating * 2) % 1 !== 0) {
+    if (false && (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 10)) {
       alert("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
       return;
     }
 
-    if (!seasonReviewEditData.review.trim()) {
+    if (false && !seasonReviewEditData.review.trim()) {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
-    if (seasonReviewEditData.review.length > 24) {
+    if (false && seasonReviewEditData.review.length > 300) {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
-      return;
-    }
-
-    if (!seasonReviewEditData.link.trim()) {
-      const el = document.querySelector(".edit-modal-content input[type='url']");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
       return;
     }
 
@@ -2076,7 +2648,16 @@ const Cluster4Content = () => {
                       <span className="rating-text">{currentSeason.rating || 0} / 10</span>
                     </div>
                     <div className="review-label-group">
-                      <span className="review-label">Season Review</span>
+                      <span
+                        className="review-label"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(openSeasonReviewModal);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        Season Review
+                      </span>
                       <div
                         className="edit-icon"
                         onClick={(e) => {
@@ -2294,15 +2875,11 @@ const Cluster4Content = () => {
                     className="edit-icon"
                     style={{ cursor: 'pointer', flexShrink: 0 }}
                     onClick={() => {
-                      if (isDemoMode) {
-                        openSeasonReputationModal();
+                      if (!isDemoMode && isOwner) {
+                        alert("시즌 평판은 타 크루끼리 작성합니다.");
                         return;
                       }
-                      if (isOwner) {
-                        alert("시즌 평판은 타 크루끼리 작성합니다.");
-                      } else {
-                        openSeasonReputationModal();
-                      }
+                      handleEditClick(openSeasonReputationModal);
                     }}
                   >
                     <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }} />
@@ -2310,11 +2887,13 @@ const Cluster4Content = () => {
                 </div>
                 <div style={{ position: "relative" }}>
                   <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
-                    {(() => {
-                      const minCount = Math.max(3, seasonReputations.length);
-                      return Array.from({ length: minCount }).map((_, idx) => {
-                        const reputation = seasonReputations[idx] as any;
-                        if (reputation) {
+                    {seasonReputations.length === 0 ? (
+                      <div className="profile-card season-reputation-waiting">
+                        <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
+                        <p className="waiting-message">시즌 평판 대기 중... 😊</p>
+                      </div>
+                    ) : (
+                      seasonReputations.map((reputation: any) => {
                           const reviewer = reputation.reviewer;
                           const currentYear = new Date().getFullYear();
                           const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
@@ -2407,43 +2986,8 @@ const Cluster4Content = () => {
                               </div>
                             </div>
                           );
-                        }
-                        return (
-                          <div className="profile-card empty" key={`empty-${idx}`} style={{ cursor: "default" }}>
-                            <div className="corner top-left"></div>
-                            <div className="corner top-right"></div>
-                            <div className="corner bottom-left"></div>
-                            <div className="corner bottom-right"></div>
-                            <div className="card-top">
-                              <div className="avatar">
-                                <div style={{ width: "100%", height: "100%", background: "#777", borderRadius: "50%" }} />
-                              </div>
-                              <div className="info">
-                                <div className="row1">
-                                  <span style={{ display: 'inline-block', minWidth: '48px', maxWidth: '48px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '18px', maxWidth: '18px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '100px', maxWidth: '100px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '100px', maxWidth: '100px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
-                                </div>
-                                <div className="row2">
-                                  <span style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator">|</span> <span style={{ display: 'inline-block', minWidth: '96px', maxWidth: '96px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="tags" />
-                            <div className="comment" style={{ cursor: "default" }}>
-                              <span className="comment-text">-</span>
-                            </div>
-                            <div className="stats">
-                              <span className="pm">FM : <span style={{ display: 'inline-block', minWidth: '4ch', textAlign: 'left', fontFamily: "'Pretendard', sans-serif" }}>-</span></span>
-                              <span className="rating">
-                                {[...Array(5)].map((_, i) => (
-                                  <img key={`empty-star-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                ))}
-                                <span className="rating-score"><span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>-</span>{" "}/{" "}10</span>
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      });
-                    })()}
+                      })
+                    )}
                   </div>
                   {/* 커스텀 스크롤바 (area-9) */}
                   <div style={{ position: "absolute", right: 0, top: 0, width: "2px", height: "100%", background: "rgba(255,227,170,0.15)", borderRadius: "2px" }}>
@@ -2472,319 +3016,188 @@ const Cluster4Content = () => {
       {/* ========== 시즌 평판 모달 ========== */}
 
       {seasonReputationModalOpen && (
-        <div className="season-reputation-edit-overlay">
-          <div className="edit-modal-content season-reputation-edit-modal">
-            {/* Header */}
-            <div className="edit-modal-header">
-              <div>
-                <h3 style={{ margin: 0 }}>✦ 시즌 평판</h3>
-                <span className="modal-subtitle" style={{ display: "block", marginTop: "8px" }}>
-                  이번 시즌에 대한 해당 크루의 평판을 남겨주세요
-                </span>
-              </div>
-              <button className="modal-close" onClick={() => setSeasonReputationModalOpen(false)} style={{ marginLeft: "12px", flexShrink: 0 }}>
-                &times;
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-season-reputation-form">
+            {/* === 헤더 === */}
+            <div className="section-modal-header">
+              <button className="modal-close-btn" onClick={handleSeasonReputationFormClose} aria-label="닫기">
+                <i className="ti ti-x"></i>
               </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain" as const, flexShrink: 0 }} />
+                <h3>시즈닝 평판 (Seasoning Reputation)</h3>
+              </div>
+              <p className="modal-subtitle">
+                혼자 하는 성장이 그 찰나에는 빠를 수 있지만, 멀리, 굳건히, 확실히 가려면 '함께' 가야 합니다! 😊
+                <br />
+                나와 함께한 동료/선배/후배 크루의 한 주를 평가/응원/조언하고, 상호간의 타산지석으로 삼아보자구요!
+              </p>
             </div>
 
-            {/* Body */}
-            <div className="edit-modal-body">
-              {/* 평점 */}
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>평점</label>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ display: "flex", gap: "4px" }}>
-                    {[1, 2, 3, 4, 5].map((starIndex) => {
-                      const starValue = starIndex * 2; // 각 별 = 2점
-                      const isFull = seasonReputationEditData.rating >= starValue;
-                      const isHalf = !isFull && seasonReputationEditData.rating >= starValue - 1;
-                      return (
-                        <div
-                          key={starIndex}
-                          style={{ width: "28px", height: "28px", position: "relative", cursor: "pointer" }}
-                          onClick={() => {
-                            // 클릭 시: 이미 해당 값이면 -2 (토글), 아니면 해당 값으로
-                            const newRating = seasonReputationEditData.rating === starValue ? starValue - 2 : starValue;
-                            setSeasonReputationEditData((prev) => ({ ...prev, rating: Math.max(0, newRating) }));
-                          }}
-                        >
-                          <svg viewBox="0 0 24 24" fill={isFull ? "#FAAB07" : "none"} stroke="#FAAB07" strokeWidth="2" style={{ position: "absolute", width: "100%", height: "100%" }}>
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                          </svg>
-                          {isHalf && (
-                            <svg viewBox="0 0 24 24" style={{ position: "absolute", width: "100%", height: "100%" }}>
-                              <defs>
-                                <clipPath id={`sr-half-${starIndex}`}>
-                                  <rect x="0" y="0" width="12" height="24" />
-                                </clipPath>
-                              </defs>
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#FAAB07" clipPath={`url(#sr-half-${starIndex})`} />
-                            </svg>
-                          )}
+            {/* === 미드 === */}
+            <div className="section-modal-body season-reputation-form-body">
+              <div className="reputation-form-top">
+                {/* 1열: 평점 — cluster-4-card 패턴 */}
+                <div className="form-rating-section">
+                  <h4>■ 평점을 입력해주세요. <span className="required-mark">*</span></h4>
+                  <div className={`rating-input rating-field ${seasonReputationSaveAttemptFailed && seasonReputationEditData.rating === 0 ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
+                    <span className="star-rating">
+                      {(() => {
+                        const r = seasonReputationEditData.rating || 0;
+                        const fullStars = Math.floor(r / 2);
+                        const hasHalf = r % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                        return (
+                          <>
+                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {hasHalf && <i className="ti ti-star-half-filled" />}
+                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                          </>
+                        );
+                      })()}
+                      <span className="rating-text">{seasonReputationEditData.rating || 0}/10</span>
+                    </span>
+                    <div className="custom-dropdown small">
+                      <div ref={seasonRatingDropdownTriggerRef} className={`dropdown-selected ${!isSeasonReputationFormEditing ? "disabled" : ""}`} onClick={openSeasonRatingDropdown} role="button" aria-haspopup="listbox" aria-expanded={seasonRatingDropdownOpen}>
+                        <span>{seasonReputationEditData.rating || "-"}</span>
+                        <i className="ti ti-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2열: 키워드 3슬롯 — cluster-4-card 패턴 + 시즌 3행 */}
+                <div className="form-keyword-section">
+                  <h4>■ 키워드를 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 10자)</span></h4>
+                  {[0, 1, 2].map((slotIndex) => {
+                    const slotMode = seasonKeywordModes[slotIndex];
+                    const slotValue = slotIndex === 0 ? seasonReputationEditData.keyword1 : slotIndex === 1 ? seasonReputationEditData.keyword2 : seasonReputationEditData.keyword3;
+                    const allKw = [seasonReputationEditData.keyword1?.trim() || "", seasonReputationEditData.keyword2?.trim() || "", seasonReputationEditData.keyword3?.trim() || ""];
+                    const sv = allKw[slotIndex];
+                    const slotInvalid = sv.length === 0 || sv.length > 10 || (sv.length > 0 && allKw.filter((k, i) => i !== slotIndex && k === sv).length > 0);
+                    const slotErrorClass = seasonReputationSaveAttemptFailed && slotInvalid ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : "";
+                    return (
+                      <div key={slotIndex} className={`season-keyword-row ${slotErrorClass}`} data-slot={slotIndex} data-field={`keyword-${slotIndex}`}>
+                        <div className="keyword-mode-select">
+                          <label>
+                            <input type="radio" name={`keyword-mode-${slotIndex}`} value="select" checked={slotMode === "select"} onChange={() => handleSeasonKeywordModeChange(slotIndex, "select")} disabled={!isSeasonReputationFormEditing} />
+                            선택
+                          </label>
+                          <label>
+                            <input type="radio" name={`keyword-mode-${slotIndex}`} value="write" checked={slotMode === "write"} onChange={() => handleSeasonKeywordModeChange(slotIndex, "write")} disabled={!isSeasonReputationFormEditing} />
+                            작성
+                          </label>
                         </div>
-                      );
-                    })}
-                  </div>
-                  <span style={{ fontSize: "16px", fontWeight: 600, color: "#FAAB07" }}>{seasonReputationEditData.rating} / 10</span>
+                        <div className="keyword-input-wrapper">
+                          <span className="keyword-hash">#</span>
+                          <input className="keyword-input" type="text" value={slotValue || ""} onChange={(e) => handleSeasonKeywordWrite(slotIndex, e.target.value)} placeholder="키워드를 입력해주세요." disabled={!isSeasonReputationFormEditing || slotMode === null || slotMode === "select"} maxLength={10} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* 내용 */}
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>
-                  내용 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 100자)</span>
-                </label>
-                <div style={{ position: "relative" }}>
-                  <textarea
-                    placeholder="해당 시즌에 대한 평가 내용을 작성해주세요..."
-                    maxLength={100}
-                    rows={4}
-                    value={seasonReputationEditData.content}
-                    onChange={(e) => {
-                      if (e.target.value.length > 100) {
-                        alert('최대 100자까지 입력할 수 있습니다.');
-                        return;
-                      }
-                      setSeasonReputationEditData((prev) => ({ ...prev, content: e.target.value }));
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "12px 14px",
-                      paddingBottom: "30px",
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.15)",
-                      borderRadius: "8px",
-                      color: "#fff",
-                      fontSize: "14px",
-                      resize: "none",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                  <span style={{ position: "absolute", right: "12px", bottom: "10px", fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{seasonReputationEditData.content.length} / 100</span>
-                </div>
-              </div>
-
-              {/* 키워드 */}
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>
-                  키워드 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 3개, 각 7자)</span>
-                </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드를 입력하세요"
-                      maxLength={7}
-                      value={seasonReputationEditData.keyword1}
-                      onChange={(e) => {
-                        if (e.target.value.length > 7) {
-                          alert('최대 7자까지 입력할 수 있습니다.');
-                          return;
-                        }
-                        setSeasonReputationEditData((prev) => ({ ...prev, keyword1: e.target.value }));
-                      }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        height: "48px",
-                        padding: "12px 14px",
-                        background: "#1a1f2e",
-                        border: "1px solid #FFA500",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드를 입력하세요"
-                      maxLength={7}
-                      value={seasonReputationEditData.keyword2}
-                      onChange={(e) => {
-                        if (e.target.value.length > 7) {
-                          alert('최대 7자까지 입력할 수 있습니다.');
-                          return;
-                        }
-                        setSeasonReputationEditData((prev) => ({ ...prev, keyword2: e.target.value }));
-                      }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        height: "48px",
-                        padding: "12px 14px",
-                        background: "#1a1f2e",
-                        border: "1px solid #FFA500",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 700, color: "#FFA500", minWidth: "24px" }}>#</span>
-                    <input
-                      type="text"
-                      placeholder="키워드를 입력하세요"
-                      maxLength={7}
-                      value={seasonReputationEditData.keyword3}
-                      onChange={(e) => {
-                        if (e.target.value.length > 7) {
-                          alert('최대 7자까지 입력할 수 있습니다.');
-                          return;
-                        }
-                        setSeasonReputationEditData((prev) => ({ ...prev, keyword3: e.target.value }));
-                      }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        height: "48px",
-                        padding: "12px 14px",
-                        background: "#1a1f2e",
-                        border: "1px solid #FFA500",
-                        borderRadius: "0",
-                        color: "#fff",
-                        fontSize: "14px",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
+              {/* 미드 2행: 내용 textarea 300자 */}
+              <div className="season-content-section">
+                <h4>▪ 내용을 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 300자)</span></h4>
+                <div className="season-content-wrapper">
+                  <textarea className={`season-content-textarea ${seasonReputationSaveAttemptFailed && (seasonReputationEditData.content?.trim().length || 0) === 0 ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : ""}`} value={seasonReputationEditData.content} onChange={(e) => { if (!isSeasonReputationFormEditing) return; const v = e.target.value.slice(0, 300); setSeasonReputationEditData((prev) => ({ ...prev, content: v })); }} placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요." maxLength={300} data-field="season-content" disabled={!isSeasonReputationFormEditing} />
+                  <span className="char-count">{seasonReputationEditData.content.length}/300</span>
                 </div>
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="edit-modal-footer">
-              <button
-                onClick={() => setSeasonReputationModalOpen(false)}
-                disabled={seasonReputationSaving}
-                style={{
-                  padding: "10px 24px",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  background: "transparent",
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "14px",
-                  cursor: seasonReputationSaving ? "not-allowed" : "pointer",
-                  opacity: seasonReputationSaving ? 0.5 : 1,
-                }}
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSaveSeasonReputation}
-                disabled={seasonReputationSaving || seasonReputationSuccess || seasonReputationEditData.content.trim() === "" || (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "")}
-                style={{
-                  padding: "10px 24px",
-                  border: "none",
-                  background: "#FAAB07",
-                  color: "#000",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  cursor: seasonReputationSaving || seasonReputationSuccess || seasonReputationEditData.content.trim() === "" || (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") ? "not-allowed" : "pointer",
-                  opacity: seasonReputationSaving || seasonReputationSuccess || seasonReputationEditData.content.trim() === "" || (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") ? 0.5 : 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                {seasonReputationSaving && <span style={{ width: "14px", height: "14px", border: "2px solid #000", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></span>}
-                {seasonReputationSaving ? "저장 중..." : seasonReputationSuccess ? "저장 완료!" : "저장"}
-              </button>
+            {/* === 푸터 — Type B === */}
+            <div className="section-modal-footer">
+              <div className="modal-footer-top">
+                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReputation")} aria-label="도움말">🔎</button>
+                <div className="modal-footer-right">
+                  {!isSeasonReputationFormEditing ? (
+                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReputationEditClick}>수정</button>
+                  ) : (
+                    <>
+                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReputationCancel}>취소</button>
+                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReputationReset}>초기화</button>
+                      <button type="button" className="modal-save-btn" onClick={handleSeasonReputationSave}>저장</button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <p className={`modal-footer-notice ${seasonReputationSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReputationSaveAttemptFailed ? "visible" : "hidden" }}>필수 항목을 모두 입력해주세요.</p>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ========== 시즌 평판 상세 보기 모달 ========== */}
-      {reputationDetailModalOpen &&
-        selectedReputation &&
-        (() => {
-          const reviewer = selectedReputation.reviewer;
-          const birthYear = reviewer?.birth_date ? parseInt(reviewer.birth_date.substring(0, 4)) : null;
-          const currentYear = new Date().getFullYear();
-          const age = birthYear ? currentYear - birthYear + 1 : null;
-          const genderLabel = reviewer?.gender === "남" ? "남" : reviewer?.gender === "여" ? "여" : "-";
-          const fullStars = Math.floor(selectedReputation.rating / 2);
-          const hasHalfStar = selectedReputation.rating % 2 >= 1;
-          const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+      {/* ========== 시즌 평판 상세 보기 모달 (가이드 적용) ========== */}
+      {reputationDetailModalOpen && selectedReputation && (
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-season-reputation-view">
+            {/* === 헤더 === */}
+            <div className="section-modal-header">
+              <button className="modal-close-btn" onClick={handleSeasonReputationViewClose} aria-label="닫기">
+                <i className="ti ti-x"></i>
+              </button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain" as const, flexShrink: 0 }} />
+                <h3>시즈닝 평판 (Seasoning Reputation)</h3>
+              </div>
+              <p className="modal-subtitle">
+                저는 당신의 한 시즌을 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊
+              </p>
+            </div>
 
-          return (
-            <div className="season-reputation-view-overlay">
-              <div className="edit-modal-content season-reputation-view-modal">
-                {/* Header */}
-                <div className="edit-modal-header">
-                  <h3 style={{ margin: 0, color: "#FAAB07", fontSize: "18px", fontWeight: 600 }}>시즌 평판 상세</h3>
-                  <button className="modal-close-btn" onClick={() => setReputationDetailModalOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: "24px", cursor: "pointer", padding: "4px" }}>
-                    ×
-                  </button>
-                </div>
-
-                {/* Body */}
-                <div className="edit-modal-body">
-                  {/* Reviewer Info */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-                    <img src={reviewer?.profile_photo_url || "/images/avatar/avatar.png"} alt="profile" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(255, 165, 0, 0.3)" }} />
-                    <div>
-                      <div style={{ color: "#fff", fontSize: "16px", fontWeight: 600, marginBottom: "4px" }}>{reviewer?.display_name || "익명"}</div>
-                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "12px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>
-                        {genderLabel} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.age(age)} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.school(reviewer?.university)} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {mask.major(reviewer?.major_first)}
-                      </div>
-                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", fontFamily: "'Pretendard', sans-serif", marginTop: "2px", whiteSpace: "nowrap" }}>
-                        {reviewer?.teamName || "-"} <span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {reviewer?.partName || "-"}
-                        {reviewer?.vision && (<><span style={{ margin: '0 3px', color: 'rgba(255,255,255,0.4)' }}>|</span> {reviewer.vision}</>)}
-                      </div>
+            {/* === 미드 === */}
+            <div className="section-modal-body season-reputation-view-body">
+              {/* 인적사항 카드 — 보낸 사람 정보 */}
+              <div className="workinfo-personal-card">
+                <div className="personal-grid">
+                  <div className="personal-photo">
+                    <img src={selectedReputation.reviewer?.profile_photo_url || "/images/0/crew profile/남 1.webp"} alt="프로필" />
+                  </div>
+                  <div className="personal-info">
+                    <div className="personal-row-1">
+                      <span className="personal-name">{selectedReputation.reviewer?.display_name || "-"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-gender">{selectedReputation.reviewer?.gender || "-"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-age">
+                        {(() => {
+                          const birthYear = selectedReputation.reviewer?.birth_date ? parseInt(selectedReputation.reviewer.birth_date.substring(0, 4)) : null;
+                          if (!birthYear) return "-";
+                          return `${new Date().getFullYear() - birthYear} 세`;
+                        })()}
+                      </span>
+                    </div>
+                    <div className="personal-row-2">
+                      <span className="personal-field">
+                        <span className="field-value">{selectedReputation.reviewer?.university || "-"}</span>
+                        <span className="field-label">학교</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{selectedReputation.reviewer?.major_first || "-"}</span>
+                        <span className="field-label">학과</span>
+                      </span>
+                    </div>
+                    <div className="personal-row-3">
+                      <span className="personal-field">
+                        <span className="field-value">{selectedReputation.reviewer?.teamName || "-"}</span>
+                        <span className="field-label">팀</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{selectedReputation.reviewer?.partName || "-"}</span>
+                        <span className="field-label">파트</span>
+                      </span>
                     </div>
                   </div>
-
-                  {/* Keywords */}
-                  <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-                    {selectedReputation.keyword_1 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_1 as string).slice(0, 7)}</span>}
-                    {selectedReputation.keyword_2 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(255, 215, 0, 0.2)", borderRadius: "20px", color: "#FFD700", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_2 as string).slice(0, 7)}</span>}
-                    {selectedReputation.keyword_3 && <span style={{ display: "inline-block", width: "fit-content", padding: "6px 12px", background: "rgba(250, 171, 7, 0.2)", borderRadius: "20px", color: "#FAAB07", fontSize: "13px", whiteSpace: "nowrap" }}>#{(selectedReputation.keyword_3 as string).slice(0, 7)}</span>}
-                  </div>
-
-                  {/* Content */}
-                  <div
-                    style={{
-                      background: "rgba(0,0,0,0.3)",
-                      borderRadius: "12px",
-                      padding: "20px",
-                      marginBottom: "20px",
-                      border: "1px solid rgba(255, 165, 0, 0.1)",
-                    }}
-                  >
-                    <p style={{ color: "#fff", fontSize: "15px", lineHeight: 1.7, margin: 0, whiteSpace: "pre-wrap" }}>{selectedReputation.content}</p>
-                  </div>
-
-                  {/* Rating */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>평점</span>
-                        <div style={{ display: "flex", gap: "2px" }}>
-                          {[...Array(fullStars)].map((_, i) => (
-                            <img key={`full-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: "18px", height: "18px" }} />
-                          ))}
-                          {hasHalfStar && <img src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: "18px", height: "18px", opacity: 0.5 }} />}
-                          {[...Array(emptyStars)].map((_, i) => (
-                            <img key={`empty-${i}`} src="/images/0/cluster4/icon - star.png" alt="star" style={{ width: "18px", height: "18px", opacity: 0.2 }} />
-                          ))}
-                        </div>
-                        <span style={{ color: "#FAAB07", fontSize: "14px", fontWeight: 600 }}>{selectedReputation.rating} / 10</span>
-                      </div>
-                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>|</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" style={{ width: "16px", height: "16px", opacity: 0.8 }} />
-                        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px" }}>FM : {selectedReputation.fmScore ?? 0}</span>
-                      </div>
-                    </div>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>{selectedReputation.created_at && !isNaN(new Date(selectedReputation.created_at).getTime()) ? new Date(selectedReputation.created_at).toLocaleDateString("ko-KR") : "-"}</span>
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">일반</span>
+                    <span className="tag-badge tag-keyword">{selectedReputation.reviewer?.vision || "키워드"}</span>
                   </div>
                 </div>
 
@@ -2827,12 +3240,267 @@ const Cluster4Content = () => {
                   </div>
                 )}
               </div>
+
+              {/* 키워드 3개 + 내용 */}
+              <div className="season-reputation-content-section">
+                <div className="season-reputation-keywords">
+                  {[selectedReputation.keyword_1, selectedReputation.keyword_2, selectedReputation.keyword_3].map((kw, i) => (
+                    <span key={i} className="tag tag--pink">{kw ? `#${kw}` : "#-"}</span>
+                  ))}
+                </div>
+                <div className="season-reputation-content-box">
+                  <p className="season-reputation-content-text">{selectedReputation.content || "-"}</p>
+                </div>
+              </div>
+
+              {/* 평점 + FM */}
+              <div className="season-reputation-stats-row">
+                <div className="season-reputation-rating">
+                  <span className="stats-label">■ 평점</span>
+                  <div className="rating-stars">
+                    {[1, 2, 3, 4, 5].map((i) => {
+                      const r = (selectedReputation.rating || 0) / 2;
+                      let cls = "rating-star star-empty";
+                      if (r >= i) cls = "rating-star star-full";
+                      else if (r >= i - 0.5) cls = "rating-star star-half";
+                      return <span key={i} className={cls}>★</span>;
+                    })}
+                  </div>
+                  <span className="rating-value">{selectedReputation.rating ? `${selectedReputation.rating} / 10` : "- / 10"}</span>
+                </div>
+                <div className="season-reputation-fm">
+                  <span className="stats-label">■ FM</span>
+                  <span className="fm-value">{selectedReputation.fmScore ?? 0}</span>
+                </div>
+              </div>
+
+              {/* 구분선 + 타임스탬프 */}
+              <div className="season-reputation-bottom-section">
+                <div className="season-reputation-bottom-divider"></div>
+                <div className="season-reputation-timestamp">
+                  <span>{formatSeasonReputationTime(selectedReputation.created_at)}</span>
+                </div>
+              </div>
             </div>
-          );
-        })()}
+
+          </div>
+        </div>
+      )}
+
+      {/* 별점 드롭다운 옵션 패널 (season-reputation form) */}
+      {seasonRatingDropdownOpen && (
+        <div
+          className="dropdown-options-fixed season-rating-dropdown-options"
+          style={{
+            position: "fixed",
+            top: seasonRatingDropdownPos.top,
+            left: seasonRatingDropdownPos.left,
+            width: Math.max(seasonRatingDropdownPos.width, 70),
+            zIndex: 100010,
+          }}
+          role="listbox"
+          onWheel={(e) => e.stopPropagation()}
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+            <div
+              key={n}
+              className={`dropdown-option${seasonReputationEditData.rating === n ? " selected" : ""}`}
+              onClick={() => handleSeasonRatingSelect(n)}
+              role="option"
+              aria-selected={seasonReputationEditData.rating === n}
+            >
+              {n}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ========== 키워드 선택 중첩 모달 (cluster-4-card 패턴 통일) ========== */}
+      {seasonKeywordModalOpen && (
+        <div className="section-modal-overlay keyword-select-overlay">
+          <div className="section-modal keyword-select-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="section-modal-header">
+              <button type="button" className="modal-close-btn" onClick={handleSeasonKeywordModalClose} aria-label="키워드 선택 모달 닫기">
+                <i className="ti ti-x"></i>
+              </button>
+              <button type="button" className="btn-select-header" onClick={handleSeasonKeywordSelectConfirm} disabled={!seasonKeywordTempSelection}>선택</button>
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain" as const, flexShrink: 0 }} />
+                <h3>키워드를 선택해주세요. 😊</h3>
+              </div>
+            </div>
+            <div className="section-modal-body keyword-select-body">
+              {(() => {
+                const usedKeywords = seasonKeywordTargetSlot !== null ? getSeasonKeywordsUsedByOtherSlots(seasonKeywordTargetSlot) : [];
+                const clusterColorMap: Record<number, string> = { 1: "group-blue", 2: "group-green", 3: "group-yellow", 4: "group-orange", 5: "group-red" };
+                const groupedByCluster: Record<number, typeof reputationKeywords> = {};
+                reputationKeywords.forEach((kw) => {
+                  if (!groupedByCluster[kw.cluster_number]) groupedByCluster[kw.cluster_number] = [];
+                  groupedByCluster[kw.cluster_number].push(kw);
+                });
+                const clusterNumbers = Object.keys(groupedByCluster).map(Number).sort((a, b) => a - b);
+                if (clusterNumbers.length === 0) return <div className="season-keyword-loading">키워드를 불러오는 중입니다...</div>;
+                return clusterNumbers.map((clusterNum) => {
+                  const items = groupedByCluster[clusterNum];
+                  const clusterName = items[0]?.cluster_name || "";
+                  const colorClass = clusterColorMap[clusterNum] || "group-blue";
+                  return (
+                    <div key={clusterNum} className={`keyword-group ${colorClass}`}>
+                      <h4 className="group-title">
+                        [군락 {clusterNum}] {clusterName}
+                        <span className="group-count">({items.length}개)</span>
+                      </h4>
+                      <div className="keyword-grid">
+                        {items.map((kw) => {
+                          const isUsedByOther = usedKeywords.includes(kw.keyword);
+                          const isSelected = seasonKeywordTempSelection === kw.keyword;
+                          return (
+                            <button key={kw.id} type="button" className={`keyword-chip ${isSelected ? "selected" : ""} ${isUsedByOther ? "disabled" : ""}`} onClick={() => !isUsedByOther && handleSeasonKeywordTempSelect(kw.keyword)} disabled={isUsedByOther} title={isUsedByOther ? "다른 슬롯에서 이미 사용 중인 키워드입니다" : undefined}>
+                              {kw.keyword}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== 도움말 모달 ========== */}
+      {helpModalKind && (
+        <div className="help-modal-overlay" onClick={() => setHelpModalKind(null)}>
+          <div className="help-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="help-modal-header">
+              <div className="modal-header-top">
+                <span style={{ fontSize: "20px" }}>🔎</span>
+                <h3>도움말</h3>
+                <button className="modal-close-btn" onClick={() => setHelpModalKind(null)} aria-label="닫기">
+                  <i className="ti ti-x"></i>
+                </button>
+              </div>
+            </div>
+            <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+          </div>
+        </div>
+      )}
 
       {/* ========== 시즌 리뷰 모달 ========== */}
       {seasonReviewModalOpen && (
+        <div className="section-modal-overlay">
+          <div className="section-modal section-modal-season-review" onClick={(e) => e.stopPropagation()}>
+            <div className="section-modal-header">
+              <div className="modal-header-top">
+                <img src="/images/0/write.png" alt="write" />
+                <h3>시즌 리뷰</h3>
+              </div>
+              <p className="modal-subtitle">이번 시즌을 어떻게 경험하고, 성장했는지 기록해주세요.</p>
+              <button className="modal-close-btn" onClick={handleSeasonReviewClose} aria-label="닫기">
+                <i className="ti ti-x"></i>
+              </button>
+            </div>
+
+            <div className="section-modal-body season-review-body">
+              <div className="season-review-row-1">
+                <div className="season-info-section">
+                  <h4>시즌</h4>
+                  <div className="season-info-display">{currentSeasonInfo?.year || currentSeason.year}년 {currentSeasonInfo?.name || currentSeason.season} 시즌</div>
+                </div>
+                <div className="season-review-rating-section">
+                  <h4>평점 <span className="required-mark">*</span></h4>
+                  <div className={`rating-input rating-field ${seasonReviewSaveAttemptFailed && seasonReviewEditData.rating === 0 ? `field-error ${seasonReviewFieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
+                    <span className="star-rating">
+                      {(() => {
+                        const r = seasonReviewEditData.rating || 0;
+                        const fullStars = Math.floor(r / 2);
+                        const hasHalf = r % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+                        return (
+                          <>
+                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {hasHalf && <i className="ti ti-star-half-filled" />}
+                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                          </>
+                        );
+                      })()}
+                      <span className="rating-text">{seasonReviewEditData.rating || 0}/10</span>
+                    </span>
+                    <div className="custom-dropdown small">
+                      <div ref={seasonReviewRatingDropdownTriggerRef} className={`dropdown-selected ${!isSeasonReviewFormEditing ? "disabled" : ""}`} onClick={openSeasonReviewRatingDropdown} role="button" tabIndex={isSeasonReviewFormEditing ? 0 : -1} aria-haspopup="listbox" aria-expanded={seasonReviewRatingDropdownOpen}>
+                        <span>{seasonReviewEditData.rating || "-"}</span>
+                        <i className="ti ti-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="workinfo-personal-card">
+                <div className="personal-grid">
+                  <div className="personal-photo"><img src={profilePhotoUrl || session?.user?.image || "/images/avatar/avatar.png"} alt="프로필" /></div>
+                  <div className="personal-info">
+                    <div className="personal-row-1">
+                      <span className="personal-name">{session?.user?.name || demoUserName || "-"}</span><span className="personal-separator">|</span><span className="personal-gender">-</span><span className="personal-separator">|</span><span className="personal-age">-</span>
+                    </div>
+                    <div className="personal-row-2">
+                      <span className="personal-field"><span className="field-value">-</span><span className="field-label">학교</span></span><span className="personal-separator">|</span><span className="personal-field"><span className="field-value">-</span><span className="field-label">학과</span></span>
+                    </div>
+                    <div className="personal-row-3">
+                      <span className="personal-field"><span className="field-value">{currentSeason.seasonRoles?.[0]?.teamName || "-"}</span><span className="field-label">팀</span></span><span className="personal-separator">|</span><span className="personal-field"><span className="field-value">{currentSeason.seasonRoles?.[0]?.partName || "-"}</span><span className="field-label">파트</span></span>
+                    </div>
+                  </div>
+                  <div className="personal-tags">
+                    <span className="tag-badge tag-role">{userDefaultRole || "심화"}</span>
+                    <span className="tag-badge tag-keyword">{currentSeason.roleInSeason || "짧음"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="season-review-content-section" data-field="review">
+                <h4>Season Review <span className="required-mark">*</span><span className="limit-hint">(최대 300자)</span></h4>
+                <div className="content-wrapper">
+                  <textarea className={`content-textarea season-review-textarea ${seasonReviewSaveAttemptFailed && (seasonReviewEditData.review?.trim().length || 0) === 0 ? `field-error ${seasonReviewFieldErrorFlash ? "flash" : ""}` : ""}`} value={seasonReviewEditData.review || ""} onChange={(e) => { if (!isSeasonReviewFormEditing) return; setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value.slice(0, 300) })); if (seasonReviewSaveAttemptFailed) setSeasonReviewSaveAttemptFailed(false); }} placeholder="이번 시즌의 경험, 성과, 성장을 300자 이내로 작성해주세요." maxLength={300} disabled={!isSeasonReviewFormEditing} />
+                  <div className="char-count">{(seasonReviewEditData.review?.length || 0)}/300</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="section-modal-footer">
+              <div className="modal-footer-top">
+                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReview")} aria-label="도움말">🔎</button>
+                <div className="modal-footer-right">
+                  {!isSeasonReviewFormEditing ? (
+                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReviewEditClick}>수정</button>
+                  ) : (
+                    <>
+                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReviewCancel}>취소</button>
+                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReviewReset}>초기화</button>
+                      <button type="button" className="modal-save-btn" onClick={handleSaveSeasonReview} disabled={seasonReviewSaving}>{seasonReviewSaving ? "저장 중..." : "저장"}</button>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer-bottom">
+                <p className={`modal-notice ${seasonReviewSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReviewSaveAttemptFailed ? "visible" : "hidden" }}>필수 항목을 입력해주세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {seasonReviewRatingDropdownOpen && typeof document !== "undefined" && createPortal(
+        <div className="dropdown-options-fixed season-review-rating-dropdown-options" style={{ position: "fixed", top: seasonReviewRatingDropdownPos.top, left: seasonReviewRatingDropdownPos.left, width: Math.max(seasonReviewRatingDropdownPos.width, 70), zIndex: 100010 }} role="listbox" onWheel={(e) => e.stopPropagation()}>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+            <div key={n} className={`dropdown-option${seasonReviewEditData.rating === n ? " selected" : ""}`} onClick={() => handleSeasonReviewRatingSelect(n)} role="option" aria-selected={seasonReviewEditData.rating === n}>{n}</div>
+          ))}
+        </div>,
+        document.body,
+      )}
+
+      {false && seasonReviewModalOpen && (
         <div className="season-review-overlay">
           <div className="edit-modal-content season-review-modal">
             {/* Header */}

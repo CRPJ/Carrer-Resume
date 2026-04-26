@@ -228,16 +228,30 @@ export async function POST(request: Request) {
       );
     }
 
-    // 받기 제한 체크: 대상 유저가 해당 주차에 이미 3개의 평판을 받았는지
+    // 받기 제한 체크: 대상 유저가 해당 주차에 이미 4개의 평판을 받았는지
     const { count: receivedCount } = await supabase
       .from("weekly_reputations")
       .select("id", { count: "exact", head: true })
       .eq("target_user_id", targetUserId)
       .eq("week_card_id", weekCardId);
 
-    if (receivedCount !== null && receivedCount >= 3) {
+    if (receivedCount !== null && receivedCount >= 4) {
       return NextResponse.json(
-        { error: "해당 크루는 이미 이 주차에 최대 3개의 평판을 받았습니다." },
+        { error: "해당 크루는 이미 이 주차에 최대 4개의 평판을 받았습니다." },
+        { status: 400 }
+      );
+    }
+
+    // 주기 제한 체크: 작성자가 해당 주차에 이미 7개의 평판을 작성했는지
+    const { count: sentCount } = await supabase
+      .from("weekly_reputations")
+      .select("id", { count: "exact", head: true })
+      .eq("reviewer_id", reviewerProfile.id)
+      .eq("week_card_id", weekCardId);
+
+    if (sentCount !== null && sentCount >= 7) {
+      return NextResponse.json(
+        { error: "이 주차에 작성할 수 있는 평판은 최대 7개입니다." },
         { status: 400 }
       );
     }

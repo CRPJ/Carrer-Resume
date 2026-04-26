@@ -3695,6 +3695,41 @@
                 display: none; /* Chrome */
               }
 
+              .profile-card.season-reputation-waiting {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px dashed rgba(255, 255, 255, 0.1) !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 8px;
+                cursor: default;
+
+                &::before,
+                &::after {
+                  display: none !important;
+                }
+
+                &:hover {
+                  background: rgba(255, 255, 255, 0.02) !important;
+                  border-color: rgba(255, 255, 255, 0.1) !important;
+                }
+
+                .waiting-image {
+                  width: 60px;
+                  height: 60px;
+                  object-fit: contain;
+                  opacity: 0.5;
+                }
+
+                .waiting-message {
+                  margin: 0;
+                  font-family: "Pretendard", sans-serif;
+                  font-size: 13px;
+                  color: rgba(255, 255, 255, 0.4);
+                  text-align: center;
+                  white-space: nowrap;
+                }
+              }
+
               .profile-card {
                 position: relative;
                 width: 100%;
@@ -5331,6 +5366,11 @@
   padding: 40px 0;
 }
 .cluster4-card-content .section-modal {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
   width: 504px;
   height: 606px;
   max-width: none;
@@ -5788,104 +5828,1555 @@
 }
 
 // ── 모달 1: 시즌 평판 작성/수정 ──
-.season-reputation-edit-modal {
-  width: 540px;
-  height: 640px;
-  max-height: 640px;
-  border: 1px solid #FFA500;
-  box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
-  position: relative;
+// ============================================
+// Season Reputation Form Modal (가로형_중 979×570)
+// ============================================
+.section-modal.section-modal-season-reputation-form {
+  width: 979px !important;
+  max-width: 979px !important;
+  height: 570px !important;
+  max-height: 570px !important;
+  display: flex;
+  flex-direction: column;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: #ffa500;
-    border-style: solid;
-  }
-  &::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-  &::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-
-  .edit-modal-header {
-    padding: 20px 24px;
+  .section-modal-header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 153px;
-    min-height: 153px;
-    max-height: 153px;
-    flex-shrink: 0;
+    flex-direction: column;
+    justify-content: flex-start;
     box-sizing: border-box;
+    flex-shrink: 0;
+    height: auto;
+    min-height: 110px;
+    max-height: none;
+    padding: 8px 24px 16px;
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      h3 {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #faab07;
+        line-height: 1.4;
+        padding-top: 0;
+        &::before { content: none !important; display: none !important; }
+      }
+    }
+
+    .modal-subtitle {
+      margin: 4px 67px 0 80px;
+      padding-left: 0 !important;
+      max-width: calc(100% - 147px);
+      min-width: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      i { font-size: 20px; }
+      &:hover { color: #faab07; }
+    }
   }
 
-  .edit-modal-body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 20px 24px;
-  }
-
-  .edit-modal-footer {
+  .section-modal-body.season-reputation-form-body {
+    padding: 12px 24px 16px;
+    flex: 1 1 auto;
+    overflow: hidden !important;
+    box-sizing: border-box;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
     gap: 12px;
-    padding: 16px 24px;
-    height: 118px;
-    min-height: 118px;
-    max-height: 118px;
+  }
+
+  // cluster-4-card .reputation-form-top 패턴 복제
+  .reputation-form-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .form-rating-section,
+  .form-keyword-section,
+  .season-content-section {
+    h4 {
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ddd;
+      margin: 0 0 6px 0;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      .required-mark { color: #e74c3c !important; font-weight: 700 !important; font-size: 16px !important; margin-left: 4px; margin-right: 4px; }
+      .limit-hint { font-size: 11px; font-weight: 400; color: rgba(255, 255, 255, 0.5); margin-left: 8px; }
+    }
+  }
+
+  .form-rating-section {
+    .rating-input {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 19px;
+    }
+
+    .rating-field { display: flex; align-items: center; gap: 8px; }
+    .star-rating {
+      display: flex; align-items: center; gap: 2px; height: 36px; flex-shrink: 0;
+      i { color: #faab07; font-size: 16px; }
+      .rating-text { margin-left: 6px; color: #faab07; font-size: 16px !important; font-weight: 600; white-space: nowrap; }
+    }
+    .custom-dropdown.small {
+      position: relative;
+      .dropdown-selected {
+        display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        padding: 6px 10px; min-width: 55px;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px;
+        font-family: "Pretendard", sans-serif; font-size: 16px; color: #fff; cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        &:hover:not(.disabled) { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+        &.disabled { opacity: 0.5; cursor: not-allowed; }
+        i.ti-chevron-down { font-size: 12px; opacity: 0.7; }
+      }
+    }
+  }
+
+  .form-keyword-section {
+    .keyword-mode-select {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 8px !important;
+
+      label {
+        display: flex; align-items: center; gap: 6px; cursor: pointer;
+        color: #ddd; font-family: "Pretendard", sans-serif; font-size: 14px;
+        input[type="radio"] { cursor: pointer; accent-color: #faab07; }
+      }
+    }
+
+    .keyword-input-wrapper {
+      display: flex; align-items: center; gap: 8px;
+
+      .keyword-hash {
+        color: #faab07; font-family: "Pretendard", sans-serif; font-size: 16px; font-weight: 700;
+      }
+
+      .keyword-input {
+        flex: 1; padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ddd; font-family: "Pretendard", sans-serif; font-size: 12px;
+        border-radius: 4px; outline: none; transition: border-color 0.15s;
+        &::placeholder { color: rgba(255, 255, 255, 0.3); }
+        &:focus { border-color: #faab07; }
+        &[readonly], &:disabled { cursor: default; background: rgba(255, 255, 255, 0.08); opacity: 0.5; }
+      }
+    }
+
+    // 시즌 평판 전용 — 슬롯 3개
+    .season-keyword-row {
+      display: flex; align-items: center; gap: 8px;
+      & + .season-keyword-row { margin-top: 6px; }
+      .keyword-mode-select { margin-bottom: 0 !important; flex-shrink: 0; }
+      .keyword-input-wrapper { flex: 1; min-width: 0; }
+    }
+  }
+
+  .season-content-section {
+    flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0;
+    .season-content-wrapper {
+      position: relative; flex: 1 1 auto; min-height: 0; display: flex;
+      textarea.season-content-textarea {
+        width: 100%; flex: 1 1 auto; min-height: 100px; height: 100px; max-height: 100px; padding: 12px 16px 28px; box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px;
+        font-family: "Pretendard", sans-serif; font-size: 14px; line-height: 1.5; color: #ddd; resize: none !important;
+        &::placeholder { color: rgba(255, 255, 255, 0.3); }
+        &:focus { outline: none; border-color: rgba(250, 171, 7, 0.5); }
+        &::-webkit-scrollbar { width: 4px; }
+        &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+      }
+      .char-count { position: absolute; bottom: 8px; right: 12px; font-family: "Pretendard", sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.5); pointer-events: none; }
+    }
+  }
+
+  .section-modal-footer {
+    flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 16px 28px;
+    height: 118px; min-height: 118px; max-height: 118px; box-sizing: border-box; border-top: none; background: transparent;
+    .modal-footer-top { display: flex; align-items: center; justify-content: space-between; width: 100%; position: relative; }
+    .modal-help-icon {
+      flex-shrink: 0; width: 40px; height: 36px; padding: 0; border: none; background: transparent; border-radius: 0;
+      color: #fff; font-size: 20px; cursor: pointer; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center;
+      &::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: rgba(0, 0, 0, 0.6); border: none; border-radius: 0; z-index: -1; }
+    }
+    .modal-footer-right { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-shrink: 0; min-width: 160px; }
+    .modal-edit-btn, .modal-save-btn {
+      padding: 8px 20px; background: #faab07; border: 1px solid transparent; color: #1a1a1a; border-radius: 0;
+      font-family: "Pretendard", sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+      &:hover:not(:disabled) { background: #ffb820; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+    .modal-cancel-btn {
+      padding: 8px 20px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #ddd;
+      border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer;
+      &:hover { border-color: #fff; color: #fff; }
+    }
+    .modal-reset-btn {
+      padding: 8px 20px; background: transparent; border: 1px solid #4caf50; color: #4caf50;
+      border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer;
+      &:hover { background: rgba(76, 175, 80, 0.1); }
+    }
+    .modal-footer-bottom {
+      width: 100%; display: flex; align-items: center; justify-content: flex-end; text-align: right; border: none;
+      .modal-footer-notice {
+        margin: 0; text-align: right; font-family: "Pretendard", sans-serif; font-size: 13px; color: #faab07;
+        &.notice-error { color: #e74c3c !important; }
+      }
+    }
+  }
+
+  // === 검증 실패 표시 ===
+  .field-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
+  }
+
+  .rating-field.field-error {
+    background: rgba(231, 76, 60, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.3) !important;
+    box-shadow: none !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
+  }
+
+  .season-keyword-row.field-error {
+    background: rgba(231, 76, 60, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.3) !important;
+    box-shadow: none !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
+    .keyword-input { border-color: rgba(255, 255, 255, 0.15) !important; box-shadow: none !important; }
+  }
+}
+
+@keyframes season-reputation-field-error-flash {
+  0%, 100% { border-color: #e74c3c; box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2); }
+  50% { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5); }
+}
+
+// ============================================
+// 키워드 선택 중첩 모달 — cluster-4-card SCSS 본체 복제
+// ============================================
+.keyword-select-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100020;
+}
+
+.keyword-select-modal {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  width: 979px !important;
+  max-width: 979px !important;
+  height: 570px !important;
+  max-height: 570px !important;
+  background: #121212;
+  border: 1px solid rgba(250, 171, 7, 0.24);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .section-modal-header {
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+    padding: 16px 24px 4px;
+    position: relative;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     box-sizing: border-box;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+
+      h3 {
+        font-family: "Pretendard", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #faab07;
+        margin: 0;
+      }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 40px;
+      right: 24px;
+      z-index: 2;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+
+      i { font-size: 20px; }
+      &:hover { color: #faab07; }
+    }
+
+    .btn-select-header {
+      position: absolute;
+      top: 40px;
+      right: 80px;
+      z-index: 2;
+      padding: 8px 20px;
+      background: #faab07;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 4px;
+      font-family: "Pretendard", sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+
+      &:disabled { opacity: 0.3; cursor: not-allowed; }
+    }
+  }
+
+  .keyword-select-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(250, 171, 7, 0.5);
+      border-radius: 4px;
+      &:hover { background: #faab07; }
+    }
+  }
+
+  .keyword-group {
+    margin-bottom: 24px;
+
+    .group-title {
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ddd;
+      margin: 0 0 4px 0 !important;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      .group-count { font-size: 11px; font-weight: 400; color: #faab07; margin-left: 8px; }
+    }
+
+    &.group-blue .group-title { border-bottom-color: rgba(82, 167, 255, 0.6); }
+    &.group-green .group-title { border-bottom-color: rgba(91, 209, 130, 0.6); }
+    &.group-yellow .group-title { border-bottom-color: rgba(255, 203, 70, 0.6); }
+    &.group-orange .group-title { border-bottom-color: rgba(255, 149, 63, 0.6); }
+    &.group-red .group-title { border-bottom-color: rgba(255, 99, 99, 0.6); }
+  }
+
+  .keyword-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .keyword-chip {
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ddd;
+    font-family: "Pretendard", sans-serif;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 165, 0, 0.5);
+    }
+
+    &.selected {
+      background: rgba(250, 171, 7, 0.2);
+      border: 2px solid #faab07;
+      color: #faab07;
+      font-weight: 700;
+      position: relative;
+      padding-right: 32px !important;
+
+      &::after {
+        content: '✓' !important;
+        position: absolute !important;
+        right: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 18px !important;
+        height: 18px !important;
+        border-radius: 50% !important;
+        background: #faab07 !important;
+        color: #1a1a1a !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+    }
+
+    // cluster-4 전용 — 다른 슬롯 사용 키워드 disabled
+    &.disabled {
+      opacity: 0.3 !important;
+      cursor: not-allowed !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+      color: rgba(255, 255, 255, 0.4) !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+      }
+    }
+  }
+
+  .season-keyword-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: "Pretendard", sans-serif;
+    font-size: 14px;
   }
 }
 
 // ── 모달 2: 시즌 평판 상세 보기 ──
-.season-reputation-view-modal {
-  width: 570px;
-  height: 449px;
-  max-height: 449px;
-  border: 1px solid #FFA500;
-  box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
-  overflow: hidden;
-  position: relative;
+// ============================================
+// Season Reputation View Modal (가로형_중 979×570)
+// 가이드 §1 + §4 + §6 적용
+// ============================================
+.section-modal.section-modal-season-reputation-view {
+  width: 979px !important;
+  max-width: 979px !important;
+  height: 570px !important;
+  max-height: 570px !important;
+  display: flex;
+  flex-direction: column;
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: #ffa500;
-    border-style: solid;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+
+  .section-modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: auto;
+    min-height: 110px;
+    max-height: none;
+    padding: 8px 24px 16px;
+    position: relative;
+    overflow: visible;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+
+      h3 {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #faab07;
+        line-height: 1.4;
+        padding-top: 0;
+
+        &::before { content: none !important; display: none !important; }
+      }
+    }
+
+    .modal-subtitle {
+      margin: 4px 67px 0 80px;
+      padding-left: 0 !important;
+      max-width: calc(100% - 147px);
+      min-width: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+
+      i { font-size: 20px; }
+      &:hover { color: #faab07; }
+    }
   }
-  &::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-  &::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 
-  .edit-modal-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+  .section-modal-body.season-reputation-view-body {
+    padding: 12px 24px 24px;
+    flex: 1 1 auto;
+    overflow: visible !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // === 인적사항 카드 ===
+  .workinfo-personal-card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 7px 12px !important;
+    border-radius: 0 !important;
+    flex-shrink: 0;
+
+    .personal-grid {
+      display: grid;
+      grid-template-columns: 64px 1fr 132px !important;
+      gap: 3px 12px !important;
+      align-items: center !important;
+    }
+
+    .personal-photo {
+      width: 64px !important;
+      height: 64px !important;
+      border-radius: 50%;
+      overflow: hidden;
+      img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    .personal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+      line-height: 24px;
+    }
+
+    .personal-name {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #fff !important;
+      white-space: nowrap;
+    }
+
+    .personal-row-1 {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+      line-height: 17.1px !important;
+    }
+
+    .personal-row-2,
+    .personal-row-3 {
+      display: grid !important;
+      grid-template-columns: 160px 40px 20px 160px 40px !important;
+      grid-template-rows: 26px !important;
+      gap: 5px 0 !important;
+      align-items: center !important;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+    }
+
+    .personal-field { display: contents !important; }
+
+    .field-value {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+    }
+
+    .field-label {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 13px !important;
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .personal-separator {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      color: rgba(255, 255, 255, 0.3) !important;
+      text-align: center;
+      line-height: 26px !important;
+    }
+
+    .personal-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-self: center;
+
+      .tag-badge {
+        width: 132px !important;
+        min-width: 132px !important;
+        max-width: 132px !important;
+        height: 32px !important;
+        padding: 4px 10px !important;
+        box-sizing: border-box;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-family: "Pretendard", sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.tag-keyword {
+          background: rgba(135, 206, 250, 0.15);
+          border: 1px solid rgba(135, 206, 250, 0.3);
+          color: rgb(135, 206, 235);
+        }
+      }
+    }
+  }
+
+  // === 키워드 + 내용 ===
+  // Match Weekly Reputation personal info card only.
+  .workinfo-personal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 7px 12px !important;
+    border-radius: 0 !important;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 110px;
-    min-height: 110px;
-    max-height: 110px;
-    flex-shrink: 0;
-    box-sizing: border-box;
+
+    .personal-grid {
+      width: 100%;
+      display: grid !important;
+      grid-template-columns: auto 1fr auto !important;
+      grid-template-rows: auto;
+      gap: 3px 12px !important;
+      align-items: center !important;
+    }
+
+    .personal-photo {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      width: 64px !important;
+      height: 64px !important;
+      margin-top: 0 !important;
+      transform: translateY(-8px) !important;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    .personal-info {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      line-height: normal;
+    }
+
+    .personal-row-1,
+    .personal-row-2,
+    .personal-row-3 {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 15px !important;
+      line-height: 1.14;
+      color: #ddd;
+      min-width: 0;
+      font-weight: 400 !important;
+    }
+
+    .personal-row-1 {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+
+    .personal-row-2,
+    .personal-row-3 {
+      display: grid !important;
+      grid-template-columns: minmax(0, 160px) 40px 20px minmax(0, 160px) 40px !important;
+      grid-template-rows: auto !important;
+      align-items: center !important;
+      column-gap: 0 !important;
+      white-space: normal !important;
+    }
+
+    .personal-field {
+      display: contents !important;
+    }
+
+    .personal-separator {
+      color: rgba(255, 255, 255, 0.3) !important;
+      flex-shrink: 0;
+      padding-left: 6px !important;
+      font-size: 15px !important;
+      line-height: normal !important;
+      text-align: left;
+    }
+
+    .personal-name {
+      display: inline-flex !important;
+      align-items: center;
+      margin: 0;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      white-space: nowrap;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+    }
+
+    .personal-gender,
+    .personal-age {
+      display: inline-block;
+      white-space: nowrap;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+    }
+
+    .personal-gender {
+      min-width: 16px;
+    }
+
+    .personal-age {
+      min-width: 48px;
+    }
+
+    .field-value {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #ddd !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .field-label {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 13px !important;
+      color: rgba(255, 255, 255, 0.4) !important;
+      transform: none !important;
+    }
+
+    .personal-tags {
+      grid-column: 3 !important;
+      grid-row: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      align-items: flex-end !important;
+      justify-self: end !important;
+      align-self: center;
+      margin: 0 20px 0 -80px !important;
+      width: 192px !important;
+      min-width: 192px !important;
+      max-width: 192px !important;
+    }
+
+    .tag-badge,
+    .personal-tags .tag-badge,
+    .personal-tags .tag-badge.tag-role,
+    .personal-tags .tag-badge.tag-keyword {
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 16px !important;
+      line-height: 1.14 !important;
+      font-weight: 600 !important;
+      padding: 6px 16px !important;
+      width: 192px !important;
+      min-width: 192px !important;
+      max-width: 192px !important;
+      height: auto !important;
+      box-sizing: border-box !important;
+      border-radius: 4px;
+      white-space: normal !important;
+      text-align: center !important;
+      flex-shrink: 0;
+      overflow: visible !important;
+      overflow-wrap: break-word !important;
+      text-overflow: unset !important;
+      display: block !important;
+    }
+
+    .tag-role {
+      background: rgba(250, 171, 7, 0.15) !important;
+      color: #faab07 !important;
+      border: 1px solid rgba(250, 171, 7, 0.3) !important;
+    }
+
+    .tag-keyword {
+      background: rgba(135, 206, 250, 0.15) !important;
+      color: #87ceeb !important;
+      border: 1px solid rgba(135, 206, 250, 0.3) !important;
+    }
   }
 
-  .edit-modal-body {
-    flex: 1;
+  .season-reputation-content-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     min-height: 0;
-    overflow-y: auto;
-    padding: 24px;
+
+    .season-reputation-keywords {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+
+      .tag {
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.tag--pink {
+          background: rgba(255, 105, 180, 0.15);
+          border: 1px solid rgba(255, 105, 180, 0.3);
+          color: rgb(255, 105, 180);
+        }
+      }
+    }
+
+    .season-reputation-content-box {
+      flex: 1 1 auto;
+      min-height: 0;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 12px 16px;
+      overflow-y: auto;
+
+      .season-reputation-content-text {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #ddd;
+        white-space: pre-wrap;
+        word-break: keep-all;
+      }
+    }
   }
-  // 푸터 없음 — height 미지정
+
+  // === 평점 + FM ===
+  .season-reputation-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-shrink: 0;
+
+    .season-reputation-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .stats-label {
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #ddd;
+      }
+
+      .rating-stars {
+        display: flex;
+        gap: 2px;
+
+        .rating-star {
+          font-size: 16px;
+          line-height: 1;
+          &.star-full { color: #faab07; }
+          &.star-half {
+            background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.3) 50%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          &.star-empty { color: rgba(255, 255, 255, 0.3); }
+        }
+      }
+
+      .rating-value {
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #faab07;
+        margin-left: 4px;
+      }
+    }
+
+    .season-reputation-fm {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .stats-label {
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #ddd;
+      }
+
+      .fm-value {
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #faab07;
+      }
+    }
+  }
+
+  // === 구분선 + 타임스탬프 ===
+  .season-reputation-bottom-section {
+    flex-shrink: 0;
+    margin-top: 8px;
+    overflow: visible;
+
+    .season-reputation-bottom-divider {
+      display: block !important;
+      height: 1px !important;
+      background: rgba(255, 165, 0, 0.2) !important;
+      width: calc(100% + 48px) !important;
+      margin: 0 -24px 8px -24px !important;
+      padding: 0 !important;
+    }
+
+    .season-reputation-timestamp {
+      text-align: right;
+      font-family: "Pretendard", sans-serif;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
 }
 
 // ── 모달 3: 시즌 리뷰 (자기평가) ──
+.section-modal.section-modal-season-review {
+  width: 674px !important;
+  max-width: 674px !important;
+  height: 826px !important;
+  max-height: 826px !important;
+  display: flex;
+  flex-direction: column;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+
+  .section-modal-header {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    min-height: 110px;
+    padding: 8px 24px 16px;
+    position: relative;
+    border-bottom: none;
+    background: transparent;
+
+    .modal-header-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      h3 {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #faab07;
+        line-height: 1.4;
+        &::before { content: none !important; display: none !important; }
+      }
+    }
+
+    .modal-subtitle {
+      margin: 4px 67px 0 calc(72px + 8px);
+      padding-left: 0 !important;
+      max-width: calc(100% - 147px);
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      i { font-size: 20px; }
+      &:hover { color: #faab07; }
+    }
+  }
+
+  .section-modal-body.season-review-body {
+    padding: 12px 24px 16px;
+    flex: 1 1 auto;
+    overflow-y: auto !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .season-review-row-1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  .season-info-section,
+  .season-review-rating-section,
+  .season-review-content-section {
+    h4 {
+      font-family: "Pretendard", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ddd;
+      margin: 0 0 8px;
+      .required-mark { color: #e74c3c !important; font-weight: 700 !important; font-size: 16px !important; margin-left: 4px; margin-right: 4px; }
+      .limit-hint { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.5); margin-left: 8px; }
+    }
+  }
+
+  .season-info-display {
+    height: 100%;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    font-family: "Pretendard", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #faab07;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .season-info-section {
+    display: flex;
+    align-items: center;
+
+    h4 { display: none !important; }
+
+    .season-info-display { width: 100%; }
+  }
+
+  .season-review-rating-section {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 8px;
+
+    h4 {
+      margin: 0 !important;
+      white-space: nowrap;
+    }
+
+    .rating-field { display: flex; align-items: center; gap: 8px; height: 36px; }
+    .star-rating {
+      display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+      i { color: #faab07; font-size: 16px; }
+      .rating-text { margin-left: 6px; color: #faab07; font-size: 16px !important; font-weight: 600; white-space: nowrap; }
+    }
+    .custom-dropdown.small {
+      position: relative;
+      .dropdown-selected {
+        display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        padding: 6px 10px; min-width: 55px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 16px;
+        color: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        &:hover:not(.disabled) { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+        &.disabled { opacity: 0.5; cursor: not-allowed; }
+        i.ti-chevron-down { font-size: 12px; opacity: 0.7; }
+      }
+    }
+  }
+
+  .workinfo-personal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 12px !important;
+    display: flex;
+    align-items: center;
+    border-radius: 4px !important;
+    flex-shrink: 0;
+    .personal-grid { width: 100%; display: grid; grid-template-columns: auto 1fr !important; gap: 4px 12px !important; align-items: center !important; }
+    .personal-photo {
+      grid-column: 1;
+      grid-row: 1;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      align-self: center;
+      img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    }
+
+    .personal-info {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .personal-row-1 {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      color: #ddd !important;
+      line-height: 1.2 !important;
+
+      .personal-name {
+        display: inline-flex;
+        align-items: center;
+        height: auto !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #fff;
+        white-space: nowrap;
+        font-size: 15px !important;
+        font-weight: 700;
+      }
+
+      .personal-gender,
+      .personal-age {
+        white-space: nowrap;
+        font-size: 15px !important;
+      }
+
+      .personal-tags {
+        margin-left: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+        flex-shrink: 0;
+      }
+    }
+
+    .personal-row-2,
+    .personal-row-3 { display: grid !important; grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto !important; align-items: center !important; column-gap: 6px !important; font-family: "Pretendard", sans-serif !important; font-size: 15px !important; color: #ddd !important; min-width: 0; }
+    .personal-field { display: contents !important; }
+    .field-value { font-size: 15px !important; color: #fff !important; font-weight: 700 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .field-label { font-size: 13px !important; color: #999 !important; }
+    .personal-separator { font-size: 15px !important; color: rgba(255, 255, 255, 0.3) !important; flex-shrink: 0; }
+    .personal-tags {
+      .tag-badge {
+        min-width: 150px !important;
+        width: 150px !important;
+        max-width: 150px !important;
+        padding: 6px 12px !important;
+        box-sizing: border-box;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+        border-radius: 4px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        &.tag-role { background: rgba(250, 171, 7, 0.15) !important; border: 1px solid rgba(250, 171, 7, 0.3) !important; color: rgb(250, 171, 7) !important; }
+        &.tag-keyword { background: rgba(135, 206, 250, 0.15) !important; border: 1px solid rgba(135, 206, 250, 0.3) !important; color: rgb(135, 206, 235) !important; }
+      }
+    }
+
+    .personal-grid { display: grid; grid-template-columns: 64px 1fr 140px !important; gap: 3px 12px !important; align-items: center !important; }
+    .personal-photo {
+      grid-column: auto;
+      grid-row: auto;
+      width: 64px !important;
+      height: 64px !important;
+      align-self: center;
+    }
+    .personal-info {
+      grid-column: auto;
+      grid-row: auto;
+      gap: 0;
+    }
+    .personal-row-1 {
+      gap: 8px !important;
+      line-height: 17.1px !important;
+      .personal-name {
+        font-size: 15px !important;
+        font-weight: 400;
+        color: #ddd;
+      }
+    }
+    .personal-row-2,
+    .personal-row-3 {
+      display: grid !important;
+      grid-template-columns: 128px 40px 20px 128px 40px !important;
+      grid-template-rows: 26px !important;
+      gap: 5px 0 !important;
+      align-items: center !important;
+      font-size: 14px !important;
+    }
+    .field-value { font-size: 14px !important; color: #ddd !important; font-weight: 400 !important; }
+    .field-label { font-size: 12px !important; color: rgba(255, 255, 255, 0.4) !important; }
+    .personal-row-2 .personal-field:nth-of-type(3) .field-label,
+    .personal-row-3 .personal-field:nth-of-type(3) .field-label {
+      transform: translateX(0.2cm);
+    }
+    .personal-tags {
+      display: grid !important;
+      grid-template-columns: 140px;
+      grid-template-rows: repeat(2, 32px);
+      gap: 4px !important;
+      align-self: center;
+      margin-left: 0 !important;
+      .tag-badge {
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
+        height: 32px !important;
+        padding: 4px 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+    }
+  }
+
+  .season-review-content-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    .content-wrapper {
+      position: relative;
+      flex: 0 0 calc(100% - 5cm);
+      min-height: 0;
+      display: flex;
+      .content-textarea {
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 200px;
+        padding: 12px 16px 28px;
+        box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #ddd;
+        resize: none !important;
+        &::placeholder { color: rgba(255, 255, 255, 0.3); }
+        &:focus { outline: none; border-color: rgba(250, 171, 7, 0.5); }
+        &:disabled { opacity: 0.6; background: rgba(255, 255, 255, 0.02); }
+      }
+      .char-count { position: absolute; bottom: 8px; right: 12px; font-family: "Pretendard", sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.5); pointer-events: none; }
+    }
+  }
+
+  .field-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
+    &.flash { animation: season-review-field-error-flash 0.3s ease-in-out 2 !important; }
+  }
+  .rating-field.field-error {
+    background: rgba(231, 76, 60, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.3) !important;
+    box-shadow: none !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .section-modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 28px;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    box-sizing: border-box;
+    border-top: none;
+    background: transparent;
+    .modal-footer-top { display: flex; align-items: center; justify-content: space-between; width: 100%; position: relative; }
+    .modal-help-icon { flex-shrink: 0; width: 40px; height: 36px; padding: 0; border: none; background: transparent; border-radius: 0; color: #fff; font-size: 20px; cursor: pointer; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; &::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: rgba(0, 0, 0, 0.6); border: none; border-radius: 0; z-index: -1; } }
+    .modal-footer-right { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-shrink: 0; min-width: 160px; }
+    .modal-edit-btn,
+    .modal-save-btn { padding: 8px 20px; background: #faab07; border: 1px solid transparent; color: #1a1a1a; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; &:hover:not(:disabled) { background: #ffb820; } &:disabled { opacity: 0.5; cursor: not-allowed; } }
+    .modal-cancel-btn { padding: 8px 20px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #ddd; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer; &:hover { border-color: #fff; color: #fff; } }
+    .modal-reset-btn { padding: 8px 20px; background: transparent; border: 1px solid #4caf50; color: #4caf50; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer; &:hover { background: rgba(76, 175, 80, 0.1); } }
+    .modal-footer-bottom {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      border: none;
+      .modal-notice { margin: 0; font-family: "Pretendard", sans-serif; font-size: 13px; color: #e74c3c; text-align: right; }
+    }
+  }
+}
+
+.cluster4-content {
+  .help-modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100001 !important;
+  }
+
+  .help-modal {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    width: 1024px;
+    height: 794px;
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    border: 1px solid #ffa500;
+    box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+      border-width: 2px 0 0 2px;
+      top: -1px;
+      left: -1px;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #ffa500;
+      border-style: solid;
+      border-width: 0 2px 2px 0;
+      bottom: -1px;
+      right: -1px;
+    }
+
+    .help-modal-header {
+      height: 126px;
+      min-height: 126px;
+      max-height: 126px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+
+      .modal-header-top {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      h3 {
+        margin: 0;
+        color: #faab07;
+        font-family: "Pretendard", sans-serif;
+        font-size: 21px;
+        font-weight: 800;
+        flex: 1;
+
+        &::before {
+          content: none;
+        }
+      }
+
+      > h3 {
+        width: 100%;
+        flex: 0 0 auto;
+      }
+
+      .modal-close-btn,
+      .help-modal-close {
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .help-modal-close {
+        position: absolute;
+        top: 50%;
+        right: 24px;
+        transform: translateY(-50%);
+      }
+    }
+
+    .help-modal-body {
+      flex: 1;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-family: "Pretendard", sans-serif;
+      font-size: 15px;
+    }
+  }
+}
+
+@keyframes season-review-field-error-flash {
+  0%, 100% { border-color: #e74c3c; box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2); }
+  50% { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5); }
+}
+
 .season-review-modal {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
   width: 570px;
   height: 449px;
   max-height: 449px;
