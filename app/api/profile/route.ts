@@ -225,7 +225,7 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
         supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
-        supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
+        supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
         supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
         supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
@@ -334,7 +334,6 @@ export async function GET(request: NextRequest) {
         is_qualified,
         rating,
         review,
-        review_link,
         seasons (
           id,
           year,
@@ -368,8 +367,8 @@ export async function GET(request: NextRequest) {
       // 해당 유저의 활동 이행 기록 (강화 상태 판단용) - id 추가 (points 매핑용)
       supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
 
-      // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크)
-      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
+      // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크, 성장 포인트, 이미지)
+      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
 
       // activity_types (cluster_id 기반 분류용) - 캐시 사용
       getCachedActivityTypes(),
@@ -825,7 +824,6 @@ export async function GET(request: NextRequest) {
             is_qualified,
             rating,
             review,
-            review_link,
             seasons (
               id,
               year,
@@ -881,7 +879,7 @@ export async function GET(request: NextRequest) {
           .from('user_season_histories')
           .select(`
             id, role_in_season, approved_weeks, total_weeks, progress_status,
-            review_status, is_qualified, rating, review, review_link,
+            review_status, is_qualified, rating, review,
             seasons (id, year, name, start_date, end_date)
           `)
           .eq('user_id', profile.id);

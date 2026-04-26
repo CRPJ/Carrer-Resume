@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { user_id, week_id, activity_type_id, sub_title, output_links } = body
+    const { user_id, week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions } = body
 
     // 필수 필드 검증
     if (!user_id || !week_id || !activity_type_id) {
@@ -74,6 +74,48 @@ export async function POST(request: NextRequest) {
         { error: 'sub_title must be 150 characters or less' },
         { status: 400 }
       )
+    }
+
+    // growth_point 길이 검증 (500자)
+    if (growth_point && typeof growth_point === 'string' && growth_point.length > 500) {
+      return NextResponse.json(
+        { error: 'growth_point must be 500 characters or less' },
+        { status: 400 }
+      )
+    }
+
+    // image_urls 검증 (최대 4개, 각 string)
+    if (image_urls !== undefined && image_urls !== null) {
+      if (!Array.isArray(image_urls) || image_urls.length > 4) {
+        return NextResponse.json(
+          { error: 'image_urls must be an array with max 4 items' },
+          { status: 400 }
+        )
+      }
+      if (image_urls.some((u: unknown) => u !== null && typeof u !== 'string')) {
+        return NextResponse.json(
+          { error: 'image_urls items must be string or null' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // image_captions 검증 (최대 4개, 각 200자)
+    if (image_captions !== undefined && image_captions !== null) {
+      if (!Array.isArray(image_captions) || image_captions.length > 4) {
+        return NextResponse.json(
+          { error: 'image_captions must be an array with max 4 items' },
+          { status: 400 }
+        )
+      }
+      for (const cap of image_captions) {
+        if (typeof cap === 'string' && cap.length > 200) {
+          return NextResponse.json(
+            { error: 'Each image caption must be 200 characters or less' },
+            { status: 400 }
+          )
+        }
+      }
     }
 
     // output_links 검증 (최대 5개, 각 desc 20자 이내)
@@ -131,21 +173,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Upsert (있으면 업데이트, 없으면 삽입)
+    // 미전달 필드는 기존 값 유지: undefined → 페이로드에서 제외
+    const upsertPayload: Record<string, unknown> = {
+      user_id,
+      week_id,
+      activity_type_id,
+      updated_at: new Date().toISOString(),
+    }
+    if (sub_title !== undefined) upsertPayload.sub_title = sub_title || null
+    if (output_links !== undefined) upsertPayload.output_links = output_links || null
+    if (growth_point !== undefined) upsertPayload.growth_point = growth_point || null
+    if (image_urls !== undefined) upsertPayload.image_urls = image_urls ?? []
+    if (image_captions !== undefined) upsertPayload.image_captions = image_captions ?? []
+
     const { data, error } = await supabaseAdmin
       .from('user_activity_details')
-      .upsert(
-        {
-          user_id,
-          week_id,
-          activity_type_id,
-          sub_title: sub_title || null,
-          output_links: output_links || null,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'user_id,week_id,activity_type_id',
-        }
-      )
+      .upsert(upsertPayload, {
+        onConflict: 'user_id,week_id,activity_type_id',
+      })
       .select()
       .single()
 

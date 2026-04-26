@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from("user_season_histories")
-      .select("rating, review, review_link")
+      .select("rating, review")
       .eq("id", seasonHistoryId)
       .maybeSingle();
 
@@ -36,7 +36,6 @@ export async function GET(request: Request) {
       data: {
         rating: data?.rating || 0,
         review: data?.review || "",
-        link: data?.review_link || "",
       },
     });
   } catch (error) {
@@ -60,7 +59,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { seasonHistoryId, rating, review, link } = body;
+    const { seasonHistoryId, rating, review } = body;
 
     if (!seasonHistoryId) {
       return NextResponse.json({ error: "시즌 기록 ID가 필요합니다." }, { status: 400 });
@@ -76,10 +75,6 @@ export async function PUT(request: Request) {
 
     if (review.length > 30) {
       return NextResponse.json({ error: "리뷰는 30자 이내로 작성해주세요." }, { status: 400 });
-    }
-
-    if (!link || link.trim().length === 0) {
-      return NextResponse.json({ error: "링크를 입력해주세요." }, { status: 400 });
     }
 
     // 해당 season_history가 본인의 것인지 확인
@@ -103,7 +98,6 @@ export async function PUT(request: Request) {
       .update({
         rating: rating,
         review: review.trim(),
-        review_link: link?.trim() || null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", seasonHistoryId);

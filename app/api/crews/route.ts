@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     // 활성 크루만 조회
     let query = supabase
       .from("user_profiles")
-      .select("id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first")
+      .select("id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first, crew_unique_number")
       .in("growth_status", ["active", "suspended", "seasonal_rest", "graduated", "club_onboarding"])
       .not("display_name", "is", null)
       .order("display_name", { ascending: true });
@@ -146,6 +146,7 @@ export async function GET(request: Request) {
 
       return {
         id: user.id,
+        number: user.crew_unique_number || null,
         name: user.display_name || '-',
         gender: user.gender || '-',
         age: displayAge,

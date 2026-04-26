@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { dedupedJson, invalidateDedupe } from "@/lib/fetch-dedupe";
 
 // Profile 데이터 타입
 interface ProfileData {
@@ -103,12 +104,13 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     try {
       const apiUrl = targetUserId ? `/api/profile/?userId=${targetUserId}` : '/api/profile/';
-      const response = await fetch(apiUrl);
-      const result = await response.json();
+      // forceRefresh 면 dedupe 캐시 무효화 후 새로 요청
+      if (forceRefresh) invalidateDedupe(apiUrl);
+      const result: any = await dedupedJson(apiUrl);
 
-      if (!response.ok || !result.success) {
-        const errorMsg = result.error || 'Failed to fetch profile';
-        console.warn('[ProfileContext] API 응답 실패:', response.status, errorMsg);
+      if (!result || !result.success) {
+        const errorMsg = result?.error || 'Failed to fetch profile';
+        console.warn('[ProfileContext] API 응답 실패:', errorMsg);
         setError(errorMsg);
         setErrorTimestamp(now);
         setLastErrorUserId(targetUserId);
@@ -162,6 +164,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setError(null);
     setErrorTimestamp(0);
     setLastErrorUserId(null);
+    // 모듈 레벨 dedupe 캐시도 같이 무효화 — Cluster4Content 등 다른 호출처와 일관성 유지
+    invalidateDedupe('/api/profile');
   }, []);
 
   // 세션 변경 시 캐시 초기화

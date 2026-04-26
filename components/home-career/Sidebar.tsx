@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
+import { dedupedJson } from "@/lib/fetch-dedupe";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
@@ -904,10 +905,9 @@ const Sidebar = () => {
   const fetchEducations = async () => {
     try {
       const apiUrl = targetUserId ? `/api/educations?userId=${targetUserId}` : "/api/educations";
-      const response = await fetch(apiUrl);
-      const result = await response.json();
+      const result: any = await dedupedJson(apiUrl);
 
-      if (result.success && result.data && result.data.length > 0) {
+      if (result?.success && result.data && result.data.length > 0) {
         // 최종학력 (isFinal: true) 찾기
         const finalEducation = result.data.find((edu: { isFinal: boolean }) => edu.isFinal);
         if (finalEducation) {
@@ -937,10 +937,9 @@ const Sidebar = () => {
   const fetchSlogan = async () => {
     try {
       const apiUrl = targetUserId ? `/api/slogans?userId=${targetUserId}` : "/api/slogans";
-      const response = await fetch(apiUrl);
-      const result = await response.json();
+      const result: any = await dedupedJson(apiUrl);
 
-      if (result.success && result.data?.slogan1?.content) {
+      if (result?.success && result.data?.slogan1?.content) {
         const content = result.data.slogan1.content as string;
         // sessionStorage 캐싱 → 다음 방문 시 즉시 표시
         try {

@@ -142,7 +142,6 @@ export async function GET(request: NextRequest) {
         is_qualified,
         rating,
         review,
-        review_link,
         seasons (
           id,
           year,

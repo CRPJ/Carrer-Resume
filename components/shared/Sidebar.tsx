@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { dedupedJson } from "@/lib/fetch-dedupe";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Define the type for the game object
@@ -36,10 +37,9 @@ const Sidebar = () => {
   useEffect(() => {
     if (!session?.user) return;
     if (session.user.isAdmin) return;
-    fetch('/api/profile/')
-      .then(res => res.json())
+    dedupedJson<any>('/api/profile/')
       .then(result => {
-        if (result.success && result.data?.id) {
+        if (result?.success && result.data?.id) {
           setMyProfileId(result.data.id);
         }
       })

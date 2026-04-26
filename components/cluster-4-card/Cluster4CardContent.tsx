@@ -420,6 +420,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     activity_type_id: string;
     sub_title: string | null;
     output_links: OutputLink[] | null;
+    growth_point?: string | null;
+    image_urls?: (string | null)[] | null;
+    image_captions?: string[] | null;
   }
   const [weekActivityDetails, setWeekActivityDetails] = useState<ActivityDetail[]>([]);
 
@@ -1859,14 +1862,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // workInfo View 모달 — 편집 모드 입력 state (보기 모드에서는 selectedWorkInfoCard 직접 표시)
   const [editingSubTitle, setEditingSubTitle] = useState<string>("");
-  // TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 — 백엔드 머지 후 selectedWorkInfoCard.growthPoint로 교체
   const [editingGrowthPoint, setEditingGrowthPoint] = useState<string>("");
   const [editingOutputLinks, setEditingOutputLinks] = useState<{ desc: string; url: string }[]>(Array(5).fill({ desc: "", url: "" }));
-  // TODO: [백엔드 작업 필요] weekly_activity_details에 image_urls(text[]) 컬럼 추가 — 백엔드 머지 후 selectedWorkInfoCard.images 사용 + URL.createObjectURL 결과를 서버 업로드로 교체
   const [editingImages, setEditingImages] = useState<(string | null)[]>(createEmptyWorkInfoImages);
   const imageFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
-  // TODO: [백엔드 작업 필요] image_captions 컬럼 추가 — 백엔드 머지 후 card.imageCaptions 사용
   const [editingImageCaptions, setEditingImageCaptions] = useState<string[]>(createEmptyWorkInfoCaptions);
   // cluster3 captionOpenIndex 패턴 — 활성 슬롯 idx(null=비활성)
   const [activeCaptionIdx, setActiveCaptionIdx] = useState<number | null>(null);
@@ -2019,7 +2019,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const card = selectedWorkInfoCard;
     // 스냅샷: 비교 대상 필드만 (subTitle/growthPoint/outputLinks/images)
     const initialOutputLinks = card?.outputLinks && card.outputLinks.length > 0 ? card.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" });
-    // TODO: [백엔드 작업 필요] card.images / card.imageCaptions로 교체. 현재는 항상 빈 슬롯 4개로 초기화.
     const initialImages = normalizeWorkInfoImages(card?.images);
     const initialCaptions = normalizeWorkInfoCaptions(card?.imageCaptions);
     workInfoSnapshot.current = {
@@ -2071,7 +2070,80 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkInfo = () => {
+  // blob: URL 배열을 Supabase Storage로 업로드 → 영구 URL 배열 반환. http(s)/data URL은 그대로 통과.
+  const persistImageUrls = async (
+    images: (string | null)[],
+    activityTypeId: string,
+  ): Promise<(string | null)[]> => {
+    const result: (string | null)[] = [];
+    for (let i = 0; i < images.length; i++) {
+      const url = images[i];
+      if (!url) {
+        result.push(null);
+        continue;
+      }
+      if (!url.startsWith("blob:")) {
+        result.push(url);
+        continue;
+      }
+      const blob = await (await fetch(url)).blob();
+      const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+      const file = new File([blob], `slot-${i}.${ext}`, { type: blob.type });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("week_id", weekId);
+      formData.append("activity_type_id", activityTypeId);
+      formData.append("slot_index", String(i));
+      const res = await fetch(apiUrl("/api/activity-details/upload-image"), {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `이미지 업로드 실패 (slot ${i + 1})`);
+      }
+      const data = await res.json();
+      result.push(data.url as string);
+    }
+    return result;
+  };
+
+  // user_activity_details 저장 (모달 저장 공용 헬퍼). 데모 모드에서는 API 호출 스킵.
+  const persistActivityDetailToServer = async (params: {
+    activityTypeId: string;
+    subTitle: string | null;
+    outputLinks: { desc: string; url: string }[] | null;
+    growthPoint: string | null;
+    images: (string | null)[];
+    imageCaptions: string[];
+  }): Promise<{ images: (string | null)[] }> => {
+    if (isDemoMode) return { images: params.images };
+    if (!currentUserId || !weekId) return { images: params.images };
+    const persistedImages = await persistImageUrls(params.images, params.activityTypeId);
+    const adminCount = getAdminOutputLinksCount(params.activityTypeId);
+    const userLinks = (params.outputLinks || []).slice(adminCount).filter((l) => l.url?.trim() !== "");
+    const res = await fetch(apiUrl("/api/activity-details"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: currentUserId,
+        week_id: weekId,
+        activity_type_id: params.activityTypeId,
+        sub_title: params.subTitle,
+        output_links: userLinks.length > 0 ? userLinks : null,
+        growth_point: params.growthPoint,
+        image_urls: persistedImages,
+        image_captions: params.imageCaptions,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "저장에 실패했습니다.");
+    }
+    return { images: persistedImages };
+  };
+
+  const handleSaveWorkInfo = async () => {
     if (!isDemoMode && !canEditWorkInfo) {
       alert("관리자 승인 후 수정할 수 있습니다.");
       return;
@@ -2095,12 +2167,41 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     // 저장 직전 confirm — 사용자 의도 재확인
     if (!window.confirm("저장하시겠습니까?")) return;
-    // sub_title + output_links 저장 (weekActivityDetails + selectedWorkInfoCard 동시 갱신)
-    // TODO: [백엔드 작업 필요] growth_point + image_urls 컬럼 추가 후 sub_title과 동일 패턴으로 저장. blob: URL은 서버 업로드 → 영구 URL 교체 필요.
     if (selectedWorkInfoCard?.activityType) {
       const newSubTitle = editingSubTitle.trim() || null;
       const newOutputLinks = editingOutputLinks;
-      setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, sub_title: newSubTitle, output_links: newOutputLinks } : d)));
+      const newGrowthPoint = editingGrowthPoint.trim() || null;
+      let persistedImages: (string | null)[] = editingImages;
+      try {
+        const persisted = await persistActivityDetailToServer({
+          activityTypeId: selectedWorkInfoCard.activityType,
+          subTitle: newSubTitle,
+          outputLinks: newOutputLinks,
+          growthPoint: newGrowthPoint,
+          images: editingImages,
+          imageCaptions: editingImageCaptions,
+        });
+        persistedImages = persisted.images;
+      } catch (err) {
+        console.error("workInfo 저장 실패:", err);
+        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+        return;
+      }
+      setEditingImages(persistedImages);
+      setWeekActivityDetails((prev) => {
+        const next = {
+          week_id: weekId,
+          activity_type_id: selectedWorkInfoCard.activityType,
+          sub_title: newSubTitle,
+          output_links: newOutputLinks,
+          growth_point: newGrowthPoint,
+          image_urls: persistedImages,
+          image_captions: editingImageCaptions,
+        };
+        const idx = prev.findIndex((d) => d.activity_type_id === selectedWorkInfoCard.activityType);
+        if (idx < 0) return [...prev, next];
+        return prev.map((d) => (d.activity_type_id === selectedWorkInfoCard.activityType ? { ...d, ...next } : d));
+      });
       setSelectedWorkInfoCard((prev: any) =>
         prev
           ? {
@@ -2108,7 +2209,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               subTitle: newSubTitle || "",
               outputLinks: newOutputLinks,
               growthPoint: editingGrowthPoint,
-              images: editingImages,
+              images: persistedImages,
               imageCaptions: editingImageCaptions,
             }
           : prev,
@@ -2118,7 +2219,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: newSubTitle || "",
         growthPoint: editingGrowthPoint,
         outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
-        images: [...editingImages],
+        images: [...persistedImages],
         imageCaptions: [...editingImageCaptions],
       };
     }
@@ -2169,7 +2270,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // TODO: [백엔드 작업 필요] 실제 모드에서는 서버 업로드 후 영구 URL로 교체. 현재는 blob: URL (미리보기 전용).
+    // 미리보기는 blob: URL로, 실제 업로드는 저장 시점(persistImageUrls)에서 일괄 처리.
     const url = URL.createObjectURL(file);
     setEditingImages((prev) => {
       const next = [...prev];
@@ -2291,7 +2392,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkAbility = () => {
+  const handleSaveWorkAbility = async () => {
     if (!isDemoMode && !canEditWorkAbility) {
       alert("관리자 승인 후 수정할 수 있습니다.");
       return;
@@ -2315,12 +2416,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (selectedWorkAbilityCard?.activityTypeId) {
       const newSubTitle = editingAbilitySubTitle.trim() || null;
       const newOutputLinks = editingAbilityOutputLinks;
+      const newGrowthPoint = editingAbilityGrowthPoint.trim() || null;
+      let persistedImages: (string | null)[] = editingAbilityImages;
+      try {
+        const persisted = await persistActivityDetailToServer({
+          activityTypeId: selectedWorkAbilityCard.activityTypeId,
+          subTitle: newSubTitle,
+          outputLinks: newOutputLinks,
+          growthPoint: newGrowthPoint,
+          images: editingAbilityImages,
+          imageCaptions: editingAbilityImageCaptions,
+        });
+        persistedImages = persisted.images;
+      } catch (err) {
+        console.error("workAbility 저장 실패:", err);
+        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+        return;
+      }
+      setEditingAbilityImages(persistedImages);
       setWeekActivityDetails((prev) => {
         const nextDetail = {
           week_id: weekId,
           activity_type_id: selectedWorkAbilityCard.activityTypeId,
           sub_title: newSubTitle,
           output_links: newOutputLinks,
+          growth_point: newGrowthPoint,
+          image_urls: persistedImages,
+          image_captions: editingAbilityImageCaptions,
         };
         const existingIndex = prev.findIndex((d) => d.activity_type_id === selectedWorkAbilityCard.activityTypeId);
         if (existingIndex < 0) return [...prev, nextDetail];
@@ -2333,7 +2455,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               subTitle: newSubTitle || "",
               outputLinks: newOutputLinks,
               growthPoint: editingAbilityGrowthPoint,
-              images: editingAbilityImages,
+              images: persistedImages,
               imageCaptions: editingAbilityImageCaptions,
             }
           : prev,
@@ -2342,7 +2464,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: newSubTitle || "",
         growthPoint: editingAbilityGrowthPoint,
         outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
-        images: [...editingAbilityImages],
+        images: [...persistedImages],
         imageCaptions: [...editingAbilityImageCaptions],
       };
     }
@@ -2519,7 +2641,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkExp = () => {
+  const handleSaveWorkExp = async () => {
     if (!isDemoMode && !canEditWorkExp) {
       alert("관리자 승인 후 수정할 수 있습니다.");
       return;
@@ -2544,7 +2666,38 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (selectedWorkExpCard?.activityTypeId) {
       const newSubTitle = editingExpSubTitle.trim() || null;
       const newOutputLinks = editingExpOutputLinks;
-      setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === selectedWorkExpCard.activityTypeId ? { ...d, sub_title: newSubTitle, output_links: newOutputLinks } : d)));
+      const newGrowthPoint = editingExpGrowthPoint.trim() || null;
+      let persistedImages: (string | null)[] = editingExpImages;
+      try {
+        const persisted = await persistActivityDetailToServer({
+          activityTypeId: selectedWorkExpCard.activityTypeId,
+          subTitle: newSubTitle,
+          outputLinks: newOutputLinks,
+          growthPoint: newGrowthPoint,
+          images: editingExpImages,
+          imageCaptions: editingExpImageCaptions,
+        });
+        persistedImages = persisted.images;
+      } catch (err) {
+        console.error("workExp 저장 실패:", err);
+        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+        return;
+      }
+      setEditingExpImages(persistedImages);
+      setWeekActivityDetails((prev) => {
+        const nextDetail = {
+          week_id: weekId,
+          activity_type_id: selectedWorkExpCard.activityTypeId,
+          sub_title: newSubTitle,
+          output_links: newOutputLinks,
+          growth_point: newGrowthPoint,
+          image_urls: persistedImages,
+          image_captions: editingExpImageCaptions,
+        };
+        const existingIndex = prev.findIndex((d) => d.activity_type_id === selectedWorkExpCard.activityTypeId);
+        if (existingIndex < 0) return [...prev, nextDetail];
+        return prev.map((d) => (d.activity_type_id === selectedWorkExpCard.activityTypeId ? { ...d, ...nextDetail } : d));
+      });
       setSelectedWorkExpCard((prev: any) =>
         prev
           ? {
@@ -2552,7 +2705,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               subTitle: newSubTitle || "",
               outputLinks: newOutputLinks,
               growthPoint: editingExpGrowthPoint,
-              images: editingExpImages,
+              images: persistedImages,
               imageCaptions: editingExpImageCaptions,
               rating: editingExpRating / 2, // 별 표시(5점 만점)로 변환
               ratingCount: `${editingExpRating} / 10`,
@@ -2563,7 +2716,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: newSubTitle || "",
         growthPoint: editingExpGrowthPoint,
         outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
-        images: [...editingExpImages],
+        images: [...persistedImages],
         imageCaptions: [...editingExpImageCaptions],
         rating: editingExpRating,
       };
@@ -4840,6 +4993,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         activityType,
         title: activity?.title || "-", // 운영진이 입력한 Main Title (없으면 '-')
         subTitle: detail?.sub_title || "",
+        growthPoint: detail?.growth_point || "",
         verified: true,
         category: config?.category || activityType,
         tagColor: config?.tagColor || "",
@@ -4850,6 +5004,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         isFailed: enhancementStatus === "failed",
         isEmpty: false,
         outputLinks: mergedOutputLinks,
+        images: normalizeWorkInfoImages(detail?.image_urls || undefined),
+        imageCaptions: normalizeWorkInfoCaptions(detail?.image_captions || undefined),
       };
     }),
   ];
@@ -4864,6 +5020,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             activityType,
             title: "-",
             subTitle: "",
+            growthPoint: "",
             verified: false,
             category: config?.category || activityType,
             tagColor: config?.tagColor || "",
@@ -4874,6 +5031,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             isFailed: false,
             isEmpty: false,
             outputLinks: [],
+            images: createEmptyWorkInfoImages(),
+            imageCaptions: createEmptyWorkInfoCaptions(),
           };
         }),
       ]
@@ -4912,10 +5071,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       badge: mapping.lineName,
       title: activity?.title || mapping.mainTitle,
       subTitle: detail?.sub_title || "",
-      growthPoint: "",
+      growthPoint: detail?.growth_point || "",
       outputLinks: mergedOutputLinks,
-      images: null as (string | null)[] | null,
-      imageCaptions: null as string[] | null,
+      images: normalizeWorkInfoImages(detail?.image_urls || undefined) as (string | null)[] | null,
+      imageCaptions: normalizeWorkInfoCaptions(detail?.image_captions || undefined) as string[] | null,
       icon: getWorkAbilityIcon(mapping.lineName),
       status: enhancementStatus,
       statusIcon: enhancementStatusIcons[enhancementStatus],
@@ -4933,6 +5092,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: "",
         growthPoint: "",
         outputLinks: Array(5).fill({ desc: "", url: "" }),
+        images: createEmptyWorkInfoImages(),
+        imageCaptions: createEmptyWorkInfoCaptions(),
         status: "not_applicable" as EnhancementStatus,
         statusIcon: enhancementStatusIcons.not_applicable,
         enhancementStatus: "not_applicable" as EnhancementStatus,
@@ -4987,12 +5148,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         badge: activityType?.name || fallbackMapping?.lineName || "-",
         title: activity?.title || fallbackMapping?.mainTitle || "-",
         subTitle: detail?.sub_title || "",
-        // TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가
-        growthPoint: "",
+        growthPoint: detail?.growth_point || "",
         outputLinks: mergedOutputLinks,
-        // TODO: [백엔드 작업 필요] image_urls / image_captions 컬럼 추가
-        images: [],
-        imageCaptions: [],
+        images: normalizeWorkInfoImages(detail?.image_urls || undefined),
+        imageCaptions: normalizeWorkInfoCaptions(detail?.image_captions || undefined),
         verified: enhStatus === "success",
         rating: rating,
         ratingCount: hasActivity ? `${ratingScore} / 10` : "- / 10",
@@ -8047,34 +8206,42 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       {/* 1열: 프로필 사진 (3행 차지) */}
                       <div className="personal-photo">
                         {/* TODO: [백엔드 작업 필요] profile API의 photo URL 사용 — 현재는 데모 더미 또는 기본 아이콘 */}
-                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="profile" />
+                        <img
+                          src={
+                            isDemoMode
+                              ? "/images/0/crew profile/남 1.webp"
+                              : reviewerProfile.profilePhotoUrl || "/images/0/crew profile/남 1.webp"
+                          }
+                          alt="profile"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "/images/0/crew profile/남 1.webp"; }}
+                        />
                       </div>
 
                       {/* 2열: 인적사항 텍스트 컬럼 (3행 stack) */}
                       <div className="personal-info">
                         {/* 1행 — 이름·성별·나이 + 역할/키워드 태그 (태그는 우측 정렬) */}
                         <div className="personal-row-1">
-                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-name">{isDemoMode ? "홍길동" : (reviewerProfile.displayName || session?.user?.name || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : (reviewerProfile.gender || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <span className="personal-age">{isDemoMode ? "22" : (reviewerProfile.age ?? "—")} 세</span>
                           <div className="personal-tags">
                             {/* TODO: [백엔드 작업 필요] role 필드 (운영진/앰배서더/일반 등) — profile API에 추가 필요 */}
-                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
-                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : (roleLabel || "—"), "—")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : (reviewerProfile.vision || "-"), "-")}</span>
                           </div>
                         </div>
 
                         {/* 2행 — 학교·학과 (필드명/값 분리, 고정폭, 말줄임 없음) */}
                         <div className="personal-row-2">
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "서울대" : (reviewerProfile.school || "—")}</span>
                             <span className="field-label">학교</span>
                           </span>
                           <span className="personal-separator">|</span>
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "경영" : (reviewerProfile.major || "—")}</span>
                             <span className="field-label">학과</span>
                           </span>
                         </div>
@@ -8208,7 +8375,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </div>
 
                     {/* Growth Point — 사용자 입력 100자 (필수) */}
-                    {/* TODO: [백엔드 작업 필요] weekly_activity_details에 growth_point 컬럼 추가 + API 확장 후, sub_title과 동일 패턴으로 데이터 연결 */}
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
@@ -8459,30 +8625,38 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="workinfo-personal-card">
                     <div className="personal-grid">
                       <div className="personal-photo">
-                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="profile" />
+                        <img
+                          src={
+                            isDemoMode
+                              ? "/images/0/crew profile/남 1.webp"
+                              : reviewerProfile.profilePhotoUrl || "/images/0/crew profile/남 1.webp"
+                          }
+                          alt="profile"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "/images/0/crew profile/남 1.webp"; }}
+                        />
                       </div>
 
                       <div className="personal-info">
                         <div className="personal-row-1">
-                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-name">{isDemoMode ? "홍길동" : (reviewerProfile.displayName || session?.user?.name || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : (reviewerProfile.gender || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <span className="personal-age">{isDemoMode ? "22" : (reviewerProfile.age ?? "—")} 세</span>
                           <div className="personal-tags">
-                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
-                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : (roleLabel || "—"), "—")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : (reviewerProfile.vision || "-"), "-")}</span>
                           </div>
                         </div>
 
                         <div className="personal-row-2">
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "서울대" : (reviewerProfile.school || "—")}</span>
                             <span className="field-label">학교</span>
                           </span>
                           <span className="personal-separator">|</span>
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "경영" : (reviewerProfile.major || "—")}</span>
                             <span className="field-label">학과</span>
                           </span>
                         </div>
@@ -8927,28 +9101,36 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="workinfo-personal-card">
                     <div className="personal-grid">
                       <div className="personal-photo">
-                        <img src={isDemoMode ? "/images/0/crew profile/남 1.webp" : "/images/0/crew profile/남 1.webp"} alt="profile" />
+                        <img
+                          src={
+                            isDemoMode
+                              ? "/images/0/crew profile/남 1.webp"
+                              : reviewerProfile.profilePhotoUrl || "/images/0/crew profile/남 1.webp"
+                          }
+                          alt="profile"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "/images/0/crew profile/남 1.webp"; }}
+                        />
                       </div>
                       <div className="personal-info">
                         <div className="personal-row-1">
-                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-name">{isDemoMode ? "홍길동" : (reviewerProfile.displayName || session?.user?.name || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : (reviewerProfile.gender || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <span className="personal-age">{isDemoMode ? "22" : (reviewerProfile.age ?? "—")} 세</span>
                           <div className="personal-tags">
-                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
-                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : (roleLabel || "—"), "—")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : (reviewerProfile.vision || "-"), "-")}</span>
                           </div>
                         </div>
                         <div className="personal-row-2">
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "서울대" : (reviewerProfile.school || "—")}</span>
                             <span className="field-label">학교</span>
                           </span>
                           <span className="personal-separator">|</span>
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "경영" : (reviewerProfile.major || "—")}</span>
                             <span className="field-label">학과</span>
                           </span>
                         </div>
@@ -9257,25 +9439,25 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                       <div className="personal-info">
                         <div className="personal-row-1">
-                          <span className="personal-name">{isDemoMode ? "홍길동" : "—"}</span>
+                          <span className="personal-name">{isDemoMode ? "홍길동" : (reviewerProfile.displayName || session?.user?.name || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-gender">{isDemoMode ? "남" : "—"}</span>
+                          <span className="personal-gender">{isDemoMode ? "남" : (reviewerProfile.gender || "—")}</span>
                           <span className="personal-separator">|</span>
-                          <span className="personal-age">{isDemoMode ? "22" : "—"} 세</span>
+                          <span className="personal-age">{isDemoMode ? "22" : (reviewerProfile.age ?? "—")} 세</span>
                           <div className="personal-tags">
-                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : "역할", "역할")}</span>
-                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : "키워드", "키워드")}</span>
+                            <span className="tag-badge tag-role">{compactPersonalTag(isDemoMode ? "앰배서더" : (roleLabel || "—"), "—")}</span>
+                            <span className="tag-badge tag-keyword">{compactPersonalTag(isDemoMode ? "엔비디아 구글 테슬라" : (reviewerProfile.vision || "-"), "-")}</span>
                           </div>
                         </div>
 
                         <div className="personal-row-2">
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "서울대" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "서울대" : (reviewerProfile.school || "—")}</span>
                             <span className="field-label">학교</span>
                           </span>
                           <span className="personal-separator">|</span>
                           <span className="personal-field">
-                            <span className="field-value">{isDemoMode ? "경영" : "—"}</span>
+                            <span className="field-value">{isDemoMode ? "경영" : (reviewerProfile.major || "—")}</span>
                             <span className="field-label">학과</span>
                           </span>
                         </div>
