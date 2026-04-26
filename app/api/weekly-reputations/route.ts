@@ -359,12 +359,12 @@ export async function DELETE(request: Request) {
   }
 }
 
-// PUT: 주차 평판 수정 (어드민 전용)
+// PUT: 주차 평판 수정 (어드민은 모두, 일반 유저는 본인 작성분만)
 export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email || !isAdminEmail(session.user.email)) {
-      return NextResponse.json({ error: "어드민 권한이 필요합니다." }, { status: 403 });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
 
     const supabase = createAdminClient();
@@ -375,10 +375,48 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "평판 ID가 필요합니다." }, { status: 400 });
     }
 
+    const isAdmin = isAdminEmail(session.user.email);
+
+    // 일반 유저는 본인이 작성한 평판인지 확인
+    if (!isAdmin) {
+      const adminTargetUserId = extractTargetUserId(request);
+      const { profile, error: profileError } = await getUserProfile("id", adminTargetUserId);
+      if (profileError) {
+        return NextResponse.json({ error: profileError.message }, { status: profileError.status });
+      }
+
+      const { data: existing } = await supabase
+        .from("weekly_reputations")
+        .select("reviewer_id")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (!existing) {
+        return NextResponse.json({ error: "평판을 찾을 수 없습니다." }, { status: 404 });
+      }
+      if (existing.reviewer_id !== profile.id) {
+        return NextResponse.json({ error: "본인이 작성한 평판만 수정할 수 있습니다." }, { status: 403 });
+      }
+    }
+
+    // 별점 / 내용 / 키워드 검증 (POST와 동일)
+    if (rating !== undefined && (rating < 0 || rating > 10 || (rating * 2) % 1 !== 0)) {
+      return NextResponse.json({ error: "평점은 0.0~10.0 사이의 0.5 단위여야 합니다." }, { status: 400 });
+    }
+    if (content !== undefined && (typeof content !== "string" || content.trim().length === 0)) {
+      return NextResponse.json({ error: "내용을 입력해주세요." }, { status: 400 });
+    }
+    if (content !== undefined && content.length > 100) {
+      return NextResponse.json({ error: "내용은 100자 이내로 작성해주세요." }, { status: 400 });
+    }
+    if (keyword !== undefined && !keyword?.trim()) {
+      return NextResponse.json({ error: "키워드를 선택해주세요." }, { status: 400 });
+    }
+
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (rating !== undefined) updateData.rating = rating;
-    if (content !== undefined) updateData.content = content;
-    if (keyword !== undefined) updateData.keyword = keyword;
+    if (content !== undefined) updateData.content = content.trim();
+    if (keyword !== undefined) updateData.keyword = keyword.trim();
 
     const { error: updateError } = await supabase
       .from("weekly_reputations")

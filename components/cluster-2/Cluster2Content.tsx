@@ -128,7 +128,14 @@ const Cluster2Content = () => {
 
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
-    // TODO: 프로덕션 배포 전 로그인 체크 복원
+    if (isDemoMode) {
+      openModalFn();
+      return;
+    }
+    if (!session) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
     openModalFn();
   };
 

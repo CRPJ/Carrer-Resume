@@ -271,9 +271,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       openModalFn();
       return;
     } // 더미 모드: 체크 스킵
-    // TODO: 개발 완료 후 로그인 체크 원복
     if (!session) {
-      openModalFn();
+      alert("로그인이 필요합니다.");
       return;
     }
 
@@ -3260,20 +3259,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
 
-    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
     try {
       const res = await fetch(`/api/weekly-reviews?weekCardId=${weekId}`);
       if (!res.ok) {
         setWeeklyReviewFromDB(null);
         return;
       }
-      const data = await res.json();
-      let record = null;
-      if (Array.isArray(data)) {
-        record = data.length > 0 ? data[0] : null;
-      } else if (data && data.id) {
-        record = data;
-      }
+      const json = await res.json();
+      const record = json?.success && json?.data ? json.data : null;
       if (record) {
         setWeeklyReviewFromDB({
           id: record.id, weekCardId: record.weekCardId || weekId,
@@ -3318,7 +3311,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return { id: `demo-weekly-review-${Date.now()}`, weekCardId: weekId, created_at: now };
     }
 
-    // 일반 모드 — TODO: 백엔드 엔드포인트 확정 후 조정
     try {
       const endpoint = isUpdate ? `/api/weekly-reviews/${weeklyReviewFromDB?.id}` : "/api/weekly-reviews";
       const method = isUpdate ? "PUT" : "POST";
@@ -3327,9 +3319,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ weekCardId: weekId, rating: weeklyReviewData.rating, content: weeklyReviewData.content }),
       });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return { id: data.id, weekCardId: data.weekCardId, created_at: data.created_at, updated_at: data.updated_at };
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        console.error("[weekly-review] API 응답 오류:", res.status, errJson);
+        return null;
+      }
+      const json = await res.json();
+      const record = json?.success && json?.data ? json.data : null;
+      if (!record) return null;
+      return { id: record.id, weekCardId: record.weekCardId, created_at: record.created_at, updated_at: record.updated_at };
     } catch (err) {
       console.error("[weekly-review] API 예외:", err);
       return null;
@@ -3633,8 +3631,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     setSaveAttemptFailed(false);
 
-    // 어드민 수정 모드 — 기존 평판 PUT (POST/중복/7개 제한 우회)
-    if (editingWeeklyReputationId && session?.user?.isAdmin) {
+    // 수정 모드 — 기존 평판 PUT (어드민 전체 / 일반 유저는 본인 작성분)
+    if (editingWeeklyReputationId) {
       if (!window.confirm("저장하시겠습니까?")) return;
       setReputationSaving(true);
       try {
@@ -5165,24 +5163,82 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div
               className="edit-icon"
               onClick={() => {
+                // 임시: 마더 계정(어드민) 외에는 주차 평판 작성/수정 비활성화
+                if (!isDemoMode && !session?.user?.isAdmin) {
+                  alert("작성할 수 있는 기간이 아닙니다. 😊");
+                  return;
+                }
                 if (!isDemoMode && isOwner && !session?.user?.isAdmin) {
                   alert("주차 평판은 타 크루만이 작성할 수 있습니다.");
                   return;
                 }
                 handleEditClick(() => {
+                  if (!isDemoMode && !canEditReputation) {
+                    alert("관리자 승인 후 작성할 수 있습니다.");
+                    return;
+                  }
+                  // 이미 작성한 평판이 있는지 확인 (편집 경로 진입)
+                  const myExistingRep = !isDemoMode && session?.user?.id
+                    ? weeklyReputations.find((r: any) => r.reviewer_id === session.user.id)
+                    : null;
+
                   setHeaderModalType("타크루");
                   setHeaderModalOpen(true);
-                  // reputation-form 리디자인 2단계 — 초기 상태 + 스냅샷 캡처
-                  const initial = { rating: 0, content: "", keyword: "" };
-                  setReputationEditData(initial);
-                  setFormSnapshot(initial);
-                  setFormKeywordMode("select");
+                  setFormKeywordMode(myExistingRep ? "select" : "select");
                   setSelectedKeywordTemp("");
-                  setIsReputationFormEditing(false); // 사용자 요청: 기본 보기 모드 ([수정] 버튼 표시)
                   setSaveAttemptFailed(false);
-                  setSelectedReputationCard(null); // 신규 작성 경로 — 편집 경로와 구분
                   fetchCrewListIfNeeded();
                   fetchKeywordsIfNeeded();
+
+                  if (myExistingRep) {
+                    // 편집 모드: 기존 데이터 로드
+                    const existing = {
+                      rating: myExistingRep.rating || 0,
+                      content: myExistingRep.content || "",
+                      keyword: myExistingRep.keyword || "",
+                    };
+                    setReputationEditData(existing);
+                    setFormSnapshot(existing);
+                    setEditingWeeklyReputationId(myExistingRep.id);
+                    // reviewer 프로필 + 평판 데이터 모두 포함 (reputationData useMemo와 동일 매핑)
+                    const reviewer = myExistingRep.reviewer;
+                    let age: string | number = "-";
+                    if (reviewer?.birth_date) {
+                      const birthYear = new Date(reviewer.birth_date).getFullYear();
+                      const currentYear = new Date().getFullYear();
+                      age = currentYear - birthYear;
+                    }
+                    setSelectedReputationCard({
+                      id: myExistingRep.id,
+                      name: reviewer?.display_name || "-",
+                      gender: reviewer?.gender || "-",
+                      age,
+                      profileImg: reviewer?.profile_photo_url || "",
+                      university: reviewer?.university || "-",
+                      major: reviewer?.major_first || "-",
+                      team: reviewer?.teamName || "-",
+                      part: reviewer?.partName || "-",
+                      nickname: reviewer?.vision || "-",
+                      role: reviewer?.role ? roleLabels[reviewer.role] || reviewer.role : "일반",
+                      rating: (myExistingRep.rating || 0) / 2,
+                      ratingCount: `${myExistingRep.rating || 0} / 10`,
+                      description: myExistingRep.content || "",
+                      fm: 1,
+                      tagColor: "tag--pink",
+                      tagText: `#${myExistingRep.keyword || "-"}`,
+                      createdAt: myExistingRep.created_at || null,
+                      isEmpty: false,
+                    });
+                    setIsReputationFormEditing(true);
+                  } else {
+                    // 신규 작성 경로
+                    const initial = { rating: 0, content: "", keyword: "" };
+                    setReputationEditData(initial);
+                    setFormSnapshot(initial);
+                    setEditingWeeklyReputationId(null);
+                    setIsReputationFormEditing(true);
+                    setSelectedReputationCard(null);
+                  }
                 });
               }}
               style={{ cursor: "pointer" }}
@@ -7463,9 +7519,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           if (saveAttemptFailed) setSaveAttemptFailed(false); // 사용자 요청: 입력 시 에러 자동 해제
                         }
                       }}
+                      onClick={() => {
+                        // select 모드 + 편집 중일 때 input 클릭으로도 키워드 picker 열기
+                        if (isReputationFormEditing && formKeywordMode === "select") {
+                          handleKeywordModeChange("select");
+                        }
+                      }}
                       placeholder={formKeywordMode === "write" ? "해당 크루의 한 주 활동의 특징을 키워드로 입력해주세요." : "선택 버튼을 눌러 키워드를 선택하세요"}
                       maxLength={10}
                       readOnly={!isReputationFormEditing || formKeywordMode === "select"}
+                      style={isReputationFormEditing && formKeywordMode === "select" ? { cursor: "pointer" } : undefined}
                       onKeyDown={(e) => {
                         if (!isReputationFormEditing || formKeywordMode === "select") {
                           e.preventDefault();

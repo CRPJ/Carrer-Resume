@@ -231,7 +231,7 @@ const Cluster41Content = () => {
   const [seasonCards, setSeasonCards] = useState<SeasonCardData[]>([]);
   const [isLoadingSeasons, setIsLoadingSeasons] = useState(!isDemoMode);
 
-  // 주차별 평판 개수 가져오기
+  // 주차별 평판 개수 + 별점 합산(명성도 FM) 가져오기
   useEffect(() => {
     if (isDemoMode) return;
     const fetchWeeklyReputationCounts = async () => {
@@ -241,12 +241,15 @@ const Cluster41Content = () => {
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
-            // 주차별로 그룹화
+            // 주차별로 그룹화 (개수 + 별점 합산)
             const counts: { [key: string]: number } = {};
-            json.data.forEach((rep: { week_card_id: string }) => {
+            const fmScores: { [key: string]: number } = {};
+            json.data.forEach((rep: { week_card_id: string; rating: number }) => {
               counts[rep.week_card_id] = (counts[rep.week_card_id] || 0) + 1;
+              fmScores[rep.week_card_id] = (fmScores[rep.week_card_id] || 0) + (rep.rating || 0);
             });
             setWeeklyReputationCounts(counts);
+            setWeeklyFmScores(fmScores);
           }
         }
       } catch (error) {
@@ -2119,7 +2122,7 @@ const Cluster41Content = () => {
                                 <div className="metric">단감 <strong>{weekPoints.star}</strong></div>
                                 <div className="metric">인절미 <strong>{injeolmi}</strong></div>
                                 <div className="metric">어흥 <strong>{Math.abs(weekPoints.lightning)}</strong></div>
-                                <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/3</span></div>
+                                <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/4</span></div>
                               </div>
                             </>
                           );
@@ -2277,8 +2280,8 @@ const Cluster41Content = () => {
                               <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : careerRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : careerRate.count}</span>/<span className="num-2">{hideStats ? '-' : careerRate.total}</span>)</span></span>
                             </div>
                             <div className="weekly-card-extra-stats">
-                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num num-1">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num num-4">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num num-1">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/<span className="num-1">4</span></span></span>
+                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num num-4">{isRest ? '-' : (weeklyFmScores[week.id] ?? 0)}</span></span>
                               <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num num-1">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
                               <span className="stat empty"></span>
                             </div>
