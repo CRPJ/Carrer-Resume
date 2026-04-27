@@ -549,6 +549,34 @@ const Cluster4Content = () => {
     setSelectedReputation(null);
   };
 
+  // 시즌 평판 삭제 핸들러 (본인 작성분만 — API는 reviewer_id 검증)
+  const handleDeleteSeasonReputation = async () => {
+    if (!selectedReputation?.id) return;
+    if (!window.confirm("이 평판을 삭제하시겠습니까?")) return;
+
+    const targetId = selectedReputation.id;
+
+    // UI 즉시 반영 (로컬 state filter)
+    setSeasonReputations((prev) => prev.filter((r) => r.id !== targetId));
+    handleSeasonReputationViewClose();
+
+    // 일반 모드: 백엔드 DELETE 호출 (데모 모드는 로컬만)
+    if (!isDemoMode) {
+      try {
+        const res = await fetch(`/api/season-reputations?id=${encodeURIComponent(targetId)}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          console.error("시즌 평판 삭제 API 실패:", await res.text());
+          alert("삭제 중 오류가 발생했습니다. 새로고침 후 다시 시도해 주세요.");
+        }
+      } catch (err) {
+        console.error("시즌 평판 삭제 네트워크 오류:", err);
+        alert("삭제 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
   // season-reputation 검증 함수
   const isSeasonReputationValid = (): boolean => {
     const k1 = seasonReputationEditData.keyword1?.trim() || "";
@@ -3359,6 +3387,13 @@ const Cluster4Content = () => {
           <div className="section-modal section-modal-season-reputation-view">
             {/* === 헤더 === */}
             <div className="section-modal-header">
+              <button
+                type="button"
+                className="modal-delete-btn"
+                onClick={handleDeleteSeasonReputation}
+              >
+                삭제
+              </button>
               <button className="modal-close-btn" onClick={handleSeasonReputationViewClose} aria-label="닫기">
                 <i className="ti ti-x"></i>
               </button>

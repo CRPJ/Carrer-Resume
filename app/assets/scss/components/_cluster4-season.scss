@@ -6338,6 +6338,28 @@
     border-bottom: none;
     background: transparent;
 
+    // [삭제] 버튼 — X 바로 좌측 (cluster-4-card .modal-delete-btn 패턴 차용, Option B)
+    .modal-delete-btn {
+      position: absolute;
+      top: 16px;
+      right: 61px;
+      padding: 6px 14px;
+      background: rgba(231, 76, 60, 0.15);
+      border: 1px solid rgba(231, 76, 60, 0.4);
+      color: #e74c3c;
+      font-family: "Pretendard", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: rgba(231, 76, 60, 0.25);
+      }
+    }
+
     .modal-header-top {
       display: flex;
       flex-direction: row;
