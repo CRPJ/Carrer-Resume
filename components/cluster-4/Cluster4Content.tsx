@@ -9,7 +9,6 @@ import { useSearchParams } from "next/navigation";
 import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { usePopup } from "@/components/ui/popup";
-import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";

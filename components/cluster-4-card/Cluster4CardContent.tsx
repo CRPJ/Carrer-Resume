@@ -10,7 +10,6 @@ import { useModalScroll } from "@/utils/useModalScroll";
 import { usePopup } from "@/components/ui/popup";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
-import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
