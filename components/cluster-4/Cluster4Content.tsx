@@ -8,6 +8,8 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { usePopup } from "@/components/ui/popup";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
@@ -278,6 +280,7 @@ const Cluster4Content = () => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const isDemoMode = checkDemoMode();
   const isOwner = !urlUserId || session?.user?.id === urlUserId;
@@ -374,7 +377,7 @@ const Cluster4Content = () => {
     const approved = await checkApprovalStatus();
 
     if (!approved) {
-      alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
+      await popup.alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
       return;
     }
 
@@ -545,7 +548,7 @@ const Cluster4Content = () => {
   }, [isDemoMode, session]);
 
   // season-reputation view 모달 핸들러
-  const handleSeasonReputationViewClose = () => {
+  const handleSeasonReputationViewClose = async () => {
     setReputationDetailModalOpen(false);
     setSelectedReputation(null);
   };
@@ -569,11 +572,11 @@ const Cluster4Content = () => {
         });
         if (!res.ok) {
           console.error("시즌 평판 삭제 API 실패:", await res.text());
-          alert("삭제 중 오류가 발생했습니다. 새로고침 후 다시 시도해 주세요.");
+          await popup.alert("삭제 중 오류가 발생했습니다. 새로고침 후 다시 시도해 주세요.");
         }
       } catch (err) {
         console.error("시즌 평판 삭제 네트워크 오류:", err);
-        alert("삭제 중 오류가 발생했습니다.");
+        await popup.alert("삭제 중 오류가 발생했습니다.");
       }
     }
   };
@@ -641,9 +644,9 @@ const Cluster4Content = () => {
   };
 
   // season-reputation form 핸들러
-  const handleSeasonReputationEditClick = () => {
+  const handleSeasonReputationEditClick = async () => {
     if (!canEditSeasonReputation) {
-      alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     setSeasonReputationFormSnapshot({
@@ -707,9 +710,9 @@ const Cluster4Content = () => {
     setSeasonKeywordTempSelection(keyword);
   };
 
-  const handleSeasonKeywordSelectConfirm = () => {
+  const handleSeasonKeywordSelectConfirm = async () => {
     if (!seasonKeywordTempSelection) {
-      alert("키워드를 먼저 선택해주세요.");
+      await popup.alert("키워드를 먼저 선택해주세요.");
       return;
     }
     if (!window.confirm(`'${seasonKeywordTempSelection}' 을 선택하시겠습니까?`)) return;
@@ -787,9 +790,9 @@ const Cluster4Content = () => {
     setSeasonReputationFormSnapshot(null);
   };
 
-  const handleSeasonReputationReset = () => {
+  const handleSeasonReputationReset = async () => {
     if (!isDemoMode && !canEditSeasonReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
@@ -841,7 +844,7 @@ const Cluster4Content = () => {
 
   const handleSeasonReputationSave = async () => {
     if (!isDemoMode && !canEditSeasonReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!isSeasonReputationValid()) {
@@ -852,7 +855,7 @@ const Cluster4Content = () => {
       const k2 = seasonReputationEditData.keyword2?.trim() || "";
       const k3 = seasonReputationEditData.keyword3?.trim() || "";
       if (k1 && k2 && k3 && (k1 === k2 || k1 === k3 || k2 === k3)) {
-        alert("키워드 3개는 모두 다른 값이어야 합니다.");
+        await popup.alert("키워드 3개는 모두 다른 값이어야 합니다.");
       }
       return;
     }
@@ -871,14 +874,14 @@ const Cluster4Content = () => {
     try {
       const savedRecord = await saveSeasonReputation();
       if (!savedRecord) {
-        alert("저장에 실패했습니다. 다시 시도해주세요.");
+        await popup.alert("저장에 실패했습니다. 다시 시도해주세요.");
         return;
       }
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
     } catch (err) {
       console.error("[season-reputation] 저장 실패:", err);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
     } finally {
       setSeasonReputationSaving(false);
     }
@@ -2049,7 +2052,7 @@ const Cluster4Content = () => {
   };
 
   // 시즌 평판 모달 열기
-  const openSeasonReputationModal = () => {
+  const openSeasonReputationModal = async () => {
     setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
     setSeasonReputationError(null);
     setSeasonReputationSuccess(false);
@@ -2061,7 +2064,7 @@ const Cluster4Content = () => {
   // 시즌 평판 저장 - 다른 사람에게 평판 남기기
   const handleSaveSeasonReputation = async () => {
     if (!isDemoMode && !canEditSeasonReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (isDemoMode) {
@@ -2093,19 +2096,19 @@ const Cluster4Content = () => {
           },
         },
       ]);
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
       setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
       return;
     }
 
     if (!urlUserId) {
-      alert("평판을 남길 대상을 찾을 수 없습니다.");
+      await popup.alert("평판을 남길 대상을 찾을 수 없습니다.");
       return;
     }
 
     if (!selectedSeasonId) {
-      alert("시즌을 선택해주세요.");
+      await popup.alert("시즌을 선택해주세요.");
       return;
     }
 
@@ -2150,7 +2153,7 @@ const Cluster4Content = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "저장에 실패했습니다.");
+        await popup.alert(result.error || "저장에 실패했습니다.");
         return;
       }
 
@@ -2159,12 +2162,12 @@ const Cluster4Content = () => {
         fetchSeasonReputations(urlUserId, currentSeason.id);
       }
 
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSeasonReputationModalOpen(false);
       setSeasonReputationEditData({ rating: 0, content: "", keyword1: "", keyword2: "", keyword3: "" });
     } catch (error) {
       console.error("시즌 평판 저장 오류:", error);
-      alert("서버 오류가 발생했습니다.");
+      await popup.alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReputationSaving(false);
     }
@@ -2212,9 +2215,9 @@ const Cluster4Content = () => {
     return seasonReviewEditData.rating !== seasonReviewFormSnapshot.rating || seasonReviewEditData.review !== seasonReviewFormSnapshot.review || seasonReviewEditData.link !== seasonReviewFormSnapshot.link;
   };
 
-  const handleSeasonReviewEditClick = () => {
+  const handleSeasonReviewEditClick = async () => {
     if (!canEditSeasonReview) {
-      alert("관리자 확인이 필요합니다.");
+      await popup.alert("관리자 확인이 필요합니다.");
       return;
     }
     setSeasonReviewFormSnapshot({
@@ -2227,7 +2230,7 @@ const Cluster4Content = () => {
     setIsSeasonReviewFormEditing(true);
   };
 
-  const handleSeasonReviewCancel = () => {
+  const handleSeasonReviewCancel = async () => {
     if (isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
     if (seasonReviewFormSnapshot) {
       setSeasonReviewEditData({ rating: seasonReviewFormSnapshot.rating, review: seasonReviewFormSnapshot.review, link: seasonReviewFormSnapshot.link });
@@ -2240,9 +2243,9 @@ const Cluster4Content = () => {
     setSeasonReviewFormSnapshot(null);
   };
 
-  const handleSeasonReviewReset = () => {
+  const handleSeasonReviewReset = async () => {
     if (!isDemoMode && !canEditSeasonReview) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
@@ -2252,14 +2255,14 @@ const Cluster4Content = () => {
     setSeasonReviewFieldErrorFlash(false);
   };
 
-  const handleSeasonReviewClose = () => {
+  const handleSeasonReviewClose = async () => {
     if (isSeasonReviewFormEditing && isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
     setSeasonReviewModalOpen(false);
   };
 
   const handleSaveSeasonReview = async () => {
     if (!isDemoMode && !canEditSeasonReview) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!isSeasonReviewValid()) {
@@ -2282,7 +2285,7 @@ const Cluster4Content = () => {
     if (isDemoMode) {
       // seasonHistories 업데이트 (UI 즉시 반영 — 현재 페이지 인덱스로 매칭)
       setSeasonHistories((prev) => prev.map((season, idx) => (idx === section3Page ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() } : season)));
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSeasonReviewModalOpen(false);
       setSeasonReviewSaving(false);
       return;
@@ -2290,13 +2293,13 @@ const Cluster4Content = () => {
 
     if (!currentSeason?.id) {
       setSeasonReviewSaving(false);
-      alert("시즌 정보를 찾을 수 없습니다.");
+      await popup.alert("시즌 정보를 찾을 수 없습니다.");
       return;
     }
 
     // 0.0~5.0 범위, 0.5 단위 검증
     if (false && (seasonReviewEditData.rating < 0 || seasonReviewEditData.rating > 10)) {
-      alert("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
+      await popup.alert("평점은 0.0~5.0 사이의 0.5 단위여야 합니다.");
       return;
     }
 
@@ -2336,7 +2339,7 @@ const Cluster4Content = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "저장에 실패했습니다.");
+        await popup.alert(data.error || "저장에 실패했습니다.");
         return;
       }
 
@@ -2345,11 +2348,11 @@ const Cluster4Content = () => {
         prev.map((season) => (currentSeasonInfo && season.year === String(currentSeasonInfo.year) && season.season === currentSeasonInfo.name ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() } : season)),
       );
 
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSeasonReviewModalOpen(false);
     } catch (error) {
       console.error("시즌 리뷰 저장 오류:", error);
-      alert("서버 오류가 발생했습니다.");
+      await popup.alert("서버 오류가 발생했습니다.");
     } finally {
       setSeasonReviewSaving(false);
     }
@@ -3027,9 +3030,9 @@ const Cluster4Content = () => {
                   <div
                     className="edit-icon"
                     style={{ cursor: "pointer", flexShrink: 0 }}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!isDemoMode && isOwner) {
-                        alert("시즌 평판은 타 크루끼리 작성합니다.");
+                        await popup.alert("시즌 평판은 타 크루끼리 작성합니다.");
                         return;
                       }
                       handleEditClick(openSeasonReputationModal);
@@ -3868,9 +3871,9 @@ const Cluster4Content = () => {
                     placeholder="이번 시즌은 어땠나요? (30자 이내)"
                     maxLength={30}
                     value={seasonReviewEditData.review}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       if (e.target.value.length > 30) {
-                        alert("최대 30자까지 입력할 수 있습니다.");
+                        await popup.alert("최대 30자까지 입력할 수 있습니다.");
                         return;
                       }
                       setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }));

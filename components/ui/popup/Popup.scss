@@ -1,0 +1,192 @@
+// =====================================================
+// Custom Popup v3
+//   - 크기: 12cm × 4cm = 456px × 152px
+//   - 헤더 그라데이션: 블루 → 다크 청록 (좌→우)
+//   - 본문: 다크 베이스 + 흰색 텍스트, 상단 가운데 정렬
+//   - 버튼: 홈페이지 .btn 패턴 (다크 + 골드 hover)
+//   - z-index: 9999998/9999999 (모든 모달 위에 표시)
+//     * cluster3 캘린더(999999), cluster4 시즌 모달(999999) 위에 안전하게 노출
+//     * 커스텀 커서(10000000/10000001)보다는 아래 — 커서가 팝업 위에 보여야 정상
+// =====================================================
+
+/* ----------------------- 변수 ----------------------- */
+
+// 사이즈
+$popup-width:         456px;
+$popup-height:        152px;
+$popup-radius:        12px;
+$popup-header-height: 35px;
+
+// 본문
+$popup-body-bg:    #1A1F26;
+$popup-text-color: #FFFFFF;
+
+// 버튼
+$popup-btn-bg:           #2A323D;
+$popup-btn-text:         #FFFFFF;
+$popup-btn-border:       transparent;
+$popup-btn-hover-bg:     #FAAB07;
+$popup-btn-hover-text:   #000000;
+$popup-btn-confirm-bg:   #FAAB07;
+$popup-btn-confirm-text: #000000;
+
+// z-index — 천만 단위로 격상
+// 충돌 분석 결과:
+//   - cluster3 캘린더 팝업: 999,999
+//   - cluster4 시즌 모달:    999,999
+//   - 커스텀 커서:           10,000,000 / 10,000,001
+// → 팝업은 그 사이(9,999,998 / 9,999,999)에 위치
+// → 모달 모두 위, 커서 아래 (커서는 팝업 위에 떠야 정상 UX)
+$popup-z-backdrop: 9999998;
+$popup-z-content:  9999999;
+
+/* ----------------------- 백드롭 ----------------------- */
+
+.custom-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: $popup-z-backdrop;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ----------------------- 팝업 본체 ----------------------- */
+
+.custom-popup {
+  position: relative;
+  width: $popup-width;
+  height: $popup-height;
+  background-color: $popup-body-bg;
+  border-radius: $popup-radius;
+  z-index: $popup-z-content;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-family: 'Pretendard', sans-serif;
+
+  /* ===========================================================
+     헤더 — 블루 → 다크 청록 그라데이션
+     - 좌측: rgba(33, 150, 243, 0.65) 블루
+     - 우측: rgba(0, 77, 95, 0.85) 다크 청록 (Dark Teal)
+     - 베이스: var(--popup-header-bg) 일러스트
+     =========================================================== */
+  &__header {
+    flex-shrink: 0;
+    width: 100%;
+    height: $popup-header-height;
+    position: relative;
+    background:
+      linear-gradient(
+        to right,
+        rgba(33, 150, 243, var(--popup-header-overlay, 0.65)),
+        rgba(0, 77, 95, 0.85)
+      ),
+      var(--popup-header-bg) center 42% / cover no-repeat;
+  }
+
+  /* ----- 본문 ----- */
+  &__body {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;       // ⭐ 상단 정렬
+    justify-content: center;
+    padding: 16px 20px 0;          // ⭐ 상단 16px 여백, 하단은 0 (footer가 절대 위치)
+    gap: 16px;
+    min-width: 0;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 77px;
+    height: 77px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -2px;              // 메시지와 시각적 베이스라인 맞춤
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__message {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: $popup-text-color;
+    text-align: center;
+    word-break: keep-all;
+    white-space: pre-wrap;
+    font-weight: 500;
+    padding-top: 6px;              // ⭐ 메시지를 살짝 더 위로 (시각 보정)
+  }
+
+  /* ----- 푸터 ----- */
+  &__footer {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    min-width: 64px;
+    height: 30px;
+    padding: 0 16px;
+    border: 1px solid $popup-btn-border;
+    border-radius: 6px;
+    background-color: $popup-btn-bg;
+    color: $popup-btn-text;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background-color: $popup-btn-hover-bg;
+      color: $popup-btn-hover-text;
+    }
+
+    &:active {
+      filter: brightness(0.92);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $popup-btn-hover-bg;
+      outline-offset: 2px;
+    }
+
+    &--confirm {
+      background-color: $popup-btn-confirm-bg;
+      color: $popup-btn-confirm-text;
+
+      &:hover {
+        background-color: lighten(#FAAB07, 5%);
+        color: $popup-btn-confirm-text;
+      }
+    }
+
+    &--cancel {
+      &:hover {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: #fff;
+      }
+    }
+  }
+}

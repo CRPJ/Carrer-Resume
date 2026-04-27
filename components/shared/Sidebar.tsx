@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { usePopup } from "@/components/ui/popup";
 // Define the type for the game object
 interface Game {
   id: number;
@@ -29,6 +30,7 @@ const games: Game[] = [
 const Sidebar = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const popup = usePopup();
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
 
   // 로그인 시 user_profiles ID를 미리 가져옴
@@ -44,7 +46,7 @@ const Sidebar = () => {
       .catch(() => {});
   }, [session]);
 
-  const handleCareerResumeClick = (e: React.MouseEvent) => {
+  const handleCareerResumeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (session?.user) {
       if (myProfileId) {
@@ -53,7 +55,7 @@ const Sidebar = () => {
         router.push("/cluster-4");
       }
     } else {
-      alert("현재 활동 중이거나 졸업한 크루여야 합니다");
+      await popup.alert("현재 활동 중이거나 졸업한 크루여야 합니다");
     }
   };
 

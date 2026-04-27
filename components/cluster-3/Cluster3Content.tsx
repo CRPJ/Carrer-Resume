@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { getDocumentZoom, getFixedDropdownPosition } from "@/utils/documentZoom";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { usePopup } from "@/components/ui/popup";
 import {
   CLUSTER3_DUMMY_PROFILE,
   CLUSTER3_DUMMY_ARCHIVES,
@@ -26,6 +27,7 @@ import { DETAIL_CARD_1_DEFAULT, createInitialDetailCardsWithDefault } from "@/co
 // Zone C(>1920px, ResponsiveScale.tsx에서 documentElement에 zoom:1.08 적용) 대응.
 // getBoundingClientRect는 zoom 적용 후 좌표를 반환하지만 position:fixed의 top/left는 CSS 픽셀 기준이라 좌표가 어긋난다.
 // zoom이 적용되지 않은 Zone A/B에서는 1을 반환해 기존 동작을 유지한다.
+
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -167,6 +169,7 @@ const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+  const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const demoNameParam = searchParams.get("demoName");
   const demoLookupName = demoNameParam || urlUserId;
@@ -211,14 +214,14 @@ const Cluster3Content = () => {
   // 수정 버튼 클릭 핸들러 (승인 상태 체크)
   const handleEditClick = async (openModalFn: () => void) => {
     if (!session) {
-      alert("로그인이 필요합니다.");
+      await popup.alert("로그인이 필요합니다.");
       return;
     }
 
     const approved = await checkApprovalStatus();
 
     if (!approved) {
-      alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
+      await popup.alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
       return;
     }
 
@@ -532,7 +535,7 @@ const Cluster3Content = () => {
         return card;
       });
       setChannelCards(updatedCards);
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSection3ModalOpen(false);
       return;
     }
@@ -556,16 +559,16 @@ const Cluster3Content = () => {
           return card;
         });
         setChannelCards(updatedCards);
-        alert("저장되었습니다.");
+        await popup.alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);
-        alert(result.error || "저장에 실패했습니다.");
+        await popup.alert(result.error || "저장에 실패했습니다.");
         return false;
       }
     } catch (error) {
       console.error("포트폴리오 아카이빙 저장 오류:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
       return false;
     } finally {
       setIsSavingArchives(false);
@@ -629,7 +632,7 @@ const Cluster3Content = () => {
         link: links[index] || "",
       }));
       setTopWorksSlides(updatedSlides);
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSection4ModalOpen(false);
       return;
     }
@@ -651,16 +654,16 @@ const Cluster3Content = () => {
           link: links[index] || "",
         }));
         setTopWorksSlides(updatedSlides);
-        alert("저장되었습니다.");
+        await popup.alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);
-        alert(result.error || "저장에 실패했습니다.");
+        await popup.alert(result.error || "저장에 실패했습니다.");
         return false;
       }
     } catch (error) {
       console.error("포트폴리오 Output 저장 오류:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
       return false;
     } finally {
       setIsSavingOutputs(false);
@@ -724,7 +727,7 @@ const Cluster3Content = () => {
         link: links[index] || "",
       }));
       setDetailThumbnails(updatedThumbnails);
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setSection5ModalOpen(false);
       return;
     }
@@ -746,16 +749,16 @@ const Cluster3Content = () => {
           link: links[index] || "",
         }));
         setDetailThumbnails(updatedThumbnails);
-        alert("저장되었습니다.");
+        await popup.alert("저장되었습니다.");
         return true;
       } else {
         console.error("저장 실패:", result.error);
-        alert(result.error || "저장에 실패했습니다.");
+        await popup.alert(result.error || "저장에 실패했습니다.");
         return false;
       }
     } catch (error) {
       console.error("Detail 10 저장 오류:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
       return false;
     } finally {
       setIsSavingDetails(false);
@@ -1377,8 +1380,8 @@ const Cluster3Content = () => {
     }
   };
 
-  const handleResetOutput = () => {
-    if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+  const handleResetOutput = async () => {
+    if (await popup.confirm("내용을 모두 초기화하시겠어요?")) {
       const updated = [...outputCards];
       updated[currentOutputIndex] = currentOutputIndex === 0 ? ({ ...OUTPUT_CARD_1_DEFAULT } as OutputCard) : emptyOutputCard(currentOutputIndex + 1);
       setOutputCards(updated);
@@ -1429,12 +1432,12 @@ const Cluster3Content = () => {
     return { ...card, links: compactLinks, metrics: compactMetrics };
   };
 
-  const handleSaveOutput = () => {
+  const handleSaveOutput = async () => {
     const current = outputCards[currentOutputIndex];
     const errors = validateOutputCard(current);
     if (errors.length > 0) {
       setOutputFooterNotice("error");
-      alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
+      await popup.alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
       return;
     }
     if (!window.confirm("저장하시겠습니까?")) return;
@@ -1510,12 +1513,12 @@ const Cluster3Content = () => {
     }
   };
 
-  const handleSaveDetail = () => {
+  const handleSaveDetail = async () => {
     const current = detailCards[currentDetailIndex];
     const errors = validateOutputCard(current);
     if (errors.length > 0) {
       setDetailFooterNotice("error");
-      alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
+      await popup.alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
       return;
     }
     if (!window.confirm("저장하시겠습니까?")) return;
@@ -2690,7 +2693,7 @@ const Cluster3Content = () => {
                         </button>
                         <button
                           className="modal-save-btn"
-                          onClick={() => {
+                          onClick={async () => {
                             const card = channelCards[currentCardIndex];
                             const missing: string[] = [];
                             if (!card.channelName?.trim()) missing.push("channelName");
@@ -2723,7 +2726,7 @@ const Cluster3Content = () => {
                             const updated = [...channelCards];
                             updated[currentCardIndex] = { ...card, images: reorderedImages };
                             setChannelCards(updated);
-                            alert("저장되었어요!");
+                            await popup.alert("저장되었어요!");
                             setCardSnapshot(JSON.parse(JSON.stringify(updated[currentCardIndex])));
                             setIsEditMode(false);
                             setSection3FooterNotice("default");
@@ -2781,7 +2784,7 @@ const Cluster3Content = () => {
                     <div
                       key={tool.key}
                       className={`dropdown-option${isSelected ? " selected" : ""}`}
-                      onClick={() => {
+                      onClick={async () => {
                         if (isSelected) {
                           handleDetailChange(
                             "tools",
@@ -2789,7 +2792,7 @@ const Cluster3Content = () => {
                           );
                         } else {
                           if (selectedTools.length >= 5) {
-                            window.alert("최대 5개까지 고를 수 있습니다.");
+                            await popup.alert("최대 5개까지 고를 수 있습니다.");
                             return;
                           }
                           handleDetailChange("tools", [...selectedTools, tool.key]);
@@ -2876,7 +2879,7 @@ const Cluster3Content = () => {
                     <div
                       key={tool.key}
                       className={`dropdown-option${isSelected ? " selected" : ""}`}
-                      onClick={() => {
+                      onClick={async () => {
                         if (isSelected) {
                           handleOutputChange(
                             "tools",
@@ -2884,7 +2887,7 @@ const Cluster3Content = () => {
                           );
                         } else {
                           if (selectedTools.length >= 5) {
-                            window.alert("최대 5개까지 고를 수 있습니다.");
+                            await popup.alert("최대 5개까지 고를 수 있습니다.");
                             return;
                           }
                           handleOutputChange("tools", [...selectedTools, tool.key]);
@@ -3760,9 +3763,9 @@ const Cluster3Content = () => {
                     {!isOutputEditMode ? (
                       <button
                         className="modal-edit-btn"
-                        onClick={() => {
+                        onClick={async () => {
                           if (!canEditOutput) {
-                            alert("관리자의 허가가 필요합니다.");
+                            await popup.alert("관리자의 허가가 필요합니다.");
                             return;
                           }
                           setIsOutputEditMode(true);
@@ -4513,9 +4516,9 @@ const Cluster3Content = () => {
                     {!isDetailEditMode ? (
                       <button
                         className="modal-edit-btn"
-                        onClick={() => {
+                        onClick={async () => {
                           if (!canEditDetail) {
-                            alert("관리자의 허가가 필요합니다.");
+                            await popup.alert("관리자의 허가가 필요합니다.");
                             return;
                           }
                           setIsDetailEditMode(true);

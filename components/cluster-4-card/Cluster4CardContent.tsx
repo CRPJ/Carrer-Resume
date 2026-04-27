@@ -7,8 +7,10 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { usePopup } from "@/components/ui/popup";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
@@ -212,6 +214,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   // SSR/client hydration 일관성을 위해 stateful — 첫 렌더 SSR=client=false, 마운트 후 localStorage 값 반영
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -268,7 +271,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const approved = await checkApprovalStatus();
 
     if (!approved) {
-      alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
+      await popup.alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
       return;
     }
 
@@ -1667,7 +1670,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleDeleteColleague = async () => {
     if (!isDemoMode && !canEditColleague) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!selectedColleagueCard) return;
@@ -1890,9 +1893,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const LINE_LOCKED_TITLE = "강화 실패 또는 해당 없음 상태에서는 수정할 수 없습니다.";
 
   // workInfo View 모달 — 보기/편집 토글 핸들러 (Type B 푸터 규칙 + 관리자 승인)
-  const handleEditWorkInfo = () => {
+  const handleEditWorkInfo = async () => {
     if (!canEditWorkInfo) {
-      window.alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     const card = selectedWorkInfoCard;
@@ -1934,9 +1937,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkInfoViewIsEditing(false);
   };
 
-  const handleResetWorkInfo = () => {
+  const handleResetWorkInfo = async () => {
     if (!isDemoMode && !canEditWorkInfo) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     // 편집 모드 유지. confirm 후 스냅샷 복원.
@@ -1950,9 +1953,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkInfo = () => {
+  const handleSaveWorkInfo = async () => {
     if (!isDemoMode && !canEditWorkInfo) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     // 필수필드 검증: Sub Title / Growth Point / 이미지 1·2번
@@ -2001,7 +2004,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingImageCaptions],
       };
     }
-    alert("저장되었습니다.");
+    await popup.alert("저장되었습니다.");
     setWorkInfoFooterNotice("default");
     setWorkInfoViewIsEditing(false);
   };
@@ -2110,13 +2113,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return false;
   };
 
-  const handleEditWorkAbility = () => {
+  const handleEditWorkAbility = async () => {
     if (selectedWorkAbilityCard?.isEmpty) {
-      window.alert("해당 카드는 비어있습니다");
+      await popup.alert("해당 카드는 비어있습니다");
       return;
     }
     if (!canEditWorkAbility) {
-      window.alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     const card = selectedWorkAbilityCard;
@@ -2155,9 +2158,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkAbilityViewIsEditing(false);
   };
 
-  const handleResetWorkAbility = () => {
+  const handleResetWorkAbility = async () => {
     if (!isDemoMode && !canEditWorkAbility) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const snap = workAbilitySnapshot.current;
@@ -2170,9 +2173,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkAbility = () => {
+  const handleSaveWorkAbility = async () => {
     if (!isDemoMode && !canEditWorkAbility) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const missing: string[] = [];
@@ -2225,7 +2228,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingAbilityImageCaptions],
       };
     }
-    alert("저장되었습니다.");
+    await popup.alert("저장되었습니다.");
     setWorkAbilityFooterNotice("default");
     setWorkAbilityViewIsEditing(false);
   };
@@ -2334,13 +2337,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return false;
   };
 
-  const handleEditWorkExp = () => {
+  const handleEditWorkExp = async () => {
     if (selectedWorkExpCard?.isEmpty) {
-      window.alert("해당 카드는 비어있습니다");
+      await popup.alert("해당 카드는 비어있습니다");
       return;
     }
     if (!canEditWorkExp) {
-      window.alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     const card = selectedWorkExpCard;
@@ -2382,9 +2385,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkExpViewIsEditing(false);
   };
 
-  const handleResetWorkExp = () => {
+  const handleResetWorkExp = async () => {
     if (!isDemoMode && !canEditWorkExp) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const snap = workExpSnapshot.current;
@@ -2398,9 +2401,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkExp = () => {
+  const handleSaveWorkExp = async () => {
     if (!isDemoMode && !canEditWorkExp) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const missing: string[] = [];
@@ -2447,7 +2450,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         rating: editingExpRating,
       };
     }
-    alert("저장되었습니다.");
+    await popup.alert("저장되었습니다.");
     setWorkExpFooterNotice("default");
     setWorkExpViewIsEditing(false);
   };
@@ -2551,13 +2554,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return false;
   };
 
-  const handleEditWorkCareer = () => {
+  const handleEditWorkCareer = async () => {
     if (selectedWorkCareerCard?.isEmpty) {
-      window.alert("해당 카드는 비어있습니다");
+      await popup.alert("해당 카드는 비어있습니다");
       return;
     }
     if (!canEditWorkCareer) {
-      window.alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     const card = selectedWorkCareerCard;
@@ -2596,9 +2599,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkCareerViewIsEditing(false);
   };
 
-  const handleResetWorkCareer = () => {
+  const handleResetWorkCareer = async () => {
     if (!isDemoMode && !canEditWorkCareer) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const snap = workCareerSnapshot.current;
@@ -2611,9 +2614,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  const handleSaveWorkCareer = () => {
+  const handleSaveWorkCareer = async () => {
     if (!isDemoMode && !canEditWorkCareer) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const missing: string[] = [];
@@ -2658,7 +2661,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         imageCaptions: [...editingCareerImageCaptions],
       };
     }
-    alert("저장되었습니다.");
+    await popup.alert("저장되었습니다.");
     setWorkCareerFooterNotice("default");
     setWorkCareerViewIsEditing(false);
   };
@@ -2825,9 +2828,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // colleague-view-modal [수정] — 관리자 승인 검증 후 편집 모달 진입
-  const handleColleagueEditClick = () => {
+  const handleColleagueEditClick = async () => {
     if (!isDemoMode) {
-      window.alert("관리자 승인이 필요합니다.");
+      await popup.alert("관리자 승인이 필요합니다.");
       return;
     }
     setColleagueViewModalOpen(false);
@@ -2844,9 +2847,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setHeaderModalOpen(false);
   };
 
-  const handleColleagueEditReset = () => {
+  const handleColleagueEditReset = async () => {
     if (!isDemoMode && !canEditColleague) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
@@ -2866,7 +2869,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleColleagueEditSave = async () => {
     if (!isDemoMode && !canEditColleague) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!isColleagueEditFormValid()) {
@@ -2911,7 +2914,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setSelectedColleagues(updatedList);
 
     if (isDemoMode) {
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setIsColleagueEditing(false);
       setHeaderModalOpen(false);
       return;
@@ -2926,12 +2929,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         body: JSON.stringify({ weekCardId: weekId, colleagues: payload }),
       });
       if (!res.ok) throw new Error("저장 실패");
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setIsColleagueEditing(false);
       setHeaderModalOpen(false);
     } catch (err) {
       console.error("연계 동료 저장 실패:", err);
-      window.alert("저장에 실패했습니다.");
+      await popup.alert("저장에 실패했습니다.");
     } finally {
       setColleagueSaving(false);
     }
@@ -2998,12 +3001,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     if (isDemoMode) {
       console.log("Demo: 연계 동료 저장", selectedColleagues);
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setHeaderModalOpen(false);
       return;
     }
     if (!weekId) {
-      alert("주차 정보를 찾을 수 없습니다.");
+      await popup.alert("주차 정보를 찾을 수 없습니다.");
       return;
     }
 
@@ -3030,17 +3033,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const json = await res.json();
 
       if (!res.ok) {
-        alert(json.error || "저장에 실패했습니다.");
+        await popup.alert(json.error || "저장에 실패했습니다.");
         return;
       }
 
       // 연계 동료 데이터 새로고침
       fetchWeeklyColleagues();
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setHeaderModalOpen(false);
     } catch (error) {
       console.error("연계 동료 저장 오류:", error);
-      alert("서버 오류가 발생했습니다.");
+      await popup.alert("서버 오류가 발생했습니다.");
     } finally {
       setColleagueSaving(false);
     }
@@ -3304,9 +3307,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 주차 리뷰 — 푸터 핸들러
-  const handleWeeklyReviewEditClick = () => {
+  const handleWeeklyReviewEditClick = async () => {
     if (!canEditReputation) {
-      alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
     setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
@@ -3336,9 +3339,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setHelpModalKind("weeklyReview");
   };
 
-  const handleWeeklyReviewReset = () => {
+  const handleWeeklyReviewReset = async () => {
     if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
@@ -3350,7 +3353,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleWeeklyReviewSave = async () => {
     if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     if (!isWeeklyReviewValid()) {
@@ -3365,7 +3368,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     try {
       const savedRecord = await saveWeeklyReview();
       if (!savedRecord) {
-        alert("저장에 실패했습니다. 다시 시도해주세요.");
+        await popup.alert("저장에 실패했습니다. 다시 시도해주세요.");
         return;
       }
       setWeeklyReviewFromDB({
@@ -3376,7 +3379,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         created_at: savedRecord.created_at,
         updated_at: savedRecord.updated_at,
       });
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setWeeklyReviewModalOpen(false);
       setIsWeeklyReviewEditing(false);
       setWeeklyReviewSaveAttemptFailed(false);
@@ -3384,7 +3387,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setWeeklyReviewFormSnapshot(null);
     } catch (err) {
       console.error("[weekly-review] 저장 실패:", err);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
     } finally {
       setWeeklyReviewSaving(false);
     }
@@ -3395,10 +3398,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
-  const handleEditMode = () => {
+  const handleEditMode = async () => {
     // 승인 체크 — reputation-view-modal [수정] (L3031)과 동일 패턴
     if (!canEditReputation) {
-      alert("관리자 승인이 필요합니다");
+      await popup.alert("관리자 승인이 필요합니다");
       return;
     }
 
@@ -3417,9 +3420,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleFormEditStart = handleEditMode;
 
   // 초기화 버튼 → 사용자 요청: window.confirm 사용 (cluster3 동일 패턴)
-  const handleFormReset = () => {
+  const handleFormReset = async () => {
     if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
@@ -3455,9 +3458,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // ========================================================================
 
   // [수정] — 관리자 승인 검증 + 편집 모달 진입 + 기존 데이터 초기화
-  const handleReputationEditClick = () => {
+  const handleReputationEditClick = async () => {
     if (!canEditReputation) {
-      window.alert("관리자 승인이 필요합니다.");
+      await popup.alert("관리자 승인이 필요합니다.");
       return;
     }
     if (!selectedReputationCard) return;
@@ -3494,7 +3497,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 관리자 승인 체크 (데모=통과, 일반=기존 canEditReputation)
     if (!canEditReputation) {
-      window.alert("관리자 승인이 필요합니다.");
+      await popup.alert("관리자 승인이 필요합니다.");
       return;
     }
 
@@ -3525,7 +3528,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setSelectedReputationCard(null);
     } catch (err) {
       console.error("평판 삭제 실패:", err);
-      window.alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      await popup.alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   };
 
@@ -3556,7 +3559,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 저장 — 작업 2+3: 검증 → 중복/제한 체크 → 저장 → view 갱신/재조회 → 편집 경로면 view 복귀
   const handleFormSave = async () => {
     if (!isDemoMode && !canEditReputation) {
-      alert("관리자 승인 후 수정할 수 있습니다.");
+      await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
     // 1. 필수필드 검증
@@ -3578,17 +3581,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const targetUid = urlUserId || "";
         const wkId = weekId || "";
         if (!targetUid || !wkId) {
-          alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+          await popup.alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
           return;
         }
         // 2-a. 중복 체크 — 같은 대상에게 이미 보냈는지
         if (checkAlreadySent(targetUid, wkId)) {
-          window.alert("해당 크루에게 이미 평판을 드렸습니다.");
+          await popup.alert("해당 크루에게 이미 평판을 드렸습니다.");
           return;
         }
         // 2-b. 최대 7명 체크
         if (getSentCountThisWeek(wkId) >= 7) {
-          window.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
+          await popup.alert("한 주에 최대 7명까지만 평판을 보낼 수 있습니다.");
           return;
         }
       }
@@ -3639,7 +3642,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       keyword: reputationEditData.keyword,
     });
 
-    alert("저장되었습니다.");
+    await popup.alert("저장되었습니다.");
     setHeaderModalOpen(false);
 
     if (wasEditEntry) {
@@ -3681,7 +3684,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     if (!urlUserId || !weekId) {
-      alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
+      await popup.alert("대상 사용자 또는 주차 정보를 찾을 수 없습니다.");
       return null;
     }
 
@@ -3704,7 +3707,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
       const json = await res.json();
       if (!res.ok) {
-        alert(json.error || "저장에 실패했습니다.");
+        await popup.alert(json.error || "저장에 실패했습니다.");
         return null;
       }
       setReputationSaveSuccess(true);
@@ -3715,7 +3718,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     } catch (error) {
       console.error("주차 평판 저장 오류:", error);
       setReputationSaveError((error as Error)?.message || "서버 오류");
-      alert("서버 오류가 발생했습니다.");
+      await popup.alert("서버 오류가 발생했습니다.");
       return null;
     } finally {
       setReputationSaving(false);
@@ -4530,12 +4533,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       if (!response.ok) {
         const error = await response.json();
         console.error("Failed to save activity detail:", error);
-        alert("저장에 실패했습니다.");
+        await popup.alert("저장에 실패했습니다.");
         return;
       }
     } catch (error) {
       console.error("Error saving activity detail:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      await popup.alert("저장 중 오류가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -4632,7 +4635,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       // 저장 후 weekActivityDetails 상태 즉시 업데이트
       updateWeekActivityDetailsAfterSave(workInfoActivityTypes);
 
-      alert("저장되었습니다.");
+      await popup.alert("저장되었습니다.");
       setWorkInfoModalOpen(false);
     } catch (error) {
       console.error("Error saving all activity details:", error);
@@ -5066,9 +5069,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="floating-icons" style={{ display: "flex" }}>
             <div
               className="edit-icon"
-              onClick={() => {
+              onClick={async () => {
                 if (!isDemoMode && isOwner) {
-                  alert("주차 평판은 타 크루만이 작성할 수 있습니다.");
+                  await popup.alert("주차 평판은 타 크루만이 작성할 수 있습니다.");
                   return;
                 }
                 handleEditClick(() => {
@@ -5460,9 +5463,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="floating-icons" style={{ display: "flex", alignItems: "flex-start" }}>
                 <div
                   className="edit-icon"
-                  onClick={() => {
+                  onClick={async () => {
                     if (!isDemoMode && !isOwner) {
-                      alert("연계 크루는 본인만이 작성할 수 있습니다.");
+                      await popup.alert("연계 크루는 본인만이 작성할 수 있습니다.");
                       return;
                     }
                     handleEditClick(() => {
@@ -6328,9 +6331,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                         <textarea
                           value={editingDetails[card.activityType]?.subTitle || ""}
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             if (e.target.value.length > 150) {
-                              alert("최대 150자까지 입력할 수 있습니다.");
+                              await popup.alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             setEditingDetails((prev) => ({
@@ -6377,9 +6380,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   value={link.desc}
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                  onChange={(e) => {
+                                  onChange={async (e) => {
                                     if (e.target.value.length > 20) {
-                                      alert("최대 20자까지 입력할 수 있습니다.");
+                                      await popup.alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
@@ -6535,9 +6538,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           rows={3}
                           maxLength={150}
                           value={editingDetails[getActiveAbilityActivityType()]?.subTitle || ""}
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             if (e.target.value.length > 150) {
-                              alert("최대 150자까지 입력할 수 있습니다.");
+                              await popup.alert("최대 150자까지 입력할 수 있습니다.");
                               return;
                             }
                             const actType = getActiveAbilityActivityType();
@@ -6578,9 +6581,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   value={link.desc}
                                   disabled={isDisabled}
                                   style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                  onChange={(e) => {
+                                  onChange={async (e) => {
                                     if (e.target.value.length > 20) {
-                                      alert("최대 20자까지 입력할 수 있습니다.");
+                                      await popup.alert("최대 20자까지 입력할 수 있습니다.");
                                       return;
                                     }
                                     !isDisabled &&
@@ -6634,7 +6637,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const actType = getActiveAbilityActivityType();
                       await saveActivityDetail(actType);
                       updateWeekActivityDetailsAfterSave([actType]);
-                      alert("저장되었습니다.");
+                      await popup.alert("저장되었습니다.");
                       setWorkAbilityModalOpen(false);
                     }}
                     disabled={!canSave}
@@ -6766,9 +6769,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                 rows={3}
                                 maxLength={150}
                                 value={editingDetails[activityType]?.subTitle || ""}
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   if (e.target.value.length > 150) {
-                                    alert("최대 150자까지 입력할 수 있습니다.");
+                                    await popup.alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -6807,9 +6810,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                         value={link.desc}
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                           if (e.target.value.length > 20) {
-                                            alert("최대 20자까지 입력할 수 있습니다.");
+                                            await popup.alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
@@ -6862,7 +6865,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       await saveActivityDetail(activityType);
                     }
                     updateWeekActivityDetailsAfterSave(workExpActivityTypes);
-                    alert("저장되었습니다.");
+                    await popup.alert("저장되었습니다.");
                     setWorkExpModalOpen(false);
                   } catch (error) {
                     console.error("Error saving work exp details:", error);
@@ -6974,9 +6977,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               </div>
                               <textarea
                                 value={editingDetails[activityType]?.subTitle || ""}
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   if (e.target.value.length > 150) {
-                                    alert("최대 150자까지 입력할 수 있습니다.");
+                                    await popup.alert("최대 150자까지 입력할 수 있습니다.");
                                     return;
                                   }
                                   setEditingDetails((prev) => ({
@@ -7029,9 +7032,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                         value={link.desc}
                                         disabled={isDisabled}
                                         style={isDisabled ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" } : {}}
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                           if (e.target.value.length > 20) {
-                                            alert("최대 20자까지 입력할 수 있습니다.");
+                                            await popup.alert("최대 20자까지 입력할 수 있습니다.");
                                             return;
                                           }
                                           !isDisabled &&
@@ -7095,7 +7098,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       await saveActivityDetail(activityType);
                     }
                     updateWeekActivityDetailsAfterSave(workCareerActivityTypes);
-                    alert("저장되었습니다.");
+                    await popup.alert("저장되었습니다.");
                     setWorkCareerModalOpen(false);
                   } catch (error) {
                     console.error("Error saving work career details:", error);

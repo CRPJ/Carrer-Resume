@@ -6639,8 +6639,9 @@
       transition: all 0.3s ease;
 
       &:hover {
-        background: rgba(136, 136, 136, 0.1);
-        color: #aaa;
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: #fff;
       }
     }
 

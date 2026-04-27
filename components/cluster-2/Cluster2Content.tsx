@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 // #ToDo 커리어넷 API 키 발급 후 전국 학교 목록 연동
 
@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { usePopup } from "@/components/ui/popup";
 import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO, CLUSTER2_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 import { SECTION1_PHOTO_DEFAULTS } from "@/constants/dummyData/cluster2-section1-default";
 import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
@@ -81,6 +82,12 @@ const Cluster2Content = () => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const { alert: showAlert, confirm: popupConfirm } = usePopup();
+  const showConfirm = useCallback(async (message: string, onConfirm: () => void | Promise<void>) => {
+    if (await popupConfirm(message)) {
+      await onConfirm();
+    }
+  }, [popupConfirm]);
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const demoNameParam = searchParams.get("demoName");
   const demoLookupName = demoNameParam || urlUserId;
@@ -245,12 +252,12 @@ const Cluster2Content = () => {
       if (result.success) {
         return result.url;
       } else {
-        alert(result.error || "사진 업로드에 실패했습니다.");
+        showAlert(result.error || "사진 업로드에 실패했습니다.");
         return null;
       }
     } catch (error) {
       console.error("사진 업로드 오류:", error);
-      alert("사진 업로드 중 오류가 발생했습니다.");
+      showAlert("사진 업로드 중 오류가 발생했습니다.");
       return null;
     }
   };
@@ -323,7 +330,7 @@ const Cluster2Content = () => {
     // 5. API 호출 (데모 모드 분기)
     if (isDemoMode) {
       console.log("TODO: 저장 API 호출", reordered);
-      window.alert("저장되었어요!");
+      showAlert("저장되었어요!");
       setSection1ModalOpen(false);
       return;
     }
@@ -340,14 +347,14 @@ const Cluster2Content = () => {
 
       const result = await response.json();
       if (result.success) {
-        window.alert("저장되었어요!");
+        showAlert("저장되었어요!");
         setSection1ModalOpen(false);
       } else {
-        alert(result.error || "사진 저장에 실패했습니다.");
+        showAlert(result.error || "사진 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("사진 저장 오류:", error);
-      alert("사진 저장 중 오류가 발생했습니다.");
+      showAlert("사진 저장 중 오류가 발생했습니다.");
     } finally {
       setPhotoSaving(false);
     }
@@ -541,7 +548,7 @@ const Cluster2Content = () => {
     if (isDemoMode) {
       setSloganData(editingSloganData);
       window.dispatchEvent(new CustomEvent("sloganUpdated", { detail: editingSloganData }));
-      alert("저장되었습니다.");
+      showAlert("저장되었습니다.");
       setSection2ModalOpen(false);
       return;
     }
@@ -562,14 +569,14 @@ const Cluster2Content = () => {
         setSloganData(editingSloganData);
         // 슬로건 변경을 Sidebar(.resume-card)에 알려 즉시 반영
         window.dispatchEvent(new CustomEvent("sloganUpdated", { detail: editingSloganData }));
-        alert("저장되었습니다.");
+        showAlert("저장되었습니다.");
         setSection2ModalOpen(false);
       } else {
-        alert(result.error || "슬로건 저장에 실패했습니다.");
+        showAlert(result.error || "슬로건 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("슬로건 저장 오류:", error);
-      alert("슬로건 저장 중 오류가 발생했습니다.");
+      showAlert("슬로건 저장 중 오류가 발생했습니다.");
     } finally {
       setSloganSaving(false);
     }
@@ -713,7 +720,7 @@ const Cluster2Content = () => {
   const handleSaveVideos = async () => {
     if (isDemoMode) {
       setVideoData([...editingVideoData]);
-      alert("저장되었습니다.");
+      showAlert("저장되었습니다.");
       setSection21ModalOpen(false);
       return;
     }
@@ -732,14 +739,14 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         setVideoData([...editingVideoData]);
-        alert("저장되었습니다.");
+        showAlert("저장되었습니다.");
         setSection21ModalOpen(false);
       } else {
-        alert(result.error || "영상 저장에 실패했습니다.");
+        showAlert(result.error || "영상 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("영상 저장 오류:", error);
-      alert("영상 저장 중 오류가 발생했습니다.");
+      showAlert("영상 저장 중 오류가 발생했습니다.");
     } finally {
       setVideoSaving(false);
     }
@@ -904,12 +911,12 @@ const Cluster2Content = () => {
           isEmptyRequired(primary.gradeValue));
 
       if (isPrimaryCleared) {
-        alert("관리자 승인 후 수정할 수 있습니다.");
+        showAlert("관리자 승인 후 수정할 수 있습니다.");
         return;
       }
 
       setEducationData(processedData);
-      alert("저장되었습니다.");
+      showAlert("저장되었습니다.");
       setSection3ModalOpen(false);
       return;
     }
@@ -932,13 +939,13 @@ const Cluster2Content = () => {
         setSection3ModalOpen(false);
         // 학력 변경을 Sidebar(.resume-card)에 알려 즉시 반영
         window.dispatchEvent(new Event("educationUpdated"));
-        alert("저장되었습니다.");
+        showAlert("저장되었습니다.");
       } else {
-        alert(result.error || "학력 저장에 실패했습니다.");
+        showAlert(result.error || "학력 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("학력 저장 오류:", error);
-      alert("학력 저장 중 오류가 발생했습니다.");
+      showAlert("학력 저장 중 오류가 발생했습니다.");
     } finally {
       setEduSaving(false);
     }
@@ -1198,7 +1205,7 @@ const Cluster2Content = () => {
       newCards[cardIndex] = { ...newCards[cardIndex], content };
       setIntroCards(newCards);
       setIsEditingIntro(false);
-      alert("저장되었습니다.");
+      showAlert("저장되었습니다.");
       return;
     }
     const fieldMapping = ["growth_story", "social_experience", "career_direction", "work_style", "personal_story"];
@@ -1224,13 +1231,13 @@ const Cluster2Content = () => {
         };
         setIntroCards(newCards);
         setIsEditingIntro(false);
-        alert("저장되었습니다.");
+        showAlert("저장되었습니다.");
       } else {
-        alert(result.error || "자기소개서 저장에 실패했습니다.");
+        showAlert(result.error || "자기소개서 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("자기소개서 저장 오류:", error);
-      alert("자기소개서 저장 중 오류가 발생했습니다.");
+      showAlert("자기소개서 저장 중 오류가 발생했습니다.");
     } finally {
       setIntroSaving(false);
     }
@@ -1239,12 +1246,12 @@ const Cluster2Content = () => {
   // 리뷰 링크 저장
   const handleSaveReviewLinks = async () => {
     if (!canEditClubReview) {
-      window.alert("관리자 승인이 필요합니다");
+      showAlert("관리자 승인이 필요합니다");
       return;
     }
     if (isDemoMode) {
       setReviewLinks([...editingReviewLinks]);
-      alert("저장되었습니다.");
+      showAlert("저장되었습니다.");
       setSection4ModalOpen(false);
       return;
     }
@@ -1261,14 +1268,14 @@ const Cluster2Content = () => {
       const result = await response.json();
       if (result.success) {
         setReviewLinks([...editingReviewLinks]);
-        alert("저장되었습니다.");
+        showAlert("저장되었습니다.");
         setSection4ModalOpen(false);
       } else {
-        alert(result.error || "리뷰 링크 저장에 실패했습니다.");
+        showAlert(result.error || "리뷰 링크 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("리뷰 링크 저장 오류:", error);
-      alert("리뷰 링크 저장 중 오류가 발생했습니다.");
+      showAlert("리뷰 링크 저장 중 오류가 발생했습니다.");
     } finally {
       setReviewLinkSaving(false);
     }
@@ -2196,7 +2203,7 @@ const Cluster2Content = () => {
                   if (reviewLinks[0]) {
                     window.open(reviewLinks[0], "_blank");
                   } else {
-                    alert("입력된 링크가 없습니다.");
+                    showAlert("입력된 링크가 없습니다.");
                   }
                 }}
               >
@@ -2234,7 +2241,7 @@ const Cluster2Content = () => {
                     if (reviewLinks[index + 1]) {
                       window.open(reviewLinks[index + 1], "_blank");
                     } else {
-                      alert("입력된 링크가 없습니다.");
+                      showAlert("입력된 링크가 없습니다.");
                     }
                   }}
                 >
@@ -2396,13 +2403,13 @@ const Cluster2Content = () => {
             <div className="section1-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   if (isSection1Dirty()) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setPhotos([...photosSnapshot]);
                       setFooterNotice("default");
                       setSection1ModalOpen(false);
-                    }
+                    });
                   } else {
                     setSection1ModalOpen(false);
                   }
@@ -2506,13 +2513,13 @@ const Cluster2Content = () => {
                 <div className="modal-footer-right">
                   <button
                     className="modal-cancel-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       if (isSection1Dirty()) {
-                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setPhotos([...photosSnapshot]);
                           setFooterNotice("default");
                           setSection1ModalOpen(false);
-                        }
+                        });
                       } else {
                         setSection1ModalOpen(false);
                       }
@@ -2522,18 +2529,18 @@ const Cluster2Content = () => {
                   </button>
                   <button
                     className="modal-reset-btn"
-                    onClick={() => {
-                      if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                    onClick={async () => {
+                      await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                         setPhotos([...SECTION1_PHOTO_DEFAULTS.photos]);
                         setFooterNotice("default");
-                      }
+                      });
                     }}
                   >
                     초기화
                   </button>
                   <button
                     className="modal-save-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       const missingFields: number[] = [];
                       if (!photos[0]) missingFields.push(0);
                       if (!photos[1]) missingFields.push(1);
@@ -2548,9 +2555,9 @@ const Cluster2Content = () => {
                         }, 900);
                         return;
                       }
-                      if (window.confirm("저장하시겠습니까?")) {
+                      await showConfirm("저장하시겠습니까?", () => {
                         handleSavePhotos();
-                      }
+                      });
                     }}
                     disabled={photoSaving || photoLoading}
                   >
@@ -2573,13 +2580,13 @@ const Cluster2Content = () => {
             <div className="section2-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   if (isSection2Dirty()) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setEditingSloganData({ ...sloganSnapshot });
                       setSection2FooterNotice("default");
                       setSection2ModalOpen(false);
-                    }
+                    });
                   } else {
                     setSection2ModalOpen(false);
                   }
@@ -2602,7 +2609,7 @@ const Cluster2Content = () => {
                 <div className="slogan-dropdown-wrapper">
                   <button
                     className="slogan-dropdown-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       setDropdown1Open(!dropdown1Open);
                       setDropdown2Open(false);
                       setDropdown3Open(false);
@@ -2641,7 +2648,7 @@ const Cluster2Content = () => {
                           slogan1: { ...editingSloganData.slogan1, content: e.target.value },
                         });
                       } else {
-                        alert("최대 86자까지 입력할 수 있습니다.");
+                        showAlert("최대 86자까지 입력할 수 있습니다.");
                       }
                     }}
                     maxLength={86}
@@ -2712,7 +2719,7 @@ const Cluster2Content = () => {
                 <div className="slogan-dropdown-wrapper">
                   <button
                     className="slogan-dropdown-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       setDropdown2Open(!dropdown2Open);
                       setDropdown1Open(false);
                       setDropdown3Open(false);
@@ -2751,7 +2758,7 @@ const Cluster2Content = () => {
                           slogan2: { ...editingSloganData.slogan2, content: e.target.value },
                         });
                       } else {
-                        alert("최대 86자까지 입력할 수 있습니다.");
+                        showAlert("최대 86자까지 입력할 수 있습니다.");
                       }
                     }}
                     maxLength={86}
@@ -2861,7 +2868,7 @@ const Cluster2Content = () => {
                           slogan3: { ...editingSloganData.slogan3, content: e.target.value },
                         });
                       } else {
-                        alert("최대 86자까지 입력할 수 있습니다.");
+                        showAlert("최대 86자까지 입력할 수 있습니다.");
                       }
                     }}
                     maxLength={86}
@@ -2934,13 +2941,13 @@ const Cluster2Content = () => {
                 <div className="modal-footer-right">
                   <button
                     className="modal-cancel-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       if (isSection2Dirty()) {
-                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setEditingSloganData({ ...sloganSnapshot });
                           setSection2FooterNotice("default");
                           setSection2ModalOpen(false);
-                        }
+                        });
                       } else {
                         setSection2ModalOpen(false);
                       }
@@ -2950,22 +2957,22 @@ const Cluster2Content = () => {
                   </button>
                   <button
                     className="modal-reset-btn"
-                    onClick={() => {
-                      if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                    onClick={async () => {
+                      await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                         setEditingSloganData({
                           slogan1: { option: SECTION2_SLOGAN_DEFAULTS.slogans[0].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[0].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[0].rating },
                           slogan2: { option: SECTION2_SLOGAN_DEFAULTS.slogans[1].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[1].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[1].rating },
                           slogan3: { option: SECTION2_SLOGAN_DEFAULTS.slogans[2].option, content: SECTION2_SLOGAN_DEFAULTS.slogans[2].content, rating: SECTION2_SLOGAN_DEFAULTS.slogans[2].rating },
                         });
                         setSection2FooterNotice("default");
-                      }
+                      });
                     }}
                   >
                     초기화
                   </button>
                   <button
                     className="modal-save-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       const s1 = editingSloganData.slogan1;
                       const missing: string[] = [];
                       if (!s1.content) missing.push("slogan1-text");
@@ -2981,9 +2988,9 @@ const Cluster2Content = () => {
                         }
                         return;
                       }
-                      if (window.confirm("저장하시겠습니까?")) {
+                      await showConfirm("저장하시겠습니까?", () => {
                         handleSaveSlogans();
-                      }
+                      });
                     }}
                     disabled={sloganSaving}
                   >
@@ -3006,12 +3013,12 @@ const Cluster2Content = () => {
             <div className="section21-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   if (isSection21Dirty()) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setEditingVideoData([...videoSnapshot]);
                       setSection21ModalOpen(false);
-                    }
+                    });
                   } else {
                     setSection21ModalOpen(false);
                   }
@@ -3087,12 +3094,12 @@ const Cluster2Content = () => {
                 <div className="modal-footer-right">
                   <button
                     className="modal-cancel-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       if (isSection21Dirty()) {
-                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setEditingVideoData([...videoSnapshot]);
                           setSection21ModalOpen(false);
-                        }
+                        });
                       } else {
                         setSection21ModalOpen(false);
                       }
@@ -3102,20 +3109,20 @@ const Cluster2Content = () => {
                   </button>
                   <button
                     className="modal-reset-btn"
-                    onClick={() => {
-                      if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                    onClick={async () => {
+                      await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                         setEditingVideoData(editingVideoData.map((v) => ({ ...v, videoUrl: "", thumbnail: "" })));
-                      }
+                      });
                     }}
                   >
                     초기화
                   </button>
                   <button
                     className="modal-save-btn"
-                    onClick={() => {
-                      if (window.confirm("저장하시겠습니까?")) {
+                    onClick={async () => {
+                      await showConfirm("저장하시겠습니까?", () => {
                         handleSaveVideos();
-                      }
+                      });
                     }}
                     disabled={videoSaving}
                   >
@@ -3139,15 +3146,15 @@ const Cluster2Content = () => {
             <div className="intro-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
                   if (isDirty) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setEditingIntroData({ content: initialIntroContent });
                       setIntroDirty(false);
                       setIsEditingIntro(false);
                       setIntroModalOpen(false);
-                    }
+                    });
                   } else {
                     setIsEditingIntro(false);
                     setIntroModalOpen(false);
@@ -3178,7 +3185,7 @@ const Cluster2Content = () => {
                         if (e.target.value.length <= 1000) {
                           setEditingIntroData({ ...editingIntroData, content: e.target.value });
                         } else {
-                          alert("최대 1000자까지 입력할 수 있습니다.");
+                          showAlert("최대 1000자까지 입력할 수 있습니다.");
                         }
                       }}
                       placeholder="내용을 입력하세요 (최대 1,000자)"
@@ -3201,14 +3208,14 @@ const Cluster2Content = () => {
                     <div className="modal-footer-right">
                       <button
                         className="modal-cancel-btn"
-                        onClick={() => {
+                        onClick={async () => {
                           const isDirty = isEditingIntro && editingIntroData.content !== initialIntroContent;
                           if (isDirty) {
-                            if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                            await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                               setEditingIntroData({ content: initialIntroContent });
                               setIntroDirty(false);
                               setIsEditingIntro(false);
-                            }
+                            });
                           } else {
                             setIsEditingIntro(false);
                           }
@@ -3218,10 +3225,10 @@ const Cluster2Content = () => {
                       </button>
                       <button
                         className="modal-reset-btn"
-                        onClick={() => {
-                          if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                        onClick={async () => {
+                          await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                             setEditingIntroData({ content: defaultIntroContent });
-                          }
+                          });
                         }}
                       >
                         초기화
@@ -3229,12 +3236,12 @@ const Cluster2Content = () => {
                       <button
                         className="modal-save-btn"
                         disabled={introSaving}
-                        onClick={() => {
-                          if (window.confirm("저장하시겠습니까?")) {
+                        onClick={async () => {
+                          await showConfirm("저장하시겠습니까?", () => {
                             if (selectedIntroCard !== null) {
                               handleSaveIntroduction(selectedIntroCard, editingIntroData.content);
                             }
-                          }
+                          });
                         }}
                       >
                         {introSaving ? "저장 중..." : "저장"}
@@ -3282,12 +3289,12 @@ const Cluster2Content = () => {
             <div className="section4-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   if (isSection4Dirty()) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setEditingReviewLinks([...reviewSnapshot]);
                       setSection4ModalOpen(false);
-                    }
+                    });
                   } else {
                     setSection4ModalOpen(false);
                   }
@@ -3311,7 +3318,7 @@ const Cluster2Content = () => {
                 if (!canEditClubReview) {
                   const target = e.target as HTMLElement;
                   if (target.closest("button")) return;
-                  window.alert("관리자 승인이 필요합니다");
+                  showAlert("관리자 승인이 필요합니다");
                 }
               }}
             >
@@ -3349,12 +3356,12 @@ const Cluster2Content = () => {
                 <div className="modal-footer-right">
                   <button
                     className="modal-cancel-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       if (isSection4Dirty()) {
-                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setEditingReviewLinks([...reviewSnapshot]);
                           setSection4ModalOpen(false);
-                        }
+                        });
                       } else {
                         setSection4ModalOpen(false);
                       }
@@ -3364,20 +3371,20 @@ const Cluster2Content = () => {
                   </button>
                   <button
                     className="modal-reset-btn"
-                    onClick={() => {
-                      if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                    onClick={async () => {
+                      await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                         setEditingReviewLinks(["", "", "", "", "", "", "", "", "", ""]);
-                      }
+                      });
                     }}
                   >
                     초기화
                   </button>
                   <button
                     className="modal-save-btn"
-                    onClick={() => {
-                      if (window.confirm("저장하시겠습니까?")) {
+                    onClick={async () => {
+                      await showConfirm("저장하시겠습니까?", () => {
                         handleSaveReviewLinks();
-                      }
+                      });
                     }}
                     disabled={reviewLinkSaving || !canEditClubReview}
                     style={!canEditClubReview ? { opacity: 0.3, cursor: "not-allowed" } : {}}
@@ -3401,14 +3408,14 @@ const Cluster2Content = () => {
             <div className="section3-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
+                onClick={async () => {
                   if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
-                    if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                       setEditingEduData([...initialEduDataSnapshot]);
                       setHasEduChanges(false);
                       setEduValidationErrors({});
                       setSection3ModalOpen(false);
-                    }
+                    });
                   } else {
                     setSection3ModalOpen(false);
                   }
@@ -3431,7 +3438,7 @@ const Cluster2Content = () => {
                     if (index === 0 && !canChangePrimary) {
                       const target = e.target as HTMLElement;
                       if (target.closest("button")) return;
-                      window.alert("관리자 승인이 필요합니다");
+                      showAlert("관리자 승인이 필요합니다");
                     }
                   }}
                 >
@@ -3494,17 +3501,17 @@ const Cluster2Content = () => {
                         className="delete-edu-btn"
                         disabled={index === 0}
                         style={index === 0 ? { opacity: 0.3, cursor: "not-allowed" } : {}}
-                        onClick={() => {
+                        onClick={async () => {
                           if (index === 0) return;
                           const schoolName = edu.school || `${index + 1}번 학력`;
-                          if (confirm(`${schoolName} 정보를 삭제하시겠습니까?`)) {
+                          await showConfirm(`${schoolName} 정보를 삭제하시겠습니까?`, () => {
                             const newData = editingEduData.filter((_, i) => i !== index);
                             if (edu.isFinal && newData.length > 0) {
                               newData[0].isFinal = true;
                             }
                             setEditingEduData(newData);
                             setHasEduChanges(true);
-                          }
+                          });
                         }}
                         title="학력 삭제"
                       >
@@ -4076,7 +4083,7 @@ const Cluster2Content = () => {
                                 newData[index].gradeValue = e.target.value;
                                 setEditingEduData(newData);
                               } else {
-                                alert("최대 5자까지 입력할 수 있습니다.");
+                                showAlert("최대 5자까지 입력할 수 있습니다.");
                               }
                             }}
                             placeholder="성적 입력 (최대 5자)"
@@ -4099,7 +4106,7 @@ const Cluster2Content = () => {
                                   newData[index].gradeMax = e.target.value || "기타";
                                   setEditingEduData(newData);
                                 } else {
-                                  alert("최대 5자까지 입력할 수 있습니다.");
+                                  showAlert("최대 5자까지 입력할 수 있습니다.");
                                 }
                               }}
                               placeholder="총점 입력 (최대 5자)"
@@ -4164,7 +4171,7 @@ const Cluster2Content = () => {
                                 newData[index].description = e.target.value;
                                 setEditingEduData(newData);
                               } else {
-                                alert("최대 200자까지 입력할 수 있습니다.");
+                                showAlert("최대 200자까지 입력할 수 있습니다.");
                               }
                             }}
                             placeholder="학교 생활에 대해 작성해주세요 (최대 200자)"
@@ -4226,14 +4233,14 @@ const Cluster2Content = () => {
                 <div className="modal-footer-right">
                   <button
                     className="modal-cancel-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
-                        if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                        await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setEditingEduData([...initialEduDataSnapshot]);
                           setHasEduChanges(false);
                           setEduValidationErrors({});
                           setSection3ModalOpen(false);
-                        }
+                        });
                       } else {
                         setSection3ModalOpen(false);
                       }
@@ -4243,8 +4250,8 @@ const Cluster2Content = () => {
                   </button>
                   <button
                     className="modal-reset-btn"
-                    onClick={() => {
-                      if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                    onClick={async () => {
+                      await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                         setEditingEduData([
                           {
                             eduLevel: "",
@@ -4268,7 +4275,7 @@ const Cluster2Content = () => {
                         setHasEduChanges(false);
                         setEduValidationErrors({});
                         setSection3FooterNotice("default");
-                      }
+                      });
                     }}
                   >
                     초기화
@@ -4276,7 +4283,7 @@ const Cluster2Content = () => {
                   <button
                     className="modal-save-btn"
                     disabled={eduSaving}
-                    onClick={() => {
+                    onClick={async () => {
                       // 모든 카드 필수필드 검증
                       const newErrors: { [key: string]: boolean } = {};
                       editingEduData.forEach((edu, idx) => {
@@ -4332,9 +4339,8 @@ const Cluster2Content = () => {
                         return;
                       }
 
-                      if (!window.confirm("저장하시겠습니까?")) return;
-
-                      const processedData = editingEduData.map((edu) => {
+                      await showConfirm("저장하시겠습니까?", () => {
+                        const processedData = editingEduData.map((edu) => {
                         const startStr = edu.startYear && edu.startMonth ? `${edu.startYear}.${edu.startMonth}` : edu.startYear || "";
                         const endStr = edu.endYear && edu.endMonth ? `${edu.endYear}.${edu.endMonth}` : edu.endYear || "";
                         const isOngoing = ["재학", "졸예", "졸업예정", "휴학"].includes(edu.status);
@@ -4368,8 +4374,9 @@ const Cluster2Content = () => {
                         const monthB = parseInt(b.startMonth || "0") || 0;
                         return monthB - monthA;
                       });
-                      const sortedData = [primaryCard, ...otherCards];
-                      handleSaveEducations(sortedData);
+                        const sortedData = [primaryCard, ...otherCards];
+                        handleSaveEducations(sortedData);
+                      });
                     }}
                   >
                     {eduSaving ? "저장 중..." : "저장"}
@@ -4427,3 +4434,4 @@ const Cluster2Content = () => {
 };
 
 export default Cluster2Content;
+
