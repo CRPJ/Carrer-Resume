@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, EffectCoverflow } from 'swiper/modules';
 import 'swiper/css';
@@ -205,14 +206,16 @@ const Cluster4RankingContent = () => {
   const updateSeasonPos = () => {
     if (seasonBtnRef.current) {
       const rect = seasonBtnRef.current.getBoundingClientRect();
-      setSeasonBtnPos({ top: rect.bottom + 8, left: rect.left });
+      const { top, left } = getFixedDropdownPosition(rect, 8);
+      setSeasonBtnPos({ top, left });
     }
   };
 
   const updateWeekPos = () => {
     if (weekBtnRef.current) {
       const rect = weekBtnRef.current.getBoundingClientRect();
-      setWeekBtnPos({ top: rect.bottom + 8, left: rect.left });
+      const { top, left } = getFixedDropdownPosition(rect, 8);
+      setWeekBtnPos({ top, left });
     }
   };
 

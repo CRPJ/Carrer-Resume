@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
@@ -3144,7 +3145,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const trigger = ratingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
-    setRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setRatingDropdownPos(getFixedDropdownPosition(rect, 4));
     setRatingDropdownOpen(true);
   };
 
@@ -3160,7 +3161,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const trigger = reviewRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
-    setReviewRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setReviewRatingDropdownPos(getFixedDropdownPosition(rect, 4));
     setReviewRatingDropdownOpen(true);
   };
 

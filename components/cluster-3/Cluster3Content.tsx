@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { getDocumentZoom, getFixedDropdownPosition } from "@/utils/documentZoom";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
 import {
@@ -25,14 +26,6 @@ import { DETAIL_CARD_1_DEFAULT, createInitialDetailCardsWithDefault } from "@/co
 // Zone C(>1920px, ResponsiveScale.tsx에서 documentElement에 zoom:1.08 적용) 대응.
 // getBoundingClientRect는 zoom 적용 후 좌표를 반환하지만 position:fixed의 top/left는 CSS 픽셀 기준이라 좌표가 어긋난다.
 // zoom이 적용되지 않은 Zone A/B에서는 1을 반환해 기존 동작을 유지한다.
-const getDocumentZoom = (): number => {
-  if (typeof window === "undefined") return 1;
-  const z = getComputedStyle(document.documentElement).zoom;
-  if (!z || z === "1" || z === "normal") return 1;
-  const num = parseFloat(z);
-  return Number.isFinite(num) && num > 0 ? num : 1;
-};
-
 // 커스텀 드롭다운 (네이티브 <option>은 cursor 스타일 미지원)
 const CustomSelect = ({ value, onChange, options, className, style }: { value: string; onChange: (val: string) => void; options: { value: string; label: string }[]; className?: string; style?: React.CSSProperties }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -1145,9 +1138,8 @@ const Cluster3Content = () => {
       setDropdownPosition(null);
     } else {
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const zoom = getDocumentZoom();
       setOpenDropdownId(id);
-      setDropdownPosition(zoom === 1 ? { top: rect.bottom, left: rect.left, width: rect.width } : { top: rect.bottom / zoom, left: rect.left / zoom, width: rect.width / zoom });
+      setDropdownPosition(getFixedDropdownPosition(rect));
     }
   };
 

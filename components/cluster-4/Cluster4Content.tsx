@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
@@ -662,7 +663,7 @@ const Cluster4Content = () => {
     const trigger = seasonRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
-    setSeasonRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setSeasonRatingDropdownPos(getFixedDropdownPosition(rect, 4));
     setSeasonRatingDropdownOpen(true);
   };
 
@@ -2188,7 +2189,7 @@ const Cluster4Content = () => {
     const trigger = seasonReviewRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
-    setSeasonReviewRatingDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    setSeasonReviewRatingDropdownPos(getFixedDropdownPosition(rect, 4));
     setSeasonReviewRatingDropdownOpen(true);
   };
 

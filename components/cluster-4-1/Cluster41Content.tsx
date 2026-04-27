@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { supabase } from "@/lib/supabase";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
@@ -1215,14 +1216,16 @@ const Cluster41Content = () => {
   const updateSeasonPos = () => {
     if (seasonBtnRef.current) {
       const rect = seasonBtnRef.current.getBoundingClientRect();
-      setSeasonBtnPos({ top: rect.bottom + 8, left: rect.left });
+      const { top, left } = getFixedDropdownPosition(rect, 8);
+      setSeasonBtnPos({ top, left });
     }
   };
 
   const updateResultPos = () => {
     if (resultBtnRef.current) {
       const rect = resultBtnRef.current.getBoundingClientRect();
-      setResultBtnPos({ top: rect.bottom + 8, left: rect.left });
+      const { top, left } = getFixedDropdownPosition(rect, 8);
+      setResultBtnPos({ top, left });
     }
   };
 
@@ -1741,6 +1744,7 @@ const Cluster41Content = () => {
                 position: 'relative'
               }}
               onClick={() => {
+                updateSeasonPos();
                 setSeasonDropdownOpen(!seasonDropdownOpen);
                 setResultDropdownOpen(false);
               }}
@@ -1753,10 +1757,9 @@ const Cluster41Content = () => {
               {seasonDropdownOpen && (
                 <div
                   style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    marginTop: 8,
+                    position: 'fixed',
+                    top: seasonBtnPos.top,
+                    left: seasonBtnPos.left,
                     width: '200px',
                     background: '#1a1a1a',
                     border: '1px solid rgba(255,255,255,0.12)',
@@ -1808,6 +1811,7 @@ const Cluster41Content = () => {
                 position: 'relative'
               }}
               onClick={() => {
+                updateResultPos();
                 setResultDropdownOpen(!resultDropdownOpen);
                 setSeasonDropdownOpen(false);
               }}
@@ -1820,10 +1824,9 @@ const Cluster41Content = () => {
               {resultDropdownOpen && (
                 <div
                   style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    marginTop: 8,
+                    position: 'fixed',
+                    top: resultBtnPos.top,
+                    left: resultBtnPos.left,
                     width: '200px',
                     background: '#1a1a1a',
                     border: '1px solid rgba(255,255,255,0.12)',
