@@ -37,6 +37,8 @@ interface PopupContextValue {
   confirm: (message: string, options?: Partial<PopupOptions>) => Promise<boolean>;
   /** alert 스타일: [확인]만 → Promise<void> */
   alert: (message: string, options?: Partial<PopupOptions>) => Promise<void>;
+  showConfirm: (message: string, options?: Partial<PopupOptions>) => Promise<boolean>;
+  showAlert: (message: string, options?: Partial<PopupOptions>) => Promise<void>;
 }
 
 const PopupContext = createContext<PopupContextValue | null>(null);
@@ -82,6 +84,11 @@ export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       confirm: (message, options) =>
         enqueue({ message, variant: 'A', ...options }),
       alert: async (message, options) => {
+        await enqueue({ message, variant: 'B', ...options });
+      },
+      showConfirm: (message, options) =>
+        enqueue({ message, variant: 'A', ...options }),
+      showAlert: async (message, options) => {
         await enqueue({ message, variant: 'B', ...options });
       },
     }),

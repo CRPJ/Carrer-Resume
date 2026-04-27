@@ -1918,10 +1918,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkInfoViewIsEditing(true);
   };
 
-  const handleCancelWorkInfo = () => {
+  const handleCancelWorkInfo = async () => {
     // Type B + isDirty: 변경 있으면 confirm. "아니오"면 편집 모드 유지.
     if (isWorkInfoDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
         return;
       }
     }
@@ -1943,7 +1943,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     // 편집 모드 유지. confirm 후 스냅샷 복원.
     const snap = workInfoSnapshot.current;
-    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
       setEditingSubTitle(snap.subTitle || "");
       setEditingGrowthPoint(snap.growthPoint || "");
       setEditingOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
@@ -1975,7 +1975,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     // sub_title + output_links 저장 (weekActivityDetails + selectedWorkInfoCard 동시 갱신)
     // TODO: [백엔드 작업 필요] growth_point + image_urls 컬럼 추가 후 sub_title과 동일 패턴으로 저장. blob: URL은 서버 업로드 → 영구 URL 교체 필요.
     if (selectedWorkInfoCard?.activityType) {
@@ -2008,10 +2008,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkInfoViewIsEditing(false);
   };
 
-  const handleCloseWorkInfo = () => {
+  const handleCloseWorkInfo = async () => {
     // 편집 모드에서만 isDirty 체크 (보기 모드는 변경 없음)
     if (workInfoViewIsEditing && isWorkInfoDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2140,9 +2140,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkAbilityViewIsEditing(true);
   };
 
-  const handleCancelWorkAbility = () => {
+  const handleCancelWorkAbility = async () => {
     if (isWorkAbilityDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
         return;
       }
     }
@@ -2163,7 +2163,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     const snap = workAbilitySnapshot.current;
-    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
       setEditingAbilitySubTitle(snap.subTitle || "");
       setEditingAbilityGrowthPoint(snap.growthPoint || "");
       setEditingAbilityOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
@@ -2192,7 +2192,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkAbilityCard?.activityTypeId) {
       const newSubTitle = editingAbilitySubTitle.trim() || null;
       const newOutputLinks = editingAbilityOutputLinks;
@@ -2232,9 +2232,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkAbilityViewIsEditing(false);
   };
 
-  const handleCloseWorkAbility = () => {
+  const handleCloseWorkAbility = async () => {
     if (workAbilityViewIsEditing && isWorkAbilityDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2366,9 +2366,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkExpViewIsEditing(true);
   };
 
-  const handleCancelWorkExp = () => {
+  const handleCancelWorkExp = async () => {
     if (isWorkExpDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
         return;
       }
     }
@@ -2390,7 +2390,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     const snap = workExpSnapshot.current;
-    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
       setEditingExpSubTitle(snap.subTitle || "");
       setEditingExpGrowthPoint(snap.growthPoint || "");
       setEditingExpOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
@@ -2421,7 +2421,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkExpCard?.activityTypeId) {
       const newSubTitle = editingExpSubTitle.trim() || null;
       const newOutputLinks = editingExpOutputLinks;
@@ -2454,9 +2454,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkExpViewIsEditing(false);
   };
 
-  const handleCloseWorkExp = () => {
+  const handleCloseWorkExp = async () => {
     if (workExpViewIsEditing && isWorkExpDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2581,9 +2581,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkCareerViewIsEditing(true);
   };
 
-  const handleCancelWorkCareer = () => {
+  const handleCancelWorkCareer = async () => {
     if (isWorkCareerDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
         return;
       }
     }
@@ -2604,7 +2604,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     const snap = workCareerSnapshot.current;
-    if (snap && window.confirm("내용을 모두 초기화하시겠어요?")) {
+    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
       setEditingCareerSubTitle(snap.subTitle || "");
       setEditingCareerGrowthPoint(snap.growthPoint || "");
       setEditingCareerOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
@@ -2633,7 +2633,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       return;
     }
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
     if (activityType) {
       const newSubTitle = editingCareerSubTitle.trim() || null;
@@ -2665,9 +2665,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setWorkCareerViewIsEditing(false);
   };
 
-  const handleCloseWorkCareer = () => {
+  const handleCloseWorkCareer = async () => {
     if (workCareerViewIsEditing && isWorkCareerDirty()) {
-      if (!window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2836,11 +2836,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     handleOpenColleagueEdit();
   };
 
-  const handleColleagueEditCancel = () => {
+  const handleColleagueEditCancel = async () => {
     // X / 취소 공용 — 편집 모드에서 dirty 시 confirm
     if (isColleagueEditing) {
       const dirty = colleagueFormSnapshot ? colleagueEditData.selectedColleague?.id !== colleagueFormSnapshot.selectedColleague?.id || colleagueEditData.content !== colleagueFormSnapshot.content : !!colleagueEditData.selectedColleague || colleagueEditData.content.trim().length > 0;
-      if (dirty && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+      if (dirty && !(await popup.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?"))) return;
     }
     setIsColleagueEditing(false);
     setHeaderModalOpen(false);
@@ -2851,7 +2851,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    const ok = await popup.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
     if (!ok) return;
     if (colleagueFormSnapshot) {
       setColleagueEditData(colleagueFormSnapshot);
@@ -2879,7 +2879,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
 
     const picked = colleagueEditData.selectedColleague!;
     // 다음 rank 할당 (기존 selectedColleagues의 빈 rank 자리를 채움)
@@ -3065,12 +3065,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }, [reputationEditData, isReputationFormEditing, saveAttemptFailed]);
 
   // 키워드 모드 전환 (select ↔ write) — 사용자 요청: 브라우저 기본 confirm 사용
-  const handleKeywordModeChange = (mode: "select" | "write") => {
+  const handleKeywordModeChange = async (mode: "select" | "write") => {
     if (mode === "select") {
       setSelectedKeywordTemp("");
       setKeywordModalOpen(true);
     } else if (mode === "write") {
-      const ok = window.confirm("키워드를 직접 작성하시겠습니까?");
+      const ok = await popup.confirm("키워드를 직접 작성하시겠습니까?");
       if (ok) {
         setReputationEditData((prev) => ({ ...prev, keyword: "" }));
         setFormKeywordMode("write");
@@ -3085,9 +3085,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   // 중첩 모달 [선택] 버튼 → window.confirm으로 최종 선택 확인
-  const handleKeywordSelectConfirm = () => {
+  const handleKeywordSelectConfirm = async () => {
     if (!selectedKeywordTemp) return;
-    const ok = window.confirm(`"${selectedKeywordTemp}"을(를) 선택하시겠습니까?`);
+    const ok = await popup.confirm(`"${selectedKeywordTemp}"을(를) 선택하시겠습니까?`);
     if (ok) {
       handleKeywordSelectFinal();
     }
@@ -3298,9 +3298,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }, [weeklyReviewModalOpen, weeklyReviewFromDB]);
 
   // 주차 리뷰 — 모달 닫기 (isDirty 체크)
-  const handleWeeklyReviewClose = () => {
+  const handleWeeklyReviewClose = async () => {
     if (isWeeklyReviewEditing && isWeeklyReviewDirty()) {
-      if (!window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+      if (!(await popup.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?"))) return;
     }
     setWeeklyReviewModalOpen(false);
   };
@@ -3317,9 +3317,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setIsWeeklyReviewEditing(true);
   };
 
-  const handleWeeklyReviewCancel = () => {
+  const handleWeeklyReviewCancel = async () => {
     if (isWeeklyReviewDirty()) {
-      if (!window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+      if (!(await popup.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?"))) return;
     }
     if (weeklyReviewFormSnapshot) {
       setWeeklyReviewData({ rating: weeklyReviewFormSnapshot.rating, content: weeklyReviewFormSnapshot.content });
@@ -3343,7 +3343,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    if (!(await popup.confirm("작성 내용을 모두 초기화하시겠습니까?"))) return;
     // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
     setWeeklyReviewData({ rating: 0, content: "" });
     setWeeklyReviewSaveAttemptFailed(false);
@@ -3362,7 +3362,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     setWeeklyReviewSaving(true);
     try {
       const savedRecord = await saveWeeklyReview();
@@ -3424,7 +3424,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const ok = window.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
+    const ok = await popup.confirm("입력하신 내용을 모두 초기화하시겠습니까?");
     if (!ok) return;
     if (formSnapshot) {
       setReputationEditData({
@@ -3500,7 +3500,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
 
-    const ok = window.confirm("이 평판을 삭제하시겠습니까?");
+    const ok = await popup.confirm("이 평판을 삭제하시겠습니까?");
     if (!ok) return;
 
     const repId = selectedReputationCard.id;
@@ -3597,7 +3597,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
 
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
 
     // 3. 저장
     const saved = await saveWeeklyReputation();
@@ -5301,7 +5301,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div
                         key={user.id}
                         className={`reputation-card ${isEmpty ? "empty" : ""}`}
-                        onClick={() => {
+                        onClick={async () => {
                           if (!isEmpty) {
                             setSelectedReputationCard(user);
                             setReputationViewModalOpen(true);
@@ -5501,7 +5501,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div
                     key={user.id}
                     className={`colleague-card ${isEmpty ? "empty" : ""}`}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!isEmpty) {
                         setSelectedColleagueCard(user);
                         setSelectedColleagueIndex(index);
@@ -5760,7 +5760,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div
                   key={card.id}
                   className={`work-info-card ${isEmpty ? "empty" : ""}`}
-                  onClick={() => {
+                  onClick={async () => {
                     if (!isEmpty) {
                       setSelectedWorkInfoCard(card);
                       setWorkInfoViewModalOpen(true);
@@ -5855,7 +5855,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div
                   key={card.id}
                   className={`work-exp-card ${isEmpty ? "empty" : ""}`}
-                  onClick={() => {
+                  onClick={async () => {
                     if (!isEmpty) {
                       setSelectedWorkExpCard(card);
                       setWorkExpViewModalOpen(true);
@@ -5995,7 +5995,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div
                   key={card.code}
                   className={`work-ability-card ${isNotApplicableCard ? "empty" : ""}`}
-                  onClick={() => {
+                  onClick={async () => {
                     setSelectedWorkAbilityCard(card);
                     setWorkAbilityViewModalOpen(true);
                   }}
@@ -6096,7 +6096,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div key={card.id} className="work-career-card-wrapper">
                   <div
                     className={`work-career-card ${isEmpty ? "empty" : ""} ${card.isFailed ? "failed" : ""} ${card.isNotApplicable ? "not-applicable" : ""}`}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!isEmpty) {
                         setSelectedWorkCareerCard(card);
                         setWorkCareerViewModalOpen(true);
@@ -7271,8 +7271,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-header">
               <button
                 className="modal-close-btn"
-                onClick={() => {
-                  if (isReputationFormEditing && isFormDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+                onClick={async () => {
+                  if (isReputationFormEditing && isFormDirty() && !(await popup.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?"))) return;
                   setHeaderModalOpen(false);
                   setIsReputationFormEditing(false);
                   setReputationSaveError(null);
@@ -7348,7 +7348,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         checked={formKeywordMode === "select"}
                         disabled={!isReputationFormEditing}
                         onChange={() => handleKeywordModeChange("select")}
-                        onClick={() => {
+                        onClick={async () => {
                           // 이미 select 상태에서도 재클릭 시 중첩 모달 재오픈 가능 (사용자 요청)
                           if (isReputationFormEditing && formKeywordMode === "select") {
                             handleKeywordModeChange("select");
@@ -7450,7 +7450,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <button
                       type="button"
                       className="modal-close-btn"
-                      onClick={() => {
+                      onClick={async () => {
                         setKeywordModalOpen(false);
                         setSelectedKeywordTemp("");
                       }}
@@ -7616,8 +7616,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="modal-footer-right modal-header-right">
                 <button
                   className="modal-edit-btn modal-delete-btn"
-                  onClick={() => {
-                    if (!window.confirm("이 동료를 삭제하시겠습니까?")) return;
+                  onClick={async () => {
+                    if (!(await popup.confirm("이 동료를 삭제하시겠습니까?"))) return;
                     handleDeleteColleague();
                   }}
                 >
@@ -7986,7 +7986,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ) : (
                             <div
                               className="image-preview"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (workInfoViewIsEditing && isEnabled) triggerImageUpload(imageIdx);
                               }}
                             >
@@ -8407,7 +8407,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ) : (
                             <div
                               className="image-preview"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (workExpViewIsEditing && isEnabled) triggerExpImageUpload(imageIdx);
                               }}
                             >
@@ -8871,7 +8871,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ) : (
                             <div
                               className="image-preview"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (workAbilityViewIsEditing && isEnabled) triggerAbilityImageUpload(imageIdx);
                               }}
                             >
@@ -9290,7 +9290,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           ) : (
                             <div
                               className="image-preview"
-                              onClick={() => {
+                              onClick={async () => {
                                 if (workCareerViewIsEditing && isEnabled) triggerCareerImageUpload(imageIdx);
                               }}
                             >

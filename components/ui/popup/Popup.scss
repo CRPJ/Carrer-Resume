@@ -47,15 +47,14 @@ $popup-z-content:  9999999;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.55);
   z-index: $popup-z-backdrop;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ----------------------- 팝업 본체 ----------------------- */
 
 .custom-popup {
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
   width: $popup-width;
   height: $popup-height;
   background-color: $popup-body-bg;
@@ -66,6 +65,7 @@ $popup-z-content:  9999999;
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   font-family: 'Pretendard', sans-serif;
+  transform: translate(-50%, -50%);
 
   /* ===========================================================
      헤더 — 블루 → 다크 청록 그라데이션
@@ -130,10 +130,13 @@ $popup-z-content:  9999999;
   /* ----- 푸터 ----- */
   &__footer {
     position: absolute;
-    right: 16px;
+    left: 0;
+    right: 0;
     bottom: 12px;
     display: flex;
-    gap: 8px;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 16px;
   }
 
   &__btn {

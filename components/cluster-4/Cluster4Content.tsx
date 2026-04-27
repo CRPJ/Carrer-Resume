@@ -555,7 +555,7 @@ const Cluster4Content = () => {
   // 시즌 평판 삭제 핸들러 (본인 작성분만 — API는 reviewer_id 검증)
   const handleDeleteSeasonReputation = async () => {
     if (!selectedReputation?.id) return;
-    if (!window.confirm("이 평판을 삭제하시겠습니까?")) return;
+    if (!(await popup.confirm("이 평판을 삭제하시겠습니까?"))) return;
 
     const targetId = selectedReputation.id;
 
@@ -675,11 +675,11 @@ const Cluster4Content = () => {
     setSeasonRatingDropdownOpen(false);
   };
 
-  const handleSeasonKeywordModeChange = (slotIndex: number, mode: "select" | "write") => {
+  const handleSeasonKeywordModeChange = async (slotIndex: number, mode: "select" | "write") => {
     if (!isSeasonReputationFormEditing) return;
 
     if (mode === "write") {
-      if (!window.confirm("키워드를 직접 작성하시겠습니까?")) return;
+      if (!(await popup.confirm("키워드를 직접 작성하시겠습니까?"))) return;
       setSeasonReputationEditData((prev) => {
         const next = { ...prev };
         if (slotIndex === 0) next.keyword1 = "";
@@ -714,7 +714,7 @@ const Cluster4Content = () => {
       await popup.alert("키워드를 먼저 선택해주세요.");
       return;
     }
-    if (!window.confirm(`'${seasonKeywordTempSelection}' 을 선택하시겠습니까?`)) return;
+    if (!(await popup.confirm(`'${seasonKeywordTempSelection}' 을 선택하시겠습니까?`))) return;
     const slotIndex = seasonKeywordTargetSlot;
     if (slotIndex === null) return;
     setSeasonReputationEditData((prev) => {
@@ -762,9 +762,9 @@ const Cluster4Content = () => {
     });
   };
 
-  const handleSeasonReputationFormClose = () => {
+  const handleSeasonReputationFormClose = async () => {
     if (isSeasonReputationFormEditing && isSeasonReputationDirty()) {
-      if (!window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+      if (!(await popup.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?"))) return;
     }
     setSeasonReputationModalOpen(false);
     setIsSeasonReputationFormEditing(false);
@@ -773,9 +773,9 @@ const Cluster4Content = () => {
     setSeasonReputationFieldErrorFlash(false);
   };
 
-  const handleSeasonReputationCancel = () => {
+  const handleSeasonReputationCancel = async () => {
     if (isSeasonReputationDirty()) {
-      if (!window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+      if (!(await popup.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?"))) return;
     }
     if (seasonReputationFormSnapshot) {
       setSeasonReputationEditData({ rating: seasonReputationFormSnapshot.rating, content: seasonReputationFormSnapshot.content, keyword1: seasonReputationFormSnapshot.keyword1, keyword2: seasonReputationFormSnapshot.keyword2, keyword3: seasonReputationFormSnapshot.keyword3 });
@@ -794,7 +794,7 @@ const Cluster4Content = () => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
+    if (!(await popup.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?"))) return;
     if (seasonReputationFormSnapshot) {
       setSeasonReputationEditData({ rating: seasonReputationFormSnapshot.rating, content: seasonReputationFormSnapshot.content, keyword1: seasonReputationFormSnapshot.keyword1, keyword2: seasonReputationFormSnapshot.keyword2, keyword3: seasonReputationFormSnapshot.keyword3 });
     } else {
@@ -860,7 +860,7 @@ const Cluster4Content = () => {
     }
 
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
 
     // TODO: 1주 보내기 10개 제한 — sentSeasonReputations state + 백엔드 카운트 API 도입 후 활성화
     // const isUpdate = !!selectedReputation?.id;
@@ -2230,7 +2230,7 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonReviewCancel = async () => {
-    if (isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?")) return;
+    if (isSeasonReviewDirty() && !(await popup.confirm("작성 중인 내용이 있습니다. 취소하시겠습니까?"))) return;
     if (seasonReviewFormSnapshot) {
       setSeasonReviewEditData({ rating: seasonReviewFormSnapshot.rating, review: seasonReviewFormSnapshot.review, link: seasonReviewFormSnapshot.link });
     } else {
@@ -2247,7 +2247,7 @@ const Cluster4Content = () => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    if (!window.confirm("작성 내용을 모두 초기화하시겠습니까?")) return;
+    if (!(await popup.confirm("작성 내용을 모두 초기화하시겠습니까?"))) return;
     // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
     setSeasonReviewEditData({ rating: 0, review: "", link: "" });
     setSeasonReviewSaveAttemptFailed(false);
@@ -2255,7 +2255,7 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonReviewClose = async () => {
-    if (isSeasonReviewFormEditing && isSeasonReviewDirty() && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
+    if (isSeasonReviewFormEditing && isSeasonReviewDirty() && !(await popup.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?"))) return;
     setSeasonReviewModalOpen(false);
   };
 
@@ -2276,7 +2276,7 @@ const Cluster4Content = () => {
     }
 
     // 저장 직전 confirm — 사용자 의도 재확인
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
 
     setSeasonReviewSaving(true);
     setSeasonReviewError(null);
@@ -2725,7 +2725,7 @@ const Cluster4Content = () => {
                   position: "relative",
                   cursor: currentSeason.reviewLink ? "pointer" : "default",
                 }}
-                onClick={() => {
+                onClick={async () => {
                   if (currentSeason.reviewLink) {
                     let url = currentSeason.reviewLink;
                     if (!/^https?:\/\//i.test(url)) {
@@ -3141,7 +3141,7 @@ const Cluster4Content = () => {
                             <div
                               className="comment"
                               style={{ cursor: "pointer" }}
-                              onClick={() => {
+                              onClick={async () => {
                                 setSelectedReputation(reputation);
                                 setReputationDetailModalOpen(true);
                               }}

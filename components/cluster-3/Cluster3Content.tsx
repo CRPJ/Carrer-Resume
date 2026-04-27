@@ -1306,9 +1306,9 @@ const Cluster3Content = () => {
     return JSON.stringify(channelCards[currentCardIndex]) !== JSON.stringify(cardSnapshot);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     if (isEditMode && isCardDirty()) {
-      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
         const restored = [...channelCards];
         restored[currentCardIndex] = JSON.parse(JSON.stringify(cardSnapshot));
         setChannelCards(restored);
@@ -1365,9 +1365,9 @@ const Cluster3Content = () => {
     if (currentOutputIndex < MAX_OUTPUT_CARDS - 1) setCurrentOutputIndex((p) => p + 1);
   };
 
-  const handleCancelOutput = () => {
+  const handleCancelOutput = async () => {
     if (isOutputDirty()) {
-      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
         const restored = [...outputCards];
         if (outputSnapshot) restored[currentOutputIndex] = JSON.parse(JSON.stringify(outputSnapshot));
         setOutputCards(restored);
@@ -1440,7 +1440,7 @@ const Cluster3Content = () => {
       await popup.alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
       return;
     }
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     const compacted = compactOutputCard(current);
     const updated = [...outputCards];
     updated[currentOutputIndex] = compacted;
@@ -1451,9 +1451,9 @@ const Cluster3Content = () => {
     setOutputFooterNotice("default");
   };
 
-  const handleCloseOutputModal = () => {
+  const handleCloseOutputModal = async () => {
     if (isOutputEditMode && isOutputDirty()) {
-      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
         const restored = [...outputCards];
         if (outputSnapshot) restored[currentOutputIndex] = JSON.parse(JSON.stringify(outputSnapshot));
         setOutputCards(restored);
@@ -1489,9 +1489,9 @@ const Cluster3Content = () => {
     if (currentDetailIndex < MAX_DETAIL_CARDS - 1) setCurrentDetailIndex((p) => p + 1);
   };
 
-  const handleCancelDetail = () => {
+  const handleCancelDetail = async () => {
     if (isDetailDirty()) {
-      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
         const restored = [...detailCards];
         if (detailSnapshot) restored[currentDetailIndex] = JSON.parse(JSON.stringify(detailSnapshot));
         setDetailCards(restored);
@@ -1504,8 +1504,8 @@ const Cluster3Content = () => {
     }
   };
 
-  const handleResetDetail = () => {
-    if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+  const handleResetDetail = async () => {
+    if (await popup.confirm("내용을 모두 초기화하시겠어요?")) {
       const updated = [...detailCards];
       updated[currentDetailIndex] = currentDetailIndex === 0 ? ({ ...DETAIL_CARD_1_DEFAULT } as OutputCard) : emptyDetailCard(currentDetailIndex + 1);
       setDetailCards(updated);
@@ -1521,7 +1521,7 @@ const Cluster3Content = () => {
       await popup.alert(`다음 필수 항목을 입력해주세요:\n${errors.join(", ")}`);
       return;
     }
-    if (!window.confirm("저장하시겠습니까?")) return;
+    if (!(await popup.confirm("저장하시겠습니까?"))) return;
     const compacted = compactOutputCard(current);
     const updated = [...detailCards];
     updated[currentDetailIndex] = compacted;
@@ -1532,9 +1532,9 @@ const Cluster3Content = () => {
     setDetailFooterNotice("default");
   };
 
-  const handleCloseDetailModal = () => {
+  const handleCloseDetailModal = async () => {
     if (isDetailEditMode && isDetailDirty()) {
-      if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+      if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
         const restored = [...detailCards];
         if (detailSnapshot) restored[currentDetailIndex] = JSON.parse(JSON.stringify(detailSnapshot));
         setDetailCards(restored);
@@ -2660,9 +2660,9 @@ const Cluster3Content = () => {
                       <>
                         <button
                           className="modal-cancel-btn"
-                          onClick={() => {
+                          onClick={async () => {
                             if (isCardDirty()) {
-                              if (window.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
+                              if (await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?")) {
                                 const restored = [...channelCards];
                                 restored[currentCardIndex] = JSON.parse(JSON.stringify(cardSnapshot));
                                 setChannelCards(restored);
@@ -2679,8 +2679,8 @@ const Cluster3Content = () => {
                         </button>
                         <button
                           className="modal-reset-btn"
-                          onClick={() => {
-                            if (window.confirm("내용을 모두 초기화하시겠어요?")) {
+                          onClick={async () => {
+                            if (await popup.confirm("내용을 모두 초기화하시겠어요?")) {
                               const resetCard = currentCardIndex === 0 ? { ...CLUSTER3_CHANNEL_DEFAULTS.firstCard } : { id: currentCardIndex + 1, ...CLUSTER3_CHANNEL_DEFAULTS.emptyCard };
                               const updated = [...channelCards];
                               updated[currentCardIndex] = resetCard;
@@ -2720,7 +2720,7 @@ const Cluster3Content = () => {
                               return;
                             }
 
-                            if (!window.confirm("저장하시겠습니까?")) return;
+                            if (!(await popup.confirm("저장하시겠습니까?"))) return;
                             const compactImages = (card.images || []).filter((img) => img !== null);
                             const reorderedImages = [...compactImages, ...Array(5 - compactImages.length).fill(null)];
                             const updated = [...channelCards];
