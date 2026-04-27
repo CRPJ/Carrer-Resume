@@ -5126,15 +5126,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </div>
               <div className="weekly-review-footer">
                 <div className="review-rating-group">
-                  <div className="review-stars">
-                    {[1, 2, 3, 4, 5].map((i) => {
-                      const r = (weeklyReviewFromDB?.rating || 0) / 2;
-                      let cls = "ti-star";
-                      if (r >= i) cls = "ti-star-filled";
-                      else if (r >= i - 0.5) cls = "ti-star-half-filled";
-                      return <i key={i} className={`ti ${cls}`}></i>;
-                    })}
-                  </div>
+                  {(() => {
+                    const rating = weeklyReviewFromDB?.rating || 0;
+                    const STAR_SIZE = 16;
+                    const STAR_GAP = 2;
+                    const visibleGaps = rating > 0 ? Math.floor((rating - 1) / 2) : 0;
+                    const fillWidthPx = rating * (STAR_SIZE / 2) + Math.max(0, visibleGaps) * STAR_GAP;
+                    return (
+                      <div className="review-stars">
+                        <div className="review-stars__base">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i key={`empty-${i}`} className="ti ti-star"></i>
+                          ))}
+                        </div>
+                        <div
+                          className="review-stars__fill"
+                          style={{ width: `${fillWidthPx}px` }}
+                          aria-hidden="true"
+                        >
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i key={`filled-${i}`} className="ti ti-star-filled"></i>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <span className="review-score">{weeklyReviewFromDB?.rating || 0} / 10</span>
                 </div>
               </div>
