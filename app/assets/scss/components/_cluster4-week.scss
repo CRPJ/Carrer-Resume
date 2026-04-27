@@ -5406,6 +5406,16 @@
           cursor: pointer;
           white-space: nowrap;
           &:hover { background: #ffb820; }
+
+          // 비활성: 권한 없음 / 빈 카드 / 강화 실패·해당 없음
+          &:disabled,
+          &[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: auto;          // 툴팁(title) 표시 위해
+
+            &:hover { background: #faab07; }   // 호버 색 변경 무효화
+          }
         }
       }
 
@@ -5982,6 +5992,16 @@
 
           &:hover {
             background: #ffb820;
+          }
+
+          // 비활성: 권한 없음 / 빈 카드 / 강화 실패·해당 없음
+          &:disabled,
+          &[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: auto;          // 툴팁(title) 표시 위해
+
+            &:hover { background: #faab07; }   // 호버 색 변경 무효화
           }
         }
       }

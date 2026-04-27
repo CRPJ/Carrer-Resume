@@ -1866,6 +1866,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return false;
   };
 
+  // 4개 view 모달 공용 — 카드의 강화 상태를 enum으로 정규화
+  // 우선순위: card.status (workInfo) → card.enhancementStatus (workExp/workAbility) → boolean 3개 (workCareer)
+  // ⚠️ verified는 workInfo 카드에 항상 true로 들어있는 신뢰성 플래그 → 강화 상태로 사용 금지
+  //    enum 필드가 없는 workCareer에서만 fallback으로 평가
+  const getEnhanceStatus = (card: any): string => {
+    if (!card) return "waiting";
+    if (typeof card.status === "string") return card.status;
+    if (typeof card.enhancementStatus === "string") return card.enhancementStatus;
+    if (card.isFailed) return "failed";
+    if (card.isNotApplicable) return "not_applicable";
+    if (card.verified) return "success";
+    return "waiting";
+  };
+
+  // 강화 실패 / 해당 없음이면 수정 불가
+  const isLineLocked = (card: any): boolean => {
+    const s = getEnhanceStatus(card);
+    return s === "failed" || s === "not_applicable";
+  };
+
+  const LINE_LOCKED_TITLE = "강화 실패 또는 해당 없음 상태에서는 수정할 수 없습니다.";
+
   // workInfo View 모달 — 보기/편집 토글 핸들러 (Type B 푸터 규칙 + 관리자 승인)
   const handleEditWorkInfo = () => {
     if (!canEditWorkInfo) {
@@ -5841,7 +5863,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div className="card-top-row">
                     <div className={`card-icon-area ${!isEmpty && card.enhancementStatus === "failed" ? "failed" : ""}`}>
                       {!isEmpty && card.icon ? <img src={card.icon} alt={card.badge} style={{ opacity: card.enhancementStatus === "failed" ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
-                      {!isRestMode && !isEmpty && (!card.hasActivity || card.enhancementStatus === "failed") && (
+                      {!isRestMode && !isEmpty && card.enhancementStatus === "failed" && (
                         <div className="failed-overlay" style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                           <span className="failed-text" style={{ whiteSpace: "nowrap", width: "auto", color: "#ff4444", fontWeight: "800" }}>
                             강화 실패
@@ -8063,9 +8085,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workInfoViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={!canEditWorkInfo} style={!canEditWorkInfo ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다"}>
-                      수정
-                    </button>
+                    (() => {
+                      const locked = isLineLocked(selectedWorkInfoCard);
+                      const disabled = !canEditWorkInfo || locked;
+                      const title = locked
+                        ? LINE_LOCKED_TITLE
+                        : canEditWorkInfo
+                          ? "수정"
+                          : "관리자 승인이 필요합니다";
+                      return (
+                        <button
+                          className="modal-edit-btn"
+                          onClick={handleEditWorkInfo}
+                          disabled={disabled}
+                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                          title={title}
+                        >
+                          수정
+                        </button>
+                      );
+                    })()
                   ) : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkInfo}>
@@ -8177,7 +8216,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           failed: "강화 실패",
                           not_applicable: "해당 없음",
                         };
-                        const statusKey = selectedWorkExpCard.enhancementStatus as string;
+                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isRestMode → !hasActivity → enhancementStatus
+                        const statusKey = isRestMode
+                          ? "not_applicable"
+                          : !selectedWorkExpCard.hasActivity
+                            ? "failed"
+                            : (selectedWorkExpCard.enhancementStatus as string);
                         const statusText = enhanceStatusTextMap[statusKey] || "—";
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
@@ -8510,15 +8554,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workExpViewIsEditing ? (
-                    <button
-                      className="modal-edit-btn"
-                      onClick={handleEditWorkExp}
-                      disabled={!canEditWorkExp || selectedWorkExpCard?.isEmpty}
-                      style={!canEditWorkExp || selectedWorkExpCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                      title={selectedWorkExpCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다"}
-                    >
-                      수정
-                    </button>
+                    (() => {
+                      const empty = selectedWorkExpCard?.isEmpty;
+                      const locked = isLineLocked(selectedWorkExpCard);
+                      const disabled = !canEditWorkExp || empty || locked;
+                      const title = empty
+                        ? "비어있는 카드입니다"
+                        : locked
+                          ? LINE_LOCKED_TITLE
+                          : canEditWorkExp
+                            ? "수정"
+                            : "관리자 승인이 필요합니다";
+                      return (
+                        <button
+                          className="modal-edit-btn"
+                          onClick={handleEditWorkExp}
+                          disabled={disabled}
+                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                          title={title}
+                        >
+                          수정
+                        </button>
+                      );
+                    })()
                   ) : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkExp}>
@@ -8897,15 +8955,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workAbilityViewIsEditing ? (
-                    <button
-                      className="modal-edit-btn"
-                      onClick={handleEditWorkAbility}
-                      disabled={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty}
-                      style={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                      title={selectedWorkAbilityCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다"}
-                    >
-                      수정
-                    </button>
+                    (() => {
+                      const empty = selectedWorkAbilityCard?.isEmpty;
+                      const locked = isLineLocked(selectedWorkAbilityCard);
+                      const disabled = !canEditWorkAbility || empty || locked;
+                      const title = empty
+                        ? "비어있는 카드입니다"
+                        : locked
+                          ? LINE_LOCKED_TITLE
+                          : canEditWorkAbility
+                            ? "수정"
+                            : "관리자 승인이 필요합니다";
+                      return (
+                        <button
+                          className="modal-edit-btn"
+                          onClick={handleEditWorkAbility}
+                          disabled={disabled}
+                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                          title={title}
+                        >
+                          수정
+                        </button>
+                      );
+                    })()
                   ) : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkAbility}>
@@ -9401,15 +9473,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workCareerViewIsEditing ? (
-                    <button
-                      className="modal-edit-btn"
-                      onClick={handleEditWorkCareer}
-                      disabled={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty}
-                      style={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                      title={selectedWorkCareerCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다"}
-                    >
-                      수정
-                    </button>
+                    (() => {
+                      const empty = selectedWorkCareerCard?.isEmpty;
+                      const locked = isLineLocked(selectedWorkCareerCard);
+                      const disabled = !canEditWorkCareer || empty || locked;
+                      const title = empty
+                        ? "비어있는 카드입니다"
+                        : locked
+                          ? LINE_LOCKED_TITLE
+                          : canEditWorkCareer
+                            ? "수정"
+                            : "관리자 승인이 필요합니다";
+                      return (
+                        <button
+                          className="modal-edit-btn"
+                          onClick={handleEditWorkCareer}
+                          disabled={disabled}
+                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                          title={title}
+                        >
+                          수정
+                        </button>
+                      );
+                    })()
                   ) : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkCareer}>
