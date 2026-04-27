@@ -1239,6 +1239,13 @@ body:has(.mobile-layout) > button:has(.ti-pencil) {
   flex-direction: column;
   box-sizing: border-box;
 
+  // reputation-form / reputation-view-modal와 동일 — 화면 정중앙 강제
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+
   .edit-modal-header {
     height: 100px;
     padding: 16px 24px 4px;
