@@ -14,9 +14,9 @@ import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES } from "@/constants/dummyData
 
 // 글자수 초과 시 '..' 표시 (CSS ellipsis '…' 대신 JS 처리)
 const truncate = (text: string | undefined | null, maxLen: number): string => {
-  if (!text) return '-';
+  if (!text) return "-";
   if (text.length <= maxLen) return text;
-  return text.slice(0, maxLen) + '..';
+  return text.slice(0, maxLen) + "..";
 };
 
 // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
@@ -29,73 +29,121 @@ const DUMMY_SEASON_ROLES = [
 // TODO: 피그마 점검용 임시 더미 데이터 - 점검 완료 후 제거
 const DUMMY_SEASON_REPUTATIONS = [
   {
-    id: "dummy-rep-1", rating: 9, fmScore: 1234,
-    keyword_1: "추진력추진력력", keyword_2: "끈기와인내력", keyword_3: "성실성실성실성",
+    id: "dummy-rep-1",
+    rating: 9,
+    fmScore: 1234,
+    keyword_1: "추진력추진력력",
+    keyword_2: "끈기와인내력",
+    keyword_3: "성실성실성실성",
     content: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하",
     reviewer: {
-      display_name: "안유현이", gender: "여", birth_date: "2002-01-01",
-      university: "서울과학기술대학", major_first: "미디어커뮤니케이션학과",
-      teamName: "엔터테인먼트", partName: "내돈내산파트",
+      display_name: "안유현이",
+      gender: "여",
+      birth_date: "2002-01-01",
+      university: "서울과학기술대학",
+      major_first: "미디어커뮤니케이션학과",
+      teamName: "엔터테인먼트",
+      partName: "내돈내산파트",
       vision: "엔비디아구글테슬라쿵야",
       profile_photo_url: "/images/0/crew profile/여 4.webp",
     },
   },
   {
-    id: "dummy-rep-2", rating: 2, fmScore: 7,
-    keyword_1: "소통력", keyword_2: null, keyword_3: null,
+    id: "dummy-rep-2",
+    rating: 2,
+    fmScore: 7,
+    keyword_1: "소통력",
+    keyword_2: null,
+    keyword_3: null,
     content: "짧은 코멘트입니다",
     reviewer: {
-      display_name: "이진", gender: "남", birth_date: "2000-05-15",
-      university: "서울대", major_first: "경영학과",
-      teamName: "운영", partName: "클럽",
+      display_name: "이진",
+      gender: "남",
+      birth_date: "2000-05-15",
+      university: "서울대",
+      major_first: "경영학과",
+      teamName: "운영",
+      partName: "클럽",
       vision: "네이버",
       profile_photo_url: "/images/0/crew profile/여 5.jpg",
     },
   },
   {
-    id: "dummy-rep-3", rating: 7, fmScore: 56,
-    keyword_1: "리더십리더십십", keyword_2: "창의력창의력력", keyword_3: null,
+    id: "dummy-rep-3",
+    rating: 7,
+    fmScore: 56,
+    keyword_1: "리더십리더십십",
+    keyword_2: "창의력창의력력",
+    keyword_3: null,
     content: "안녕하세요 이 시즌안녕하세요 이 시즌일이삼사오육칠팔구십",
     reviewer: {
-      display_name: "유성이", gender: "남", birth_date: "2001-03-20",
-      university: "한국과학기술원", major_first: "전자전기공학과",
-      teamName: "마케팅전략", partName: "전략기획팀",
+      display_name: "유성이",
+      gender: "남",
+      birth_date: "2001-03-20",
+      university: "한국과학기술원",
+      major_first: "전자전기공학과",
+      teamName: "마케팅전략",
+      partName: "전략기획팀",
       vision: "구글애플삼성테슬라아",
       profile_photo_url: "/images/0/crew profile/여 6.jpg",
     },
   },
   {
-    id: "dummy-rep-4", rating: 10, fmScore: 999,
-    keyword_1: "분석력분석력력", keyword_2: "전략적사고력", keyword_3: "팀워크팀워크팀",
+    id: "dummy-rep-4",
+    rating: 10,
+    fmScore: 999,
+    keyword_1: "분석력분석력력",
+    keyword_2: "전략적사고력",
+    keyword_3: "팀워크팀워크팀",
     content: "매우 뛰어난 역량을 보여주었습니다 이번 시즌 최고의 크루입니다",
     reviewer: {
-      display_name: "김민준수", gender: "남", birth_date: "1999-11-30",
-      university: "연세대학교", major_first: "데이터사이언스학과",
-      teamName: "글로벌전략", partName: "콘텐츠마케",
+      display_name: "김민준수",
+      gender: "남",
+      birth_date: "1999-11-30",
+      university: "연세대학교",
+      major_first: "데이터사이언스학과",
+      teamName: "글로벌전략",
+      partName: "콘텐츠마케",
       vision: "마이크로소프트엔비디",
       profile_photo_url: "/images/0/crew profile/여 1.jpg",
     },
   },
   {
-    id: "dummy-rep-5", rating: 1, fmScore: 3,
-    keyword_1: "성장가능성", keyword_2: null, keyword_3: null,
+    id: "dummy-rep-5",
+    rating: 1,
+    fmScore: 3,
+    keyword_1: "성장가능성",
+    keyword_2: null,
+    keyword_3: null,
     content: "아직 시작 단계이지만 가능성이 보입니다",
     reviewer: {
-      display_name: "한솔", gender: "여", birth_date: "2003-07-22",
-      university: "홍익대학교", major_first: "컴퓨터공학",
-      teamName: "기획팀전략", partName: "기획팀",
+      display_name: "한솔",
+      gender: "여",
+      birth_date: "2003-07-22",
+      university: "홍익대학교",
+      major_first: "컴퓨터공학",
+      teamName: "기획팀전략",
+      partName: "기획팀",
       vision: "카카오",
       profile_photo_url: "/images/0/crew profile/여 2.jpg",
     },
   },
   {
-    id: "dummy-rep-6", rating: 5, fmScore: 88,
-    keyword_1: "커뮤니케이션", keyword_2: "문제해결능력", keyword_3: null,
+    id: "dummy-rep-6",
+    rating: 5,
+    fmScore: 88,
+    keyword_1: "커뮤니케이션",
+    keyword_2: "문제해결능력",
+    keyword_3: null,
     content: "소통 능력이 뛰어나고 팀 분위기를 이끄는 데 기여했습니다",
     reviewer: {
-      display_name: "박지현", gender: "여", birth_date: "2001-09-05",
-      university: "성균관대학교", major_first: "산업디자인학과",
-      teamName: "브랜드", partName: "디자인파트",
+      display_name: "박지현",
+      gender: "여",
+      birth_date: "2001-09-05",
+      university: "성균관대학교",
+      major_first: "산업디자인학과",
+      teamName: "브랜드",
+      partName: "디자인파트",
       vision: "삼성전자구글",
       profile_photo_url: "/images/0/crew profile/여 3.jpg",
     },
@@ -163,28 +211,65 @@ const formatSeasonReputationTime = (timestamp: string | null | undefined): strin
 // 데모 모드용 키워드 100개 폴백 (5군락)
 const SEASON_KEYWORDS_FALLBACK = [
   ...[
-    "노션 유망주","노션 마스터","인스타 유망주","인스타 마스터","유튜브 유망주","유튜브 마스터",
-    "AI 유망주","AI 마스터","블로그 유망주","블로그 마스터","미드저니 유망주","미드저니 마스터",
-    "깃업 유망주","깃업 마스터","노코드 유망주","노코드 마스터","옵시디언 유망주","옵시디언 마스터",
-    "파워포인트","엑셀 유망주","엑셀 마스터","카카오 생태계","네이버 생태계","구글 생태계",
-    "퍼블리싱","UI / UX 기획","웹 develop","앱 develop","서버 관리","데이터 처리",
-    "데이터 분석","데이터 해석","AI 프롬프트","시스템 구축력","도구 사용력","기술 습득력",
+    "노션 유망주",
+    "노션 마스터",
+    "인스타 유망주",
+    "인스타 마스터",
+    "유튜브 유망주",
+    "유튜브 마스터",
+    "AI 유망주",
+    "AI 마스터",
+    "블로그 유망주",
+    "블로그 마스터",
+    "미드저니 유망주",
+    "미드저니 마스터",
+    "깃업 유망주",
+    "깃업 마스터",
+    "노코드 유망주",
+    "노코드 마스터",
+    "옵시디언 유망주",
+    "옵시디언 마스터",
+    "파워포인트",
+    "엑셀 유망주",
+    "엑셀 마스터",
+    "카카오 생태계",
+    "네이버 생태계",
+    "구글 생태계",
+    "퍼블리싱",
+    "UI / UX 기획",
+    "웹 develop",
+    "앱 develop",
+    "서버 관리",
+    "데이터 처리",
+    "데이터 분석",
+    "데이터 해석",
+    "AI 프롬프트",
+    "시스템 구축력",
+    "도구 사용력",
+    "기술 습득력",
   ].map((kw, i) => ({ id: i + 1, cluster_number: 1, cluster_name: "도구 · 기술 · 시스템 활용 역량", cluster_color: "#3B82F6", keyword: kw })),
-  ...[
-    "콘텐츠","카드 콘텐츠","텍스트 콘텐츠","스토리텔링","동영상 숏폼","동영상 롱폼",
-    "릴스 특화","쇼츠 특화","캐치프레이즈","슬로건","표현력","언어 능력","설득력","상상력","유머와 재미","창의성",
-  ].map((kw, i) => ({ id: 37 + i, cluster_number: 2, cluster_name: "콘텐츠 · 표현 · 메시지 생산 역량", cluster_color: "#22C55E", keyword: kw })),
-  ...[
-    "퍼포먼스","브랜딩 마케팅","바이럴 마케팅","커뮤니티","연관 검색어","구글 트렌드","정보력","사회성","소통력","공감력",
-  ].map((kw, i) => ({ id: 53 + i, cluster_number: 3, cluster_name: "마케팅 · 확산 · 영향력 설계", cluster_color: "#EAB308", keyword: kw })),
-  ...[
-    "인지력","관찰력","이해력","논리력","상황 추론력","문제 정의력","연구력","업무 분석력",
-    "업무 기획력","계획력","구조화","도식화","범위화","항목화","자료화","변칙성",
-  ].map((kw, i) => ({ id: 63 + i, cluster_number: 4, cluster_name: "사고 · 분석 · 구조화 역량", cluster_color: "#F97316", keyword: kw })),
-  ...[
-    "지속성","기민성","신뢰성","성장성","유연성","안정성","위기 대응성","학습력","지도력","소속감",
-    "적극성","자신감","헌신성","행동력","회복력","몰입력","잠재력","업무 진행력","업무 관리력","수용력","지구력","강인한 체력",
-  ].map((kw, i) => ({ id: 79 + i, cluster_number: 5, cluster_name: "태도 · 실행 · 지속성 기반 역량", cluster_color: "#EF4444", keyword: kw })),
+  ...["콘텐츠", "카드 콘텐츠", "텍스트 콘텐츠", "스토리텔링", "동영상 숏폼", "동영상 롱폼", "릴스 특화", "쇼츠 특화", "캐치프레이즈", "슬로건", "표현력", "언어 능력", "설득력", "상상력", "유머와 재미", "창의성"].map((kw, i) => ({
+    id: 37 + i,
+    cluster_number: 2,
+    cluster_name: "콘텐츠 · 표현 · 메시지 생산 역량",
+    cluster_color: "#22C55E",
+    keyword: kw,
+  })),
+  ...["퍼포먼스", "브랜딩 마케팅", "바이럴 마케팅", "커뮤니티", "연관 검색어", "구글 트렌드", "정보력", "사회성", "소통력", "공감력"].map((kw, i) => ({ id: 53 + i, cluster_number: 3, cluster_name: "마케팅 · 확산 · 영향력 설계", cluster_color: "#EAB308", keyword: kw })),
+  ...["인지력", "관찰력", "이해력", "논리력", "상황 추론력", "문제 정의력", "연구력", "업무 분석력", "업무 기획력", "계획력", "구조화", "도식화", "범위화", "항목화", "자료화", "변칙성"].map((kw, i) => ({
+    id: 63 + i,
+    cluster_number: 4,
+    cluster_name: "사고 · 분석 · 구조화 역량",
+    cluster_color: "#F97316",
+    keyword: kw,
+  })),
+  ...["지속성", "기민성", "신뢰성", "성장성", "유연성", "안정성", "위기 대응성", "학습력", "지도력", "소속감", "적극성", "자신감", "헌신성", "행동력", "회복력", "몰입력", "잠재력", "업무 진행력", "업무 관리력", "수용력", "지구력", "강인한 체력"].map((kw, i) => ({
+    id: 79 + i,
+    cluster_number: 5,
+    cluster_name: "태도 · 실행 · 지속성 기반 역량",
+    cluster_color: "#EF4444",
+    keyword: kw,
+  })),
 ];
 
 const Cluster4Content = () => {
@@ -210,9 +295,9 @@ const Cluster4Content = () => {
           setDemoUserName(name);
           // 데모 모드 사용자별 성장 상태 설정
           const demoStatusMap: Record<string, { us: string | null; gs: string | null }> = {
-            '전민경': { us: 'graduated', gs: '졸업 완료' },
-            '곽예원': { us: 'weekly_rest', gs: '주차 휴식 중' },
-            '김의환': { us: 'suspended', gs: '활동 중단' },
+            전민경: { us: "graduated", gs: "졸업 완료" },
+            곽예원: { us: "weekly_rest", gs: "주차 휴식 중" },
+            김의환: { us: "suspended", gs: "활동 중단" },
           };
           if (name && demoStatusMap[name]) {
             setUserStatus(demoStatusMap[name].us);
@@ -226,12 +311,33 @@ const Cluster4Content = () => {
     fetchName();
   }, [isDemoMode, urlUserId]);
 
-  const demoCollectionMessage = isDemoMode && demoUserName ? ({
-    '윤재윤': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 봄 시즌</span>을 가동 중에 있습니다.</>,
-    '전민경': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 여름 시즌</span>을 준비 중인 전환 과정에 있습니다.</>,
-    '곽예원': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 겨울 시즌</span>을 가동 중에 있습니다.</>,
-    '김의환': <>현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>2026년 가을 시즌</span>을 준비 중인 전환 과정에 있습니다.</>,
-  } as Record<string, React.ReactNode>)[demoUserName] || null : null;
+  const demoCollectionMessage =
+    isDemoMode && demoUserName
+      ? (
+          {
+            윤재윤: (
+              <>
+                현재 클럽은, <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>2026년 봄 시즌</span>을 가동 중에 있습니다.
+              </>
+            ),
+            전민경: (
+              <>
+                현재 클럽은, <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>2026년 여름 시즌</span>을 준비 중인 전환 과정에 있습니다.
+              </>
+            ),
+            곽예원: (
+              <>
+                현재 클럽은, <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>2026년 겨울 시즌</span>을 가동 중에 있습니다.
+              </>
+            ),
+            김의환: (
+              <>
+                현재 클럽은, <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>2026년 가을 시즌</span>을 준비 중인 전환 과정에 있습니다.
+              </>
+            ),
+          } as Record<string, React.ReactNode>
+        )[demoUserName] || null
+      : null;
 
   // 승인 상태 확인 함수
   const checkApprovalStatus = async () => {
@@ -304,7 +410,11 @@ const Cluster4Content = () => {
   // 보기/편집 모드 토글
   const [isSeasonReputationFormEditing, setIsSeasonReputationFormEditing] = useState(false);
   const [seasonReputationFormSnapshot, setSeasonReputationFormSnapshot] = useState<{
-    rating: number; content: string; keyword1: string; keyword2: string; keyword3: string;
+    rating: number;
+    content: string;
+    keyword1: string;
+    keyword2: string;
+    keyword3: string;
   } | null>(null);
   const [seasonReputationSaveAttemptFailed, setSeasonReputationSaveAttemptFailed] = useState(false);
   const [seasonReputationFieldErrorFlash, setSeasonReputationFieldErrorFlash] = useState(false);
@@ -428,7 +538,9 @@ const Cluster4Content = () => {
       setCanEditSeasonReputation(approved);
       setCanEditSeasonReview(approved);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [isDemoMode, session]);
 
   // season-reputation view 모달 핸들러
@@ -462,14 +574,7 @@ const Cluster4Content = () => {
         value: keyword,
         mode: seasonKeywordModes[index],
         valid: keyword.length > 0 && keyword.length <= 10 && !duplicateKeywords.includes(keyword),
-        reason:
-          keyword.length === 0
-            ? "keyword is required"
-            : keyword.length > 10
-              ? "keyword must be 10 characters or less"
-              : duplicateKeywords.includes(keyword)
-                ? "keyword must be unique"
-                : "ok",
+        reason: keyword.length === 0 ? "keyword is required" : keyword.length > 10 ? "keyword must be 10 characters or less" : duplicateKeywords.includes(keyword) ? "keyword must be unique" : "ok",
       })),
     ];
     const invalidFields = fieldResults.filter((result) => !result.valid);
@@ -497,7 +602,13 @@ const Cluster4Content = () => {
     if (!seasonReputationFormSnapshot) {
       return seasonReputationEditData.rating > 0 || (seasonReputationEditData.content?.trim().length || 0) > 0 || (seasonReputationEditData.keyword1?.length || 0) > 0 || (seasonReputationEditData.keyword2?.length || 0) > 0 || (seasonReputationEditData.keyword3?.length || 0) > 0;
     }
-    return seasonReputationEditData.rating !== seasonReputationFormSnapshot.rating || seasonReputationEditData.content !== seasonReputationFormSnapshot.content || seasonReputationEditData.keyword1 !== seasonReputationFormSnapshot.keyword1 || seasonReputationEditData.keyword2 !== seasonReputationFormSnapshot.keyword2 || seasonReputationEditData.keyword3 !== seasonReputationFormSnapshot.keyword3;
+    return (
+      seasonReputationEditData.rating !== seasonReputationFormSnapshot.rating ||
+      seasonReputationEditData.content !== seasonReputationFormSnapshot.content ||
+      seasonReputationEditData.keyword1 !== seasonReputationFormSnapshot.keyword1 ||
+      seasonReputationEditData.keyword2 !== seasonReputationFormSnapshot.keyword2 ||
+      seasonReputationEditData.keyword3 !== seasonReputationFormSnapshot.keyword3
+    );
   };
 
   // season-reputation form 핸들러
@@ -546,7 +657,11 @@ const Cluster4Content = () => {
         console.log("[season-reputation keyword mode] write", { slotIndex, next });
         return next;
       });
-      setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "write"; return next; });
+      setSeasonKeywordModes((prev) => {
+        const next = [...prev];
+        next[slotIndex] = "write";
+        return next;
+      });
       return;
     }
 
@@ -564,7 +679,10 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonKeywordSelectConfirm = () => {
-    if (!seasonKeywordTempSelection) { alert("키워드를 먼저 선택해주세요."); return; }
+    if (!seasonKeywordTempSelection) {
+      alert("키워드를 먼저 선택해주세요.");
+      return;
+    }
     if (!window.confirm(`'${seasonKeywordTempSelection}' 을 선택하시겠습니까?`)) return;
     const slotIndex = seasonKeywordTargetSlot;
     if (slotIndex === null) return;
@@ -576,7 +694,11 @@ const Cluster4Content = () => {
       console.log("[season-reputation keyword select] confirmed", { slotIndex, keyword: seasonKeywordTempSelection, next });
       return next;
     });
-    setSeasonKeywordModes((prev) => { const next = [...prev]; next[slotIndex] = "select"; return next; });
+    setSeasonKeywordModes((prev) => {
+      const next = [...prev];
+      next[slotIndex] = "select";
+      return next;
+    });
     setSeasonKeywordModalOpen(false);
     setSeasonKeywordTargetSlot(null);
     setSeasonKeywordTempSelection(null);
@@ -1960,13 +2082,19 @@ const Cluster4Content = () => {
 
     if (seasonReputationEditData.content.trim() === "") {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (seasonReputationEditData.keyword1.trim() === "" && seasonReputationEditData.keyword2.trim() === "") {
       const el = document.querySelector(".edit-modal-content input[placeholder='키워드를 입력하세요']");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -2124,9 +2252,7 @@ const Cluster4Content = () => {
 
     if (isDemoMode) {
       // seasonHistories 업데이트 (UI 즉시 반영 — 현재 페이지 인덱스로 매칭)
-      setSeasonHistories((prev) =>
-        prev.map((season, idx) => (idx === section3Page ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() } : season)),
-      );
+      setSeasonHistories((prev) => prev.map((season, idx) => (idx === section3Page ? { ...season, rating: seasonReviewEditData.rating, review: seasonReviewEditData.review.trim(), reviewLink: seasonReviewEditData.link.trim() } : season)));
       alert("저장되었습니다.");
       setSeasonReviewModalOpen(false);
       setSeasonReviewSaving(false);
@@ -2147,13 +2273,19 @@ const Cluster4Content = () => {
 
     if (false && !seasonReviewEditData.review.trim()) {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     if (false && seasonReviewEditData.review.length > 300) {
       const el = document.querySelector(".edit-modal-content textarea");
-      if (el) { (el as HTMLElement).style.border = "1px solid #ff4444"; (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" }); }
+      if (el) {
+        (el as HTMLElement).style.border = "1px solid #ff4444";
+        (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -2355,16 +2487,30 @@ const Cluster4Content = () => {
                   <span className="collection-label">Add new passion, hardship and growth</span>
                 </div>
                 <p className="collection-text">
-                  {demoCollectionMessage ? demoCollectionMessage : (
-                    currentSeasonInfo?.isBreakSeason ? (
-                      <>
-                        현재 클럽은, <span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</span>을 준비 중인 전환 과정에 있습니다.
-                      </>
-                    ) : (
-                      <>
-                        현재 클럽은, {currentSeasonInfo ? <><span style={{ color: '#FF9C9C', fontSize: 20, fontFamily: 'Pretendard', fontWeight: '800', lineHeight: '30px', wordWrap: 'break-word' }}>{currentSeasonInfo.year}년 {currentSeasonInfo.name} 시즌</span>을 가동 중에 있습니다.</> : "로딩 중..."}
-                      </>
-                    )
+                  {demoCollectionMessage ? (
+                    demoCollectionMessage
+                  ) : currentSeasonInfo?.isBreakSeason ? (
+                    <>
+                      현재 클럽은,{" "}
+                      <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>
+                        {currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌
+                      </span>
+                      을 준비 중인 전환 과정에 있습니다.
+                    </>
+                  ) : (
+                    <>
+                      현재 클럽은,{" "}
+                      {currentSeasonInfo ? (
+                        <>
+                          <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>
+                            {currentSeasonInfo.year}년 {currentSeasonInfo.name} 시즌
+                          </span>
+                          을 가동 중에 있습니다.
+                        </>
+                      ) : (
+                        "로딩 중..."
+                      )}
+                    </>
                   )}
                 </p>
               </div>
@@ -2457,13 +2603,16 @@ const Cluster4Content = () => {
           {/* 상단 헤더 영역 (영역 1 + 영역 2) */}
           <div className="top-header-row">
             {/* 영역 1: 타이틀 + 날짜 + 상태 */}
-            <div className={`area-1-title ${isTextFading ? "fading" : ""}`} style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
-              <div className="season-main-title" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+            <div className={`area-1-title ${isTextFading ? "fading" : ""}`} style={{ display: "flex", alignItems: "center", flexWrap: "nowrap", whiteSpace: "nowrap" }}>
+              <div className="season-main-title" style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
                 <span className="year-orange">{currentSeason.year}</span>년도<span style={{ display: "inline-block", width: "1.2em" }}></span>
-                <span className="season-highlight" style={{ display: 'inline-block', minWidth: '2em', textAlign: 'right' }}>{currentSeason.season}</span> 시즌
+                <span className="season-highlight" style={{ display: "inline-block", minWidth: "2em", textAlign: "right" }}>
+                  {currentSeason.season}
+                </span>{" "}
+                시즌
               </div>
               <span className="bullet-dot" style={{ display: "inline-block", width: "2px", height: "2px", background: "#FAAB07", borderRadius: "50%", marginLeft: "15px", transform: "translateY(0px)" }}></span>
-              <div className="date-status" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              <div className="date-status" style={{ display: "flex", alignItems: "center", flexShrink: 0, whiteSpace: "nowrap" }}>
                 <span className="date-range">{currentSeason.dateRange}</span>
                 <button className={`status-badge ${currentSeason.statusClass}`}>{currentSeason.status}</button>
               </div>
@@ -2674,7 +2823,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 <span style={{ color: '#FF9B9B' }}>정보</span> 강화율 <span className="rate-number">{currentSeason.progress.info.rate}</span>%
+                      <img src="/images/0/cluster4/icon/1 실무 정보.png" alt="1" className="progress-icon" /> 실무 <span style={{ color: "#FF9B9B" }}>정보</span> 강화율 <span className="rate-number">{currentSeason.progress.info.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.info.total}</span> 개 중 <span className="highlight">{currentSeason.progress.info.completed}</span> 개
@@ -2687,7 +2836,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/2 실무 경험.png" alt="2" className="progress-icon" /> 실무 <span style={{ color: '#FFD09B' }}>경험</span> 강화율 <span className="rate-number">{currentSeason.progress.competency.rate}</span>%
+                      <img src="/images/0/cluster4/icon/2 실무 경험.png" alt="2" className="progress-icon" /> 실무 <span style={{ color: "#FFD09B" }}>경험</span> 강화율 <span className="rate-number">{currentSeason.progress.competency.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.competency.total}</span> 개 중 <span className="highlight">{currentSeason.progress.competency.completed}</span> 개
@@ -2700,7 +2849,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/3 실무 역량.png" alt="3" className="progress-icon" /> 실무 <span style={{ color: '#A8D8A8' }}>역량</span> 강화율 <span className="rate-number">{currentSeason.progress.experience.rate}</span>%
+                      <img src="/images/0/cluster4/icon/3 실무 역량.png" alt="3" className="progress-icon" /> 실무 <span style={{ color: "#A8D8A8" }}>역량</span> 강화율 <span className="rate-number">{currentSeason.progress.experience.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.experience.total}</span> 개 중 <span className="highlight">{currentSeason.progress.experience.completed}</span> 개
@@ -2713,7 +2862,7 @@ const Cluster4Content = () => {
                 <div className="progress-item">
                   <div className="progress-header">
                     <span className="name">
-                      <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 <span style={{ color: '#9BB8FF' }}>경력</span> 강화율 <span className="rate-number">{currentSeason.progress.career.rate}</span>%
+                      <img src="/images/0/cluster4/icon/4 실무 경력.png" alt="4" className="progress-icon" /> 실무 <span style={{ color: "#9BB8FF" }}>경력</span> 강화율 <span className="rate-number">{currentSeason.progress.career.rate}</span>%
                     </span>
                     <span className="value">
                       <img src="/images/0/cluster4/icon/stars.png" alt="stars" className="stars-icon" /> 총 <span className="num-fixed">{currentSeason.progress.career.total}</span> 개 중 <span className="highlight">{currentSeason.progress.career.completed}</span> 개
@@ -2752,15 +2901,35 @@ const Cluster4Content = () => {
                               <div className="badge-info">
                                 {roleItem.isAdmin ? (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(`운영진(${roleItem.adminGeneration}기)`, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>클럽 단위</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(`운영진(${roleItem.adminGeneration}기)`, 6)}</span>{" "}
+                                    <span className="separator" style={{ margin: "0 4px 0 0" }}>
+                                      |
+                                    </span>{" "}
+                                    <span className="sub-text" style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>
+                                      클럽 단위
+                                    </span>{" "}
+                                    <span className="separator" style={{ margin: "0" }}>
+                                      |
+                                    </span>
                                   </span>
                                 ) : (
                                   <span className="badge-text">
-                                    <span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.teamName, 6)}</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(roleItem.partName, 6)}</span> <span className="separator" style={{ margin: '0' }}>|</span>
+                                    <span style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(roleItem.teamName, 6)}</span>{" "}
+                                    <span className="separator" style={{ margin: "0 4px 0 0" }}>
+                                      |
+                                    </span>{" "}
+                                    <span className="sub-text" style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>
+                                      {truncate(roleItem.partName, 6)}
+                                    </span>{" "}
+                                    <span className="separator" style={{ margin: "0" }}>
+                                      |
+                                    </span>
                                   </span>
                                 )}
                               </div>
-                              <span className="badge-status yellow" style={{ display: 'inline-block', width: 'fit-content', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px', padding: '4px 10px', marginLeft: '-4px' }}>{truncate(roleItem.roleLabel, 9)}</span>
+                              <span className="badge-status yellow" style={{ display: "inline-block", width: "fit-content", whiteSpace: "nowrap", fontFamily: "'Pretendard', sans-serif", fontSize: "13px", padding: "4px 10px", marginLeft: "-4px" }}>
+                                {truncate(roleItem.roleLabel, 9)}
+                              </span>
                             </div>
                           );
                         }
@@ -2770,9 +2939,22 @@ const Cluster4Content = () => {
                               <div style={{ width: "100%", height: "100%", background: "#555", borderRadius: "50%" }} />
                             </div>
                             <div className="badge-info">
-                              <span className="badge-text"><span style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0 4px 0 0' }}>|</span> <span className="sub-text" style={{ display: 'inline-block', minWidth: '86px', maxWidth: '86px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>-</span> <span className="separator" style={{ margin: '0' }}>|</span></span>
+                              <span className="badge-text">
+                                <span style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>-</span>{" "}
+                                <span className="separator" style={{ margin: "0 4px 0 0" }}>
+                                  |
+                                </span>{" "}
+                                <span className="sub-text" style={{ display: "inline-block", minWidth: "86px", maxWidth: "86px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>
+                                  -
+                                </span>{" "}
+                                <span className="separator" style={{ margin: "0" }}>
+                                  |
+                                </span>
+                              </span>
                             </div>
-                            <span className="badge-status yellow" style={{ display: 'inline-block', width: 'fit-content', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px', padding: '4px 10px', marginLeft: '-4px' }}>-</span>
+                            <span className="badge-status yellow" style={{ display: "inline-block", width: "fit-content", whiteSpace: "nowrap", fontFamily: "'Pretendard', sans-serif", fontSize: "13px", padding: "4px 10px", marginLeft: "-4px" }}>
+                              -
+                            </span>
                           </div>
                         );
                       });
@@ -2787,16 +2969,35 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', width: '100%', position: 'relative' }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", width: "100%", position: "relative" }}>
                   <h4 className="section-title">
                     <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판{" "}
                     <span className="count-label">
                       <span className="num-fixed">{seasonReputations.length}</span>개
                     </span>
+                    <span
+                      className="fm-badge"
+                      style={{
+                        fontSize: "14px",
+                        marginLeft: "44px",
+                        fontWeight: 600,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        color: "#fff",
+                        fontFamily: "'Rajdhani', sans-serif",
+                        letterSpacing: "0.7px",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
+                      FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
+                    </span>
                   </h4>
                   <div
                     className="edit-icon"
-                    style={{ cursor: 'pointer', flexShrink: 0 }}
+                    style={{ cursor: "pointer", flexShrink: 0 }}
                     onClick={() => {
                       if (!isDemoMode && isOwner) {
                         alert("시즌 평판은 타 크루끼리 작성합니다.");
@@ -2805,7 +3006,7 @@ const Cluster4Content = () => {
                       handleEditClick(openSeasonReputationModal);
                     }}
                   >
-                    <i className="ti ti-pencil" style={{ fontSize: '16px', color: '#1a1a1a' }} />
+                    <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }} />
                   </div>
                 </div>
                 <div style={{ position: "relative" }}>
@@ -2817,98 +3018,149 @@ const Cluster4Content = () => {
                       </div>
                     ) : (
                       seasonReputations.map((reputation: any) => {
-                          const reviewer = reputation.reviewer;
-                          const currentYear = new Date().getFullYear();
-                          const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
-                          const age = birthYear ? currentYear - birthYear : null;
-                          const genderLabel = reviewer?.gender || "-";
-                          const fullStars = Math.floor(reputation.rating / 2);
-                          const hasHalfStar = reputation.rating % 2 === 1;
-                          const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                        const reviewer = reputation.reviewer;
+                        const currentYear = new Date().getFullYear();
+                        const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
+                        const age = birthYear ? currentYear - birthYear : null;
+                        const genderLabel = reviewer?.gender || "-";
+                        const fullStars = Math.floor(reputation.rating / 2);
+                        const hasHalfStar = reputation.rating % 2 === 1;
+                        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-                          return (
-                            <div className="profile-card" key={reputation.id}>
-                              <div className="corner top-left"></div>
-                              <div className="corner top-right"></div>
-                              <div className="corner bottom-left"></div>
-                              <div className="corner bottom-right"></div>
-                              <div className="card-top">
-                                <div className="avatar">
-                                  <img src={reviewer?.profile_photo_url || "/images/avatar/avatar.png"} alt="profile" />
+                        return (
+                          <div className="profile-card" key={reputation.id}>
+                            <div className="corner top-left"></div>
+                            <div className="corner top-right"></div>
+                            <div className="corner bottom-left"></div>
+                            <div className="corner bottom-right"></div>
+                            <div className="card-top">
+                              <div className="avatar">
+                                <img src={reviewer?.profile_photo_url || "/images/avatar/avatar.png"} alt="profile" />
+                              </div>
+                              <div className="info">
+                                <div className="row1">
+                                  <span
+                                    style={{
+                                      display: "inline-block",
+                                      minWidth: "48px",
+                                      maxWidth: "48px",
+                                      whiteSpace: "nowrap",
+                                      verticalAlign: "middle",
+                                      fontFamily: "'Pretendard', sans-serif",
+                                      fontSize: "14px",
+                                      textAlign: !reviewer?.display_name || reviewer?.display_name === "-" ? "left" : undefined,
+                                    }}
+                                  >
+                                    {truncate(reviewer?.display_name || "익명", 3)}
+                                  </span>{" "}
+                                  <span className="separator" style={{ margin: "0 1px" }}>
+                                    |
+                                  </span>{" "}
+                                  <span style={{ display: "inline-block", minWidth: "18px", maxWidth: "18px", whiteSpace: "nowrap", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px", textAlign: genderLabel === "-" ? "left" : undefined }}>{genderLabel}</span>{" "}
+                                  <span className="separator" style={{ margin: "0 1px" }}>
+                                    |
+                                  </span>{" "}
+                                  <span style={{ display: "inline-block", minWidth: "2ch", maxWidth: "2ch", textAlign: !age && age !== 0 ? "left" : "right", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{mask.age(age)}</span>{" "}
+                                  <span className="separator" style={{ margin: "0 1px" }}>
+                                    |
+                                  </span>{" "}
+                                  <span style={{ minWidth: "85px", width: "85px", flex: "0 0 85px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "clip", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>
+                                    {truncate(mask.school(reviewer?.university), 6)}
+                                  </span>{" "}
+                                  <span className="separator" style={{ margin: "0 1px" }}>
+                                    |
+                                  </span>{" "}
+                                  <span style={{ flex: "1 1 0", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(mask.major(reviewer?.major_first), 6)}</span>
                                 </div>
-                                <div className="info">
-                                  <div className="row1">
-                                    <span style={{ display: 'inline-block', minWidth: '48px', maxWidth: '48px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (!reviewer?.display_name || reviewer?.display_name === '-') ? 'left' : undefined }}>{truncate(reviewer?.display_name || "익명", 3)}</span> <span className="separator" style={{ margin: '0 1px' }}>|</span> <span style={{ display: 'inline-block', minWidth: '18px', maxWidth: '18px', whiteSpace: 'nowrap', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px', textAlign: (genderLabel === '-') ? 'left' : undefined }}>{genderLabel}</span> <span className="separator" style={{ margin: '0 1px' }}>|</span> <span style={{ display: 'inline-block', minWidth: '2ch', maxWidth: '2ch', textAlign: (!age && age !== 0) ? 'left' : 'right', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{mask.age(age)}</span> <span className="separator" style={{ margin: '0 1px' }}>|</span> <span style={{ minWidth: '85px', width: '85px', flex: '0 0 85px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'clip', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(mask.school(reviewer?.university), 6)}</span> <span className="separator" style={{ margin: '0 1px' }}>|</span>{" "}
-                                    <span style={{ flex: '1 1 0', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(mask.major(reviewer?.major_first), 6)}</span>
-                                  </div>
-                                  <div className="row2">
-                                    <span style={{ minWidth: '85px', width: '85px', flex: '0 0 85px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'clip', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(reviewer?.teamName, 6)}</span> <span className="separator" style={{ margin: '0 1px' }}>|</span> <span style={{ minWidth: '85px', width: '85px', flex: '0 0 85px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'clip', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(reviewer?.partName, 6)}</span>
-                                    {reviewer?.vision && (
-                                      <>
-                                        {" "}
-                                        <span className="separator" style={{ margin: '0 1px' }}>|</span> <span style={{ flex: '1 1 0', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', verticalAlign: 'middle', fontFamily: "'Pretendard', sans-serif", fontSize: '14px' }}>{truncate(reviewer?.vision, 9)}</span>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="tags" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap' }}>
-                                {reputation.keyword_1 && <span className="tag" style={{ display: 'inline-block', width: 'fit-content', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px' }}>#{truncate(reputation.keyword_1 as string, 7)}</span>}
-                                {reputation.keyword_2 && <span className="tag-yellow" style={{ display: 'inline-block', width: 'fit-content', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px' }}>#{truncate(reputation.keyword_2 as string, 7)}</span>}
-                                {reputation.keyword_3 && <span className="tag" style={{ display: 'inline-block', width: 'fit-content', whiteSpace: 'nowrap', fontFamily: "'Pretendard', sans-serif", fontSize: '13px' }}>#{truncate(reputation.keyword_3 as string, 7)}</span>}
-                              </div>
-                              <div
-                                className="comment"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => {
-                                  setSelectedReputation(reputation);
-                                  setReputationDetailModalOpen(true);
-                                }}
-                              >
-                                <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
-                                <span className="comment-text">{reputation.content}</span>
-                                <span
-                                  className="arrow-icon"
-                                  style={{
-                                    width: "15px",
-                                    height: "15px",
-                                    padding: "5px",
-                                    flexShrink: 0,
-                                    background: "#FAAB07",
-                                    borderRadius: "5px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    marginRight: "11px",
-                                  }}
-                                >
-                                  <svg width="11" height="10" viewBox="0 0 11 10" fill="none">
-                                    <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                  </svg>
-                                </span>
-                              </div>
-                              <div className="stats">
-                                <span className="pm">
-                                  <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: 'inline-block', minWidth: '4ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
-                                </span>
-                                <span className="rating">
-                                  {[...Array(fullStars)].map((_, i) => (
-                                    <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                  ))}
-                                  {hasHalfStar && (
-                                    <span className="star-half">
-                                      <img className="star-half-filled" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                      <img className="star-half-empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                    </span>
+                                <div className="row2">
+                                  <span style={{ minWidth: "85px", width: "85px", flex: "0 0 85px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "clip", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(reviewer?.teamName, 6)}</span>{" "}
+                                  <span className="separator" style={{ margin: "0 1px" }}>
+                                    |
+                                  </span>{" "}
+                                  <span style={{ minWidth: "85px", width: "85px", flex: "0 0 85px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "clip", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(reviewer?.partName, 6)}</span>
+                                  {reviewer?.vision && (
+                                    <>
+                                      {" "}
+                                      <span className="separator" style={{ margin: "0 1px" }}>
+                                        |
+                                      </span>{" "}
+                                      <span style={{ flex: "1 1 0", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", verticalAlign: "middle", fontFamily: "'Pretendard', sans-serif", fontSize: "14px" }}>{truncate(reviewer?.vision, 9)}</span>
+                                    </>
                                   )}
-                                  {[...Array(emptyStars)].map((_, i) => (
-                                    <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
-                                  ))}
-                                  <span className="rating-score"><span style={{ display: 'inline-block', minWidth: '2ch', textAlign: 'right', fontFamily: "'Pretendard', sans-serif" }}>{reputation.rating}</span>{" "}/{" "}10</span>
-                                </span>
+                                </div>
                               </div>
                             </div>
-                          );
+                            <div className="tags" style={{ display: "flex", gap: "8px", flexWrap: "nowrap" }}>
+                              {reputation.keyword_1 && (
+                                <span className="tag" style={{ display: "inline-block", width: "fit-content", whiteSpace: "nowrap", fontFamily: "'Pretendard', sans-serif", fontSize: "13px" }}>
+                                  #{truncate(reputation.keyword_1 as string, 7)}
+                                </span>
+                              )}
+                              {reputation.keyword_2 && (
+                                <span className="tag-yellow" style={{ display: "inline-block", width: "fit-content", whiteSpace: "nowrap", fontFamily: "'Pretendard', sans-serif", fontSize: "13px" }}>
+                                  #{truncate(reputation.keyword_2 as string, 7)}
+                                </span>
+                              )}
+                              {reputation.keyword_3 && (
+                                <span className="tag" style={{ display: "inline-block", width: "fit-content", whiteSpace: "nowrap", fontFamily: "'Pretendard', sans-serif", fontSize: "13px" }}>
+                                  #{truncate(reputation.keyword_3 as string, 7)}
+                                </span>
+                              )}
+                            </div>
+                            <div
+                              className="comment"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                setSelectedReputation(reputation);
+                                setReputationDetailModalOpen(true);
+                              }}
+                            >
+                              <img className="speech-icon" src="/images/0/cluster4/icon - speech.png" alt="speech" />
+                              <span className="comment-text">{reputation.content}</span>
+                              <span
+                                className="arrow-icon"
+                                style={{
+                                  width: "15px",
+                                  height: "15px",
+                                  padding: "5px",
+                                  flexShrink: 0,
+                                  background: "#FAAB07",
+                                  borderRadius: "5px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  marginRight: "11px",
+                                }}
+                              >
+                                <svg width="11" height="10" viewBox="0 0 11 10" fill="none">
+                                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </span>
+                            </div>
+                            <div className="stats">
+                              <span className="pm">
+                                <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
+                              </span>
+                              <span className="rating">
+                                {[...Array(fullStars)].map((_, i) => (
+                                  <img key={`full-${i}`} className="star-icon" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                ))}
+                                {hasHalfStar && (
+                                  <span className="star-half">
+                                    <img className="star-half-filled" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                    <img className="star-half-empty" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                  </span>
+                                )}
+                                {[...Array(emptyStars)].map((_, i) => (
+                                  <img key={`empty-${i}`} className="star-icon empty" src="/images/0/cluster4/icon - star.png" alt="star" />
+                                ))}
+                                <span className="rating-score">
+                                  <span style={{ display: "inline-block", minWidth: "2ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{reputation.rating}</span> / 10
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        );
                       })
                     )}
                   </div>
@@ -2962,7 +3214,9 @@ const Cluster4Content = () => {
               <div className="reputation-form-top">
                 {/* 1열: 평점 — cluster-4-card 패턴 */}
                 <div className="form-rating-section">
-                  <h4>■ 평점을 입력해주세요. <span className="required-mark">*</span></h4>
+                  <h4>
+                    ■ 평점을 입력해주세요. <span className="required-mark">*</span>
+                  </h4>
                   <div className={`rating-input rating-field ${seasonReputationSaveAttemptFailed && seasonReputationEditData.rating === 0 ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
                     <span className="star-rating">
                       {(() => {
@@ -2972,9 +3226,17 @@ const Cluster4Content = () => {
                         const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
                         return (
                           <>
-                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {Array(fullStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`f${i}`} className="ti ti-star-filled" />
+                              ))}
                             {hasHalf && <i className="ti ti-star-half-filled" />}
-                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                            {Array(emptyStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`e${i}`} className="ti ti-star" />
+                              ))}
                           </>
                         );
                       })()}
@@ -2991,7 +3253,9 @@ const Cluster4Content = () => {
 
                 {/* 2열: 키워드 3슬롯 — cluster-4-card 패턴 + 시즌 3행 */}
                 <div className="form-keyword-section">
-                  <h4>■ 키워드를 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 10자)</span></h4>
+                  <h4>
+                    ■ 키워드를 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 10자)</span>
+                  </h4>
                   {[0, 1, 2].map((slotIndex) => {
                     const slotMode = seasonKeywordModes[slotIndex];
                     const slotValue = slotIndex === 0 ? seasonReputationEditData.keyword1 : slotIndex === 1 ? seasonReputationEditData.keyword2 : seasonReputationEditData.keyword3;
@@ -3013,7 +3277,15 @@ const Cluster4Content = () => {
                         </div>
                         <div className="keyword-input-wrapper">
                           <span className="keyword-hash">#</span>
-                          <input className="keyword-input" type="text" value={slotValue || ""} onChange={(e) => handleSeasonKeywordWrite(slotIndex, e.target.value)} placeholder="키워드를 입력해주세요." disabled={!isSeasonReputationFormEditing || slotMode === null || slotMode === "select"} maxLength={10} />
+                          <input
+                            className="keyword-input"
+                            type="text"
+                            value={slotValue || ""}
+                            onChange={(e) => handleSeasonKeywordWrite(slotIndex, e.target.value)}
+                            placeholder="키워드를 입력해주세요."
+                            disabled={!isSeasonReputationFormEditing || slotMode === null || slotMode === "select"}
+                            maxLength={10}
+                          />
                         </div>
                       </div>
                     );
@@ -3023,9 +3295,23 @@ const Cluster4Content = () => {
 
               {/* 미드 2행: 내용 textarea 300자 */}
               <div className="season-content-section">
-                <h4>▪ 내용을 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 300자)</span></h4>
+                <h4>
+                  ▪ 내용을 입력해주세요. <span className="required-mark">*</span> <span className="limit-hint">(최대 300자)</span>
+                </h4>
                 <div className="season-content-wrapper">
-                  <textarea className={`season-content-textarea ${seasonReputationSaveAttemptFailed && (seasonReputationEditData.content?.trim().length || 0) === 0 ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : ""}`} value={seasonReputationEditData.content} onChange={(e) => { if (!isSeasonReputationFormEditing) return; const v = e.target.value.slice(0, 300); setSeasonReputationEditData((prev) => ({ ...prev, content: v })); }} placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요." maxLength={300} data-field="season-content" disabled={!isSeasonReputationFormEditing} />
+                  <textarea
+                    className={`season-content-textarea ${seasonReputationSaveAttemptFailed && (seasonReputationEditData.content?.trim().length || 0) === 0 ? `field-error ${seasonReputationFieldErrorFlash ? "flash" : ""}` : ""}`}
+                    value={seasonReputationEditData.content}
+                    onChange={(e) => {
+                      if (!isSeasonReputationFormEditing) return;
+                      const v = e.target.value.slice(0, 300);
+                      setSeasonReputationEditData((prev) => ({ ...prev, content: v }));
+                    }}
+                    placeholder="해당 크루의 한 주 활동을 따뜻하고, 냉철한 시각으로 평가/응원/조언해주세요."
+                    maxLength={300}
+                    data-field="season-content"
+                    disabled={!isSeasonReputationFormEditing}
+                  />
                   <span className="char-count">{seasonReputationEditData.content.length}/300</span>
                 </div>
               </div>
@@ -3034,21 +3320,33 @@ const Cluster4Content = () => {
             {/* === 푸터 — Type B === */}
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReputation")} aria-label="도움말">🔎</button>
+                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReputation")} aria-label="도움말">
+                  🔎
+                </button>
                 <div className="modal-footer-right">
                   {!isSeasonReputationFormEditing ? (
-                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReputationEditClick}>수정</button>
+                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReputationEditClick}>
+                      수정
+                    </button>
                   ) : (
                     <>
-                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReputationCancel}>취소</button>
-                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReputationReset}>초기화</button>
-                      <button type="button" className="modal-save-btn" onClick={handleSeasonReputationSave}>저장</button>
+                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReputationCancel}>
+                        취소
+                      </button>
+                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReputationReset}>
+                        초기화
+                      </button>
+                      <button type="button" className="modal-save-btn" onClick={handleSeasonReputationSave}>
+                        저장
+                      </button>
                     </>
                   )}
                 </div>
               </div>
               <div className="modal-footer-bottom">
-                <p className={`modal-footer-notice ${seasonReputationSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReputationSaveAttemptFailed ? "visible" : "hidden" }}>필수 항목을 모두 입력해주세요.</p>
+                <p className={`modal-footer-notice ${seasonReputationSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReputationSaveAttemptFailed ? "visible" : "hidden" }}>
+                  필수 항목을 모두 입력해주세요.
+                </p>
               </div>
             </div>
           </div>
@@ -3068,9 +3366,7 @@ const Cluster4Content = () => {
                 <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain" as const, flexShrink: 0 }} />
                 <h3>시즈닝 평판 (Seasoning Reputation)</h3>
               </div>
-              <p className="modal-subtitle">
-                저는 당신의 한 시즌을 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊
-              </p>
+              <p className="modal-subtitle">저는 당신의 한 시즌을 아래와 같이 바라보았습니다. 당신의 땀방울에 제가 함께 있어요. 😊</p>
             </div>
 
             {/* === 미드 === */}
@@ -3129,7 +3425,9 @@ const Cluster4Content = () => {
               <div className="season-reputation-content-section">
                 <div className="season-reputation-keywords">
                   {[selectedReputation.keyword_1, selectedReputation.keyword_2, selectedReputation.keyword_3].map((kw, i) => (
-                    <span key={i} className="tag tag--pink">{kw ? `#${kw}` : "#-"}</span>
+                    <span key={i} className="tag tag--pink">
+                      {kw ? `#${kw}` : "#-"}
+                    </span>
                   ))}
                 </div>
                 <div className="season-reputation-content-box">
@@ -3147,7 +3445,11 @@ const Cluster4Content = () => {
                       let cls = "rating-star star-empty";
                       if (r >= i) cls = "rating-star star-full";
                       else if (r >= i - 0.5) cls = "rating-star star-half";
-                      return <span key={i} className={cls}>★</span>;
+                      return (
+                        <span key={i} className={cls}>
+                          ★
+                        </span>
+                      );
                     })}
                   </div>
                   <span className="rating-value">{selectedReputation.rating ? `${selectedReputation.rating} / 10` : "- / 10"}</span>
@@ -3166,7 +3468,6 @@ const Cluster4Content = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       )}
@@ -3186,13 +3487,7 @@ const Cluster4Content = () => {
           onWheel={(e) => e.stopPropagation()}
         >
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-            <div
-              key={n}
-              className={`dropdown-option${seasonReputationEditData.rating === n ? " selected" : ""}`}
-              onClick={() => handleSeasonRatingSelect(n)}
-              role="option"
-              aria-selected={seasonReputationEditData.rating === n}
-            >
+            <div key={n} className={`dropdown-option${seasonReputationEditData.rating === n ? " selected" : ""}`} onClick={() => handleSeasonRatingSelect(n)} role="option" aria-selected={seasonReputationEditData.rating === n}>
               {n}
             </div>
           ))}
@@ -3207,7 +3502,9 @@ const Cluster4Content = () => {
               <button type="button" className="modal-close-btn" onClick={handleSeasonKeywordModalClose} aria-label="키워드 선택 모달 닫기">
                 <i className="ti ti-x"></i>
               </button>
-              <button type="button" className="btn-select-header" onClick={handleSeasonKeywordSelectConfirm} disabled={!seasonKeywordTempSelection}>선택</button>
+              <button type="button" className="btn-select-header" onClick={handleSeasonKeywordSelectConfirm} disabled={!seasonKeywordTempSelection}>
+                선택
+              </button>
               <div className="modal-header-top">
                 <img src="/images/0/write.png" alt="write" style={{ width: 72, height: 72, objectFit: "contain" as const, flexShrink: 0 }} />
                 <h3>키워드를 선택해주세요. 😊</h3>
@@ -3222,7 +3519,9 @@ const Cluster4Content = () => {
                   if (!groupedByCluster[kw.cluster_number]) groupedByCluster[kw.cluster_number] = [];
                   groupedByCluster[kw.cluster_number].push(kw);
                 });
-                const clusterNumbers = Object.keys(groupedByCluster).map(Number).sort((a, b) => a - b);
+                const clusterNumbers = Object.keys(groupedByCluster)
+                  .map(Number)
+                  .sort((a, b) => a - b);
                 if (clusterNumbers.length === 0) return <div className="season-keyword-loading">키워드를 불러오는 중입니다...</div>;
                 return clusterNumbers.map((clusterNum) => {
                   const items = groupedByCluster[clusterNum];
@@ -3239,7 +3538,14 @@ const Cluster4Content = () => {
                           const isUsedByOther = usedKeywords.includes(kw.keyword);
                           const isSelected = seasonKeywordTempSelection === kw.keyword;
                           return (
-                            <button key={kw.id} type="button" className={`keyword-chip ${isSelected ? "selected" : ""} ${isUsedByOther ? "disabled" : ""}`} onClick={() => !isUsedByOther && handleSeasonKeywordTempSelect(kw.keyword)} disabled={isUsedByOther} title={isUsedByOther ? "다른 슬롯에서 이미 사용 중인 키워드입니다" : undefined}>
+                            <button
+                              key={kw.id}
+                              type="button"
+                              className={`keyword-chip ${isSelected ? "selected" : ""} ${isUsedByOther ? "disabled" : ""}`}
+                              onClick={() => !isUsedByOther && handleSeasonKeywordTempSelect(kw.keyword)}
+                              disabled={isUsedByOther}
+                              title={isUsedByOther ? "다른 슬롯에서 이미 사용 중인 키워드입니다" : undefined}
+                            >
                               {kw.keyword}
                             </button>
                           );
@@ -3291,10 +3597,14 @@ const Cluster4Content = () => {
               <div className="season-review-row-1">
                 <div className="season-info-section">
                   <h4>시즌</h4>
-                  <div className="season-info-display">{currentSeasonInfo?.year || currentSeason.year}년 {currentSeasonInfo?.name || currentSeason.season} 시즌</div>
+                  <div className="season-info-display">
+                    {currentSeasonInfo?.year || currentSeason.year}년 {currentSeasonInfo?.name || currentSeason.season} 시즌
+                  </div>
                 </div>
                 <div className="season-review-rating-section">
-                  <h4>평점 <span className="required-mark">*</span></h4>
+                  <h4>
+                    평점 <span className="required-mark">*</span>
+                  </h4>
                   <div className={`rating-input rating-field ${seasonReviewSaveAttemptFailed && seasonReviewEditData.rating === 0 ? `field-error ${seasonReviewFieldErrorFlash ? "flash" : ""}` : ""}`} data-field="rating">
                     <span className="star-rating">
                       {(() => {
@@ -3304,16 +3614,32 @@ const Cluster4Content = () => {
                         const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
                         return (
                           <>
-                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {Array(fullStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`f${i}`} className="ti ti-star-filled" />
+                              ))}
                             {hasHalf && <i className="ti ti-star-half-filled" />}
-                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                            {Array(emptyStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`e${i}`} className="ti ti-star" />
+                              ))}
                           </>
                         );
                       })()}
                       <span className="rating-text">{seasonReviewEditData.rating || 0}/10</span>
                     </span>
                     <div className="custom-dropdown small">
-                      <div ref={seasonReviewRatingDropdownTriggerRef} className={`dropdown-selected ${!isSeasonReviewFormEditing ? "disabled" : ""}`} onClick={openSeasonReviewRatingDropdown} role="button" tabIndex={isSeasonReviewFormEditing ? 0 : -1} aria-haspopup="listbox" aria-expanded={seasonReviewRatingDropdownOpen}>
+                      <div
+                        ref={seasonReviewRatingDropdownTriggerRef}
+                        className={`dropdown-selected ${!isSeasonReviewFormEditing ? "disabled" : ""}`}
+                        onClick={openSeasonReviewRatingDropdown}
+                        role="button"
+                        tabIndex={isSeasonReviewFormEditing ? 0 : -1}
+                        aria-haspopup="listbox"
+                        aria-expanded={seasonReviewRatingDropdownOpen}
+                      >
                         <span>{seasonReviewEditData.rating || "-"}</span>
                         <i className="ti ti-chevron-down"></i>
                       </div>
@@ -3324,16 +3650,38 @@ const Cluster4Content = () => {
 
               <div className="workinfo-personal-card">
                 <div className="personal-grid">
-                  <div className="personal-photo"><img src={profilePhotoUrl || session?.user?.image || "/images/avatar/avatar.png"} alt="프로필" /></div>
+                  <div className="personal-photo">
+                    <img src={profilePhotoUrl || session?.user?.image || "/images/avatar/avatar.png"} alt="프로필" />
+                  </div>
                   <div className="personal-info">
                     <div className="personal-row-1">
-                      <span className="personal-name">{session?.user?.name || demoUserName || "-"}</span><span className="personal-separator">|</span><span className="personal-gender">-</span><span className="personal-separator">|</span><span className="personal-age">-</span>
+                      <span className="personal-name">{session?.user?.name || demoUserName || "-"}</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-gender">-</span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-age">-</span>
                     </div>
                     <div className="personal-row-2">
-                      <span className="personal-field"><span className="field-value">-</span><span className="field-label">학교</span></span><span className="personal-separator">|</span><span className="personal-field"><span className="field-value">-</span><span className="field-label">학과</span></span>
+                      <span className="personal-field">
+                        <span className="field-value">-</span>
+                        <span className="field-label">학교</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">-</span>
+                        <span className="field-label">학과</span>
+                      </span>
                     </div>
                     <div className="personal-row-3">
-                      <span className="personal-field"><span className="field-value">{currentSeason.seasonRoles?.[0]?.teamName || "-"}</span><span className="field-label">팀</span></span><span className="personal-separator">|</span><span className="personal-field"><span className="field-value">{currentSeason.seasonRoles?.[0]?.partName || "-"}</span><span className="field-label">파트</span></span>
+                      <span className="personal-field">
+                        <span className="field-value">{currentSeason.seasonRoles?.[0]?.teamName || "-"}</span>
+                        <span className="field-label">팀</span>
+                      </span>
+                      <span className="personal-separator">|</span>
+                      <span className="personal-field">
+                        <span className="field-value">{currentSeason.seasonRoles?.[0]?.partName || "-"}</span>
+                        <span className="field-label">파트</span>
+                      </span>
                     </div>
                   </div>
                   <div className="personal-tags">
@@ -3344,45 +3692,80 @@ const Cluster4Content = () => {
               </div>
 
               <div className="season-review-content-section" data-field="review">
-                <h4>Season Review <span className="required-mark">*</span><span className="limit-hint">(최대 300자)</span></h4>
+                <h4>
+                  Season Review <span className="required-mark">*</span>
+                  <span className="limit-hint">(최대 300자)</span>
+                </h4>
                 <div className="content-wrapper">
-                  <textarea className={`content-textarea season-review-textarea ${seasonReviewSaveAttemptFailed && (seasonReviewEditData.review?.trim().length || 0) === 0 ? `field-error ${seasonReviewFieldErrorFlash ? "flash" : ""}` : ""}`} value={seasonReviewEditData.review || ""} onChange={(e) => { if (!isSeasonReviewFormEditing) return; setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value.slice(0, 300) })); if (seasonReviewSaveAttemptFailed) setSeasonReviewSaveAttemptFailed(false); }} placeholder="이번 시즌의 경험, 성과, 성장을 300자 이내로 작성해주세요." maxLength={300} disabled={!isSeasonReviewFormEditing} />
-                  <div className="char-count">{(seasonReviewEditData.review?.length || 0)}/300</div>
+                  <textarea
+                    className={`content-textarea season-review-textarea ${seasonReviewSaveAttemptFailed && (seasonReviewEditData.review?.trim().length || 0) === 0 ? `field-error ${seasonReviewFieldErrorFlash ? "flash" : ""}` : ""}`}
+                    value={seasonReviewEditData.review || ""}
+                    onChange={(e) => {
+                      if (!isSeasonReviewFormEditing) return;
+                      setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value.slice(0, 300) }));
+                      if (seasonReviewSaveAttemptFailed) setSeasonReviewSaveAttemptFailed(false);
+                    }}
+                    placeholder="이번 시즌의 경험, 성과, 성장을 300자 이내로 작성해주세요."
+                    maxLength={300}
+                    disabled={!isSeasonReviewFormEditing}
+                  />
+                  <div className="char-count">{seasonReviewEditData.review?.length || 0}/300</div>
                 </div>
               </div>
             </div>
 
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReview")} aria-label="도움말">🔎</button>
+                <button type="button" className="modal-help-icon" onClick={() => setHelpModalKind("seasonReview")} aria-label="도움말">
+                  🔎
+                </button>
                 <div className="modal-footer-right">
                   {!isSeasonReviewFormEditing ? (
-                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReviewEditClick}>수정</button>
+                    <button type="button" className="modal-edit-btn" onClick={handleSeasonReviewEditClick}>
+                      수정
+                    </button>
                   ) : (
                     <>
-                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReviewCancel}>취소</button>
-                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReviewReset}>초기화</button>
-                      <button type="button" className="modal-save-btn" onClick={handleSaveSeasonReview} disabled={seasonReviewSaving}>{seasonReviewSaving ? "저장 중..." : "저장"}</button>
+                      <button type="button" className="modal-cancel-btn" onClick={handleSeasonReviewCancel}>
+                        취소
+                      </button>
+                      <button type="button" className="modal-reset-btn" onClick={handleSeasonReviewReset}>
+                        초기화
+                      </button>
+                      <button type="button" className="modal-save-btn" onClick={handleSaveSeasonReview} disabled={seasonReviewSaving}>
+                        {seasonReviewSaving ? "저장 중..." : "저장"}
+                      </button>
                     </>
                   )}
                 </div>
               </div>
               <div className="modal-footer-bottom">
-                <p className={`modal-notice ${seasonReviewSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReviewSaveAttemptFailed ? "visible" : "hidden" }}>필수 항목을 입력해주세요.</p>
+                <p className={`modal-notice ${seasonReviewSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: seasonReviewSaveAttemptFailed ? "visible" : "hidden" }}>
+                  필수 항목을 입력해주세요.
+                </p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {seasonReviewRatingDropdownOpen && typeof document !== "undefined" && createPortal(
-        <div className="dropdown-options-fixed season-review-rating-dropdown-options" style={{ position: "fixed", top: seasonReviewRatingDropdownPos.top, left: seasonReviewRatingDropdownPos.left, width: Math.max(seasonReviewRatingDropdownPos.width, 70), zIndex: 100010 }} role="listbox" onWheel={(e) => e.stopPropagation()}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-            <div key={n} className={`dropdown-option${seasonReviewEditData.rating === n ? " selected" : ""}`} onClick={() => handleSeasonReviewRatingSelect(n)} role="option" aria-selected={seasonReviewEditData.rating === n}>{n}</div>
-          ))}
-        </div>,
-        document.body,
-      )}
+      {seasonReviewRatingDropdownOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="dropdown-options-fixed season-review-rating-dropdown-options"
+            style={{ position: "fixed", top: seasonReviewRatingDropdownPos.top, left: seasonReviewRatingDropdownPos.left, width: Math.max(seasonReviewRatingDropdownPos.width, 70), zIndex: 100010 }}
+            role="listbox"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div key={n} className={`dropdown-option${seasonReviewEditData.rating === n ? " selected" : ""}`} onClick={() => handleSeasonReviewRatingSelect(n)} role="option" aria-selected={seasonReviewEditData.rating === n}>
+                {n}
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
 
       {false && seasonReviewModalOpen && (
         <div className="season-review-overlay">
@@ -3451,7 +3834,7 @@ const Cluster4Content = () => {
                     value={seasonReviewEditData.review}
                     onChange={(e) => {
                       if (e.target.value.length > 30) {
-                        alert('최대 30자까지 입력할 수 있습니다.');
+                        alert("최대 30자까지 입력할 수 있습니다.");
                         return;
                       }
                       setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }));

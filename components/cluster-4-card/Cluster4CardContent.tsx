@@ -80,19 +80,8 @@ const normalizeWorkCareerCaptions = (captions?: string[]): string[] => Array.fro
 
 // workCareer 데모 모드 폴백 이미지 (DB 값 없을 때만 사용 — 일반 모드는 폴백 없음)
 // 실제 파일: public/images/0/cluster4/icon/실무 경력/
-const DEMO_COMPANY_LOGOS = [
-  "/images/0/cluster4/icon/실무 경력/네이버 웹툰.png",
-  "/images/0/cluster4/icon/실무 경력/씨제이.png",
-  "/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png",
-  "/images/0/cluster4/icon/실무 경력/우아한형제들.png",
-  "/images/0/cluster4/icon/실무 경력/티비엔.png",
-];
-const DEMO_SUPERVISOR_PHOTOS = [
-  "/images/0/cluster4/icon/실무 경력/감독자.jpg",
-  "/images/0/cluster4/icon/실무 경력/감독자2.png",
-  "/images/0/cluster4/icon/실무 경력/감독자3.png",
-  "/images/0/cluster4/icon/실무 경력/감독자4.png",
-];
+const DEMO_COMPANY_LOGOS = ["/images/0/cluster4/icon/실무 경력/네이버 웹툰.png", "/images/0/cluster4/icon/실무 경력/씨제이.png", "/images/0/cluster4/icon/실무 경력/에스엠엔터테인먼트.png", "/images/0/cluster4/icon/실무 경력/우아한형제들.png", "/images/0/cluster4/icon/실무 경력/티비엔.png"];
+const DEMO_SUPERVISOR_PHOTOS = ["/images/0/cluster4/icon/실무 경력/감독자.jpg", "/images/0/cluster4/icon/실무 경력/감독자2.png", "/images/0/cluster4/icon/실무 경력/감독자3.png", "/images/0/cluster4/icon/실무 경력/감독자4.png"];
 
 const WORK_ABILITY_ICON_FILES = [
   "실무 역량 - default.png",
@@ -145,15 +134,42 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
     title: "도구 · 기술 · 시스템 활용 역량",
     count: 36,
     keywords: [
-      "노션 유망주", "노션 마스터", "인스타 유망주", "인스타 마스터",
-      "유튜브 유망주", "유튜브 마스터", "AI 유망주", "AI 마스터",
-      "블로그 유망주", "블로그 마스터", "미드저니 유망주", "미드저니 마스터",
-      "깃업 유망주", "깃업 마스터", "노코드 유망주", "노코드 마스터",
-      "옵시디언 유망주", "옵시디언 마스터", "파워포인트", "엑셀 유망주",
-      "엑셀 마스터", "카카오 생태계", "네이버 생태계", "구글 생태계",
-      "퍼블리싱", "UI / UX 기획", "웹 develop", "앱 develop",
-      "서버 관리", "데이터 처리", "데이터 분석", "데이터 해석",
-      "AI 프롬프트", "시스템 구축력", "도구 사용력", "기술 습득력",
+      "노션 유망주",
+      "노션 마스터",
+      "인스타 유망주",
+      "인스타 마스터",
+      "유튜브 유망주",
+      "유튜브 마스터",
+      "AI 유망주",
+      "AI 마스터",
+      "블로그 유망주",
+      "블로그 마스터",
+      "미드저니 유망주",
+      "미드저니 마스터",
+      "깃업 유망주",
+      "깃업 마스터",
+      "노코드 유망주",
+      "노코드 마스터",
+      "옵시디언 유망주",
+      "옵시디언 마스터",
+      "파워포인트",
+      "엑셀 유망주",
+      "엑셀 마스터",
+      "카카오 생태계",
+      "네이버 생태계",
+      "구글 생태계",
+      "퍼블리싱",
+      "UI / UX 기획",
+      "웹 develop",
+      "앱 develop",
+      "서버 관리",
+      "데이터 처리",
+      "데이터 분석",
+      "데이터 해석",
+      "AI 프롬프트",
+      "시스템 구축력",
+      "도구 사용력",
+      "기술 습득력",
     ],
   },
   {
@@ -162,12 +178,7 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
     emoji: "🟢",
     title: "콘텐츠 · 표현 · 메시지 생산 역량",
     count: 16,
-    keywords: [
-      "콘텐츠", "카드 콘텐츠", "텍스트 콘텐츠", "스토리텔링",
-      "동영상 숏폼", "동영상 롱폼", "릴스 특화", "쇼츠 특화",
-      "캐치프레이즈", "슬로건", "표현력", "언어 능력",
-      "설득력", "상상력", "유머와 재미", "창의성",
-    ],
+    keywords: ["콘텐츠", "카드 콘텐츠", "텍스트 콘텐츠", "스토리텔링", "동영상 숏폼", "동영상 롱폼", "릴스 특화", "쇼츠 특화", "캐치프레이즈", "슬로건", "표현력", "언어 능력", "설득력", "상상력", "유머와 재미", "창의성"],
   },
   {
     id: "group3",
@@ -175,11 +186,7 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
     emoji: "🟡",
     title: "마케팅 · 확산 · 영향력 설계",
     count: 10,
-    keywords: [
-      "퍼포먼스", "브랜딩 마케팅", "바이럴 마케팅", "커뮤니티",
-      "연관 검색어", "구글 트렌드", "정보력", "사회성",
-      "소통력", "공감력",
-    ],
+    keywords: ["퍼포먼스", "브랜딩 마케팅", "바이럴 마케팅", "커뮤니티", "연관 검색어", "구글 트렌드", "정보력", "사회성", "소통력", "공감력"],
   },
   {
     id: "group4",
@@ -187,12 +194,7 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
     emoji: "🟠",
     title: "사고 · 분석 · 구조화 역량",
     count: 16,
-    keywords: [
-      "인지력", "관찰력", "이해력", "논리력",
-      "상황 추론력", "문제 정의력", "연구력", "업무 분석력",
-      "업무 기획력", "계획력", "구조화", "도식화",
-      "범위화", "항목화", "자료화", "변칙성",
-    ],
+    keywords: ["인지력", "관찰력", "이해력", "논리력", "상황 추론력", "문제 정의력", "연구력", "업무 분석력", "업무 기획력", "계획력", "구조화", "도식화", "범위화", "항목화", "자료화", "변칙성"],
   },
   {
     id: "group5",
@@ -200,14 +202,7 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
     emoji: "🔴",
     title: "태도 · 실행 · 지속성 기반 역량",
     count: 22,
-    keywords: [
-      "지속성", "기민성", "신뢰성", "성장성",
-      "유연성", "안정성", "위기 대응성", "학습력",
-      "지도력", "소속감", "적극성", "자신감",
-      "헌신성", "행동력", "회복력", "몰입력",
-      "잠재력", "업무 진행력", "업무 관리력", "수용력",
-      "지구력", "강인한 체력",
-    ],
+    keywords: ["지속성", "기민성", "신뢰성", "성장성", "유연성", "안정성", "위기 대응성", "학습력", "지도력", "소속감", "적극성", "자신감", "헌신성", "행동력", "회복력", "몰입력", "잠재력", "업무 진행력", "업무 관리력", "수용력", "지구력", "강인한 체력"],
   },
 ];
 
@@ -1586,7 +1581,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [weeklyReviewFormSnapshot, setWeeklyReviewFormSnapshot] = useState<{ rating: number; content: string } | null>(null);
   const [weeklyReviewFieldErrorFlash, setWeeklyReviewFieldErrorFlash] = useState(false);
   const [weeklyReviewFromDB, setWeeklyReviewFromDB] = useState<{
-    id?: string; weekCardId?: string; rating: number; content: string; created_at?: string; updated_at?: string;
+    id?: string;
+    weekCardId?: string;
+    rating: number;
+    content: string;
+    created_at?: string;
+    updated_at?: string;
   } | null>(null);
 
   // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
@@ -1616,7 +1616,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setCanEditWorkExp(approved);
       setCanEditWorkCareer(approved);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [isDemoMode, session]);
 
   // 작업 3: 이번 주 내가 보낸 평판 리스트 (중복 방지 + 7명 제한 체크용 — best-effort)
@@ -1690,9 +1692,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [selectedWorkInfoCard, setSelectedWorkInfoCard] = useState<any>(null);
 
   // 도움말 모달 (workInfo 푸터 🔎 공용)
-  const [helpModalKind, setHelpModalKind] = useState<
-    'colleague' | 'workInfo' | 'reputation' | 'weeklyReview' | null
-  >(null);
+  const [helpModalKind, setHelpModalKind] = useState<"colleague" | "workInfo" | "reputation" | "weeklyReview" | null>(null);
 
   // 실무 역량 카드 상세보기 모달 상태
   const [workAbilityViewModalOpen, setWorkAbilityViewModalOpen] = useState(false);
@@ -2777,10 +2777,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return filtered.sort((a, b) => (a.name || "").localeCompare(b.name || "", "ko")).slice(0, 5);
   };
 
-  const colleagueSearchResults = useMemo(
-    () => searchColleagueCandidates(colleagueSearchQuery, allCrewList).slice(0, 5),
-    [colleagueSearchQuery, allCrewList, selectedColleagues]
-  );
+  const colleagueSearchResults = useMemo(() => searchColleagueCandidates(colleagueSearchQuery, allCrewList).slice(0, 5), [colleagueSearchQuery, allCrewList, selectedColleagues]);
 
   // 편집 모달 오픈 — 빈 상태로 초기화 + 스냅샷 캡처 + 크루 리스트 fetch
   const handleOpenColleagueEdit = async () => {
@@ -2817,10 +2814,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleColleagueEditCancel = () => {
     // X / 취소 공용 — 편집 모드에서 dirty 시 confirm
     if (isColleagueEditing) {
-      const dirty = colleagueFormSnapshot
-        ? colleagueEditData.selectedColleague?.id !== colleagueFormSnapshot.selectedColleague?.id ||
-          colleagueEditData.content !== colleagueFormSnapshot.content
-        : !!colleagueEditData.selectedColleague || colleagueEditData.content.trim().length > 0;
+      const dirty = colleagueFormSnapshot ? colleagueEditData.selectedColleague?.id !== colleagueFormSnapshot.selectedColleague?.id || colleagueEditData.content !== colleagueFormSnapshot.content : !!colleagueEditData.selectedColleague || colleagueEditData.content.trim().length > 0;
       if (dirty && !window.confirm("작성 중인 내용이 있습니다. 닫으시겠습니까?")) return;
     }
     setIsColleagueEditing(false);
@@ -3201,9 +3195,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }
       if (record) {
         setWeeklyReviewFromDB({
-          id: record.id, weekCardId: record.weekCardId || weekId,
-          rating: record.rating, content: record.content,
-          created_at: record.created_at, updated_at: record.updated_at,
+          id: record.id,
+          weekCardId: record.weekCardId || weekId,
+          rating: record.rating,
+          content: record.content,
+          created_at: record.created_at,
+          updated_at: record.updated_at,
         });
       } else {
         setWeeklyReviewFromDB(null);
@@ -3313,7 +3310,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleWeeklyReviewHelp = () => {
-    setHelpModalKind('weeklyReview');
+    setHelpModalKind("weeklyReview");
   };
 
   const handleWeeklyReviewReset = () => {
@@ -3349,9 +3346,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         return;
       }
       setWeeklyReviewFromDB({
-        id: savedRecord.id, weekCardId: savedRecord.weekCardId,
-        rating: weeklyReviewData.rating, content: weeklyReviewData.content,
-        created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
+        id: savedRecord.id,
+        weekCardId: savedRecord.weekCardId,
+        rating: weeklyReviewData.rating,
+        content: weeklyReviewData.content,
+        created_at: savedRecord.created_at,
+        updated_at: savedRecord.updated_at,
       });
       alert("저장되었습니다.");
       setWeeklyReviewModalOpen(false);
@@ -3368,7 +3368,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleReputationHelp = () => {
-    setHelpModalKind('reputation');
+    setHelpModalKind("reputation");
   };
 
   // 편집 진입 — 보기 → 편집 전환 + 현재값으로 스냅샷 업데이트 (롤백 기준점)
@@ -3509,28 +3509,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // isDirty — 스냅샷 대비 변경 여부
   const isFormDirty = (): boolean => {
     if (!formSnapshot) {
-      return (
-        reputationEditData.rating !== 0 ||
-        reputationEditData.content.trim() !== "" ||
-        reputationEditData.keyword !== ""
-      );
+      return reputationEditData.rating !== 0 || reputationEditData.content.trim() !== "" || reputationEditData.keyword !== "";
     }
-    return (
-      reputationEditData.rating !== formSnapshot.rating ||
-      reputationEditData.content !== formSnapshot.content ||
-      reputationEditData.keyword !== formSnapshot.keyword
-    );
+    return reputationEditData.rating !== formSnapshot.rating || reputationEditData.content !== formSnapshot.content || reputationEditData.keyword !== formSnapshot.keyword;
   };
 
   // 필수필드 유효성 검사 — 평점>0 + 키워드 1~10자 (UI 힌트 "최대 10자" 와 일치, 최소값 1로 완화) + 내용>0
   const isFormValid = (): boolean => {
     const keywordLen = reputationEditData.keyword.trim().length;
-    return (
-      reputationEditData.rating > 0 &&
-      keywordLen >= 1 &&
-      keywordLen <= 10 &&
-      reputationEditData.content.trim().length > 0
-    );
+    return reputationEditData.rating > 0 && keywordLen >= 1 && keywordLen <= 10 && reputationEditData.content.trim().length > 0;
   };
 
   // 작업 3: 같은 주차 + 같은 대상에게 이미 보냈는지 체크 (best-effort, 로컬 state 기반)
@@ -4185,12 +4172,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     "EX02A-ES0001": {
       lineName: "[커리어] 마케터 Launch",
       lineCode: "EX02A - ES0001",
-      mainTitle: "[역량 파악 & 성장점 분석] \"백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!\"",
+      mainTitle: '[역량 파악 & 성장점 분석] "백날 말로만 떠드는 마케팅 커리어가 아니라, 지금 당장 어느 정도로 준비되었는지 그 현실을 뼈저리게 느껴보자구!"',
     },
     "EX99A-ER0002": {
       lineName: "[생산성] 상호 피드백",
       lineCode: "EX99A - ER0002",
-      mainTitle: "[상호 피드백] \"100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?\"",
+      mainTitle: '[상호 피드백] "100명의 사람이 있으면, 100개의 시각과 관점이 있다고 하지. 과연 내 마케팅은, 내가 의도한대로 전달되고 있는 것이 맞을까?"',
     },
     "EX99A-ER0003": {
       lineName: "[콘텐츠] 마케팅 실무",
@@ -5104,25 +5091,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
 
             {/* Weekly Review 박스 (작업 0~2: 정적 더미 + unfurl 애니메이션) */}
-            <div
-              ref={weeklyReviewRef}
-              className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}
-            >
+            <div ref={weeklyReviewRef} className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}>
               <div className="weekly-review-header">
                 <img src="/images/0/book.png" alt="book" className="review-book-icon" />
                 <h3 className="review-title">Weekly Review</h3>
-                <button
-                  className="review-view-btn"
-                  onClick={() => setWeeklyReviewModalOpen(true)}
-                  aria-label="더보기"
-                >
+                <button className="review-view-btn" onClick={() => setWeeklyReviewModalOpen(true)} aria-label="더보기">
                   <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
                 </button>
               </div>
               <div className="weekly-review-mid">
-                <p className="review-content">
-                  {weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}
-                </p>
+                <p className="review-content">{weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}</p>
               </div>
               <div className="weekly-review-footer">
                 <div className="review-rating-group">
@@ -5139,11 +5117,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <i key={`empty-${i}`} className="ti ti-star"></i>
                           ))}
                         </div>
-                        <div
-                          className="review-stars__fill"
-                          style={{ width: `${fillWidthPx}px` }}
-                          aria-hidden="true"
-                        >
+                        <div className="review-stars__fill" style={{ width: `${fillWidthPx}px` }} aria-hidden="true">
                           {[1, 2, 3, 4, 5].map((i) => (
                             <i key={`filled-${i}`} className="ti ti-star-filled"></i>
                           ))}
@@ -5251,6 +5225,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="section-count" style={{ fontSize: "17px" }}>
                 <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
+              <span
+                className="fm-badge"
+                style={{
+                  fontSize: "17px",
+                  marginLeft: "48px",
+                  fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color: "#fff",
+                  fontFamily: "'Rajdhani', sans-serif",
+                  letterSpacing: "0.7px",
+                }}
+              >
+                <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
+                FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{reputationData.filter((c: any) => c && !c.isEmpty).reduce((sum: number, c: any) => sum + (c.fm || 0), 0)}</span>
+              </span>
             </div>
             {(() => {
               // 카드 0개(또는 휴식 주차): 4슬롯 전체 영역을 통합 대기 영역으로 표시
@@ -5282,158 +5273,158 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     // 1~3개 상태의 빈 슬롯: 카드 골격 + 내부 자리(프로필/별/코멘트/FM) 유지 + 각 자리의 값만 placeholder
                     // (pre-6단계 원래 구조: 같은 .reputation-card에 isEmpty 조건부 "-" 값)
                     return (
-                  <div
-                    key={user.id}
-                    className={`reputation-card ${isEmpty ? "empty" : ""}`}
-                    onClick={() => {
-                      if (!isEmpty) {
-                        setSelectedReputationCard(user);
-                        setReputationViewModalOpen(true);
-                      }
-                    }}
-                    style={{ cursor: isEmpty ? "default" : "pointer" }}
-                  >
-                    <div className="card-profile">
-                      <div className="profile-image">{!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
-                      <div className="profile-info">
-                        <div className="profile-name">
+                      <div
+                        key={user.id}
+                        className={`reputation-card ${isEmpty ? "empty" : ""}`}
+                        onClick={() => {
+                          if (!isEmpty) {
+                            setSelectedReputationCard(user);
+                            setReputationViewModalOpen(true);
+                          }
+                        }}
+                        style={{ cursor: isEmpty ? "default" : "pointer" }}
+                      >
+                        <div className="card-profile">
+                          <div className="profile-image">{!isEmpty && user.profileImg ? <img src={user.profileImg} alt={user.name} /> : <div className="profile-placeholder"></div>}</div>
+                          <div className="profile-info">
+                            <div className="profile-name">
+                              {isEmpty ? (
+                                <>
+                                  <span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="profile-details" style={{ fontSize: "16px" }}>
+                              {isEmpty ? (
+                                <>
+                                  <div className="detail-line">
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
+                                      -
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      학교
+                                    </span>{" "}
+                                    |{" "}
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
+                                      -
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      학과
+                                    </span>
+                                  </div>
+                                  <div className="detail-line">
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
+                                      -
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      팀
+                                    </span>{" "}
+                                    |{" "}
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
+                                      -
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      파트
+                                    </span>
+                                  </div>
+                                  <div className="detail-line">
+                                    <span className="text">&nbsp;</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="detail-line">
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
+                                      {truncate(formatSchool(mask.school(user.university)), 6)}
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      학교
+                                    </span>{" "}
+                                    |{" "}
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
+                                      {truncate(formatMajor(mask.major(user.major)), 6)}
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      학과
+                                    </span>
+                                  </div>
+                                  <div className="detail-line">
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
+                                      {truncate(user.team || "-", 6)}
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      팀
+                                    </span>{" "}
+                                    |{" "}
+                                    <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
+                                      {truncate(user.part || "-", 6)}
+                                    </span>
+                                    <span className="label" style={{ fontSize: "16px" }}>
+                                      파트
+                                    </span>
+                                  </div>
+                                  <div className="detail-line" style={{ display: "flex", alignItems: "center" }}>
+                                    <span style={{ flex: 1, display: "flex", justifyContent: "flex-end", overflow: "hidden", textOverflow: "clip", whiteSpace: "nowrap" }}>
+                                      <span
+                                        className="badge-status yellow"
+                                        style={{
+                                          padding: "4px 7.2px",
+                                          background: "rgba(250, 171, 7, 0.1)",
+                                          borderRadius: 4,
+                                          fontSize: 15,
+                                          fontFamily: "'Pretendard', sans-serif",
+                                          fontWeight: 600,
+                                          lineHeight: "15px",
+                                          color: "#faab07",
+                                          whiteSpace: "nowrap",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
+                                      </span>
+                                    </span>
+                                    <span style={{ width: "3px", flexShrink: 0 }}></span>
+                                    <span className="nickname" style={{ flex: 1, fontSize: "16px", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
+                                      {(user.nickname || "-").length > 8 ? (user.nickname || "-").slice(0, 8) + ".." : user.nickname || "-"}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="profile-divider"></div>
+                        <div className="card-rating">
+                          <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
+                          <span className="rating-count" style={{ fontSize: "14px" }}>
+                            {isEmpty ? "- / 10" : user.ratingCount}
+                          </span>
+                        </div>
+                        <div className="card-description" style={{ fontSize: "15px" }}>
                           {isEmpty ? (
-                            <>
-                              <span className="text">-</span> | <span className="text">-</span> | <span className="text">-</span>
-                            </>
+                            "-"
                           ) : (
                             <>
-                              <span className="text">{user.name}</span> | <span className="text">{user.gender}</span> | <span className="text">{mask.age(user.age)}세</span>
+                              {user.description.length > 20 ? `${user.description.slice(0, 20)}..` : user.description} <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" />
                             </>
                           )}
                         </div>
-                        <div className="profile-details" style={{ fontSize: "16px" }}>
-                          {isEmpty ? (
-                            <>
-                              <div className="detail-line">
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
-                                  -
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  학교
-                                </span>{" "}
-                                |{" "}
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
-                                  -
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  학과
-                                </span>
-                              </div>
-                              <div className="detail-line">
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
-                                  -
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  팀
-                                </span>{" "}
-                                |{" "}
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right", paddingRight: "4px" }}>
-                                  -
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  파트
-                                </span>
-                              </div>
-                              <div className="detail-line">
-                                <span className="text">&nbsp;</span>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="detail-line">
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(formatSchool(mask.school(user.university)), 6)}
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  학교
-                                </span>{" "}
-                                |{" "}
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(formatMajor(mask.major(user.major)), 6)}
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  학과
-                                </span>
-                              </div>
-                              <div className="detail-line">
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(user.team || "-", 6)}
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  팀
-                                </span>{" "}
-                                |{" "}
-                                <span className="text" style={{ flex: 1, overflow: "hidden", textOverflow: "clip", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap", textAlign: "right" }}>
-                                  {truncate(user.part || "-", 6)}
-                                </span>
-                                <span className="label" style={{ fontSize: "16px" }}>
-                                  파트
-                                </span>
-                              </div>
-                              <div className="detail-line" style={{ display: "flex", alignItems: "center" }}>
-                                <span style={{ flex: 1, display: "flex", justifyContent: "flex-end", overflow: "hidden", textOverflow: "clip", whiteSpace: "nowrap" }}>
-                                  <span
-                                    className="badge-status yellow"
-                                    style={{
-                                      padding: "4px 7.2px",
-                                      background: "rgba(250, 171, 7, 0.1)",
-                                      borderRadius: 4,
-                                      fontSize: 15,
-                                      fontFamily: "'Pretendard', sans-serif",
-                                      fontWeight: 600,
-                                      lineHeight: "15px",
-                                      color: "#faab07",
-                                      whiteSpace: "nowrap",
-                                      flexShrink: 0,
-                                    }}
-                                  >
-                                    {(user.role || "일반").length > 7 ? (user.role || "일반").slice(0, 7) + ".." : user.role || "일반"}
-                                  </span>
-                                </span>
-                                <span style={{ width: "3px", flexShrink: 0 }}></span>
-                                <span className="nickname" style={{ flex: 1, fontSize: "16px", textAlign: "right", overflow: "hidden", whiteSpace: "nowrap", color: NICKNAME_COLORS[(index + NICKNAME_COLOR_OFFSET) % 4] }}>
-                                  {(user.nickname || "-").length > 8 ? (user.nickname || "-").slice(0, 8) + ".." : user.nickname || "-"}
-                                </span>
-                              </div>
-                            </>
-                          )}
+                        <div className="card-footer">
+                          <span className="fm-badge" style={{ fontSize: "17px" }}>
+                            <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{isEmpty ? "-" : user.fm}</span>
+                          </span>
+                          <span className="footer-divider">|</span>
+                          <span className={`tag ${isEmpty ? "tag--dark" : user.tagColor}`} style={{ fontSize: "11.6px" }}>
+                            {isEmpty ? "-" : truncate(user.tagText, 10)}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                    <div className="profile-divider"></div>
-                    <div className="card-rating">
-                      <div className="stars">{renderStars(isEmpty ? 0 : user.rating)}</div>
-                      <span className="rating-count" style={{ fontSize: "14px" }}>
-                        {isEmpty ? "- / 10" : user.ratingCount}
-                      </span>
-                    </div>
-                    <div className="card-description" style={{ fontSize: "15px" }}>
-                      {isEmpty ? (
-                        "-"
-                      ) : (
-                        <>
-                          {user.description.length > 20 ? `${user.description.slice(0, 20)}..` : user.description} <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="more-icon" />
-                        </>
-                      )}
-                    </div>
-                    <div className="card-footer">
-                      <span className="fm-badge" style={{ fontSize: "17px" }}>
-                        <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{isEmpty ? "-" : user.fm}</span>
-                      </span>
-                      <span className="footer-divider">|</span>
-                      <span className={`tag ${isEmpty ? "tag--dark" : user.tagColor}`} style={{ fontSize: "11.6px" }}>
-                        {isEmpty ? "-" : truncate(user.tagText, 10)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
                 </div>
               );
             })()}
@@ -6422,7 +6413,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
-
           </div>
         </div>
       )}
@@ -7110,7 +7100,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <h3>연계 동료</h3>
               </div>
               <p className="modal-subtitle">
-                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나<br/>기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
+                이번 주차 동안 클럽에서 함께 성장하며, 자신이 도움을 받았거나
+                <br />
+                기억에 남는 결과를 보여준 선배/후배/동료 크루를 선택해주세요. 😊
               </p>
               <button className="modal-close-btn" onClick={handleColleagueEditCancel}>
                 <i className="ti ti-x"></i>
@@ -7140,9 +7132,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </button>
                   </div>
                 ) : (
-                  <div className={`selected-colleague-empty ${colleagueSaveAttemptFailed ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>
-                    아직 선택된 크루가 없습니다.
-                  </div>
+                  <div className={`selected-colleague-empty ${colleagueSaveAttemptFailed ? `field-error ${colleagueFieldErrorFlash ? "flash" : ""}` : ""}`}>아직 선택된 크루가 없습니다.</div>
                 )}
 
                 {/* A 영역: 검색 + 후보 (선택 전에만) */}
@@ -7186,9 +7176,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                     )}
 
-                    {colleagueSearchQuery.trim() && colleagueSearchResults.length === 0 && (
-                      <div className="search-no-results">일치하는 크루가 없습니다.</div>
-                    )}
+                    {colleagueSearchQuery.trim() && colleagueSearchResults.length === 0 && <div className="search-no-results">일치하는 크루가 없습니다.</div>}
                   </>
                 )}
               </div>
@@ -7218,7 +7206,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             {/* ── 푸터 (118px) Type B ── */}
             <div className="section-modal-footer">
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('colleague')} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind("colleague")} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -7242,10 +7230,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
               <div className="modal-footer-bottom">
-                <span
-                  className={`modal-notice ${colleagueSaveAttemptFailed ? "notice-error" : ""}`}
-                  style={{ visibility: colleagueSaveAttemptFailed ? "visible" : "hidden" }}
-                >
+                <span className={`modal-notice ${colleagueSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: colleagueSaveAttemptFailed ? "visible" : "hidden" }}>
                   필수 사항이 누락되었어요! 확인 부탁드려요! 😊
                 </span>
               </div>
@@ -7298,9 +7283,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
                         return (
                           <>
-                            {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                            {Array(fullStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`f${i}`} className="ti ti-star-filled" />
+                              ))}
                             {hasHalf && <i className="ti ti-star-half-filled" />}
-                            {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                            {Array(emptyStars)
+                              .fill(0)
+                              .map((_, i) => (
+                                <i key={`e${i}`} className="ti ti-star" />
+                              ))}
                           </>
                         );
                       })()}
@@ -7308,15 +7301,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </span>
 
                     <div className="custom-dropdown small">
-                      <div
-                        ref={ratingDropdownTriggerRef}
-                        className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`}
-                        onClick={openRatingDropdown}
-                        role="button"
-                        tabIndex={isReputationFormEditing ? 0 : -1}
-                        aria-haspopup="listbox"
-                        aria-expanded={ratingDropdownOpen}
-                      >
+                      <div ref={ratingDropdownTriggerRef} className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`} onClick={openRatingDropdown} role="button" tabIndex={isReputationFormEditing ? 0 : -1} aria-haspopup="listbox" aria-expanded={ratingDropdownOpen}>
                         <span>{reputationEditData.rating || "-"}</span>
                         <i className="ti ti-chevron-down"></i>
                       </div>
@@ -7348,14 +7333,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       선택
                     </label>
                     <label>
-                      <input
-                        type="radio"
-                        name="keywordMode"
-                        value="write"
-                        checked={formKeywordMode === "write"}
-                        disabled={!isReputationFormEditing}
-                        onChange={() => handleKeywordModeChange("write")}
-                      />
+                      <input type="radio" name="keywordMode" value="write" checked={formKeywordMode === "write"} disabled={!isReputationFormEditing} onChange={() => handleKeywordModeChange("write")} />
                       작성
                     </label>
                   </div>
@@ -7424,11 +7402,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <button className="modal-reset-btn" onClick={handleFormReset}>
                         초기화
                       </button>
-                      <button
-                        className="modal-save-btn"
-                        onClick={handleFormSave}
-                        disabled={reputationSaving}
-                      >
+                      <button className="modal-save-btn" onClick={handleFormSave} disabled={reputationSaving}>
                         {reputationSaving ? "저장 중..." : "저장"}
                       </button>
                     </>
@@ -7438,10 +7412,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
               {/* 행 2 — cluster3 패턴: 편집 모드에서 항상 표시, 에러 시 빨간색 + 텍스트 변경 */}
               <div className="modal-footer-bottom">
-                <span
-                  className={`modal-notice modal-footer-notice ${saveAttemptFailed ? "notice-error" : ""}`}
-                  style={{ visibility: isReputationFormEditing ? "visible" : "hidden" }}
-                >
+                <span className={`modal-notice modal-footer-notice ${saveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: isReputationFormEditing ? "visible" : "hidden" }}>
                   {saveAttemptFailed ? "필수 사항이 누락되었어요! 확인 부탁드려요! 😊" : "내용을 모두 잘 확인하신 후 저장을 눌러주세요. 😊"}
                 </span>
               </div>
@@ -7463,12 +7434,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <i className="ti ti-x"></i>
                     </button>
 
-                    <button
-                      type="button"
-                      className="btn-select-header"
-                      onClick={handleKeywordSelectConfirm}
-                      disabled={!selectedKeywordTemp}
-                    >
+                    <button type="button" className="btn-select-header" onClick={handleKeywordSelectConfirm} disabled={!selectedKeywordTemp}>
                       선택
                     </button>
 
@@ -7487,12 +7453,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </h4>
                         <div className="keyword-grid">
                           {group.keywords.map((keyword) => (
-                            <button
-                              key={`${group.id}-${keyword}`}
-                              type="button"
-                              className={`keyword-chip ${selectedKeywordTemp === keyword ? "selected" : ""}`}
-                              onClick={() => handleKeywordSelect(keyword)}
-                            >
+                            <button key={`${group.id}-${keyword}`} type="button" className={`keyword-chip ${selectedKeywordTemp === keyword ? "selected" : ""}`} onClick={() => handleKeywordSelect(keyword)}>
                               {keyword}
                             </button>
                           ))}
@@ -7503,7 +7464,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             )}
-
           </div>
         </div>
       )}
@@ -7529,9 +7489,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* 상단: 인적사항 카드 (4개 모달과 동일 구조) */}
               <div className="workinfo-personal-card">
                 <div className="personal-grid">
-                  <div className="personal-photo">
-                    {selectedReputationCard.profileImg ? <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} /> : <img src="/images/0/crew profile/남 1.webp" alt="profile" />}
-                  </div>
+                  <div className="personal-photo">{selectedReputationCard.profileImg ? <img src={selectedReputationCard.profileImg} alt={selectedReputationCard.name} /> : <img src="/images/0/crew profile/남 1.webp" alt="profile" />}</div>
 
                   <div className="personal-info">
                     <div className="personal-row-1">
@@ -7539,9 +7497,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="personal-separator">|</span>
                       <span className="personal-gender">{selectedReputationCard.gender || "—"}</span>
                       <span className="personal-separator">|</span>
-                      <span className="personal-age">
-                        {mask.age(selectedReputationCard.age) || "—"} 세
-                      </span>
+                      <span className="personal-age">{mask.age(selectedReputationCard.age) || "—"} 세</span>
                     </div>
 
                     <div className="personal-row-2">
@@ -7578,9 +7534,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
               {/* 중단: 키워드(tag.tag--색상) + 내용 */}
               <div className="reputation-content-section">
-                <span className={`tag ${selectedReputationCard.tagColor || "tag--pink"}`}>
-                  {selectedReputationCard.tagText || "#—"}
-                </span>
+                <span className={`tag ${selectedReputationCard.tagColor || "tag--pink"}`}>{selectedReputationCard.tagText || "#—"}</span>
                 <div className="reputation-content-box">
                   <p className="reputation-content-text">{selectedReputationCard.description || "-"}</p>
                 </div>
@@ -7656,13 +7610,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               {/* 인적사항 카드 — reputation-view-modal .workinfo-personal-card 구조 재사용 */}
               <div className="workinfo-personal-card">
                 <div className="personal-grid">
-                  <div className="personal-photo">
-                    {selectedColleagueCard.profileImg ? (
-                      <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} />
-                    ) : (
-                      <img src="/images/0/crew profile/남 1.webp" alt="profile" />
-                    )}
-                  </div>
+                  <div className="personal-photo">{selectedColleagueCard.profileImg ? <img src={selectedColleagueCard.profileImg} alt={selectedColleagueCard.name} /> : <img src="/images/0/crew profile/남 1.webp" alt="profile" />}</div>
 
                   <div className="personal-info">
                     <div className="personal-row-1">
@@ -7738,7 +7686,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       )}
@@ -7976,11 +7923,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2; // 1·2번만 필수
                       return (
-                        <div
-                          key={imageIdx}
-                          className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`}
-                          {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}
-                        >
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {workInfoViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleImagePreview(imageIdx)}>
@@ -8115,7 +8058,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             <div className="section-modal-footer">
               {/* 행 1 */}
               <div className="modal-footer-top">
-                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind('workInfo')} style={{ cursor: "pointer" }}>
+                <div className="modal-help-icon" title="도움말" onClick={() => setHelpModalKind("workInfo")} style={{ cursor: "pointer" }}>
                   🔎
                 </div>
                 <div className="modal-footer-right">
@@ -8261,11 +8204,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
                       <div className="workinfo-line-info">
                         <div className="line-info-row">
-                          <img
-                            className="line-activity-icon"
-                            src={getWorkExpIcon(lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "")}
-                            alt={selectedWorkExpCard.badge || "활동"}
-                          />
+                          <img className="line-activity-icon" src={getWorkExpIcon(lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "")} alt={selectedWorkExpCard.badge || "활동"} />
                           <span className="line-name">{lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "—"}</span>
                         </div>
                       </div>
@@ -8384,11 +8323,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2;
                       return (
-                        <div
-                          key={imageIdx}
-                          className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`}
-                          {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}
-                        >
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {workExpViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleExpImagePreview(imageIdx)}>
@@ -8575,7 +8510,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workExpViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={!canEditWorkExp || selectedWorkExpCard?.isEmpty} style={!canEditWorkExp || selectedWorkExpCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkExpCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다"}>
+                    <button
+                      className="modal-edit-btn"
+                      onClick={handleEditWorkExp}
+                      disabled={!canEditWorkExp || selectedWorkExpCard?.isEmpty}
+                      style={!canEditWorkExp || selectedWorkExpCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                      title={selectedWorkExpCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다"}
+                    >
                       수정
                     </button>
                   ) : (
@@ -8839,20 +8780,53 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
                               {workAbilityViewIsEditing && (
                                 <div className="image-actions-overlay">
-                                  <button type="button" className="image-action-btn" onClick={(e) => { e.stopPropagation(); triggerAbilityImageUpload(imageIdx); }} title="교체" aria-label="교체">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerAbilityImageUpload(imageIdx);
+                                    }}
+                                    title="교체"
+                                    aria-label="교체"
+                                  >
                                     <i className="ti ti-upload"></i>
                                   </button>
-                                  <button type="button" className="image-action-btn image-delete-btn" onClick={(e) => { e.stopPropagation(); handleAbilityImageDelete(imageIdx); }} title="삭제" aria-label="삭제">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn image-delete-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAbilityImageDelete(imageIdx);
+                                    }}
+                                    title="삭제"
+                                    aria-label="삭제"
+                                  >
                                     <i className="ti ti-trash"></i>
                                   </button>
                                 </div>
                               )}
                             </div>
                           ) : (
-                            <div className="image-preview" onClick={() => { if (workAbilityViewIsEditing && isEnabled) triggerAbilityImageUpload(imageIdx); }}>
+                            <div
+                              className="image-preview"
+                              onClick={() => {
+                                if (workAbilityViewIsEditing && isEnabled) triggerAbilityImageUpload(imageIdx);
+                              }}
+                            >
                               {workAbilityViewIsEditing && (
                                 <div className="image-actions-overlay">
-                                  <button type="button" className="image-action-btn" onClick={(e) => { e.stopPropagation(); triggerAbilityImageUpload(imageIdx); }} disabled={!isEnabled} title="업로드" aria-label="업로드">
+                                  <button
+                                    type="button"
+                                    className="image-action-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      triggerAbilityImageUpload(imageIdx);
+                                    }}
+                                    disabled={!isEnabled}
+                                    title="업로드"
+                                    aria-label="업로드"
+                                  >
                                     <i className="ti ti-upload"></i>
                                   </button>
                                   <button type="button" className="image-action-btn image-delete-btn" disabled title="삭제" aria-label="삭제">
@@ -8865,7 +8839,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               </div>
                             </div>
                           )}
-                          <input type="file" accept="image/*" ref={(el) => { abilityImageFileInputRefs.current[imageIdx] = el; }} style={{ display: "none" }} onChange={(e) => handleAbilityImageFileChange(e, imageIdx)} />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={(el) => {
+                              abilityImageFileInputRefs.current[imageIdx] = el;
+                            }}
+                            style={{ display: "none" }}
+                            onChange={(e) => handleAbilityImageFileChange(e, imageIdx)}
+                          />
                           <div className="image-caption-overlay">
                             {workAbilityViewIsEditing && activeAbilityCaptionIdx === imageIdx ? (
                               <input
@@ -8885,7 +8867,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             )}
                           </div>
                           {workAbilityViewIsEditing && (
-                            <button type="button" className={`image-action-btn image-caption-btn${activeAbilityCaptionIdx === imageIdx ? " active" : ""}`} onClick={(e) => { e.stopPropagation(); handleAbilityCaptionToggle(imageIdx); }} title={activeAbilityCaptionIdx === imageIdx ? "캡션 저장" : "캡션 편집"} aria-label="캡션" style={{ position: "absolute", bottom: "8px", right: "8px", zIndex: 3 }}>
+                            <button
+                              type="button"
+                              className={`image-action-btn image-caption-btn${activeAbilityCaptionIdx === imageIdx ? " active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAbilityCaptionToggle(imageIdx);
+                              }}
+                              title={activeAbilityCaptionIdx === imageIdx ? "캡션 저장" : "캡션 편집"}
+                              aria-label="캡션"
+                              style={{ position: "absolute", bottom: "8px", right: "8px", zIndex: 3 }}
+                            >
                               <i className="ti ti-text-caption"></i>
                             </button>
                           )}
@@ -8905,14 +8897,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workAbilityViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty} style={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkAbilityCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다"}>
+                    <button
+                      className="modal-edit-btn"
+                      onClick={handleEditWorkAbility}
+                      disabled={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty}
+                      style={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                      title={selectedWorkAbilityCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다"}
+                    >
                       수정
                     </button>
                   ) : (
                     <>
-                      <button className="modal-cancel-btn" onClick={handleCancelWorkAbility}>취소</button>
-                      <button className="modal-reset-btn" onClick={handleResetWorkAbility}>초기화</button>
-                      <button className="modal-save-btn" onClick={handleSaveWorkAbility}>저장</button>
+                      <button className="modal-cancel-btn" onClick={handleCancelWorkAbility}>
+                        취소
+                      </button>
+                      <button className="modal-reset-btn" onClick={handleResetWorkAbility}>
+                        초기화
+                      </button>
+                      <button className="modal-save-btn" onClick={handleSaveWorkAbility}>
+                        저장
+                      </button>
                     </>
                   )}
                 </div>
@@ -9174,11 +9178,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2;
                       return (
-                        <div
-                          key={imageIdx}
-                          className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`}
-                          {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}
-                        >
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {workCareerViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleCareerImagePreview(imageIdx)}>
@@ -9364,7 +9364,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               </div>
                               {/* 4행: 직책 (company 숨김, divider는 visible 유지 → x좌표 grid 일치) */}
                               <div className="supervisor-details">
-                                <span className="supervisor-company-placeholder" style={{ visibility: "hidden" }}>-</span>
+                                <span className="supervisor-company-placeholder" style={{ visibility: "hidden" }}>
+                                  -
+                                </span>
                                 <span className="supervisor-separator">|</span>
                                 <span className="supervisor-position">{selectedWorkCareerCard.supervisorPosition || "-"}</span>
                               </div>
@@ -9399,7 +9401,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!workCareerViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty} style={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkCareerCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다"}>
+                    <button
+                      className="modal-edit-btn"
+                      onClick={handleEditWorkCareer}
+                      disabled={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty}
+                      style={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+                      title={selectedWorkCareerCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다"}
+                    >
                       수정
                     </button>
                   ) : (
@@ -9487,9 +9495,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <img src="/images/0/write.png" alt="write" />
                   <h3>주차 리뷰</h3>
                 </div>
-                <p className="modal-subtitle">
-                  이번 주차에 이렇게 경험하고, 성찰하고 성장했습니다. 😊
-                </p>
+                <p className="modal-subtitle">이번 주차에 이렇게 경험하고, 성찰하고 성장했습니다. 😊</p>
               </div>
 
               {/* 미드 — 3행 세로 배치 */}
@@ -9498,9 +9504,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <div className="weekly-review-row weekly-review-row-1">
                   {/* 1열: 주차 정보 */}
                   <div className="review-week-info">
-                    <span className="week-info-text">
-                      {weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}
-                    </span>
+                    <span className="week-info-text">{weekData ? `${weekData.seasonYear}년 ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차` : "시즌 정보 로딩 중..."}</span>
                   </div>
 
                   {/* 2열: 리뷰 평점 */}
@@ -9517,24 +9521,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
                           return (
                             <>
-                              {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+                              {Array(fullStars)
+                                .fill(0)
+                                .map((_, i) => (
+                                  <i key={`f${i}`} className="ti ti-star-filled" />
+                                ))}
                               {hasHalf && <i className="ti ti-star-half-filled" />}
-                              {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+                              {Array(emptyStars)
+                                .fill(0)
+                                .map((_, i) => (
+                                  <i key={`e${i}`} className="ti ti-star" />
+                                ))}
                             </>
                           );
                         })()}
                         <span className="rating-text">{weeklyReviewData.rating || 0}/10</span>
                       </span>
                       <div className="custom-dropdown small">
-                        <div
-                          ref={reviewRatingDropdownTriggerRef}
-                          className={`dropdown-selected ${!isWeeklyReviewEditing ? "disabled" : ""}`}
-                          onClick={openReviewRatingDropdown}
-                          role="button"
-                          tabIndex={isWeeklyReviewEditing ? 0 : -1}
-                          aria-haspopup="listbox"
-                          aria-expanded={reviewRatingDropdownOpen}
-                        >
+                        <div ref={reviewRatingDropdownTriggerRef} className={`dropdown-selected ${!isWeeklyReviewEditing ? "disabled" : ""}`} onClick={openReviewRatingDropdown} role="button" tabIndex={isWeeklyReviewEditing ? 0 : -1} aria-haspopup="listbox" aria-expanded={reviewRatingDropdownOpen}>
                           <span>{weeklyReviewData.rating || "-"}</span>
                           <i className="ti ti-chevron-down"></i>
                         </div>
@@ -9644,17 +9648,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
                 <div className="modal-footer-bottom">
-                  <p
-                    className={`modal-footer-notice ${weeklyReviewSaveAttemptFailed ? "notice-error" : ""}`}
-                    style={{ visibility: weeklyReviewSaveAttemptFailed ? "visible" : "hidden" }}
-                  >
+                  <p className={`modal-footer-notice ${weeklyReviewSaveAttemptFailed ? "notice-error" : ""}`} style={{ visibility: weeklyReviewSaveAttemptFailed ? "visible" : "hidden" }}>
                     필수 항목을 모두 입력해주세요.
                   </p>
                 </div>
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* 주차 리뷰 — 평점 드롭다운 옵션 패널 (Portal) */}
@@ -9674,18 +9675,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             onWheel={(e) => e.stopPropagation()}
           >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <div
-                key={n}
-                className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`}
-                onClick={() => handleReviewRatingSelect(n)}
-                role="option"
-                aria-selected={weeklyReviewData.rating === n}
-              >
+              <div key={n} className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`} onClick={() => handleReviewRatingSelect(n)} role="option" aria-selected={weeklyReviewData.rating === n}>
                 {n}
               </div>
             ))}
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* 커스텀 별점 드롭다운 옵션 패널 — Portal (body 직속, cluster3 .dropdown-options-fixed 재사용) */}
@@ -9705,18 +9700,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             onWheel={(e) => e.stopPropagation()}
           >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <div
-                key={n}
-                className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`}
-                onClick={() => handleRatingSelect(n)}
-                role="option"
-                aria-selected={reputationEditData.rating === n}
-              >
+              <div key={n} className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`} onClick={() => handleRatingSelect(n)} role="option" aria-selected={reputationEditData.rating === n}>
                 {n}
               </div>
             ))}
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );
