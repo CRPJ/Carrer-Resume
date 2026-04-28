@@ -5193,7 +5193,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-badge week" style={{ flexShrink: 0, marginLeft: "auto" }}>
                 <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
                 <span>
-                  <span className="highlight">{(weekData?.growthStatus === "진행 중" || weekData?.growthStatus === "집계 중") ? "+1" : cumulativeApprovedWeeks}</span> / 30 주차
+                  <span className="highlight">{weekData?.growthStatus === "진행 중" || weekData?.growthStatus === "집계 중" ? "+1" : cumulativeApprovedWeeks}</span> / 30 주차
                 </span>
               </div>
             </div>
@@ -5264,7 +5264,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
               <span className="fm-badge">
-                <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" />
+                <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" />
                 <span className="fm-label">FM :</span>
                 <span className="fm-value">{reputationData.filter((c: any) => c && !c.isEmpty).reduce((sum: number, c: any) => sum + (c.fm || 0), 0)}</span>
               </span>
@@ -5441,7 +5441,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         </div>
                         <div className="card-footer">
                           <span className="fm-badge" style={{ fontSize: "17px" }}>
-                            <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{isEmpty ? "-" : user.fm}</span>
+                            <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{isEmpty ? "-" : user.fm}</span>
                           </span>
                           <span className="footer-divider">|</span>
                           <span className={`tag ${isEmpty ? "tag--dark" : user.tagColor}`} style={{ fontSize: "11.6px" }}>

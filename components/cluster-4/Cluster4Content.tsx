@@ -3006,10 +3006,8 @@ const Cluster4Content = () => {
                     <span className="count-label">
                       <span className="num-fixed">{seasonReputations.length}</span>개
                     </span>
-                    <span
-                      className="fm-badge"
-                    >
-                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" />
+                    <span className="fm-badge">
+                      <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" />
                       <span className="fm-label">FM :</span>
                       <span className="fm-value">{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
                     </span>
@@ -3158,7 +3156,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="stats">
                               <span className="pm">
-                                <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
+                                <img className="wifi-icon" src="/images/0/cluster4/wifi new.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
                               </span>
                               <span className="rating">
                                 {[...Array(fullStars)].map((_, i) => (
