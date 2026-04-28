@@ -1363,6 +1363,7 @@
             .row3 {
               display: flex;
               gap: 6px;
+              position: relative;
 
               .green-box,
               .yellow-box {
@@ -3697,6 +3698,10 @@
               display: flex;
               align-items: center;
               gap: 6px;
+
+              > *:not(.edit-icon) {
+                transform: translateY(-8px);
+              }
               .section-icon {
                 width: 21px;
                 height: 21px;
@@ -3713,7 +3718,6 @@
                 letter-spacing: 0.7px;
                 line-height: 1;
                 flex-shrink: 0;
-                transform: translateX(-0.1cm);
               }
 
               .section-count {
@@ -3779,17 +3783,18 @@
 
             // 단독 edit-icon (floating-icons 밖) — absolute로 부모 기준 배치
             .season-reputation-header .edit-icon {
-              width: 36px;
-              height: 36px;
+              width: 33px;
+              height: 33px;
               background: #faab07;
               border-radius: 50%;
               display: flex;
               align-items: center;
               justify-content: center;
               cursor: pointer;
-              flex-shrink: 0;
-              margin-left: 20px;
-              transform: translateY(-4px); // ← 위로 올림
+              transition: all 0.3s ease;
+              position: absolute;
+              top: calc(1px + 4cm);
+              right: 0px;
 
               &:hover {
                 transform: scale(1.1);
@@ -3797,6 +3802,8 @@
               }
 
               i {
+                position: relative;
+                top: 2px;
                 font-size: 16px;
                 color: #1a1a1a;
               }
