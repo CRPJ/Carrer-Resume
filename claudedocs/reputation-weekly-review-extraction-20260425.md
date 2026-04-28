@@ -6,33 +6,34 @@
 
 ## A. SCSS 블록 위치 요약
 
-| 블록 | 파일 | 시작 | 끝 |
-|------|------|------|-----|
-| `&.section-modal-reputation-form` | _cluster4-week.scss | 5356 | 5926 |
-| `&.reputation-view-modal` (nested) | _cluster4-week.scss | 7255 | 7771 |
-| `.section-modal-weekly-review-form` | _cluster4-week.scss | 12884 | 13473 |
-| `.weekly-review-box` | _cluster4-week.scss | 12622 | 12791 |
-| `@keyframes weekly-review-float` | _cluster4-week.scss | 12795 | 12802 |
-| reputation-form `.rating-field` 패턴 | _cluster4-week.scss | 12807 | 12878 |
-| `@keyframes weekly-review-field-error-flash` | _cluster4-week.scss | 13475 | 13484 |
-| `@keyframes field-error-flash` | _cluster4-week.scss | 5526 | 5536 |
-| `@keyframes colleague-edit-field-flash` | _cluster4-week.scss | 5215 | 5224 |
-| `.dropdown-options-fixed` (글로벌, cluster3) | _cluster3.scss | 2567 | 2615 |
+| 블록                                         | 파일                 | 시작  | 끝    |
+| -------------------------------------------- | -------------------- | ----- | ----- |
+| `&.section-modal-reputation-form`            | \_cluster4-week.scss | 5356  | 5926  |
+| `&.reputation-view-modal` (nested)           | \_cluster4-week.scss | 7255  | 7771  |
+| `.section-modal-weekly-review-form`          | \_cluster4-week.scss | 12884 | 13473 |
+| `.weekly-review-box`                         | \_cluster4-week.scss | 12622 | 12791 |
+| `@keyframes weekly-review-float`             | \_cluster4-week.scss | 12795 | 12802 |
+| reputation-form `.rating-field` 패턴         | \_cluster4-week.scss | 12807 | 12878 |
+| `@keyframes weekly-review-field-error-flash` | \_cluster4-week.scss | 13475 | 13484 |
+| `@keyframes field-error-flash`               | \_cluster4-week.scss | 5526  | 5536  |
+| `@keyframes colleague-edit-field-flash`      | \_cluster4-week.scss | 5215  | 5224  |
+| `.dropdown-options-fixed` (글로벌, cluster3) | \_cluster3.scss      | 2567  | 2615  |
 
-### .workinfo-personal-card 정의 위치들 (_cluster4-week.scss)
+### .workinfo-personal-card 정의 위치들 (\_cluster4-week.scss)
 
-| 모달/컨텍스트 | 시작 | 끝 |
-|---------------|------|-----|
-| reputation-view-modal 내 | 7416 | 7619 |
-| colleague-view-modal 내 | 8014 | 8162 |
-| weekly-review-form 내 | 13112 | 13248 |
-| 기타 (workInfo view 등) | 10669, 11645, 11691, 11737, 11783, 12109, 12403, 12429, 12483 | 각각 |
+| 모달/컨텍스트            | 시작                                                          | 끝    |
+| ------------------------ | ------------------------------------------------------------- | ----- |
+| reputation-view-modal 내 | 7416                                                          | 7619  |
+| colleague-view-modal 내  | 8014                                                          | 8162  |
+| weekly-review-form 내    | 13112                                                         | 13248 |
+| 기타 (workInfo view 등)  | 10669, 11645, 11691, 11737, 11783, 12109, 12403, 12429, 12483 | 각각  |
 
 ---
 
 ## B-1. reputation-form 별점 커스텀 드롭다운
 
 ### SCSS (.section-modal.section-modal-reputation-form)
+
 - 위치: `_cluster4-week.scss:12807~12878`
 
 ```scss
@@ -89,7 +90,9 @@
       font-size: 16px;
       color: #fff;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      transition:
+        border-color 0.15s,
+        background 0.15s;
 
       &:hover:not(.disabled) {
         border-color: rgba(255, 255, 255, 0.3);
@@ -176,9 +179,17 @@ const handleRatingSelect = (value: number) => {
       const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
       return (
         <>
-          {Array(fullStars).fill(0).map((_, i) => <i key={`f${i}`} className="ti ti-star-filled" />)}
+          {Array(fullStars)
+            .fill(0)
+            .map((_, i) => (
+              <i key={`f${i}`} className="ti ti-star-filled" />
+            ))}
           {hasHalf && <i className="ti ti-star-half-filled" />}
-          {Array(emptyStars).fill(0).map((_, i) => <i key={`e${i}`} className="ti ti-star" />)}
+          {Array(emptyStars)
+            .fill(0)
+            .map((_, i) => (
+              <i key={`e${i}`} className="ti ti-star" />
+            ))}
         </>
       );
     })()}
@@ -186,15 +197,7 @@ const handleRatingSelect = (value: number) => {
   </span>
 
   <div className="custom-dropdown small">
-    <div
-      ref={ratingDropdownTriggerRef}
-      className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`}
-      onClick={openRatingDropdown}
-      role="button"
-      tabIndex={isReputationFormEditing ? 0 : -1}
-      aria-haspopup="listbox"
-      aria-expanded={ratingDropdownOpen}
-    >
+    <div ref={ratingDropdownTriggerRef} className={`dropdown-selected ${!isReputationFormEditing ? "disabled" : ""}`} onClick={openRatingDropdown} role="button" tabIndex={isReputationFormEditing ? 0 : -1} aria-haspopup="listbox" aria-expanded={ratingDropdownOpen}>
       <span>{reputationEditData.rating || "-"}</span>
       <i className="ti ti-chevron-down"></i>
     </div>
@@ -205,35 +208,31 @@ const handleRatingSelect = (value: number) => {
 ### TSX — 옵션 패널 Portal (Cluster4CardContent.tsx:9519~9547)
 
 ```tsx
-{ratingDropdownOpen &&
-  typeof document !== "undefined" &&
-  createPortal(
-    <div
-      className="dropdown-options-fixed"
-      style={{
-        position: "fixed",
-        top: ratingDropdownPos.top,
-        left: ratingDropdownPos.left,
-        width: Math.max(ratingDropdownPos.width, 70),
-        zIndex: 100010,
-      }}
-      role="listbox"
-      onWheel={(e) => e.stopPropagation()}
-    >
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-        <div
-          key={n}
-          className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`}
-          onClick={() => handleRatingSelect(n)}
-          role="option"
-          aria-selected={reputationEditData.rating === n}
-        >
-          {n}
-        </div>
-      ))}
-    </div>,
-    document.body
-  )}
+{
+  ratingDropdownOpen &&
+    typeof document !== "undefined" &&
+    createPortal(
+      <div
+        className="dropdown-options-fixed"
+        style={{
+          position: "fixed",
+          top: ratingDropdownPos.top,
+          left: ratingDropdownPos.left,
+          width: Math.max(ratingDropdownPos.width, 70),
+          zIndex: 100010,
+        }}
+        role="listbox"
+        onWheel={(e) => e.stopPropagation()}
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+          <div key={n} className={`dropdown-option${reputationEditData.rating === n ? " selected" : ""}`} onClick={() => handleRatingSelect(n)} role="option" aria-selected={reputationEditData.rating === n}>
+            {n}
+          </div>
+        ))}
+      </div>,
+      document.body,
+    );
+}
 ```
 
 ---
@@ -246,7 +245,7 @@ const handleRatingSelect = (value: number) => {
 const handleEditMode = () => {
   // 승인 체크 — reputation-view-modal [수정] (L3031)과 동일 패턴
   if (!canEditReputation) {
-    alert("관리자 승인이 필요합니다");
+    alert("작성할 수 있는 기간이 아닙니다. 😊");
     return;
   }
 
@@ -267,6 +266,7 @@ const handleEditMode = () => {
 ## B-3. weekly-review-form 전체
 
 ### SCSS 전체 블록
+
 - 위치: `_cluster4-week.scss:12884~13473`
 - (위 A 섹션의 SCSS 읽기 결과 전체 — 590줄)
 
@@ -284,11 +284,17 @@ const [weeklyReviewSaveAttemptFailed, setWeeklyReviewSaveAttemptFailed] = useSta
 const [weeklyReviewFormSnapshot, setWeeklyReviewFormSnapshot] = useState<{ rating: number; content: string } | null>(null);
 const [weeklyReviewFieldErrorFlash, setWeeklyReviewFieldErrorFlash] = useState(false);
 const [weeklyReviewFromDB, setWeeklyReviewFromDB] = useState<{
-  id?: string; weekCardId?: string; rating: number; content: string; created_at?: string; updated_at?: string;
+  id?: string;
+  weekCardId?: string;
+  rating: number;
+  content: string;
+  created_at?: string;
+  updated_at?: string;
 } | null>(null);
 ```
 
 unfurl ref/state (Cluster4CardContent.tsx:1773~1774):
+
 ```tsx
 const weeklyReviewRef = useRef<HTMLDivElement>(null);
 const [isReviewUnfurled, setIsReviewUnfurled] = useState(false);
@@ -297,6 +303,7 @@ const [isReviewUnfurled, setIsReviewUnfurled] = useState(false);
 ### TSX — 핸들러
 
 **openReviewRatingDropdown (3049~3056):**
+
 ```tsx
 const openReviewRatingDropdown = () => {
   if (!isWeeklyReviewEditing) return;
@@ -309,6 +316,7 @@ const openReviewRatingDropdown = () => {
 ```
 
 **handleReviewRatingSelect (3058~3061):**
+
 ```tsx
 const handleReviewRatingSelect = (value: number) => {
   setWeeklyReviewData((prev) => ({ ...prev, rating: value }));
@@ -317,6 +325,7 @@ const handleReviewRatingSelect = (value: number) => {
 ```
 
 **fetchWeeklyReview (3083~3122):**
+
 ```tsx
 const fetchWeeklyReview = async () => {
   if (isDemoMode) {
@@ -345,9 +354,12 @@ const fetchWeeklyReview = async () => {
     }
     if (record) {
       setWeeklyReviewFromDB({
-        id: record.id, weekCardId: record.weekCardId || weekId,
-        rating: record.rating, content: record.content,
-        created_at: record.created_at, updated_at: record.updated_at,
+        id: record.id,
+        weekCardId: record.weekCardId || weekId,
+        rating: record.rating,
+        content: record.content,
+        created_at: record.created_at,
+        updated_at: record.updated_at,
       });
     } else {
       setWeeklyReviewFromDB(null);
@@ -360,6 +372,7 @@ const fetchWeeklyReview = async () => {
 ```
 
 **isWeeklyReviewValid (3130~3132):**
+
 ```tsx
 const isWeeklyReviewValid = (): boolean => {
   return weeklyReviewData.rating > 0 && weeklyReviewData.content.trim().length > 0;
@@ -367,6 +380,7 @@ const isWeeklyReviewValid = (): boolean => {
 ```
 
 **isWeeklyReviewDirty (3134~3139):**
+
 ```tsx
 const isWeeklyReviewDirty = (): boolean => {
   if (!weeklyReviewFormSnapshot) {
@@ -377,6 +391,7 @@ const isWeeklyReviewDirty = (): boolean => {
 ```
 
 **saveWeeklyReview (3142~3169):**
+
 ```tsx
 const saveWeeklyReview = async (): Promise<{ id: string; weekCardId?: string; created_at: string; updated_at?: string } | null> => {
   const isUpdate = !!weeklyReviewFromDB?.id;
@@ -408,6 +423,7 @@ const saveWeeklyReview = async (): Promise<{ id: string; weekCardId?: string; cr
 ```
 
 **handleWeeklyReviewClose (3186~3191):**
+
 ```tsx
 const handleWeeklyReviewClose = () => {
   if (isWeeklyReviewEditing && isWeeklyReviewDirty()) {
@@ -418,10 +434,11 @@ const handleWeeklyReviewClose = () => {
 ```
 
 **handleWeeklyReviewEditClick (3194~3203):**
+
 ```tsx
 const handleWeeklyReviewEditClick = () => {
   if (!canEditReputation) {
-    alert("관리자 승인이 필요합니다");
+    alert("작성할 수 있는 기간이 아닙니다. 😊");
     return;
   }
   setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
@@ -432,6 +449,7 @@ const handleWeeklyReviewEditClick = () => {
 ```
 
 **handleWeeklyReviewCancel (3205~3220):**
+
 ```tsx
 const handleWeeklyReviewCancel = () => {
   if (isWeeklyReviewDirty()) {
@@ -452,13 +470,15 @@ const handleWeeklyReviewCancel = () => {
 ```
 
 **handleWeeklyReviewHelp (3222~3224):**
+
 ```tsx
 const handleWeeklyReviewHelp = () => {
-  setHelpModalKind('weeklyReview');
+  setHelpModalKind("weeklyReview");
 };
 ```
 
 **handleWeeklyReviewReset (3226~3235):**
+
 ```tsx
 const handleWeeklyReviewReset = () => {
   if (!window.confirm("작성 내용을 초기 상태로 되돌리시겠습니까?")) return;
@@ -473,6 +493,7 @@ const handleWeeklyReviewReset = () => {
 ```
 
 **handleWeeklyReviewSave (3237~3266):**
+
 ```tsx
 const handleWeeklyReviewSave = async () => {
   if (!isWeeklyReviewValid()) {
@@ -489,9 +510,12 @@ const handleWeeklyReviewSave = async () => {
       return;
     }
     setWeeklyReviewFromDB({
-      id: savedRecord.id, weekCardId: savedRecord.weekCardId,
-      rating: weeklyReviewData.rating, content: weeklyReviewData.content,
-      created_at: savedRecord.created_at, updated_at: savedRecord.updated_at,
+      id: savedRecord.id,
+      weekCardId: savedRecord.weekCardId,
+      rating: weeklyReviewData.rating,
+      content: weeklyReviewData.content,
+      created_at: savedRecord.created_at,
+      updated_at: savedRecord.updated_at,
     });
     setIsWeeklyReviewEditing(false);
     setWeeklyReviewSaveAttemptFailed(false);
@@ -509,6 +533,7 @@ const handleWeeklyReviewSave = async () => {
 ### TSX — useEffect
 
 **드롭다운 외부 클릭/ESC (3063~3080):**
+
 ```tsx
 useEffect(() => {
   if (!reviewRatingDropdownOpen) return;
@@ -531,6 +556,7 @@ useEffect(() => {
 ```
 
 **페이지 로드 fetch (3124~3127):**
+
 ```tsx
 useEffect(() => {
   if (!weekId) return;
@@ -539,6 +565,7 @@ useEffect(() => {
 ```
 
 **모달 초기화 (3172~3183):**
+
 ```tsx
 useEffect(() => {
   if (!weeklyReviewModalOpen) return;
@@ -555,6 +582,7 @@ useEffect(() => {
 ```
 
 **IntersectionObserver / scroll unfurl (1783~1808):**
+
 ```tsx
 useEffect(() => {
   const target = weeklyReviewRef.current;
@@ -602,35 +630,31 @@ L9485: }
 ### TSX — 옵션 패널 Portal (9488~9516)
 
 ```tsx
-{reviewRatingDropdownOpen &&
-  typeof document !== "undefined" &&
-  createPortal(
-    <div
-      className="dropdown-options-fixed review-rating-dropdown-options"
-      style={{
-        position: "fixed",
-        top: reviewRatingDropdownPos.top,
-        left: reviewRatingDropdownPos.left,
-        width: Math.max(reviewRatingDropdownPos.width, 70),
-        zIndex: 100010,
-      }}
-      role="listbox"
-      onWheel={(e) => e.stopPropagation()}
-    >
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-        <div
-          key={n}
-          className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`}
-          onClick={() => handleReviewRatingSelect(n)}
-          role="option"
-          aria-selected={weeklyReviewData.rating === n}
-        >
-          {n}
-        </div>
-      ))}
-    </div>,
-    document.body
-  )}
+{
+  reviewRatingDropdownOpen &&
+    typeof document !== "undefined" &&
+    createPortal(
+      <div
+        className="dropdown-options-fixed review-rating-dropdown-options"
+        style={{
+          position: "fixed",
+          top: reviewRatingDropdownPos.top,
+          left: reviewRatingDropdownPos.left,
+          width: Math.max(reviewRatingDropdownPos.width, 70),
+          zIndex: 100010,
+        }}
+        role="listbox"
+        onWheel={(e) => e.stopPropagation()}
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+          <div key={n} className={`dropdown-option${weeklyReviewData.rating === n ? " selected" : ""}`} onClick={() => handleReviewRatingSelect(n)} role="option" aria-selected={weeklyReviewData.rating === n}>
+            {n}
+          </div>
+        ))}
+      </div>,
+      document.body,
+    );
+}
 ```
 
 ---
@@ -640,6 +664,7 @@ L9485: }
 - 위치: `_cluster4-week.scss:13112~13248` (weekly-review-form 내)
 
 핵심:
+
 ```scss
 .personal-row-2,
 .personal-row-3 {
@@ -679,31 +704,23 @@ L9485: }
 ## B-6. Weekly Review 박스 (좌하단 unfurl 카드)
 
 ### SCSS
+
 - 위치: `_cluster4-week.scss:12622~12791`
 - (위 읽기 결과 전체 참조)
 
 ### TSX 마크업 (4981~5015)
 
 ```tsx
-<div
-  ref={weeklyReviewRef}
-  className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}
->
+<div ref={weeklyReviewRef} className={`weekly-review-box ${isReviewUnfurled ? "unfurled" : ""}`}>
   <div className="weekly-review-header">
     <img src="/images/0/book.png" alt="book" className="review-book-icon" />
     <h3 className="review-title">Weekly Review</h3>
-    <button
-      className="review-view-btn"
-      onClick={() => setWeeklyReviewModalOpen(true)}
-      aria-label="더보기"
-    >
+    <button className="review-view-btn" onClick={() => setWeeklyReviewModalOpen(true)} aria-label="더보기">
       <img src="/images/0/cluster4/icon/icon - 7 - eye.png" alt="view" className="view-icon" />
     </button>
   </div>
   <div className="weekly-review-mid">
-    <p className="review-content">
-      {weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}
-    </p>
+    <p className="review-content">{weeklyReviewFromDB?.content || "아직 작성된 리뷰가 없습니다. 클릭하여 작성해보세요. 😊"}</p>
   </div>
   <div className="weekly-review-footer">
     <div className="review-rating-group">
@@ -726,16 +743,16 @@ L9485: }
 
 ## C. 공유 글로벌 패턴 — 버튼/푸터 스타일 정의 위치
 
-| 패턴 | 정의 위치 | 비고 |
-|------|-----------|------|
+| 패턴                                | 정의 위치                                                                    | 비고                    |
+| ----------------------------------- | ---------------------------------------------------------------------------- | ----------------------- |
 | `.modal-edit-btn / .modal-save-btn` | reputation-form L5305~5334, work-view L5859~5928, weekly-review L13404~13453 | 모달 스코프별 개별 정의 |
-| `.modal-cancel-btn` | reputation-form L5320~5334, work-view L5879~5894, weekly-review L13417~13427 | 동일 |
-| `.modal-reset-btn` | reputation-form L5336~5350, work-view L5895~5910, weekly-review L13429~13438 | 동일 |
-| `.modal-help-icon` | reputation-form L5248~5275, work-view L5799~5826, weekly-review L13376~13395 | 동일 |
-| `.modal-footer-right` | reputation-form L5276, work-view L5827, weekly-review L13397 | 동일 |
-| `.modal-footer-bottom` | reputation-form L5286, work-view L5838, weekly-review L13455 | 동일 |
-| `.section-modal-overlay` | 글로벌 (main.scss 또는 _global.scss) | 조사 필요 |
-| `.dropdown-options-fixed` | _cluster3.scss L2567~2615 | 글로벌 스코프 |
+| `.modal-cancel-btn`                 | reputation-form L5320~5334, work-view L5879~5894, weekly-review L13417~13427 | 동일                    |
+| `.modal-reset-btn`                  | reputation-form L5336~5350, work-view L5895~5910, weekly-review L13429~13438 | 동일                    |
+| `.modal-help-icon`                  | reputation-form L5248~5275, work-view L5799~5826, weekly-review L13376~13395 | 동일                    |
+| `.modal-footer-right`               | reputation-form L5276, work-view L5827, weekly-review L13397                 | 동일                    |
+| `.modal-footer-bottom`              | reputation-form L5286, work-view L5838, weekly-review L13455                 | 동일                    |
+| `.section-modal-overlay`            | 글로벌 (main.scss 또는 \_global.scss)                                        | 조사 필요               |
+| `.dropdown-options-fixed`           | \_cluster3.scss L2567~2615                                                   | 글로벌 스코프           |
 
 **결론**: 버튼/푸터 스타일은 글로벌 공통이 아닌, 각 모달 스코프에 개별 복제되어 있음.
 새 모달 추가 시 해당 블록을 복제해야 함.

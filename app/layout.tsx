@@ -2,6 +2,7 @@ import Bootstrap from "@/components/shared/Bootstrap";
 import Progress from "@/components/shared/Progress";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { ProfileProvider } from "@/contexts/ProfileContext";
+import { PopupProvider } from "@/components/ui/popup";
 import ZoomPrevention from "@/components/shared/ZoomPrevention";
 import ResponsiveScale from "@/components/shared/ResponsiveScale";
 import MobileBlockScreen from "@/components/shared/MobileBlockScreen";
@@ -47,10 +48,12 @@ export default function RootLayout({
         <MobileBlockScreen />
         <SessionProvider>
           <ProfileProvider>
-            {/* <ZoomPrevention /> */}
-            <ResponsiveScale />
-            <Progress />
-            <Bootstrap>{children}</Bootstrap>
+            <PopupProvider>
+              {/* <ZoomPrevention /> */}
+              <ResponsiveScale />
+              <Progress />
+              <Bootstrap>{children}</Bootstrap>
+            </PopupProvider>
           </ProfileProvider>
         </SessionProvider>
       </body>

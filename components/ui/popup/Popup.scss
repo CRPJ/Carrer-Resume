@@ -1,0 +1,170 @@
+// =====================================================
+// Custom Popup v3
+// =====================================================
+
+$popup-width: 456px;
+$popup-height: 152px;
+$popup-radius: 12px;
+$popup-header-height: 35px;
+
+$popup-body-bg: #1a1f26;
+$popup-text-color: #ffffff;
+
+$popup-btn-bg: #2a323d;
+$popup-btn-text: #ffffff;
+$popup-btn-border: transparent;
+$popup-btn-hover-bg: #faab07;
+$popup-btn-hover-text: #000000;
+$popup-btn-confirm-bg: #faab07;
+$popup-btn-confirm-text: #000000;
+
+$popup-z-backdrop: 9999998;
+$popup-z-content: 9999999;
+
+.custom-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: $popup-z-backdrop;
+}
+
+.custom-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: $popup-width;
+  height: calc(#{$popup-height} * 1.2);
+  min-height: calc(#{$popup-height} * 1.2);
+  background-color: $popup-body-bg;
+  border-radius: $popup-radius;
+  z-index: $popup-z-content;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-family: "Pretendard", sans-serif;
+  transform: translate(-50%, -50%);
+
+  &__header {
+    flex-shrink: 0;
+    width: 100%;
+    height: $popup-header-height;
+    position: relative;
+    background:
+      linear-gradient(to right, rgba(33, 150, 243, var(--popup-header-overlay, 0.65)), rgba(0, 77, 95, 0.85)),
+      var(--popup-header-bg) center 42% / cover no-repeat;
+  }
+
+  &__body {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 16px 20px 0;
+    min-width: 0;
+  }
+
+  &__icon {
+    position: absolute;
+    left: 20px;
+    top: 14px;
+    flex-shrink: 0;
+    width: 77px;
+    height: 77px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__message {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 260px);
+    margin-top: -50px;
+    margin-left: 48px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: $popup-text-color;
+    text-align: center;
+    word-break: keep-all;
+    white-space: pre-wrap;
+    font-weight: 500;
+  }
+
+  &__footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    min-width: 64px;
+    height: 30px;
+    padding: 0 16px;
+    border: 1px solid $popup-btn-border;
+    border-radius: 6px;
+    background-color: $popup-btn-bg;
+    color: $popup-btn-text;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover {
+      background-color: $popup-btn-hover-bg;
+      color: $popup-btn-hover-text;
+    }
+
+    &:active {
+      filter: brightness(0.92);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $popup-btn-hover-bg;
+      outline-offset: 2px;
+    }
+
+    &--confirm {
+      background-color: $popup-btn-confirm-bg;
+      color: $popup-btn-confirm-text;
+
+      &:hover {
+        background-color: lighten(#faab07, 5%);
+        color: $popup-btn-confirm-text;
+      }
+    }
+
+    &--cancel {
+      &:hover {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: #fff;
+      }
+    }
+  }
+}

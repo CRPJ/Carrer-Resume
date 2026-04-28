@@ -13,6 +13,7 @@ import { DUMMY_USER_PROFILE, DUMMY_SIDEBAR_EXTRA } from "@/constants/dummyData";
 import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { usePopup } from "@/components/ui/popup";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -26,6 +27,12 @@ const IDENTITY_TAB_IMAGES = [
 ];
 
 const Sidebar = () => {
+  const { alert: showAlert, confirm: popupConfirm } = usePopup();
+  const showConfirm = useCallback(async (message: string, onConfirm: () => void | Promise<void>) => {
+    if (await popupConfirm(message)) {
+      await onConfirm();
+    }
+  }, [popupConfirm]);
   // SSR-safe: 첫 렌더는 항상 [0], 마운트 후 useEffect에서 random 갱신
   const [tabBg, setTabBg] = useState(IDENTITY_TAB_IMAGES[0]);
   const { data: session } = useSession();
@@ -585,6 +592,7 @@ const Sidebar = () => {
   const [isPhoneCommentModalOpen, setIsPhoneCommentModalOpen] = useState(false);
   const [isPhoneEditing, setIsPhoneEditing] = useState(false);
   const phoneCommentSnapshot = useRef("");
+  const profileFormSnapshotRef = useRef<typeof formData | null>(null);
   const [isPhoneHelpModalOpen, setIsPhoneHelpModalOpen] = useState(false);
   const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
@@ -595,6 +603,13 @@ const Sidebar = () => {
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const normalizeDirtyValue = (value: unknown) => (value ?? "").toString().trim();
+  const isPhoneCommentDirty = () => normalizeDirtyValue(formData.phoneComment) !== normalizeDirtyValue(phoneCommentSnapshot.current);
+  const isProfileEditDirty = () => {
+    const snap = profileFormSnapshotRef.current;
+    if (!snap) return false;
+    return JSON.stringify(formData) !== JSON.stringify(snap);
+  };
 
   // Sidebar 모달 배경 스크롤 차단
   const isSidebarModalOpen = isEditModalOpen || isPhoneCommentModalOpen || isPhoneHelpModalOpen;
@@ -1039,7 +1054,7 @@ const Sidebar = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>, field: "lastName" | "firstName", maxLength: number) => {
+  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>, field: "lastName" | "firstName", maxLength: number) => {
     const { value } = e.target;
 
     if (value.length <= maxLength) {
@@ -1051,14 +1066,14 @@ const Sidebar = () => {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
     } else {
-      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+      await showAlert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
   // 영문 이름 입력 핸들러
   const isEnglishOnly = (text: string) => /^[a-zA-Z\s]*$/.test(text);
 
-  const handleEngNameChange = (e: React.ChangeEvent<HTMLInputElement>, field: "lastNameEng" | "firstNameEng", maxLength: number) => {
+  const handleEngNameChange = async (e: React.ChangeEvent<HTMLInputElement>, field: "lastNameEng" | "firstNameEng", maxLength: number) => {
     const { value } = e.target;
 
     if (value.length <= maxLength) {
@@ -1070,7 +1085,7 @@ const Sidebar = () => {
         setErrors((prev) => ({ ...prev, [field]: "" }));
       }
     } else {
-      alert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
+      await showAlert(`최대 ${maxLength}자까지 입력할 수 있습니다.`);
     }
   };
 
@@ -1204,12 +1219,13 @@ const Sidebar = () => {
   // 프로필 수정 버튼 클릭 핸들러
   const handleEditButtonClick = async () => {
     if (demoMode) {
+      profileFormSnapshotRef.current = formData;
       setIsEditModalOpen(true);
       return;
     }
 
     if (!session) {
-      alert("로그인이 필요합니다.");
+      await showAlert("로그인이 필요합니다.");
       return;
     }
 
@@ -1218,18 +1234,19 @@ const Sidebar = () => {
       const approved = await checkApprovalStatus();
 
       if (!approved) {
-        alert("아직 회원 상태가 어드민 승인 대기 중입니다.");
+        await showAlert("아직 회원 상태가 어드민 승인 대기 중입니다.");
         return;
       }
     }
 
     // 승인된 경우 프로필 로드 후 모달 열기
     await loadProfile();
+    profileFormSnapshotRef.current = formData;
     setIsEditModalOpen(true);
   };
 
   // 모달 필드 네비게이션: Enter로 다음 필드 이동
-  const navigateToNextField = (currentNavIndex: number) => {
+  const navigateToNextField = async (currentNavIndex: number) => {
     const allNav = Array.from(document.querySelectorAll("[data-nav-index]")) as HTMLElement[];
     const sorted = allNav.sort((a, b) => Number(a.getAttribute("data-nav-index")) - Number(b.getAttribute("data-nav-index")));
     const currentPos = sorted.findIndex((el) => Number(el.getAttribute("data-nav-index")) === currentNavIndex);
@@ -1248,7 +1265,7 @@ const Sidebar = () => {
     }
   };
 
-  const handleEnterKeyNavigation = (e: React.KeyboardEvent<HTMLElement>) => {
+  const handleEnterKeyNavigation = async (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
     const el = e.currentTarget as HTMLElement;
@@ -1265,7 +1282,7 @@ const Sidebar = () => {
     e.preventDefault();
 
     if (demoMode) {
-      alert("저장되었습니다.");
+      await showAlert("저장되었습니다.");
       setIsEditModalOpen(false);
       return;
     }
@@ -1273,7 +1290,7 @@ const Sidebar = () => {
     const missingFields = validateForm();
 
     if (missingFields.length > 0) {
-      alert(`다음 필드를 입력해주세요:\n${missingFields.join(", ")}`);
+      await showAlert(`다음 필드를 입력해주세요:\n${missingFields.join(", ")}`);
       return;
     }
 
@@ -1305,17 +1322,17 @@ const Sidebar = () => {
       const result = await response.json();
 
       if (result.success) {
-        alert("저장되었습니다.");
+        await showAlert("저장되었습니다.");
         setIsEditModalOpen(false);
         // 캐시 무효화 후 프로필 데이터 새로고침
         clearProfileCache();
         fetchUserProfile(true);
       } else {
-        alert(result.error || "프로필 저장에 실패했습니다.");
+        await showAlert(result.error || "프로필 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("프로필 저장 오류:", error);
-      alert("프로필 저장 중 오류가 발생했습니다.");
+      await showAlert("프로필 저장 중 오류가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -1936,19 +1953,25 @@ const Sidebar = () => {
                             onClick={async () => {
                               // 모달 열기 전에 기존 값 로드
                               // Profile GET은 ?userId= 사용 (PUT의 ?targetUserId=와 다름)
+                              let nextPhoneComment = formData.phoneComment;
                               try {
                                 const profileUrl = targetUserId ? `/api/profile/?userId=${targetUserId}` : "/api/profile/";
                                 const response = await fetch(profileUrl);
                                 const result = await response.json();
                                 if (result.success && result.data) {
+                                  nextPhoneComment = result.data.contact_available || DEFAULT_PHONE_COMMENT;
                                   setFormData((prev) => ({
                                     ...prev,
-                                    phoneComment: result.data.contact_available || DEFAULT_PHONE_COMMENT,
+                                    phoneComment: nextPhoneComment,
                                   }));
+                                  phoneCommentSnapshot.current = nextPhoneComment;
+                                } else {
+                                  phoneCommentSnapshot.current = formData.phoneComment;
                                 }
                               } catch (error) {
                                 console.error("연락처 코멘트 로드 오류:", error);
                               }
+                              phoneCommentSnapshot.current = nextPhoneComment;
                               setIsPhoneCommentModalOpen(true);
                               setIsPhoneEditing(false);
                             }}
@@ -2272,12 +2295,12 @@ const Sidebar = () => {
             {/* Skill Cards */}
             <div className="resume-skills">
               <div className="skill-card">
-                <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={34} height={34} className="skill-icon" />
+                <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={34} height={34} className="skill-icon" />
                 <div className="skill-num-row">
-                  <span className="skill-num">{hasActivityData ? practicalCompetency : "-"}</span>
-                  <span className="skill-unit">unit</span>
+                  <span className="skill-num">{hasActivityData ? practicalInfo : "-"}</span>
+                  <span className="skill-unit">회</span>
                 </div>
-                <span className="skill-label">실무 역량 성장</span>
+                <span className="skill-label">실무 정보 습득</span>
               </div>
               <div className="skill-card">
                 <Image src="/images/0/cluster 1/Sheriff Badge1.png" alt="" width={34} height={34} className="skill-icon" />
@@ -2288,12 +2311,12 @@ const Sidebar = () => {
                 <span className="skill-label">실무 경험 축적</span>
               </div>
               <div className="skill-card">
-                <Image src="/images/0/cluster 1/Sheriff Badge1 3.png" alt="" width={34} height={34} className="skill-icon" />
+                <Image src="/images/0/cluster 1/Sheriff Badge1 2.png" alt="" width={34} height={34} className="skill-icon" />
                 <div className="skill-num-row">
-                  <span className="skill-num">{hasActivityData ? practicalInfo : "-"}</span>
-                  <span className="skill-unit">회</span>
+                  <span className="skill-num">{hasActivityData ? practicalCompetency : "-"}</span>
+                  <span className="skill-unit">unit</span>
                 </div>
-                <span className="skill-label">실무 정보 습득</span>
+                <span className="skill-label">실무 역량 성장</span>
               </div>
               <div className="skill-card">
                 <Image src="/images/0/cluster 1/Sheriff Badge1 4.png" alt="" width={34} height={34} className="skill-icon" />
@@ -2344,7 +2367,15 @@ const Sidebar = () => {
             {/* X 닫기 버튼 */}
             <button
               className="modal-close-btn"
-              onClick={() => setIsEditModalOpen(false)}
+              onClick={() => {
+                if (isProfileEditDirty()) {
+                  void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                    setIsEditModalOpen(false);
+                  });
+                  return;
+                }
+                setIsEditModalOpen(false);
+              }}
               style={{
                 position: "absolute",
                 top: "15px",
@@ -2423,9 +2454,13 @@ const Sidebar = () => {
                   type="button"
                   className="modal-close-btn"
                   onClick={() => {
-                    if (confirm("변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?")) {
-                      setIsEditModalOpen(false);
+                    if (isProfileEditDirty()) {
+                      void showConfirm("변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?", () => {
+                        setIsEditModalOpen(false);
+                      });
+                      return;
                     }
+                    setIsEditModalOpen(false);
                   }}
                   style={{
                     position: "absolute",
@@ -3223,11 +3258,11 @@ const Sidebar = () => {
                             className="phone-input modal-input chamfer-box"
                             data-nav-index={11}
                             value={phoneMid}
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
                               const value = digitsOnly.slice(0, 4);
                               if (digitsOnly.length > 4) {
-                                alert("최대 4자까지 입력할 수 있습니다.");
+                                await showAlert("최대 4자까지 입력할 수 있습니다.");
                               }
                               setFormData((prev) => ({ ...prev, phone: `${value}-${phoneLast}` }));
                             }}
@@ -3255,11 +3290,11 @@ const Sidebar = () => {
                             className="phone-input modal-input chamfer-box"
                             data-nav-index={12}
                             value={phoneLast}
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
                               const value = digitsOnly.slice(0, 4);
                               if (digitsOnly.length > 4) {
-                                alert("최대 4자까지 입력할 수 있습니다.");
+                                await showAlert("최대 4자까지 입력할 수 있습니다.");
                               }
                               setFormData((prev) => ({ ...prev, phone: `${phoneMid}-${value}` }));
                             }}
@@ -3504,11 +3539,11 @@ const Sidebar = () => {
                       name="vision"
                       data-nav-index={15}
                       value={formData.vision}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         if (e.target.value.length <= 10) {
                           setFormData((prev) => ({ ...prev, vision: e.target.value }));
                         } else {
-                          alert("최대 10자까지 입력할 수 있습니다.");
+                          await showAlert("최대 10자까지 입력할 수 있습니다.");
                         }
                       }}
                       onKeyDown={handleEnterKeyNavigation}
@@ -3660,8 +3695,17 @@ const Sidebar = () => {
                 </h3>
               </div>
               <button
+                type="button"
                 className="modal-close-btn"
-                onClick={() => setIsPhoneCommentModalOpen(false)}
+                onClick={() => {
+                  if (isPhoneCommentDirty()) {
+                    void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setIsPhoneCommentModalOpen(false);
+                    });
+                    return;
+                  }
+                  setIsPhoneCommentModalOpen(false);
+                }}
                 style={{
                   flexShrink: 0,
                 }}
@@ -3695,7 +3739,19 @@ const Sidebar = () => {
           >
             {/* 헤더 */}
             <div className="edit-modal-header">
-              <button type="button" className="modal-close-btn" onClick={() => setIsPhoneCommentModalOpen(false)}>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => {
+                  if (isPhoneCommentDirty()) {
+                    void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setIsPhoneCommentModalOpen(false);
+                    });
+                    return;
+                  }
+                  setIsPhoneCommentModalOpen(false);
+                }}
+              >
                 ✕
               </button>
 
@@ -3769,7 +3825,7 @@ const Sidebar = () => {
                       <button
                         type="button"
                         className="modal-cancel-btn"
-                        onClick={() => {
+                        onClick={async () => {
                           setFormData((prev) => ({ ...prev, phoneComment: phoneCommentSnapshot.current }));
                           setIsPhoneEditing(false);
                         }}
@@ -3779,10 +3835,10 @@ const Sidebar = () => {
                       <button
                         type="button"
                         className="modal-reset-btn"
-                        onClick={() => {
-                          if (window.confirm("입력한 내용을 초기화하시겠습니까?")) {
+                        onClick={async () => {
+                          await showConfirm("입력한 내용을 초기화하시겠습니까?", () => {
                             setFormData((prev) => ({ ...prev, phoneComment: DEFAULT_PHONE_COMMENT }));
-                          }
+                          });
                         }}
                       >
                         초기화
@@ -3791,30 +3847,33 @@ const Sidebar = () => {
                         type="button"
                         className="modal-save-btn"
                         onClick={async () => {
-                          if (!window.confirm("저장하시겠습니까?")) return;
-                          if (demoMode) {
-                            setIsPhoneEditing(false);
-                            setIsPhoneCommentModalOpen(false);
-                            return;
-                          }
-                          try {
-                            // admin이 다른 크루 페이지에서 편집 시 ?targetUserId= 자동 부착 (apiUrl 헬퍼)
-                            const response = await fetch(apiUrl("/api/profile/"), {
-                              method: "PUT",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ contact_available: formData.phoneComment || null }),
-                            });
-                            const result = await response.json();
-                            if (result.success) {
+                          await showConfirm("저장하시겠습니까?", async () => {
+                            if (demoMode) {
                               setIsPhoneEditing(false);
                               setIsPhoneCommentModalOpen(false);
-                            } else {
-                              alert("저장 실패: " + (result.error || "알 수 없는 오류"));
+                              await showAlert("저장되었습니다.");
+                              return;
                             }
-                          } catch (error) {
-                            console.error("연락처 코멘트 저장 오류:", error);
-                            alert("저장 중 오류가 발생했습니다.");
-                          }
+                            try {
+                              // admin이 다른 크루 페이지에서 편집 시 ?targetUserId= 자동 부착 (apiUrl 헬퍼)
+                              const response = await fetch(apiUrl("/api/profile/"), {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ contact_available: formData.phoneComment || null }),
+                              });
+                              const result = await response.json();
+                              if (result.success) {
+                                setIsPhoneEditing(false);
+                                setIsPhoneCommentModalOpen(false);
+                                await showAlert("저장되었습니다.");
+                              } else {
+                                await showAlert("저장 실패: " + (result.error || "알 수 없는 오류"));
+                              }
+                            } catch (error) {
+                              console.error("연락처 코멘트 저장 오류:", error);
+                              await showAlert("저장 중 오류가 발생했습니다.");
+                            }
+                          });
                         }}
                       >
                         저장

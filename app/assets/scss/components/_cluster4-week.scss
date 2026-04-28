@@ -5406,6 +5406,16 @@
           cursor: pointer;
           white-space: nowrap;
           &:hover { background: #ffb820; }
+
+          // 비활성: 권한 없음 / 빈 카드 / 강화 실패·해당 없음
+          &:disabled,
+          &[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: auto;          // 툴팁(title) 표시 위해
+
+            &:hover { background: #faab07; }   // 호버 색 변경 무효화
+          }
         }
       }
 
@@ -5982,6 +5992,16 @@
 
           &:hover {
             background: #ffb820;
+          }
+
+          // 비활성: 권한 없음 / 빈 카드 / 강화 실패·해당 없음
+          &:disabled,
+          &[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: auto;          // 툴팁(title) 표시 위해
+
+            &:hover { background: #faab07; }   // 호버 색 변경 무효화
           }
         }
       }
@@ -12824,14 +12844,47 @@
     }
 
     .review-stars {
-      display: flex;
-      gap: 2px;
+      position: relative;
+      display: inline-block;
+      width: 88px;                                   // 16px × 5 + 2px × 4
+      height: 16px;
+      line-height: 0;
 
-      i {
-        font-size: 16px;                             // [수정5] 14 → 16
-        color: rgba(255, 255, 255, 0.3);
+      &__base,
+      &__fill {
+        display: flex;
+        gap: 2px;
 
-        &.ti-star-filled {
+        i {
+          font-size: 16px;                           // [수정5] 14 → 16
+          line-height: 1;
+          flex-shrink: 0;
+          display: block;
+        }
+      }
+
+      &__base {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        i {
+          color: rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      &__fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+
+        i {
           color: #FAAB07;
         }
       }
