@@ -3,7 +3,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { supabase } from "@/lib/supabase";
+import { dedupedJson } from "@/lib/fetch-dedupe";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
 
@@ -106,6 +108,26 @@ const Cluster41Content = () => {
   } as Record<string, React.ReactNode>)[demoUserName] || null : null;
 
   const router = useRouter();
+  const { data: session, status: sessionStatus } = useSession();
+
+  // 로그인 상태로 /cluster-4 진입 시 자기 userId 를 URL 에 부착
+  // (카카오 로그인 callbackUrl 이 /cluster-4 로 고정 — userId 는 로그인 시점에 알 수 없어 여기서 정규화)
+  useEffect(() => {
+    if (isDemoMode) return;
+    if (sessionStatus !== 'authenticated') return;
+    if (targetUserId) return;
+    if ((session?.user as any)?.isAdmin) return; // 어드민(마더 계정)은 user_profiles 에 없음
+    let cancelled = false;
+    dedupedJson<any>('/api/profile/')
+      .then((result) => {
+        if (cancelled) return;
+        const myId = result?.success && result?.data?.id;
+        if (myId) router.replace(`/cluster-4?userId=${myId}`);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [sessionStatus, session, targetUserId, isDemoMode, router]);
+
   const headerRef = useRef<HTMLElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);

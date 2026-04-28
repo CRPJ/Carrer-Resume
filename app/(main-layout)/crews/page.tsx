@@ -39,6 +39,14 @@ const clubOptions = ["엥크레", "오랑캐", "팔랑크스"];
 const statusOptions = ["활동 중", "활동 졸업", "활동 중단"];
 const ITEMS_PER_PAGE = 50;
 
+// 베타 테스터 화이트리스트 — 이 명단의 크루만 /crews 목록에 노출
+// 베타 종료 시 이 상수를 제거하고 fetchCrews의 betaOnly 필터를 함께 정리
+const BETA_TESTERS = new Set<string>([
+  "박건희", "김시영", "김예령", "김현진", "정우현",
+  "이용준", "김혜윤", "김나우", "김승민", "김수현",
+  "정재웅", "고수림", "최희원", "윤재윤", "빵떡이",
+]);
+
 const page = () => {
   const { mask } = useDataMasking();
   const [demoMode, setDemoMode] = useState(false);
@@ -100,9 +108,10 @@ const page = () => {
         const res = await fetch("/api/crews");
         const result = await res.json();
         if (result.success) {
-          setCrews(result.data);
-          const active = result.data.filter((c: Crew) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
-          active.sort((a: Crew, b: Crew) => b.approvedWeeks - a.approvedWeeks);
+          const betaOnly = (result.data as Crew[]).filter((c) => BETA_TESTERS.has(c.name));
+          setCrews(betaOnly);
+          const active = betaOnly.filter((c) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
+          active.sort((a, b) => b.approvedWeeks - a.approvedWeeks);
           setFilteredCrews(active);
         }
       } catch (err) {

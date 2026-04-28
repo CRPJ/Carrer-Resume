@@ -8558,11 +8558,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  {!workInfoViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={!canEditWorkInfo} style={!canEditWorkInfo ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다"}>
-                      수정
-                    </button>
-                  ) : (
+                  {!workInfoViewIsEditing ? (() => {
+                    const infoStatus = selectedWorkInfoCard?.status as string | undefined;
+                    const isInactiveStatus = infoStatus === "failed" || infoStatus === "not_applicable";
+                    const editDisabled = !canEditWorkInfo || isInactiveStatus;
+                    const editTitle = isInactiveStatus
+                      ? (infoStatus === "failed" ? "강화 실패 라인은 수정할 수 없습니다" : "해당 없음 라인은 수정할 수 없습니다")
+                      : (canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다");
+                    return (
+                      <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={editDisabled} style={editDisabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={editTitle}>
+                        수정
+                      </button>
+                    );
+                  })() : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkInfo}>
                         취소
@@ -9021,11 +9029,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  {!workExpViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={!canEditWorkExp || selectedWorkExpCard?.isEmpty} style={!canEditWorkExp || selectedWorkExpCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkExpCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다"}>
-                      수정
-                    </button>
-                  ) : (
+                  {!workExpViewIsEditing ? (() => {
+                    const expStatus = selectedWorkExpCard?.enhancementStatus as string | undefined;
+                    const isInactiveStatus = expStatus === "failed" || expStatus === "not_applicable";
+                    const editDisabled = !canEditWorkExp || selectedWorkExpCard?.isEmpty || isInactiveStatus;
+                    const editTitle = selectedWorkExpCard?.isEmpty
+                      ? "비어있는 카드입니다"
+                      : isInactiveStatus
+                        ? (expStatus === "failed" ? "강화 실패 라인은 수정할 수 없습니다" : "해당 없음 라인은 수정할 수 없습니다")
+                        : (canEditWorkExp ? "수정" : "관리자 승인이 필요합니다");
+                    return (
+                      <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={editDisabled} style={editDisabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={editTitle}>
+                        수정
+                      </button>
+                    );
+                  })() : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkExp}>
                         취소
@@ -9359,11 +9377,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  {!workAbilityViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty} style={!canEditWorkAbility || selectedWorkAbilityCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkAbilityCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다"}>
-                      수정
-                    </button>
-                  ) : (
+                  {!workAbilityViewIsEditing ? (() => {
+                    const abilityStatus = selectedWorkAbilityCard?.enhancementStatus as string | undefined;
+                    const isInactiveStatus = abilityStatus === "failed" || abilityStatus === "not_applicable";
+                    const editDisabled = !canEditWorkAbility || selectedWorkAbilityCard?.isEmpty || isInactiveStatus;
+                    const editTitle = selectedWorkAbilityCard?.isEmpty
+                      ? "비어있는 카드입니다"
+                      : isInactiveStatus
+                        ? (abilityStatus === "failed" ? "강화 실패 라인은 수정할 수 없습니다" : "해당 없음 라인은 수정할 수 없습니다")
+                        : (canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다");
+                    return (
+                      <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={editDisabled} style={editDisabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={editTitle}>
+                        수정
+                      </button>
+                    );
+                  })() : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkAbility}>취소</button>
                       <button className="modal-reset-btn" onClick={handleResetWorkAbility}>초기화</button>
@@ -9853,11 +9881,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   🔎
                 </div>
                 <div className="modal-footer-right">
-                  {!workCareerViewIsEditing ? (
-                    <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty} style={!canEditWorkCareer || selectedWorkCareerCard?.isEmpty ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={selectedWorkCareerCard?.isEmpty ? "비어있는 카드입니다" : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다"}>
-                      수정
-                    </button>
-                  ) : (
+                  {!workCareerViewIsEditing ? (() => {
+                    const isInactiveStatus = !!selectedWorkCareerCard?.isFailed || !!selectedWorkCareerCard?.isNotApplicable;
+                    const editDisabled = !canEditWorkCareer || selectedWorkCareerCard?.isEmpty || isInactiveStatus;
+                    const editTitle = selectedWorkCareerCard?.isEmpty
+                      ? "비어있는 카드입니다"
+                      : isInactiveStatus
+                        ? (selectedWorkCareerCard?.isFailed ? "강화 실패 라인은 수정할 수 없습니다" : "해당 없음 라인은 수정할 수 없습니다")
+                        : (canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다");
+                    return (
+                      <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={editDisabled} style={editDisabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={editTitle}>
+                        수정
+                      </button>
+                    );
+                  })() : (
                     <>
                       <button className="modal-cancel-btn" onClick={handleCancelWorkCareer}>
                         취소
