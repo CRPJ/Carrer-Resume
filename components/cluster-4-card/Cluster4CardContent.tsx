@@ -1894,7 +1894,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // workInfo View 모달 — 보기/편집 토글 핸들러 (Type B 푸터 규칙 + 관리자 승인)
   const handleEditWorkInfo = async () => {
     if (!canEditWorkInfo) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     const card = selectedWorkInfoCard;
@@ -2118,7 +2118,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     if (!canEditWorkAbility) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     const card = selectedWorkAbilityCard;
@@ -2342,7 +2342,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     if (!canEditWorkExp) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     const card = selectedWorkExpCard;
@@ -2559,7 +2559,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       return;
     }
     if (!canEditWorkCareer) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     const card = selectedWorkCareerCard;
@@ -2829,7 +2829,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // colleague-view-modal [수정] — 관리자 승인 검증 후 편집 모달 진입
   const handleColleagueEditClick = async () => {
     if (!isDemoMode) {
-      await popup.alert("관리자 승인이 필요합니다.");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊.");
       return;
     }
     setColleagueViewModalOpen(false);
@@ -3308,7 +3308,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 리뷰 — 푸터 핸들러
   const handleWeeklyReviewEditClick = async () => {
     if (!canEditReputation) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
@@ -3400,7 +3400,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleEditMode = async () => {
     // 승인 체크 — reputation-view-modal [수정] (L3031)과 동일 패턴
     if (!canEditReputation) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
 
@@ -3459,7 +3459,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // [수정] — 관리자 승인 검증 + 편집 모달 진입 + 기존 데이터 초기화
   const handleReputationEditClick = async () => {
     if (!canEditReputation) {
-      await popup.alert("관리자 승인이 필요합니다.");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊.");
       return;
     }
     if (!selectedReputationCard) return;
@@ -3496,7 +3496,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 관리자 승인 체크 (데모=통과, 일반=기존 canEditReputation)
     if (!canEditReputation) {
-      await popup.alert("관리자 승인이 필요합니다.");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊.");
       return;
     }
 
@@ -8091,7 +8091,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const locked = isLineLocked(selectedWorkInfoCard);
                       const disabled = !canEditWorkInfo || locked;
-                      const title = locked ? LINE_LOCKED_TITLE : canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다";
+                      const title = locked ? LINE_LOCKED_TITLE : canEditWorkInfo ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -8547,7 +8547,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkExpCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkExpCard);
                       const disabled = !canEditWorkExp || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkExp ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -8936,7 +8936,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkAbilityCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkAbilityCard);
                       const disabled = !canEditWorkAbility || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkAbility ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -9442,7 +9442,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkCareerCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkCareerCard);
                       const disabled = !canEditWorkCareer || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkCareer ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정

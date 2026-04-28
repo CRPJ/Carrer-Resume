@@ -645,7 +645,7 @@ const Cluster4Content = () => {
   // season-reputation form 핸들러
   const handleSeasonReputationEditClick = async () => {
     if (!canEditSeasonReputation) {
-      await popup.alert("관리자 승인이 필요합니다");
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     setSeasonReputationFormSnapshot({
@@ -3390,11 +3390,7 @@ const Cluster4Content = () => {
           <div className="section-modal section-modal-season-reputation-view">
             {/* === 헤더 === */}
             <div className="section-modal-header">
-              <button
-                type="button"
-                className="modal-delete-btn"
-                onClick={handleDeleteSeasonReputation}
-              >
+              <button type="button" className="modal-delete-btn" onClick={handleDeleteSeasonReputation}>
                 삭제
               </button>
               <button className="modal-close-btn" onClick={handleSeasonReputationViewClose} aria-label="닫기">
