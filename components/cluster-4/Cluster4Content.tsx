@@ -490,6 +490,7 @@ const Cluster4Content = () => {
     } | null;
   }
   const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
+  const SEASON_REPUTATION_SLOT_COUNT = 7;
 
   const getDemoSeasonReputations = (reputations: any[]) => {
     if (searchParams.get("admin") !== "true") return reputations;
@@ -500,6 +501,16 @@ const Cluster4Content = () => {
     const count = Math.max(0, Math.min(reputations.length, parseInt(raw, 10) || 0));
     return reputations.slice(0, count);
   };
+
+  const emptySeasonReputationSlotCount = Math.max(0, SEASON_REPUTATION_SLOT_COUNT - seasonReputations.length);
+
+  const displaySeasonReputations = [
+    ...seasonReputations,
+    ...Array.from({ length: emptySeasonReputationSlotCount }, (_, index) => ({
+      id: `season-reputation-empty-${index}`,
+      isEmpty: true,
+    })),
+  ];
 
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
@@ -3000,21 +3011,21 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", width: "100%", position: "relative" }}>
-                  <h4 className="section-title">
-                    <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판{" "}
-                    <span className="count-label">
-                      <span className="num-fixed">{seasonReputations.length}</span>개
-                    </span>
-                    <span className="fm-badge">
-                      <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" />
-                      <span className="fm-label">FM :</span>
-                      <span className="fm-value">{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
-                    </span>
-                  </h4>
+                <div className="season-reputation-header">
+                  <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" />
+                  <span className="section-label">
+                    <span className="season-reputation-title-text">시즌 평판</span>
+                  </span>
+                  <span className="section-count">
+                    <span className="count-num">{seasonReputations.length}</span>/7
+                  </span>
+                  <span className="fm-badge">
+                    <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" />
+                    <span className="fm-label">FM :</span>
+                    <span className="fm-value">{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
+                  </span>
                   <div
                     className="edit-icon"
-                    style={{ cursor: "pointer", flexShrink: 0 }}
                     onClick={async () => {
                       if (!isDemoMode && isOwner) {
                         await popup.alert("시즌 평판은 타 크루끼리 작성합니다.");
@@ -3023,18 +3034,21 @@ const Cluster4Content = () => {
                       handleEditClick(openSeasonReputationModal);
                     }}
                   >
-                    <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }} />
+                    <i className="ti ti-pencil"></i>
                   </div>
                 </div>
                 <div style={{ position: "relative" }}>
-                  <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
-                    {seasonReputations.length === 0 ? (
-                      <div className="profile-card season-reputation-waiting">
-                        <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
-                        <p className="waiting-message">시즌 평판 대기 중... 😊</p>
-                      </div>
-                    ) : (
-                      seasonReputations.map((reputation: any) => {
+                  <div ref={profileCardsRef} className="profile-cards season-reputation-list" onScroll={updateScrollbar9}>
+                    {displaySeasonReputations.map((reputation: any) => {
+                      if (reputation.isEmpty) {
+                        return (
+                          <div className="profile-card season-reputation-waiting" key={reputation.id}>
+                            <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
+                            <p className="waiting-message">시즌 평판 대기 중... 😊</p>
+                          </div>
+                        );
+                      }
+
                         const reviewer = reputation.reviewer;
                         const currentYear = new Date().getFullYear();
                         const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
@@ -3178,8 +3192,7 @@ const Cluster4Content = () => {
                             </div>
                           </div>
                         );
-                      })
-                    )}
+                      })}
                   </div>
                   {/* 커스텀 스크롤바 (area-9) */}
                   <div style={{ position: "absolute", right: 0, top: 0, width: "2px", height: "100%", background: "rgba(255,227,170,0.15)", borderRadius: "2px" }}>
