@@ -1195,6 +1195,40 @@ const Cluster41Content = () => {
     }
   };
 
+  useEffect(() => {
+    if (!seasonDropdownOpen) return;
+
+    const handleViewportChange = () => {
+      updateSeasonPos();
+    };
+
+    handleViewportChange();
+    window.addEventListener("scroll", handleViewportChange, { passive: true });
+    window.addEventListener("resize", handleViewportChange);
+
+    return () => {
+      window.removeEventListener("scroll", handleViewportChange);
+      window.removeEventListener("resize", handleViewportChange);
+    };
+  }, [seasonDropdownOpen]);
+
+  useEffect(() => {
+    if (!resultDropdownOpen) return;
+
+    const handleViewportChange = () => {
+      updateResultPos();
+    };
+
+    handleViewportChange();
+    window.addEventListener("scroll", handleViewportChange, { passive: true });
+    window.addEventListener("resize", handleViewportChange);
+
+    return () => {
+      window.removeEventListener("scroll", handleViewportChange);
+      window.removeEventListener("resize", handleViewportChange);
+    };
+  }, [resultDropdownOpen]);
+
   // 드롭다운 옵션 - dbWeeklyData에서 유니크한 시즌 추출
   const seasonOptions = React.useMemo(() => {
     // 시즌 순서 매핑 (정렬용 - 겨울 시작)
