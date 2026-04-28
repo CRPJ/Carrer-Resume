@@ -804,10 +804,6 @@ const Sidebar = () => {
           const ownerCheck = !targetUserId || targetUserId === currentUserId || fetchedProfileId === currentUserId;
           console.log("[isOwner] 결과:", ownerCheck, "| !targetUserId:", !targetUserId, "| url일치:", targetUserId === currentUserId, "| profile일치:", fetchedProfileId === currentUserId);
           setIsOwner(ownerCheck);
-        } else {
-          // 비로그인 상태에서 다른 유저 프로필 조회 — 소유자 아님 (편집 UI 비활성)
-          console.log("[isOwner] 비로그인 — 비소유자 처리");
-          setIsOwner(false);
         }
         const addressParts = (profile.address || "").split(" ");
 
@@ -3815,22 +3811,28 @@ const Sidebar = () => {
                 {/* 우측: 버튼 그룹 */}
                 <div className="modal-footer-right">
                   {!isPhoneEditing ? (
-                    <button
-                      type="button"
-                      className="modal-edit-btn"
-                      disabled={!isOwner && !demoMode}
-                      onClick={() => {
-                        if (!isOwner && !demoMode) return;
-                        phoneCommentSnapshot.current = formData.phoneComment;
-                        setIsPhoneEditing(true);
-                      }}
-                      style={{
-                        cursor: isOwner || demoMode ? "pointer" : "not-allowed",
-                        opacity: isOwner || demoMode ? 1 : 0.4,
-                      }}
-                    >
-                      수정
-                    </button>
+                    (() => {
+                      // 본인(또는 어드민) 만 수정 가능 — 비로그인/타크루는 비활성
+                      const canEditPhone = demoMode || (isOwner && !!session);
+                      return (
+                        <button
+                          type="button"
+                          className="modal-edit-btn"
+                          disabled={!canEditPhone}
+                          onClick={() => {
+                            if (!canEditPhone) return;
+                            phoneCommentSnapshot.current = formData.phoneComment;
+                            setIsPhoneEditing(true);
+                          }}
+                          style={{
+                            cursor: canEditPhone ? "pointer" : "not-allowed",
+                            opacity: canEditPhone ? 1 : 0.4,
+                          }}
+                        >
+                          수정
+                        </button>
+                      );
+                    })()
                   ) : (
                     <>
                       <button
