@@ -3013,9 +3013,7 @@ const Cluster4Content = () => {
               <div className="area-9-season-reputation">
                 <div className="season-reputation-header">
                   <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" />
-                  <span className="section-label">
-                    <span className="season-reputation-title-text">시즌 평판</span>
-                  </span>
+                  <span className="section-label">시즌 평판</span>
                   <span className="section-count">
                     <span className="count-num">{seasonReputations.length}</span>/7
                   </span>

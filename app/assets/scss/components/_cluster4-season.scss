@@ -3707,12 +3707,13 @@
 
               .section-label {
                 font-family: "Chakra Petch", sans-serif;
-                font-size: 24px;
+                font-size: 1rem;
                 color: #fff;
                 font-weight: 700;
                 letter-spacing: 0.7px;
                 line-height: 1;
                 flex-shrink: 0;
+                transform: translateX(-0.1cm);
               }
 
               .section-count {
@@ -3728,7 +3729,7 @@
                   min-width: 2ch;
                   text-align: right;
                   font-family: "Chakra Petch", sans-serif;
-                  font-size: 17px;
+                  font-size: 14px;
                   font-weight: 700;
                   color: #faab07;
                 }
@@ -3788,6 +3789,7 @@
               cursor: pointer;
               flex-shrink: 0;
               margin-left: 20px;
+              transform: translateY(-4px); // ← 위로 올림
 
               &:hover {
                 transform: scale(1.1);
