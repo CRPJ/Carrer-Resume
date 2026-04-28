@@ -1833,7 +1833,7 @@ const Cluster3Content = () => {
             <div className="card-body">
               <div className="info-row">
                 <span className="info-label">
-                  <span className="dot">·</span> 성장(성공) 주차
+                  <span className="dot">·</span> 성장 <span className="hl success">성공</span> 주차
                 </span>
                 <span className="info-value week">
                   {growthPeriodStats?.approvedWeeks ?? 0}
@@ -1843,7 +1843,7 @@ const Cluster3Content = () => {
               </div>
               <div className="info-row">
                 <span className="info-label">
-                  <span className="dot">·</span> 성장(실패) 주차
+                  <span className="dot">·</span> 성장 <span className="hl fail">실패</span> 주차
                 </span>
                 <span className="info-value week">
                   {growthPeriodStats?.unapprovedWeeks ?? 0}
@@ -1852,7 +1852,7 @@ const Cluster3Content = () => {
               </div>
               <div className="info-row">
                 <span className="info-label">
-                  <span className="dot">·</span> 휴식(개인) 주차
+                  <span className="dot">·</span> <span className="hl personal">개인</span> 휴식 주차
                 </span>
                 <span className="info-value week">
                   {growthPeriodStats?.restWeeks ?? 0}
@@ -1862,7 +1862,7 @@ const Cluster3Content = () => {
               </div>
               <div className="info-row club-break-row">
                 <span className="info-label">
-                  <span className="dot">·</span> 휴식(공식) 주차
+                  <span className="dot">·</span> <span className="hl official">공식</span> 휴식 주차
                 </span>
                 <span className="info-value week">
                   {growthPeriodStats?.clubBreakWeeks ?? 0}
@@ -1881,7 +1881,7 @@ const Cluster3Content = () => {
               </div>
               <div className="info-row separator">
                 <span className="info-label">
-                  <span className="dot">·</span> 성장 휴식 시즌
+                  <span className="dot">·</span> <span className="hl personal">개인</span> 휴식 시즌
                 </span>
                 <span className="info-value season">
                   {growthPeriodStats?.restSeasons ?? 0}
@@ -1890,7 +1890,7 @@ const Cluster3Content = () => {
               </div>
               <div className="info-row">
                 <span className="info-label">
-                  <span className="dot">·</span> 성장(성공) 시즌
+                  <span className="dot">·</span> 성장 <span className="hl success">성공</span> 시즌
                 </span>
                 <span className="info-value season">
                   {growthPeriodStats?.approvedSeasons ?? 0}
