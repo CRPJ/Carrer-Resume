@@ -72,6 +72,31 @@ const truncate = (text: string | null | undefined, maxLen: number = 5): string =
   return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
 };
 
+// 성장 상태 표시 헬퍼 — '성장 (xxx)' / '휴식 (xxx)' 통일
+// TODO: [백엔드 작업 필요] '진행 중' / '집계 중' 상태 결정 로직 추가
+const getStatusDisplay = (status: string): string => {
+  if (status === "휴식(개인)") return "휴식 (개인)";
+  if (status === "휴식(공식)") return "휴식 (공식)";
+  return `성장 (${status})`;
+};
+const getStatusClass = (status: string): string => {
+  switch (status) {
+    case "실패": return "fail";
+    case "휴식(개인)": return "rest-personal";
+    case "휴식(공식)": return "rest-official";
+    case "진행 중": return "in-progress";
+    case "집계 중": return "counting";
+    default: return "";
+  }
+};
+const getStatusIcon = (status: string): string => {
+  if (status === "진행 중") return "/images/0/cluster4/icon/icon%20-%20성장%20(진행%20중).png";
+  if (status === "집계 중") return "/images/0/cluster4/icon/icon%20-%20성장%20(집계%20중).png";
+  if (status.includes("휴식")) return `/images/0/cluster4/icon/icon%20-%20${status.replace("(", "%28").replace(")", "%29")}.png`;
+  return `/images/0/cluster4/icon/icon%20-%20성장%28${status}%29.png`;
+};
+const isStatusPlusOne = (status: string): boolean => status === "진행 중" || status === "집계 중";
+
 const Cluster4RankingContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
@@ -1266,8 +1291,8 @@ const Cluster4RankingContent = () => {
                     </div>
                   )}
                   <div className="image-badges">
-                    <div className={`badge-tag ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                      {user.growthStatus.includes('휴식') ? user.growthStatus : `성장(${user.growthStatus})`}
+                    <div className={`badge-tag ${getStatusClass(user.growthStatus)}`}>
+                      {getStatusDisplay(user.growthStatus)}
                     </div>
                   </div>
                 </div>
@@ -1285,7 +1310,9 @@ const Cluster4RankingContent = () => {
                         </span>
                         <span className="weekly-card-week">
                           <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                          <span className="week-number">{user.cumulativeApprovedWeeks}</span> / 30 주차
+                          <span className="week-number">
+                            {isStatusPlusOne(user.growthStatus) ? "+1" : user.cumulativeApprovedWeeks}
+                          </span> / 30 주차
                         </span>
                       </>
                     )}
@@ -1367,9 +1394,9 @@ const Cluster4RankingContent = () => {
                 </div>
 
                 {/* 우측 성장 상태 */}
-                <div className={`weekly-card-status-badge ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                  <span className="status-text">{user.growthStatus.includes('휴식') ? user.growthStatus : `성장 (${user.growthStatus})`}</span>
-                  <img src={`/images/0/cluster4/icon/icon%20-%20${user.growthStatus.includes('휴식') ? user.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${user.growthStatus}%29`}.png`} alt={user.growthStatus} className="trophy-icon" />
+                <div className={`weekly-card-status-badge ${getStatusClass(user.growthStatus)}`}>
+                  <span className="status-text">{getStatusDisplay(user.growthStatus)}</span>
+                  <img src={getStatusIcon(user.growthStatus)} alt={getStatusDisplay(user.growthStatus)} className="trophy-icon" />
                 </div>
 
                 {/* 더보기 버튼 */}

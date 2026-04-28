@@ -2,7 +2,8 @@
 // TODO: 더미 데이터 — 기획자 확인용, 실서버 노출 안 됨
 
 // DBWeekData 인터페이스에 맞춤 — 20개 주차 (다양한 시즌/상태/숫자)
-// 성장 상태 분포: 성공7 / 실패5 / 휴식(공식)5 / 휴식(개인)3
+// 성장 상태 분포: 성공6 / 실패4 / 휴식(공식)5 / 휴식(개인)3 / 진행 중1 / 집계 중1
+// TODO: [백엔드 작업 필요] '진행 중' / '집계 중' 상태 결정 로직 추가 — 현재는 더미 맨 위 2장에만 표시
 export const DUMMY_WEEKLY_LIST: {
   id: string;
   weekNumber: number;
@@ -19,8 +20,8 @@ export const DUMMY_WEEKLY_LIST: {
   growthStatus: string;
 }[] = [
   // 2026 봄 시즌
-  { id: "dw-01", weekNumber: 3, seasonYear: 2026, seasonName: "봄", startDate: "2026-03-16", endDate: "2026-03-22", isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: "성공" },
-  { id: "dw-02", weekNumber: 2, seasonYear: 2026, seasonName: "봄", startDate: "2026-03-09", endDate: "2026-03-15", isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: "실패" },
+  { id: "dw-01", weekNumber: 3, seasonYear: 2026, seasonName: "봄", startDate: "2026-03-16", endDate: "2026-03-22", isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: "진행 중" },
+  { id: "dw-02", weekNumber: 2, seasonYear: 2026, seasonName: "봄", startDate: "2026-03-09", endDate: "2026-03-15", isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: "집계 중" },
   { id: "dw-03", weekNumber: 1, seasonYear: 2026, seasonName: "봄", startDate: "2026-03-02", endDate: "2026-03-08", isClubBreak: false, isBreakSeason: false, fromSeason: null, toSeason: null, holidayName: null, termNumber: null, growthStatus: "성공" },
   // 전환 주차
   { id: "dw-04", weekNumber: 0, seasonYear: 2026, seasonName: "봄", startDate: "2026-02-23", endDate: "2026-03-01", isClubBreak: false, isBreakSeason: false, fromSeason: "겨울", toSeason: "봄", holidayName: null, termNumber: null, growthStatus: "성공" },

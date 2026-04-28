@@ -3773,37 +3773,50 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 기간 문자열 생성
   const weekDateRange = weekData ? `${formatDateWithDay(weekData.startDate)} ~ ${formatDateWithDay(weekData.endDate)}` : "날짜 로딩 중...";
 
-  // 성장 상태에 따른 뱃지 정보
+  // 성장 상태에 따른 뱃지 정보 — '성장 (xxx)' / '휴식 (xxx)' 통일
+  // TODO: [백엔드 작업 필요] '진행 중' / '집계 중' 상태 결정 로직 추가 — 현재는 더미 맨 위 2장에서 진입 시 표시
   const getStatusBadgeInfo = (status: string | undefined) => {
     switch (status) {
       case "성공":
         return {
           className: "success",
-          text: "성장(성공)",
+          text: "성장 (성공)",
           icon: "/images/0/cluster4/icon/icon - 성장(성공).png",
         };
       case "실패":
         return {
           className: "fail",
-          text: "성장(실패)",
+          text: "성장 (실패)",
           icon: "/images/0/cluster4/icon/icon - 성장(실패).png",
         };
       case "휴식(개인)":
         return {
           className: "rest-personal",
-          text: "휴식(개인)",
+          text: "휴식 (개인)",
           icon: "/images/0/cluster4/icon/icon - 휴식(개인).png",
         };
       case "휴식(공식)":
         return {
           className: "rest-official",
-          text: "휴식(공식)",
+          text: "휴식 (공식)",
           icon: "/images/0/cluster4/icon/icon - 휴식(공식).png",
+        };
+      case "진행 중":
+        return {
+          className: "progress",
+          text: "성장 (진행 중)",
+          icon: "/images/0/cluster4/icon/icon - 성장 (진행 중).png",
+        };
+      case "집계 중":
+        return {
+          className: "counting",
+          text: "성장 (집계 중)",
+          icon: "/images/0/cluster4/icon/icon - 성장 (집계 중).png",
         };
       default:
         return {
           className: "success",
-          text: "성장(성공)",
+          text: "성장 (성공)",
           icon: "/images/0/cluster4/icon/icon - 성장(성공).png",
         };
     }
@@ -3832,7 +3845,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       rating: 0.5,
       ratingCount: "1 / 10",
       description: "짧은코멘트",
-      fm: 1,
+      fm: 85,
       tagColor: "tag--pink",
       tagText: "#힘",
       isEmpty: false,
@@ -3852,7 +3865,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       rating: 3,
       ratingCount: "6 / 10",
       description: "중간길이의코멘트입니다이번주",
-      fm: 42,
+      fm: 92,
       tagColor: "tag--red",
       tagText: "#추진력있는",
       isEmpty: false,
@@ -3872,7 +3885,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       rating: 5,
       ratingCount: "10 / 10",
       description: "가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차일이",
-      fm: 999,
+      fm: 78,
       tagColor: "tag--yellow",
       tagText: "#끈기와인내의결과물",
       isEmpty: false,
@@ -3892,7 +3905,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       rating: 4,
       ratingCount: "8 / 10",
       description: "네번째 슬롯 테스트용 평판 코멘트입니다.",
-      fm: 30,
+      fm: 65,
       tagColor: "tag--purple",
       tagText: "#꼼꼼함",
       isEmpty: false,
@@ -5250,22 +5263,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="section-count" style={{ fontSize: "17px" }}>
                 <span className="count-num">{weeklyReputations.length}</span>/4
               </span>
-              <span
-                className="fm-badge"
-                style={{
-                  fontSize: "17px",
-                  marginLeft: "48px",
-                  fontWeight: 600,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  color: "#fff",
-                  fontFamily: "'Rajdhani', sans-serif",
-                  letterSpacing: "0.7px",
-                }}
-              >
-                <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
-                FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{reputationData.filter((c: any) => c && !c.isEmpty).reduce((sum: number, c: any) => sum + (c.fm || 0), 0)}</span>
+              <span className="fm-badge">
+                <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" />
+                <span className="fm-label">FM :</span>
+                <span className="fm-value">{reputationData.filter((c: any) => c && !c.isEmpty).reduce((sum: number, c: any) => sum + (c.fm || 0), 0)}</span>
               </span>
             </div>
             {(() => {

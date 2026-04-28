@@ -3008,22 +3008,10 @@ const Cluster4Content = () => {
                     </span>
                     <span
                       className="fm-badge"
-                      style={{
-                        fontSize: "14px",
-                        marginLeft: "44px",
-                        fontWeight: 600,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        color: "#fff",
-                        fontFamily: "'Rajdhani', sans-serif",
-                        letterSpacing: "0.7px",
-                        whiteSpace: "nowrap",
-                        flexShrink: 0,
-                      }}
                     >
-                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
-                      FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
+                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" />
+                      <span className="fm-label">FM :</span>
+                      <span className="fm-value">{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
                     </span>
                   </h4>
                   <div

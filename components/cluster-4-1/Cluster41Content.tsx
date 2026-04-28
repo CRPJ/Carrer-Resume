@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
@@ -1980,10 +1980,10 @@ const Cluster41Content = () => {
                       className="weekly-card-main"
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
+                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
                         <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                         <div className="image-badges">
-                          <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
+                          <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
                         </div>
                       </div>
 
@@ -2080,7 +2080,7 @@ const Cluster41Content = () => {
               return (
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
-                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
+                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
                     <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
@@ -2095,7 +2095,7 @@ const Cluster41Content = () => {
                       </div>
                     )}
                     <div className="image-badges">
-                      <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
+                      <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
                       <div className="badge-like">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -2115,7 +2115,7 @@ const Cluster41Content = () => {
                       </span>
                       <span className="weekly-card-week">
                         <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                        <span className="week-number num-2">{getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
+                        <span className="week-number num-2">{(week.growthStatus === '진행 중' || week.growthStatus === '집계 중') ? '+1' : getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
                       </span>
                     </div>
 
@@ -2214,7 +2214,11 @@ const Cluster41Content = () => {
                             </div>
                             <div className="weekly-card-extra-stats">
                               <span className="stat"><span className="dot">·</span> <span className="label">주차 평판</span> <span className="num num-1">{isRest ? '-' : (weeklyReputationCounts[week.id] || 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
-                              <span className="stat"><span className="dot">·</span> <span className="label">명성도(FM)</span> <span className="num num-4">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span></span>
+                              <span className="stat fm-badge">
+                                <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" />
+                                <span className="fm-label">FM :</span>
+                                <span className="fm-value">{isRest ? '-' : (weeklyFmScores[week.id] ?? weeklyReputationCounts[week.id] ?? 0)}</span>
+                              </span>
                               <span className="stat"><span className="dot">·</span> <span className="label">연계 동료</span> <span className="num num-1">{isRest ? '-' : (weeklyColleagueCounts[week.id] ?? 0)}</span><span className="white">/<span className="num-1">3</span></span></span>
                               <span className="stat empty"></span>
                             </div>
@@ -2225,9 +2229,9 @@ const Cluster41Content = () => {
                   </div>
 
                   {/* 우측 성장 상태 */}
-                  <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
+                  <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>
                     <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus : `성장 (${week.growthStatus})`}</span>
-                    <img src={`/images/0/cluster4/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
+                    <img src={week.growthStatus === '진행 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28진행%20중%29.png' : week.growthStatus === '집계 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28집계%20중%29.png' : `/images/0/cluster4/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
                   </div>
 
                   {/* 더보기 버튼 */}

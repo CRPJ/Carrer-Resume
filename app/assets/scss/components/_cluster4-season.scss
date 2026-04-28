@@ -3489,11 +3489,11 @@
                 margin-top: -4px;
               }
 
-              .count-label {
-                font-family: "Pretendard", sans-serif;
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.5);
-                font-weight: 400;
+            .count-label {
+              font-family: "Pretendard", sans-serif;
+              font-size: 12px;
+              color: rgba(255, 255, 255, 0.5);
+              font-weight: 400;
                 margin-left: 8px;
 
                 .num-fixed {
@@ -3502,6 +3502,83 @@
                   text-align: right;
                   font-size: 16px;
                 }
+              }
+
+              .fm-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-left: 44px;
+                white-space: nowrap;
+                flex-shrink: 0;
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                letter-spacing: normal !important;
+
+                .wifi-icon {
+                  width: 21px !important;
+                  height: 21px !important;
+                  object-fit: contain !important;
+                  flex-shrink: 0;
+                }
+
+                .fm-label {
+                  font: inherit !important;
+                  color: inherit !important;
+                }
+
+                .fm-value {
+                  font: inherit !important;
+                  color: inherit !important;
+                  display: inline-block;
+                  min-width: 3ch;
+                  text-align: right;
+                }
+              }
+
+              h4.section-title .fm-badge {
+                display: inline-flex !important;
+                align-items: center !important;
+                vertical-align: middle !important;
+                gap: 6px !important;
+                margin-left: 44px !important;
+                flex-shrink: 0 !important;
+                line-height: 1 !important;
+              }
+
+              h4.section-title .fm-badge .wifi-icon {
+                width: 21px !important;
+                height: 21px !important;
+                object-fit: contain !important;
+                display: block !important;
+                vertical-align: middle !important;
+                margin: 0 !important;
+                transform: none !important;
+                position: static !important;
+              }
+
+              h4.section-title .fm-badge .fm-label {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                display: inline-flex;
+                align-items: center;
+                line-height: 1;
+              }
+
+              h4.section-title .fm-badge .fm-value {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                display: inline-flex;
+                align-items: center;
+                line-height: 1;
+                min-width: 3ch;
+                text-align: right;
               }
             }
 
@@ -4386,6 +4463,14 @@
           &.rest-official {
             color: #ffea48;
           }
+
+          &.in-progress {
+            color: #9b59b6;
+          }
+
+          &.counting {
+            color: #ff1493;
+          }
         }
 
         .badge-like {
@@ -4812,6 +4897,37 @@
           visibility: hidden;
         }
       }
+
+      .weekly-card-extra-stats .stat.fm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-left: 44px;
+        font-size: inherit !important;
+        font-family: inherit !important;
+        font-weight: inherit !important;
+        color: inherit !important;
+        letter-spacing: 0 !important;
+
+        .wifi-icon {
+          width: 21px !important;
+          height: 21px !important;
+          object-fit: contain;
+          flex-shrink: 0;
+        }
+
+        .fm-label {
+          font: inherit !important;
+        }
+
+        .fm-value {
+          font: inherit !important;
+          min-width: 3ch !important;
+          text-align: right;
+        }
+      }
     }
 
     // 우측 성장 상태 배지
@@ -4831,22 +4947,26 @@
         color: #9dfa07;
         text-transform: capitalize;
         line-height: 19px;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 1);
       }
 
       &.fail .status-text {
         color: #ff6b6b;
-        text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
       }
 
       &.rest-personal .status-text {
         color: #65e3ff;
-        text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
       }
 
       &.rest-official .status-text {
         color: #ffea48;
-        text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
+      }
+
+      &.in-progress .status-text {
+        color: #9b59b6;
+      }
+
+      &.counting .status-text {
+        color: #ff1493;
       }
 
       .trophy-icon {
