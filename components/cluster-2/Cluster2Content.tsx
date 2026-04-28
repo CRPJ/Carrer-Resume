@@ -136,11 +136,30 @@ const Cluster2Content = () => {
   const [starredPhoto, setStarredPhoto] = useState<number | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
   const [photoSaving, setPhotoSaving] = useState(false);
-  const isSection1Dirty = () => JSON.stringify(photos) !== JSON.stringify(photosSnapshot);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   const [photosSnapshot, setPhotosSnapshot] = useState<(string | null)[]>([null, null, null, null, null, null]);
   const [footerNotice, setFooterNotice] = useState<"default" | "error">("default");
   const photoFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const normalizeDirtyValue = (value: unknown): unknown => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value.trim();
+    if (Array.isArray(value)) return value.map((item) => normalizeDirtyValue(item));
+    if (typeof value === "object") {
+      return Object.keys(value as Record<string, unknown>)
+        .sort()
+        .reduce((acc, key) => {
+          (acc as Record<string, unknown>)[key] = normalizeDirtyValue((value as Record<string, unknown>)[key]);
+          return acc;
+        }, {} as Record<string, unknown>);
+    }
+    return value;
+  };
+
+  const isDirtyBySnapshot = (current: unknown, snapshot: unknown) =>
+    JSON.stringify(normalizeDirtyValue(current)) !== JSON.stringify(normalizeDirtyValue(snapshot));
+
+  const isSection1Dirty = () => isDirtyBySnapshot(photos, photosSnapshot);
 
   // 사진 슬롯 활성화 판단
   const isSlotEnabled = (index: number): boolean => {
@@ -479,7 +498,7 @@ const Cluster2Content = () => {
   const [dropdown3Open, setDropdown3Open] = useState(false);
   const [sloganSaving, setSloganSaving] = useState(false);
   const [sloganSnapshot, setSloganSnapshot] = useState(sloganData);
-  const isSection2Dirty = () => JSON.stringify(editingSloganData) !== JSON.stringify(sloganSnapshot);
+  const isSection2Dirty = () => isDirtyBySnapshot(editingSloganData, sloganSnapshot);
   const [section2FooterNotice, setSection2FooterNotice] = useState<"default" | "error">("default");
   const [sloganAuthorName, setSloganAuthorName] = useState("");
 
@@ -644,7 +663,7 @@ const Cluster2Content = () => {
   const [editingVideoData, setEditingVideoData] = useState(videoData);
   const [videoSaving, setVideoSaving] = useState(false);
   const [videoSnapshot, setVideoSnapshot] = useState(videoData);
-  const isSection21Dirty = () => JSON.stringify(editingVideoData) !== JSON.stringify(videoSnapshot);
+  const isSection21Dirty = () => isDirtyBySnapshot(editingVideoData, videoSnapshot);
   const [videoPage, setVideoPage] = useState(0);
   const VIDEOS_PER_PAGE = 3;
 
@@ -954,7 +973,7 @@ const Cluster2Content = () => {
   // 섹션 4 모달 (바로가기 링크 편집)
   const [section4ModalOpen, setSection4ModalOpen] = useState(false);
   const [reviewSnapshot, setReviewSnapshot] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""]);
-  const isSection4Dirty = () => JSON.stringify(editingReviewLinks) !== JSON.stringify(reviewSnapshot);
+  const isSection4Dirty = () => isDirtyBySnapshot(editingReviewLinks, reviewSnapshot);
 
   // 수정_허가 데이터 (데모용 하드코딩, 추후 DB 연동)
   const reviewPermissions = [
@@ -1031,6 +1050,7 @@ const Cluster2Content = () => {
   const [initialSloganData, setInitialSloganData] = useState(sloganData);
   const [initialVideoData, setInitialVideoData] = useState(videoData);
   const [initialEduDataSnapshot, setInitialEduDataSnapshot] = useState<EduData[]>(initialEducationData);
+  const isSection3Dirty = () => isDirtyBySnapshot(editingEduData, initialEduDataSnapshot);
   const [initialReviewLinksData, setInitialReviewLinksData] = useState<string[]>(["", "", "", "", "", "", "", "", "", ""]);
   const [initialIntroContent, setInitialIntroContent] = useState("");
 
@@ -2376,11 +2396,7 @@ const Cluster2Content = () => {
           <div className="edu-modal description-only" onClick={(e) => e.stopPropagation()}>
             <button
               className="modal-close"
-              onClick={async () => {
-                await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                  closeModal();
-                });
-              }}
+              onClick={closeModal}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -2411,11 +2427,15 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setPhotos([...photosSnapshot]);
-                    setFooterNotice("default");
-                    setSection1ModalOpen(false);
-                  });
+                  if (isSection1Dirty()) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setPhotos([...photosSnapshot]);
+                      setFooterNotice("default");
+                      setSection1ModalOpen(false);
+                    });
+                    return;
+                  }
+                  setSection1ModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -2584,11 +2604,15 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setEditingSloganData({ ...sloganSnapshot });
-                    setSection2FooterNotice("default");
-                    setSection2ModalOpen(false);
-                  });
+                  if (isSection2Dirty()) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setEditingSloganData({ ...sloganSnapshot });
+                      setSection2FooterNotice("default");
+                      setSection2ModalOpen(false);
+                    });
+                    return;
+                  }
+                  setSection2ModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -3013,10 +3037,14 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setEditingVideoData([...videoSnapshot]);
-                    setSection21ModalOpen(false);
-                  });
+                  if (isSection21Dirty()) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setEditingVideoData([...videoSnapshot]);
+                      setSection21ModalOpen(false);
+                    });
+                    return;
+                  }
+                  setSection21ModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -3142,12 +3170,18 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setEditingIntroData({ content: initialIntroContent });
-                    setIntroDirty(false);
-                    setIsEditingIntro(false);
-                    setIntroModalOpen(false);
-                  });
+                  const hasIntroChanges = isEditingIntro && editingIntroData.content.trim() !== initialIntroContent.trim();
+                  if (hasIntroChanges) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setEditingIntroData({ content: initialIntroContent });
+                      setIntroDirty(false);
+                      setIsEditingIntro(false);
+                      setIntroModalOpen(false);
+                    });
+                    return;
+                  }
+                  setIsEditingIntro(false);
+                  setIntroModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -3279,10 +3313,14 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setEditingReviewLinks([...reviewSnapshot]);
-                    setSection4ModalOpen(false);
-                  });
+                  if (isSection4Dirty()) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setEditingReviewLinks([...reviewSnapshot]);
+                      setSection4ModalOpen(false);
+                    });
+                    return;
+                  }
+                  setSection4ModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -3394,12 +3432,16 @@ const Cluster2Content = () => {
               <button
                 className="modal-close-btn"
                 onClick={async () => {
-                  await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setEditingEduData([...initialEduDataSnapshot]);
-                    setHasEduChanges(false);
-                    setEduValidationErrors({});
-                    setSection3ModalOpen(false);
-                  });
+                  if (isSection3Dirty()) {
+                    await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setEditingEduData([...initialEduDataSnapshot]);
+                      setHasEduChanges(false);
+                      setEduValidationErrors({});
+                      setSection3ModalOpen(false);
+                    });
+                    return;
+                  }
+                  setSection3ModalOpen(false);
                 }}
               >
                 <i className="ti ti-x"></i>
@@ -4215,7 +4257,7 @@ const Cluster2Content = () => {
                   <button
                     className="modal-cancel-btn"
                     onClick={async () => {
-                      if (JSON.stringify(editingEduData) !== JSON.stringify(initialEduDataSnapshot)) {
+                      if (isSection3Dirty()) {
                         await showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
                           setEditingEduData([...initialEduDataSnapshot]);
                           setHasEduChanges(false);

@@ -571,6 +571,8 @@ const Sidebar = () => {
   const [isArrowShaking, setIsArrowShaking] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState<"email" | "school" | "major" | "hexagon1" | "hexagon2" | "hexagon3" | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const normalizeDirtyValue = (value: unknown) => (value ?? "").toString().trim();
+  const isPhoneCommentDirty = () => normalizeDirtyValue(formData.phoneComment) !== normalizeDirtyValue(phoneCommentSnapshot.current);
 
   // Sidebar 모달 배경 스크롤 차단
   const isSidebarModalOpen = isEditModalOpen || isPhoneCommentModalOpen || isPhoneHelpModalOpen;
@@ -1131,6 +1133,7 @@ const Sidebar = () => {
   // 프로필 수정 버튼 클릭 핸들러
   const handleEditButtonClick = async () => {
     if (demoMode) {
+      profileFormSnapshotRef.current = formData;
       setIsEditModalOpen(true);
       return;
     }
@@ -1149,6 +1152,7 @@ const Sidebar = () => {
 
     // 승인된 경우 프로필 로드 후 모달 열기
     await loadProfile();
+    profileFormSnapshotRef.current = formData;
     setIsEditModalOpen(true);
   };
 
@@ -1860,18 +1864,24 @@ const Sidebar = () => {
                           <span
                             onClick={async () => {
                               // 모달 열기 전에 기존 값 로드
+                              let nextPhoneComment = formData.phoneComment;
                               try {
                                 const response = await fetch("/api/profile/");
                                 const result = await response.json();
                                 if (result.success && result.data) {
+                                  nextPhoneComment = result.data.contact_available || DEFAULT_PHONE_COMMENT;
                                   setFormData((prev) => ({
                                     ...prev,
-                                    phoneComment: result.data.contact_available || DEFAULT_PHONE_COMMENT,
+                                    phoneComment: nextPhoneComment,
                                   }));
+                                  phoneCommentSnapshot.current = nextPhoneComment;
+                                } else {
+                                  phoneCommentSnapshot.current = formData.phoneComment;
                                 }
                               } catch (error) {
                                 console.error("연락처 코멘트 로드 오류:", error);
                               }
+                              phoneCommentSnapshot.current = nextPhoneComment;
                               setIsPhoneCommentModalOpen(true);
                               setIsPhoneEditing(false);
                             }}
@@ -2268,9 +2278,13 @@ const Sidebar = () => {
             <button
               className="modal-close-btn"
               onClick={() => {
-                void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                  setIsEditModalOpen(false);
-                });
+                if (isProfileEditDirty()) {
+                  void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                    setIsEditModalOpen(false);
+                  });
+                  return;
+                }
+                setIsEditModalOpen(false);
               }}
               style={{
                 position: "absolute",
@@ -2350,9 +2364,13 @@ const Sidebar = () => {
                   type="button"
                   className="modal-close-btn"
                   onClick={() => {
-                    void showConfirm("변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?", () => {
-                      setIsEditModalOpen(false);
-                    });
+                    if (isProfileEditDirty()) {
+                      void showConfirm("변경사항이 저장되지 않았습니다.\n\n하단에 [작성 완료]를 눌러야 저장이 완료됩니다.\n지금 나가시겠습니까?", () => {
+                        setIsEditModalOpen(false);
+                      });
+                      return;
+                    }
+                    setIsEditModalOpen(false);
                   }}
                   style={{
                     position: "absolute",
@@ -3587,11 +3605,16 @@ const Sidebar = () => {
                 </h3>
               </div>
               <button
+                type="button"
                 className="modal-close-btn"
                 onClick={() => {
-                  void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setIsPhoneCommentModalOpen(false);
-                  });
+                  if (isPhoneCommentDirty()) {
+                    void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setIsPhoneCommentModalOpen(false);
+                    });
+                    return;
+                  }
+                  setIsPhoneCommentModalOpen(false);
                 }}
                 style={{
                   flexShrink: 0,
@@ -3630,9 +3653,13 @@ const Sidebar = () => {
                 type="button"
                 className="modal-close-btn"
                 onClick={() => {
-                  void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
-                    setIsPhoneCommentModalOpen(false);
-                  });
+                  if (isPhoneCommentDirty()) {
+                    void showConfirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?", () => {
+                      setIsPhoneCommentModalOpen(false);
+                    });
+                    return;
+                  }
+                  setIsPhoneCommentModalOpen(false);
                 }}
               >
                 ✕

@@ -1921,7 +1921,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const handleCancelWorkInfo = async () => {
     // Type B + isDirty: 변경 있으면 confirm. "아니오"면 편집 모드 유지.
     if (isWorkInfoDirty()) {
-      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2142,7 +2142,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleCancelWorkAbility = async () => {
     if (isWorkAbilityDirty()) {
-      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2368,7 +2368,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleCancelWorkExp = async () => {
     if (isWorkExpDirty()) {
-      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -2583,7 +2583,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const handleCancelWorkCareer = async () => {
     if (isWorkCareerDirty()) {
-      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 보기 모드로 전환하시겠습니까?"))) {
+      if (!(await popup.confirm("입력한 데이터가 저장되지 않았습니다. 종료하시겠습니까?"))) {
         return;
       }
     }
@@ -8091,19 +8091,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const locked = isLineLocked(selectedWorkInfoCard);
                       const disabled = !canEditWorkInfo || locked;
-                      const title = locked
-                        ? LINE_LOCKED_TITLE
-                        : canEditWorkInfo
-                          ? "수정"
-                          : "관리자 승인이 필요합니다";
+                      const title = locked ? LINE_LOCKED_TITLE : canEditWorkInfo ? "수정" : "관리자 승인이 필요합니다";
                       return (
-                        <button
-                          className="modal-edit-btn"
-                          onClick={handleEditWorkInfo}
-                          disabled={disabled}
-                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                          title={title}
-                        >
+                        <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
                         </button>
                       );
@@ -8220,11 +8210,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           not_applicable: "해당 없음",
                         };
                         // 카드 status-badge(L5920)와 동일 우선순위로 평가: isRestMode → !hasActivity → enhancementStatus
-                        const statusKey = isRestMode
-                          ? "not_applicable"
-                          : !selectedWorkExpCard.hasActivity
-                            ? "failed"
-                            : (selectedWorkExpCard.enhancementStatus as string);
+                        const statusKey = isRestMode ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
                         const statusText = enhanceStatusTextMap[statusKey] || "—";
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
@@ -8561,21 +8547,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkExpCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkExpCard);
                       const disabled = !canEditWorkExp || empty || locked;
-                      const title = empty
-                        ? "비어있는 카드입니다"
-                        : locked
-                          ? LINE_LOCKED_TITLE
-                          : canEditWorkExp
-                            ? "수정"
-                            : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkExp ? "수정" : "관리자 승인이 필요합니다";
                       return (
-                        <button
-                          className="modal-edit-btn"
-                          onClick={handleEditWorkExp}
-                          disabled={disabled}
-                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                          title={title}
-                        >
+                        <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
                         </button>
                       );
@@ -8962,21 +8936,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkAbilityCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkAbilityCard);
                       const disabled = !canEditWorkAbility || empty || locked;
-                      const title = empty
-                        ? "비어있는 카드입니다"
-                        : locked
-                          ? LINE_LOCKED_TITLE
-                          : canEditWorkAbility
-                            ? "수정"
-                            : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkAbility ? "수정" : "관리자 승인이 필요합니다";
                       return (
-                        <button
-                          className="modal-edit-btn"
-                          onClick={handleEditWorkAbility}
-                          disabled={disabled}
-                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                          title={title}
-                        >
+                        <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
                         </button>
                       );
@@ -9480,21 +9442,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const empty = selectedWorkCareerCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkCareerCard);
                       const disabled = !canEditWorkCareer || empty || locked;
-                      const title = empty
-                        ? "비어있는 카드입니다"
-                        : locked
-                          ? LINE_LOCKED_TITLE
-                          : canEditWorkCareer
-                            ? "수정"
-                            : "관리자 승인이 필요합니다";
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkCareer ? "수정" : "관리자 승인이 필요합니다";
                       return (
-                        <button
-                          className="modal-edit-btn"
-                          onClick={handleEditWorkCareer}
-                          disabled={disabled}
-                          style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-                          title={title}
-                        >
+                        <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
                         </button>
                       );
