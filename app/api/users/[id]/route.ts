@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { isAdminEmail } from '@/lib/admin'
 import { maskProfileForResponse } from '@/lib/dataMasking'
+import { getViewerContext, getActiveTeamPart, canSeePersonalInfo } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -83,10 +84,25 @@ export async function GET(
       practical_career_participated: complianceData?.practical_career_participated ?? 0
     }
 
-    // 마스킹 옵션 결정
+    // 마스킹 옵션 결정 (역할 기반 권한 포함)
     const session = await getServerSession(authOptions)
     const maskIsAdmin = !!session?.user?.isAdmin || isAdminEmail(session?.user?.email)
-    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: !!session }
+    const maskIsLoggedIn = !!session
+
+    let canSeePersonal = false
+    if (maskIsLoggedIn && !maskIsAdmin && session?.user?.id) {
+      const [viewerCtx, targetTP] = await Promise.all([
+        getViewerContext(supabase, session.user.id, false),
+        getActiveTeamPart(supabase, userId),
+      ])
+      canSeePersonal = canSeePersonalInfo(viewerCtx, {
+        userId: userId,
+        teamId: targetTP.teamId,
+        partId: targetTP.partId,
+      })
+    }
+
+    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: maskIsLoggedIn, canSeePersonal }
 
     return NextResponse.json({
       success: true,

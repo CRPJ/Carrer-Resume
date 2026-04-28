@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
-import { extractTargetUserId } from "@/lib/admin";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { maskDisplayName } from "@/lib/dataMasking";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,13 +53,24 @@ export async function GET(request: Request) {
       .eq("user_id", profile.id)
       .maybeSingle();
 
+    // engName 마스킹: 어드민/로그인 → raw, 비로그인 → 알파벳 마스킹
+    const session = await getServerSession(authOptions);
+    const sessionIsAdmin = !!session?.user?.isAdmin || isAdminEmail(session?.user?.email);
+    const sessionIsLoggedIn = !!session;
+    const rawEngName = profile.eng_name || null;
+    const engNameDisplay = !rawEngName
+      ? null
+      : sessionIsAdmin || sessionIsLoggedIn
+        ? rawEngName
+        : maskDisplayName(rawEngName);
+
     return NextResponse.json({
       success: true,
       data: {
         videoUrl1: introduction?.video_url_1 || null,
         videoUrl2: introduction?.video_url_2 || null,
         videoUrl3: introduction?.video_url_3 || null,
-        engName: profile.eng_name || null,
+        engName: engNameDisplay,
       },
     });
   } catch (error) {

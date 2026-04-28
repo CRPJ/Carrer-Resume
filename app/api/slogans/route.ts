@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { maskDisplayName } from "@/lib/dataMasking";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -100,6 +101,17 @@ export async function GET(request: Request) {
       .eq("user_id", profile.id)
       .maybeSingle();
 
+    // engName 마스킹: 어드민/로그인 → raw, 비로그인 → 알파벳 마스킹
+    const session = await getServerSession(authOptions);
+    const sessionIsAdmin = !!session?.user?.isAdmin || isAdminEmail(session?.user?.email);
+    const sessionIsLoggedIn = !!session;
+    const rawEngName = profile.eng_name || null;
+    const engNameDisplay = !rawEngName
+      ? null
+      : sessionIsAdmin || sessionIsLoggedIn
+        ? rawEngName
+        : maskDisplayName(rawEngName);
+
     return NextResponse.json({
       success: true,
       data: {
@@ -118,7 +130,7 @@ export async function GET(request: Request) {
           option: introduction?.slogan_3_tag || null,
           rating: introduction?.slogan_3_rating ?? 0,
         },
-        engName: profile.eng_name || null,
+        engName: engNameDisplay,
       },
     });
   } catch (error) {

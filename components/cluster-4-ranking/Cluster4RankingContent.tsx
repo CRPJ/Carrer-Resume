@@ -1266,8 +1266,8 @@ const Cluster4RankingContent = () => {
                     </div>
                   )}
                   <div className="image-badges">
-                    <div className={`badge-tag ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                      {user.growthStatus.includes('휴식') ? user.growthStatus : `성장(${user.growthStatus})`}
+                    <div className={`badge-tag ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${user.growthStatus === '진행 중' ? 'in-progress' : ''} ${user.growthStatus === '집계 중' ? 'counting' : ''}`}>
+                      {user.growthStatus.includes('휴식') ? user.growthStatus.replace('(', ' (') : `성장 (${user.growthStatus})`}
                     </div>
                   </div>
                 </div>
@@ -1285,7 +1285,7 @@ const Cluster4RankingContent = () => {
                         </span>
                         <span className="weekly-card-week">
                           <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                          <span className="week-number">{user.cumulativeApprovedWeeks}</span> / 30 주차
+                          <span className="week-number">{(user.growthStatus === '진행 중' || user.growthStatus === '집계 중') ? '+1' : user.cumulativeApprovedWeeks}</span> / 30 주차
                         </span>
                       </>
                     )}
@@ -1367,9 +1367,9 @@ const Cluster4RankingContent = () => {
                 </div>
 
                 {/* 우측 성장 상태 */}
-                <div className={`weekly-card-status-badge ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                  <span className="status-text">{user.growthStatus.includes('휴식') ? user.growthStatus : `성장 (${user.growthStatus})`}</span>
-                  <img src={`/images/0/cluster4/icon/icon%20-%20${user.growthStatus.includes('휴식') ? user.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${user.growthStatus}%29`}.png`} alt={user.growthStatus} className="trophy-icon" />
+                <div className={`weekly-card-status-badge ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${user.growthStatus === '진행 중' ? 'in-progress' : ''} ${user.growthStatus === '집계 중' ? 'counting' : ''}`}>
+                  <span className="status-text">{user.growthStatus.includes('휴식') ? user.growthStatus.replace('(', ' (') : `성장 (${user.growthStatus})`}</span>
+                  <img src={user.growthStatus === '진행 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28진행%20중%29.png' : user.growthStatus === '집계 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28집계%20중%29.png' : `/images/0/cluster4/icon/icon%20-%20${user.growthStatus.includes('휴식') ? user.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${user.growthStatus}%29`}.png`} alt={user.growthStatus} className="trophy-icon" />
                 </div>
 
                 {/* 더보기 버튼 */}

@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
 import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
-import { maskProfileForResponse } from "@/lib/dataMasking";
+import { maskProfileForResponse, normalizePhoneForStorage } from "@/lib/dataMasking";
 import { getViewerContext, getActiveTeamPart, canSeePersonalInfo } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
@@ -1405,7 +1405,7 @@ export async function PUT(request: Request) {
       updateData.birth_date = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) ? dateStr : null;
     }
     if (body.address !== undefined && !isMasked(body.address)) updateData.address = body.address;
-    if (body.phone !== undefined && !isMasked(body.phone)) updateData.phone = body.phone;
+    if (body.phone !== undefined && !isMasked(body.phone)) updateData.phone = normalizePhoneForStorage(body.phone);
     if (body.email !== undefined && !isMasked(body.email)) updateData.email = body.email;
     if (body.bio !== undefined) updateData.bio = body.bio;
     if (body.vision !== undefined) updateData.vision = body.vision;

@@ -377,10 +377,11 @@ const Sidebar = () => {
       birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
       city: addressParts[0] || "",
       district: addressParts.slice(1).join(" ") || "",
+      // 서버가 권한에 따라 raw 또는 마스킹된 값을 보냄 — 별표 포함 시 그대로 사용, 아니면 하이픈 정규화
       phone: profile.phone
-        ? (session?.user?.isAdmin
-          ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-          : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****"))
+        ? (profile.phone.includes('*')
+          ? profile.phone
+          : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"))
         : "",
       email: profile.email || "",
       school: "",
@@ -803,6 +804,10 @@ const Sidebar = () => {
           const ownerCheck = !targetUserId || targetUserId === currentUserId || fetchedProfileId === currentUserId;
           console.log("[isOwner] 결과:", ownerCheck, "| !targetUserId:", !targetUserId, "| url일치:", targetUserId === currentUserId, "| profile일치:", fetchedProfileId === currentUserId);
           setIsOwner(ownerCheck);
+        } else {
+          // 비로그인 상태에서 다른 유저 프로필 조회 — 소유자 아님 (편집 UI 비활성)
+          console.log("[isOwner] 비로그인 — 비소유자 처리");
+          setIsOwner(false);
         }
         const addressParts = (profile.address || "").split(" ");
 
@@ -2003,7 +2008,7 @@ const Sidebar = () => {
                           cursor: "default",
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.email(currentProfile.email)}
+                        <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.email || '-'}
                       </span>
                     </div>
                     <div className="detail-row">
@@ -3813,9 +3818,15 @@ const Sidebar = () => {
                     <button
                       type="button"
                       className="modal-edit-btn"
+                      disabled={!isOwner && !demoMode}
                       onClick={() => {
+                        if (!isOwner && !demoMode) return;
                         phoneCommentSnapshot.current = formData.phoneComment;
                         setIsPhoneEditing(true);
+                      }}
+                      style={{
+                        cursor: isOwner || demoMode ? "pointer" : "not-allowed",
+                        opacity: isOwner || demoMode ? 1 : 0.4,
                       }}
                     >
                       수정

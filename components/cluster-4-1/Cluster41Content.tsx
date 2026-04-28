@@ -1060,12 +1060,20 @@ const Cluster41Content = () => {
           setIsLoadingSeasons(false);
         }
 
-        // 1. 모든 주차 가져오기 (완료된 주차만, 가입 주차 이후만)
-        // 현재 진행 중인 주차는 제외 (end_date < today)
+        // 주차 카드 phase 시간 기준 (KST, 월요일 00:00 기준 누적 시간)
+        //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h  → 카드 노출 + '진행 중' 시작
+        //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h → '집계 중' 시작 (보라 → 핑크)
+        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h → 성공/실패/휴식 결정 (weeklyGrowth 반영)
+        const VISIBLE_OFFSET_HOURS = 65;
+        const COUNTING_START_HOURS = 144;
+        const RESULT_DECIDED_HOURS = 278;
+        const cutoffDateStr = new Date(Date.now() + 9 * 3600 * 1000 - VISIBLE_OFFSET_HOURS * 3600 * 1000)
+          .toISOString()
+          .split('T')[0];
         let weeksQuery = supabase
           .from('weeks')
           .select('id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name, term_number)')
-          .lt('end_date', today)
+          .lte('start_date', cutoffDateStr)
           .order('start_date', { ascending: false });
 
         // 가입 주차 이후만 필터링
@@ -1205,7 +1213,7 @@ const Cluster41Content = () => {
           const rawSeasonName = seasonData?.name || '';
           const { displayName: seasonName, isBreak: isBreakSeason, fromSeason: breakFromSeason, toSeason: breakToSeason } = parseBreakSeasonName(rawSeasonName);
 
-          // 성장 상태 결정 (온보딩 주차 → break 시즌 → user_weekly_growth → 기존 로직)
+          // 성장 상태 결정 (온보딩 → break 시즌 → 시간 phase → weeklyGrowth/폴백)
           let status = '실패';
 
           // 온보딩 주차는 무조건 성공 처리
@@ -1215,27 +1223,38 @@ const Cluster41Content = () => {
             // break 시즌(전환 주차)은 기본적으로 휴식(공식)
             status = '휴식(공식)';
           } else {
-            const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
+            // 주차 시작(월 00:00 KST)으로부터 경과 시간 산출
+            const weekStartMs = new Date(week.start_date + 'T00:00:00+09:00').getTime();
+            const hoursSinceStart = (Date.now() - weekStartMs) / 3600000;
 
-            if (weeklyGrowth) {
-              // user_weekly_growth 테이블에 데이터가 있으면 해당 데이터 사용
-              if (weeklyGrowth.is_club_break) {
-                status = '휴식(공식)';
-              } else if (weeklyGrowth.is_resting) {
-                status = '휴식(개인)';
-              } else if (weeklyGrowth.is_success) {
-                status = '성공';
-              } else {
-                status = '실패';
-              }
+            if (hoursSinceStart >= VISIBLE_OFFSET_HOURS && hoursSinceStart < COUNTING_START_HOURS) {
+              // (수) 17:00 ~ (일) 00:00 — 보라색 '진행 중'
+              status = '진행 중';
+            } else if (hoursSinceStart >= COUNTING_START_HOURS && hoursSinceStart < RESULT_DECIDED_HOURS) {
+              // (일) 00:00 ~ N+1(목) 14:00 — 핑크 '집계 중'
+              status = '집계 중';
             } else {
-              // user_weekly_growth 테이블에 데이터가 없으면 기존 로직으로 폴백
-              if (week.is_club_break) {
-                status = '휴식(공식)';
-              } else if (restWeekIds.has(week.id)) {
-                status = '휴식(개인)';
-              } else if (activityWeekIds.has(week.id)) {
-                status = '성공';
+              // N+1(목) 14:00 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
+              const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
+              if (weeklyGrowth) {
+                if (weeklyGrowth.is_club_break) {
+                  status = '휴식(공식)';
+                } else if (weeklyGrowth.is_resting) {
+                  status = '휴식(개인)';
+                } else if (weeklyGrowth.is_success) {
+                  status = '성공';
+                } else {
+                  status = '실패';
+                }
+              } else {
+                // user_weekly_growth 가 아직 없으면 기존 폴백 로직
+                if (week.is_club_break) {
+                  status = '휴식(공식)';
+                } else if (restWeekIds.has(week.id)) {
+                  status = '휴식(개인)';
+                } else if (activityWeekIds.has(week.id)) {
+                  status = '성공';
+                }
               }
             }
           }
@@ -1604,7 +1623,7 @@ const Cluster41Content = () => {
                     currentSeasonInfo?.isBreakSeason ? (
                       <>현재 클럽은, <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.fromSeason} 시즌</strong>에서 <strong>{currentSeasonInfo.year}년 {currentSeasonInfo.toSeason} 시즌</strong>으로 가는 휴식(시즌 전환) 중에 있습니다.</>
                     ) : (
-                      <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식(${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
+                      <>현재 클럽은, <strong>{currentSeasonInfo ? `${currentSeasonInfo.year}년 ${currentSeasonInfo.name} 시즌, ${currentSeasonInfo.currentWeek}주차` : '로딩 중...'}</strong>를 {currentSeasonInfo?.isClubBreak ? `휴식 (${currentSeasonInfo.holidayName || '공식'})` : '진행'} 중에 있습니다.</>
                     )
                   )}
                 </p>
@@ -2060,10 +2079,10 @@ const Cluster41Content = () => {
                       className="weekly-card-main"
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
+                      <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
                         <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                         <div className="image-badges">
-                          <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
+                          <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', ' (') : `성장 (${week.growthStatus})`}</div>
                         </div>
                       </div>
 
@@ -2162,7 +2181,7 @@ const Cluster41Content = () => {
               return (
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
-                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : '#9dfa07' } as React.CSSProperties}>
+                  <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
                     <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
@@ -2177,7 +2196,7 @@ const Cluster41Content = () => {
                       </div>
                     )}
                     <div className="image-badges">
-                      <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus : `성장(${week.growthStatus})`}</div>
+                      <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', ' (') : `성장 (${week.growthStatus})`}</div>
                       <div className="badge-like">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -2197,7 +2216,7 @@ const Cluster41Content = () => {
                       </span>
                       <span className="weekly-card-week">
                         <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                        <span className="week-number num-2">{getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
+                        <span className="week-number num-2">{(week.growthStatus === '진행 중' || week.growthStatus === '집계 중') ? '+1' : getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
                       </span>
                     </div>
 
@@ -2317,9 +2336,9 @@ const Cluster41Content = () => {
                   </div>
 
                   {/* 우측 성장 상태 */}
-                  <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
-                    <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus : `성장 (${week.growthStatus})`}</span>
-                    <img src={`/images/0/cluster4/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
+                  <div className={`weekly-card-status-badge ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>
+                    <span className="status-text">{week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', ' (') : `성장 (${week.growthStatus})`}</span>
+                    <img src={week.growthStatus === '진행 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28진행%20중%29.png' : week.growthStatus === '집계 중' ? '/images/0/cluster4/icon/icon%20-%20성장%20%28집계%20중%29.png' : `/images/0/cluster4/icon/icon%20-%20${week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', '%28').replace(')', '%29') : `성장%28${week.growthStatus}%29`}.png`} alt={week.growthStatus} className="trophy-icon" />
                   </div>
 
                   {/* 더보기 버튼 */}

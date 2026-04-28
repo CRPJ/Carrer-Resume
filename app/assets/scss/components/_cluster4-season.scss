@@ -4386,6 +4386,14 @@
           &.rest-official {
             color: #ffea48;
           }
+
+          &.in-progress {
+            color: #9b59b6;
+          }
+
+          &.counting {
+            color: #ff1493;
+          }
         }
 
         .badge-like {
@@ -4847,6 +4855,16 @@
       &.rest-official .status-text {
         color: #ffea48;
         text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
+      }
+
+      &.in-progress .status-text {
+        color: #9b59b6;
+        text-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+      }
+
+      &.counting .status-text {
+        color: #ff1493;
+        text-shadow: 0 0 8px rgba(255, 20, 147, 0.5);
       }
 
       .trophy-icon {

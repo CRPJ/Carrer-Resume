@@ -1275,6 +1275,30 @@
               }
             }
 
+            &.in-progress {
+              span {
+                font-family: "Manrope", sans-serif;
+                font-size: 22px;
+                font-weight: 800;
+                color: #9b59b6;
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+              }
+            }
+
+            &.counting {
+              span {
+                font-family: "Manrope", sans-serif;
+                font-size: 22px;
+                font-weight: 800;
+                color: #ff1493;
+                line-height: 19px;
+                text-transform: capitalize;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+              }
+            }
+
             img {
               width: 49px;
               height: 54px;
