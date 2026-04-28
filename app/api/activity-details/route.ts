@@ -138,12 +138,18 @@ export async function POST(request: NextRequest) {
     }
 
     // 권한 체크: 마감 시간 이내 OR 어드민 개별 grant
-    const [weeklyActivityResult, grantResult] = await Promise.all([
+    // 실무경험은 team_id 별로 weekly_activities 가 분리되어 있어서, 유저 팀에 해당하는 행을 골라야 한다.
+    const [weeklyActivitiesResult, userTeamResult, grantResult] = await Promise.all([
       supabaseAdmin
         .from('weekly_activities')
-        .select('is_active, opened_at, deadline')
+        .select('is_active, opened_at, deadline, team_id')
         .eq('week_id', week_id)
-        .eq('activity_type_id', activity_type_id)
+        .eq('activity_type_id', activity_type_id),
+      supabaseAdmin
+        .from('user_team_parts')
+        .select('team_id, left_at')
+        .eq('user_id', user_id)
+        .is('left_at', null)
         .maybeSingle(),
       supabaseAdmin
         .from('secondary_info_grants')
@@ -154,7 +160,12 @@ export async function POST(request: NextRequest) {
         .maybeSingle(),
     ])
 
-    const wa = weeklyActivityResult.data
+    const userTeamId: string | null = userTeamResult.data?.team_id || null
+    const candidateRows = weeklyActivitiesResult.data || []
+    // 클럽 공통(NULL) 행 우선, 없으면 유저 팀 매칭 행
+    const wa = candidateRows.find((r) => r.team_id == null)
+      || candidateRows.find((r) => r.team_id === userTeamId)
+      || null
     // deadline 컬럼 우선, 없으면 opened_at+48h 폴백
     const isBeforeDeadline = wa?.is_active && (
       wa?.deadline

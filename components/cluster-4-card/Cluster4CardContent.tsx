@@ -378,6 +378,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     opened_at: string | null;
     deadline?: string | null; // 마감 시각 (없으면 opened_at+48h 폴백)
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
+    output_images?: Array<{ url: string; caption: string }> | null; // 운영진이 업로드한 이미지 (최대 2)
+    team_id?: string | null; // 실무경험만 NOT NULL
   }
   const [weeklyActivities, setWeeklyActivities] = useState<WeeklyActivity[]>([]);
 
@@ -1097,7 +1099,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const allWeeksForCumulative = allUserWeeksData.filter((w: any) => w.end_date && w.end_date <= currentWeek.end_date);
         const allWeeksResult = { data: allWeeksForCumulative };
 
-        // 성장 상태 결정
+        // 성장 상태 결정 (Cluster41Content 와 동일한 phase 로직 — 동기화 필수)
+        //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h
+        //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h
+        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h
+        const VISIBLE_OFFSET_HOURS = 65;
+        const COUNTING_START_HOURS = 144;
+        const RESULT_DECIDED_HOURS = 278;
+
         const weeklyGrowth = weeklyGrowthData;
         const onboardingWeekId = profileResult.onboardingWeekId;
         const isCurrentWeekOnboarding = weekId === onboardingWeekId;
@@ -1106,23 +1115,34 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         // 온보딩 주차(무적 주차)는 무조건 성공
         if (isCurrentWeekOnboarding) {
           growthStatus = "성공";
-        } else if (weeklyGrowth) {
-          if (weeklyGrowth.is_club_break || isBreakSeason) {
-            growthStatus = "휴식(공식)";
-          } else if (weeklyGrowth.is_resting) {
-            growthStatus = "휴식(개인)";
-          } else if (weeklyGrowth.is_success) {
-            growthStatus = "성공";
-          } else {
-            growthStatus = "실패";
-          }
+        } else if (isBreakSeason) {
+          growthStatus = "휴식(공식)";
         } else {
-          if (currentWeek.is_club_break || isBreakSeason) {
-            growthStatus = "휴식(공식)";
-          } else if (apiRestWeekIds.includes(currentWeek.id)) {
-            growthStatus = "휴식(개인)";
-          } else if (apiActivityWeekIds.includes(currentWeek.id)) {
-            growthStatus = "성공";
+          const weekStartMs = new Date(currentWeek.start_date + "T00:00:00+09:00").getTime();
+          const hoursSinceStart = (Date.now() - weekStartMs) / 3600000;
+
+          if (hoursSinceStart >= VISIBLE_OFFSET_HOURS && hoursSinceStart < COUNTING_START_HOURS) {
+            growthStatus = "진행 중";
+          } else if (hoursSinceStart >= COUNTING_START_HOURS && hoursSinceStart < RESULT_DECIDED_HOURS) {
+            growthStatus = "집계 중";
+          } else if (weeklyGrowth) {
+            if (weeklyGrowth.is_club_break) {
+              growthStatus = "휴식(공식)";
+            } else if (weeklyGrowth.is_resting) {
+              growthStatus = "휴식(개인)";
+            } else if (weeklyGrowth.is_success) {
+              growthStatus = "성공";
+            } else {
+              growthStatus = "실패";
+            }
+          } else {
+            if (currentWeek.is_club_break) {
+              growthStatus = "휴식(공식)";
+            } else if (apiRestWeekIds.includes(currentWeek.id)) {
+              growthStatus = "휴식(개인)";
+            } else if (apiActivityWeekIds.includes(currentWeek.id)) {
+              growthStatus = "성공";
+            }
           }
         }
 
@@ -2174,13 +2194,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    // 필수필드 검증: Sub Title / Growth Point / 이미지 1·2번
+    // 필수필드 검증: Sub Title / Growth Point (이미지/캡션/링크는 옵셔널)
     // cluster2/cluster3 표준 패턴: footerNotice + field-missing 깜빡임 + scrollIntoView
     const missing: string[] = [];
     if (!editingSubTitle.trim()) missing.push("subTitle");
     if (!editingGrowthPoint.trim()) missing.push("growthPoint");
-    if (!editingImages[0]) missing.push("image0");
-    if (!editingImages[1]) missing.push("image1");
     if (missing.length > 0) {
       setWorkInfoFooterNotice("error");
       const targetEl = document.querySelector(`.workinfo-view-modal [data-field="${missing[0]}"]`);
@@ -2426,8 +2444,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const missing: string[] = [];
     if (!editingAbilitySubTitle.trim()) missing.push("subTitle");
     if (!editingAbilityGrowthPoint.trim()) missing.push("growthPoint");
-    if (!editingAbilityImages[0]) missing.push("image0");
-    if (!editingAbilityImages[1]) missing.push("image1");
+    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
     if (missing.length > 0) {
       setWorkAbilityFooterNotice("error");
       const targetEl = document.querySelector(`.workability-view-modal [data-field="${missing[0]}"]`);
@@ -2675,8 +2692,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const missing: string[] = [];
     if (!editingExpSubTitle.trim()) missing.push("subTitle");
     if (!editingExpGrowthPoint.trim()) missing.push("growthPoint");
-    if (!editingExpImages[0]) missing.push("image0");
-    if (!editingExpImages[1]) missing.push("image1");
+    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
     if (editingExpRating <= 0) missing.push("rating");
     if (missing.length > 0) {
       setWorkExpFooterNotice("error");
@@ -2919,8 +2935,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const missing: string[] = [];
     if (!editingCareerSubTitle.trim()) missing.push("subTitle");
     if (!editingCareerGrowthPoint.trim()) missing.push("growthPoint");
-    if (!editingCareerImages[0]) missing.push("image0");
-    if (!editingCareerImages[1]) missing.push("image1");
+    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
     if (missing.length > 0) {
       setWorkCareerFooterNotice("error");
       const targetEl = document.querySelector(`.workcareer-view-modal [data-field="${missing[0]}"]`);
@@ -4123,31 +4138,43 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       case "성공":
         return {
           className: "success",
-          text: "성장(성공)",
+          text: "성장 (성공)",
           icon: "/images/0/cluster4/icon/icon - 성장(성공).png",
         };
       case "실패":
         return {
           className: "fail",
-          text: "성장(실패)",
+          text: "성장 (실패)",
           icon: "/images/0/cluster4/icon/icon - 성장(실패).png",
         };
       case "휴식(개인)":
         return {
           className: "rest-personal",
-          text: "휴식(개인)",
+          text: "휴식 (개인)",
           icon: "/images/0/cluster4/icon/icon - 휴식(개인).png",
         };
       case "휴식(공식)":
         return {
           className: "rest-official",
-          text: "휴식(공식)",
+          text: "휴식 (공식)",
           icon: "/images/0/cluster4/icon/icon - 휴식(공식).png",
+        };
+      case "진행 중":
+        return {
+          className: "in-progress",
+          text: "성장 (진행 중)",
+          icon: "/images/0/cluster4/icon/icon - 성장 (진행 중).png",
+        };
+      case "집계 중":
+        return {
+          className: "counting",
+          text: "성장 (집계 중)",
+          icon: "/images/0/cluster4/icon/icon - 성장 (집계 중).png",
         };
       default:
         return {
           className: "success",
-          text: "성장(성공)",
+          text: "성장 (성공)",
           icon: "/images/0/cluster4/icon/icon - 성장(성공).png",
         };
     }
@@ -4774,6 +4801,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
     return activity?.output_links || [];
   };
+
+  // 운영진이 업로드한 output images 가져오기 (최대 2)
+  const getAdminOutputImages = (activityType: string): Array<{ url: string; caption: string }> => {
+    const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
+    return (activity?.output_images || []).filter((i) => i?.url?.trim());
+  };
+  const getAdminOutputImagesCount = (activityType: string): number => getAdminOutputImages(activityType).length;
 
   // 편집 모달 열 때 초기화
   const initializeEditingDetails = () => {
@@ -5578,7 +5612,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-badge week" style={{ flexShrink: 0, marginLeft: "auto" }}>
                 <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
                 <span>
-                  <span className="highlight">{cumulativeApprovedWeeks}</span> / 30 주차
+                  <span className="highlight">{(weekData?.growthStatus === "진행 중" || weekData?.growthStatus === "집계 중") ? "+1" : cumulativeApprovedWeeks}</span> / 30 주차
                 </span>
               </div>
             </div>
@@ -8389,35 +8423,52 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                 </div>
 
-                {/* ──── 우측 — 이미지 2×2 그리드 (1·2번 필수, 순차 업로드, 클릭 시 확대) ──── */}
+                {/* ──── 우측 — 이미지 2×2 그리드 ──── */}
+                {/* 슬롯 0·1: 운영진 이미지 (read-only), 슬롯 2·3: 크루 이미지 (옵셔널) */}
                 <div className="workinfo-right">
                   <div className="workinfo-image-grid images-grid">
                     {Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }).map((_, imageIdx) => {
-                      // 보기 모드는 카드 데이터, 편집 모드는 editingImages
-                      // TODO: [백엔드 작업 필요] selectedWorkInfoCard.images 필드 보장 후 fallback 제거
+                      // 운영진 이미지 슬롯 분기
+                      const adminImages = selectedWorkInfoCard?.activityType ? getAdminOutputImages(selectedWorkInfoCard.activityType) : []
+                      const adminCount = adminImages.length
+                      const isAdminSlot = imageIdx < 2
+                      // 슬롯 idx → 데이터 출처
+                      // 0,1: adminImages[0], adminImages[1]
+                      // 2,3: 크루 이미지 (image_urls[0], image_urls[1])
                       const viewImages = normalizeWorkInfoImages(selectedWorkInfoCard?.images);
                       const viewCaptions = normalizeWorkInfoCaptions(selectedWorkInfoCard?.imageCaptions);
-                      const imagesForState = workInfoViewIsEditing ? editingImages : viewImages;
-                      const captionsForState = workInfoViewIsEditing ? editingImageCaptions : viewCaptions;
-                      const image = imagesForState[imageIdx] || null;
-                      const caption = captionsForState[imageIdx] || "";
-                      const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
-                      const isRequired = imageIdx < 2; // 1·2번만 필수
+                      const crewImagesForState = workInfoViewIsEditing ? editingImages : viewImages;
+                      const crewCaptionsForState = workInfoViewIsEditing ? editingImageCaptions : viewCaptions;
+                      let image: string | null = null
+                      let caption = ""
+                      if (isAdminSlot) {
+                        const adminImg = adminImages[imageIdx]
+                        image = adminImg?.url || null
+                        caption = adminImg?.caption || ""
+                      } else {
+                        const crewSlotIdx = imageIdx - 2
+                        image = crewImagesForState[crewSlotIdx] || null
+                        caption = crewCaptionsForState[crewSlotIdx] || ""
+                      }
+                      // 어드민 슬롯은 클릭/편집/삭제 모두 비활성, 크루 슬롯만 편집 가능
+                      const slotIsEditable = workInfoViewIsEditing && !isAdminSlot
+                      const crewSlotIdx = imageIdx - 2 // 슬롯 2,3 → 크루 image_urls[0,1]
                       return (
-                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
-                          {workInfoViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${isAdminSlot && !image ? " disabled" : ""}${isAdminSlot ? " admin-slot" : ""}`} style={{ position: "relative" }}>
+                          {isAdminSlot && image && (
+                            <span className="admin-badge" title="운영진 업로드" style={{ position: "absolute", top: 4, left: 4, zIndex: 2, background: "#7c3aed", color: "#fff", borderRadius: 4, padding: "0 6px", fontSize: 11 }}>A</span>
+                          )}
                           {image ? (
-                            <div className="image-preview" onClick={() => handleImagePreview(imageIdx)}>
+                            <div className="image-preview" onClick={() => !isAdminSlot && handleImagePreview(crewSlotIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
-                              {/* cluster3 image-actions-overlay 패턴: 편집 모드에서 항상 표시 */}
-                              {workInfoViewIsEditing && (
+                              {slotIsEditable && (
                                 <div className="image-actions-overlay">
                                   <button
                                     type="button"
                                     className="image-action-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      triggerImageUpload(imageIdx);
+                                      triggerImageUpload(crewSlotIdx);
                                     }}
                                     title="교체"
                                     aria-label="교체"
@@ -8429,7 +8480,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                     className="image-action-btn image-delete-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleImageDelete(imageIdx);
+                                      handleImageDelete(crewSlotIdx);
                                     }}
                                     title="삭제"
                                     aria-label="삭제"
@@ -8443,63 +8494,50 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <div
                               className="image-preview"
                               onClick={async () => {
-                                if (workInfoViewIsEditing && isEnabled) triggerImageUpload(imageIdx);
+                                if (slotIsEditable) triggerImageUpload(crewSlotIdx);
                               }}
                             >
-                              {/* 빈 슬롯에서도 편집 모드면 cluster3 image-actions-overlay 표시 (업로드 아이콘) */}
-                              {workInfoViewIsEditing && (
+                              {slotIsEditable && (
                                 <div className="image-actions-overlay">
                                   <button
                                     type="button"
                                     className="image-action-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      triggerImageUpload(imageIdx);
+                                      triggerImageUpload(crewSlotIdx);
                                     }}
-                                    disabled={!isEnabled}
                                     title="업로드"
                                     aria-label="업로드"
                                   >
                                     <i className="ti ti-upload"></i>
                                   </button>
-                                  <button
-                                    type="button"
-                                    className="image-action-btn image-delete-btn"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleImageDelete(imageIdx);
-                                    }}
-                                    disabled
-                                    title="??젣"
-                                    aria-label="??젣"
-                                  >
-                                    <i className="ti ti-trash"></i>
-                                  </button>
                                 </div>
                               )}
                               <div className="empty-slot">
-                                <i className="ti ti-photo-plus"></i>
+                                {isAdminSlot ? <span style={{ color: "#aaa", fontSize: 12 }}>운영진 미업로드</span> : <i className="ti ti-photo-plus"></i>}
                               </div>
                             </div>
                           )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            ref={(el) => {
-                              imageFileInputRefs.current[imageIdx] = el;
-                            }}
-                            style={{ display: "none" }}
-                            onChange={(e) => handleImageFileChange(e, imageIdx)}
-                          />
-                          {/* 캡션 바 — 이미지/빈 슬롯/disabled 무관하게 항상 렌더 (cluster3 image-caption-overlay 패턴) */}
+                          {!isAdminSlot && (
+                            <input
+                              type="file"
+                              accept="image/*"
+                              ref={(el) => {
+                                imageFileInputRefs.current[crewSlotIdx] = el;
+                              }}
+                              style={{ display: "none" }}
+                              onChange={(e) => handleImageFileChange(e, crewSlotIdx)}
+                            />
+                          )}
+                          {/* 캡션 바 — 어드민 슬롯은 보기 전용, 크루 슬롯만 편집 가능 */}
                           <div className="image-caption-overlay">
-                            {workInfoViewIsEditing && activeCaptionIdx === imageIdx ? (
+                            {slotIsEditable && activeCaptionIdx === crewSlotIdx ? (
                               <input
                                 type="text"
                                 className="caption-input"
-                                value={editingImageCaptions[imageIdx] || ""}
+                                value={editingImageCaptions[crewSlotIdx] || ""}
                                 onChange={(e) => {
-                                  if (e.target.value.length <= 20) handleCaptionChange(imageIdx, e.target.value);
+                                  if (e.target.value.length <= 20) handleCaptionChange(crewSlotIdx, e.target.value);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 placeholder="캡션 입력 (최대 20자)"
@@ -8510,16 +8548,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span className="caption-text">{caption}</span>
                             )}
                           </div>
-                          {/* 캡션 토글 아이콘 — cluster3 Cluster3Content.tsx:3431 패턴. 편집 모드에서만 표시 */}
-                          {workInfoViewIsEditing && (
+                          {slotIsEditable && (
                             <button
                               type="button"
-                              className={`image-action-btn image-caption-btn${activeCaptionIdx === imageIdx ? " active" : ""}`}
+                              className={`image-action-btn image-caption-btn${activeCaptionIdx === crewSlotIdx ? " active" : ""}`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setActiveCaptionIdx(activeCaptionIdx === imageIdx ? null : imageIdx);
+                                setActiveCaptionIdx(activeCaptionIdx === crewSlotIdx ? null : crewSlotIdx);
                               }}
-                              title={activeCaptionIdx === imageIdx ? "캡션 저장" : "캡션 편집"}
+                              title={activeCaptionIdx === crewSlotIdx ? "캡션 저장" : "캡션 편집"}
                               aria-label="캡션"
                               style={{ position: "absolute", bottom: "8px", right: "8px", zIndex: 3 }}
                             >

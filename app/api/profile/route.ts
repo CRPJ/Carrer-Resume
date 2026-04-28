@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
 import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 import { maskProfileForResponse } from "@/lib/dataMasking";
+import { getViewerContext, getActiveTeamPart, canSeePersonalInfo } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -152,11 +153,26 @@ export async function GET(request: NextRequest) {
 
     }
 
-    // 마스킹 옵션 결정 (세션 기반)
+    // 마스킹 옵션 결정 (세션 기반 + 역할 기반 권한)
     const maskSession = await getServerSession(authOptions);
     const maskIsAdmin = !!maskSession?.user?.isAdmin || isAdminEmail(maskSession?.user?.email);
     const maskIsLoggedIn = !!maskSession;
-    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: maskIsLoggedIn };
+
+    // 역할 기반 개인정보 열람 권한: 로그인 비어드민에 한해 viewer/target 컨텍스트로 판정
+    let canSeePersonal = false;
+    if (maskIsLoggedIn && !maskIsAdmin && maskSession?.user?.id) {
+      const [viewerCtx, targetTP] = await Promise.all([
+        getViewerContext(supabaseAdmin, maskSession.user.id, false),
+        getActiveTeamPart(supabaseAdmin, profile.id),
+      ]);
+      canSeePersonal = canSeePersonalInfo(viewerCtx, {
+        userId: profile.id,
+        teamId: targetTP.teamId,
+        partId: targetTP.partId,
+      });
+    }
+
+    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: maskIsLoggedIn, canSeePersonal };
 
     const context = searchParams.get('context');
 
@@ -181,7 +197,7 @@ export async function GET(request: NextRequest) {
           .order("start_date", { ascending: false }),
         // [13] weekly_activities for this week
         supabaseAdmin.from("weekly_activities")
-          .select("id, activity_type_id, title, is_active, opened_at, deadline, output_links")
+          .select("id, activity_type_id, title, is_active, opened_at, deadline, output_links, output_images, team_id")
           .eq("week_id", weekId),
         // [14] user_weekly_growth for this week
         supabaseAdmin.from("user_weekly_growth")
@@ -237,12 +253,25 @@ export async function GET(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const completedActivities = activityRecordsData.filter((ar: any) => ar.is_completed);
 
+      // 유저의 현재 팀 (실무경험 weekly_activities 필터링용)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userTeamParts = (userTeamPartsResult.data || []) as Array<any>
+      const userCurrentTeamId: string | null = userTeamParts.find((tp) => !tp.left_at)?.team_id || null
+
+      // 실무경험 클러스터(team_id IS NOT NULL)는 유저 팀 일치만, 그 외는 team_id IS NULL 만 노출
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const filterWeeklyActivitiesByTeam = (rows: any[]) =>
+        rows.filter((wa) => {
+          if (wa.team_id == null) return true
+          return wa.team_id === userCurrentTeamId
+        })
+
       // weekId가 있으면 주차 번들 데이터 포함
       const weekBundle = weekId && weekResults.length === 8 ? {
         activityTypes: weekResults[0]?.data || [],
         currentWeek: weekResults[1]?.data || null,
         allWeeks: weekResults[2]?.data || [],
-        weeklyActivities: weekResults[3]?.data || [],
+        weeklyActivities: filterWeeklyActivitiesByTeam(weekResults[3]?.data || []),
         weeklyGrowth: weekResults[4]?.data || null,
         allPoints: weekResults[5]?.data || [],
         successWeeks: weekResults[6]?.data || [],
