@@ -5612,7 +5612,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-badge week" style={{ flexShrink: 0, marginLeft: "auto" }}>
                 <img src="/images/0/cluster4/icon/icon - 7.png" alt="week" />
                 <span>
-                  <span className="highlight">{(weekData?.growthStatus === "진행 중" || weekData?.growthStatus === "집계 중") ? "+1" : cumulativeApprovedWeeks}</span> / 30 주차
+                  <span className="highlight">{(weekData?.growthStatus === "진행 중" || weekData?.growthStatus === "집계 중") ? "+1" : cumulativeApprovedWeeks}</span> / 25 주차
                 </span>
               </div>
             </div>

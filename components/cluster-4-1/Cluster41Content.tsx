@@ -2216,7 +2216,7 @@ const Cluster41Content = () => {
                       </span>
                       <span className="weekly-card-week">
                         <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                        <span className="week-number num-2">{(week.growthStatus === '진행 중' || week.growthStatus === '집계 중') ? '+1' : getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">30</span> 주차
+                        <span className="week-number num-2">{(week.growthStatus === '진행 중' || week.growthStatus === '집계 중') ? '+1' : getCumulativeApprovedWeeks(week.endDate)}</span> / <span className="num-2">25</span> 주차
                       </span>
                     </div>
 

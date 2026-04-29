@@ -1285,7 +1285,7 @@ const Cluster4RankingContent = () => {
                         </span>
                         <span className="weekly-card-week">
                           <img src="/images/0/cluster4/icon/icon - 7.png" alt="clock" className="week-icon" />
-                          <span className="week-number">{(user.growthStatus === '진행 중' || user.growthStatus === '집계 중') ? '+1' : user.cumulativeApprovedWeeks}</span> / 30 주차
+                          <span className="week-number">{(user.growthStatus === '진행 중' || user.growthStatus === '집계 중') ? '+1' : user.cumulativeApprovedWeeks}</span> / 25 주차
                         </span>
                       </>
                     )}
