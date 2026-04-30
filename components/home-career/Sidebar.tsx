@@ -823,10 +823,11 @@ const Sidebar = () => {
           birthDate: profile.birth_date ? profile.birth_date.replace(/-/g, ".") : "",
           city: addressParts[0] || "",
           district: addressParts.slice(1).join(" ") || "",
+          // 서버가 권한에 따라 raw 또는 마스킹된 값을 보냄 — 별표 포함 시 그대로 사용, 아니면 하이픈 정규화
           phone: profile.phone
-            ? (session?.user?.isAdmin
-              ? profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-              : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{1})\d{3}(\d{4})/, "$1-$2***-****"))
+            ? (profile.phone.includes('*')
+              ? profile.phone
+              : profile.phone.replace(/-/g, "").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3"))
             : "",
           email: profile.email || "",
           school: "",

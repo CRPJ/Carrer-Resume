@@ -1758,24 +1758,49 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setCanEditColleague(isDemoMode);
   }, [isDemoMode]);
 
+  // Weekly Review / 연계동료 작성 시간 윈도우
+  // 앵커 = weekData.startDate (= N주차 월요일 00:00 KST)
+  //   144h(=6d 0h)  → N주차 일요일 00:00 KST  → +1min = 일 00:01 (오픈)
+  //   252h(=10d 12h) → N+1주차 목요일 12:00 KST (마감, 시스템 여유분)
+  // 데모/어드민은 우회.
+  const requireWriteWindow = async (): Promise<boolean> => {
+    if (isDemoMode) return true;
+    if (session?.user?.isAdmin) return true;
+    if (!weekData?.startDate) {
+      await popup.alert("주차 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      return false;
+    }
+    const anchorMs = new Date(`${weekData.startDate}T00:00:00+09:00`).getTime();
+    const openMs = anchorMs + 144 * 3600 * 1000 + 60 * 1000;
+    const closeMs = anchorMs + 252 * 3600 * 1000;
+    const now = Date.now();
+    if (now < openMs || now >= closeMs) {
+      await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
+      return false;
+    }
+    return true;
+  };
+
   // 일반 모드 백엔드 승인 상태 → 모든 canEdit* 플래그에 일괄 반영
+  // 다른 크루 카드 열람 시(isOwner=false)에는 승인됐어도 수정 비활성화
   useEffect(() => {
     if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
     let cancelled = false;
     (async () => {
       const approved = await checkApprovalStatus();
       if (cancelled) return;
-      setCanEditReputation(approved);
-      setCanEditColleague(approved);
-      setCanEditWorkInfo(approved);
-      setCanEditWorkAbility(approved);
-      setCanEditWorkExp(approved);
-      setCanEditWorkCareer(approved);
+      const editable = approved && isOwner;
+      setCanEditReputation(editable);
+      setCanEditColleague(editable);
+      setCanEditWorkInfo(editable);
+      setCanEditWorkAbility(editable);
+      setCanEditWorkExp(editable);
+      setCanEditWorkCareer(editable);
     })();
     return () => {
       cancelled = true;
     };
-  }, [isDemoMode, session]);
+  }, [isDemoMode, session, isOwner]);
 
   // 작업 3: 이번 주 내가 보낸 평판 리스트 (중복 방지 + 7명 제한 체크용 — best-effort)
   // TODO: [백엔드 작업 필요]
@@ -1827,6 +1852,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
+    if (!(await requireWriteWindow())) return;
     if (!selectedColleagueCard) return;
 
     const remaining = selectedColleagues.filter((c) => c.id !== selectedColleagueCard.id);
@@ -2105,15 +2131,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    // 편집 모드 유지. confirm 후 스냅샷 복원.
-    const snap = workInfoSnapshot.current;
-    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
-      setEditingSubTitle(snap.subTitle || "");
-      setEditingGrowthPoint(snap.growthPoint || "");
-      setEditingOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
-      setEditingImages(normalizeWorkInfoImages(snap.images));
-      setEditingImageCaptions(normalizeWorkInfoCaptions(snap.imageCaptions));
-    }
+    // 초기화 = 모든 필드를 빈 값으로 (Weekly Review 와 동일 패턴 — "초기화" 라벨대로 비우기)
+    if (!(await popup.confirm("내용을 모두 초기화하시겠어요?"))) return;
+    setEditingSubTitle("");
+    setEditingGrowthPoint("");
+    setEditingOutputLinks(Array(5).fill({ desc: "", url: "" }));
+    setEditingImages(createEmptyWorkInfoImages());
+    setEditingImageCaptions(createEmptyWorkInfoCaptions());
   };
 
   // blob: URL 배열을 Supabase Storage로 업로드 → 영구 URL 배열 반환. http(s)/data URL은 그대로 통과.
@@ -2194,21 +2218,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    // 필수필드 검증: Sub Title / Growth Point (이미지/캡션/링크는 옵셔널)
-    // cluster2/cluster3 표준 패턴: footerNotice + field-missing 깜빡임 + scrollIntoView
-    const missing: string[] = [];
-    if (!editingSubTitle.trim()) missing.push("subTitle");
-    if (!editingGrowthPoint.trim()) missing.push("growthPoint");
-    if (missing.length > 0) {
-      setWorkInfoFooterNotice("error");
-      const targetEl = document.querySelector(`.workinfo-view-modal [data-field="${missing[0]}"]`);
-      if (targetEl) {
-        targetEl.classList.add("field-missing");
-        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => targetEl.classList.remove("field-missing"), 900);
-      }
-      return;
-    }
+    // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     // 저장 직전 confirm — 사용자 의도 재확인
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkInfoCard?.activityType) {
@@ -2426,14 +2436,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const snap = workAbilitySnapshot.current;
-    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
-      setEditingAbilitySubTitle(snap.subTitle || "");
-      setEditingAbilityGrowthPoint(snap.growthPoint || "");
-      setEditingAbilityOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
-      setEditingAbilityImages(normalizeWorkInfoImages(snap.images));
-      setEditingAbilityImageCaptions(normalizeWorkInfoCaptions(snap.imageCaptions));
-    }
+    // 초기화 = 모든 필드를 빈 값으로
+    if (!(await popup.confirm("내용을 모두 초기화하시겠어요?"))) return;
+    setEditingAbilitySubTitle("");
+    setEditingAbilityGrowthPoint("");
+    setEditingAbilityOutputLinks(Array(5).fill({ desc: "", url: "" }));
+    setEditingAbilityImages(createEmptyWorkInfoImages());
+    setEditingAbilityImageCaptions(createEmptyWorkInfoCaptions());
   };
 
   const handleSaveWorkAbility = async () => {
@@ -2441,20 +2450,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const missing: string[] = [];
-    if (!editingAbilitySubTitle.trim()) missing.push("subTitle");
-    if (!editingAbilityGrowthPoint.trim()) missing.push("growthPoint");
-    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
-    if (missing.length > 0) {
-      setWorkAbilityFooterNotice("error");
-      const targetEl = document.querySelector(`.workability-view-modal [data-field="${missing[0]}"]`);
-      if (targetEl) {
-        targetEl.classList.add("field-missing");
-        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => targetEl.classList.remove("field-missing"), 900);
-      }
-      return;
-    }
+    // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkAbilityCard?.activityTypeId) {
       const newSubTitle = editingAbilitySubTitle.trim() || null;
@@ -2616,7 +2612,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     for (let i = 0; i < WORKINFO_IMAGE_SLOT_COUNT; i++) {
       if ((snapCaptions[i] || "") !== (editingExpImageCaptions[i] || "")) return true;
     }
-    if (editingExpRating !== (snap.rating || 0)) return true;
+    // 라인 평점은 어드민 전용 — dirty 판단 대상 아님
     return false;
   };
 
@@ -2673,15 +2669,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const snap = workExpSnapshot.current;
-    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
-      setEditingExpSubTitle(snap.subTitle || "");
-      setEditingExpGrowthPoint(snap.growthPoint || "");
-      setEditingExpOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
-      setEditingExpImages(normalizeWorkInfoImages(snap.images));
-      setEditingExpImageCaptions(normalizeWorkInfoCaptions(snap.imageCaptions));
-      setEditingExpRating(snap.rating || 0);
-    }
+    // 초기화 = 크루 입력 필드만 빈 값으로 (라인 평점은 어드민 전용 → 손 대지 않음)
+    if (!(await popup.confirm("내용을 모두 초기화하시겠어요?"))) return;
+    setEditingExpSubTitle("");
+    setEditingExpGrowthPoint("");
+    setEditingExpOutputLinks(Array(5).fill({ desc: "", url: "" }));
+    setEditingExpImages(createEmptyWorkInfoImages());
+    setEditingExpImageCaptions(createEmptyWorkInfoCaptions());
   };
 
   const handleSaveWorkExp = async () => {
@@ -2689,21 +2683,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const missing: string[] = [];
-    if (!editingExpSubTitle.trim()) missing.push("subTitle");
-    if (!editingExpGrowthPoint.trim()) missing.push("growthPoint");
-    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
-    if (editingExpRating <= 0) missing.push("rating");
-    if (missing.length > 0) {
-      setWorkExpFooterNotice("error");
-      const targetEl = document.querySelector(`.workexp-view-modal [data-field="${missing[0]}"]`);
-      if (targetEl) {
-        targetEl.classList.add("field-missing");
-        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => targetEl.classList.remove("field-missing"), 900);
-      }
-      return;
-    }
+    // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능 (라인 평점은 어드민 전용)
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkExpCard?.activityTypeId) {
       const newSubTitle = editingExpSubTitle.trim() || null;
@@ -2749,8 +2729,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               growthPoint: editingExpGrowthPoint,
               images: persistedImages,
               imageCaptions: editingExpImageCaptions,
-              rating: editingExpRating / 2, // 별 표시(5점 만점)로 변환
-              ratingCount: `${editingExpRating} / 10`,
+              // rating은 어드민(compliance-manage)에서만 갱신 — 크루 저장 시 건드리지 않음
             }
           : prev,
       );
@@ -2917,14 +2896,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const snap = workCareerSnapshot.current;
-    if (snap && (await popup.confirm("내용을 모두 초기화하시겠어요?"))) {
-      setEditingCareerSubTitle(snap.subTitle || "");
-      setEditingCareerGrowthPoint(snap.growthPoint || "");
-      setEditingCareerOutputLinks(snap.outputLinks && snap.outputLinks.length > 0 ? snap.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" }));
-      setEditingCareerImages(normalizeWorkCareerImages(snap.images));
-      setEditingCareerImageCaptions(normalizeWorkCareerCaptions(snap.imageCaptions));
-    }
+    // 초기화 = 모든 필드를 빈 값으로 (workCareer 는 이미지 슬롯 3개)
+    if (!(await popup.confirm("내용을 모두 초기화하시겠어요?"))) return;
+    setEditingCareerSubTitle("");
+    setEditingCareerGrowthPoint("");
+    setEditingCareerOutputLinks(Array(5).fill({ desc: "", url: "" }));
+    setEditingCareerImages(createEmptyWorkCareerImages());
+    setEditingCareerImageCaptions(createEmptyWorkCareerCaptions());
   };
 
   const handleSaveWorkCareer = async () => {
@@ -2932,20 +2910,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    const missing: string[] = [];
-    if (!editingCareerSubTitle.trim()) missing.push("subTitle");
-    if (!editingCareerGrowthPoint.trim()) missing.push("growthPoint");
-    // 이미지/링크/캡션은 옵셔널 (크루는 안 올려도 됨)
-    if (missing.length > 0) {
-      setWorkCareerFooterNotice("error");
-      const targetEl = document.querySelector(`.workcareer-view-modal [data-field="${missing[0]}"]`);
-      if (targetEl) {
-        targetEl.classList.add("field-missing");
-        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => targetEl.classList.remove("field-missing"), 900);
-      }
-      return;
-    }
+    // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
     const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
     if (activityType) {
@@ -3184,6 +3149,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
+    if (!(await requireWriteWindow())) return;
     if (!isColleagueEditFormValid()) {
       setColleagueSaveAttemptFailed(true);
       setColleagueFieldErrorFlash(true);
@@ -3631,6 +3597,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("본인 주차 리뷰만 수정할 수 있습니다.");
       return;
     }
+    if (!(await requireWriteWindow())) return;
     setWeeklyReviewFormSnapshot({ rating: weeklyReviewData.rating, content: weeklyReviewData.content });
     setWeeklyReviewSaveAttemptFailed(false);
     setWeeklyReviewFieldErrorFlash(false);
@@ -3671,6 +3638,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("본인 주차 리뷰만 저장할 수 있습니다.");
       return;
     }
+    if (!(await requireWriteWindow())) return;
     if (!isWeeklyReviewValid()) {
       setWeeklyReviewSaveAttemptFailed(true);
       setWeeklyReviewFieldErrorFlash(true);
@@ -5899,6 +5867,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       await popup.alert("연계 크루는 본인만이 작성할 수 있습니다.");
                       return;
                     }
+                    if (!(await requireWriteWindow())) return;
                     handleEditClick(() => {
                       handleOpenColleagueEdit();
                     });
@@ -7668,7 +7637,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </div>
                 <div className="modal-footer-right">
                   {!isColleagueEditing ? (
-                    <button type="button" className="modal-edit-btn" onClick={() => handleEditClick(() => setIsColleagueEditing(true))}>
+                    <button
+                      type="button"
+                      className="modal-edit-btn"
+                      onClick={async () => {
+                        if (!(await requireWriteWindow())) return;
+                        handleEditClick(() => setIsColleagueEditing(true));
+                      }}
+                    >
                       수정
                     </button>
                   ) : (
@@ -8377,7 +8353,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Sub Title {workInfoViewIsEditing && <span className="required-mark">*</span>}
+                        Sub Title
                       </h4>
                       {workInfoViewIsEditing ? (
                         <div className="text-block-edit">
@@ -8401,7 +8377,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Growth Point {workInfoViewIsEditing && <span className="required-mark">*</span>}
+                        Growth Point
                       </h4>
                       {workInfoViewIsEditing ? (
                         <div className="text-block-edit">
@@ -8799,7 +8775,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Sub Title {workExpViewIsEditing && <span className="required-mark">*</span>}
+                        Sub Title
                       </h4>
                       {workExpViewIsEditing ? (
                         <div className="text-block-edit">
@@ -8822,7 +8798,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Growth Point {workExpViewIsEditing && <span className="required-mark">*</span>}
+                        Growth Point
                       </h4>
                       {workExpViewIsEditing ? (
                         <div className="text-block-edit">
@@ -8858,7 +8834,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isRequired = imageIdx < 2;
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
-                          {workExpViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleExpImagePreview(imageIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
@@ -8981,10 +8956,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   </div>
                   <span className="line-code image-line-code">{lookupWorkExpMapping(selectedWorkExpCard.code)?.lineCode || selectedWorkExpCard.code || ""}</span>
 
-                  {/* 라인 평점 — workExp 전용 (필수, 0=미입력, 1~10) */}
+                  {/* 라인 평점 — 어드민(compliance-manage)에서 입력한 값을 읽기전용으로 표시 (0=미입력, 1~10) */}
                   {(() => {
-                    // 보기 모드: 카드 데이터(card.rating은 5점 만점) × 2로 10점 변환. 편집 모드: editingExpRating(10점).
-                    const ratingValue = workExpViewIsEditing ? editingExpRating : (selectedWorkExpCard?.rating ?? 0) * 2;
+                    const ratingValue = (selectedWorkExpCard?.rating ?? 0) * 2;
                     const halfValue = (ratingValue || 0) / 2;
                     return (
                       <div className="workexp-rating-section" data-field="rating">
@@ -9004,31 +8978,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             );
                           })}
                         </div>
-                        {workExpViewIsEditing ? (
-                          <>
-                            <input
-                              type="number"
-                              className="rating-number-input"
-                              value={editingExpRating === 0 ? "" : editingExpRating}
-                              min={1}
-                              max={10}
-                              placeholder="-"
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                if (value === "") {
-                                  setEditingExpRating(0);
-                                  return;
-                                }
-                                const nextRating = Math.max(1, Math.min(10, Number(value)));
-                                setEditingExpRating(Number.isNaN(nextRating) ? 0 : nextRating);
-                              }}
-                            />
-                            <span className="rating-max">/ 10</span>
-                            <span className="required-mark">*</span>
-                          </>
-                        ) : (
-                          <span className="rating-display">{ratingValue > 0 ? ratingValue : "-"} / 10</span>
-                        )}
+                        <span className="rating-display">{ratingValue > 0 ? ratingValue : "-"} / 10</span>
                       </div>
                     );
                   })()}
@@ -9261,7 +9211,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Sub Title {workAbilityViewIsEditing && <span className="required-mark">*</span>}
+                        Sub Title
                       </h4>
                       {workAbilityViewIsEditing ? (
                         <div className="text-block-edit">
@@ -9283,7 +9233,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Growth Point {workAbilityViewIsEditing && <span className="required-mark">*</span>}
+                        Growth Point
                       </h4>
                       {workAbilityViewIsEditing ? (
                         <div className="text-block-edit">
@@ -9318,7 +9268,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isRequired = imageIdx < 2;
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
-                          {workAbilityViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleAbilityImagePreview(imageIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
@@ -9666,7 +9615,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Sub Title {workCareerViewIsEditing && <span className="required-mark">*</span>}
+                        Sub Title
                       </h4>
                       {workCareerViewIsEditing ? (
                         <div className="text-block-edit">
@@ -9689,7 +9638,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     <div className="workinfo-text-block text-block-growth" data-field="growthPoint">
                       <h4 className="text-block-title">
                         <i className="ti ti-pin"></i>
-                        Growth Point {workCareerViewIsEditing && <span className="required-mark">*</span>}
+                        Growth Point
                       </h4>
                       {workCareerViewIsEditing ? (
                         <div className="text-block-edit">
@@ -9725,7 +9674,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const isRequired = imageIdx < 2;
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
-                          {workCareerViewIsEditing && isRequired && <span className="image-required-mark">*</span>}
                           {image ? (
                             <div className="image-preview" onClick={() => handleCareerImagePreview(imageIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
