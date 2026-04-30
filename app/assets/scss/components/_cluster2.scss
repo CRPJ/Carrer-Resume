@@ -6826,17 +6826,5 @@
   }
 } // end .cluster2-content
 
-// ===== Zone A (<1920): cluster2 모달 viewport 축소 정책 =====
-// cluster4 work-view-modal 패턴을 적용하여 wide 모달도 viewport에 맞춰 자연스럽게 축소.
-// modal-scroll-content wrapper는 JSX 호환을 위해 유지하되 cluster2 스코프에서 무력화
-// (cluster3의 wide 모달은 영향 없도록 cluster2 스코프 한정).
-@media (max-width: 1919px) {
-  // cluster2의 .modal-scroll-content 무력화: wrapper를 layout에서 제거해
-  // overlay의 grid centering이 모달을 직접 정렬하도록 한다.
-  // cluster3의 동일 selector 글로벌 규칙(min-width: 1920px)을 specificity로 override.
-  .cluster2-content .modal-scroll-content {
-    min-width: 0;
-    min-height: 0;
-    display: contents;
-  }
-}
+// .modal-scroll-content 무력화는 _global.scss에서 모든 viewport에 일괄 적용됨
+// (display: contents). cluster2 스코프 별도 규칙 불필요.

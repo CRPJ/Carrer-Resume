@@ -1618,6 +1618,10 @@ svg {
 }
 
 // 8. 모달 오버레이 투명도 통일 (Sidebar edit-modal 기준: rgba(0,0,0,0.7), blur 없음)
+// 정렬 정책(wide/non-wide 통일): viewport보다 작은 모달은 grid+safe center로 항상 화면 정중앙,
+// viewport보다 큰 경우(드물게 발생)에는 overflow:auto + safe center로 시작점이 잘리지 않도록.
+// cluster2/3/4 모든 모달이 width: min(value, calc(100vw - 48px)) + max-height: min(value, calc(100dvh - 80px))로
+// viewport-aware 축소되므로 가로 스크롤용 Zone A(display:block) 패치는 더 이상 필요 없음.
 [class*="modal-overlay"] {
   position: fixed !important;
   inset: 0 !important;
@@ -1628,43 +1632,14 @@ svg {
   padding: 40px 24px !important;
   box-sizing: border-box !important;
   display: grid !important;
-  place-items: center !important;
+  place-items: safe center !important;
   overscroll-behavior: contain;
 }
 
-// ★ Zone A (<1920): 모달 오버레이 내부 가로 스크롤
-// position:fixed 유지(화면 고정) + 오버레이 자체를 가로 스크롤 컨테이너로 사용.
-// 모달 본문이 오버레이 폭을 초과하면 오버레이 안에서 자연스럽게 스크롤 발생.
-// (Zone B/C는 본 미디어쿼리에 매칭되지 않음 → 영향 없음)
-// cluster2/cluster3의 기존 개별 Zone A 미디어쿼리는 중복이지만 회귀 위험으로 유지.
-@media (max-width: 1919px) {
-  [class*="modal-overlay"] {
-    // position/width/height는 기존값(fixed, 100%, 100%/100vh) 유지 — 건드리지 않음
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    display: block !important;     // flex → block (내부 콘텐츠가 오버레이 폭 초과 가능)
-  }
-
-  // .modal-scroll-content 래퍼가 있는 모달(cluster2/3) — 래퍼가 1920 폭 + flex center 담당
-  [class*="modal-overlay"] > .modal-scroll-content {
-    min-width: 1920px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-  }
-
-  // .modal-scroll-content 래퍼가 없는 모달(cluster4, Sidebar 등)
-  // 모달 본문 자체에 flex-shrink: 0 → 오버레이 폭에 맞춰 축소되지 않게
-  [class*="modal-overlay"] > [class*="-modal"]:not(.modal-scroll-content) {
-    flex-shrink: 0;
-  }
-}
-
+// .modal-scroll-content (cluster2/3 wide 모달의 JSX 래퍼) — layout에서 제거해
+// overlay의 grid centering이 모달을 직접 정렬하도록 함. 모든 viewport에 동일 적용.
 [class*="modal-overlay"] > .modal-scroll-content {
-  min-height: 100%;
-  box-sizing: border-box;
+  display: contents;
 }
 
 .section-modal,
