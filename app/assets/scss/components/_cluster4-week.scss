@@ -2712,6 +2712,17 @@
         min-width: 0;
         padding-left: 56px;
 
+        // <1920에서만 .legend-items 마지막 항목이 우측에서 잘리지 않도록 보정.
+        // 기본 50% basis는 유지하되 shrink 허용 + margin/padding을 clamp로 줄여 안쪽으로.
+        // legend-items가 transform: scale(1.2)로 그려져 CSS box보다 ~20% 넓게 페인트되기 때문에,
+        // padding-left를 줄여 legend-items 시작점을 좌측으로 당겨 마지막 항목이 wrapper의
+        // overflow-x: clip 경계 안에 들어오게 한다.
+        @media (max-width: 1919px) {
+          flex: 0 1 50%;
+          margin-right: clamp(8px, 1.5vw, 35px);
+          padding-left: clamp(0px, 1vw, 56px);
+        }
+
         .growth-label {
           font-size: 25px;
           font-weight: 700;
@@ -2743,6 +2754,13 @@
           transform: scale(1.2);
           transform-origin: left center;
 
+          // <1920에서만 wrap 허용 + 폭 제한
+          @media (max-width: 1919px) {
+            flex-wrap: wrap;
+            min-width: 0;
+            max-width: 100%;
+          }
+
           .legend-item {
             display: flex;
             align-items: center;
@@ -2756,6 +2774,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+
+            @media (max-width: 1919px) {
+              flex-shrink: 1;
+            }
 
             .legend-icon {
               width: 45px;
