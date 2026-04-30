@@ -5611,29 +5611,25 @@
 // 시즌 평판 모달 스타일 (cluster4-card-content 스코프)
 // ============================================
 .cluster4-card-content .section-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 99999;
-  overflow-y: auto;
-  padding: 40px 0;
+  overflow: auto;
+  padding: 40px 24px;
 }
+
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal-overlay {
+    display: grid !important;
+    place-items: center !important;
+  }
+}
+
 .cluster4-card-content .section-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 504px;
+  width: min(504px, calc(100vw - 48px));
   height: 606px;
-  max-width: none;
-  max-height: 606px;
+  max-width: 504px;
+  max-height: min(606px, calc(100dvh - 80px));
   border: 1px solid #ffa500;
   border-radius: 0;
   overflow: hidden;
@@ -5641,7 +5637,8 @@
   flex-direction: column;
 
   &.section-modal-wide {
-    width: 700px;
+    width: min(700px, calc(100vw - 48px));
+    max-width: 700px;
   }
 
   .section-modal-header {
@@ -5688,6 +5685,7 @@
   .section-modal-body {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     padding: 16px 24px;
 
     &::-webkit-scrollbar {
@@ -6072,17 +6070,17 @@
 .season-reputation-view-overlay,
 .season-review-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
   z-index: 99999;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  overscroll-behavior: contain;
 }
 
 // ── 모달 1: 시즌 평판 작성/수정 ──
@@ -6090,16 +6088,12 @@
 // Season Reputation Form Modal (가로형_중 979×570)
 // ============================================
 .section-modal.section-modal-season-reputation-form {
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -6597,22 +6591,21 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.68);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
   z-index: 100020;
+  overscroll-behavior: contain;
 }
 
 .keyword-select-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   background: #121212;
   border: 1px solid rgba(250, 171, 7, 0.24);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
@@ -6840,17 +6833,13 @@
 // 가이드 §1 + §4 + §6 적용
 // ============================================
 .section-modal.section-modal-season-reputation-view {
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
 
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -7430,16 +7419,12 @@
 
 // ── 모달 3: 시즌 리뷰 (자기평가) ──
 .section-modal.section-modal-season-review {
-  width: 674px !important;
+  width: min(674px, calc(100vw - 48px)) !important;
   max-width: 674px !important;
   height: 826px !important;
-  max-height: 826px !important;
+  max-height: min(826px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -8041,25 +8026,23 @@
 
 .cluster4-content {
   .help-modal-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100%;
-    height: 100vh;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 100001 !important;
   }
 
+  @media (max-width: 1919px) {
+    .help-modal-overlay {
+      display: grid !important;
+      place-items: center !important;
+    }
+  }
+
   .help-modal {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
     margin: 0 !important;
-    width: 1024px;
+    width: min(1024px, calc(100vw - 48px));
+    max-width: 1024px;
     height: 794px;
+    max-height: min(794px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -8175,14 +8158,11 @@
 }
 
 .season-review-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 570px;
+  width: min(570px, calc(100vw - 48px));
+  max-width: 570px;
   height: 449px;
-  max-height: 449px;
+  max-height: min(449px, calc(100dvh - 80px));
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
   border: 1px solid #ffa500;
   box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);

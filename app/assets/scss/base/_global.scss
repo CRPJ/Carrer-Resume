@@ -1618,9 +1618,17 @@ svg {
 
 // 8. 모달 오버레이 투명도 통일 (Sidebar edit-modal 기준: rgba(0,0,0,0.7), blur 없음)
 [class*="modal-overlay"] {
+  position: fixed !important;
+  inset: 0 !important;
   background: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  overflow: auto !important;
+  padding: 40px 24px !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  place-items: center !important;
+  overscroll-behavior: contain;
 }
 
 // ★ Zone A (<1920): 모달 오버레이 내부 가로 스크롤
@@ -1651,6 +1659,29 @@ svg {
   [class*="modal-overlay"] > [class*="-modal"]:not(.modal-scroll-content) {
     flex-shrink: 0;
   }
+}
+
+[class*="modal-overlay"] > .modal-scroll-content {
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.section-modal,
+.section-modal-wide {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.section-modal-header,
+.section-modal-footer {
+  flex-shrink: 0;
+}
+
+.section-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* ====
