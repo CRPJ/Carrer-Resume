@@ -5829,4 +5829,32 @@
       }
     }
   }
+
+  /* 보정 5 (D-3): section3 채널 모달 자식 입력 폭 유연화
+     배경: 자식 width 233px가 부모 컬럼폭(.channel-info-section: 32%)이 좁아질 때 잘림 유발
+     1920(Zone B)는 base 정의 그대로 → max-width: 233px 상한이 그대로 작동하므로 변화 없음
+     .rating-field는 의도적으로 제외 (별점 영역 55px 제약 보호) */
+  .channel-info-field {
+    input,
+    .custom-dropdown,
+    .platform-dropdown,
+    .channel-date-input,
+    .channel-name-input-wrapper,
+    .link-field {
+      width: 100% !important;
+      max-width: 233px !important;
+      min-width: 0 !important;
+      flex: 1 1 0 !important;
+    }
+
+    .link-field {
+      input,
+      .field-value {
+        width: 100% !important;
+        max-width: 233px !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+      }
+    }
+  }
 }
