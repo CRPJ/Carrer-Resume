@@ -13859,3 +13859,41 @@
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
   }
 }
+
+/* ============================================
+   cluster-4-card — 모달 자체 스크롤 통합 (Zone A)
+
+   문제: Zone A 환경(낮은 뷰포트 높이)에서 work-view-modal 4종(view + edit)의
+        .workinfo-text-section만 자체 스크롤되어 어색함.
+        편집 모드는 이중 스크롤(modal-body + text-section) 발생.
+
+   해결: workinfo-text-section의 자체 스크롤 제거 + 부모 height 제약 풀어
+        section-modal-body가 자연스럽게 모달 단일 스크롤을 담당하게 함.
+
+   selector 구분:
+   - .work-view-modal: view 모드와 편집 모드가 같은 클래스 사용
+   - 4개 카드 종류(workexp, workinfo, workability, workcareer) 모두
+     .workinfo-text-section / .workinfo-left / .workinfo-content-layout 공통 클래스 사용
+
+   Zone B(1920) / Zone C(>1920) 절대 보호:
+   @media (max-width: 1919px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px) {
+  .nftg-app:has(.cluster4-card-content) {
+    .section-modal.work-view-modal {
+      .workinfo-text-section {
+        overflow-y: visible !important;
+        height: auto !important;
+        max-height: none !important;
+      }
+
+      .workinfo-left {
+        height: auto !important;
+      }
+
+      .workinfo-content-layout {
+        height: auto !important;
+      }
+    }
+  }
+}
