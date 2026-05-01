@@ -349,7 +349,13 @@
 
       // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
       // @media (min-width: 1200px) unwrapped:
+      // <1920에서는 wrapper 폭(~1236)이 좁아 우측 28px만큼 wrapper 밖으로 튀어나가므로
+      // 작은 viewport에서만 transform을 비활성화. 1920+ 디자인은 그대로.
       transform: translateX(clamp(0px, 2.2vw, 72px));
+
+      @media (max-width: 1919px) {
+        transform: none;
+      }
 
       p {
         font-family: "HakgyoansimTuho", sans-serif;
@@ -797,6 +803,13 @@
         align-items: flex-end;
         justify-content: flex-end;
         pointer-events: none !important;
+
+        // <1920에서는 wrapper 폭(~1236)이 좁아 right:-80px이 페이지 우측 밖으로
+        // 80px 밀려나가 가시 영역에서 잘림. absolute 구조와 size는 유지하고
+        // 우측 anchor만 0으로 끌어와 부모 안쪽으로 들어오게 한다.
+        @media (max-width: 1919px) {
+          right: 0;
+        }
 
         img {
           width: 100%;

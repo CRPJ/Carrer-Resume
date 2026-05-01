@@ -1979,7 +1979,13 @@
                     font-size: 1rem !important;
                     font-family: "Pretendard", sans-serif;
                     font-weight: 700;
-                    flex-shrink: 0;
+                    // 부모 .profile-details(flex+overflow:hidden)가 좁을 때
+                    // nickname이 flex-shrink:0 + min-width:auto 때문에 본인 content
+                    // 폭을 그대로 유지하며 부모 우측을 넘어가 글자가 잘렸음.
+                    // 우측 끝 항목이라 shrink 허용 + ellipsis로 자연스럽게 축약.
+                    flex-shrink: 1;
+                    min-width: 0;
+                    text-overflow: ellipsis;
                   }
                 }
               }
