@@ -609,6 +609,7 @@ const Cluster2Content = () => {
   // 섹션 2-1 모달 (비디오 편집)
   const [section21ModalOpen, setSection21ModalOpen] = useState(false);
   const section21OverlayRef = useRef<HTMLDivElement>(null);
+  const introOverlayRef = useRef<HTMLDivElement>(null);
   // YouTube 비디오 ID 추출 함수
   const extractYouTubeId = (url: string): string | null => {
     if (!url) return null;
@@ -1091,6 +1092,52 @@ const Cluster2Content = () => {
     overlay.addEventListener("wheel", handleWheel, { passive: false });
     return () => overlay.removeEventListener("wheel", handleWheel);
   }, [section21ModalOpen]);
+
+  // intro-modal Zone A 휠 스크롤 활성화 (native listener — passive: false 필수)
+  // useModalScroll의 >= absDelta 조건이 휠 끝부분에서 차단하는 문제 우회
+  // Zone A에서만 적용: 1920px 이상 환경에서는 등록 안 함
+  useEffect(() => {
+    if (!introModalOpen) return;
+
+    // Zone A 한정: 뷰포트 1920px 이상이면 등록 안 함 (Zone B/C 보호)
+    if (window.innerWidth >= 1920) return;
+
+    const overlay = introOverlayRef.current;
+    if (!overlay) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const body = overlay.querySelector(".intro-modal-body") as HTMLElement | null;
+      if (!body) {
+        e.preventDefault();
+        return;
+      }
+
+      // 휠 target이 body 바깥이면 차단 (모달 외부 스크롤 방지)
+      if (!body.contains(e.target as Node)) {
+        e.preventDefault();
+        return;
+      }
+
+      // body 끝 도달 여부 판단 — useModalScroll보다 너그러운 조건 (>= absDelta가 아닌 > 0)
+      const remainingDown = body.scrollHeight - body.clientHeight - body.scrollTop;
+      const remainingUp = body.scrollTop;
+      const canScrollDown = e.deltaY > 0 && remainingDown > 0;
+      const canScrollUp = e.deltaY < 0 && remainingUp > 0;
+
+      if (canScrollDown || canScrollUp) {
+        // body가 직접 스크롤하도록 + 글로벌 useModalScroll 가드 차단
+        body.scrollTop += e.deltaY;
+        e.stopPropagation();
+        e.preventDefault();
+      } else {
+        // 끝 도달 시 페이지 스크롤 방지
+        e.preventDefault();
+      }
+    };
+
+    overlay.addEventListener("wheel", handleWheel, { passive: false });
+    return () => overlay.removeEventListener("wheel", handleWheel);
+  }, [introModalOpen]);
 
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     "", // Total Complete (cluving_review_link)
@@ -3171,7 +3218,7 @@ const Cluster2Content = () => {
       )}
       {/* 섹션 5 모달 - 자기소개서 카드 상세/편집 */}
       {introModalOpen && selectedIntroCard !== null && (
-        <div className="intro-modal-overlay">
+        <div ref={introOverlayRef} className="intro-modal-overlay">
           <div className="modal-scroll-content">
             <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
               <div className="intro-modal-header">

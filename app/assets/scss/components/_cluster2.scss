@@ -6857,3 +6857,55 @@
     }
   }
 }
+
+/* ============================================
+   Cluster2 intro-modal Zone A 스크롤 활성화 (v2)
+
+   목적: Zone A 환경에서 intro-modal-body 콘텐츠가 길어질 때
+        body 영역에 스크롤바가 정상 발생하도록 함
+
+   진짜 원인:
+   - intro-modal-body 자체는 이미 overflow-y: scroll, flex: 1 1 0%,
+     min-height: 0 으로 올바르게 설정되어 있음
+   - 그러나 content-section이 flex: 1 0 0% (flex-grow: 1)로 설정되어
+     자기 자식(textarea-wrapper 336px)을 무시하고 부모의 남은 공간
+     (276px)만 받음
+   - 결과: textarea-wrapper가 content-section을 뚫고 나오지만
+     scrollHeight는 clientHeight와 같아 스크롤 활성화 안 됨
+
+   해결:
+   - content-section을 flex: 0 0 auto + height: auto로 변경
+     → 자기 자식 크기(textarea-wrapper 336px)를 자기 크기로 받음
+     → body의 scrollHeight가 자식 합계로 늘어남
+     → overflow-y: scroll 정상 활성화
+   - textarea-wrapper도 flex: 0 0 auto + flex-shrink: 0 추가
+     → 압축되지 않고 자기 크기 유지
+   - body의 모든 직속 자식에 flex-shrink: 0 추가
+     → subtitle-section 등 다른 자식도 압축되지 않음
+
+   부수 효과:
+   - 콘텐츠가 짧을 때(현재 정상 상태)에는 변화 없음
+   - 콘텐츠가 길어질 때만 스크롤로 접근 가능해짐
+   - char-count(0/1,000)가 정상 위치에 표시됨
+
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px) {
+  .nftg-app:has(.cluster2-content) {
+    .intro-modal-body {
+      > * {
+        flex-shrink: 0 !important;
+      }
+
+      .content-section {
+        flex: 0 0 auto !important;
+        height: auto !important;
+      }
+
+      .textarea-wrapper {
+        flex: 0 0 auto !important;
+        flex-shrink: 0 !important;
+      }
+    }
+  }
+}
