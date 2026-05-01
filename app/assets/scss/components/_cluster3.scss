@@ -5817,14 +5817,19 @@
       width: 100% !important;
     }
 
-    /* 보정 4: meta-row contribution / platform 폭 조정 */
+    /* 보정 4: meta-row contribution / platform 폭 조정
+       left-column이 좁을 때 contribution이 가용 공간으로 수축, 넉넉할 땐 560/470 상한 유지 */
     .output-meta-row {
       .output-contribution {
-        flex: 0 0 560px !important;
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        max-width: 560px !important;
 
         .contribution-bar-wrapper {
-          flex: 0 0 470px !important;
-          width: 470px !important;
+          flex: 1 1 0 !important;
+          width: auto !important;
+          min-width: 0 !important;
+          max-width: 470px !important;
         }
       }
     }
