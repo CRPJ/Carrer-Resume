@@ -545,24 +545,13 @@ const page = () => {
                   </div>
                 ) : (
                   <div
+                    className="crews-grid"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
                       gap: 24,
                     }}
-                    className="crews-grid"
                   >
-                    <style>{`
-                      @media (min-width: 700px) {
-                        .crews-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
-                      }
-                      @media (min-width: 1200px) {
-                        .crews-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
-                      }
-                      @media (min-width: 1600px) {
-                        .crews-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
-                      }
-                    `}</style>
                     {paginatedCrews.map((crew) => (
                       <div key={crew.id} className="trending__single" style={{ height: "100%" }}>
                         <div className="thumb">
