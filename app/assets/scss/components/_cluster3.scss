@@ -5771,31 +5771,32 @@
 // (display: contents). cluster3 스코프 별도 규칙 불필요.
 
 /* ============================================
-   cluster3 — output/detail 모달 편집 모드 레이아웃 보정 (Zone A)
+   cluster3 — output/detail 모달 편집 모드 레이아웃 통합 보정
 
-   문제 1: .output-links-section(우측 링크 영역) 안의 link-dot, input이
-          부모 영역(215px) 밖으로 좌측 튀어나감
-   문제 2: .output-role-input-wrap의 min-width: 612px이 부모 영역 밖으로
-          81px 우측 튀어나감
-
-   해결:
-   - link-input max-width 140px로 줄임 + link-dot margin 8px로 조정
-     → 자식 합계 폭이 부모 영역에 들어맞음
-   - role-input-wrap의 min-width를 0으로 풀어 부모 폭 따라가게 함
+   4가지 문제 보정:
+   1. [Zone A] 우측 링크 영역 좌측 잘림 — link-input/link-dot 폭 조정
+   2. [모든 zone] 역할 input-wrap min-width 612px이 부모 침범
+      (Zone A 81px / Zone B 85px / Zone C 84px — 모든 zone에서 발생하는 구조적 문제)
+   3. [Zone A] sub-title의 width 983px(SCSS 절대값) 부모 침범
+   4. [Zone A] meta-row platform 우측 침범 — contribution flex 폭 조정
 
    selector 구분:
-   - .output-modal-overlay: output / detail 모달이 같은 컴포넌트 재사용
-   - 편집 모드에서만 input/textarea가 보이므로 input/textarea 자체가 selector 역할
-   - cluster3 페이지에서만 사용되는 클래스이므로 추가 페이지 한정 불필요
-     (cluster-4-card도 .output-link-input을 사용하지만 .output-modal-overlay
-      안에 있지 않으므로 본 규칙은 매칭되지 않음)
-
-   Zone B(1920) / Zone C(>1920) 절대 보호:
-   @media (max-width: 1919px) 안에서만 동작
+   - .output-modal-overlay: output / detail 모달 동일 컴포넌트 재사용
+   - 보정 2번은 모든 zone 발생하는 구조적 문제 → @media 밖
+   - 나머지는 Zone A 한정 → @media (max-width: 1919px) 안
    ============================================ */
+
+/* 보정 2: role-input-wrap min-width 풀기 (모든 zone) */
+.output-modal-overlay {
+  .output-role-section .output-role-header .output-role-input-wrap {
+    min-width: 0 !important;
+  }
+}
+
+/* 보정 1, 3, 4: Zone A 전용 */
 @media (max-width: 1919px) {
   .output-modal-overlay {
-    /* 문제 1: 우측 링크 영역 폭 조정 */
+    /* 보정 1: 우측 링크 영역 폭 조정 */
     .output-links-section {
       .output-link-input {
         max-width: 140px !important;
@@ -5806,29 +5807,17 @@
       }
     }
 
-    /* 문제 2: 역할 input wrap min-width 풀기 */
-    .output-role-input-wrap {
-      min-width: 0 !important;
+    /* 보정 3: sub-title 폭 보정 (SCSS 절대값 무력화) */
+    .output-modal .output-modal-body .output-sub-title {
+      width: auto !important;
+      max-width: 100% !important;
     }
-  }
-}
 
-/* ============================================
-   cluster3 — output/detail 모달 meta-row 폭 보정 (Zone A)
+    .output-modal .output-modal-body .output-sub-title .output-sub-title-input {
+      width: 100% !important;
+    }
 
-   문제: .output-meta-row 안의 .output-platform이 부모 영역을 우측 45px 침범
-   원인: contribution(612) + gap(24) + platform(272) = 908px 합계 > 부모 폭 863px
-   해결: contribution 폭을 560px로 줄여 platform이 영역 안에 들어가게 함
-
-   selector 구분:
-   - .output-modal-overlay: output / detail 모달이 같은 컴포넌트 재사용
-   - cluster3 페이지에서만 사용되는 클래스
-
-   Zone B(1920) / Zone C(>1920) 절대 보호:
-   @media (max-width: 1919px) 안에서만 동작
-   ============================================ */
-@media (max-width: 1919px) {
-  .output-modal-overlay {
+    /* 보정 4: meta-row contribution / platform 폭 조정 */
     .output-meta-row {
       .output-contribution {
         flex: 0 0 560px !important;
@@ -5838,31 +5827,6 @@
           width: 470px !important;
         }
       }
-    }
-  }
-}
-
-/* ============================================
-   cluster3 — output/detail 모달 sub-title 폭 보정 (Zone A)
-
-   문제: .output-sub-title { width: 983px; }와
-        .output-sub-title-input { width: 992px; }이 SCSS에 절대값으로 박혀있어
-        Zone A에서 부모(output-left-column 863px)를 우측 침범
-
-   해결: Zone A에서만 두 요소의 width를 풀어 부모 따라가게 함
-
-   selector: .output-modal-overlay (output / detail 모달 같은 컴포넌트)
-   Zone B(1920) / Zone C(>1920) 보호: @media (max-width: 1919px) 안에서만
-   ============================================ */
-@media (max-width: 1919px) {
-  .output-modal-overlay {
-    .output-modal .output-modal-body .output-sub-title {
-      width: auto !important;
-      max-width: 100% !important;
-    }
-
-    .output-modal .output-modal-body .output-sub-title .output-sub-title-input {
-      width: 100% !important;
     }
   }
 }
