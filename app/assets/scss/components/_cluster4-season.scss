@@ -8233,3 +8233,23 @@
     box-sizing: border-box;
   }
 }
+
+/* ============================================
+   cluster-4-1 — season-growth-card 이미지 겹침 보정
+
+   문제: Zone A에서 .card-right 이미지가 .season-badge(성장 진행 중)를 123px 가림
+   해결: card-right 이미지의 width와 left를 조정하여 badge와 겹치지 않게 함
+
+   selector 구분:
+   - .nftg-app:has(.cluster4-section3) → cluster-4-1만 매칭
+   - cluster-4 페이지에는 .cluster4-section3가 없으므로 영향 없음
+   - 콘솔 진단으로 확인됨 (cluster-4: section3 false, cluster-4-1: section3 true)
+
+   Zone B(1920) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px) {
+  .nftg-app:has(.cluster4-section3) .season-growth-card .card-right {
+    width: 600px !important;
+    left: 700px !important;
+  }
+}
