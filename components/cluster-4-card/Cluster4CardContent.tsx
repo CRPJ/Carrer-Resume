@@ -3144,6 +3144,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   const openRatingDropdown = () => {
     if (!isReputationFormEditing) return;
+    if (ratingDropdownOpen) {
+      setRatingDropdownOpen(false);
+      return;
+    }
     const trigger = ratingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
@@ -3160,6 +3164,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 주차 리뷰 — 평점 드롭다운 핸들러
   const openReviewRatingDropdown = () => {
     if (!isWeeklyReviewEditing) return;
+    if (reviewRatingDropdownOpen) {
+      setReviewRatingDropdownOpen(false);
+      return;
+    }
     const trigger = reviewRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();

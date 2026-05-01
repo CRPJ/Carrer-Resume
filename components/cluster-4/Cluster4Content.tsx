@@ -673,6 +673,10 @@ const Cluster4Content = () => {
 
   const openSeasonRatingDropdown = () => {
     if (!isSeasonReputationFormEditing) return;
+    if (seasonRatingDropdownOpen) {
+      setSeasonRatingDropdownOpen(false);
+      return;
+    }
     const trigger = seasonRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
@@ -2199,6 +2203,10 @@ const Cluster4Content = () => {
   // 시즌 리뷰 저장
   const openSeasonReviewRatingDropdown = () => {
     if (!isSeasonReviewFormEditing) return;
+    if (seasonReviewRatingDropdownOpen) {
+      setSeasonReviewRatingDropdownOpen(false);
+      return;
+    }
     const trigger = seasonReviewRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
