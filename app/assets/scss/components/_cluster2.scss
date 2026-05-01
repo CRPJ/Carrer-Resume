@@ -6828,3 +6828,32 @@
 
 // .modal-scroll-content 무력화는 _global.scss에서 모든 viewport에 일괄 적용됨
 // (display: contents). cluster2 스코프 별도 규칙 불필요.
+
+/* ============================================
+   Zone A 폭 확장 (cluster2 전용)
+
+   목적: Zone A 뷰포트(< 1920px)에서 cluster2 페이지가
+        Zone B(1920px)와 동일한 시각적 결과를 가로 스크롤로 보여주도록 함
+
+   메커니즘:
+   - 부모 .nftg-app: 1920 → 1995 (= 1920 + nftg-sidebar 75px) 확장
+     → nftg-sidebar(75px sticky)의 자리를 확보
+   - 자식 .nftg-layout: flex: 1 1 0% → flex: 0 0 1920px 강제
+     → 메인 콘텐츠 영역이 1920px 전체를 받음
+   - .home-two-content-col은 flex 메커니즘에 의해 자동으로 75px 확장 (1238→1293)
+   - .nftg-sidebar는 변경 없음 (sticky 유지, 햄버거 메뉴 정상 표시)
+
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px) {
+  .nftg-app:has(.cluster2-content) {
+    width: 1995px !important;
+    min-width: 1995px !important;
+
+    > .nftg-layout {
+      flex: 0 0 1920px !important;
+      width: 1920px !important;
+      min-width: 1920px !important;
+    }
+  }
+}
