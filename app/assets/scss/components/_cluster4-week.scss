@@ -13954,3 +13954,43 @@
     }
   }
 }
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-card 본인 헤더(work-edit) 모달 바디 스크롤 활성화
+// 사유: 사용자 헤더 편집 모달도 다른 폼 모달과 동일하게 viewport보다 클 때
+//       본문 영역에서 스크롤이 동작하도록 명시적 보장.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.section-modal-work-edit {
+    .section-modal-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Reputation View / Colleague View 모달 바디 스크롤 보장
+// 사유: 두 모달은 createPortal로 document.body에 렌더링되어
+//       .cluster4-card-content 스코프 안의 default 스타일이 적용되지만
+//       Zone A 환경에서 viewport-aware max-height로 모달이 줄어들 때
+//       본문이 자연스럽게 스크롤되어야 함.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.reputation-view-modal {
+    .section-modal-body.reputation-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  .cluster4-card-content .section-modal.colleague-view-modal {
+    .section-modal-body,
+    .section-modal-body.colleague-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}

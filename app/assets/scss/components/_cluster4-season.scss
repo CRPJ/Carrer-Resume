@@ -8253,3 +8253,53 @@
     left: 700px !important;
   }
 }
+
+/* ============================================
+   cluster-4-1 — Zone A (< 1920px) 모달 스크롤 활성화
+
+   문제: 1366×768 / 1440×900 / 1536×864 등 1920px 미만 해상도에서
+        시즌 모달 4종(form/view/review/keyword-select)이 viewport보다
+        클 때 본문이 스크롤되지 않거나(overflow: hidden) 모달 밖으로
+        넘쳐(overflow: visible) 잘려 보이는 문제.
+
+   해결: Zone A에서만 본문 영역을 overflow-y: auto로 전환하여 모달
+        내부에서 스크롤이 동작하도록 함. 모달의 viewport-aware 사이즈
+        (width: min(N, 100vw-48px), max-height: min(N, 100dvh-80px))는
+        이미 적용돼 있어 모달이 화면을 벗어나지 않음.
+
+   Zone B (1920×1080) 절대 보호:
+   @media (max-width: 1919px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px) {
+  // 모달 1: 시즌 평판 작성/수정 (section-modal-wide 패턴, 979×570)
+  .section-modal.section-modal-season-reputation-form {
+    .section-modal-body.season-reputation-form-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 2: 시즌 평판 상세 보기 (979×570) — 사용자 명시 "section-modal: 평판 상세 보기"
+  .section-modal.section-modal-season-reputation-view {
+    .section-modal-body.season-reputation-view-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 3: 시즌 리뷰 (자기평가, 674×826)
+  .section-modal.section-modal-season-review {
+    .section-modal-body.season-review-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 4: 키워드 선택 서브모달 (form 내부)
+  .section-modal.keyword-select-modal {
+    .section-modal-body.keyword-select-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
