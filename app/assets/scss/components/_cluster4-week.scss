@@ -13859,6 +13859,52 @@
   }
 }
 
+// =====================================================================
+// Zone A (< 1920px) — Weekly Review 모달 바디 스크롤 활성화
+// 사유: Cluster4CardContent.tsx의 Weekly Review 모달은 createPortal로
+//       document.body에 직접 렌더링되므로 .cluster4-card-content 스코프
+//       하위 규칙이 적용되지 않는다. 따라서 탑레벨 셀렉터로 작성한다.
+// 범위: Zone B (1920×1080) baseline 절대 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .section-modal-weekly-review-form {
+    .section-modal-body.weekly-review-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Weekly Reputation 모달 바디 스크롤 활성화
+// 사유: Weekly Review와 동일 패턴 적용. Zone A에서 모달이 뷰포트보다
+//       클 때 바디 영역만 스크롤되어야 함 (헤더/푸터는 flex-shrink: 0
+//       으로 이미 고정됨).
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.section-modal-reputation-form {
+    .section-modal-body.reputation-form-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Colleague Card 모달 바디 스크롤 활성화
+// 사유: Weekly Review와 동일 패턴 적용.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.section-modal-colleague-edit {
+    .section-modal-body.colleague-edit-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
 @keyframes weekly-review-field-error-flash {
   0%,
   100% {
