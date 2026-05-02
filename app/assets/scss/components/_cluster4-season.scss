@@ -8303,3 +8303,43 @@
     }
   }
 }
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-1 모달 overlay 좌표계 보정
+// 사유: .cluster4-content 페이지가 Zone A에서 1920 캔버스로 강제 확장됨
+//       (_cluster-zone-a.scss). overlay가 normal flow면 1920 캔버스 안
+//       에 갇혀 모달이 viewport 중앙이 아닌 캔버스 중앙에 배치되어
+//       작은 viewport에서 모달 일부가 잘리는 문제 발생.
+// 해결: Zone A에서만 overlay를 position: fixed; inset: 0 으로 viewport
+//       좌표계로 끌어올림. cluster-4-card에서 검증된 패턴 그대로 적용.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-content .section-modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-1 모달 body 직계 자식 flex 압축 방지
+// 사유: body가 display: flex; flex-direction: column 이라 자식들이
+//       flex-shrink: 1(default)로 압축되어 본질 height을 잃음.
+//       그 결과 body scrollHeight가 실제 필요 높이를 반영하지 못해
+//       overflow-y: auto 가 발동하지 않음.
+// 적용: form-body, view-body, review-body (3개). keyword-select-body는
+//       display: flex가 아니므로 제외.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-content .section-modal.section-modal-season-reputation-form
+    .section-modal-body.season-reputation-form-body > *,
+  .cluster4-content .section-modal.section-modal-season-reputation-view
+    .section-modal-body.season-reputation-view-body > *,
+  .cluster4-content .section-modal.section-modal-season-review
+    .section-modal-body.season-review-body > * {
+    flex-shrink: 0 !important;
+  }
+}

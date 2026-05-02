@@ -4913,6 +4913,8 @@
 
   @media (max-width: 1919px) {
     .section-modal-overlay {
+      position: fixed !important;
+      inset: 0 !important;
       display: grid !important;
       place-items: center !important;
     }
@@ -13885,6 +13887,7 @@
 @media (max-width: 1919px) {
   .cluster4-card-content .section-modal.section-modal-reputation-form {
     .section-modal-body.reputation-form-body {
+      min-height: 0 !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
     }
@@ -13899,6 +13902,7 @@
 @media (max-width: 1919px) {
   .cluster4-card-content .section-modal.section-modal-colleague-edit {
     .section-modal-body.colleague-edit-body {
+      min-height: 0 !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
     }
@@ -13992,5 +13996,26 @@
       overflow-y: auto !important;
       overflow-x: hidden !important;
     }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — 모달 body 직계 자식 flex 압축 방지
+// 사유: body가 display: flex; flex-direction: column 이라 자식들이
+//       flex-shrink: 1(default)로 압축되어 본질 height을 잃음.
+//       그 결과 body scrollHeight가 실제 필요 높이를 반영하지 못해
+//       overflow-y: auto가 발동하지 않음.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.section-modal-reputation-form
+    .section-modal-body.reputation-form-body > *,
+  .cluster4-card-content .section-modal.section-modal-colleague-edit
+    .section-modal-body.colleague-edit-body > *,
+  .cluster4-card-content .section-modal.reputation-view-modal
+    .section-modal-body.reputation-body > *,
+  .cluster4-card-content .section-modal.colleague-view-modal
+    .section-modal-body.colleague-body > * {
+    flex-shrink: 0 !important;
   }
 }

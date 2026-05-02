@@ -21,8 +21,8 @@ export function useModalScroll(isOpen: boolean) {
           const remainingUp = el.scrollTop;
           const absDelta = Math.abs(e.deltaY);
 
-          const canScrollDown = e.deltaY > 0 && remainingDown >= absDelta;
-          const canScrollUp = e.deltaY < 0 && remainingUp >= absDelta;
+          const canScrollDown = e.deltaY > 0 && remainingDown > 0;
+          const canScrollUp = e.deltaY < 0 && remainingUp > 0;
 
           if (canScrollDown || canScrollUp) {
             return;
@@ -56,8 +56,8 @@ export function useModalScroll(isOpen: boolean) {
           const remainingUp = el.scrollTop;
           const absDelta = Math.abs(deltaY);
 
-          const canScrollDown = deltaY > 0 && remainingDown >= absDelta;
-          const canScrollUp = deltaY < 0 && remainingUp >= absDelta;
+          const canScrollDown = deltaY > 0 && remainingDown > 0;
+          const canScrollUp = deltaY < 0 && remainingUp > 0;
 
           if (canScrollDown || canScrollUp) {
             return;
