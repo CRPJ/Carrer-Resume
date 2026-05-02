@@ -5535,6 +5535,14 @@
   }
 }
 
+// Zone A: keep cluster3 channel modal bottom textareas as one horizontal canvas.
+@media (max-width: 1919px) {
+  .cluster3-content .section-modal .section-modal-body > .channel-bottom-section {
+    min-width: 1180px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
 .period-range-panel.calendar-popup {
   position: absolute;
   width: 286px;
