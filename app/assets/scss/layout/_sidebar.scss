@@ -1225,7 +1225,7 @@ body:has(.mobile-layout) > button:has(.ti-pencil) {
   padding: 40px 24px;
 }
 
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .phone-comment-modal-overlay {
     display: grid !important;
     place-items: center !important;

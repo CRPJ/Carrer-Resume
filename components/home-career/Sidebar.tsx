@@ -478,7 +478,10 @@ const Sidebar = () => {
       //   1920px 고정 + 가로 스크롤 전략이므로 화면 자체가 1920×1080 그대로 표시되어야 함.
       //   (Zone B/C는 ternary 두 번째 분기 사용 → 기존 동작과 동일)
       const originalWidth = window.innerWidth;
-      const viewportHeight = (originalWidth < 1920)
+      const isZoneAViewport =
+        originalWidth < 1920 ||
+        (originalWidth >= 1920 && originalWidth < 2560 && window.innerHeight >= 1200);
+      const viewportHeight = isZoneAViewport
         ? 1080
         : window.innerHeight;
       console.log('[calculateScale]', {
@@ -495,7 +498,7 @@ const Sidebar = () => {
 
       // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
       // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
-      if (originalWidth > 1920) {
+      if (originalWidth > 1920 && !isZoneAViewport) {
         scale = 1.31;
       }
 
@@ -504,7 +507,7 @@ const Sidebar = () => {
 
       // 사이드바 폭: 1920 이하만 JS로 동적 설정
       // 1921px+ 는 SCSS @media (min-width: 1921px)에서 --sidebar-width: 651px 고정
-      if (originalWidth <= 1920) {
+      if (originalWidth <= 1920 || isZoneAViewport) {
         const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
         document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
       }

@@ -313,7 +313,7 @@ body {
 // ===== Zone A (<1920) 대응 =====
 // 정책: 축소/zoom 없음. 1920×1080 baseline 그대로 표시 + 가로 스크롤로 자연 노출.
 // (Zone B/C는 본 미디어쿼리에 매칭되지 않으므로 영향 없음.)
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   html {
     overflow-x: auto !important;  // 가로 스크롤 허용
     min-width: 1920px;            // viewport보다 작아도 최소 1920px 보장

@@ -1121,8 +1121,10 @@ const Cluster2Content = () => {
   useEffect(() => {
     if (!introModalOpen) return;
 
-    // Zone A 한정: 뷰포트 1920px 이상이면 등록 안 함 (Zone B/C 보호)
-    if (window.innerWidth >= 1920) return;
+    const isZoneAViewport =
+      window.innerWidth < 1920 ||
+      (window.innerWidth >= 1920 && window.innerWidth < 2560 && window.innerHeight >= 1200);
+    if (!isZoneAViewport) return;
 
     const overlay = introOverlayRef.current;
     if (!overlay) return;

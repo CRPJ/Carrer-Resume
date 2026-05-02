@@ -12,6 +12,15 @@ import { useEffect, RefObject } from 'react';
 const BASE_CARD_HEIGHT = 810;   // 기존 calculateScale과 동일한 기준값
 const SCALE_OFFSET = 130;       // 기존 calculateScale과 동일한 오프셋
 
+const getEffectiveViewportHeight = () => {
+  const width = window.innerWidth;
+  const isZoneAViewport =
+    width < 1920 ||
+    (width >= 1920 && width < 2560 && window.innerHeight >= 1200);
+
+  return isZoneAViewport ? 1080 : window.innerHeight;
+};
+
 export function useResumeCardHeight(
   cardRef: RefObject<HTMLDivElement | null>,
   isMobile: boolean
@@ -27,7 +36,7 @@ export function useResumeCardHeight(
     const updateHeight = () => {
       rafId = null;
 
-      const viewportHeight = window.innerHeight;
+      const viewportHeight = getEffectiveViewportHeight();
       const availableForScale = viewportHeight - SCALE_OFFSET;
       let scale = Math.min(1.25, availableForScale / BASE_CARD_HEIGHT);
       scale = Math.max(0.55, scale);
@@ -36,7 +45,7 @@ export function useResumeCardHeight(
       const header = document.querySelector('header');
       const headerHeight = header ? header.getBoundingClientRect().height : 66;
       const gap = 8;
-      const availableHeight = window.innerHeight - headerHeight - gap;
+      const availableHeight = viewportHeight - headerHeight - gap;
 
       // scale 보정: visual = cssHeight * scale, 그러므로 cssHeight = available / scale
       const cssHeight = Math.round(availableHeight / scale);

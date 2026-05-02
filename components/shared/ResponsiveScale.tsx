@@ -17,6 +17,10 @@ const updateHeaderDividerY = () => {
   document.documentElement.style.setProperty("--header-divider-y", `${headerHeight}px`);
 };
 
+const isZoneAViewport = () =>
+  window.innerWidth < 1920 ||
+  (window.innerWidth >= 1920 && window.innerWidth < 2560 && window.innerHeight >= 1200);
+
 const ResponsiveScale = () => {
   // 초기 헤더 높이 측정: useLayoutEffect로 PageReveal(opacity:1)보다 먼저 실행
   useLayoutEffect(() => {
@@ -26,7 +30,7 @@ const ResponsiveScale = () => {
   useEffect(() => {
     // 1920px 초과 해상도에서만 10% 확대
     const applyZoom = () => {
-      if (window.innerWidth > 1920) {
+      if (window.innerWidth > 1920 && !isZoneAViewport()) {
         document.documentElement.style.zoom = "1.08";
       } else {
         document.documentElement.style.zoom = "";

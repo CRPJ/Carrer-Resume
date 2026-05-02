@@ -353,7 +353,7 @@
       // 작은 viewport에서만 transform을 비활성화. 1920+ 디자인은 그대로.
       transform: translateX(clamp(0px, 2.2vw, 72px));
 
-      @media (max-width: 1919px) {
+      @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
         transform: none;
       }
 
@@ -807,7 +807,7 @@
         // <1920에서는 wrapper 폭(~1236)이 좁아 right:-80px이 페이지 우측 밖으로
         // 80px 밀려나가 가시 영역에서 잘림. absolute 구조와 size는 유지하고
         // 우측 anchor만 0으로 끌어와 부모 안쪽으로 들어오게 한다.
-        @media (max-width: 1919px) {
+        @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
           right: 0;
         }
 
@@ -5630,7 +5630,7 @@
   padding: 40px 24px;
 }
 
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal-overlay {
     display: grid !important;
     place-items: center !important;
@@ -8043,7 +8043,7 @@
     z-index: 100001 !important;
   }
 
-  @media (max-width: 1919px) {
+  @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
     .help-modal-overlay {
       display: grid !important;
       place-items: center !important;
@@ -8245,9 +8245,9 @@
    - cluster-4 페이지에는 .cluster4-section3가 없으므로 영향 없음
    - 콘솔 진단으로 확인됨 (cluster-4: section3 false, cluster-4-1: section3 true)
 
-   Zone B(1920) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   Zone B(1920) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
    ============================================ */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .nftg-app:has(.cluster4-section3) .season-growth-card .card-right {
     width: 600px !important;
     left: 700px !important;
@@ -8268,9 +8268,9 @@
         이미 적용돼 있어 모달이 화면을 벗어나지 않음.
 
    Zone B (1920×1080) 절대 보호:
-   @media (max-width: 1919px) 안에서만 동작
+   @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
    ============================================ */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   // 모달 1: 시즌 평판 작성/수정 (section-modal-wide 패턴, 979×570)
   .section-modal.section-modal-season-reputation-form {
     .section-modal-body.season-reputation-form-body {
@@ -8314,7 +8314,7 @@
 //       좌표계로 끌어올림. cluster-4-card에서 검증된 패턴 그대로 적용.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-content .section-modal-overlay {
     position: fixed !important;
     inset: 0 !important;
@@ -8333,7 +8333,7 @@
 //       display: flex가 아니므로 제외.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-content .section-modal.section-modal-season-reputation-form
     .section-modal-body.season-reputation-form-body > *,
   .cluster4-content .section-modal.section-modal-season-reputation-view

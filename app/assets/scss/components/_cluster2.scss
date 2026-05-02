@@ -6843,9 +6843,9 @@
    - .home-two-content-col은 flex 메커니즘에 의해 자동으로 75px 확장 (1238→1293)
    - .nftg-sidebar는 변경 없음 (sticky 유지, 햄버거 메뉴 정상 표시)
 
-   Zone B(1920px) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
    ============================================ */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .nftg-app:has(.cluster2-content) {
     width: 1995px !important;
     min-width: 1995px !important;
@@ -6888,9 +6888,9 @@
    - 콘텐츠가 길어질 때만 스크롤로 접근 가능해짐
    - char-count(0/1,000)가 정상 위치에 표시됨
 
-   Zone B(1920px) 절대 보호: @media (max-width: 1919px) 안에서만 동작
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
    ============================================ */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .nftg-app:has(.cluster2-content) {
     .intro-modal-body {
       > * {

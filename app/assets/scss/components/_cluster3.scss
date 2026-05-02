@@ -5536,7 +5536,7 @@
 }
 
 // Zone A: keep cluster3 channel modal bottom textareas as one horizontal canvas.
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster3-content .section-modal .section-modal-body > .channel-bottom-section {
     min-width: 1180px !important;
     flex-shrink: 0 !important;
@@ -5791,7 +5791,7 @@
    selector 구분:
    - .output-modal-overlay: output / detail 모달 동일 컴포넌트 재사용
    - 보정 2번은 모든 zone 발생하는 구조적 문제 → @media 밖
-   - 나머지는 Zone A 한정 → @media (max-width: 1919px) 안
+   - 나머지는 Zone A 한정 → @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안
    ============================================ */
 
 /* 보정 2: role-input-wrap min-width 풀기 (모든 zone) */
@@ -5802,7 +5802,7 @@
 }
 
 /* 보정 1, 3, 4: Zone A 전용 */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .output-modal-overlay {
     /* 보정 1: 우측 링크 영역 폭 조정 */
     .output-links-section {

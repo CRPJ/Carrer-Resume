@@ -1,4 +1,4 @@
-﻿// Cluster 4 - Club Challenge Growth Styles
+// Cluster 4 - Club Challenge Growth Styles
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 // reputation-form ?꾩슜 ?꾨뱶 源쒕묀???ㅽ봽?덉엫 (cluster3??border-blink? ?숈씪 而⑥뀎, outline 湲곕컲?쇰줈 ?덉씠?꾩썐 shift ?놁쓬)
@@ -2723,7 +2723,7 @@
         // legend-items가 transform: scale(1.2)로 그려져 CSS box보다 ~20% 넓게 페인트되기 때문에,
         // padding-left를 줄여 legend-items 시작점을 좌측으로 당겨 마지막 항목이 wrapper의
         // overflow-x: clip 경계 안에 들어오게 한다.
-        @media (max-width: 1919px) {
+        @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
           flex: 0 1 50%;
           margin-right: clamp(8px, 1.5vw, 35px);
           padding-left: clamp(0px, 1vw, 56px);
@@ -2761,7 +2761,7 @@
           transform-origin: left center;
 
           // <1920에서만 wrap 허용 + 폭 제한
-          @media (max-width: 1919px) {
+          @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
             flex-wrap: wrap;
             min-width: 0;
             max-width: 100%;
@@ -2781,7 +2781,7 @@
             text-overflow: ellipsis;
             max-width: 100%;
 
-            @media (max-width: 1919px) {
+            @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
               flex-shrink: 1;
             }
 
@@ -4911,7 +4911,7 @@
     padding: 40px 24px;
   }
 
-  @media (max-width: 1919px) {
+  @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
     .section-modal-overlay {
       position: fixed !important;
       inset: 0 !important;
@@ -5578,7 +5578,7 @@
         }
       }
 
-      @media (max-width: 1919px) {
+      @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
         max-width: 90vw !important;
         max-height: 90vh !important;
       }
@@ -13868,7 +13868,7 @@
 //       하위 규칙이 적용되지 않는다. 따라서 탑레벨 셀렉터로 작성한다.
 // 범위: Zone B (1920×1080) baseline 절대 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .section-modal-weekly-review-form {
     .section-modal-body.weekly-review-body {
       overflow-y: auto !important;
@@ -13884,7 +13884,7 @@
 //       으로 이미 고정됨).
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.section-modal-reputation-form {
     .section-modal-body.reputation-form-body {
       min-height: 0 !important;
@@ -13899,7 +13899,7 @@
 // 사유: Weekly Review와 동일 패턴 적용.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.section-modal-colleague-edit {
     .section-modal-body.colleague-edit-body {
       min-height: 0 !important;
@@ -13937,9 +13937,9 @@
      .workinfo-text-section / .workinfo-left / .workinfo-content-layout 공통 클래스 사용
 
    Zone B(1920) / Zone C(>1920) 절대 보호:
-   @media (max-width: 1919px) 안에서만 동작
+   @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
    ============================================ */
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .nftg-app:has(.cluster4-card-content) {
     .section-modal.work-view-modal {
       .workinfo-text-section {
@@ -13966,7 +13966,7 @@
 //       스크롤바로 이어지지 않는 문제를 work view 4종에만 한정 보정.
 // 범위: work info / work exp / work ability / work career view modal only.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
@@ -13989,7 +13989,7 @@
 //       본문 영역에서 스크롤이 동작하도록 명시적 보장.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.section-modal-work-edit {
     .section-modal-body {
       overflow-y: auto !important;
@@ -14006,7 +14006,7 @@
 //       본문이 자연스럽게 스크롤되어야 함.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.reputation-view-modal {
     .section-modal-body.reputation-body {
       overflow-y: auto !important;
@@ -14031,7 +14031,7 @@
 //       overflow-y: auto가 발동하지 않음.
 // 범위: Zone B (1920×1080) baseline 영향 없음.
 // =====================================================================
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   .cluster4-card-content .section-modal.section-modal-reputation-form
     .section-modal-body.reputation-form-body > *,
   .cluster4-card-content .section-modal.section-modal-colleague-edit

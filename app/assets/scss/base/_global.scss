@@ -1660,7 +1660,7 @@ svg {
   min-height: 0;
 }
 
-@media (max-width: 1919px) {
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   [class*="modal-overlay"] {
     position: fixed !important;
     inset: 0 !important;
