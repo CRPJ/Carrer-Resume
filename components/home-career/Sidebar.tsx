@@ -473,22 +473,18 @@ const Sidebar = () => {
       const BASE_CARD_HEIGHT = 810;
       const BASE_SIDEBAR_WIDTH = 497;
 
-      // 브라우저 zoom 보정: zoom 시 innerWidth/innerHeight가 줄어드므로
-      // 원래 뷰포트 기준으로 계산하기 위해 zoom 비율을 적용
-      const browserZoom = window.outerWidth / window.innerWidth || 1;
-
       // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
       // ★ Zone A(<1920): 1920×1080 baseline과 동일한 sidebar 비율을 위해 viewportHeight = 1080 고정.
       //   1920px 고정 + 가로 스크롤 전략이므로 화면 자체가 1920×1080 그대로 표시되어야 함.
       //   (Zone B/C는 ternary 두 번째 분기 사용 → 기존 동작과 동일)
-      const viewportHeight = (window.innerWidth < 1920)
+      const originalWidth = window.innerWidth;
+      const viewportHeight = (originalWidth < 1920)
         ? 1080
-        : window.innerHeight * browserZoom;
+        : window.innerHeight;
       console.log('[calculateScale]', {
-        screenWidth: screen.width,
+        innerWidth: originalWidth,
         innerHeight: window.innerHeight,
-        browserZoom: window.outerWidth / window.innerWidth,
-        계산값: window.innerHeight * (window.outerWidth / window.innerWidth),
+        viewportHeight,
       });
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
@@ -499,7 +495,6 @@ const Sidebar = () => {
 
       // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
       // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
-      const originalWidth = screen.width;
       if (originalWidth > 1920) {
         scale = 1.31;
       }

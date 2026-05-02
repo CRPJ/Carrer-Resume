@@ -27,11 +27,7 @@ export function useResumeCardHeight(
     const updateHeight = () => {
       rafId = null;
 
-      // 브라우저 zoom 보정: zoom 전 원래 뷰포트 기준으로 scale 계산
-      const browserZoom = window.outerWidth / window.innerWidth || 1;
-
-      // 기존 calculateScale과 동일한 scale 계산 (zoom 전 원래 높이 기준)
-      const viewportHeight = window.innerHeight * browserZoom;
+      const viewportHeight = window.innerHeight;
       const availableForScale = viewportHeight - SCALE_OFFSET;
       let scale = Math.min(1.25, availableForScale / BASE_CARD_HEIGHT);
       scale = Math.max(0.55, scale);
