@@ -2916,7 +2916,38 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (activityType) {
       const newSubTitle = editingCareerSubTitle.trim() || null;
       const newOutputLinks = editingCareerOutputLinks;
-      setWeekActivityDetails((prev) => prev.map((d) => (d.activity_type_id === activityType ? { ...d, sub_title: newSubTitle, output_links: newOutputLinks } : d)));
+      const newGrowthPoint = editingCareerGrowthPoint.trim() || null;
+      let persistedImages: (string | null)[] = editingCareerImages;
+      try {
+        const persisted = await persistActivityDetailToServer({
+          activityTypeId: activityType,
+          subTitle: newSubTitle,
+          outputLinks: newOutputLinks,
+          growthPoint: newGrowthPoint,
+          images: editingCareerImages,
+          imageCaptions: editingCareerImageCaptions,
+        });
+        persistedImages = persisted.images;
+      } catch (err) {
+        console.error("workCareer 저장 실패:", err);
+        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+        return;
+      }
+      setEditingCareerImages(persistedImages);
+      setWeekActivityDetails((prev) => {
+        const nextDetail = {
+          week_id: weekId,
+          activity_type_id: activityType,
+          sub_title: newSubTitle,
+          output_links: newOutputLinks,
+          growth_point: newGrowthPoint,
+          image_urls: persistedImages,
+          image_captions: editingCareerImageCaptions,
+        };
+        const existingIndex = prev.findIndex((d) => d.activity_type_id === activityType);
+        if (existingIndex < 0) return [...prev, nextDetail];
+        return prev.map((d) => (d.activity_type_id === activityType ? { ...d, ...nextDetail } : d));
+      });
       setSelectedWorkCareerCard((prev: any) =>
         prev
           ? {
@@ -2924,8 +2955,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               subTitle: newSubTitle || "",
               outputLinks: newOutputLinks,
               growthPoint: editingCareerGrowthPoint,
-              // TODO: [백엔드 작업 필요] 이미지 저장 DB 컬럼 확정 후 연동 — 현재는 isDemoMode 더미 저장
-              images: editingCareerImages,
+              images: persistedImages,
               imageCaptions: editingCareerImageCaptions,
             }
           : prev,
@@ -2934,7 +2964,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: newSubTitle || "",
         growthPoint: editingCareerGrowthPoint,
         outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
-        images: [...editingCareerImages],
+        images: [...persistedImages],
         imageCaptions: [...editingCareerImageCaptions],
       };
     }

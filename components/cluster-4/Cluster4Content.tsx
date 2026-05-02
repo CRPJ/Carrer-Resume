@@ -193,6 +193,36 @@ const defaultSeasonData = {
   },
 };
 
+// 역할 라벨 매핑
+const ROLE_LABELS: { [key: string]: string } = {
+  crew: "일반",
+  crew_regular: "일반",
+  crew_normal: "일반",
+  crew_advanced_agent: "심화(에이전트)",
+  crew_agent: "심화(에이전트)",
+  crew_advanced_part_leader: "심화(파트장)",
+  crew_partleader: "심화(파트장)",
+  operations_partleader: "심화(파트장)",
+  part_leader: "심화(파트장)",
+  admin_team_leader: "운영진(팀장)",
+  crew_team_leader: "운영진(팀장)",
+  operations_teamleader: "운영진(팀장)",
+  admin_ambassador: "운영진(앰배서더)",
+  crew_ambassador: "운영진(앰배서더)",
+  operations_ambassador: "운영진(앰배서더)",
+};
+
+const ADMIN_ROLES = new Set([
+  "admin_team_leader",
+  "crew_team_leader",
+  "operations_teamleader",
+  "admin_ambassador",
+  "crew_ambassador",
+  "operations_ambassador",
+]);
+
+const isAdminRole = (role: string): boolean => ADMIN_ROLES.has(role);
+
 const formatSeasonReputationTime = (timestamp: string | null | undefined): string => {
   if (!timestamp) return "00. 00. 00(0)  00:00";
   try {
@@ -633,21 +663,9 @@ const Cluster4Content = () => {
     const invalidFields = fieldResults.filter((result) => !result.valid);
 
     if (invalidFields.length > 0) {
-      console.log("[season-reputation validation] failed", {
-        editData: seasonReputationEditData,
-        keywordModes: seasonKeywordModes,
-        invalidFields,
-      });
-      console.table(fieldResults);
       return false;
     }
 
-    console.log("[season-reputation validation] passed", {
-      rating: seasonReputationEditData.rating,
-      contentLength: seasonReputationEditData.content.trim().length,
-      keywords,
-      keywordModes: seasonKeywordModes,
-    });
     return true;
   };
 
@@ -692,7 +710,6 @@ const Cluster4Content = () => {
   };
 
   const handleSeasonRatingSelect = (value: number) => {
-    console.log("[season-reputation rating] selected", value);
     setSeasonReputationEditData((prev) => ({ ...prev, rating: value }));
     setSeasonRatingDropdownOpen(false);
   };
@@ -707,7 +724,6 @@ const Cluster4Content = () => {
         if (slotIndex === 0) next.keyword1 = "";
         else if (slotIndex === 1) next.keyword2 = "";
         else if (slotIndex === 2) next.keyword3 = "";
-        console.log("[season-reputation keyword mode] write", { slotIndex, next });
         return next;
       });
       setSeasonKeywordModes((prev) => {
@@ -744,7 +760,6 @@ const Cluster4Content = () => {
       if (slotIndex === 0) next.keyword1 = seasonKeywordTempSelection;
       else if (slotIndex === 1) next.keyword2 = seasonKeywordTempSelection;
       else if (slotIndex === 2) next.keyword3 = seasonKeywordTempSelection;
-      console.log("[season-reputation keyword select] confirmed", { slotIndex, keyword: seasonKeywordTempSelection, next });
       return next;
     });
     setSeasonKeywordModes((prev) => {
@@ -779,7 +794,6 @@ const Cluster4Content = () => {
       if (slotIndex === 0) next.keyword1 = v;
       else if (slotIndex === 1) next.keyword2 = v;
       else if (slotIndex === 2) next.keyword3 = v;
-      console.log("[season-reputation keyword write] changed", { slotIndex, value: v, next });
       return next;
     });
   };
@@ -860,7 +874,6 @@ const Cluster4Content = () => {
             keyword2: seasonReputationEditData.keyword2.trim(),
             keyword3: seasonReputationEditData.keyword3.trim(),
           };
-      console.log("[season-reputation save] request", { method, body });
       const res = await fetch(endpoint, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) {
         const errBody = await res.json().catch(() => null);
@@ -1052,10 +1065,12 @@ const Cluster4Content = () => {
     const targetId = urlUserId || session?.user?.id;
     if (!targetId) return;
     let cancelled = false;
+    // urlUserId 없을 때는 fetchUserStatus 효과와 동일한 캐시 키(`/api/profile/`)를 사용하여 중복 네트워크 호출 방지
+    const profileUrl = urlUserId ? `/api/profile/?userId=${urlUserId}` : "/api/profile/";
     (async () => {
       try {
         const [profileJson, eduJson] = await Promise.all([
-          dedupedJson<any>(`/api/profile/?userId=${targetId}`).catch(() => null),
+          dedupedJson<any>(profileUrl).catch(() => null),
           dedupedJson<any>(`/api/educations?userId=${targetId}`).catch(() => null),
         ]);
         if (cancelled) return;
@@ -1632,12 +1647,7 @@ const Cluster4Content = () => {
       const res = await fetch(`/api/season-reputations?targetUserId=${targetId}&seasonHistoryId=${seasonHistoryId}`);
       if (res.ok) {
         const json = await res.json();
-        console.log("[fetchSeasonReputations] API 응답:", json);
         if (json.success && json.data) {
-          console.log("[fetchSeasonReputations] 평판 데이터:", json.data);
-          if (json.data.length > 0) {
-            console.log("[fetchSeasonReputations] 첫번째 평판의 reviewer:", json.data[0].reviewer);
-          }
           setSeasonReputations(json.data);
         }
       }
@@ -1677,10 +1687,6 @@ const Cluster4Content = () => {
     const targetId = urlUserId || session?.user?.id;
     if (!targetId || !currentSeason?.id) return;
 
-    console.log("[fetchSeasonReputations] 현재 시즌:", currentSeason);
-    console.log("[fetchSeasonReputations] currentSeason.id:", currentSeason.id);
-    console.log("[fetchSeasonReputations] targetId:", targetId);
-
     fetchSeasonReputations(targetId, currentSeason.id);
   }, [urlUserId, session?.user?.id, currentSeason?.id]);
 
@@ -1705,30 +1711,6 @@ const Cluster4Content = () => {
       setSeasonReputations([]);
     }
   }, [section3Page, isDemoMode]);
-
-  // 역할 라벨 매핑
-  const roleLabels: { [key: string]: string } = {
-    crew: "일반",
-    crew_regular: "일반",
-    crew_normal: "일반",
-    crew_advanced_agent: "심화(에이전트)",
-    crew_agent: "심화(에이전트)",
-    crew_advanced_part_leader: "심화(파트장)",
-    crew_partleader: "심화(파트장)",
-    operations_partleader: "심화(파트장)",
-    part_leader: "심화(파트장)",
-    admin_team_leader: "운영진(팀장)",
-    crew_team_leader: "운영진(팀장)",
-    operations_teamleader: "운영진(팀장)",
-    admin_ambassador: "운영진(앰배서더)",
-    crew_ambassador: "운영진(앰배서더)",
-    operations_ambassador: "운영진(앰배서더)",
-  };
-
-  // 운영진 역할인지 확인
-  const isAdminRole = (role: string): boolean => {
-    return ["admin_team_leader", "crew_team_leader", "operations_teamleader", "admin_ambassador", "crew_ambassador", "operations_ambassador"].includes(role);
-  };
 
   // 시즌 히스토리 포맷팅 함수
   const formatSeasonHistories = (
@@ -3185,7 +3167,7 @@ const Cluster4Content = () => {
                       }}
                     >
                       <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
-                      FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.fmScore ?? 0), 0)}</span>
+                      FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.rating ?? 0) * 3, 0)}</span>
                     </span>
                   </h4>
                   <div
@@ -3337,7 +3319,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="stats">
                               <span className="pm">
-                                <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{reputation.fmScore ?? 0}</span>
+                                <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{(reputation.rating ?? 0) * 3}</span>
                               </span>
                               <span className="rating">
                                 {[...Array(fullStars)].map((_, i) => (
@@ -3696,7 +3678,7 @@ const Cluster4Content = () => {
                 </div>
                 <div className="season-reputation-fm">
                   <span className="stats-label">■ FM</span>
-                  <span className="fm-value">{selectedReputation.fmScore ?? 3}</span>
+                  <span className="fm-value">{(selectedReputation.rating ?? 0) * 3}</span>
                 </div>
               </div>
 
@@ -3948,7 +3930,7 @@ const Cluster4Content = () => {
                         const latest = sr && sr.length > 0 ? sr[sr.length - 1] : null;
                         if (latest?.roleLabel) return latest.roleLabel;
                         const rawRole = currentSeason.roleInSeason || userDefaultRole || "";
-                        return roleLabels[rawRole] || rawRole || "일반";
+                        return ROLE_LABELS[rawRole] || rawRole || "일반";
                       })()}
                     </span>
                     <span className="tag-badge tag-keyword">
