@@ -1660,6 +1660,117 @@ svg {
   min-height: 0;
 }
 
+@media (max-width: 1919px) {
+  [class*="modal-overlay"] {
+    position: fixed !important;
+    inset: 0 !important;
+    overflow: auto !important;
+    padding: 40px 24px !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    place-items: safe center !important;
+    overscroll-behavior: contain;
+  }
+
+  .section-modal,
+  .section-modal-wide,
+  .output-modal,
+  .help-modal,
+  .edu-modal,
+  .intro-modal,
+  .section1-modal,
+  .section2-modal,
+  .section21-modal,
+  .section3-modal,
+  .section4-modal,
+  .edit-modal-content {
+    max-width: calc(100vw - 48px) !important;
+    max-height: calc(100dvh - 80px) !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .section-modal-body,
+  .output-modal-body,
+  .help-modal-body,
+  .intro-modal-body,
+  .section1-modal-body,
+  .section2-modal-body,
+  .section21-modal-body,
+  .section3-modal-body,
+  .section4-modal-body,
+  .edit-modal-body,
+  .modal-body {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+  }
+
+  .section-modal-body > .modal-top-row,
+  .output-modal-body > .output-upper-section,
+  .output-modal-body > .output-role-links-row,
+  .output-modal-body > .output-bottom-row,
+  .section1-modal-body > .photo-grid,
+  .section2-modal-body > .slogan-edit-item,
+  .section21-modal-body > .video-edit-item,
+  .section3-modal-body > .edu-edit-card,
+  .section4-modal-body > .link-edit-item,
+  .intro-modal-body > .subtitle-section,
+  .intro-modal-body > .content-section,
+  .section-modal-body > .reputation-form-top,
+  .section-modal-body > .weekly-review-row-1,
+  .section-modal-body > .weekly-review-row-2,
+  .section-modal-body > .weekly-review-row-3,
+  .section-modal-body > .season-review-row-1,
+  .section-modal-body > .workinfo-content-layout {
+    flex-shrink: 0 !important;
+  }
+
+  .section-modal-body > .modal-top-row,
+  .output-modal-body > .output-upper-section,
+  .output-modal-body > .output-role-links-row,
+  .output-modal-body > .output-bottom-row {
+    min-width: 1180px !important;
+  }
+
+  .section1-modal-body > .photo-grid {
+    min-width: 920px !important;
+  }
+
+  .section2-modal-body > .slogan-edit-item,
+  .section3-modal-body > .edu-edit-card,
+  .intro-modal-body > .subtitle-section,
+  .intro-modal-body > .content-section,
+  .section-modal-body > .reputation-form-top,
+  .section-modal-body > .weekly-review-row-1,
+  .section-modal-body > .weekly-review-row-2,
+  .section-modal-body > .weekly-review-row-3,
+  .section-modal-body > .season-review-row-1 {
+    min-width: 620px !important;
+  }
+
+  .section4-modal-body > .link-edit-item {
+    min-width: 360px !important;
+  }
+
+  .section21-modal-body {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 440px !important;
+    grid-template-columns: none !important;
+    justify-content: start !important;
+  }
+
+  .section-modal-body > .workinfo-content-layout {
+    min-width: 1388px !important;
+  }
+
+  .section-modal:has(> .section-modal-body > .workinfo-content-layout) > .section-modal-body {
+    display: block !important;
+    width: auto !important;
+  }
+}
+
 /* ====
  --------- (2.04) global modal styles end ---------
  ==== */

@@ -13960,6 +13960,30 @@
 }
 
 // =====================================================================
+// Zone A (< 1920px) — work view 4종 가로 canvas 스크롤 복구
+// 사유: 뒤쪽/전용 규칙의 overflow-x:hidden 계열이 전역 modal safety layer의
+//       overflow-x:auto를 덮어 .workinfo-content-layout의 min-width가
+//       스크롤바로 이어지지 않는 문제를 work view 4종에만 한정 보정.
+// 범위: work info / work exp / work ability / work career view modal only.
+// =====================================================================
+@media (max-width: 1919px) {
+  .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+    .section-modal-body {
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+    }
+
+    .workinfo-content-layout {
+      min-width: 1388px !important;
+      flex-shrink: 0 !important;
+    }
+  }
+}
+
+// =====================================================================
 // Zone A (< 1920px) — cluster-4-card 본인 헤더(work-edit) 모달 바디 스크롤 활성화
 // 사유: 사용자 헤더 편집 모달도 다른 폼 모달과 동일하게 viewport보다 클 때
 //       본문 영역에서 스크롤이 동작하도록 명시적 보장.

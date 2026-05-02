@@ -1071,7 +1071,7 @@ const Cluster2Content = () => {
     if (!overlay) return;
 
     const handleWheel = (e: WheelEvent) => {
-      const body = overlay.querySelector(".section21-modal-body") as HTMLElement | null;
+      const body = document.querySelector(".section21-modal-body") as HTMLElement | null;
       if (!body) {
         e.preventDefault();
         return;
@@ -1081,12 +1081,34 @@ const Cluster2Content = () => {
         e.preventDefault();
         return;
       }
-      const remainingDown = body.scrollHeight - body.clientHeight - body.scrollTop;
-      const remainingUp = body.scrollTop;
-      const absDelta = Math.abs(e.deltaY);
-      const canScrollDown = e.deltaY > 0 && remainingDown >= absDelta;
-      const canScrollUp = e.deltaY < 0 && remainingUp >= absDelta;
-      if (!canScrollDown && !canScrollUp) e.preventDefault();
+
+      if (e.shiftKey) {
+        if (body.scrollWidth > body.clientWidth) {
+          const canScrollX =
+            (e.deltaY > 0 && body.scrollLeft + body.clientWidth < body.scrollWidth) ||
+            (e.deltaY < 0 && body.scrollLeft > 0);
+
+          if (canScrollX) {
+            body.scrollLeft += e.deltaY;
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+        }
+      }
+
+      const canScrollY =
+        (e.deltaY > 0 && body.scrollTop + body.clientHeight < body.scrollHeight) ||
+        (e.deltaY < 0 && body.scrollTop > 0);
+
+      if (canScrollY) {
+        body.scrollTop += e.deltaY;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      e.preventDefault();
     };
 
     overlay.addEventListener("wheel", handleWheel, { passive: false });
