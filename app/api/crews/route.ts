@@ -29,27 +29,67 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    // 활성 크루만 조회 + 베타 화이트리스트 필터
-    let query = supabase
-      .from("user_profiles")
-      .select("id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first, crew_unique_number")
-      .in("growth_status", ["active", "suspended", "seasonal_rest", "graduated", "club_onboarding"])
-      .in("display_name", BETA_TESTERS)
-      .order("display_name", { ascending: true });
-
-    if (excludeUserId && isValidUUID(excludeUserId)) {
-      query = query.neq("id", excludeUserId);
+    // 화이트리스트 1: BETA_TESTERS (display_name)
+    // 화이트리스트 2: '뉴트리션' 팀 멤버 (user_team_parts.left_at IS NULL)
+    // 두 화이트리스트 합집합을 노출. 베타 종료 시 BETA_TESTERS 분기와 함께 제거.
+    const teamsForWhitelist = await getCachedTeams();
+    const nutritionTeamId = teamsForWhitelist?.find((t) => t.name === "뉴트리션")?.id ?? null;
+    let nutritionUserIds: string[] = [];
+    if (nutritionTeamId) {
+      const { data: nutritionMembers, error: nutritionError } = await supabase
+        .from("user_team_parts")
+        .select("user_id")
+        .eq("team_id", nutritionTeamId)
+        .is("left_at", null);
+      if (nutritionError) {
+        console.error("뉴트리션 팀 멤버 조회 오류:", JSON.stringify(nutritionError));
+      } else {
+        nutritionUserIds = (nutritionMembers ?? []).map((m) => m.user_id).filter(Boolean);
+      }
     }
 
-    const { data: users, error } = await query;
+    const baseSelect = "id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first, crew_unique_number";
+    const allowedGrowthStatus = ["active", "suspended", "seasonal_rest", "graduated", "club_onboarding"];
+    const buildBaseQuery = () => {
+      let q = supabase
+        .from("user_profiles")
+        .select(baseSelect)
+        .in("growth_status", allowedGrowthStatus);
+      if (excludeUserId && isValidUUID(excludeUserId)) {
+        q = q.neq("id", excludeUserId);
+      }
+      return q;
+    };
 
-    if (error) {
-      console.error("크루 목록 조회 오류:", JSON.stringify(error));
+    const [betaResult, nutritionResult] = await Promise.all([
+      buildBaseQuery().in("display_name", BETA_TESTERS),
+      nutritionUserIds.length > 0
+        ? buildBaseQuery().in("id", nutritionUserIds)
+        : Promise.resolve({ data: [] as any[], error: null as any }),
+    ]);
+
+    if (betaResult.error) {
+      console.error("크루 목록 조회 오류(beta):", JSON.stringify(betaResult.error));
       return NextResponse.json(
-        { error: "크루 목록 조회에 실패했습니다.", detail: error.message, code: error.code },
+        { error: "크루 목록 조회에 실패했습니다.", detail: betaResult.error.message, code: betaResult.error.code },
         { status: 500 }
       );
     }
+    if (nutritionResult.error) {
+      console.error("크루 목록 조회 오류(nutrition):", JSON.stringify(nutritionResult.error));
+      return NextResponse.json(
+        { error: "크루 목록 조회에 실패했습니다.", detail: nutritionResult.error.message, code: nutritionResult.error.code },
+        { status: 500 }
+      );
+    }
+
+    // id 기준 dedupe + display_name 한글 정렬
+    const merged = new Map<string, any>();
+    (betaResult.data ?? []).forEach((u: any) => merged.set(u.id, u));
+    (nutritionResult.data ?? []).forEach((u: any) => merged.set(u.id, u));
+    const users = Array.from(merged.values()).sort((a: any, b: any) =>
+      (a.display_name || "").localeCompare(b.display_name || "", "ko")
+    );
 
     if (!users || users.length === 0) {
       return NextResponse.json({
