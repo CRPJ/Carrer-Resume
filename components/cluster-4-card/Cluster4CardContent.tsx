@@ -476,6 +476,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     line_code: string | null;
     line_name: string | null;
     output_links: { desc: string; url: string }[] | null;
+    output_images?: { url: string; caption: string }[] | null;
     secondary_info_deadline: string | null;
     created_at: string;
     weeks?: {
@@ -4805,6 +4806,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 운영진이 업로드한 output images 가져오기 (최대 2)
   const getAdminOutputImages = (activityType: string): Array<{ url: string; caption: string }> => {
+    // 실무 경력: career_projects.output_images (career_records API 가 project 정보 같이 반환)
+    const careerIndex = (careerTypeIds.length > 0 ? careerTypeIds : ["practical_project"]).indexOf(activityType);
+    if (careerIndex >= 0 && careerRecords[careerIndex]) {
+      const imgs = careerRecords[careerIndex].output_images || [];
+      return imgs.filter((i) => i?.url?.trim());
+    }
     const activity = weeklyActivities.find((a) => a.activity_type_id === activityType);
     return (activity?.output_images || []).filter((i) => i?.url?.trim());
   };

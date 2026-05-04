@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
           line_code: project.line_code,
           line_name: project.line_name,
           output_links: project.output_links,
+          output_images: project.output_images || null,
           secondary_info_deadline: project.secondary_info_deadline || null,
           weeks: null,
           created_at: project.created_at,
@@ -136,7 +137,8 @@ export async function GET(request: NextRequest) {
           id,
           line_code,
           line_name,
-          output_links
+          output_links,
+          output_images
         ),
         weeks!career_records_week_id_fkey (
           id,
