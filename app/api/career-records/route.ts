@@ -86,12 +86,13 @@ export async function GET(request: NextRequest) {
           grade_points: userRecord?.grade_points || null,
           career_code: userRecord?.career_code || null,
 
-          // 감독자 정보 (기록이 있는 경우)
-          supervisor_name: userRecord?.supervisor_name || null,
-          supervisor_position: userRecord?.supervisor_position || null,
-          supervisor_department: userRecord?.supervisor_department || null,
-          supervisor_company: userRecord?.supervisor_company || null,
-          supervisor_profile_img: userRecord?.supervisor_profile_img || null,
+          // 감독자 정보 — 어드민이 career_projects 레벨에서 지정한 값을 우선,
+          // 없으면 기존 career_records 의 값을 폴백 (구 데이터 호환)
+          supervisor_name: project.supervisor_name || userRecord?.supervisor_name || null,
+          supervisor_position: project.supervisor_position || userRecord?.supervisor_position || null,
+          supervisor_department: project.supervisor_department || userRecord?.supervisor_department || null,
+          supervisor_company: project.supervisor_company || userRecord?.supervisor_company || null,
+          supervisor_profile_img: project.supervisor_profile_img || userRecord?.supervisor_profile_img || null,
         }
       }) || []
 
@@ -138,7 +139,12 @@ export async function GET(request: NextRequest) {
           line_code,
           line_name,
           output_links,
-          output_images
+          output_images,
+          supervisor_name,
+          supervisor_position,
+          supervisor_department,
+          supervisor_company,
+          supervisor_profile_img
         ),
         weeks!career_records_week_id_fkey (
           id,

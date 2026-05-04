@@ -14,6 +14,11 @@ export function createAdminClient() {
     auth: {
       autoRefreshToken: false,
       persistSession: false
-    }
+    },
+    // Next.js 14 가 PostgREST GET 응답을 자동 캐시해서 새로 추가/변경된 행이 안 보이는 문제 차단
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: 'no-store' }),
+    },
   })
 }
