@@ -115,7 +115,10 @@
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\\" | Where-Object { $_.Name -match \"PHASE|alert|cluster4\" } | Select-Object Name, LastWriteTime | Format-Table -AutoSize)",
       "Bash(echo \"exit=$?\")",
       "mcp__playwright__browser_close",
-      "mcp__playwright__browser_take_screenshot"
+      "mcp__playwright__browser_take_screenshot",
+      "PowerShell(Move-Item *)",
+      "mcp__playwright__browser_navigate_back",
+      "mcp__playwright__browser_wait_for"
     ],
     "deny": [],
     "ask": []

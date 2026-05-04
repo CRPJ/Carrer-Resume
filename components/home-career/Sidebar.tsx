@@ -39,6 +39,9 @@ const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
+  const sessionUserId = session?.user?.id ?? null;
+  const shouldFetchProfile = !!targetUserId || sessionStatus === "authenticated";
+  const hasFetchIdentity = !!targetUserId || !!sessionUserId;
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   // SSR-safe: localStorage를 render time에 읽으면 SSR(false)/client(true) 불일치 → stateful로 변환
   const [demoMode, setDemoMode] = useState(false);
@@ -711,28 +714,35 @@ const Sidebar = () => {
 
   // 페이지 로드 시 프로필 데이터 가져오기 (캐시 활용)
   const fetchUserProfile = async (forceRefresh?: boolean) => {
-    // session이 아직 로딩 중이면 다음 effect 사이클까지 대기 (effect deps의 sessionStatus가 status 변화 시 재실행 보장)
-    if (sessionStatus === "loading") {
-      console.log("[fetchUserProfile] skipped: sessionStatus=loading", { targetUserId, hasSession: !!session });
-      return;
+    // targetUserId가 있으면 public profile lookup이므로 session 상태 무관하게 진행.
+    // targetUserId가 없으면 본인 프로필이므로 session이 확정될 때까지 대기.
+    if (!targetUserId) {
+      if (sessionStatus === "loading") {
+        console.log("[fetchUserProfile] skipped: sessionStatus=loading & no targetUserId", { hasSession: !!session });
+        return;
+      }
+      if (sessionStatus !== "authenticated") {
+        console.log("[fetchUserProfile] skipped: no targetUserId & session not authenticated", { sessionStatus });
+        return;
+      }
+      if (!sessionUserId) {
+        console.log("[fetchUserProfile] skipped: authenticated session has no user id", { sessionStatus, hasSession: !!session });
+        setHasData(false);
+        return;
+      }
     }
-    // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
-    if (!targetUserId && !session) {
-      console.log("[fetchUserProfile] skipped: no targetUserId & no session", { sessionStatus });
-      return;
-    }
-    console.log("[fetchUserProfile] started", { targetUserId, sessionStatus, sessionUserId: session?.user?.id, forceRefresh });
+    console.log("[fetchUserProfile] started", { targetUserId, sessionStatus, sessionUserId, forceRefresh });
 
     try {
       // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
       let cachedResult = await fetchCachedProfile(targetUserId || undefined, forceRefresh);
 
       // targetUserId로 조회 실패 시, 로그인 사용자 본인 프로필로 폴백 시도
-      if ((!cachedResult || !cachedResult.data) && targetUserId && session?.user?.id) {
+      if ((!cachedResult || !cachedResult.data) && targetUserId && sessionUserId) {
         const fallbackResult = await fetchCachedProfile(undefined, true);
-        if (fallbackResult?.data?.id === session?.user?.id) {
+        if (fallbackResult?.data?.id === sessionUserId) {
           // 본인 프로필인지 확인: 세션 ID가 URL의 userId를 포함하는지 체크 (UUID 잘림 대응)
-          if (session?.user?.id === targetUserId || session?.user?.id?.startsWith(targetUserId)) {
+          if (sessionUserId === targetUserId || sessionUserId.startsWith(targetUserId)) {
             cachedResult = fallbackResult;
             setIsOwner(true);
           }
@@ -763,7 +773,7 @@ const Sidebar = () => {
         const profile = result.data;
 
         // 본인 여부 확인
-        const currentUserId = session?.user?.id;
+        const currentUserId = sessionUserId;
         const fetchedProfileId = profile.id;
         console.log("[isOwner] session.user.id:", currentUserId, "| targetUserId:", targetUserId, "| profile.id:", fetchedProfileId);
         if (currentUserId) {
@@ -919,12 +929,41 @@ const Sidebar = () => {
   // 세션 또는 targetUserId 변경 시 프로필 로드
   // sessionStatus를 deps에 포함 — loading→authenticated/unauthenticated 전환 시 effect 재실행 보장.
   // (session reference가 null→null로 유지되는 unauthenticated 케이스에서 fetch가 영영 skip되던 회귀 방지)
+  // pathname을 deps에 포함 — 뒤로가기로 cluster-* 복귀 시 segment 재사용 케이스에서도 effect 재실행 보장.
+  // 정책: targetUserId가 있으면 session 상태 무관 fetch (fetchUserProfile 내부 가드 참조).
   useEffect(() => {
     if (demoMode) return; // 더미 모드면 API 안 부름
-    if (session || targetUserId) {
+    if (shouldFetchProfile) {
       fetchUserProfile();
     }
-  }, [session, sessionStatus, targetUserId, demoMode]);
+  }, [shouldFetchProfile, sessionStatus, sessionUserId, targetUserId, demoMode, pathname]);
+
+  // [진단] 뒤로가기/마운트 직후 화면 상태 로깅. 검은 화면 시점에
+  // .page-reveal opacity / children 존재 여부를 함께 출력 → PageReveal 회귀인지,
+  // Sidebar/data 상태 문제인지 즉시 판별 가능.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const pageRevealEl = document.querySelector(".page-reveal") as HTMLElement | null;
+    const computedOpacity = pageRevealEl ? getComputedStyle(pageRevealEl).opacity : "(no .page-reveal)";
+    const childCount = pageRevealEl ? pageRevealEl.childElementCount : 0;
+    const innerHTMLLen = pageRevealEl ? pageRevealEl.innerHTML.length : 0;
+    // eslint-disable-next-line no-console
+    console.table({
+      pathname,
+      searchParams: searchParams?.toString() || "",
+      sessionStatus,
+      sessionUserId: session?.user?.id ?? null,
+      targetUserId: targetUserId ?? null,
+      hasData,
+      isMounted,
+      demoMode,
+      profileId: cachedProfile?.data?.id ?? null,
+      pageRevealExists: !!pageRevealEl,
+      pageRevealOpacity: computedOpacity,
+      pageRevealChildCount: childCount,
+      pageRevealInnerHTMLLen: innerHTMLLen,
+    });
+  }, [pathname, sessionStatus, targetUserId, hasData, isMounted, demoMode, session?.user?.id, cachedProfile?.data?.id, searchParams]);
 
   // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {
@@ -1542,7 +1581,49 @@ const Sidebar = () => {
     };
   }, [isDragging]);
 
-  // Hydration 에러 방지: 마운트 전에는 빈 placeholder 반환
+  // [렌더 게이트] 모든 상태에서 명시적 UI 보장 — 절대 blank frame 금지.
+  //   ┌──────────────────────────────────┬─────────────────────────────┐
+  //   │ 상태                              │ 렌더                         │
+  //   ├──────────────────────────────────┼─────────────────────────────┤
+  //   │ !isMounted                       │ 투명 placeholder (hydration) │
+  //   │ sessionStatus === "loading"       │ Skeleton ("Authenticating…") │
+  //   │ fetch 진행 중 (!hasData + 식별자) │ Skeleton ("Loading…")        │
+  //   │ unauthenticated + !targetUserId   │ defaultProfile로 정상 렌더   │
+  //   │ hasData=true / demoMode           │ 정상 sidebarContent          │
+  //   └──────────────────────────────────┴─────────────────────────────┘
+  //
+  // 식별자 보강: "session 있음"의 기준은 session?.user?.id 존재까지 확인.
+  // (NextAuth 일부 케이스에서 status="authenticated"이지만 user 정보가 비어있을 수 있음 →
+  //  이 상태로 fetch가 일어나면 own profile lookup이 깨지므로, fetch 흐름에서는
+  //  hasUserIdentity 기준으로만 식별자 인정)
+  const hasUserIdentity = hasFetchIdentity;
+
+  const renderSkeleton = (label: string) => (
+    <div className="home-two-sidebar-col">
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        style={{
+          width: "489px",
+          height: "1001px",
+          borderRadius: "12px",
+          backgroundColor: "rgba(255, 255, 255, 0.02)",
+          border: "1px solid rgba(255, 255, 255, 0.04)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "rgba(255, 255, 255, 0.4)",
+          fontSize: "13px",
+          fontFamily: "Pretendard, sans-serif",
+          letterSpacing: "1px",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+
+  // 1) Hydration 가드 (항상 첫 단계): SSR 첫 페인트와 일치시키기 위해 투명 reserve.
   if (!isMounted) {
     return (
       <div className="home-two-sidebar-col">
@@ -1550,12 +1631,23 @@ const Sidebar = () => {
           style={{
             width: "489px",
             height: "1001px",
-            backgroundColor: "#1a1a2e",
+            backgroundColor: "transparent",
             borderRadius: "12px",
           }}
         />
       </div>
     );
+  }
+
+  // 2) Session loading: blank frame 대신 명시적 skeleton 노출.
+  if (sessionStatus === "loading") {
+    return renderSkeleton("Authenticating…");
+  }
+
+  // 3) Fetch 대기 중: 식별자(targetUserId 또는 session.user.id)가 있는데 hasData=false → skeleton.
+  //    (식별자 없으면 fetch가 일어나지 않으므로 무한 skeleton 회피하고 정상 렌더로 fallthrough)
+  if (!demoMode && !hasData && hasUserIdentity) {
+    return renderSkeleton("Loading…");
   }
 
   // ★ 모바일: 슬라이드 패널 전체를 body에 Portal 렌더링

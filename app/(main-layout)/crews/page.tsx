@@ -619,8 +619,8 @@ const page = () => {
                                   {crew.totalStars.toLocaleString()}{" "}
                                   <span className="currency">단감</span>
                                 </p>
-                                <Link href={resolveHref(crew)} className="btn--primary text-sm">
-                                  Car
+                                <Link href={resolveHref(crew)} className="btn--primary text-sm" style={{ fontSize: 12 }}>
+                                  보기
                                   <i className="ti ti-arrow-narrow-right"></i>
                                 </Link>
                                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="none" className="cmn-shape">
