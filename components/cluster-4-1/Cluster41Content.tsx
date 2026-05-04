@@ -113,19 +113,26 @@ const Cluster41Content = () => {
 
   // 로그인 상태로 /cluster-4 진입 시 자기 userId 를 URL 에 부착
   // (카카오 로그인 callbackUrl 이 /cluster-4 로 고정 — userId 는 로그인 시점에 알 수 없어 여기서 정규화)
+  // dedupedJson 우회: 다른 컴포넌트가 sessionStatus='authenticated' 직전에 /api/profile/ 호출하여
+  // 401 응답을 30s TTL 캐시에 박는 race 발생 시 새로고침 전까지 myId 부착 실패 — direct fetch + no-store 로 회피
+  // 404(user_profiles 매칭 실패) 처리는 (main-layout) 의 ProfileApprovalGate 에 위임
   useEffect(() => {
     if (isDemoMode) return;
     if (sessionStatus !== 'authenticated') return;
     if (targetUserId) return;
     if ((session?.user as any)?.isAdmin) return; // 어드민(마더 계정)은 user_profiles 에 없음
     let cancelled = false;
-    dedupedJson<any>('/api/profile/')
-      .then((result) => {
+    (async () => {
+      try {
+        const res = await fetch('/api/profile/', { cache: 'no-store', credentials: 'same-origin' });
+        if (cancelled) return;
+        if (!res.ok) return;
+        const result = await res.json();
         if (cancelled) return;
         const myId = result?.success && result?.data?.id;
         if (myId) router.replace(`/cluster-4?userId=${myId}`);
-      })
-      .catch(() => {});
+      } catch {}
+    })();
     return () => { cancelled = true; };
   }, [sessionStatus, session, targetUserId, isDemoMode, router]);
 
