@@ -43,8 +43,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`} style={{ opacity: 0 }}>
-        <PageReveal />
+      <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
         <MobileBlockScreen />
         <SessionProvider>
           <ProfileProvider>
@@ -52,7 +51,9 @@ export default function RootLayout({
               {/* <ZoomPrevention /> */}
               <ResponsiveScale />
               <Progress />
-              <Bootstrap>{children}</Bootstrap>
+              <Bootstrap>
+                <PageReveal>{children}</PageReveal>
+              </Bootstrap>
             </PopupProvider>
           </ProfileProvider>
         </SessionProvider>

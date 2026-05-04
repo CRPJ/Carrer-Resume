@@ -12,6 +12,21 @@
 // scrollbar-gutter: stable 제거 — 숨겨진 스크롤바에 대해 공간을 예약하면
 // Mac(오버레이 스크롤바)에서 페이지 전환 시 ~15px 너비 점프 발생
 
+// PageReveal — body가 아닌 페이지 wrapper(.page-reveal)에만 fade-in 적용.
+// base를 opacity:1로 명시 고정. fill-mode 미사용 — 일부 브라우저/캐시 복귀
+// 시나리오(bfcache, App Router segment 재사용)에서 fill-mode both/backwards가
+// from 상태(opacity:0)를 영구 유지시켜 화면이 빈 상태로 남는 회귀 방지.
+// animation 미적용/조기 종료 어떤 경로에서도 base = visible 보장.
+.page-reveal {
+  opacity: 1;
+  animation: pageReveal 0.15s ease-in;
+}
+
+@keyframes pageReveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 img {
   max-width: 100%;
   height: auto;

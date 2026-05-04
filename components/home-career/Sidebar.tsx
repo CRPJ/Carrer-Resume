@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useDataMasking } from "@/hooks/useDataMasking";
@@ -33,10 +33,11 @@ const Sidebar = () => {
   }, [popupConfirm]);
   // SSR-safe: 첫 렌더는 항상 [0], 마운트 후 useEffect에서 random 갱신
   const [tabBg, setTabBg] = useState(IDENTITY_TAB_IMAGES[0]);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
   // SSR-safe: localStorage를 render time에 읽으면 SSR(false)/client(true) 불일치 → stateful로 변환
@@ -710,8 +711,17 @@ const Sidebar = () => {
 
   // 페이지 로드 시 프로필 데이터 가져오기 (캐시 활용)
   const fetchUserProfile = async (forceRefresh?: boolean) => {
+    // session이 아직 로딩 중이면 다음 effect 사이클까지 대기 (effect deps의 sessionStatus가 status 변화 시 재실행 보장)
+    if (sessionStatus === "loading") {
+      console.log("[fetchUserProfile] skipped: sessionStatus=loading", { targetUserId, hasSession: !!session });
+      return;
+    }
     // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
-    if (!targetUserId && !session) return;
+    if (!targetUserId && !session) {
+      console.log("[fetchUserProfile] skipped: no targetUserId & no session", { sessionStatus });
+      return;
+    }
+    console.log("[fetchUserProfile] started", { targetUserId, sessionStatus, sessionUserId: session?.user?.id, forceRefresh });
 
     try {
       // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
@@ -720,9 +730,9 @@ const Sidebar = () => {
       // targetUserId로 조회 실패 시, 로그인 사용자 본인 프로필로 폴백 시도
       if ((!cachedResult || !cachedResult.data) && targetUserId && session?.user?.id) {
         const fallbackResult = await fetchCachedProfile(undefined, true);
-        if (fallbackResult?.data?.id === session.user.id) {
+        if (fallbackResult?.data?.id === session?.user?.id) {
           // 본인 프로필인지 확인: 세션 ID가 URL의 userId를 포함하는지 체크 (UUID 잘림 대응)
-          if (session.user.id === targetUserId || session.user.id.startsWith(targetUserId)) {
+          if (session?.user?.id === targetUserId || session?.user?.id?.startsWith(targetUserId)) {
             cachedResult = fallbackResult;
             setIsOwner(true);
           }
@@ -907,12 +917,14 @@ const Sidebar = () => {
   };
 
   // 세션 또는 targetUserId 변경 시 프로필 로드
+  // sessionStatus를 deps에 포함 — loading→authenticated/unauthenticated 전환 시 effect 재실행 보장.
+  // (session reference가 null→null로 유지되는 unauthenticated 케이스에서 fetch가 영영 skip되던 회귀 방지)
   useEffect(() => {
     if (demoMode) return; // 더미 모드면 API 안 부름
     if (session || targetUserId) {
       fetchUserProfile();
     }
-  }, [session, targetUserId, demoMode]);
+  }, [session, sessionStatus, targetUserId, demoMode]);
 
   // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {
@@ -1786,7 +1798,9 @@ const Sidebar = () => {
                     return;
                   }
                   // 다른 페이지에 있으면 /cluster-3으로 이동 후 스크롤
-                  window.location.href = targetPath + '?scrollTo=' + targetSection;
+                  // SPA navigation 유지 — window.location.href(hard reload)는 RSC 캐시/React state를
+                  // 끊어 뒤로가기 복귀 시 빈 화면 유발. 도착지(/cluster-3)는 scrollTo query를 처리함.
+                  router.push(targetPath + '?scrollTo=' + targetSection);
                 }}
                 style={{
                   width: "24px",
