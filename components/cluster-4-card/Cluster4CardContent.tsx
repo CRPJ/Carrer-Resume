@@ -4567,12 +4567,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
 
     // 실무 경험 활동의 eligible 조건 체크 (누적 주차 범위 밖이면 해당 없음)
+    // 단, 실제 이행 기록이 있으면 운영진이 진행 주차 외 라인을 예외 처리한 케이스이므로
+    // 일반 흐름을 타도록 폴백 (예: 진행 2주차 크루의 [생산성] 상호 피드백)
     const expInfo = experienceTypeInfos.find((info) => info.id === activityType);
     if (expInfo) {
       const minWeek = expInfo.eligible_min_approved_weeks ?? 1;
       const maxWeek = expInfo.eligible_max_approved_weeks ?? 999;
       if (cumulativeApprovedWeeks < minWeek || cumulativeApprovedWeeks > maxWeek) {
-        return "not_applicable";
+        const hasRecord = weekActivityRecords.some((ar) => ar.activity_type_id === activityType);
+        if (!hasRecord) return "not_applicable";
       }
     }
 
