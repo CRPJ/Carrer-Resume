@@ -1542,8 +1542,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
-    // 개인 휴식만 경력 통계 0으로 강제. 공식 휴식이라도 예외적으로 등록된 프로젝트가 있으면 그대로 반영.
-    if (weekData?.growthStatus === "휴식(개인)") {
+    // 개인 휴식 / 집계 중 → 경력 통계 0 으로 강제 (집계 중은 강화 결과 미확정)
+    if (weekData?.growthStatus === "휴식(개인)" || weekData?.growthStatus === "집계 중") {
       setCareerStats({ total: 0, success: 0 });
       return;
     }
@@ -4566,6 +4566,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
     // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
     if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
+    // 집계 중 — 강화 성공/실패가 아직 확정되지 않았으므로 모두 '해당 없음' 으로 표기
+    if (weekData?.growthStatus === "집계 중") return "not_applicable";
 
     // 실무 경험 활동의 eligible 조건 체크 (누적 주차 범위 밖이면 해당 없음)
     // 단, 실제 이행 기록이 있으면 운영진이 진행 주차 외 라인을 예외 처리한 케이스이므로
@@ -4947,8 +4949,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ["calendar", "essay", "forum", "infodesk", "session", "wisdom", "practical_lecture", "community", "etc_a"];
-    // 온보딩 주차 또는 개인 휴식이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
-    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)") {
+    // 온보딩 주차 / 개인 휴식 / 집계 중이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
+    // (집계 중: 성공/실패 미확정 → 모든 활동 '해당 없음' 표기와 통계 일치)
+    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)" || weekData?.growthStatus === "집계 중") {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
@@ -5326,8 +5329,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     secondaryInfoDeadline: null as string | null,
   });
 
-  // 휴식 모드일 때 실무 경력 카드 전부 '해당 없음'으로 강제
-  const effectiveWorkCareerCards = isRestMode
+  // 휴식 모드 / 집계 중일 때 실무 경력 카드 전부 '해당 없음'으로 강제
+  // (집계 중: 강화 성공/실패가 아직 확정되지 않음)
+  const isCountingMode = weekData?.growthStatus === "집계 중";
+  const effectiveWorkCareerCards = (isRestMode || isCountingMode)
     ? workCareerCards.map((card) => ({
         ...card,
         statusBadge: "/images/0/cluster4/icon/8 해당 없음.png",
