@@ -5287,6 +5287,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             lineName: record.line_name,
             outputLinks: record.output_links,
             secondaryInfoDeadline: record.secondary_info_deadline || null,
+            // 어드민이 career_projects.output_images 에 업로드한 이미지를 카드 슬롯에 매핑
+            images: (record.output_images || []).map((i) => i?.url || null),
+            imageCaptions: (record.output_images || []).map((i) => i?.caption || ""),
           };
         })
       : [];
