@@ -2897,13 +2897,36 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
-    // 초기화 = 모든 필드를 빈 값으로 (workCareer 는 이미지 슬롯 3개)
+    // 초기화 = 크루가 입력한 값만 비움. 어드민이 등록한 슬롯(output_images, output_links 앞쪽)은 유지.
     if (!(await popup.confirm("내용을 모두 초기화하시겠어요?"))) return;
+    const careerIdx = (selectedWorkCareerCard?.id || 1) - 1;
+    const careerRecord = careerRecords[careerIdx];
+    const adminImgs = (careerRecord?.output_images || []).filter((i) => i?.url?.trim());
+    const adminLinks = (careerRecord?.output_links || []).filter((l) => l?.url?.trim());
     setEditingCareerSubTitle("");
     setEditingCareerGrowthPoint("");
-    setEditingCareerOutputLinks(Array(5).fill({ desc: "", url: "" }));
-    setEditingCareerImages(createEmptyWorkCareerImages());
-    setEditingCareerImageCaptions(createEmptyWorkCareerCaptions());
+    const resetLinks: { desc: string; url: string }[] = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < adminLinks.length) {
+        resetLinks.push({ desc: adminLinks[i].desc || "", url: adminLinks[i].url || "" });
+      } else {
+        resetLinks.push({ desc: "", url: "" });
+      }
+    }
+    setEditingCareerOutputLinks(resetLinks);
+    const resetImages: (string | null)[] = [];
+    const resetCaptions: string[] = [];
+    for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
+      if (i < adminImgs.length) {
+        resetImages.push(adminImgs[i].url);
+        resetCaptions.push(adminImgs[i].caption || "");
+      } else {
+        resetImages.push(null);
+        resetCaptions.push("");
+      }
+    }
+    setEditingCareerImages(resetImages);
+    setEditingCareerImageCaptions(resetCaptions);
   };
 
   const handleSaveWorkCareer = async () => {
@@ -5290,12 +5313,23 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             return "/images/0/cluster4/icon/8 해당 없음.png";
           };
 
-          // 어드민 output_images 와 크루 user_activity_details.image_urls 를 합쳐 3슬롯 채움
+          // 어드민 output_images 와 크루 user_activity_details.image_urls 를 합쳐 3슬롯 채움.
+          // 레거시 데이터(과거 저장 로직이 어드민 URL 까지 image_urls 에 함께 저장한 케이스)
+          // 중복 노출 방지를 위해, 크루 슬롯에서 어드민 URL 과 동일한 항목은 걸러냄.
           const adminImgs = (record.output_images || []).filter((i) => i?.url?.trim());
+          const adminUrlSet = new Set(adminImgs.map((i) => i.url));
           const careerActivityType = workCareerActivityTypes[index];
           const careerDetail = careerActivityType ? weekActivityDetails.find((d) => d.activity_type_id === careerActivityType) : null;
-          const crewImgs = careerDetail?.image_urls || [];
-          const crewCaps = careerDetail?.image_captions || [];
+          const rawCrewImgs = careerDetail?.image_urls || [];
+          const rawCrewCaps = careerDetail?.image_captions || [];
+          const crewImgs: (string | null)[] = [];
+          const crewCaps: string[] = [];
+          for (let i = 0; i < rawCrewImgs.length; i++) {
+            const u = rawCrewImgs[i];
+            if (u && adminUrlSet.has(u)) continue;
+            crewImgs.push(u || null);
+            crewCaps.push(rawCrewCaps[i] || "");
+          }
           const mergedImages: (string | null)[] = [];
           const mergedCaptions: string[] = [];
           for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
