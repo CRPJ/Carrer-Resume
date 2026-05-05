@@ -1302,8 +1302,8 @@ const Cluster4Content = () => {
 
       const weekId = currentWeekData.id;
 
-      // 2. activity_types 정보 가져오기 (eligible 조건 포함)
-      const { data: activityTypesData } = await supabase.from("activity_types").select("id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total").eq("is_active", true);
+      // 2. activity_types 정보 가져오기 (eligible 조건 + 라인명 — 매니징 라인 역할 분기에 사용)
+      const { data: activityTypesData } = await supabase.from("activity_types").select("id, cluster_id, name, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total").eq("is_active", true);
 
       if (!activityTypesData) return;
 
@@ -1314,6 +1314,7 @@ const Cluster4Content = () => {
       const careerTypeIds: string[] = [];
       type ExperienceTypeInfo = {
         id: string;
+        name: string;
         eligible_min_approved_weeks: number | null;
         eligible_max_approved_weeks: number | null;
         count_once_in_total: boolean | null;
@@ -1327,6 +1328,7 @@ const Cluster4Content = () => {
           experienceTypeIds.push(at.id);
           experienceInfos.push({
             id: at.id,
+            name: at.name || "",
             eligible_min_approved_weeks: at.eligible_min_approved_weeks,
             eligible_max_approved_weeks: at.eligible_max_approved_weeks,
             count_once_in_total: at.count_once_in_total,
@@ -1432,12 +1434,42 @@ const Cluster4Content = () => {
         (weekSeasonData.year === 2026 && weekSeasonData.name !== 'spring') ||
         (weekSeasonData.year === 2026 && weekSeasonData.name === 'spring' && (currentWeekData as any).week_number >= 9)
       );
+
+      // 매니징 라인 역할 분기 — 라인명에 _파트장/_에이전트 표기.
+      // 사용자 역할과 라인이 안 맞으면 '해당 없음' 처리해야 함 (이행 기록이 없을 때만).
+      const apiUserRoleHistory = profileResult.userRoleHistory || [];
+      const userRoleForWeek = apiUserRoleHistory.find((urh: any) => {
+        const startedAt = new Date(urh.started_at);
+        const endedAt = urh.ended_at ? new Date(urh.ended_at) : null;
+        const weekStart = new Date((currentWeekData as any).start_date);
+        return startedAt <= weekStart && (!endedAt || endedAt > weekStart);
+      });
+      const userRole = userRoleForWeek?.role || profileResult.data?.role || "";
+      const isLineForOtherRole = (lineName: string): boolean => {
+        if (!lineName) return false;
+        if (lineName.includes("파트장")) {
+          return !userRole.includes("partleader") && !userRole.includes("part_leader");
+        }
+        if (lineName.includes("에이전트")) {
+          return !userRole.includes("agent");
+        }
+        return false;
+      };
+      const hasRecordForType = (activityTypeId: string): boolean => {
+        return apiActivityRecords.some((ar: { week_id: string; activity_type_id: string }) => ar.week_id === weekId && ar.activity_type_id === activityTypeId);
+      };
+
       const calcExperienceStats = () => {
         let experienceTotal = 0;
         const experienceActivities = activeActivities.filter((a) => experienceTypeIds.includes(a.activity_type_id));
 
         experienceActivities.forEach((a) => {
           const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
+
+          // 매니징 라인 역할 분기: 사용자 역할과 안 맞으면 카운트 제외 (이행 기록 있으면 폴백)
+          if (typeInfo && isLineForOtherRole(typeInfo.name) && !hasRecordForType(a.activity_type_id)) {
+            return;
+          }
 
           if (!typeInfo) {
             experienceTotal++; // 정보가 없으면 기본 포함
@@ -1449,23 +1481,25 @@ const Cluster4Content = () => {
             const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
             const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
 
-            // 누적 주차가 eligible 범위 내인지 확인
-            if (currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek) {
-              // count_once_in_total 체크 (1회만 가능한 활동)
-              if (typeInfo.count_once_in_total) {
-                // 이미 이전 주차에서 완료했는지 확인
-                const previouslyCompleted = allCompletedActivities.some(
-                  (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
-                );
-                if (!previouslyCompleted) {
-                  experienceTotal++;
-                }
-              } else {
+            // 누적 주차가 eligible 범위 내인지 확인 (범위 밖이어도 이행 기록 있으면 폴백)
+            const inRange = currentCumulativeApproved >= minWeek && currentCumulativeApproved <= maxWeek;
+            if (!inRange && !hasRecordForType(a.activity_type_id)) {
+              return;
+            }
+
+            if (inRange && typeInfo.count_once_in_total) {
+              // 이미 이전 주차에서 완료했는지 확인
+              const previouslyCompleted = allCompletedActivities.some(
+                (ca: { week_id: string; activity_type_id: string }) => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
+              );
+              if (!previouslyCompleted) {
                 experienceTotal++;
               }
+            } else {
+              experienceTotal++;
             }
           } else {
-            // 룰 적용 이전: 모든 실무 경험 활동 카운트
+            // 룰 적용 이전: 모든 실무 경험 활동 카운트 (단, 역할 미스매치는 위에서 이미 제외됨)
             experienceTotal++;
           }
         });
@@ -1474,6 +1508,12 @@ const Cluster4Content = () => {
         const now = Date.now();
 
         const experienceSuccess = experienceActivities.filter((a) => {
+          // 역할 미스매치 + 이행 기록 없음 → 카운트 제외
+          const typeInfo = experienceInfos.find((info) => info.id === a.activity_type_id);
+          if (typeInfo && isLineForOtherRole(typeInfo.name) && !hasRecordForType(a.activity_type_id)) {
+            return false;
+          }
+
           if (!approvedActivityTypes.has(a.activity_type_id)) return false;
 
           // 2차 정보 확인
