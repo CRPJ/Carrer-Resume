@@ -1542,8 +1542,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
-    // 개인 휴식 / 집계 중 → 경력 통계 0 으로 강제 (집계 중은 강화 결과 미확정)
-    if (weekData?.growthStatus === "휴식(개인)" || weekData?.growthStatus === "집계 중") {
+    // 개인 휴식 → 경력 통계 0 으로 강제
+    if (weekData?.growthStatus === "휴식(개인)") {
       setCareerStats({ total: 0, success: 0 });
       return;
     }
@@ -4564,10 +4564,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
   type EnhancementStatus = "success" | "waiting" | "failed" | "not_applicable";
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
+    // 클럽 온보딩 주차(무적 주차)는 모든 활동이 해당 없음
+    if (isOnboardingWeek) return "not_applicable";
+
     // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
     if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
-    // 집계 중 — 강화 성공/실패가 아직 확정되지 않았으므로 모두 '해당 없음' 으로 표기
-    if (weekData?.growthStatus === "집계 중") return "not_applicable";
 
     // 실무 경험 활동의 eligible 조건 체크 (누적 주차 범위 밖이면 해당 없음)
     // 단, 실제 이행 기록이 있으면 운영진이 진행 주차 외 라인을 예외 처리한 케이스이므로
@@ -4949,9 +4950,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
 
     const infoTypes = ["calendar", "essay", "forum", "infodesk", "session", "wisdom", "practical_lecture", "community", "etc_a"];
-    // 온보딩 주차 / 개인 휴식 / 집계 중이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
-    // (집계 중: 성공/실패 미확정 → 모든 활동 '해당 없음' 표기와 통계 일치)
-    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)" || weekData?.growthStatus === "집계 중") {
+    // 온보딩 주차 / 개인 휴식이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
+    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)") {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
@@ -5329,10 +5329,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     secondaryInfoDeadline: null as string | null,
   });
 
-  // 휴식 모드 / 집계 중일 때 실무 경력 카드 전부 '해당 없음'으로 강제
-  // (집계 중: 강화 성공/실패가 아직 확정되지 않음)
-  const isCountingMode = weekData?.growthStatus === "집계 중";
-  const effectiveWorkCareerCards = (isRestMode || isCountingMode)
+  // 휴식 모드일 때 실무 경력 카드 전부 '해당 없음'으로 강제
+  const effectiveWorkCareerCards = isRestMode
     ? workCareerCards.map((card) => ({
         ...card,
         statusBadge: "/images/0/cluster4/icon/8 해당 없음.png",
@@ -6369,9 +6367,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     {!isEmpty && <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />}
                   </div>
                   {!isEmpty && (
-                    <div className={`status-badge ${isRestMode ? "not_applicable" : !card.hasActivity ? "failed" : card.enhancementStatus}`}>
+                    <div className={`status-badge ${isRestMode || isOnboardingWeek ? "not_applicable" : !card.hasActivity ? "failed" : card.enhancementStatus}`}>
                       {(() => {
-                        if (isRestMode) return <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />;
+                        if (isRestMode || isOnboardingWeek) return <img src="/images/0/cluster4/icon/8 해당 없음.png" alt="해당 없음" />;
                         if (!card.hasActivity) return <img src="/images/0/cluster4/icon/7 강화 실패.png" alt="강화 실패" />;
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
@@ -8734,8 +8732,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           failed: "강화 실패",
                           not_applicable: "해당 없음",
                         };
-                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isRestMode → !hasActivity → enhancementStatus
-                        const statusKey = isRestMode ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
+                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isRestMode/온보딩 → !hasActivity → enhancementStatus
+                        const statusKey = isRestMode || isOnboardingWeek ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
                         const statusText = enhanceStatusTextMap[statusKey] || "—";
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
