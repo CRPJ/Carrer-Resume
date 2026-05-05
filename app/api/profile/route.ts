@@ -242,7 +242,8 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
         supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
-        supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+        // points: 어드민(points/save)은 line_id(activity_types.id) + week_id 로 별점을 저장. 최신 우선.
+        supabaseAdmin.from("points").select("line_id, week_id, points, given_at").eq("user_id", profile.id).eq("point_type", "star").order("given_at", { ascending: false }),
         supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
         getCachedParts(),
@@ -402,8 +403,8 @@ export async function GET(request: NextRequest) {
       // activity_types (cluster_id 기반 분류용) - 캐시 사용
       getCachedActivityTypes(),
 
-      // 해당 유저의 활동별 포인트 (평점용) - star 타입만
-      supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+      // 해당 유저의 활동별 포인트 (평점용) - star 타입만 (어드민 points/save 가 line_id 기반 저장)
+      supabaseAdmin.from("points").select("line_id, week_id, points, given_at").eq("user_id", profile.id).eq("point_type", "star").order("given_at", { ascending: false }),
 
       // 해당 유저의 시즌별 포인트 (week_id를 통해 season 조인)
       supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id),

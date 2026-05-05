@@ -250,8 +250,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   }>({ displayName: "", profilePhotoUrl: "", gender: "", age: null, school: "", major: "", vision: "" });
 
   useEffect(() => {
-    if (!session?.user?.id) return;
-    const targetId = urlUserId || session.user.id;
+    // urlUserId 가 있으면 비로그인이라도 공개 프로필을 표시할 수 있도록 fetch.
+    // (서버에서 비로그인이면 자동 마스킹되므로 안전.)
+    const targetId = urlUserId || session?.user?.id;
+    if (!targetId) return;
     let cancelled = false;
     (async () => {
       try {
@@ -358,6 +360,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [generation, setGeneration] = useState<number | null>(null);
   const [managedTeamName, setManagedTeamName] = useState<string | null>(null);
   const [roleLabel, setRoleLabel] = useState<string | null>(null);
+  // 해당 주차 시점의 raw 역할 코드 (예: crew_partleader / crew_agent / crew_regular ...) — 매니징 라인 적용 여부 판단용
+  const [userWeekRole, setUserWeekRole] = useState<string | null>(null);
   const [weekPoints, setWeekPoints] = useState<{ star: number; lightning: number; shield: number }>({ star: 0, lightning: 0, shield: 0 });
   const [cumulativeInjeolmi, setCumulativeInjeolmi] = useState<number>(0);
   const [cumulativeApprovedWeeks, setCumulativeApprovedWeeks] = useState<number>(0);
@@ -1192,8 +1196,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
         if (userRole) {
           setRoleLabel(roleLabels[userRole.role] || userRole.role);
+          setUserWeekRole(userRole.role || null);
         } else if (profileResult.data?.role) {
           setRoleLabel(roleLabels[profileResult.data.role] || profileResult.data.role);
+          setUserWeekRole(profileResult.data.role || null);
         }
 
         // 포인트 정보 처리
@@ -1307,12 +1313,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             setSecondaryInfoGrants(wb.secondaryInfoGrants as SecondaryInfoGrant[]);
           }
 
-          // 13. 평점 매핑 (activity_records.id → points → activity_type_id)
+          // 13. 평점 매핑 — points.line_id (= activity_types.id) + 현재 주차 매칭.
+          //   어드민(compliance-manage)이 reward_star + 보너스 평점을 합쳐 저장하므로,
+          //   화면 표시는 (points - reward_star) 가 아니라 그대로 0~10 노출.
+          //   apiActivityPoints 는 given_at desc 정렬이므로 동일 키 중복 시 최신 값이 우선.
           const ratingsMap = new Map<string, number>();
-          filteredActivityRecords.forEach((ar: { id: string; activity_type_id: string }) => {
-            const pointData = apiActivityPoints.find((p: { activity_id: string }) => p.activity_id === ar.id);
-            if (pointData) {
-              ratingsMap.set(ar.activity_type_id, pointData.points);
+          apiActivityPoints.forEach((p: { line_id: string | null; week_id: string | null; points: number }) => {
+            if (p.line_id && p.week_id === weekId && !ratingsMap.has(p.line_id)) {
+              ratingsMap.set(p.line_id, p.points);
             }
           });
           setActivityRatings(ratingsMap);
@@ -4613,6 +4621,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return activityTypesMap.get(activityTypeId);
   };
 
+  // 매니징 라인은 사용자 역할에 따라 적용 여부가 갈림 — 라인명에 _파트장/_에이전트 표기.
+  // 라인이 사용자의 역할과 맞지 않으면 강화 실패가 아니라 '해당 없음' 처리해야 함
+  // (활동이 애초에 그 역할에게 개설되지 않으므로).
+  const isLineForOtherRole = (activityTypeId: string): boolean => {
+    const lineName = activityTypesMap.get(activityTypeId)?.name || workExpLineMap[activityTypeId.replace(/\s+/g, "")]?.lineName || "";
+    if (!lineName) return false;
+    const role = userWeekRole || "";
+    if (lineName.includes("파트장")) {
+      return !role.includes("partleader") && !role.includes("part_leader");
+    }
+    if (lineName.includes("에이전트")) {
+      return !role.includes("agent");
+    }
+    return false;
+  };
+
   // 강화 상태 판단 함수 (2차 정보 기입 OR 48시간 기준)
   // - 해당 없음: weekly_activities.is_active = false (활동 미개설) 또는 온보딩 주차(무적 주차)
   // - 강화 실패: 활동 개설됨 + 카페 댓글 집계에서 이행하지 않음 (is_completed = false)
@@ -4625,6 +4649,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
     if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
+
+    // 매니징 라인 — 사용자 역할이 다른 역할용 라인이면 '해당 없음'
+    // 단, 실제 이행 기록이 있으면 운영진이 예외 부여한 케이스이므로 일반 흐름 유지
+    if (isLineForOtherRole(activityType)) {
+      const hasRecord = weekActivityRecords.some((ar) => ar.activity_type_id === activityType);
+      if (!hasRecord) return "not_applicable";
+    }
 
     // 실무 경험 활동의 eligible 조건 체크 (누적 주차 범위 밖이면 해당 없음)
     // 단, 실제 이행 기록이 있으면 운영진이 진행 주차 외 라인을 예외 처리한 케이스이므로
@@ -5216,6 +5247,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       }))
     : workAbilityCards;
 
+  // 실무 역량: 단일 표시 카드 — 강화 성공/실패/대기인 카드 우선, 모두 not_applicable이면 보이드
+  const matchedAbilityCard = effectiveWorkAbilityCards.find(
+    (c) => c.enhancementStatus !== "not_applicable"
+  );
+  const isAbilityCardVoid = !matchedAbilityCard;
+  const displayedAbilityCard = matchedAbilityCard ?? {
+    id: 0,
+    activityTypeId: "",
+    code: "-",
+    lineCode: "-",
+    lineName: "-",
+    badge: "-",
+    title: "",
+    subTitle: "",
+    growthPoint: "",
+    outputLinks: [] as { desc: string; url: string }[],
+    images: null as (string | null)[] | null,
+    imageCaptions: null as string[] | null,
+    icon: "",
+    status: "not_applicable" as EnhancementStatus,
+    statusIcon: enhancementStatusIcons.not_applicable,
+    enhancementStatus: "not_applicable" as EnhancementStatus,
+    isFailed: false,
+    isEmpty: true,
+    hasActivity: false,
+  };
+
   // 실무 경험 카드 데이터 (동적 생성 + 빈 카드)
   const workExpCards = [
     ...workExpCardLineCodes.map((lineCodeKey, index) => {
@@ -5255,6 +5313,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         }
       }
 
+      // 어드민 output_images(weekly_activities.output_images) 와 크루 image_urls 병합 — workCareer 와 동일 패턴.
+      // 어드민 슬롯 우선, 그 다음 크루 슬롯. 레거시로 image_urls 에 어드민 URL 이 같이 저장된 경우 중복 제거.
+      const adminImgs = (activity?.output_images || []).filter((i: { url?: string }) => i?.url?.trim());
+      const adminUrlSet = new Set(adminImgs.map((i: { url: string }) => i.url));
+      const rawCrewImgs: (string | null | undefined)[] = detail?.image_urls || [];
+      const rawCrewCaps: string[] = detail?.image_captions || [];
+      const filteredCrewImgs: (string | null)[] = [];
+      const filteredCrewCaps: string[] = [];
+      for (let i = 0; i < rawCrewImgs.length; i++) {
+        const u = rawCrewImgs[i];
+        if (u && adminUrlSet.has(u)) continue;
+        filteredCrewImgs.push(u || null);
+        filteredCrewCaps.push(rawCrewCaps[i] || "");
+      }
+      const mergedImages: (string | null)[] = [];
+      const mergedCaptions: string[] = [];
+      for (let i = 0; i < WORKINFO_IMAGE_SLOT_COUNT; i++) {
+        if (i < adminImgs.length) {
+          mergedImages.push(adminImgs[i].url);
+          mergedCaptions.push(adminImgs[i].caption || "");
+        } else {
+          const crewIdx = i - adminImgs.length;
+          mergedImages.push(filteredCrewImgs[crewIdx] || null);
+          mergedCaptions.push(filteredCrewCaps[crewIdx] || "");
+        }
+      }
+
       return {
         id: index + 1,
         activityTypeId,
@@ -5264,8 +5349,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: detail?.sub_title || "",
         growthPoint: detail?.growth_point || "",
         outputLinks: mergedOutputLinks,
-        images: normalizeWorkInfoImages(detail?.image_urls || undefined),
-        imageCaptions: normalizeWorkInfoCaptions(detail?.image_captions || undefined),
+        images: normalizeWorkInfoImages(mergedImages),
+        imageCaptions: normalizeWorkInfoCaptions(mergedCaptions),
         verified: enhStatus === "success",
         rating: rating,
         ratingCount: hasActivity ? `${ratingScore} / 10` : "- / 10",
@@ -5278,6 +5363,30 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }),
   ];
 
+  // 4칸 슬롯 규칙: 해당되는(=not_applicable이 아닌) 라인만 좌측부터 채우고,
+  // 부족한 칸은 보이드 '-' 카드로 패딩한다. workExpLineMap 의 6개 라인 중
+  // 한 주에 5개 이상 해당될 일은 없으므로 최대 4개까지 노출.
+  const buildVoidWorkExpCard = (n: number) => ({
+    id: 1000 + n,
+    activityTypeId: "",
+    code: "-",
+    badge: "-",
+    title: "-",
+    subTitle: "",
+    growthPoint: "",
+    outputLinks: [] as { desc: string; url: string }[],
+    images: normalizeWorkInfoImages(undefined),
+    imageCaptions: normalizeWorkInfoCaptions(undefined),
+    verified: false,
+    rating: 0,
+    ratingCount: "- / 10",
+    hasWeb: false,
+    icon: "",
+    isEmpty: true,
+    enhancementStatus: "not_applicable" as EnhancementStatus,
+    hasActivity: false,
+  });
+
   // 휴식 모드일 때 실무 경험 카드 — 해당 없음 + 보이드
   const effectiveWorkExpCards = isRestMode
     ? workExpCards.map((card) => ({
@@ -5287,7 +5396,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         enhancementStatus: "not_applicable" as EnhancementStatus,
         isFailed: false,
       }))
-    : workExpCards;
+    : [
+        ...workExpCards.filter((c) => c.enhancementStatus !== "not_applicable"),
+        buildVoidWorkExpCard(0),
+        buildVoidWorkExpCard(1),
+        buildVoidWorkExpCard(2),
+        buildVoidWorkExpCard(3),
+      ];
 
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)
   const workCareerCards =
@@ -6520,18 +6635,19 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </div>
           </div>
           <div className="work-ability-cards">
-            {effectiveWorkAbilityCards.slice(0, 1).map((card) => {
+            {[displayedAbilityCard].map((card) => {
               const isFailedCard = card.enhancementStatus === "failed";
               const isNotApplicableCard = card.enhancementStatus === "not_applicable";
               return (
                 <div
-                  key={card.code}
+                  key={isAbilityCardVoid ? "void" : card.code}
                   className={`work-ability-card ${isNotApplicableCard ? "empty" : ""}`}
                   onClick={async () => {
+                    if (isAbilityCardVoid) return;
                     setSelectedWorkAbilityCard(card);
                     setWorkAbilityViewModalOpen(true);
                   }}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: isAbilityCardVoid ? "default" : "pointer" }}
                 >
                   <div className={`card-icon-area ${isFailedCard ? "failed" : ""}`}>
                     {card.icon ? <img src={card.icon} alt={card.lineName} style={{ opacity: isFailedCard ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
