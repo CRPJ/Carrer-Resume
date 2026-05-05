@@ -450,6 +450,7 @@ const Cluster41Content = () => {
   // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함)
   interface ExperienceTypeInfo {
     id: string;
+    name: string;
     eligible_min_approved_weeks: number | null;
     eligible_max_approved_weeks: number | null;
     count_once_in_total: boolean;
@@ -768,8 +769,16 @@ const Cluster41Content = () => {
       return { count: 0, total: 0, rate: 0 };
     }
 
-    // 2. 해당 주차까지의 누적 성공 주차 수 계산 (현재 주차 포함)
-    const cumulativeApproved = getCumulativeApprovedWeeks(weekData.endDate);
+    // 2. 해당 주차까지의 누적 성공 주차 수 계산 (현재 주차 포함).
+    // cluster-4-card 와 동일 정책: 평가 대상 주차가 active(클럽 공식 휴식/온보딩 아님) 이고
+    // 아직 성공 카운트에 포함되지 않은 진행 중/집계 중/실패 상태이면 +1 (이 주차도 성장 시도로 셈).
+    // 이렇게 해야 봄 9주차(집계 중) 같이 결과 결정 전 주차에서도 eligible_min/max 가 일관되게 평가됨.
+    const baseCumulative = getCumulativeApprovedWeeks(weekData.endDate);
+    const isClubBreakWeek = !!weekData.isClubBreak;
+    const isOnboardingThisWeek = !!(onboardingWeekId && weekId === onboardingWeekId);
+    const alreadyCountedAsSuccess = weekData.growthStatus === '성공';
+    const cumulativeApproved = baseCumulative
+      + ((!isClubBreakWeek && !isOnboardingThisWeek && !alreadyCountedAsSuccess) ? 1 : 0);
 
     // 3. 해당 주차에 개설된 experience 활동 중 eligible한 것 필터링
     // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
@@ -778,6 +787,21 @@ const Cluster41Content = () => {
       (weekData.seasonYear === 2026 && weekData.seasonName !== '봄') ||
       (weekData.seasonYear === 2026 && weekData.seasonName === '봄' && weekData.weekNumber >= 9)
     );
+    // 매니징 라인 역할 분기 — 라인명에 _파트장/_에이전트 표기 → 사용자 역할과 안 맞으면 '해당 없음'
+    const roleForWeek = getRoleForDate(weekData.startDate)?.role || '';
+    const isLineForOtherRole = (lineName: string): boolean => {
+      if (!lineName) return false;
+      if (lineName.includes('파트장')) {
+        return !roleForWeek.includes('partleader') && !roleForWeek.includes('part_leader');
+      }
+      if (lineName.includes('에이전트')) {
+        return !roleForWeek.includes('agent');
+      }
+      return false;
+    };
+    const hasRecordForType = (activityTypeId: string): boolean =>
+      userActivities.some(a => a.week_id === weekId && a.activity_type_id === activityTypeId);
+
     let eligibleTotal = 0;
     const eligibleExperienceTypeIds: string[] = [];
     // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
@@ -786,6 +810,11 @@ const Cluster41Content = () => {
     );
     weekActiveExperienceActivities.forEach(a => {
       const typeInfo = experienceTypeInfos.find(info => info.id === a.activity_type_id);
+
+      // 역할 미스매치 + 이행 기록 없음 → 카운트 제외 (이행 기록 있으면 폴백)
+      if (typeInfo && isLineForOtherRole(typeInfo.name) && !hasRecordForType(a.activity_type_id)) {
+        return;
+      }
 
       if (!typeInfo) {
         eligibleTotal++;
@@ -796,24 +825,28 @@ const Cluster41Content = () => {
       if (isEligibilityRuleActive) {
         const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
         const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
+        const inRange = cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek;
 
-        if (cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek) {
-          if (typeInfo.count_once_in_total) {
-            const previouslyCompleted = userActivities.some(a =>
-              a.activity_type_id === typeInfo.id &&
-              a.week_id !== weekId
-            );
-            if (!previouslyCompleted) {
-              eligibleTotal++;
-              eligibleExperienceTypeIds.push(typeInfo.id);
-            }
-          } else {
+        // eligibility 윈도우 밖이라도 이행 기록 있으면 폴백
+        if (!inRange && !hasRecordForType(a.activity_type_id)) {
+          return;
+        }
+
+        if (inRange && typeInfo.count_once_in_total) {
+          const previouslyCompleted = userActivities.some(a =>
+            a.activity_type_id === typeInfo.id &&
+            a.week_id !== weekId
+          );
+          if (!previouslyCompleted) {
             eligibleTotal++;
             eligibleExperienceTypeIds.push(typeInfo.id);
           }
+        } else {
+          eligibleTotal++;
+          eligibleExperienceTypeIds.push(typeInfo.id);
         }
       } else {
-        // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트
+        // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트 (역할 미스매치는 위에서 이미 제외됨)
         eligibleTotal++;
         eligibleExperienceTypeIds.push(a.activity_type_id);
       }
@@ -1119,7 +1152,7 @@ const Cluster41Content = () => {
             // activity_records
             supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
             // activity_types
-            supabase.from('activity_types').select('id, cluster_id, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
+            supabase.from('activity_types').select('id, cluster_id, name, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
             // career_records
             supabase.from('career_records').select('id, user_id, week_id, project_id, enhancement_status, weeks!career_records_week_id_fkey(id, start_date, end_date)').eq('user_id', userId).in('enhancement_status', ['pending', 'enhanced']),
             // weekly_activities - 사용자의 주차만 필터링 (1000개 제한 우회) + opened_at 추가
@@ -1170,6 +1203,7 @@ const Cluster41Content = () => {
             activityTypesResult.data.forEach((at: {
               id: string;
               cluster_id: string;
+              name: string | null;
               eligible_min_approved_weeks: number | null;
               eligible_max_approved_weeks: number | null;
               count_once_in_total: boolean;
@@ -1182,6 +1216,7 @@ const Cluster41Content = () => {
                 experienceIds.push(at.id);
                 experienceInfos.push({
                   id: at.id,
+                  name: at.name || '',
                   eligible_min_approved_weeks: at.eligible_min_approved_weeks,
                   eligible_max_approved_weeks: at.eligible_max_approved_weeks,
                   count_once_in_total: at.count_once_in_total || false
