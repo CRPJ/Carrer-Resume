@@ -2918,23 +2918,43 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const newSubTitle = editingCareerSubTitle.trim() || null;
       const newOutputLinks = editingCareerOutputLinks;
       const newGrowthPoint = editingCareerGrowthPoint.trim() || null;
-      let persistedImages: (string | null)[] = editingCareerImages;
+      // 어드민 output_images 가 차지한 슬롯은 user_activity_details 에 저장하지 않음 (출처 분리)
+      const careerIdx = (selectedWorkCareerCard?.id || 1) - 1;
+      const adminImgsForSave = (careerRecords[careerIdx]?.output_images || []).filter((i) => i?.url?.trim());
+      const adminImgCount = adminImgsForSave.length;
+      const crewImagesToSave = editingCareerImages.slice(adminImgCount);
+      const crewCaptionsToSave = editingCareerImageCaptions.slice(adminImgCount);
+      let persistedCrewImages: (string | null)[] = crewImagesToSave;
       try {
         const persisted = await persistActivityDetailToServer({
           activityTypeId: activityType,
           subTitle: newSubTitle,
           outputLinks: newOutputLinks,
           growthPoint: newGrowthPoint,
-          images: editingCareerImages,
-          imageCaptions: editingCareerImageCaptions,
+          images: crewImagesToSave,
+          imageCaptions: crewCaptionsToSave,
         });
-        persistedImages = persisted.images;
+        persistedCrewImages = persisted.images;
       } catch (err) {
         console.error("workCareer 저장 실패:", err);
         alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
         return;
       }
-      setEditingCareerImages(persistedImages);
+      // 화면 상태는 어드민 + 크루 머지 결과로 복원
+      const mergedImages: (string | null)[] = [];
+      const mergedCaptions: string[] = [];
+      for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
+        if (i < adminImgCount) {
+          mergedImages.push(adminImgsForSave[i].url);
+          mergedCaptions.push(adminImgsForSave[i].caption || "");
+        } else {
+          const crewIdx = i - adminImgCount;
+          mergedImages.push(persistedCrewImages[crewIdx] || null);
+          mergedCaptions.push(crewCaptionsToSave[crewIdx] || "");
+        }
+      }
+      setEditingCareerImages(mergedImages);
+      setEditingCareerImageCaptions(mergedCaptions);
       setWeekActivityDetails((prev) => {
         const nextDetail = {
           week_id: weekId,
@@ -2942,8 +2962,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           sub_title: newSubTitle,
           output_links: newOutputLinks,
           growth_point: newGrowthPoint,
-          image_urls: persistedImages,
-          image_captions: editingCareerImageCaptions,
+          image_urls: persistedCrewImages,
+          image_captions: crewCaptionsToSave,
         };
         const existingIndex = prev.findIndex((d) => d.activity_type_id === activityType);
         if (existingIndex < 0) return [...prev, nextDetail];
@@ -2956,8 +2976,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               subTitle: newSubTitle || "",
               outputLinks: newOutputLinks,
               growthPoint: editingCareerGrowthPoint,
-              images: persistedImages,
-              imageCaptions: editingCareerImageCaptions,
+              images: mergedImages,
+              imageCaptions: mergedCaptions,
             }
           : prev,
       );
@@ -2965,8 +2985,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         subTitle: newSubTitle || "",
         growthPoint: editingCareerGrowthPoint,
         outputLinks: JSON.parse(JSON.stringify(newOutputLinks)),
-        images: [...persistedImages],
-        imageCaptions: [...editingCareerImageCaptions],
+        images: [...mergedImages],
+        imageCaptions: [...mergedCaptions],
       };
     }
     await popup.alert("저장되었습니다.");
@@ -3008,11 +3028,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     });
   };
 
+  // 어드민 output_images 가 차지한 앞쪽 슬롯 수 (이 인덱스 미만은 크루 편집 불가)
+  const getCareerAdminSlotCount = (): number => {
+    const careerIdx = (selectedWorkCareerCard?.id || 1) - 1;
+    return (careerRecords[careerIdx]?.output_images || []).filter((i) => i?.url?.trim()).length;
+  };
+
   const triggerCareerImageUpload = (idx: number) => {
+    if (idx < getCareerAdminSlotCount()) return;
     careerImageFileInputRefs.current[idx]?.click();
   };
 
   const handleCareerImageFileChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    if (idx < getCareerAdminSlotCount()) {
+      e.target.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
@@ -3025,6 +3056,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleCareerImageDelete = (idx: number) => {
+    if (idx < getCareerAdminSlotCount()) return;
     setEditingCareerImages((prev) => {
       const next = prev.filter((_, i) => i !== idx);
       while (next.length < WORKCAREER_IMAGE_SLOT_COUNT) next.push(null);
@@ -3038,6 +3070,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleCareerCaptionChange = (idx: number, value: string) => {
+    if (idx < getCareerAdminSlotCount()) return;
     setEditingCareerImageCaptions((prev) => {
       const next = [...prev];
       next[idx] = value;
@@ -5257,6 +5290,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             return "/images/0/cluster4/icon/8 해당 없음.png";
           };
 
+          // 어드민 output_images 와 크루 user_activity_details.image_urls 를 합쳐 3슬롯 채움
+          const adminImgs = (record.output_images || []).filter((i) => i?.url?.trim());
+          const careerActivityType = workCareerActivityTypes[index];
+          const careerDetail = careerActivityType ? weekActivityDetails.find((d) => d.activity_type_id === careerActivityType) : null;
+          const crewImgs = careerDetail?.image_urls || [];
+          const crewCaps = careerDetail?.image_captions || [];
+          const mergedImages: (string | null)[] = [];
+          const mergedCaptions: string[] = [];
+          for (let i = 0; i < WORKCAREER_IMAGE_SLOT_COUNT; i++) {
+            if (i < adminImgs.length) {
+              mergedImages.push(adminImgs[i].url);
+              mergedCaptions.push(adminImgs[i].caption || "");
+            } else {
+              const crewIdx = i - adminImgs.length;
+              mergedImages.push(crewImgs[crewIdx] || null);
+              mergedCaptions.push(crewCaps[crewIdx] || "");
+            }
+          }
           return {
             id: index + 1,
             code: record.line_code || record.career_code || "-",
@@ -5267,7 +5318,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             likes: "0,99",
             hasWeb: (record.output_links?.length || 0) > 0,
             icon: record.company_logo_url || "/images/0/cluster4/icon/default-company.png",
-            supervisorImg: record.supervisor_profile_img || "/images/0/crew profile/default.jpg",
+            supervisorImg: record.supervisor_profile_img || "/images/0/cluster4/icon/실무 경력/감독자.jpg",
             supervisorName: record.supervisor_name || "-",
             supervisorDept: record.supervisor_department || "",
             supervisorCompany: record.supervisor_company || "",
@@ -5290,9 +5341,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             lineName: record.line_name,
             outputLinks: record.output_links,
             secondaryInfoDeadline: record.secondary_info_deadline || null,
-            // 어드민이 career_projects.output_images 에 업로드한 이미지를 카드 슬롯에 매핑
-            images: (record.output_images || []).map((i) => i?.url || null),
-            imageCaptions: (record.output_images || []).map((i) => i?.caption || ""),
+            // 어드민 output_images 우선, 남은 슬롯은 크루 user_activity_details.image_urls 로 채움
+            images: mergedImages,
+            imageCaptions: mergedCaptions,
           };
         })
       : [];
@@ -9709,7 +9760,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 {/* ──── 우측 — 이미지 3장 + 후원사 placeholder(4단계) ──── */}
                 <div className="workinfo-right">
                   <div className="workinfo-image-grid images-grid workcareer-image-grid">
-                    {Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }).map((_, imageIdx) => {
+                    {(() => {
+                      const careerIdxForLock = (selectedWorkCareerCard?.id || 1) - 1;
+                      const adminImgCountForLock = (careerRecords[careerIdxForLock]?.output_images || []).filter((i) => i?.url?.trim()).length;
+                      return Array.from({ length: WORKCAREER_IMAGE_SLOT_COUNT }).map((_, imageIdx) => {
                       const viewImages = normalizeWorkCareerImages(selectedWorkCareerCard?.images);
                       const viewCaptions = normalizeWorkCareerCaptions(selectedWorkCareerCard?.imageCaptions);
                       const imagesForState = workCareerViewIsEditing ? editingCareerImages : viewImages;
@@ -9718,12 +9772,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const caption = captionsForState[imageIdx] || "";
                       const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2;
+                      const isAdminLocked = imageIdx < adminImgCountForLock;
+                      const showEditingActions = workCareerViewIsEditing && !isAdminLocked;
                       return (
-                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}${isAdminLocked ? " admin-locked" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {image ? (
                             <div className="image-preview" onClick={() => handleCareerImagePreview(imageIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
-                              {workCareerViewIsEditing && (
+                              {showEditingActions && (
                                 <div className="image-actions-overlay">
                                   <button
                                     type="button"
@@ -9756,10 +9812,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <div
                               className="image-preview"
                               onClick={async () => {
-                                if (workCareerViewIsEditing && isEnabled) triggerCareerImageUpload(imageIdx);
+                                if (showEditingActions && isEnabled) triggerCareerImageUpload(imageIdx);
                               }}
                             >
-                              {workCareerViewIsEditing && (
+                              {showEditingActions && (
                                 <div className="image-actions-overlay">
                                   <button
                                     type="button"
@@ -9804,7 +9860,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             onChange={(e) => handleCareerImageFileChange(e, imageIdx)}
                           />
                           <div className="image-caption-overlay">
-                            {workCareerViewIsEditing && activeCareerCaptionIdx === imageIdx ? (
+                            {showEditingActions && activeCareerCaptionIdx === imageIdx ? (
                               <input
                                 type="text"
                                 className="caption-input"
@@ -9821,7 +9877,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span className="caption-text">{caption}</span>
                             )}
                           </div>
-                          {workCareerViewIsEditing && (
+                          {showEditingActions && (
                             <button
                               type="button"
                               className={`image-action-btn image-caption-btn${activeCareerCaptionIdx === imageIdx ? " active" : ""}`}
@@ -9838,7 +9894,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           )}
                         </div>
                       );
-                    })}
+                      });
+                    })()}
                     {/* 4번째 슬롯 — 후원/제휴사 카드 (항상 읽기전용, 편집 모드에서도 수정 불가) */}
                     {(() => {
                       // DB 값이 우선. 없으면 데모 모드에서만 card id 기반 랜덤 폴백
