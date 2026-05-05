@@ -30,6 +30,11 @@ interface DBWeekData {
   isClubBreak: boolean;
   holidayName: string | null;
   growthStatus: string;
+  // 활동 라인 단위 판정에서 사용. growthStatus 는 phase 기반(진행 중/집계 중/...)이라
+  // 결과 결정 phase 이전에는 휴식 여부가 묻혀버림. 이 플래그는 phase 와 무관하게
+  // '운영진이 정해둔' 휴식 여부를 그대로 유지한다.
+  isPersonalRest: boolean;
+  isOfficialRest: boolean;
 }
 
 interface SelectedColleague {
@@ -792,14 +797,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (fileName) {
       return `/images/0/cluster4/icon/실무 경험/${fileName}`;
     }
-    return "/images/0/cluster4/icon/실무 경험/실무 경험 - default.png";
+    return "/images/0/cluster4/icon/2 실무 경험.png";
   };
 
   // workExp 모달 전용: 라인명 → 아이콘 파일 매칭 (부분 키워드 매칭)
   // 실제 파일: [매니징] 파트장.png / [매니징] 에이전트.png / 실무 경험 - [커리어|생산성|콘텐츠|퍼포먼스]...png
   const getWorkExpIcon = (lineName: string): string => {
     const basePath = "/images/0/cluster4/icon/실무 경험/";
-    if (!lineName) return basePath + "실무 경험 - default.png";
+    const fallbackIcon = "/images/0/cluster4/icon/2 실무 경험.png";
+    if (!lineName) return fallbackIcon;
 
     // 매니징 라인은 파트장/에이전트로 세부 분기 (파일명 네이밍이 다름)
     if (lineName.includes("매니징")) {
@@ -818,7 +824,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       if (lineName.includes(keyword)) return basePath + file;
     }
 
-    return basePath + "실무 경험 - default.png";
+    return fallbackIcon;
   };
 
   // 시즌 이름 변환 맵
@@ -883,6 +889,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           isClubBreak: dummyWeek.isClubBreak,
           holidayName: dummyWeek.holidayName,
           growthStatus: dummyWeek.growthStatus,
+          isPersonalRest: dummyWeek.growthStatus === "휴식(개인)",
+          isOfficialRest: dummyWeek.growthStatus === "휴식(공식)" || dummyWeek.isBreakSeason,
         });
       } else {
         setWeekData({
@@ -897,6 +905,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           isClubBreak: false,
           holidayName: null,
           growthStatus: "성공",
+          isPersonalRest: false,
+          isOfficialRest: false,
         });
       }
 
@@ -1116,6 +1126,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const onboardingWeekId = profileResult.onboardingWeekId;
         const isCurrentWeekOnboarding = weekId === onboardingWeekId;
 
+        // phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 여부.
+        // 활동 라인 단위(실무 정보/역량/경험/경력) 판정에서 사용.
+        const userIsOnOfficialRestForWeek = !isCurrentWeekOnboarding && (
+          isBreakSeason
+          || !!weeklyGrowth?.is_club_break
+          || (!weeklyGrowth && !!currentWeek.is_club_break)
+        );
+        const userIsOnPersonalRestForWeek = !isCurrentWeekOnboarding && (
+          !!weeklyGrowth?.is_resting
+          || (!weeklyGrowth && apiRestWeekIds.includes(currentWeek.id))
+        );
+
         let growthStatus = "실패";
         // 온보딩 주차(무적 주차)는 무조건 성공
         if (isCurrentWeekOnboarding) {
@@ -1163,6 +1185,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           isClubBreak: currentWeek.is_club_break || false,
           holidayName: currentWeek.holiday_name,
           growthStatus,
+          isPersonalRest: userIsOnPersonalRestForWeek,
+          isOfficialRest: userIsOnOfficialRestForWeek,
         });
 
         // 팀/파트 정보 처리 (profile API 데이터 활용)
@@ -1467,7 +1491,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
           // 개인 휴식 크루는 통계를 0으로 강제 (해당 주차에 활동 자체가 없는 게 정상).
           // 공식 휴식 주차는 강제로 0 처리하지 않음 — 예외적으로 개설된 활동이 있으면 자연스럽게 반영.
-          const isPersonalRest = growthStatus === "휴식(개인)";
+          // phase(집계 중/진행 중)에 가려지지 않도록 phase-독립 플래그를 사용.
+          const isPersonalRest = userIsOnPersonalRestForWeek;
           if (isPersonalRest) {
             setInfoStats({ total: 0, success: 0 });
             setCompetencyStats({ total: 0, success: 0 });
@@ -1550,8 +1575,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
   // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
   useEffect(() => {
-    // 개인 휴식 → 경력 통계 0 으로 강제
-    if (weekData?.growthStatus === "휴식(개인)") {
+    // 개인 휴식 → 경력 통계 0 으로 강제. phase(집계 중) 와 무관하게 적용.
+    if (weekData?.isPersonalRest) {
       setCareerStats({ total: 0, success: 0 });
       return;
     }
@@ -1792,8 +1817,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // 일반 모드 백엔드 승인 상태 → 모든 canEdit* 플래그에 일괄 반영
   // 다른 크루 카드 열람 시(isOwner=false)에는 승인됐어도 수정 비활성화
+  // 어드민(마더) 계정은 승인/소유 무관하게 모든 라인 카드 수정 가능
   useEffect(() => {
     if (isDemoMode) return; // 데모 모드는 위 useEffect들이 true로 셋업
+    if (session?.user?.isAdmin) {
+      setCanEditReputation(true);
+      setCanEditColleague(true);
+      setCanEditWorkInfo(true);
+      setCanEditWorkAbility(true);
+      setCanEditWorkExp(true);
+      setCanEditWorkCareer(true);
+      return;
+    }
     let cancelled = false;
     (async () => {
       const approved = await checkApprovalStatus();
@@ -2149,6 +2184,26 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     setEditingImageCaptions(createEmptyWorkInfoCaptions());
   };
 
+  // 아웃풋 이미지 ↔ 캡션 1:1 페어 검증 — 한쪽만 채워진 첫 슬롯과 종류 반환, 모두 정상이면 null
+  const findImageCaptionMismatch = (
+    images: (string | null)[],
+    captions: string[],
+    startIdx: number = 0,
+  ): { slot: number; type: "missing-caption" | "missing-image" } | null => {
+    for (let i = startIdx; i < images.length; i++) {
+      const hasImage = !!images[i];
+      const hasCaption = !!(captions[i] && captions[i].trim());
+      if (hasImage && !hasCaption) return { slot: i + 1, type: "missing-caption" };
+      if (!hasImage && hasCaption) return { slot: i + 1, type: "missing-image" };
+    }
+    return null;
+  };
+
+  const captionMismatchMessage = (m: { slot: number; type: "missing-caption" | "missing-image" }) =>
+    m.type === "missing-caption"
+      ? `아웃풋 이미지 ${m.slot}번의 캡션을 입력해주세요.\n이미지와 캡션은 한 쌍이에요. 😊`
+      : `아웃풋 ${m.slot}번에 이미지를 올려주세요.\n캡션만 입력할 수 없어요. 이미지와 캡션은 한 쌍이에요. 😊`;
+
   // blob: URL 배열을 Supabase Storage로 업로드 → 영구 URL 배열 반환. http(s)/data URL은 그대로 통과.
   const persistImageUrls = async (
     images: (string | null)[],
@@ -2226,6 +2281,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!isDemoMode && !canEditWorkInfo) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
+    }
+    // 아웃풋 이미지 ↔ 캡션 1:1 페어 검증 (이미지 1개 = 캡션 1개, 한쪽만 입력 불가)
+    {
+      const mismatch = findImageCaptionMismatch(editingImages, editingImageCaptions);
+      if (mismatch) {
+        setWorkInfoFooterNotice("error");
+        await popup.alert(captionMismatchMessage(mismatch));
+        return;
+      }
     }
     // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     // 저장 직전 confirm — 사용자 의도 재확인
@@ -2459,6 +2523,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
+    // 아웃풋 이미지 ↔ 캡션 1:1 페어 검증 (이미지 1개 = 캡션 1개, 한쪽만 입력 불가)
+    {
+      const mismatch = findImageCaptionMismatch(editingAbilityImages, editingAbilityImageCaptions);
+      if (mismatch) {
+        setWorkAbilityFooterNotice("error");
+        await popup.alert(captionMismatchMessage(mismatch));
+        return;
+      }
+    }
     // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
     if (selectedWorkAbilityCard?.activityTypeId) {
@@ -2691,6 +2764,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!isDemoMode && !canEditWorkExp) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
+    }
+    // 아웃풋 이미지 ↔ 캡션 1:1 페어 검증 (이미지 1개 = 캡션 1개, 한쪽만 입력 불가)
+    {
+      const mismatch = findImageCaptionMismatch(editingExpImages, editingExpImageCaptions);
+      if (mismatch) {
+        setWorkExpFooterNotice("error");
+        await popup.alert(captionMismatchMessage(mismatch));
+        return;
+      }
     }
     // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능 (라인 평점은 어드민 전용)
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
@@ -2941,6 +3023,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (!isDemoMode && !canEditWorkCareer) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
+    }
+    // 아웃풋 이미지 ↔ 캡션 1:1 페어 검증 — 어드민 슬롯은 크루가 편집 불가하므로 제외 (한쪽만 입력 불가)
+    {
+      const careerIdxForCheck = (selectedWorkCareerCard?.id || 1) - 1;
+      const adminImgCountForCheck = (careerRecords[careerIdxForCheck]?.output_images || []).filter((i) => i?.url?.trim()).length;
+      const mismatch = findImageCaptionMismatch(editingCareerImages, editingCareerImageCaptions, adminImgCountForCheck);
+      if (mismatch) {
+        setWorkCareerFooterNotice("error");
+        await popup.alert(captionMismatchMessage(mismatch));
+        return;
+      }
     }
     // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
@@ -4153,7 +4246,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const restImage = "/images/0/cluster4/주차%20이미지/휴식(개인,공식).png";
 
   // 휴식 모드 체크 (휴식(개인), 휴식(공식)일 때 모든 카드 비활성화)
-  const isRestMode = weekData?.growthStatus?.includes("휴식") || false;
+  // phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 여부를 본다 — 봄 9주차가 아직
+  // 결과 결정 시점 이전이라 growthStatus 가 "집계 중" 으로 잡혀도, 개인 휴식 크루의
+  // 활동 라인은 '해당 없음' 으로 표시되어야 한다.
+  const isRestMode = !!(weekData?.isPersonalRest || weekData?.isOfficialRest);
 
   // 시즌명과 주차번호로 월/주차 계산하여 이미지 경로 생성
   const getWeekImagePath = (data: DBWeekData) => {
@@ -4648,7 +4744,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     if (isOnboardingWeek) return "not_applicable";
 
     // 개인 휴식 크루는 모든 활동이 해당 없음. 공식 휴식이라도 예외적으로 개설된 활동은 정상 평가.
-    if (weekData?.growthStatus === "휴식(개인)") return "not_applicable";
+    // phase(집계 중/진행 중) 와 무관하게 적용 — growthStatus 가 phase 로 가려져도 휴식 플래그를 본다.
+    if (weekData?.isPersonalRest) return "not_applicable";
 
     // 매니징 라인 — 사용자 역할이 다른 역할용 라인이면 '해당 없음'
     // 단, 실제 이행 기록이 있으면 운영진이 예외 부여한 케이스이므로 일반 흐름 유지
@@ -4681,7 +4778,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     //   - 평소 주차에서 eligible 실무 경험: '강화 실패' (운영진이 개설 누락한 시그널)
     //   - 그 외: '해당 없음'
     if (!activity?.is_active) {
-      if (weekData?.growthStatus?.includes("휴식")) return "not_applicable";
+      if (weekData?.isPersonalRest || weekData?.isOfficialRest) return "not_applicable";
       if (expInfo) return "failed";
       return "not_applicable";
     }
@@ -5038,7 +5135,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
     const infoTypes = ["calendar", "essay", "forum", "infodesk", "session", "wisdom", "practical_lecture", "community", "etc_a"];
     // 온보딩 주차 / 개인 휴식이면 강화율 0. 공식 휴식은 예외 활동 있으면 자연스럽게 반영.
-    if (isOnboardingWeek || weekData?.growthStatus === "휴식(개인)") {
+    // phase(집계 중) 에 가려지지 않도록 phase-독립 플래그 사용.
+    if (isOnboardingWeek || weekData?.isPersonalRest) {
       setInfoStats({ total: 0, success: 0 });
       setCompetencyStats({ total: 0, success: 0 });
       setExperienceStats({ total: 0, success: 0 });
@@ -5047,7 +5145,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       setInfoStats(calcStats(infoTypes));
       const competencyCalc = calcStats(competencyTypeIds);
       // 평소 매주 최대 1개. 공식 휴식 주차는 예외 개설 있을 때만 1.
-      const isClubBreakNow = weekData?.growthStatus === "휴식(공식)";
+      const isClubBreakNow = !!weekData?.isOfficialRest;
       const competencyTotalNow = isClubBreakNow ? (competencyCalc.total > 0 ? 1 : 0) : 1;
       setCompetencyStats({ total: competencyTotalNow, success: competencyCalc.success > 0 ? 1 : 0 });
       setExperienceStats(calcStats(experienceTypeIds));
@@ -5155,32 +5253,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }),
   ];
 
-  // 휴식 모드일 때 실무 정보 카드 전부 '해당 없음' + 보이드
+  // 휴식 모드일 때 실무 정보 카드 전부 '해당 없음'.
+  // 단, 운영진이 개설한 라인의 본문(Main Title 등)은 그대로 보존하고 상태만 not_applicable 로 강제.
   const effectiveWorkInfoCards = isRestMode
-    ? [
-        ...workInfoActivityTypes.map((activityType, index) => {
-          const config = activityTypeConfig[activityType];
-          return {
-            id: index + 1,
-            activityType,
-            title: "-",
-            subTitle: "",
-            growthPoint: "",
-            verified: false,
-            category: config?.category || activityType,
-            tagColor: config?.tagColor || "",
-            status: "not_applicable" as EnhancementStatus,
-            statusIcon: enhancementStatusIcons["not_applicable"],
-            icon: config?.icon || "",
-            isFruit: config?.isFruit || false,
-            isFailed: false,
-            isEmpty: false,
-            outputLinks: [],
-            images: createEmptyWorkInfoImages(),
-            imageCaptions: createEmptyWorkInfoCaptions(),
-          };
-        }),
-      ]
+    ? workInfoCards.map((card) => ({
+        ...card,
+        status: "not_applicable" as EnhancementStatus,
+        statusIcon: enhancementStatusIcons["not_applicable"],
+        verified: false,
+        isFailed: false,
+      }))
     : workInfoCards;
 
   const workAbilityCards = workAbilityCardLineCodes.map((lineCodeKey, index) => {
@@ -5230,28 +5312,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
   });
 
+  // 휴식 모드 — 개설된 라인의 본문(Main Title, Sub Title 등)은 보존하고 상태만 '해당 없음'.
+  // 단, 매칭된 활동이 없는 placeholder 라인(hasActivity=false) 은 본문이 default 매핑값이라
+  // 보여줄 의미가 없으므로 그대로 두고 단일 카드 매칭에서 not_applicable 로 걸러진다.
   const effectiveWorkAbilityCards = isRestMode
     ? workAbilityCards.map((card) => ({
         ...card,
-        title: "-",
-        subTitle: "",
-        growthPoint: "",
-        outputLinks: Array(5).fill({ desc: "", url: "" }),
-        images: createEmptyWorkInfoImages(),
-        imageCaptions: createEmptyWorkInfoCaptions(),
         status: "not_applicable" as EnhancementStatus,
         statusIcon: enhancementStatusIcons.not_applicable,
         enhancementStatus: "not_applicable" as EnhancementStatus,
         isFailed: false,
-        hasActivity: false,
       }))
     : workAbilityCards;
 
-  // 실무 역량: 단일 표시 카드 — 강화 성공/실패/대기인 카드 우선, 모두 not_applicable이면 보이드
-  const matchedAbilityCard = effectiveWorkAbilityCards.find(
-    (c) => c.enhancementStatus !== "not_applicable"
-  );
+  // 실무 역량: 단일 표시 카드 — 강화 성공/실패/대기인 카드 우선, 모두 not_applicable이면 보이드.
+  // 크루가 활동 중(휴식/온보딩 아님)이면 매칭 실패 시 '강화 실패'로 폴백.
+  // 휴식 주차 — 모든 카드가 not_applicable 이라 status 기반 매칭이 안 되므로, 운영진이 실제
+  // 개설한 라인(hasActivity) 을 우선 찾아 본문(Main Title 등) 을 보여주고 상태만 '해당 없음'.
+  const matchedAbilityCard = isRestMode
+    ? effectiveWorkAbilityCards.find((c) => c.hasActivity)
+    : effectiveWorkAbilityCards.find((c) => c.enhancementStatus !== "not_applicable");
   const isAbilityCardVoid = !matchedAbilityCard;
+  const abilityVoidFallbackStatus: EnhancementStatus =
+    isRestMode || isOnboardingWeek ? "not_applicable" : "failed";
   const displayedAbilityCard = matchedAbilityCard ?? {
     id: 0,
     activityTypeId: "",
@@ -5266,10 +5349,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     images: null as (string | null)[] | null,
     imageCaptions: null as string[] | null,
     icon: "",
-    status: "not_applicable" as EnhancementStatus,
-    statusIcon: enhancementStatusIcons.not_applicable,
-    enhancementStatus: "not_applicable" as EnhancementStatus,
-    isFailed: false,
+    status: abilityVoidFallbackStatus,
+    statusIcon: enhancementStatusIcons[abilityVoidFallbackStatus],
+    enhancementStatus: abilityVoidFallbackStatus,
+    isFailed: abilityVoidFallbackStatus === "failed",
     isEmpty: true,
     hasActivity: false,
   };
@@ -5387,15 +5470,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     hasActivity: false,
   });
 
-  // 휴식 모드일 때 실무 경험 카드 — 해당 없음 + 보이드
+  // 휴식 모드 — 운영진이 개설한 라인은 본문(Main Title, 별점 등) 보존하고 상태만 '해당 없음'.
+  // 미개설 라인은 not_applicable 폴백 후 void 카드로 패딩(평소 주차와 동일 슬롯 정책).
   const effectiveWorkExpCards = isRestMode
-    ? workExpCards.map((card) => ({
-        ...card,
-        title: "-",
-        hasActivity: false,
-        enhancementStatus: "not_applicable" as EnhancementStatus,
-        isFailed: false,
-      }))
+    ? [
+        ...workExpCards
+          .filter((c) => c.hasActivity)
+          .map((card) => ({
+            ...card,
+            enhancementStatus: "not_applicable" as EnhancementStatus,
+            isFailed: false,
+          })),
+        buildVoidWorkExpCard(0),
+        buildVoidWorkExpCard(1),
+        buildVoidWorkExpCard(2),
+        buildVoidWorkExpCard(3),
+      ]
     : [
         ...workExpCards.filter((c) => c.enhancementStatus !== "not_applicable"),
         buildVoidWorkExpCard(0),
@@ -5403,6 +5493,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         buildVoidWorkExpCard(2),
         buildVoidWorkExpCard(3),
       ];
+
+  // 실무 경험 통계 — 카드 표시 기준(getEnhancementStatus 결과)에 맞춰 derive.
+  // 운영진이 개설한 활동 중 이 크루에게 해당 없음(역할/이력 외)인 라인은 카운트에서 제외.
+  const experienceStatsDisplay = {
+    total: workExpCards.filter((c) => c.enhancementStatus !== "not_applicable").length,
+    success: workExpCards.filter((c) => c.enhancementStatus === "success").length,
+  };
 
   // 실무 경력 카드 데이터 (DB에서 가져온 프로젝트 기반 데이터 변환)
   const workCareerCards =
@@ -6298,11 +6395,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-count">
                 <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총{" "}
                 <span style={{ display: "inline-block", minWidth: "2ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>
-                  {infoStats.total + competencyStats.total + experienceStats.total + careerStats.total}
+                  {infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total}
                 </span>{" "}
                 개 중{" "}
                 <span className="highlight" style={{ display: "inline-block", minWidth: "2ch", textAlign: "right" }}>
-                  {infoStats.success + competencyStats.success + experienceStats.success + careerStats.success}
+                  {infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success}
                 </span>
                 개
               </span>
@@ -6313,7 +6410,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 style={{
                   width: isRestMode
                     ? "100%"
-                    : `${infoStats.total + competencyStats.total + experienceStats.total + careerStats.total > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100) : isOnboardingWeek ? 100 : 0}%`,
+                    : `${infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total)) * 100) : isOnboardingWeek ? 100 : 0}%`,
                 }}
               ></div>
               {isRestMode && <span className="rest-message">휴식주차로서 집계되지 않습니다</span>}
@@ -6324,8 +6421,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="number">
                 {isRestMode
                   ? "-"
-                  : infoStats.total + competencyStats.total + experienceStats.total + careerStats.total > 0
-                    ? Math.ceil(((infoStats.success + competencyStats.success + experienceStats.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStats.total + careerStats.total)) * 100)
+                  : infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total > 0
+                    ? Math.ceil(((infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total)) * 100)
                     : isOnboardingWeek
                       ? 100
                       : 0}
@@ -6408,12 +6505,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   key={card.id}
                   className={`work-info-card ${isEmpty ? "empty" : ""}`}
                   onClick={async () => {
-                    if (!isEmpty) {
-                      setSelectedWorkInfoCard(card);
-                      setWorkInfoViewModalOpen(true);
-                    }
+                    setSelectedWorkInfoCard(card);
+                    setWorkInfoViewModalOpen(true);
                   }}
-                  style={{ cursor: isEmpty ? "default" : "pointer" }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-content-area">
                     <div className="card-title-row">
@@ -6478,9 +6573,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : experienceStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : experienceStatsDisplay.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {isOnboardingWeek ? "-" : experienceStats.success}
+                {isOnboardingWeek ? "-" : experienceStatsDisplay.success}
               </span>{" "}
               개
             </span>
@@ -6488,7 +6583,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                  {(isOnboardingWeek || isRestMode) ? "-" : experienceStats.total > 0 ? Math.ceil((experienceStats.success / experienceStats.total) * 100) : 0}
+                  {(isOnboardingWeek || isRestMode) ? "-" : experienceStatsDisplay.total > 0 ? Math.ceil((experienceStatsDisplay.success / experienceStatsDisplay.total) * 100) : 0}
                 </span>
                 %
               </span>
@@ -6503,12 +6598,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   key={card.id}
                   className={`work-exp-card ${isEmpty ? "empty" : ""}`}
                   onClick={async () => {
-                    if (!isEmpty) {
-                      setSelectedWorkExpCard(card);
-                      setWorkExpViewModalOpen(true);
-                    }
+                    setSelectedWorkExpCard(card);
+                    setWorkExpViewModalOpen(true);
                   }}
-                  style={{ cursor: isEmpty ? "default" : "pointer" }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="card-top-row">
                     <div className={`card-icon-area ${!isEmpty && card.enhancementStatus === "failed" ? "failed" : ""}`}>
@@ -6557,7 +6650,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="sub-label">Sub Title</span>
                     </div>
                     <span className="sub-desc">
-                      {isEmpty || isRestMode
+                      {isEmpty
                         ? "-"
                         : (() => {
                             const text = weekActivityDetails.find((d) => d.activity_type_id === card.activityTypeId)?.sub_title || "-";
@@ -6637,17 +6730,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="work-ability-cards">
             {[displayedAbilityCard].map((card) => {
               const isFailedCard = card.enhancementStatus === "failed";
-              const isNotApplicableCard = card.enhancementStatus === "not_applicable";
+              const usePlaceholder = isAbilityCardVoid;
               return (
                 <div
                   key={isAbilityCardVoid ? "void" : card.code}
-                  className={`work-ability-card ${isNotApplicableCard ? "empty" : ""}`}
+                  className={`work-ability-card ${usePlaceholder ? "empty" : ""}`}
                   onClick={async () => {
-                    if (isAbilityCardVoid) return;
                     setSelectedWorkAbilityCard(card);
                     setWorkAbilityViewModalOpen(true);
                   }}
-                  style={{ cursor: isAbilityCardVoid ? "default" : "pointer" }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className={`card-icon-area ${isFailedCard ? "failed" : ""}`}>
                     {card.icon ? <img src={card.icon} alt={card.lineName} style={{ opacity: isFailedCard ? 0.3 : 1 }} /> : <div className="icon-placeholder"></div>}
@@ -6673,12 +6765,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <span className="code-tag">{card.lineCode}</span>
                       <span className="info-tag">{card.lineName}</span>
                     </div>
-                    <p className="main-desc">{isNotApplicableCard ? "-" : card.title || "준비 중입니다"}</p>
+                    <p className="main-desc">{usePlaceholder ? "-" : card.title || "-"}</p>
                     <div className="sub-title-row">
                       <img src="/images/0/cluster4/icon/icon - 11 - file.png" alt="icon" className="sub-icon" />
                       <span className="sub-label">Sub Title</span>
                     </div>
-                    <span className="sub-desc">{isNotApplicableCard ? "-" : card.subTitle || "-"}</span>
+                    <span className="sub-desc">{usePlaceholder ? "-" : card.subTitle || "-"}</span>
                     <img src="/images/0/cluster4/icon - 더보기.png" alt="더보기" className="card-arrow" />
                   </div>
                   <div className="status-badge">
@@ -6745,12 +6837,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div
                     className={`work-career-card ${isEmpty ? "empty" : ""} ${card.isFailed ? "failed" : ""} ${card.isNotApplicable ? "not-applicable" : ""}`}
                     onClick={async () => {
-                      if (!isEmpty) {
-                        setSelectedWorkCareerCard(card);
-                        setWorkCareerViewModalOpen(true);
-                      }
+                      setSelectedWorkCareerCard(card);
+                      setWorkCareerViewModalOpen(true);
                     }}
-                    style={{ cursor: isEmpty ? "default" : "pointer" }}
+                    style={{ cursor: "pointer" }}
                   >
                     {card.isFailed && <div className="card-overlay failed"></div>}
                     <div className="card-top-row">
@@ -8593,7 +8683,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <i className="ti ti-pin"></i>
                         Main Title
                       </h4>
-                      <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "준비 중입니다"}</div>
+                      <div className="text-block-content main-title-readonly">{selectedWorkInfoCard.title && selectedWorkInfoCard.title !== "-" ? selectedWorkInfoCard.title : "-"}</div>
                     </div>
 
                     {/* Sub Title — 사용자 입력 200자 (필수) */}
@@ -8933,8 +9023,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           failed: "강화 실패",
                           not_applicable: "해당 없음",
                         };
-                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isRestMode/온보딩 → !hasActivity → enhancementStatus
-                        const statusKey = isRestMode || isOnboardingWeek ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
+                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isEmpty(보이드) → isRestMode/온보딩 → !hasActivity → enhancementStatus
+                        const statusKey = selectedWorkExpCard.isEmpty || isRestMode || isOnboardingWeek ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
                         const statusText = enhanceStatusTextMap[statusKey] || "—";
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
@@ -9016,7 +9106,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <i className="ti ti-pin"></i>
                         Main Title
                       </h4>
-                      <div className="text-block-content main-title-readonly">{lookupWorkExpMapping(selectedWorkExpCard.code)?.mainTitle || (selectedWorkExpCard.title && selectedWorkExpCard.title !== "-" ? selectedWorkExpCard.title : "준비 중입니다")}</div>
+                      <div className="text-block-content main-title-readonly">{lookupWorkExpMapping(selectedWorkExpCard.code)?.mainTitle || (selectedWorkExpCard.title && selectedWorkExpCard.title !== "-" ? selectedWorkExpCard.title : "-")}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
@@ -9453,7 +9543,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <i className="ti ti-pin"></i>
                         Main Title
                       </h4>
-                      <div className="text-block-content main-title-readonly">{selectedWorkAbilityCard.title && selectedWorkAbilityCard.title !== "-" ? selectedWorkAbilityCard.title : "준비 중입니다"}</div>
+                      <div className="text-block-content main-title-readonly">{selectedWorkAbilityCard.title && selectedWorkAbilityCard.title !== "-" ? selectedWorkAbilityCard.title : "-"}</div>
                     </div>
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
                       <h4 className="text-block-title">
@@ -9767,11 +9857,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
 
                       {(() => {
-                        const statusKey = selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not_applicable" : "waiting";
-                        const statusText = selectedWorkCareerCard.verified ? "강화 성공" : selectedWorkCareerCard.isFailed ? "강화 실패" : selectedWorkCareerCard.isNotApplicable ? "해당 없음" : "강화 대기";
+                        const isEmptyCard = !!selectedWorkCareerCard.isEmpty;
+                        const statusKey = isEmptyCard ? "not_applicable" : selectedWorkCareerCard.verified ? "success" : selectedWorkCareerCard.isFailed ? "failed" : selectedWorkCareerCard.isNotApplicable ? "not_applicable" : "waiting";
+                        const statusText = isEmptyCard ? "해당 없음" : selectedWorkCareerCard.verified ? "강화 성공" : selectedWorkCareerCard.isFailed ? "강화 실패" : selectedWorkCareerCard.isNotApplicable ? "해당 없음" : "강화 대기";
+                        const statusIconSrc = isEmptyCard ? "/images/0/cluster4/icon/8 해당 없음.png" : selectedWorkCareerCard.statusBadge;
                         return (
                           <div className="personal-line-status line-info-row">
-                            {selectedWorkCareerCard.statusBadge ? <img className="line-enhance-icon" src={selectedWorkCareerCard.statusBadge} alt={statusText} /> : <span className="line-status-icon">●</span>}
+                            {statusIconSrc ? <img className="line-enhance-icon" src={statusIconSrc} alt={statusText} /> : <span className="line-status-icon">●</span>}
                             <span className={`line-enhance-status enhance-${statusKey}`}>{statusText}</span>
                           </div>
                         );
@@ -9856,7 +9948,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         <i className="ti ti-pin"></i>
                         Main Title
                       </h4>
-                      <div className="text-block-content main-title-readonly">{selectedWorkCareerCard.title && selectedWorkCareerCard.title !== "-" ? selectedWorkCareerCard.title : "준비 중입니다"}</div>
+                      <div className="text-block-content main-title-readonly">{selectedWorkCareerCard.title && selectedWorkCareerCard.title !== "-" ? selectedWorkCareerCard.title : "-"}</div>
                     </div>
 
                     <div className="workinfo-text-block text-block-sub" data-field="subTitle">
