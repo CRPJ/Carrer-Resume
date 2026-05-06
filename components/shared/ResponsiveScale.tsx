@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect } from "react";
+import { logEvent } from "@/utils/blackScreenDiagnostics";
 
 /**
  * 고정 너비 레이아웃 헬퍼
@@ -35,6 +36,11 @@ const ResponsiveScale = () => {
       } else {
         document.documentElement.style.zoom = "";
       }
+      logEvent("zoom-applied", {
+        zoom: document.documentElement.style.zoom || "1",
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+      });
     };
     applyZoom();
 
@@ -46,7 +52,14 @@ const ResponsiveScale = () => {
     // viewport 기준 CSS media query와 동일하게 resize에서만 갱신
     // 레이아웃 계산 완료 후 페이지 표시 (헤더-사이드바 flash 방지)
     requestAnimationFrame(() => {
-      document.querySelector(".nftg-app")?.classList.add("app-ready");
+      const appEl = document.querySelector(".nftg-app");
+      if (appEl) {
+        appEl.classList.add("app-ready");
+        logEvent("app-ready-add", {
+          at: "ResponsiveScale effect",
+          zoom: document.documentElement.style.zoom || "1",
+        });
+      }
     });
 
     return () => {
@@ -54,6 +67,11 @@ const ResponsiveScale = () => {
       window.removeEventListener("resize", updateHeaderDividerY);
       window.removeEventListener("resize", applyZoom);
       document.documentElement.style.removeProperty("--header-divider-y");
+      const appEl = document.querySelector(".nftg-app");
+      if (appEl?.classList.contains("app-ready")) {
+        appEl.classList.remove("app-ready");
+        logEvent("app-ready-remove", { at: "ResponsiveScale cleanup" });
+      }
     };
   }, []);
 
