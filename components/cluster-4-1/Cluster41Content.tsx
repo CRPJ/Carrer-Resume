@@ -456,16 +456,6 @@ const Cluster41Content = () => {
   const [experienceTypeIds, setExperienceTypeIds] = useState<string[]>([]);
   const [careerTypeIds, setCareerTypeIds] = useState<string[]>([]);
 
-  // 실무 경험 활동 타입 상세 정보 (주차별 eligible 조건 포함)
-  interface ExperienceTypeInfo {
-    id: string;
-    name: string;
-    eligible_min_approved_weeks: number | null;
-    eligible_max_approved_weeks: number | null;
-    count_once_in_total: boolean;
-  }
-  const [experienceTypeInfos, setExperienceTypeInfos] = useState<ExperienceTypeInfo[]>([]);
-
   // 주차별 열린 활동 데이터 (weekly_activities 테이블)
   interface WeeklyActivityData {
     week_id: string;
@@ -696,9 +686,10 @@ const Cluster41Content = () => {
     if (!week?.startDate) return false;
     if (Date.now() < computeResultDecidedMs(week.startDate)) return false;
 
-    // 2. 결정 시점 이후 — 이행(is_completed=true) 여부만 본다
+    // 2. 결정 시점 이후 — 이행(is_completed=true) 여부만 본다.
+    //    userActivities 는 is_completed 무관 전체 records 라서 명시적으로 필터.
     return userActivities.some(a =>
-      a.week_id === weekId && a.activity_type_id === activityTypeId
+      a.week_id === weekId && a.activity_type_id === activityTypeId && a.is_completed
     );
   };
 
@@ -736,106 +727,31 @@ const Cluster41Content = () => {
     return { count: competencyCount, total, rate: total > 0 ? Math.ceil((competencyCount / total) * 100) : 0 };
   };
 
-  // 주차별 실무 경험 강화율 (experience) - 유저의 누적 활동 주차에 따라 P값 동적 계산
+  // 주차별 실무 경험 강화율 (experience) — cluster-4-card / ranking API 와 정합: per-user 레코드 기반.
+  // 운영진이 크루별로 실무 경험 라인을 임의 대체/지정 가능 → weeklyActivities.is_active=true (전체
+  // 일괄 개설) + eligibility 윈도우 만으로는 분모 판정 부정확. source of truth = user_activity_records
+  // 존재 여부 (어드민이 강화 성공/실패 마크 또는 크루 이행 인증 시 생성).
+  // 분모 = 이 크루의 그 주차 records 중 experience 클러스터 라인의 distinct 개수.
   const getWeeklyExperienceRate = (weekId: string) => {
     if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].experienceRate;
     if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
-    // 온보딩 주차도 강화율 정상 계산
-    // 1. 해당 주차 정보 찾기
     const weekData = dbWeeklyData.find(w => w.id === weekId);
     if (!weekData) {
       return { count: 0, total: 0, rate: 0 };
     }
 
-    // 2. 해당 주차까지의 누적 성공 주차 수 계산 (현재 주차 포함).
-    // cluster-4-card 와 동일 정책: 평가 대상 주차가 active(클럽 공식 휴식/온보딩 아님) 이고
-    // 아직 성공 카운트에 포함되지 않은 진행 중/집계 중/실패 상태이면 +1 (이 주차도 성장 시도로 셈).
-    // 이렇게 해야 봄 9주차(집계 중) 같이 결과 결정 전 주차에서도 eligible_min/max 가 일관되게 평가됨.
-    const baseCumulative = getCumulativeApprovedWeeks(weekData.endDate);
-    const isClubBreakWeek = !!weekData.isClubBreak;
-    const isOnboardingThisWeek = !!(onboardingWeekId && weekId === onboardingWeekId);
-    const alreadyCountedAsSuccess = weekData.growthStatus === '성공';
-    const cumulativeApproved = baseCumulative
-      + ((!isClubBreakWeek && !isOnboardingThisWeek && !alreadyCountedAsSuccess) ? 1 : 0);
-
-    // 3. 해당 주차에 개설된 experience 활동 중 eligible한 것 필터링
-    // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
-    const isEligibilityRuleActive = weekData && (
-      weekData.seasonYear > 2026 ||
-      (weekData.seasonYear === 2026 && weekData.seasonName !== '봄') ||
-      (weekData.seasonYear === 2026 && weekData.seasonName === '봄' && weekData.weekNumber >= 9)
-    );
-    // 매니징 라인 역할 분기 — 라인명에 _파트장/_에이전트 표기 → 사용자 역할과 안 맞으면 '해당 없음'
-    const roleForWeek = getRoleForDate(weekData.startDate)?.role || '';
-    const isLineForOtherRole = (lineName: string): boolean => {
-      if (!lineName) return false;
-      if (lineName.includes('파트장')) {
-        return !roleForWeek.includes('partleader') && !roleForWeek.includes('part_leader');
-      }
-      if (lineName.includes('에이전트')) {
-        return !roleForWeek.includes('agent');
-      }
-      return false;
-    };
-    const hasRecordForType = (activityTypeId: string): boolean =>
-      userActivities.some(a => a.week_id === weekId && a.activity_type_id === activityTypeId);
-
-    let eligibleTotal = 0;
-    const eligibleExperienceTypeIds: string[] = [];
-    // 해당 주차에 개설된(is_active) experience 활동만 대상으로 함
-    const weekActiveExperienceActivities = weeklyActivities.filter(
-      wa => wa.week_id === weekId && wa.is_active && experienceTypeIds.includes(wa.activity_type_id)
-    );
-    weekActiveExperienceActivities.forEach(a => {
-      const typeInfo = experienceTypeInfos.find(info => info.id === a.activity_type_id);
-
-      // 역할 미스매치 + 이행 기록 없음 → 카운트 제외 (이행 기록 있으면 폴백)
-      if (typeInfo && isLineForOtherRole(typeInfo.name) && !hasRecordForType(a.activity_type_id)) {
-        return;
-      }
-
-      if (!typeInfo) {
-        eligibleTotal++;
-        eligibleExperienceTypeIds.push(a.activity_type_id);
-        return;
-      }
-
-      if (isEligibilityRuleActive) {
-        const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-        const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
-        const inRange = cumulativeApproved >= minWeek && cumulativeApproved <= maxWeek;
-
-        // eligibility 윈도우 밖이라도 이행 기록 있으면 폴백
-        if (!inRange && !hasRecordForType(a.activity_type_id)) {
-          return;
-        }
-
-        if (inRange && typeInfo.count_once_in_total) {
-          const previouslyCompleted = userActivities.some(a =>
-            a.activity_type_id === typeInfo.id &&
-            a.week_id !== weekId
-          );
-          if (!previouslyCompleted) {
-            eligibleTotal++;
-            eligibleExperienceTypeIds.push(typeInfo.id);
-          }
-        } else {
-          eligibleTotal++;
-          eligibleExperienceTypeIds.push(typeInfo.id);
-        }
-      } else {
-        // 룰 적용 이전: 개설된 모든 실무 경험 활동 카운트 (역할 미스매치는 위에서 이미 제외됨)
-        eligibleTotal++;
-        eligibleExperienceTypeIds.push(a.activity_type_id);
+    const userExperienceTypeIds = new Set<string>();
+    userActivities.forEach(a => {
+      if (a.week_id === weekId && experienceTypeIds.includes(a.activity_type_id)) {
+        userExperienceTypeIds.add(a.activity_type_id);
       }
     });
 
-    // 4. 강화 성공한 experience 활동 개수 (eligible한 활동 중에서만)
-    const experienceCount = eligibleExperienceTypeIds.filter(activityTypeId =>
+    const eligibleTotal = userExperienceTypeIds.size;
+    const experienceCount = Array.from(userExperienceTypeIds).filter(activityTypeId =>
       isEnhancementSuccess(weekId, activityTypeId)
     ).length;
 
-    // 소수점 올림 처리
     return {
       count: experienceCount,
       total: eligibleTotal,
@@ -1128,8 +1044,9 @@ const Cluster41Content = () => {
             supabase.from('user_weekly_growth').select('week_id, is_success, is_resting, is_club_break').eq('user_id', userId),
             // points
             supabase.from('points').select('id, user_id, week_id, point_type, points').eq('user_id', userId),
-            // activity_records
-            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId).eq('is_completed', true),
+            // activity_records — is_completed 무관 전체 fetch (실무 경험 분모 판정용 per-user 레코드).
+            // is_completed=true 인 것만 강화 성공 판정에 사용 (isEnhancementSuccess 에서 명시 체크).
+            supabase.from('activity_records').select('id, user_id, week_id, activity_type_id, is_completed').eq('user_id', userId),
             // activity_types
             supabase.from('activity_types').select('id, cluster_id, name, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total').eq('is_active', true),
             // career_records
@@ -1178,28 +1095,13 @@ const Cluster41Content = () => {
             const competencyIds: string[] = [];
             const experienceIds: string[] = [];
             const careerIds: string[] = [];
-            const experienceInfos: ExperienceTypeInfo[] = [];
-            activityTypesResult.data.forEach((at: {
-              id: string;
-              cluster_id: string;
-              name: string | null;
-              eligible_min_approved_weeks: number | null;
-              eligible_max_approved_weeks: number | null;
-              count_once_in_total: boolean;
-            }) => {
+            activityTypesResult.data.forEach((at: { id: string; cluster_id: string }) => {
               if (at.cluster_id === 'practical_info') {
                 infoIds.push(at.id);
               } else if (at.cluster_id === 'practical_competency') {
                 competencyIds.push(at.id);
               } else if (at.cluster_id === 'practical_experience') {
                 experienceIds.push(at.id);
-                experienceInfos.push({
-                  id: at.id,
-                  name: at.name || '',
-                  eligible_min_approved_weeks: at.eligible_min_approved_weeks,
-                  eligible_max_approved_weeks: at.eligible_max_approved_weeks,
-                  count_once_in_total: at.count_once_in_total || false
-                });
               } else if (at.cluster_id === 'practical_career') {
                 careerIds.push(at.id);
               }
@@ -1207,7 +1109,6 @@ const Cluster41Content = () => {
             setInfoTypeIds(infoIds);
             setCompetencyTypeIds(competencyIds);
             setExperienceTypeIds(experienceIds);
-            setExperienceTypeInfos(experienceInfos);
             setCareerTypeIds(careerIds);
           }
         }

@@ -223,6 +223,13 @@ const KEYWORD_GROUPS: KeywordGroup[] = [
   },
 ];
 
+// 기업 로고 클릭 → 기업 홈페이지 1번 링크 새 탭. URL 없으면 동작 안 함.
+const handleCompanyLogoClick = (e: React.MouseEvent, url: string | null | undefined) => {
+  if (!url) return
+  e.stopPropagation()
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
 const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
@@ -369,9 +376,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
-  // 결과 결정 시점 (N+1주(목) 12:01 KST) 도달 여부.
-  // 강화 대기 → 강화 성공 / 집계 중 → 성장 성공·실패 가 모두 이 시점에 확정된다.
-  // 2차 정보 작성 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
+  // 라인 카드 강화 결정 시점 (N+1주(목) 12:01 KST) 도달 여부 — 강화 대기 → 강화 성공 확정.
+  // 2차 정보 작성 여부는 강화 판정에 영향을 주지 않는다 (2026 정책).
+  // ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정은 별도 시점(N+1 금 14:00) — RESULT_DECIDED_HOURS 참고.
   const resultsDecided = !!(
     weekData?.startDate && Date.now() >= computeResultDecidedMs(weekData.startDate)
   );
@@ -402,7 +409,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     title: string | null;
     is_active: boolean;
     opened_at: string | null;
-    deadline?: string | null; // 마감 시각 (없으면 opened_at+48h 폴백)
+    deadline?: string | null; // 어드민 직접 지정 마감 (옵션 — 없으면 시스템 기본 N+1주(목) 12:00 KST)
     output_links: OutputLink[] | null; // 운영진이 입력한 output links
     output_images?: Array<{ url: string; caption: string }> | null; // 운영진이 업로드한 이미지 (최대 2)
     team_id?: string | null; // 실무경험만 NOT NULL
@@ -503,6 +510,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     line_name: string | null;
     output_links: { desc: string; url: string }[] | null;
     output_images?: { url: string; caption: string }[] | null;
+    company_homepage_links?: string[] | null;
     secondary_info_deadline: string | null;
     created_at: string;
     weeks?: {
@@ -4796,15 +4804,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return weekActivityDetails.find((ad) => ad.activity_type_id === activityType);
   };
 
-  // 마감 시간 이내인지 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
+  // 2차 정보 작성 마감 시간 이내인지 확인.
+  // - 어드민이 weekly_activities.deadline 을 직접 지정한 경우 우선 적용 (옛날 주차 보정 등 특수 오버라이드)
+  // - 그 외 기본 시스템 마감: N+1주(목) 12:00 KST = weekStart(월 00:00) + 252h
+  //   (= requireWriteWindow / 라인 강화 결정(목 12:01)과 페어인 마감점 — 12:00 닫고 1분 뒤 결과 확정)
   const isBeforeDeadline = (activity: { opened_at: string | null; deadline?: string | null } | null): boolean => {
     if (!activity) return false;
     if (activity.deadline) {
       return Date.now() < new Date(activity.deadline).getTime();
     }
-    if (!activity.opened_at) return false;
-    const openedTime = new Date(activity.opened_at).getTime();
-    return (Date.now() - openedTime) < 48 * 60 * 60 * 1000;
+    if (!weekData?.startDate) return false;
+    const closeMs = new Date(`${weekData.startDate}T00:00:00+09:00`).getTime() + 252 * 3600 * 1000;
+    return Date.now() < closeMs;
   };
 
   // 어드민 개별 권한(grant)이 활성 상태인지 확인
@@ -4861,7 +4872,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return openedType || workAbilityActivityTypes[0];
   };
 
-  // 남은 시간 계산 (표시용) - deadline 컬럼 우선, 없으면 opened_at+48h 폴백
+  // 남은 시간 계산 (표시용)
+  // - 어드민 deadline 직접 지정 시 그것 기준
+  // - 그 외 기본: N+1주(목) 12:00 KST = weekStart + 252h
   const getRemainingTime = (activityType: string): { hours: number; minutes: number } | null => {
     const now = Date.now();
 
@@ -4870,8 +4883,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       let deadlineTime: number | null = null;
       if (activity.deadline) {
         deadlineTime = new Date(activity.deadline).getTime();
-      } else if (activity.opened_at) {
-        deadlineTime = new Date(activity.opened_at).getTime() + 48 * 60 * 60 * 1000;
+      } else if (weekData?.startDate) {
+        deadlineTime = new Date(`${weekData.startDate}T00:00:00+09:00`).getTime() + 252 * 3600 * 1000;
       }
       if (deadlineTime) {
         const remaining = deadlineTime - now;
@@ -9826,6 +9839,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               className="line-activity-icon"
                               src={selectedWorkCareerCard.icon}
                               alt={selectedWorkCareerCard.badge || "활동"}
+                              onClick={(e) => handleCompanyLogoClick(e, selectedWorkCareerCard.companyHomepageUrl)}
+                              style={{ cursor: selectedWorkCareerCard.companyHomepageUrl ? 'pointer' : undefined }}
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = "none";
                               }}
@@ -10097,6 +10112,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   <img
                                     src={companyLogo}
                                     alt="기업 로고"
+                                    onClick={(e) => handleCompanyLogoClick(e, selectedWorkCareerCard.companyHomepageUrl)}
+                                    style={{ cursor: selectedWorkCareerCard.companyHomepageUrl ? 'pointer' : undefined }}
                                     onError={(e) => {
                                       (e.target as HTMLImageElement).style.display = "none";
                                       const sibling = (e.target as HTMLImageElement).nextElementSibling as HTMLElement | null;
