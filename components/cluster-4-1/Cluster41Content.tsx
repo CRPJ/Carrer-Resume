@@ -16,10 +16,11 @@ const truncate = (text: string | null | undefined, maxLen: number = 5): string =
   return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
 };
 
-// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
-// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정 (라인 단위).
+// 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점에 동시에 확정:
+//   - 라인 카드: '강화 대기' → '강화 성공' (이행자) / '강화 실패' (미이행자, 단 미이행은 진행 중 phase 부터 즉시 표시)
+//   - 주차 카드: '집계 중' → '성장 성공' / '성장 실패' / '휴식(개인)' / '휴식(공식)'
 // 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
-// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00 = RESULT_DECIDED_HOURS).
 const computeResultDecidedMs = (startDate: string): number => {
   const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
   return weekStartMs + (10 * 24 + 12) * 3600 * 1000 + 60 * 1000;
@@ -994,15 +995,15 @@ const Cluster41Content = () => {
           setIsLoadingSeasons(false);
         }
 
-        // 주차 카드 phase 시간 기준 (KST, 월요일 00:00 기준 누적 시간)
-        //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h  → 카드 노출 + '진행 중' 시작
-        //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h → '집계 중' 시작 (보라 → 핑크)
-        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h → 성장 성공/실패/휴식 결정 (weeklyGrowth 반영)
-        //     ※ 라인 카드의 '강화 대기 → 강화 성공' 은 별도 시점(N+1 목 12:01)에 확정됨 — Cluster4CardContent 의 computeResultDecidedMs 참고
-        const VISIBLE_OFFSET_HOURS = 65;
+        // 주차 카드 phase 시간 기준 (KST, 월요일 00:00 기준 누적)
+        //   - VISIBLE_OFFSET_MINUTES  = N(월) 00:01   = 1m       → 카드 노출 + '진행 중' 시작
+        //   - COUNTING_START_HOURS    = N(일) 00:00   = 144h     → '집계 중' 시작 (보라 → 핑크)
+        //   - RESULT_DECIDED_MINUTES  = N+1(목) 12:01 = 252h 1m  → 성장 성공/실패/휴식 결정 (weeklyGrowth 반영)
+        //     라인 카드 '강화 대기 → 강화 성공' 도 동일 시점에 확정 — computeResultDecidedMs 참고
+        const VISIBLE_OFFSET_MINUTES = 1;
         const COUNTING_START_HOURS = 144;
-        const RESULT_DECIDED_HOURS = 278;
-        const cutoffDateStr = new Date(Date.now() + 9 * 3600 * 1000 - VISIBLE_OFFSET_HOURS * 3600 * 1000)
+        const RESULT_DECIDED_MINUTES = 252 * 60 + 1;
+        const cutoffDateStr = new Date(Date.now() + 9 * 3600 * 1000 - VISIBLE_OFFSET_MINUTES * 60 * 1000)
           .toISOString()
           .split('T')[0];
         let weeksQuery = supabase
@@ -1158,16 +1159,18 @@ const Cluster41Content = () => {
           } else {
             // 주차 시작(월 00:00 KST)으로부터 경과 시간 산출
             const weekStartMs = new Date(week.start_date + 'T00:00:00+09:00').getTime();
-            const hoursSinceStart = (Date.now() - weekStartMs) / 3600000;
+            const elapsedMs = Date.now() - weekStartMs;
+            const hoursSinceStart = elapsedMs / 3600000;
+            const minutesSinceStart = elapsedMs / 60000;
 
-            if (hoursSinceStart >= VISIBLE_OFFSET_HOURS && hoursSinceStart < COUNTING_START_HOURS) {
-              // (수) 17:00 ~ (일) 00:00 — 보라색 '진행 중'
+            if (minutesSinceStart >= VISIBLE_OFFSET_MINUTES && hoursSinceStart < COUNTING_START_HOURS) {
+              // (월) 00:01 ~ (일) 00:00 — 보라색 '진행 중'
               status = '진행 중';
-            } else if (hoursSinceStart >= COUNTING_START_HOURS && hoursSinceStart < RESULT_DECIDED_HOURS) {
-              // (일) 00:00 ~ N+1(금) 14:00 — 핑크 '집계 중'
+            } else if (hoursSinceStart >= COUNTING_START_HOURS && minutesSinceStart < RESULT_DECIDED_MINUTES) {
+              // (일) 00:00 ~ N+1(목) 12:01 — 핑크 '집계 중'
               status = '집계 중';
             } else {
-              // N+1(금) 14:00 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
+              // N+1(목) 12:01 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
               // ※ 개인 휴식은 위에서 이미 처리됨 — 여기는 개인 휴식이 아닌 케이스만 들어옴.
               if (weeklyGrowthForWeek) {
                 if (weeklyGrowthForWeek.is_club_break) {

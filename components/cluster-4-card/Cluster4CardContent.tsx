@@ -13,10 +13,11 @@ import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
-// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
-// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정된다 (라인 단위).
-// 2차 정보 작성 여부는 강화 성공/실패 판정에 영향을 주지 않는다 (2026 정책).
-// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00 = 278h) — RESULT_DECIDED_HOURS 참고.
+// 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점에 동시에 확정:
+//   - 라인 카드: '강화 대기' → '강화 성공' (이행자) — 미이행자는 진행 중 phase 부터 즉시 '강화 실패'
+//   - 주차 카드: '집계 중' → '성장 성공' / '성장 실패' / '휴식(개인)' / '휴식(공식)'
+// 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
 // startDate: 'YYYY-MM-DD' (KST 기준 주차 시작일, 월요일).
 const computeResultDecidedMs = (startDate: string): number => {
   const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
@@ -376,9 +377,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
 
-  // 라인 카드 강화 결정 시점 (N+1주(목) 12:01 KST) 도달 여부 — 강화 대기 → 강화 성공 확정.
+  // 주차 결과 결정 시점 (N+1주(목) 12:01 KST) 도달 여부.
+  // 라인 카드 '강화 대기 → 강화 성공' 과 주차 카드 '집계 중 → 성장 성공/실패/휴식' 이 동시에 확정.
   // 2차 정보 작성 여부는 강화 판정에 영향을 주지 않는다 (2026 정책).
-  // ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정은 별도 시점(N+1 금 14:00) — RESULT_DECIDED_HOURS 참고.
   const resultsDecided = !!(
     weekData?.startDate && Date.now() >= computeResultDecidedMs(weekData.startDate)
   );
@@ -1140,13 +1141,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         const allWeeksResult = { data: allWeeksForCumulative };
 
         // 성장 상태 결정 (Cluster41Content 와 동일한 phase 로직 — 동기화 필수)
-        //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h
-        //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h
-        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h
-        //     ※ 라인 카드의 '강화 대기 → 강화 성공' 은 별도 시점(N+1 목 12:01)에 확정 — computeResultDecidedMs / resultsDecided 참고
-        const VISIBLE_OFFSET_HOURS = 65;
+        //   - VISIBLE_OFFSET_MINUTES  = N(월) 00:01   = 1m
+        //   - COUNTING_START_HOURS    = N(일) 00:00   = 144h
+        //   - RESULT_DECIDED_MINUTES  = N+1(목) 12:01 = 252h 1m
+        //     라인 카드 '강화 대기 → 강화 성공' 도 동일 시점에 확정 — computeResultDecidedMs / resultsDecided 와 동기.
+        const VISIBLE_OFFSET_MINUTES = 1;
         const COUNTING_START_HOURS = 144;
-        const RESULT_DECIDED_HOURS = 278;
+        const RESULT_DECIDED_MINUTES = 252 * 60 + 1;
 
         const weeklyGrowth = weeklyGrowthData;
         const onboardingWeekId = profileResult.onboardingWeekId;
@@ -1175,11 +1176,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           growthStatus = "휴식(개인)";
         } else {
           const weekStartMs = new Date(currentWeek.start_date + "T00:00:00+09:00").getTime();
-          const hoursSinceStart = (Date.now() - weekStartMs) / 3600000;
+          const elapsedMs = Date.now() - weekStartMs;
+          const hoursSinceStart = elapsedMs / 3600000;
+          const minutesSinceStart = elapsedMs / 60000;
 
-          if (hoursSinceStart >= VISIBLE_OFFSET_HOURS && hoursSinceStart < COUNTING_START_HOURS) {
+          if (minutesSinceStart >= VISIBLE_OFFSET_MINUTES && hoursSinceStart < COUNTING_START_HOURS) {
             growthStatus = "진행 중";
-          } else if (hoursSinceStart >= COUNTING_START_HOURS && hoursSinceStart < RESULT_DECIDED_HOURS) {
+          } else if (hoursSinceStart >= COUNTING_START_HOURS && minutesSinceStart < RESULT_DECIDED_MINUTES) {
             growthStatus = "집계 중";
           } else if (weeklyGrowth) {
             if (weeklyGrowth.is_club_break) {

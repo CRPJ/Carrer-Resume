@@ -8,10 +8,11 @@ export const revalidate = 0;
 // weekly_activities.activity_type_id는 line_code 형식 (예: 'calendar', 'essay' 등)
 const infoTypeIds = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
 
-// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
-// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정 (라인 단위).
+// 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점에 동시에 확정:
+//   - 라인 카드: '강화 대기' → '강화 성공' (이행자) — 미이행자는 진행 중 phase 부터 즉시 '강화 실패'
+//   - 주차 카드: '집계 중' → '성장 성공' / '성장 실패' / '휴식(개인)' / '휴식(공식)'
 // 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
-// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00).
 const computeResultDecidedMs = (startDate: string): number => {
   const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
   return weekStartMs + (10 * 24 + 12) * 3600 * 1000 + 60 * 1000;
