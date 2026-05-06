@@ -16,6 +16,15 @@ const truncate = (text: string | null | undefined, maxLen: number = 5): string =
   return t.length > maxLen ? t.slice(0, maxLen) + ".." : t;
 };
 
+// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정 (라인 단위).
+// 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
+// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00 = RESULT_DECIDED_HOURS).
+const computeResultDecidedMs = (startDate: string): number => {
+  const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
+  return weekStartMs + (10 * 24 + 12) * 3600 * 1000 + 60 * 1000;
+};
+
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
@@ -679,49 +688,18 @@ const Cluster41Content = () => {
   };
 
   // 주차별 실무 강화율 계산 함수들 (소수점 올림 처리)
-  // 강화 성공 여부 판단 헬퍼 함수 (is_completed + (48시간 경과 OR 2차 정보 기입))
+  // 강화 성공 여부 판단 헬퍼 (결정 시점 기반: N+1 목 12:01 KST)
+  // ※ 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
   const isEnhancementSuccess = (weekId: string, activityTypeId: string): boolean => {
-    // 1. 활동 완료 여부 확인
-    const isCompleted = userActivities.some(a =>
+    // 1. 결정 시점(N+1 목 12:01 KST) 도달 전이면 무조건 false (강화 대기 상태)
+    const week = dbWeeklyData.find(w => w.id === weekId);
+    if (!week?.startDate) return false;
+    if (Date.now() < computeResultDecidedMs(week.startDate)) return false;
+
+    // 2. 결정 시점 이후 — 이행(is_completed=true) 여부만 본다
+    return userActivities.some(a =>
       a.week_id === weekId && a.activity_type_id === activityTypeId
     );
-    if (!isCompleted) return false;
-
-    // 2. 2차 정보 기입 여부 확인
-    const detail = activityDetails.find(d =>
-      d.week_id === weekId && d.activity_type_id === activityTypeId
-    );
-    const hasSecondaryInfo = detail && (
-      (detail.sub_title && detail.sub_title.trim() !== '') ||
-      (detail.output_links && detail.output_links.some(link => link?.url && link.url.trim() !== ''))
-    );
-    if (hasSecondaryInfo) return true;
-
-    // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
-    const activity = weeklyActivities.find(wa =>
-      wa.week_id === weekId && wa.activity_type_id === activityTypeId
-    );
-
-    if (activity?.deadline) {
-      return Date.now() >= new Date(activity.deadline).getTime();
-    }
-
-    const deadline48h = 48 * 60 * 60 * 1000; // 48시간 (밀리초)
-
-    if (!activity?.opened_at) {
-      // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
-      const week = dbWeeklyData.find(w => w.id === weekId);
-      if (week?.endDate) {
-        const weekEndTime = new Date(`${week.endDate}T23:59:59`).getTime();
-        if (Date.now() - weekEndTime >= deadline48h) return true;
-      }
-      return false;
-    }
-
-    const openedTime = new Date(activity.opened_at).getTime();
-    const elapsed = Date.now() - openedTime;
-
-    return elapsed >= deadline48h;
   };
 
   // 주차별 실무 정보 강화율 (info)
@@ -1103,7 +1081,8 @@ const Cluster41Content = () => {
         // 주차 카드 phase 시간 기준 (KST, 월요일 00:00 기준 누적 시간)
         //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h  → 카드 노출 + '진행 중' 시작
         //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h → '집계 중' 시작 (보라 → 핑크)
-        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h → 성공/실패/휴식 결정 (weeklyGrowth 반영)
+        //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h → 성장 성공/실패/휴식 결정 (weeklyGrowth 반영)
+        //     ※ 라인 카드의 '강화 대기 → 강화 성공' 은 별도 시점(N+1 목 12:01)에 확정됨 — Cluster4CardContent 의 computeResultDecidedMs 참고
         const VISIBLE_OFFSET_HOURS = 65;
         const COUNTING_START_HOURS = 144;
         const RESULT_DECIDED_HOURS = 278;
@@ -1255,15 +1234,26 @@ const Cluster41Content = () => {
           const rawSeasonName = seasonData?.name || '';
           const { displayName: seasonName, isBreak: isBreakSeason, fromSeason: breakFromSeason, toSeason: breakToSeason } = parseBreakSeasonName(rawSeasonName);
 
-          // 성장 상태 결정 (온보딩 → break 시즌 → 시간 phase → weeklyGrowth/폴백)
+          // 성장 상태 결정 (온보딩 → break 시즌 → 개인 휴식 → 시간 phase → weeklyGrowth/폴백)
           let status = '실패';
 
+          // 개인 휴식 여부 — phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 플래그를 본다.
+          const weeklyGrowthForWeek = userWeeklyGrowthMap.get(week.id);
+          const isOnboardingThisWeek = !!(apiOnboardingWeekId && week.id === apiOnboardingWeekId);
+          const userIsOnPersonalRestForWeek = !isOnboardingThisWeek && (
+            !!weeklyGrowthForWeek?.is_resting
+            || (!weeklyGrowthForWeek && restWeekIds.has(week.id))
+          );
+
           // 온보딩 주차는 무조건 성공 처리
-          if (apiOnboardingWeekId && week.id === apiOnboardingWeekId) {
+          if (isOnboardingThisWeek) {
             status = '성공';
           } else if (isBreakSeason) {
             // break 시즌(전환 주차)은 기본적으로 휴식(공식)
             status = '휴식(공식)';
+          } else if (userIsOnPersonalRestForWeek) {
+            // 개인 휴식 크루는 phase(진행 중/집계 중) 를 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
+            status = '휴식(개인)';
           } else {
             // 주차 시작(월 00:00 KST)으로부터 경과 시간 산출
             const weekStartMs = new Date(week.start_date + 'T00:00:00+09:00').getTime();
@@ -1273,17 +1263,15 @@ const Cluster41Content = () => {
               // (수) 17:00 ~ (일) 00:00 — 보라색 '진행 중'
               status = '진행 중';
             } else if (hoursSinceStart >= COUNTING_START_HOURS && hoursSinceStart < RESULT_DECIDED_HOURS) {
-              // (일) 00:00 ~ N+1(목) 14:00 — 핑크 '집계 중'
+              // (일) 00:00 ~ N+1(금) 14:00 — 핑크 '집계 중'
               status = '집계 중';
             } else {
-              // N+1(목) 14:00 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
-              const weeklyGrowth = userWeeklyGrowthMap.get(week.id);
-              if (weeklyGrowth) {
-                if (weeklyGrowth.is_club_break) {
+              // N+1(금) 14:00 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
+              // ※ 개인 휴식은 위에서 이미 처리됨 — 여기는 개인 휴식이 아닌 케이스만 들어옴.
+              if (weeklyGrowthForWeek) {
+                if (weeklyGrowthForWeek.is_club_break) {
                   status = '휴식(공식)';
-                } else if (weeklyGrowth.is_resting) {
-                  status = '휴식(개인)';
-                } else if (weeklyGrowth.is_success) {
+                } else if (weeklyGrowthForWeek.is_success) {
                   status = '성공';
                 } else {
                   status = '실패';
@@ -1292,8 +1280,6 @@ const Cluster41Content = () => {
                 // user_weekly_growth 가 아직 없으면 기존 폴백 로직
                 if (week.is_club_break) {
                   status = '휴식(공식)';
-                } else if (restWeekIds.has(week.id)) {
-                  status = '휴식(개인)';
                 } else if (activityWeekIds.has(week.id)) {
                   status = '성공';
                 }

@@ -13,6 +13,16 @@ import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 
+// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정된다 (라인 단위).
+// 2차 정보 작성 여부는 강화 성공/실패 판정에 영향을 주지 않는다 (2026 정책).
+// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00 = 278h) — RESULT_DECIDED_HOURS 참고.
+// startDate: 'YYYY-MM-DD' (KST 기준 주차 시작일, 월요일).
+const computeResultDecidedMs = (startDate: string): number => {
+  const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
+  return weekStartMs + (10 * 24 + 12) * 3600 * 1000 + 60 * 1000;
+};
+
 interface Cluster4CardContentProps {
   weekId: string;
 }
@@ -358,6 +368,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // DB에서 가져온 주차 데이터 상태
   const [weekData, setWeekData] = useState<DBWeekData | null>(null);
   const [isLoadingWeek, setIsLoadingWeek] = useState(true);
+
+  // 결과 결정 시점 (N+1주(목) 12:01 KST) 도달 여부.
+  // 강화 대기 → 강화 성공 / 집계 중 → 성장 성공·실패 가 모두 이 시점에 확정된다.
+  // 2차 정보 작성 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
+  const resultsDecided = !!(
+    weekData?.startDate && Date.now() >= computeResultDecidedMs(weekData.startDate)
+  );
 
   // 팀/파트/역할/포인트 데이터 상태
   const [teamName, setTeamName] = useState<string | null>(null);
@@ -1118,6 +1135,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         //   - VISIBLE_OFFSET_HOURS  = N(수) 17:00 = 65h
         //   - COUNTING_START_HOURS  = N(일) 00:00 = 144h
         //   - RESULT_DECIDED_HOURS  = N+1(금) 14:00 = 278h
+        //     ※ 라인 카드의 '강화 대기 → 강화 성공' 은 별도 시점(N+1 목 12:01)에 확정 — computeResultDecidedMs / resultsDecided 참고
         const VISIBLE_OFFSET_HOURS = 65;
         const COUNTING_START_HOURS = 144;
         const RESULT_DECIDED_HOURS = 278;
@@ -1144,6 +1162,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           growthStatus = "성공";
         } else if (isBreakSeason) {
           growthStatus = "휴식(공식)";
+        } else if (userIsOnPersonalRestForWeek) {
+          // 개인 휴식 크루는 phase(진행 중/집계 중) 를 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
+          growthStatus = "휴식(개인)";
         } else {
           const weekStartMs = new Date(currentWeek.start_date + "T00:00:00+09:00").getTime();
           const hoursSinceStart = (Date.now() - weekStartMs) / 3600000;
@@ -1418,44 +1439,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 실무 경력: career_records 기반으로 계산됨 (별도 useEffect에서 처리)
           // 여기서는 초기값 0으로 설정, career_records 로드 후 덮어씀
 
-          // success 계산 (강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
+          // success 계산 (강화 성공 기준: is_completed + 결정 시점 도달 — N+1 목 12:01 KST)
           // 해당 주차의 완료된 활동만 필터링
           type CompletedActivity = { week_id: string; activity_type_id: string };
           const weekCompletedActivities = allCompletedActivities.filter((a: CompletedActivity) => a.week_id === weekId);
 
-          // 강화 성공 여부 판단 헬퍼 함수 (getEnhancementStatus와 동일한 로직)
+          // 결정 시점 (N+1 목 12:01 KST) 도달 여부 — getEnhancementStatus 와 동일 기준
+          const isResultsDecidedHere = currentWeek?.start_date
+            ? Date.now() >= computeResultDecidedMs(currentWeek.start_date)
+            : false;
+
+          // 강화 성공 여부 판단 헬퍼 (2차 정보 / deadline 무관, 결정 시점만 본다)
           const isEnhancementSuccess = (activityTypeId: string): boolean => {
-            // 1. 활동 완료 여부 확인
-            const isCompleted = weekCompletedActivities.some((a: CompletedActivity) => a.activity_type_id === activityTypeId);
-            if (!isCompleted) return false;
-
-            // 2. 2차 정보 기입 여부 확인
-            const detail = filteredActivityDetails.find((d: { activity_type_id: string; sub_title: string | null; output_links: OutputLink[] | null }) => d.activity_type_id === activityTypeId);
-            const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
-            if (hasSecondaryInfo) return true;
-
-            // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
-            const activity = activitiesData.find((a) => a.activity_type_id === activityTypeId);
-
-            if (activity?.deadline) {
-              return Date.now() >= new Date(activity.deadline).getTime();
-            }
-
-            const deadline48h = 48 * 60 * 60 * 1000;
-
-            if (!activity?.opened_at) {
-              // opened_at 누락 시, 주차 종료일 기준 48시간 경과면 강화 성공 처리
-              if (currentWeek?.end_date) {
-                const weekEndTime = new Date(`${currentWeek.end_date}T23:59:59`).getTime();
-                if (Date.now() - weekEndTime >= deadline48h) return true;
-              }
-              return false;
-            }
-
-            const openedTime = new Date(activity.opened_at).getTime();
-            const elapsed = Date.now() - openedTime;
-
-            return elapsed >= deadline48h;
+            if (!isResultsDecidedHere) return false;
+            return weekCompletedActivities.some((a: CompletedActivity) => a.activity_type_id === activityTypeId);
           };
 
           const infoSuccess = infoTypesList.filter((activityTypeId) => isEnhancementSuccess(activityTypeId)).length;
@@ -1571,33 +1568,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     fetchCareerRecords();
   }, [currentUserId, weekId, urlUserId]);
 
-  // 실무 경력 통계 업데이트 (computed status 기반)
-  // total: 해당 주차의 전체 프로젝트 수 (제한 없음)
-  // success: 강화 성공한 프로젝트 수 (computed enhanced - 최대 total개)
+  // 실무 경력 통계 업데이트 (computed status 기반) — cluster-4-1 / ranking API 와 정합.
+  // total: 해당 주차에 어드민이 개설한 career_projects 수 (cap 5).
+  //   ※ careerRecords 는 /api/career-records 응답 = 그 주차 모든 projects + 유저 레코드 머지.
+  //      따라서 careerRecords.length 자체가 career_projects 수와 같음.
+  // success: 강화 성공한 프로젝트 수 (computed enhanced) — 최대 total 까지 cap.
+  // 운영 정책: 크루는 한 주에 최대 5개까지 참여 가능 → 분모/분자 모두 5 cap.
   useEffect(() => {
     // 개인 휴식 → 경력 통계 0 으로 강제. phase(집계 중) 와 무관하게 적용.
     if (weekData?.isPersonalRest) {
       setCareerStats({ total: 0, success: 0 });
       return;
     }
-    // 전체 프로젝트 수 (제한 없음)
-    const rawTotal = careerRecords.length;
-    const total = rawTotal;
-    // computed status 기반: pending이어도 2차 정보 작성 or 마감 경과 시 성공으로 카운트
-    const enhancedCount = careerRecords.filter((r, index) => {
+    const total = Math.min(careerRecords.length, 5);
+    // computed status: pending → 결정 시점(N+1 목 12:01 KST) 이후에만 enhanced 로 승격.
+    //   2차 정보 / secondary_info_deadline 은 강화 성공/실패 판정에 영향 없음 (2026 정책).
+    const enhancedCount = careerRecords.filter((r) => {
       if (r.enhancement_status === "enhanced") return true;
-      if (r.enhancement_status === "pending") {
-        const activityType = (careerTypeIds.length > 0 ? careerTypeIds : ["practical_project"])[index];
-        const detail = activityType ? weekActivityDetails.find((d) => d.activity_type_id === activityType) : null;
-        const hasSecondaryInfo = detail && ((detail.sub_title && detail.sub_title.trim() !== "") || (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== "")));
-        const deadlinePassed = r.secondary_info_deadline ? new Date(r.secondary_info_deadline) <= new Date() : false;
-        return hasSecondaryInfo || deadlinePassed;
-      }
+      if (r.enhancement_status === "pending") return resultsDecided;
       return false;
     }).length;
     const success = Math.min(enhancedCount, total);
     setCareerStats({ total, success });
-  }, [careerRecords, weekActivityDetails, weekData]);
+  }, [careerRecords, weekData, resultsDecided]);
 
   // 키워드 목록 가져오기 (모달 열릴 때 lazy load)
   const fetchKeywordsIfNeeded = async () => {
@@ -4649,7 +4642,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     },
   };
   // code(with/without space) → map entry 조회 헬퍼
-  const workExpCardLineCodes = Object.keys(workExpLineMap);
   const lookupWorkExpMapping = (code?: string | null) => {
     if (!code) return undefined;
     const noSpace = code.replace(/\s+/g, "");
@@ -4733,11 +4725,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     return false;
   };
 
-  // 강화 상태 판단 함수 (2차 정보 기입 OR 48시간 기준)
-  // - 해당 없음: weekly_activities.is_active = false (활동 미개설) 또는 온보딩 주차(무적 주차)
-  // - 강화 실패: 활동 개설됨 + 카페 댓글 집계에서 이행하지 않음 (is_completed = false)
-  // - 강화 대기: 활동 개설됨 + 이행함 (is_completed = true) + 48시간 미경과 + 2차 정보 미기입
-  // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + (48시간 경과 OR 2차 정보 기입)
+  // 강화 상태 판단 함수 (결정 시점 기반: N+1주(목) 12:01 KST)
+  // - 해당 없음: 활동 미개설(is_active=false) / 온보딩 주차(무적 주차) / 개인 휴식 / 역할 미스매치 / 누적 주차 외
+  // - 강화 실패: 활동 개설됨 + 카페 댓글 집계에서 이행하지 않음 (is_completed = false) — 진행 중에도 즉시 표시
+  // - 강화 대기: 활동 개설됨 + 이행함 (is_completed = true) + 결정 시점 이전
+  // - 강화 성공: 활동 개설됨 + 이행함 (is_completed = true) + 결정 시점 이후
+  // ※ 2차 정보 작성 여부 / weekly_activities.deadline / opened_at+48h 는 강화 성공/실패 판정에 영향을 주지 않는다.
   type EnhancementStatus = "success" | "waiting" | "failed" | "not_applicable";
   const getEnhancementStatus = (activityType: string): EnhancementStatus => {
     // 클럽 온보딩 주차(무적 주차)는 모든 활동이 해당 없음
@@ -4773,63 +4766,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // activity_records에서 해당 activity_type의 이행 여부 확인
     const record = weekActivityRecords.find((ar) => ar.activity_type_id === activityType);
 
-    // 1. 활동이 개설되지 않음(is_active=false) → 사용자에게 노출 안 됨. 통계와 일관되게 처리.
-    //   - 휴식 주차: 미개설은 '해당 없음' (필수 아님)
-    //   - 평소 주차에서 eligible 실무 경험: '강화 실패' (운영진이 개설 누락한 시그널)
-    //   - 그 외: '해당 없음'
+    // 활동이 개설되지 않음(is_active=false) → 그 주차에 요구되지 않는 라인 → '해당 없음'.
+    // (cluster-4-1 / cluster-4-ranking 통계와 정합 — 양쪽 모두 is_active=true 라인만 분모에 포함.)
+    // expInfo 가 있어도 "운영진 개설 누락 시그널" 로 강화 실패 처리하지 않음:
+    // 운영진의 개설 결정이 곧 그 주차에 라인이 요구되는지의 source of truth.
     if (!activity?.is_active) {
-      if (weekData?.isPersonalRest || weekData?.isOfficialRest) return "not_applicable";
-      if (expInfo) return "failed";
       return "not_applicable";
     }
 
     if (!record || !record.is_completed) {
-      // 레코드 없거나 is_completed = false → 강화 실패
+      // 레코드 없거나 is_completed = false → 강화 실패 (진행 중 phase에도 즉시 표시)
       return "failed";
     }
 
-    // 3. is_completed = true인 경우, 2차 정보 기입 여부 확인
-    const detail = weekActivityDetails.find((d) => d.activity_type_id === activityType);
-    const hasSecondaryInfo = detail && ((detail.sub_title && detail.sub_title.trim() !== "") || (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== "")));
-
-    // 2차 정보가 기입되어 있으면 바로 강화 성공
-    if (hasSecondaryInfo) {
-      return "success";
-    }
-
-    // 4. 2차 정보 미기입 시, 마감 시간 경과 여부 확인 (deadline 컬럼 우선)
-    if (activity?.deadline) {
-      const isPastDeadline = Date.now() >= new Date(activity.deadline).getTime();
-      console.log(`[getEnhancementStatus] ${activityType}: deadline=${activity.deadline}, result=${isPastDeadline ? "success" : "waiting"}`);
-      return isPastDeadline ? "success" : "waiting";
-    }
-
-    const openedAt = activity?.opened_at;
-    if (!openedAt) {
-      // 개설 시각이 없으면, 주차 종료일 기준 48시간 경과 여부로 판단
-      if (weekData?.endDate) {
-        const weekEndTime = new Date(`${weekData.endDate}T23:59:59`).getTime();
-        if (Date.now() - weekEndTime >= 48 * 60 * 60 * 1000) {
-          return "success";
-        }
-      }
-      console.log(`[getEnhancementStatus] ${activityType}: no opened_at -> waiting`);
-      return "waiting";
-    }
-
-    const openedTime = new Date(openedAt).getTime();
-    const now = Date.now();
-    const elapsed = now - openedTime;
-    const deadline48h = 48 * 60 * 60 * 1000;
-    const hoursElapsed = Math.floor(elapsed / (60 * 60 * 1000));
-
-    console.log(`[getEnhancementStatus] ${activityType}: openedAt=${openedAt}, elapsed=${hoursElapsed}h, result=${elapsed >= deadline48h ? "success" : "waiting"}`);
-
-    if (elapsed >= deadline48h) {
-      return "success";
-    } else {
-      return "waiting";
-    }
+    // 이행함 (is_completed = true) — 결정 시점 도달 여부로 결정
+    return resultsDecided ? "success" : "waiting";
   };
 
   // 강화 상태별 아이콘
@@ -5100,30 +5051,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
   };
 
-  // 통계 재계산 함수 (저장 후 즉시 업데이트용 - 강화 성공 기준: is_completed + (48시간 경과 OR 2차 정보 기입))
+  // 통계 재계산 함수 (저장 후 즉시 업데이트용 - 강화 성공 기준: is_completed + 결정 시점 도달)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const recalculateStats = (updatedDetails: ActivityDetail[]) => {
+  const recalculateStats = (_updatedDetails: ActivityDetail[]) => {
     const activeActivities = weeklyActivities.filter((a) => a.is_active);
 
-    // 강화 성공 여부 판단 헬퍼 함수
+    // 강화 성공 여부 판단 헬퍼 (2차 정보 / deadline 무관, 결정 시점만 본다 — getEnhancementStatus 와 동일)
     const isEnhancementSuccessLocal = (activityTypeId: string): boolean => {
-      // 1. 활동 완료 여부 확인
-      if (!weekApprovedTypes.has(activityTypeId)) return false;
-
-      // 2. 2차 정보 기입 여부 확인 (저장 후 업데이트된 데이터 사용)
-      const detail = updatedDetails.find((d) => d.activity_type_id === activityTypeId);
-      const hasSecondaryInfo = detail && (detail.sub_title || (detail.output_links && detail.output_links.length > 0));
-      if (hasSecondaryInfo) return true;
-
-      // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
-      const activity = weeklyActivities.find((a) => a.activity_type_id === activityTypeId);
-      if (activity?.deadline) {
-        return Date.now() >= new Date(activity.deadline).getTime();
-      }
-      if (!activity?.opened_at) return false;
-
-      const openedTime = new Date(activity.opened_at).getTime();
-      return (Date.now() - openedTime) >= 48 * 60 * 60 * 1000;
+      if (!resultsDecided) return false;
+      return weekApprovedTypes.has(activityTypeId);
     };
 
     const calcStats = (types: string[]) => {
@@ -5357,18 +5293,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     hasActivity: false,
   };
 
-  // 실무 경험 카드 데이터 (동적 생성 + 빈 카드)
-  const workExpCards = [
-    ...workExpCardLineCodes.map((lineCodeKey, index) => {
-      const matchedActivityTypeId = workExpActivityTypes.find((typeId) => {
-        const lineCode = activityTypesMap.get(typeId)?.line_code || typeId;
-        return lineCode.replace(/\s+/g, "") === lineCodeKey;
-      });
-      const activityTypeId = matchedActivityTypeId || lineCodeKey;
+  // 실무 경험 카드 데이터 — 이 크루에게 어드민/시스템이 실제로 처리한 라인만 동적 생성.
+  // 운영진이 크루별로 실무 경험 라인을 임의 대체/지정 가능 → hardcoded workExpLineMap 6 라인을
+  // 기준으로 띄우면 운영진 결정과 무관한 카드가 강제로 노출됨.
+  // weeklyActivities.is_active=true (전체 일괄 개설) 만으로는 부족 — 어드민이 그 주차에
+  // 이 크루에게 라인을 적용 안 했어도 is_active 가 true 일 수 있음. source of truth 는
+  // user_activity_records 존재 여부 (크루 이행 인증 시 또는 어드민이 강화 성공/실패 마크 시 생성).
+  // workExpLineMap 은 라인 본문이 비어있을 때 표시용 fallback 으로만 사용.
+  const adminProcessedExpTypeIds: string[] = [];
+  const seenExpTypeIds = new Set<string>();
+  weekActivityRecords.forEach((ar) => {
+    if (experienceTypeIds.includes(ar.activity_type_id) && !seenExpTypeIds.has(ar.activity_type_id)) {
+      seenExpTypeIds.add(ar.activity_type_id);
+      adminProcessedExpTypeIds.push(ar.activity_type_id);
+    }
+  });
+
+  const workExpCards = adminProcessedExpTypeIds.map((activityTypeId, index) => {
       const activityType = activityTypesMap.get(activityTypeId);
       const activity = weeklyActivities.find((a) => a.activity_type_id === activityTypeId);
       const detail = weekActivityDetails.find((d) => d.activity_type_id === activityTypeId);
       const enhStatus = getEnhancementStatus(activityTypeId);
+      const lineCodeKey = (activityType?.line_code || "").replace(/\s+/g, "");
       const fallbackMapping = workExpLineMap[lineCodeKey];
       const hasActivity = !!activity;
 
@@ -5443,12 +5389,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         enhancementStatus: enhStatus,
         hasActivity,
       };
-    }),
-  ];
+    });
 
   // 4칸 슬롯 규칙: 해당되는(=not_applicable이 아닌) 라인만 좌측부터 채우고,
-  // 부족한 칸은 보이드 '-' 카드로 패딩한다. workExpLineMap 의 6개 라인 중
-  // 한 주에 5개 이상 해당될 일은 없으므로 최대 4개까지 노출.
+  // 부족한 칸은 보이드 '-' 카드로 패딩한다. 어드민이 한 주에 적용 가능한 실무 경험 라인은
+  // 운영 정책상 최대 4개로 가정하므로 slice(0, 4) 로 자른다.
   const buildVoidWorkExpCard = (n: number) => ({
     id: 1000 + n,
     activityTypeId: "",
@@ -5505,16 +5450,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const workCareerCards =
     careerRecords.length > 0
       ? careerRecords.map((record, index) => {
-          // 강화 상태 계산: pending일 때 2차 정보 작성 또는 마감 기한 경과 시 강화 성공으로 표시
+          // 강화 상태 계산: pending → 결정 시점(N+1 목 12:01 KST) 이후에만 enhanced 로 승격.
+          // 2차 정보 / secondary_info_deadline 은 강화 성공/실패 판정에 영향 없음 (2026 정책).
           let computedStatus = record.enhancement_status;
-          if (record.enhancement_status === "pending") {
-            const activityType = workCareerActivityTypes[index];
-            const detail = activityType ? weekActivityDetails.find((d) => d.activity_type_id === activityType) : null;
-            const hasSecondaryInfo = detail && ((detail.sub_title && detail.sub_title.trim() !== "") || (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== "")));
-            const deadlinePassed = record.secondary_info_deadline ? new Date(record.secondary_info_deadline) <= new Date() : false;
-            if (hasSecondaryInfo || deadlinePassed) {
-              computedStatus = "enhanced";
-            }
+          if (record.enhancement_status === "pending" && resultsDecided) {
+            computedStatus = "enhanced";
           }
 
           // 강화 상태에 따른 배지 결정
@@ -5567,7 +5507,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             supervisorImg: record.supervisor_profile_img || "/images/0/cluster4/icon/실무 경력/감독자.jpg",
             supervisorName: record.supervisor_name || "-",
             supervisorDept: record.supervisor_department || "",
-            supervisorCompany: record.supervisor_company || "",
+            supervisorCompany: record.company_name || record.supervisor_company || "",
             supervisorPosition: record.supervisor_position || "",
             statusBadge: getStatusBadge(computedStatus),
             grade: record.grade || "",

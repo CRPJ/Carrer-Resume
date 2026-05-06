@@ -8,6 +8,15 @@ export const revalidate = 0;
 // weekly_activities.activity_type_id는 line_code 형식 (예: 'calendar', 'essay' 등)
 const infoTypeIds = ['calendar', 'essay', 'forum', 'infodesk', 'session', 'wisdom', 'etc_a'];
 
+// 라인 카드 강화 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
+// 이 시점 이후로 '강화 대기 → 강화 성공' 이 확정 (라인 단위).
+// 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향을 주지 않는다 (2026 정책).
+// ※ 주차 단위 '집계 중 → 성장 성공/실패/휴식' 결정 시점은 별도(N+1 금 14:00).
+const computeResultDecidedMs = (startDate: string): number => {
+  const weekStartMs = new Date(`${startDate}T00:00:00+09:00`).getTime();
+  return weekStartMs + (10 * 24 + 12) * 3600 * 1000 + 60 * 1000;
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -179,7 +188,7 @@ export async function GET(request: NextRequest) {
       currentWeekCompletedResult,
       previousWeeksCompletedResult,
       careerRecordsResult,
-      activityDetailsResult
+      careerProjectsResult
     ] = await Promise.all([
       // 해당 주차의 성장 기록
       supabaseAdmin
@@ -228,12 +237,14 @@ export async function GET(request: NextRequest) {
         .select('id, activity_type_id, is_active, opened_at, deadline')
         .eq('week_id', weekId)
         .eq('is_active', true),
-      // 현재 주차의 완료된 활동 기록 (강화 성공 판정용 — 1000건 제한에 안전)
+      // 현재 주차의 활동 기록 (전체 — 강화 성공/실패 판정 + 실무 경험 분모 판정용).
+      // is_completed 필터 없이 가져와서 사용처에서 분기. cluster-4-card 의 weekActivityRecords
+      // 와 같은 source 로 정합 맞추기 위함 (실무 경험 카드 분모 = 레코드 존재 라인 수).
       supabaseAdmin
         .from('activity_records')
-        .select('user_id, activity_type_id')
+        .select('user_id, activity_type_id, is_completed')
         .eq('week_id', weekId)
-        .eq('is_completed', true),
+        .limit(10000),
       // 이전 주차의 완료된 활동 기록 (count_once_in_total 판정용)
       supabaseAdmin
         .from('activity_records')
@@ -242,19 +253,20 @@ export async function GET(request: NextRequest) {
         .neq('week_id', weekId)
         .eq('is_completed', true)
         .limit(10000),
-      // 실무 경력 데이터
+      // 실무 경력 데이터 (per-user 강화 카운트용)
       supabaseAdmin
         .from('career_records')
         .select('user_id, week_id, enhancement_status')
         .eq('week_id', weekId)
         .in('user_id', userIdArray)
         .in('enhancement_status', ['pending', 'enhanced']),
-      // 2차 정보 (강화 성공 판정용: sub_title, output_links)
+      // 실무 경력 분모 — 그 주차에 어드민이 개설한 프로젝트 수 (cluster-4-1 정합).
+      // career_records 가 아니라 career_projects 가 source. is_active=true 인 슬롯만 카운트.
       supabaseAdmin
-        .from('user_activity_details')
-        .select('user_id, activity_type_id, sub_title, output_links')
+        .from('career_projects')
+        .select('id')
         .eq('week_id', weekId)
-        .in('user_id', userIdArray)
+        .eq('is_active', true)
     ]);
 
     const weeklyGrowthData = weeklyGrowthResult.data;
@@ -267,11 +279,15 @@ export async function GET(request: NextRequest) {
     const roleHistories = roleHistoriesResult.data;
     const activityTypes = activityTypesResult.data;
     const activeActivities = weeklyActivitiesResult.data || [];
-    const currentWeekCompleted = (currentWeekCompletedResult.data || []).map(r => ({ ...r, week_id: weekId }));
+    // 현재 주차 전체 활동 기록 (is_completed 무관) — 실무 경험 분모 판정용 (cluster-4-card 정합).
+    const currentWeekAllRecords = (currentWeekCompletedResult.data || []).map(r => ({ ...r, week_id: weekId }));
+    // 강화 성공 판정에는 is_completed=true 만 사용.
+    const currentWeekCompleted = currentWeekAllRecords.filter(r => r.is_completed);
     const previousWeeksCompleted = previousWeeksCompletedResult.data || [];
     const allCompletedActivityRecords = [...currentWeekCompleted, ...previousWeeksCompleted];
     const careerRecordsData = careerRecordsResult.data;
-    const activityDetailsData = activityDetailsResult.data;
+    // 그 주차에 어드민이 개설한 실무 경력 프로젝트 수 (모든 크루 공통 분모, max 5).
+    const careerProjectsCount = (careerProjectsResult.data || []).length;
 
     // 4. 사용자 프로필 정보 (이미 가져옴)
     const profiles = eligibleProfiles;
@@ -280,25 +296,9 @@ export async function GET(request: NextRequest) {
     const competencyTypeIds: string[] = [];
     const experienceTypeIds: string[] = [];
 
-    interface ExperienceTypeInfo {
-      id: string;
-      eligible_min_approved_weeks: number | null;
-      eligible_max_approved_weeks: number | null;
-      count_once_in_total: boolean;
-    }
-    const experienceTypeInfos: ExperienceTypeInfo[] = [];
-
     (activityTypes || []).forEach(at => {
       if (at.cluster_id === 'practical_competency') competencyTypeIds.push(at.id);
-      else if (at.cluster_id === 'practical_experience') {
-        experienceTypeIds.push(at.id);
-        experienceTypeInfos.push({
-          id: at.id,
-          eligible_min_approved_weeks: at.eligible_min_approved_weeks,
-          eligible_max_approved_weeks: at.eligible_max_approved_weeks,
-          count_once_in_total: at.count_once_in_total || false
-        });
-      }
+      else if (at.cluster_id === 'practical_experience') experienceTypeIds.push(at.id);
     });
 
     // ============ 빠른 조회를 위한 Map 생성 ============
@@ -336,20 +336,22 @@ export async function GET(request: NextRequest) {
       userCompletedActivitiesMap.get(ar.user_id)!.push(ar);
     });
 
+    // 사용자별 현재 주차 활동 기록 활동 타입 Set (is_completed 무관) — 실무 경험 분모 판정용.
+    // cluster-4-card 의 weekActivityRecords 기반 카드 생성 로직과 동일 source.
+    const userCurrentWeekRecordTypesMap = new Map<string, Set<string>>();
+    currentWeekAllRecords.forEach(ar => {
+      if (!userCurrentWeekRecordTypesMap.has(ar.user_id)) {
+        userCurrentWeekRecordTypesMap.set(ar.user_id, new Set());
+      }
+      userCurrentWeekRecordTypesMap.get(ar.user_id)!.add(ar.activity_type_id);
+    });
+
     // 사용자별 경력 기록 Map
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userCareerMap = new Map<string, any[]>();
     (careerRecordsData || []).forEach(cr => {
       if (!userCareerMap.has(cr.user_id)) userCareerMap.set(cr.user_id, []);
       userCareerMap.get(cr.user_id)!.push(cr);
-    });
-
-    // 사용자별 2차 정보 Map (강화 성공 판정용)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userActivityDetailsMap = new Map<string, any[]>();
-    (activityDetailsData || []).forEach(d => {
-      if (!userActivityDetailsMap.has(d.user_id)) userActivityDetailsMap.set(d.user_id, []);
-      userActivityDetailsMap.get(d.user_id)!.push(d);
     });
 
     // 프로필 Map
@@ -460,35 +462,14 @@ export async function GET(request: NextRequest) {
       const userAllCompletedActivities = (userCompletedActivitiesMap.get(userId) || [])
         .map(ar => ({ week_id: ar.week_id, activity_type_id: ar.activity_type_id }));
 
-      // ===== 강화 성공 판정 헬퍼 (cluster-4-card와 동일: is_completed + (48시간 경과 OR 2차정보 기입)) =====
-      const userDetails = userActivityDetailsMap.get(userId) || [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // ===== 강화 성공 판정 헬퍼 (cluster-4-card 와 동일: 결정 시점(N+1 목 12:01 KST) 도달 후 is_completed=true) =====
+      // ※ 2차 정보 / weekly_activities.deadline / opened_at+48h 는 영향 없음 (2026 정책).
+      const isResultsDecidedForWeek = Date.now() >= computeResultDecidedMs(selectedWeek.startDate);
       const isEnhancementSuccess = (activityTypeId: string): boolean => {
-        // 1. 활동 완료 여부 확인
-        const isCompleted = userAllCompletedActivities.some(
+        if (!isResultsDecidedForWeek) return false;
+        return userAllCompletedActivities.some(
           a => a.week_id === weekId && a.activity_type_id === activityTypeId
         );
-        if (!isCompleted) return false;
-
-        // 2. 2차 정보 기입 여부 확인
-        const detail = userDetails.find((d: { activity_type_id: string; sub_title: string | null; output_links: { url?: string }[] | null }) => d.activity_type_id === activityTypeId);
-        if (detail) {
-          const hasSecondaryInfo =
-            (detail.sub_title && detail.sub_title.trim() !== '') ||
-            (detail.output_links && detail.output_links.some((link: { url?: string }) => link?.url && link.url.trim() !== ''));
-          if (hasSecondaryInfo) return true;
-        }
-
-        // 3. 마감 시간 경과 여부 확인 (deadline 컬럼 우선, 없으면 opened_at+48h 폴백)
-        const activity = activeActivities.find(a => a.activity_type_id === activityTypeId);
-        if (!activity?.opened_at) return false;
-
-        if (activity.deadline) {
-          return Date.now() >= new Date(activity.deadline).getTime();
-        }
-        const openedTime = new Date(activity.opened_at).getTime();
-        const elapsed = Date.now() - openedTime;
-        return elapsed >= 48 * 60 * 60 * 1000;
       };
 
       // ===== 휴식 주차 체크 =====
@@ -502,59 +483,27 @@ export async function GET(request: NextRequest) {
       const competencyTotal = (isOnboardingWeek || isRestWeek) ? 0 : 1;
       const competencyCount = (isOnboardingWeek || isRestWeek) ? 0 : (competencyTypeIds.some(typeId => isEnhancementSuccess(typeId)) ? 1 : 0);
 
-      // ===== 실무 경험 (experience) - cluster-4-card와 동일: eligible 조건 + 강화 성공 기준 =====
-      // eligible_min/max 룰 적용 시점: 2026년 봄 시즌 9주차부터
-      const isEligibilityRuleActive = (
-        selectedWeek.seasonYear > 2026 ||
-        (selectedWeek.seasonYear === 2026 && selectedWeek.rawSeasonName !== 'spring') ||
-        (selectedWeek.seasonYear === 2026 && selectedWeek.rawSeasonName === 'spring' && selectedWeek.weekNumber >= 9)
-      );
+      // ===== 실무 경험 (experience) - cluster-4-card 와 정합: per-user 레코드 기반 =====
+      // 운영진이 크루별로 실무 경험 라인을 임의 대체/지정 가능 → weeklyActivities.is_active=true
+      // (전체 일괄 개설) 만으로는 분모 판정 부정확. source of truth = user_activity_records 존재.
+      // 분모 = 이 크루의 현재 주차 records 중 실무 경험 클러스터 라인의 distinct 개수.
+      const userCurrentWeekRecordTypes = userCurrentWeekRecordTypesMap.get(userId) || new Set<string>();
       let experienceTotal = 0;
       if (!isOnboardingWeek && !isRestWeek) {
-        const experienceActivities = activeActivities.filter(a => experienceTypeIds.includes(a.activity_type_id));
-
-        experienceActivities.forEach(a => {
-          const typeInfo = experienceTypeInfos.find(info => info.id === a.activity_type_id);
-
-          if (!typeInfo) {
-            experienceTotal++;
-            return;
-          }
-
-          if (isEligibilityRuleActive) {
-            // eligible_min/max 체크 (null이면 제한 없음)
-            const minWeek = typeInfo.eligible_min_approved_weeks ?? 1;
-            const maxWeek = typeInfo.eligible_max_approved_weeks ?? 999;
-
-            // 누적 주차가 eligible 범위 내인지 확인
-            if (cumulativeApprovedWeeks >= minWeek && cumulativeApprovedWeeks <= maxWeek) {
-              // count_once_in_total 체크 (1회만 가능한 활동)
-              if (typeInfo.count_once_in_total) {
-                // 이미 이전 주차에서 완료했는지 확인
-                const previouslyCompleted = userAllCompletedActivities.some(
-                  ca => ca.activity_type_id === a.activity_type_id && ca.week_id !== weekId
-                );
-                if (!previouslyCompleted) {
-                  experienceTotal++;
-                }
-              } else {
-                experienceTotal++;
-              }
-            }
-          } else {
-            // 룰 적용 이전: 모든 실무 경험 활동 카운트
+        userCurrentWeekRecordTypes.forEach(activityTypeId => {
+          if (experienceTypeIds.includes(activityTypeId)) {
             experienceTotal++;
           }
         });
       }
       const experienceCount = (isOnboardingWeek || isRestWeek) ? 0 : experienceTypeIds.filter(typeId => isEnhancementSuccess(typeId)).length;
 
-      // ===== 실무 경력 (career) - career_records 기반 (Map 사용) =====
-      // total: pending 또는 enhanced 상태인 프로젝트 수 (최대 5개)
-      // count: enhanced 상태인 프로젝트 수 (최대 total개)
+      // ===== 실무 경력 (career) - cluster-4-1 / cluster-4-card 와 정합 =====
+      // 분모 = 그 주차에 어드민이 개설한 career_projects 수 (모든 크루 공통, 최대 5).
+      // 분자 = 이 크루의 enhanced 상태 records 수 (최대 분모까지 cap).
+      // 운영 정책: 크루는 한 주에 최대 5개까지 참여 가능 → 분모/분자 모두 5 cap.
       const userCareerRecords = userCareerMap.get(userId) || [];
-      const careerRawTotal = (isOnboardingWeek || isRestWeek) ? 0 : userCareerRecords.length;
-      const careerTotal = Math.min(careerRawTotal, 5);
+      const careerTotal = (isOnboardingWeek || isRestWeek) ? 0 : Math.min(careerProjectsCount, 5);
       const careerEnhancedCount = (isOnboardingWeek || isRestWeek) ? 0 : userCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
       const careerCount = Math.min(careerEnhancedCount, careerTotal);
 
