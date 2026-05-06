@@ -73,8 +73,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "리뷰를 입력해주세요." }, { status: 400 });
     }
 
-    if (review.length > 30) {
-      return NextResponse.json({ error: "리뷰는 30자 이내로 작성해주세요." }, { status: 400 });
+    if (review.length > 300) {
+      return NextResponse.json({ error: "리뷰는 300자 이내로 작성해주세요." }, { status: 400 });
     }
 
     // 해당 season_history가 본인의 것인지 확인

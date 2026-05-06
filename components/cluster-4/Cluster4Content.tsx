@@ -358,6 +358,7 @@ const Cluster4Content = () => {
       ? (
           {
             윤재윤: (
+
               <>
                 현재 클럽은, <span style={{ color: "#FF9C9C", fontSize: 20, fontFamily: "Pretendard", fontWeight: "800", lineHeight: "30px", wordWrap: "break-word" }}>2026년 봄 시즌</span>을 가동 중에 있습니다.
               </>
@@ -4120,17 +4121,17 @@ const Cluster4Content = () => {
               {/* 리뷰 입력 */}
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "#FAAB07", marginBottom: "10px" }}>
-                  한줄평 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 30자)</span>
+                  한줄평 <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>(최대 300자)</span>
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
-                    placeholder="이번 시즌은 어땠나요? (30자 이내)"
-                    maxLength={30}
+                    placeholder="이번 시즌은 어땠나요? (300자 이내)"
+                    maxLength={300}
                     value={seasonReviewEditData.review}
                     onChange={async (e) => {
-                      if (e.target.value.length > 30) {
-                        await popup.alert("최대 30자까지 입력할 수 있습니다.");
+                      if (e.target.value.length > 300) {
+                        await popup.alert("최대 300자까지 입력할 수 있습니다.");
                         return;
                       }
                       setSeasonReviewEditData((prev) => ({ ...prev, review: e.target.value }));
@@ -4157,7 +4158,7 @@ const Cluster4Content = () => {
                       color: "rgba(255,255,255,0.4)",
                     }}
                   >
-                    {seasonReviewEditData.review.length} / 30
+                    {seasonReviewEditData.review.length} / 300
                   </span>
                 </div>
               </div>

@@ -68,10 +68,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // sub_title 길이 검증 (150자)
-    if (sub_title && sub_title.length > 150) {
+    // sub_title 길이 검증 (300자)
+    if (sub_title && sub_title.length > 300) {
       return NextResponse.json(
-        { error: 'sub_title must be 150 characters or less' },
+        { error: 'sub_title must be 300 characters or less' },
         { status: 400 }
       )
     }
