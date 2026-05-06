@@ -5504,6 +5504,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             likes: "0,99",
             hasWeb: (record.output_links?.length || 0) > 0,
             icon: record.company_logo_url || "/images/0/cluster4/icon/default-company.png",
+            companyHomepageUrl: (record.company_homepage_links && record.company_homepage_links[0]) || null,
             supervisorImg: record.supervisor_profile_img || "/images/0/cluster4/icon/실무 경력/감독자.jpg",
             supervisorName: record.supervisor_name || "-",
             supervisorDept: record.supervisor_department || "",
