@@ -1167,14 +1167,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           || (!weeklyGrowth && apiRestWeekIds.includes(currentWeek.id))
         );
 
+        // 휴식만 phase 우회 — 온보딩 주차도 일반 phase(진행 중 → 집계 중) 거치고 결정 시점에 무조건 성공.
         let growthStatus = "실패";
-        // 온보딩 주차(무적 주차)는 무조건 성공
-        if (isCurrentWeekOnboarding) {
-          growthStatus = "성공";
-        } else if (isBreakSeason) {
+        if (userIsOnOfficialRestForWeek) {
+          // 클럽 공식 휴식 주차(전환 주차 포함)는 phase 우회하고 카드 노출 시점부터 바로 '휴식(공식)'.
           growthStatus = "휴식(공식)";
         } else if (userIsOnPersonalRestForWeek) {
-          // 개인 휴식 크루는 phase(진행 중/집계 중) 를 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
+          // 개인 휴식 크루도 phase 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
           growthStatus = "휴식(개인)";
         } else {
           const weekStartMs = new Date(currentWeek.start_date + "T00:00:00+09:00").getTime();
@@ -1186,24 +1185,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             growthStatus = "진행 중";
           } else if (hoursSinceStart >= COUNTING_START_HOURS && minutesSinceStart < RESULT_DECIDED_MINUTES) {
             growthStatus = "집계 중";
+          } else if (isCurrentWeekOnboarding) {
+            // N+1(목) 12:01 이후 — 온보딩(무적) 주차는 무조건 성공.
+            growthStatus = "성공";
           } else if (weeklyGrowth) {
-            if (weeklyGrowth.is_club_break) {
-              growthStatus = "휴식(공식)";
-            } else if (weeklyGrowth.is_resting) {
-              growthStatus = "휴식(개인)";
-            } else if (weeklyGrowth.is_success) {
-              growthStatus = "성공";
-            } else {
-              growthStatus = "실패";
-            }
-          } else {
-            if (currentWeek.is_club_break) {
-              growthStatus = "휴식(공식)";
-            } else if (apiRestWeekIds.includes(currentWeek.id)) {
-              growthStatus = "휴식(개인)";
-            } else if (apiActivityWeekIds.includes(currentWeek.id)) {
-              growthStatus = "성공";
-            }
+            // 휴식은 위에서 이미 처리됨 — 여기는 성공/실패만 결정.
+            growthStatus = weeklyGrowth.is_success ? "성공" : "실패";
+          } else if (apiActivityWeekIds.includes(currentWeek.id)) {
+            growthStatus = "성공";
           }
         }
 
@@ -4316,13 +4305,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const isRestMode = !!(weekData?.isPersonalRest || weekData?.isOfficialRest);
 
   // 시즌명과 주차번호로 월/주차 계산하여 이미지 경로 생성
-  const getWeekImagePath = (data: DBWeekData) => {
-    // 시즌별 시작 월 매핑
+  // primary 는 holiday_name 접미사를 포함한 1차 경로, stripped 는 holiday 없는 폴백.
+  // (holiday_name 에 '시험 기간' 같이 디스크 파일에 없는 값이 들어와도 stripped 로 자동 복구)
+  const getWeekImagePath = (data: DBWeekData): { primary: string; stripped: string } => {
     const seasonStartMonth: { [key: string]: number } = {
-      겨울: 1, // 1월
-      봄: 3, // 3월
-      여름: 7, // 7월
-      가을: 9, // 9월
+      겨울: 1,
+      봄: 3,
+      여름: 7,
+      가을: 9,
     };
 
     const startMonth = seasonStartMonth[data.seasonName] || 1;
@@ -4330,15 +4320,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const month = startMonth + monthOffset;
     const weekOfMonth = ((data.weekNumber - 1) % 4) + 1;
 
-    // 공휴일이 있는 경우 파일명에 추가
     const holidaySuffix = data.holidayName ? ` ${data.holidayName}` : "";
-
-    // 파일명 형식: "겨울 1주차 (1월 1주차).png" 또는 "겨울 6주차 (2월 2주차 설,구정).png"
-    return `/images/0/cluster4/주차 이미지/${data.seasonName} ${data.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+    const base = `/images/0/cluster4/주차 이미지/${data.seasonName} ${data.weekNumber}주차 (${month}월 ${weekOfMonth}주차`;
+    return {
+      primary: `${base}${holidaySuffix}).png`,
+      stripped: `${base}).png`,
+    };
   };
 
   // 휴식 모드일 때는 휴식 전용 이미지 사용, 아닐 때는 시즌/주차에 맞는 이미지
-  const currentImage = isRestMode ? restImage : weekData ? getWeekImagePath(weekData) : "/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png";
+  const computedWeekPaths = weekData ? getWeekImagePath(weekData) : null;
+  const currentImage = isRestMode ? restImage : (computedWeekPaths ? computedWeekPaths.primary : "/images/0/cluster4/주차 이미지/겨울 1주차 (1월 1주차).png");
+  const currentImageStripped = !isRestMode && computedWeekPaths && computedWeekPaths.stripped !== computedWeekPaths.primary ? computedWeekPaths.stripped : null;
   const currentTitle = weekData ? (weekData.isBreakSeason ? `${weekData.seasonYear} ${weekData.toSeasonName} 시즌, 전환 주차` : `${weekData.seasonYear} ${weekData.seasonName} 시즌, ${weekData.weekNumber}주차`) : "로딩 중...";
 
   // 날짜 포맷팅 함수 (2025 - 01 - 06 (월) 형식)
@@ -5273,11 +5266,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }),
   ];
 
-  // 휴식 모드일 때 실무 정보 카드 전부 '해당 없음'.
-  // 단, 운영진이 개설한 라인의 본문(Main Title 등)은 그대로 보존하고 상태만 not_applicable 로 강제.
+  // 휴식 모드(공식/개인) — 카드 전부 '해당 없음' 상태로, Main Title 도 강제로 '-'.
+  // 본문 중 카테고리/아이콘 등은 보존하고 Main Title 만 차폐. 라인 개설 여부와 무관.
   const effectiveWorkInfoCards = isRestMode
     ? workInfoCards.map((card) => ({
         ...card,
+        title: "",
         status: "not_applicable" as EnhancementStatus,
         statusIcon: enhancementStatusIcons["not_applicable"],
         verified: false,
@@ -5332,12 +5326,17 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     };
   });
 
-  // 휴식 모드 — 개설된 라인의 본문(Main Title, Sub Title 등)은 보존하고 상태만 '해당 없음'.
-  // 단, 매칭된 활동이 없는 placeholder 라인(hasActivity=false) 은 본문이 default 매핑값이라
-  // 보여줄 의미가 없으므로 그대로 두고 단일 카드 매칭에서 not_applicable 로 걸러진다.
+  // 휴식 모드(공식/개인) — 본문(Main Title, lineCode, lineName, Sub Title) 모두 강제 '-'.
+  // 휴식 주차에는 실무 역량 라인이 의미 없으므로 본문 전부 차폐, 상태도 '해당 없음'.
   const effectiveWorkAbilityCards = isRestMode
     ? workAbilityCards.map((card) => ({
         ...card,
+        title: "",
+        subTitle: "",
+        lineCode: "-",
+        lineName: "-",
+        code: "-",
+        badge: "-",
         status: "not_applicable" as EnhancementStatus,
         statusIcon: enhancementStatusIcons.not_applicable,
         enhancementStatus: "not_applicable" as EnhancementStatus,
@@ -5499,14 +5498,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     hasActivity: false,
   });
 
-  // 휴식 모드 — 운영진이 개설한 라인은 본문(Main Title, 별점 등) 보존하고 상태만 '해당 없음'.
-  // 미개설 라인은 not_applicable 폴백 후 void 카드로 패딩(평소 주차와 동일 슬롯 정책).
+  // 휴식 모드(공식/개인) — 운영진 개설 여부와 무관하게 Main Title 강제 '-'.
+  // 별점/카테고리 등 본문은 보존, Main Title 만 차폐. 미개설 라인은 void 카드로 패딩.
   const effectiveWorkExpCards = isRestMode
     ? [
         ...workExpCards
           .filter((c) => c.hasActivity)
           .map((card) => ({
             ...card,
+            title: "",
             enhancementStatus: "not_applicable" as EnhancementStatus,
             isFailed: false,
           })),
@@ -5651,7 +5651,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     secondaryInfoDeadline: null as string | null,
   });
 
-  // 휴식 모드일 때 실무 경력 카드 전부 '해당 없음'으로 강제
+  // 휴식 모드일 때 실무 경력 카드 전부 '해당 없음'으로 강제. 본문(프로젝트명 등)은 보존.
   const effectiveWorkCareerCards = isRestMode
     ? workCareerCards.map((card) => ({
         ...card,
@@ -5871,8 +5871,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               src={currentImage}
               alt="주차 이미지"
               className="main-week-image"
+              data-stripped-src={currentImageStripped || undefined}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/0/cluster4/주차 이미지/휴식(개인,공식).png";
+                const img = e.currentTarget;
+                const stripped = img.dataset.strippedSrc;
+                if (img.dataset.fallbackStep !== "1" && stripped) {
+                  img.dataset.fallbackStep = "1";
+                  img.src = stripped;
+                } else {
+                  img.src = "/images/0/cluster4/주차 이미지/휴식(개인,공식).png";
+                }
               }}
             />
             {/* 뱃지 두 개 */}
@@ -6447,11 +6455,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-count">
                 <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총{" "}
                 <span style={{ display: "inline-block", minWidth: "2ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>
-                  {infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total}
+                  {isRestMode ? "-" : infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total}
                 </span>{" "}
                 개 중{" "}
                 <span className="highlight" style={{ display: "inline-block", minWidth: "2ch", textAlign: "right" }}>
-                  {infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success}
+                  {isRestMode ? "-" : infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success}
                 </span>
                 개
               </span>
@@ -6533,9 +6541,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{infoStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isRestMode ? "-" : infoStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {infoStats.success}
+                {isRestMode ? "-" : infoStats.success}
               </span>{" "}
               개
             </span>
@@ -6625,9 +6633,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : experienceStatsDisplay.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{(isOnboardingWeek || isRestMode) ? "-" : experienceStatsDisplay.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {isOnboardingWeek ? "-" : experienceStatsDisplay.success}
+                {(isOnboardingWeek || isRestMode) ? "-" : experienceStatsDisplay.success}
               </span>{" "}
               개
             </span>
@@ -6763,9 +6771,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : competencyStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{(isOnboardingWeek || isRestMode) ? "-" : competencyStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {isOnboardingWeek ? "-" : competencyStats.success}
+                {(isOnboardingWeek || isRestMode) ? "-" : competencyStats.success}
               </span>{" "}
               개
             </span>
@@ -6867,9 +6875,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek ? "-" : careerStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{(isOnboardingWeek || isRestMode) ? "-" : careerStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {isOnboardingWeek ? "-" : careerStats.success}
+                {(isOnboardingWeek || isRestMode) ? "-" : careerStats.success}
               </span>{" "}
               개
             </span>
@@ -8631,7 +8639,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       </div>
 
                       <div className="personal-line-status line-info-row">
-                        {(selectedWorkInfoCard.status as string) === "empty" ? (
+                        {selectedWorkInfoCard.isEmpty || (selectedWorkInfoCard.status as string) === "empty" ? (
                           <div className="line-enhance-void" aria-label="빈 카드">
                             <span className="void-mark" />
                             <span className="void-mark" />
@@ -9062,8 +9070,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           failed: "강화 실패",
                           not_applicable: "해당 없음",
                         };
-                        // 카드 status-badge(L5920)와 동일 우선순위로 평가: isEmpty(보이드) → isRestMode/온보딩 → !hasActivity → enhancementStatus
-                        const statusKey = selectedWorkExpCard.isEmpty || isRestMode || isOnboardingWeek ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
+                        // 카드 status-badge와 동일 우선순위로 평가: isEmpty(보이드) → isRestMode/온보딩 → !hasActivity → enhancementStatus
+                        const statusKey = selectedWorkExpCard.isEmpty ? "empty" : (isRestMode || isOnboardingWeek) ? "not_applicable" : !selectedWorkExpCard.hasActivity ? "failed" : (selectedWorkExpCard.enhancementStatus as string);
                         const statusText = enhanceStatusTextMap[statusKey] || "—";
                         const statusImages: Record<string, string> = {
                           success: "/images/0/cluster4/icon/5 강화 성공.png",
@@ -9514,7 +9522,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           failed: "강화 실패",
                           not_applicable: "해당 없음",
                         };
-                        const statusKey = selectedWorkAbilityCard.enhancementStatus as string;
+                        const statusKey = selectedWorkAbilityCard.isEmpty ? "empty" : (selectedWorkAbilityCard.enhancementStatus as string);
                         const statusText = statusTextMap[statusKey] || "—";
                         return (
                           <div className="personal-line-status line-info-row">

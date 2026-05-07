@@ -1136,10 +1136,10 @@ const Cluster41Content = () => {
           const rawSeasonName = seasonData?.name || '';
           const { displayName: seasonName, isBreak: isBreakSeason, fromSeason: breakFromSeason, toSeason: breakToSeason } = parseBreakSeasonName(rawSeasonName);
 
-          // 성장 상태 결정 (온보딩 → 공식 휴식 → 개인 휴식 → 시간 phase → weeklyGrowth/폴백)
+          // 성장 상태 결정 (공식 휴식 → 개인 휴식 → 시간 phase → 온보딩/weeklyGrowth/폴백)
+          // 휴식만 phase 우회 — 온보딩 주차도 일반 phase(진행 중 → 집계 중) 거치고 결정 시점에 무조건 성공.
           let status = '실패';
 
-          // 휴식 여부 — phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 플래그를 본다.
           const weeklyGrowthForWeek = userWeeklyGrowthMap.get(week.id);
           const isOnboardingThisWeek = !!(apiOnboardingWeekId && week.id === apiOnboardingWeekId);
           const userIsOnOfficialRestForWeek = !isOnboardingThisWeek && (
@@ -1152,10 +1152,7 @@ const Cluster41Content = () => {
             || (!weeklyGrowthForWeek && restWeekIds.has(week.id))
           );
 
-          // 온보딩 주차는 무조건 성공 처리
-          if (isOnboardingThisWeek) {
-            status = '성공';
-          } else if (userIsOnOfficialRestForWeek) {
+          if (userIsOnOfficialRestForWeek) {
             // 클럽 공식 휴식 주차(전환 주차 포함)는 phase 우회하고 카드 노출 시점부터 바로 '휴식(공식)'.
             status = '휴식(공식)';
           } else if (userIsOnPersonalRestForWeek) {
@@ -1174,13 +1171,13 @@ const Cluster41Content = () => {
             } else if (hoursSinceStart >= COUNTING_START_HOURS && minutesSinceStart < RESULT_DECIDED_MINUTES) {
               // (일) 00:00 ~ N+1(목) 12:01 — 핑크 '집계 중'
               status = '집계 중';
-            } else {
-              // N+1(목) 12:01 이후 — 성공/실패 결정 (휴식은 위에서 이미 처리됨)
-              if (weeklyGrowthForWeek) {
-                status = weeklyGrowthForWeek.is_success ? '성공' : '실패';
-              } else if (activityWeekIds.has(week.id)) {
-                status = '성공';
-              }
+            } else if (isOnboardingThisWeek) {
+              // N+1(목) 12:01 이후 — 온보딩(무적) 주차는 무조건 성공.
+              status = '성공';
+            } else if (weeklyGrowthForWeek) {
+              status = weeklyGrowthForWeek.is_success ? '성공' : '실패';
+            } else if (activityWeekIds.has(week.id)) {
+              status = '성공';
             }
           }
 
@@ -1394,7 +1391,9 @@ const Cluster41Content = () => {
   };
 
   // DB 주차 데이터에서 이미지 경로 생성 (시즌명과 주차번호로 월/주차 계산)
-  const getWeekImagePath = (week: DBWeekData) => {
+  // primary 는 holiday_name 접미사를 포함한 1차 경로, stripped 는 holiday 없는 폴백.
+  // (holiday_name 에 '시험 기간' 같이 디스크 파일에 없는 값이 들어와도 stripped 로 자동 복구)
+  const getWeekImagePath = (week: DBWeekData): { primary: string; stripped: string } => {
     // 더미 데이터용 이미지 매핑
     if (week.id.startsWith('dummy')) {
       const dummyImages: { [key: string]: string } = {
@@ -1409,12 +1408,14 @@ const Cluster41Content = () => {
         'dummy-9': '/images/0/cluster4/주차 이미지/휴식(개인,공식)3.png',
         'dummy-10': '/images/0/cluster4/주차 이미지/휴식(개인,공식)4.png',
       };
-      return dummyImages[week.id] || '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
+      const dummy = dummyImages[week.id] || '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
+      return { primary: dummy, stripped: dummy };
     }
 
     // 전환 주차 (break season) → 중간 주차 이미지 사용 (온보딩 주차는 정상 이미지)
     if (week.isBreakSeason && !(onboardingWeekId && week.id === onboardingWeekId) && week.fromSeason && week.toSeason) {
-      return `/images/0/cluster4/주차 이미지/중간 주차 (${week.fromSeason}-${week.toSeason}).png`;
+      const mid = `/images/0/cluster4/주차 이미지/중간 주차 (${week.fromSeason}-${week.toSeason}).png`;
+      return { primary: mid, stripped: mid };
     }
 
     // 시즌별 시작 월 매핑 (cluster-4-card와 동일한 로직)
@@ -1432,10 +1433,25 @@ const Cluster41Content = () => {
     const month = startMonth + monthOffset;
     const weekOfMonth = ((week.weekNumber - 1) % 4) + 1;
 
-    // 공휴일이 있는 경우 파일명에 추가
     const holidaySuffix = week.holidayName ? ` ${week.holidayName}` : '';
+    const base = `/images/0/cluster4/주차 이미지/${effectiveSeasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차`;
+    return {
+      primary: `${base}${holidaySuffix}).png`,
+      stripped: `${base}).png`,
+    };
+  };
 
-    return `/images/0/cluster4/주차 이미지/${effectiveSeasonName} ${week.weekNumber}주차 (${month}월 ${weekOfMonth}주차${holidaySuffix}).png`;
+  // 주차 카드 이미지 onError 핸들러 — primary(holiday 접미사) → stripped → 휴식(개인,공식) 순서로 폴백.
+  const handleWeekImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const rest = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png';
+    const stripped = img.dataset.strippedSrc;
+    if (img.dataset.fallbackStep !== '1' && stripped) {
+      img.dataset.fallbackStep = '1';
+      img.src = stripped;
+    } else {
+      img.src = rest;
+    }
   };
 
   const renderStars = (rating: number) => {
@@ -2005,7 +2021,9 @@ const Cluster41Content = () => {
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
                       <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
-                        <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
+                        {(() => { const paths = getWeekImagePath(week); return (
+                          <img src={paths.primary} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} data-stripped-src={paths.stripped !== paths.primary ? paths.stripped : undefined} onError={handleWeekImageError} />
+                        ); })()}
                         <div className="image-badges">
                           <div className={`badge-tag ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>{week.growthStatus.includes('휴식') ? week.growthStatus.replace('(', ' (') : `성장 (${week.growthStatus})`}</div>
                         </div>
@@ -2107,7 +2125,9 @@ const Cluster41Content = () => {
                 <Link href={weekHref} key={week.id} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                   {/* 왼쪽 이미지 */}
                   <div className={`weekly-card-image ${week.growthStatus === '휴식(개인)' || week.growthStatus === '실패' ? 'rest-personal-overlay' : ''}`} style={{ '--divider-color': week.growthStatus === '실패' ? '#ff6b6b' : week.growthStatus === '휴식(개인)' ? '#65e3ff' : week.growthStatus === '휴식(공식)' ? '#ffea48' : week.growthStatus === '진행 중' ? '#9b59b6' : week.growthStatus === '집계 중' ? '#ff1493' : '#9dfa07' } as React.CSSProperties}>
-                    <img src={getWeekImagePath(week) as string} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} onError={(e) => { (e.target as HTMLImageElement).src = '/images/0/cluster4/주차 이미지/휴식(개인,공식).png'; }} />
+                    {(() => { const paths = getWeekImagePath(week); return (
+                      <img src={paths.primary} alt={`${week.seasonYear}년, ${week.seasonName} 시즌, ${week.isBreakSeason ? '전환 주차' : `${week.weekNumber}주차`}`} data-stripped-src={paths.stripped !== paths.primary ? paths.stripped : undefined} onError={handleWeekImageError} />
+                    ); })()}
                     {week.growthStatus === '휴식(개인)' && (
                       <div className="rest-message">
                         <span className="rest-text-line">충분히 <span className="rest-emoji">🥰</span></span>

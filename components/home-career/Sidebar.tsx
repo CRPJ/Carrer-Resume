@@ -330,6 +330,9 @@ const Sidebar = () => {
   // Hydration 에러 방지를 위한 마운트 상태
   const [isMounted, setIsMounted] = useState(false);
   const [hasData, setHasData] = useState(false); // 데이터 있음/없음 상태 (SSR-safe 기본)
+  // fetch 가 한 번이라도 완료(성공/실패)되었는지 — render gate 무한 skeleton 방지용.
+  // (잘못된 UUID / 본인 프로필 미존재 등으로 영구 실패해도 defaultProfile 로 fallthrough.)
+  const [fetchSettled, setFetchSettled] = useState(false);
   useEffect(() => {
     setIsMounted(true);
     // 마운트 후 demo 모드 확정 + tabBg random 갱신
@@ -791,6 +794,7 @@ const Sidebar = () => {
       if (!sessionUserId) {
         console.log("[fetchUserProfile] skipped: authenticated session has no user id", { sessionStatus, hasSession: !!session });
         setHasData(false);
+        setFetchSettled(true);
         return;
       }
     }
@@ -958,6 +962,8 @@ const Sidebar = () => {
       console.log("[hasData] catch에서 false로 설정됨", error);
       setHasData(false);
       setHasSeasonData(false);
+    } finally {
+      setFetchSettled(true);
     }
   };
 
@@ -1762,7 +1768,9 @@ const Sidebar = () => {
 
   // 3) Fetch 대기 중: 식별자(targetUserId 또는 session.user.id)가 있는데 hasData=false → skeleton.
   //    (식별자 없으면 fetch가 일어나지 않으므로 무한 skeleton 회피하고 정상 렌더로 fallthrough)
-  if (!demoMode && !hasData && hasUserIdentity) {
+  //    fetchSettled=true 면 fetch 가 한 번이라도 완료된 상태 — 영구 실패(잘못된 UUID/본인 프로필 미존재 등)
+  //    여도 무한 skeleton('블랙 화면') 회피하고 defaultProfile 로 fallthrough.
+  if (!demoMode && !hasData && hasUserIdentity && !fetchSettled) {
     return renderSkeleton("Loading…");
   }
 

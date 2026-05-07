@@ -99,6 +99,20 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return null;
     }
 
+    // targetUserId 가 UUID 형식 아니면 API 호출 전에 즉시 실패 처리 — 불필요한 400 응답 차단.
+    // (URL 의 userId 가 잘리거나 잘못 입력된 케이스에서 무한 skeleton 으로 빠지는 것 방지)
+    if (targetUserId) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(targetUserId)) {
+        const errorMsg = '유효하지 않은 사용자 ID 형식입니다.';
+        console.warn('[ProfileContext] UUID 형식 오류로 fetch 스킵:', targetUserId);
+        setError(errorMsg);
+        setErrorTimestamp(now);
+        setLastErrorUserId(targetUserId);
+        return null;
+      }
+    }
+
     setIsLoading(true);
     setError(null);
 
