@@ -12,7 +12,7 @@ import { usePopup } from "@/components/ui/popup";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
-import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES } from "@/constants/dummyData";
+import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES, REVIEW_COMMENT_DEFAULT } from "@/constants/dummyData";
 import { dedupedJson } from "@/lib/fetch-dedupe";
 
 // 글자수 초과 시 '..' 표시 (CSS ellipsis '…' 대신 JS 처리)
@@ -173,7 +173,8 @@ const defaultSeasonData = {
   ],
   stats: { dangam: 25, injeolmi: 999, eoheung: 3 }, // TODO: 더미 데이터 — 자릿수 테스트용
   rating: 10,
-  review: "가나다라마바사아자차카타파하가나다라마바사아자차카",
+  review: REVIEW_COMMENT_DEFAULT,
+  reviewLink: "",
   circles: {
     weekUsage: 27, // TODO: 더미 데이터 — 자릿수 테스트용 (8/30)
     scheduleReliability: 13, // TODO: 더미 데이터 — 자릿수 테스트용 (125/999)
@@ -536,6 +537,7 @@ const Cluster4Content = () => {
     } | null;
   }
   const [seasonReputations, setSeasonReputations] = useState<SeasonReputationData[]>([]);
+  const SEASON_REPUTATION_SLOT_COUNT = 7;
 
   const getDemoSeasonReputations = (reputations: any[]) => {
     if (searchParams.get("admin") !== "true") return reputations;
@@ -546,6 +548,16 @@ const Cluster4Content = () => {
     const count = Math.max(0, Math.min(reputations.length, parseInt(raw, 10) || 0));
     return reputations.slice(0, count);
   };
+
+  const emptySeasonReputationSlotCount = Math.max(0, SEASON_REPUTATION_SLOT_COUNT - seasonReputations.length);
+
+  const displaySeasonReputations = [
+    ...seasonReputations,
+    ...Array.from({ length: emptySeasonReputationSlotCount }, (_, index) => ({
+      id: `season-reputation-empty-${index}`,
+      isEmpty: true,
+    })),
+  ];
 
   // 시즌 평판 상세 보기 모달
   const [reputationDetailModalOpen, setReputationDetailModalOpen] = useState(false);
@@ -559,6 +571,7 @@ const Cluster4Content = () => {
   const [seasonReviewEditData, setSeasonReviewEditData] = useState<{
     rating: number;
     review: string;
+    link?: string;
   }>({ rating: 0, review: "" });
   const [seasonReviewSaving, setSeasonReviewSaving] = useState(false);
   const [seasonReviewError, setSeasonReviewError] = useState<string | null>(null);
@@ -703,6 +716,10 @@ const Cluster4Content = () => {
 
   const openSeasonRatingDropdown = () => {
     if (!isSeasonReputationFormEditing) return;
+    if (seasonRatingDropdownOpen) {
+      setSeasonRatingDropdownOpen(false);
+      return;
+    }
     const trigger = seasonRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
@@ -2369,6 +2386,10 @@ const Cluster4Content = () => {
   // 시즌 리뷰 저장
   const openSeasonReviewRatingDropdown = () => {
     if (!isSeasonReviewFormEditing) return;
+    if (seasonReviewRatingDropdownOpen) {
+      setSeasonReviewRatingDropdownOpen(false);
+      return;
+    }
     const trigger = seasonReviewRatingDropdownTriggerRef.current;
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
@@ -2432,8 +2453,8 @@ const Cluster4Content = () => {
       return;
     }
     if (!(await popup.confirm("작성 내용을 모두 초기화하시겠습니까?"))) return;
-    // 초기화 = snapshot 복원이 아니라 모든 필드를 빈 값으로 (사용자 기대치: "초기화" 라벨대로 비우기)
-    setSeasonReviewEditData({ rating: 0, review: "" });
+    // 초기화 = review는 디폴트 문구로 교체, 나머지(rating/link)는 빈 값으로
+    setSeasonReviewEditData({ rating: 0, review: REVIEW_COMMENT_DEFAULT, link: "" });
     setSeasonReviewSaveAttemptFailed(false);
     setSeasonReviewFieldErrorFlash(false);
   };
@@ -2960,7 +2981,7 @@ const Cluster4Content = () => {
                   </div>
                   <p className="review-comment">
                     {(() => {
-                      const r = currentSeason.review || "이번시즌 30자 평을 해보라는데, 어디까지 갈 수 있나";
+                      const r = currentSeason.review || REVIEW_COMMENT_DEFAULT;
                       return r.length > 24 ? r.slice(0, 24) + "..." : r;
                     })()}
                   </p>
@@ -3185,35 +3206,19 @@ const Cluster4Content = () => {
 
               {/* 영역 9: 시즌 평판 */}
               <div className="area-9-season-reputation">
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", width: "100%", position: "relative" }}>
-                  <h4 className="section-title">
-                    <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" /> 시즌 평판{" "}
-                    <span className="count-label">
-                      <span className="num-fixed">{seasonReputations.length}</span>개
-                    </span>
-                    <span
-                      className="fm-badge"
-                      style={{
-                        fontSize: "14px",
-                        marginLeft: "44px",
-                        fontWeight: 600,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        color: "#fff",
-                        fontFamily: "'Rajdhani', sans-serif",
-                        letterSpacing: "0.7px",
-                        whiteSpace: "nowrap",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <img src="/images/0/cluster4/icon - wifi.png" alt="wifi" className="wifi-icon" style={{ width: "13.7px", height: "13px", objectFit: "contain" }} />
-                      FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right" }}>{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.rating ?? 0) * 3, 0)}</span>
-                    </span>
-                  </h4>
+                <div className="season-reputation-header">
+                  <img className="section-icon" src="/images/0/cluster4/icon - 시즌 평판.png" alt="시즌 평판" />
+                  <span className="section-label">시즌 평판</span>
+                  <span className="section-count">
+                    <span className="count-num">{seasonReputations.length}</span>/7
+                  </span>
+                  <span className="fm-badge">
+                    <img src="/images/0/cluster4/wifi new.png" alt="wifi" className="wifi-icon" />
+                    <span className="fm-label">FM :</span>
+                    <span className="fm-value">{(seasonReputations || []).reduce((sum: number, r: any) => sum + (r?.rating ?? 0) * 3, 0)}</span>
+                  </span>
                   <div
                     className="edit-icon"
-                    style={{ cursor: "pointer", flexShrink: 0 }}
                     onClick={async () => {
                       // 임시: 마더 계정(어드민) 외에는 시즌 평판 작성/수정 비활성화 (주차 평판과 동일 정책)
                       if (!isDemoMode && !session?.user?.isAdmin) {
@@ -3227,18 +3232,21 @@ const Cluster4Content = () => {
                       handleEditClick(openSeasonReputationModal);
                     }}
                   >
-                    <i className="ti ti-pencil" style={{ fontSize: "16px", color: "#1a1a1a" }} />
+                    <i className="ti ti-pencil"></i>
                   </div>
                 </div>
                 <div style={{ position: "relative" }}>
-                  <div ref={profileCardsRef} className="profile-cards" onScroll={updateScrollbar9}>
-                    {seasonReputations.length === 0 ? (
-                      <div className="profile-card season-reputation-waiting">
-                        <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
-                        <p className="waiting-message">시즌 평판 대기 중... 😊</p>
-                      </div>
-                    ) : (
-                      seasonReputations.map((reputation: any) => {
+                  <div ref={profileCardsRef} className="profile-cards season-reputation-list" onScroll={updateScrollbar9}>
+                    {displaySeasonReputations.map((reputation: any) => {
+                      if (reputation.isEmpty) {
+                        return (
+                          <div className="profile-card season-reputation-waiting" key={reputation.id}>
+                            <img src="/images/0/waiting.png" alt="waiting" className="waiting-image" />
+                            <p className="waiting-message">시즌 평판 대기 중... 😊</p>
+                          </div>
+                        );
+                      }
+
                         const reviewer = reputation.reviewer;
                         const currentYear = new Date().getFullYear();
                         const birthYear = reviewer?.birth_date ? new Date(reviewer.birth_date).getFullYear() : null;
@@ -3360,7 +3368,7 @@ const Cluster4Content = () => {
                             </div>
                             <div className="stats">
                               <span className="pm">
-                                <img className="wifi-icon" src="/images/0/cluster4/icon - wifi.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{(reputation.rating ?? 0) * 3}</span>
+                                <img className="wifi-icon" src="/images/0/cluster4/wifi new.png" alt="wifi" /> FM : <span style={{ display: "inline-block", minWidth: "4ch", textAlign: "right", fontFamily: "'Pretendard', sans-serif" }}>{(reputation.rating ?? 0) * 3}</span>
                               </span>
                               <span className="rating">
                                 {[...Array(fullStars)].map((_, i) => (
@@ -3382,8 +3390,7 @@ const Cluster4Content = () => {
                             </div>
                           </div>
                         );
-                      })
-                    )}
+                      })}
                   </div>
                   {/* 커스텀 스크롤바 (area-9) */}
                   <div style={{ position: "absolute", right: 0, top: 0, width: "2px", height: "100%", background: "rgba(255,227,170,0.15)", borderRadius: "2px" }}>

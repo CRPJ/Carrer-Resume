@@ -12,6 +12,15 @@
 // scrollbar-gutter: stable 제거 — 숨겨진 스크롤바에 대해 공간을 예약하면
 // Mac(오버레이 스크롤바)에서 페이지 전환 시 ~15px 너비 점프 발생
 
+// PageReveal — 진단 중: 검은 화면 원인에서 PageReveal을 완전히 배제하기 위해
+// 애니메이션을 일시 제거. opacity는 항상 1 고정. 이 상태에서도 검은 화면이
+// 재현되면 PageReveal은 원인이 아님이 확정됨 → home-career/Sidebar 또는
+// cluster 페이지의 데이터/마운트 상태 문제로 좁혀짐.
+.page-reveal {
+  opacity: 1;
+}
+// @keyframes pageReveal { from { opacity: 0; } to { opacity: 1; } }
+
 img {
   max-width: 100%;
   height: auto;
@@ -1592,6 +1601,7 @@ svg {
 .section5-modal-body,
 .section6-modal-body,
 .section-modal-body,
+.output-modal-body,
 .intro-modal-body,
 .edit-modal-body,
 .modal-body {
@@ -1617,39 +1627,156 @@ svg {
 }
 
 // 8. 모달 오버레이 투명도 통일 (Sidebar edit-modal 기준: rgba(0,0,0,0.7), blur 없음)
+// 정렬 정책(wide/non-wide 통일): viewport보다 작은 모달은 grid+safe center로 항상 화면 정중앙,
+// viewport보다 큰 경우(드물게 발생)에는 overflow:auto + safe center로 시작점이 잘리지 않도록.
+// cluster2/3/4 모든 모달이 width: min(value, calc(100vw - 48px)) + max-height: min(value, calc(100dvh - 80px))로
+// viewport-aware 축소되므로 가로 스크롤용 Zone A(display:block) 패치는 더 이상 필요 없음.
 [class*="modal-overlay"] {
+  position: fixed !important;
+  inset: 0 !important;
   background: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  overflow: auto !important;
+  padding: 40px 24px !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  place-items: safe center !important;
+  overscroll-behavior: contain;
 }
 
-// ★ Zone A (<1920): 모달 오버레이 내부 가로 스크롤
-// position:fixed 유지(화면 고정) + 오버레이 자체를 가로 스크롤 컨테이너로 사용.
-// 모달 본문이 오버레이 폭을 초과하면 오버레이 안에서 자연스럽게 스크롤 발생.
-// (Zone B/C는 본 미디어쿼리에 매칭되지 않음 → 영향 없음)
-// cluster2/cluster3의 기존 개별 Zone A 미디어쿼리는 중복이지만 회귀 위험으로 유지.
-@media (max-width: 1919px) {
+// .modal-scroll-content (cluster2/3 wide 모달의 JSX 래퍼) — layout에서 제거해
+// overlay의 grid centering이 모달을 직접 정렬하도록 함. 모든 viewport에 동일 적용.
+[class*="modal-overlay"] > .modal-scroll-content {
+  display: contents;
+}
+
+.section-modal,
+.section-modal-wide {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.section-modal-header,
+.section-modal-footer {
+  flex-shrink: 0;
+}
+
+.section-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
   [class*="modal-overlay"] {
-    // position/width/height는 기존값(fixed, 100%, 100%/100vh) 유지 — 건드리지 않음
-    overflow-x: auto !important;
+    position: fixed !important;
+    inset: 0 !important;
+    overflow: auto !important;
+    padding: 40px 24px !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    place-items: safe center !important;
+    overscroll-behavior: contain;
+  }
+
+  .section-modal,
+  .section-modal-wide,
+  .output-modal,
+  .help-modal,
+  .edu-modal,
+  .intro-modal,
+  .section1-modal,
+  .section2-modal,
+  .section21-modal,
+  .section3-modal,
+  .section4-modal,
+  .edit-modal-content {
+    max-width: calc(100vw - 48px) !important;
+    max-height: calc(100dvh - 80px) !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .section-modal-body,
+  .output-modal-body,
+  .help-modal-body,
+  .intro-modal-body,
+  .section1-modal-body,
+  .section2-modal-body,
+  .section21-modal-body,
+  .section3-modal-body,
+  .section4-modal-body,
+  .edit-modal-body,
+  .modal-body {
+    min-height: 0 !important;
     overflow-y: auto !important;
-    display: block !important;     // flex → block (내부 콘텐츠가 오버레이 폭 초과 가능)
+    overflow-x: auto !important;
   }
 
-  // .modal-scroll-content 래퍼가 있는 모달(cluster2/3) — 래퍼가 1920 폭 + flex center 담당
-  [class*="modal-overlay"] > .modal-scroll-content {
-    min-width: 1920px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
+  .section-modal-body > .modal-top-row,
+  .output-modal-body > .output-upper-section,
+  .output-modal-body > .output-role-links-row,
+  .output-modal-body > .output-bottom-row,
+  .section1-modal-body > .photo-grid,
+  .section2-modal-body > .slogan-edit-item,
+  .section21-modal-body > .video-edit-item,
+  .section3-modal-body > .edu-edit-card,
+  .section4-modal-body > .link-edit-item,
+  .intro-modal-body > .subtitle-section,
+  .intro-modal-body > .content-section,
+  .section-modal-body > .reputation-form-top,
+  .section-modal-body > .weekly-review-row-1,
+  .section-modal-body > .weekly-review-row-2,
+  .section-modal-body > .weekly-review-row-3,
+  .section-modal-body > .season-review-row-1,
+  .section-modal-body > .workinfo-content-layout {
+    flex-shrink: 0 !important;
   }
 
-  // .modal-scroll-content 래퍼가 없는 모달(cluster4, Sidebar 등)
-  // 모달 본문 자체에 flex-shrink: 0 → 오버레이 폭에 맞춰 축소되지 않게
-  [class*="modal-overlay"] > [class*="-modal"]:not(.modal-scroll-content) {
-    flex-shrink: 0;
+  .section-modal-body > .modal-top-row,
+  .output-modal-body > .output-upper-section,
+  .output-modal-body > .output-role-links-row,
+  .output-modal-body > .output-bottom-row {
+    min-width: 1180px !important;
+  }
+
+  .section1-modal-body > .photo-grid {
+    min-width: 920px !important;
+  }
+
+  .section2-modal-body > .slogan-edit-item,
+  .section3-modal-body > .edu-edit-card,
+  .intro-modal-body > .subtitle-section,
+  .intro-modal-body > .content-section,
+  .section-modal-body > .reputation-form-top,
+  .section-modal-body > .weekly-review-row-1,
+  .section-modal-body > .weekly-review-row-2,
+  .section-modal-body > .weekly-review-row-3,
+  .section-modal-body > .season-review-row-1 {
+    min-width: 620px !important;
+  }
+
+  .section4-modal-body > .link-edit-item {
+    min-width: 360px !important;
+  }
+
+  .section21-modal-body {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 440px !important;
+    grid-template-columns: none !important;
+    justify-content: start !important;
+  }
+
+  .section-modal-body > .workinfo-content-layout {
+    min-width: 1388px !important;
+  }
+
+  .section-modal:has(> .section-modal-body > .workinfo-content-layout) > .section-modal-body {
+    display: block !important;
+    width: auto !important;
   }
 }
 

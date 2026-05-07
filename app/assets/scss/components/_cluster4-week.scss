@@ -1,4 +1,4 @@
-// Cluster 4 - Club Challenge Growth Styles
+﻿// Cluster 4 - Club Challenge Growth Styles
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 // reputation-form ?꾩슜 ?꾨뱶 源쒕묀???ㅽ봽?덉엫 (cluster3??border-blink? ?숈씪 而⑥뀎, outline 湲곕컲?쇰줈 ?덉씠?꾩썐 shift ?놁쓬)
@@ -1179,6 +1179,7 @@
             }
           }
         }
+
       }
     }
 
@@ -1315,6 +1316,7 @@
           margin-top: 13px !important;
           margin-bottom: 13px !important;
           flex-wrap: wrap;
+          position: relative; // week-info-wrapper(absolute)의 좌표 기준
 
           .info-badge {
             display: flex;
@@ -1357,6 +1359,100 @@
               font-weight: 800;
               text-transform: capitalize;
               line-height: 19px;
+            }
+          }
+
+          // 주차 배지 + 주차 확인 + Detail Log 세로 wrapper.
+          // 인라인 스타일로 column/stretch/gap을 강제 (Vercel SCSS 순서 차이 대비).
+          .week-info-wrapper {
+            // 인라인 스타일 보강용 fallback
+            position: relative;
+
+            .week-confirm-btn,
+            .detail-log-btn {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+              padding: 7px 12px;
+              border-radius: 8px;
+              font-family: "Pretendard", sans-serif;
+              font-size: 16px;
+              font-weight: 600;
+              line-height: 1;
+              white-space: nowrap;
+              cursor: pointer;
+              background: rgba(0, 0, 0, 0.45);
+              border: 1px solid rgba(255, 200, 80, 0.4);
+              color: #ffd87a;
+              transition:
+                background 0.4s ease,
+                border-color 0.4s ease,
+                color 0.4s ease;
+
+              i {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 17px;
+                line-height: 1;
+              }
+
+              span {
+                display: inline-flex;
+                align-items: center;
+                line-height: 1;
+              }
+            }
+
+            .week-confirm-btn {
+              position: relative; // 폭죽이 z-index 영향 받지 않도록
+
+              .icon-shift {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transform: translateY(0);
+                transition: transform 0.4s ease;
+              }
+
+              &:hover:not(:disabled) {
+                background: rgba(255, 200, 80, 0.18);
+                border-color: rgba(255, 200, 80, 0.7);
+                color: #ffe6a8;
+              }
+
+              &.status-confirming {
+                animation: weekConfirmPulse 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+                .icon-shift i {
+                  animation: weekConfirmIconSpin 0.6s ease-out;
+                }
+              }
+
+              &.status-confirmed,
+              &.is-confirmed {
+                background: rgba(120, 200, 120, 0.18);
+                border-color: rgba(120, 200, 120, 0.55);
+                color: #a8e6a8;
+                cursor: default;
+
+                .icon-shift {
+                  transform: translateY(2px);
+                }
+              }
+
+              &:disabled {
+                cursor: default;
+              }
+            }
+
+            .detail-log-btn {
+              &:hover {
+                background: rgba(255, 200, 80, 0.18);
+                border-color: rgba(255, 200, 80, 0.7);
+                color: #ffe6a8;
+              }
             }
           }
         }
@@ -1510,6 +1606,46 @@
               font-size: 17px;
               font-weight: 700;
               color: #faab07;
+            }
+          }
+
+          .fm-badge {
+            margin-left: 48px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-family: "Pretendard", sans-serif;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0;
+
+            .wifi-icon {
+              height: 21px !important;
+              width: auto !important;
+              object-fit: contain !important;
+              image-rendering: auto !important;
+              flex-shrink: 0;
+            }
+
+            .fm-label {
+              font-size: 20px !important;
+              font-family: "Pretendard", sans-serif !important;
+              font-weight: 700 !important;
+              color: #fff !important;
+              letter-spacing: normal !important;
+            }
+
+            .fm-value {
+              font-family: "Chakra Petch", sans-serif;
+              font-size: 17px !important;
+              font-weight: 700 !important;
+              color: #fff !important;
+              letter-spacing: normal !important;
+              display: inline-block;
+              min-width: 3ch;
+              text-align: right;
             }
           }
         }
@@ -1939,7 +2075,13 @@
                     font-size: 1rem !important;
                     font-family: "Pretendard", sans-serif;
                     font-weight: 700;
-                    flex-shrink: 0;
+                    // 부모 .profile-details(flex+overflow:hidden)가 좁을 때
+                    // nickname이 flex-shrink:0 + min-width:auto 때문에 본인 content
+                    // 폭을 그대로 유지하며 부모 우측을 넘어가 글자가 잘렸음.
+                    // 우측 끝 항목이라 shrink 허용 + ellipsis로 자연스럽게 축약.
+                    flex-shrink: 1;
+                    min-width: 0;
+                    text-overflow: ellipsis;
                   }
                 }
               }
@@ -2546,7 +2688,7 @@
             margin-left: -24px;
 
             &::before {
-	              content: "•";
+              content: "•";
               display: inline-block;
               margin-right: 13px;
               font-size: 0.3em;
@@ -2672,6 +2814,17 @@
         min-width: 0;
         padding-left: 56px;
 
+        // <1920에서만 .legend-items 마지막 항목이 우측에서 잘리지 않도록 보정.
+        // 기본 50% basis는 유지하되 shrink 허용 + margin/padding을 clamp로 줄여 안쪽으로.
+        // legend-items가 transform: scale(1.2)로 그려져 CSS box보다 ~20% 넓게 페인트되기 때문에,
+        // padding-left를 줄여 legend-items 시작점을 좌측으로 당겨 마지막 항목이 wrapper의
+        // overflow-x: clip 경계 안에 들어오게 한다.
+        @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+          flex: 0 1 50%;
+          margin-right: clamp(8px, 1.5vw, 35px);
+          padding-left: clamp(0px, 1vw, 56px);
+        }
+
         .growth-label {
           font-size: 25px;
           font-weight: 700;
@@ -2683,7 +2836,7 @@
           top: -16px;
 
           &::before {
-	            content: "•";
+            content: "•";
             display: inline-block;
             margin-right: 13px;
             font-size: 0.3em;
@@ -2703,6 +2856,13 @@
           transform: scale(1.2);
           transform-origin: left center;
 
+          // <1920에서만 wrap 허용 + 폭 제한
+          @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+            flex-wrap: wrap;
+            min-width: 0;
+            max-width: 100%;
+          }
+
           .legend-item {
             display: flex;
             align-items: center;
@@ -2716,6 +2876,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+
+            @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+              flex-shrink: 1;
+            }
 
             .legend-icon {
               width: 45px;
@@ -2843,6 +3007,16 @@
           overflow: visible;
           display: flex;
           flex-direction: row;
+
+          // '강화 상태 = empty' 카드: 시각적으로 dim 처리 (클릭은 가능, 모달은 열림)
+          &.is-empty-card {
+            opacity: 0.45;
+            filter: grayscale(0.6);
+            transition:
+              opacity 0.2s ease,
+              filter 0.2s ease;
+            cursor: pointer;
+          }
 
           .card-content-area {
             flex: 1;
@@ -4837,27 +5011,29 @@
   // 紐⑤떖 ?ㅽ???(?대윭?ㅽ꽣 3 ?붿옄???곸슜)
   // ============================================
   .section-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 99999;
-    overflow: hidden;
+    overflow: auto;
+    padding: 40px 24px;
+  }
+
+  @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+    .section-modal-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      display: grid !important;
+      place-items: center !important;
+    }
   }
 
   .section-modal {
-    width: 504px;
-    max-width: none;
-    max-height: calc(100vh - 80px);
+    width: min(504px, calc(100vw - 48px));
+    max-width: 504px;
+    max-height: min(606px, calc(100dvh - 80px));
     border: 1px solid #ffa500;
     border-radius: 0;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
-    overflow: visible;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -4897,7 +5073,8 @@
     }
 
     &.section-modal-wide {
-      width: 700px;
+      width: min(700px, calc(100vw - 48px));
+      max-width: 700px;
     }
 
     // reputation/colleague 紐⑤떖? ?먮옒 font-size ?좎?
@@ -4938,23 +5115,20 @@
     }
 
     &.section-modal-work-edit {
-      width: 674px;
+      width: min(674px, calc(100vw - 48px));
+      max-width: 674px;
       height: 826px;
-      max-height: 826px;
+      max-height: min(826px, calc(100dvh - 80px));
     }
 
     &.section-modal-colleague-edit {
-      width: 674px !important;
+      width: min(674px, calc(100vw - 48px)) !important;
       max-width: 674px !important;
       height: 826px !important;
-      max-height: 826px !important;
+      max-height: min(826px, calc(100dvh - 80px)) !important;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) !important;
       margin: 0 !important;
 
       // ── 헤더 (110px) — reputation-form/view 패턴 준용 ──
@@ -5030,8 +5204,12 @@
           padding: 4px;
           line-height: 1;
 
-          i { font-size: 20px; }
-          &:hover { color: #faab07; }
+          i {
+            font-size: 20px;
+          }
+          &:hover {
+            color: #faab07;
+          }
         }
       }
 
@@ -5092,10 +5270,26 @@
           min-width: 0;
           flex: 1;
 
-          .crew-number  { color: #faab07; font-weight: 600; flex-shrink: 0; }
-          .crew-divider { color: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
-          .crew-name    { font-weight: 700; color: #fff; flex-shrink: 0; }
-          .crew-team    { color: rgba(255, 255, 255, 0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .crew-number {
+            color: #faab07;
+            font-weight: 600;
+            flex-shrink: 0;
+          }
+          .crew-divider {
+            color: rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+          }
+          .crew-name {
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+          }
+          .crew-team {
+            color: rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         }
 
         .btn-deselect {
@@ -5107,8 +5301,12 @@
           line-height: 1;
           flex-shrink: 0;
 
-          i { font-size: 16px; }
-          &:hover { color: #fff; }
+          i {
+            font-size: 16px;
+          }
+          &:hover {
+            color: #fff;
+          }
         }
       }
 
@@ -5142,8 +5340,12 @@
           box-sizing: border-box;
           transition: border-color 0.15s;
 
-          &::placeholder { color: rgba(255, 255, 255, 0.3); }
-          &:focus { border-color: #faab07; }
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+          }
+          &:focus {
+            border-color: #faab07;
+          }
         }
 
         .search-icon {
@@ -5172,8 +5374,12 @@
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           transition: background 0.1s;
 
-          &:last-child { border-bottom: none; }
-          &:hover { background: rgba(250, 171, 7, 0.1); }
+          &:last-child {
+            border-bottom: none;
+          }
+          &:hover {
+            background: rgba(250, 171, 7, 0.1);
+          }
 
           .crew-info {
             display: flex;
@@ -5185,10 +5391,25 @@
             min-width: 0;
             flex: 1;
 
-            .crew-number  { color: #faab07; flex-shrink: 0; }
-            .crew-divider { color: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
-            .crew-name    { font-weight: 600; color: #fff; flex-shrink: 0; }
-            .crew-team    { color: rgba(255, 255, 255, 0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .crew-number {
+              color: #faab07;
+              flex-shrink: 0;
+            }
+            .crew-divider {
+              color: rgba(255, 255, 255, 0.3);
+              flex-shrink: 0;
+            }
+            .crew-name {
+              font-weight: 600;
+              color: #fff;
+              flex-shrink: 0;
+            }
+            .crew-team {
+              color: rgba(255, 255, 255, 0.5);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
           }
 
           .btn-select {
@@ -5201,7 +5422,9 @@
             flex-shrink: 0;
             line-height: 1;
 
-            i { font-size: 14px; }
+            i {
+              font-size: 14px;
+            }
 
             &:hover {
               background: #faab07;
@@ -5243,8 +5466,12 @@
           box-sizing: border-box;
           transition: border-color 0.15s;
 
-          &::placeholder { color: rgba(255, 255, 255, 0.3); }
-          &:focus { border-color: #faab07; }
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+          }
+          &:focus {
+            border-color: #faab07;
+          }
         }
 
         .char-count {
@@ -5285,7 +5512,8 @@
       }
 
       @keyframes colleague-edit-field-flash {
-        0%, 100% {
+        0%,
+        100% {
           border-color: #e74c3c;
           box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
         }
@@ -5370,7 +5598,9 @@
             text-align: right;
             margin: 0;
 
-            &.notice-error { color: #ff4444; }
+            &.notice-error {
+              color: #ff4444;
+            }
           }
         }
 
@@ -5385,8 +5615,13 @@
           font-family: "Pretendard", sans-serif;
           cursor: pointer;
           white-space: nowrap;
-          &:hover { background: #ffb820; }
-          &:disabled { opacity: 0.3; cursor: not-allowed; }
+          &:hover {
+            background: #ffb820;
+          }
+          &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+          }
         }
 
         .modal-cancel-btn {
@@ -5415,7 +5650,9 @@
           font-family: "Pretendard", sans-serif;
           cursor: pointer;
           white-space: nowrap;
-          &:hover { background: rgba(76, 175, 80, 0.1); }
+          &:hover {
+            background: rgba(76, 175, 80, 0.1);
+          }
         }
 
         .modal-edit-btn {
@@ -5429,21 +5666,25 @@
           font-family: "Pretendard", sans-serif;
           cursor: pointer;
           white-space: nowrap;
-          &:hover { background: #ffb820; }
+          &:hover {
+            background: #ffb820;
+          }
 
           // 비활성: 권한 없음 / 빈 카드 / 강화 실패·해당 없음
           &:disabled,
           &[disabled] {
             opacity: 0.3;
             cursor: not-allowed;
-            pointer-events: auto;          // 툴팁(title) 표시 위해
+            pointer-events: auto; // 툴팁(title) 표시 위해
 
-            &:hover { background: #faab07; }   // 호버 색 변경 무효화
+            &:hover {
+              background: #faab07;
+            } // 호버 색 변경 무효화
           }
         }
       }
 
-      @media (max-width: 1919px) {
+      @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
         max-width: 90vw !important;
         max-height: 90vh !important;
       }
@@ -5451,18 +5692,14 @@
 
     &.section-modal-reputation-form {
       // ?ъ슜???붿껌: 媛濡쒗삎_以?979횞570 (MD ?ㅽ럺)
-      width: 979px !important;
+      width: min(979px, calc(100vw - 48px)) !important;
       max-width: 979px !important;
       height: 570px !important;
-      max-height: 570px !important;
+      max-height: min(570px, calc(100dvh - 80px)) !important;
       display: flex;
       flex-direction: column;
       // ?ъ슜???붿껌: Zone A(<1920)?먯꽌 overlay媛 display:block?쇰줈 override?섏뼱 flex 以묒븰 ?뺣젹 臾댄슚
       // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (Zone B/C?먮룄 ?곹뼢 ?놁쓬, 寃곌낵 ?숈씪 以묒븰)
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) !important;
       margin: 0 !important;
 
       // ??곗????섏씠?쇱씠??
@@ -6023,9 +6260,11 @@
           &[disabled] {
             opacity: 0.3;
             cursor: not-allowed;
-            pointer-events: auto;          // 툴팁(title) 표시 위해
+            pointer-events: auto; // 툴팁(title) 표시 위해
 
-            &:hover { background: #faab07; }   // 호버 색 변경 무효화
+            &:hover {
+              background: #faab07;
+            } // 호버 색 변경 무효화
           }
         }
       }
@@ -6036,17 +6275,19 @@
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.68);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: grid;
+        place-items: center;
         z-index: 100002;
+        overflow: auto;
+        padding: 40px 24px;
+        box-sizing: border-box;
       }
 
       .keyword-select-modal {
-        width: 979px !important;
+        width: min(979px, calc(100vw - 48px)) !important;
         max-width: 979px !important;
         height: 570px !important;
-        max-height: 570px !important;
+        max-height: min(570px, calc(100dvh - 80px)) !important;
         background: #121212;
         border: 1px solid rgba(250, 171, 7, 0.24);
         box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
@@ -6227,7 +6468,7 @@
             padding-right: 32px !important;
 
             &::after {
-              content: '✓' !important;
+              content: "✓" !important;
               position: absolute !important;
               right: 8px !important;
               top: 50% !important;
@@ -7294,19 +7535,12 @@
     // 怨듭쑀 ??됲꽣(.workinfo-view-modal, .workexp-view-modal?? 異붽? ??????979횞570 vs 1468횞855 異⑸룎 諛⑹?
     // ?몄쟻?ы빆? .workinfo-personal-card ?대옒???ъ궗??(??釉붾줉 ?대????낅┰ ?좎뼵)
     &.reputation-view-modal {
-      width: 979px !important;
+      width: min(979px, calc(100vw - 48px)) !important;
       max-width: 979px !important;
       height: 570px !important;
-      max-height: 570px !important;
+      max-height: min(570px, calc(100dvh - 80px)) !important;
       display: flex;
       flex-direction: column;
-      // ?ъ슜???붿껌: Zone A(<1920)?먯꽌 overlay媛 display:block?쇰줈 override?섏뼱 flex 以묒븰 ?뺣젹 臾댄슚
-      // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (Zone B/C?먮룄 ?곹뼢 ?놁쓬, 寃곌낵 ?숈씪 以묒븰)
-      // reputation-form怨??숈씪 ?⑦꽩
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) !important;
       margin: 0 !important;
 
       // ?? ?ㅻ뜑 (110px) ??cluster3/workInfo ?⑦꽩 ??
@@ -7813,25 +8047,16 @@
 
     // ?곌퀎 ?숇즺 ?곸꽭蹂닿린 紐⑤떖 ???몃줈??以?540횞640 (?묒뾽 1: ?ㅻ뜑 + ??젣 踰꾪듉)
     &.colleague-view-modal {
-	      width: 674px !important;
-	      max-width: 674px !important;
-	      height: 826px !important;
-	      max-height: 826px !important;
+      width: min(674px, calc(100vw - 48px)) !important;
+      max-width: 674px !important;
+      height: 826px !important;
+      max-height: min(826px, calc(100dvh - 80px)) !important;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       // Zone A(<1920)?먯꽌 overlay display:block override濡?flex 以묒븰 ?뺣젹 臾댄슚
       // ??紐⑤떖 ?먯껜瑜?absolute濡?viewport 以묒븰 諛곗튂 (reputation-form/reputation-view-modal ?숈씪 ?⑦꽩)
-      position: absolute !important;
-      left: 50% !important;
-      top: 50% !important;
-	      transform: translate(-50%, -50%) !important;
-	      margin: 0 !important;
-
-	      @media (max-width: 1919px) {
-	        max-width: 90vw !important;
-	        max-height: 90vh !important;
-	      }
+      margin: 0 !important;
 
       // ?? ?ㅻ뜑 (110px) ??reputation-view-modal ?⑦꽩 以????
       .section-modal-header {
@@ -7904,7 +8129,7 @@
         .modal-edit-btn.modal-delete-btn {
           padding: 8px 20px !important;
           background: rgba(231, 76, 60, 0.15) !important;
-          color: #E74C3C !important;
+          color: #e74c3c !important;
           border: 1px solid rgba(231, 76, 60, 0.4) !important;
           border-radius: 0 !important;
           font-family: "Pretendard", sans-serif !important;
@@ -8061,44 +8286,43 @@
           }
 
           // ?먯닔??3??margin-left:auto ?쒓굅 ???대쫫|?깅퀎|?섏씠 諛붾줈 ?ㅻⅨ履??몄젒 (gap 12px)
-	          .personal-tags {
-	            margin-left: auto !important;
-	            display: flex !important;
-	            flex-direction: row !important;
-	            gap: 6px !important;
-	            flex-shrink: 0;
+          .personal-tags {
+            margin-left: auto !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 6px !important;
+            flex-shrink: 0;
 
+            .tag-badge {
+              min-width: 150px !important;
+              width: 150px !important;
+              max-width: 150px !important;
+              padding: 6px 12px !important;
+              font-size: 12px !important;
+              font-family: "Pretendard", sans-serif !important;
+              font-weight: 600 !important;
+              line-height: 1.2 !important;
+              text-align: center !important;
+              border-radius: 4px !important;
+              white-space: nowrap !important;
+              overflow: hidden !important;
+              text-overflow: ellipsis !important;
+              box-sizing: border-box !important;
 
-	            .tag-badge {
-	              min-width: 150px !important;
-	              width: 150px !important;
-	              max-width: 150px !important;
-	              padding: 6px 12px !important;
-	              font-size: 12px !important;
-	              font-family: "Pretendard", sans-serif !important;
-	              font-weight: 600 !important;
-	              line-height: 1.2 !important;
-	              text-align: center !important;
-	              border-radius: 4px !important;
-	              white-space: nowrap !important;
-	              overflow: hidden !important;
-	              text-overflow: ellipsis !important;
-	              box-sizing: border-box !important;
+              &.tag-role {
+                background: rgba(250, 171, 7, 0.15) !important;
+                border: 1px solid rgba(250, 171, 7, 0.3) !important;
+                color: rgb(250, 171, 7) !important;
+              }
 
-	              &.tag-role {
-	                background: rgba(250, 171, 7, 0.15) !important;
-	                border: 1px solid rgba(250, 171, 7, 0.3) !important;
-	                color: rgb(250, 171, 7) !important;
-	              }
-
-	              &.tag-keyword {
-	                background: rgba(135, 206, 250, 0.15) !important;
-	                border: 1px solid rgba(135, 206, 250, 0.3) !important;
-	                color: rgb(135, 206, 235) !important;
-	              }
-	            }
-	          }
-	        }
+              &.tag-keyword {
+                background: rgba(135, 206, 250, 0.15) !important;
+                border: 1px solid rgba(135, 206, 250, 0.3) !important;
+                color: rgb(135, 206, 235) !important;
+              }
+            }
+          }
+        }
 
         .personal-row-2,
         .personal-row-3 {
@@ -8343,9 +8567,10 @@
 
     // ?ㅻТ ?뺣낫/??웾/寃쏀뿕/寃쎈젰 ?곸꽭蹂닿린 紐⑤떖
     &.work-view-modal {
-      width: 674px;
+      width: min(674px, calc(100vw - 48px));
+      max-width: 674px;
       height: 826px;
-      max-height: 826px;
+      max-height: min(826px, calc(100dvh - 80px));
 
       .work-view-fixed {
         padding: 24px;
@@ -8762,7 +8987,7 @@
             }
 
             &::after {
-	              content: "•";
+              content: "•";
               color: rgba(255, 255, 255, 0.4);
               font-size: 1rem;
             }
@@ -10346,10 +10571,10 @@
 .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
 .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
 .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
-  width: 1468px !important;
+  width: min(1468px, calc(100vw - 48px)) !important;
   max-width: 1468px !important;
   height: 855px !important;
-  max-height: 855px !important;
+  max-height: min(855px, calc(100dvh - 80px)) !important;
 
   // ?? ?ㅻ뜑 (110px) ??cluster3 .section-modal .section-modal-header ?⑦꽩 ?뺥솗 ?듭씪 ??
   // 李몄“: app/assets/scss/components/_cluster3.scss L2710-2814
@@ -10976,6 +11201,31 @@
         &.enhance-none,
         &.enhance-not_applicable {
           --enhance-color: 160, 132, 220;
+        }
+      }
+
+      // 'empty' 상태: 보이드 기호 3개 (정사각형 칩 ▮ ▮ ▮) — 색상 rgba(255, 195, 0, 1) 고정
+      // 영역 폭 확대(102px = 14×3 + 30×2)로 칩 사이 명확한 분리감 확보.
+      // space-between으로 양 끝 + 가운데 배치 → 칩 사이 간격 자동 30px.
+      // margin-left: 102px — 칩 그룹 자체를 오른쪽으로 102px 이동 (empty 케이스 전용).
+      // 부모 .personal-line-status의 transform은 다른 상태와 공유되므로 손대지 않음.
+      .line-enhance-void {
+        width: 102px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: 60px;
+
+        transform: translateX(-19px);
+
+        .void-mark {
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          border-radius: 3px;
+          background: rgba(255, 195, 0, 1);
+          flex-shrink: 0;
         }
       }
     }
@@ -12395,15 +12645,19 @@
   width: 100%;
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   z-index: 100001 !important;
+  overflow: auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
 }
 
 .help-modal {
-  width: 1024px;
+  width: min(1024px, calc(100vw - 48px));
+  max-width: 1024px;
   height: 794px;
+  max-height: min(794px, calc(100dvh - 80px));
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
   border: 1px solid #ffa500;
   box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -12516,6 +12770,115 @@
 
     .tag-badge {
       padding: 3px 10px !important;
+    }
+  }
+}
+
+@media (max-width: 1516px) {
+  .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal {
+    .workinfo-personal-card {
+      min-width: 0;
+
+      .personal-grid {
+        grid-template-columns: auto minmax(0, 1fr) auto !important;
+        column-gap: 12px;
+        min-width: 0;
+      }
+
+      .personal-info,
+      .personal-row-1,
+      .personal-row-2,
+      .personal-row-3,
+      .personal-field {
+        min-width: 0;
+      }
+
+      .personal-row-1 {
+        gap: 6px;
+
+        .personal-tags {
+          min-width: 0;
+          gap: 6px !important;
+        }
+      }
+
+      .personal-row-2,
+      .personal-row-3 {
+        grid-template-columns: minmax(0, 160px) 24px 14px minmax(0, 160px) 24px;
+      }
+
+      .personal-line-status {
+        min-width: 0;
+        padding-left: 8px;
+        gap: 6px;
+      }
+
+      .personal-name {
+        width: 120px;
+        min-width: 0;
+      }
+
+      .tag-badge,
+      .personal-tags .tag-badge,
+      .personal-tags .tag-badge.tag-role,
+      .personal-tags .tag-badge.tag-keyword {
+        width: 140px;
+        min-width: 140px;
+      }
+    }
+  }
+
+  .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+    .sponsor-card,
+    .sponsor-company,
+    .sponsor-supervisor,
+    .supervisor-row-2,
+    .supervisor-details {
+      min-width: 0;
+    }
+
+    .sponsor-card {
+      gap: 10px !important;
+    }
+
+    .sponsor-company {
+      gap: 10px !important;
+
+      .sponsor-company-logo {
+        max-width: 50%;
+        min-width: 0;
+      }
+
+      .sponsor-company-name {
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        display: block;
+      }
+    }
+
+    .sponsor-supervisor {
+      gap: 8px !important;
+    }
+
+    .supervisor-row-2 {
+      gap: 10px;
+    }
+
+    .supervisor-details {
+      grid-template-columns: 72px 12px minmax(0, 1fr) !important;
+
+      .supervisor-name,
+      .supervisor-dept,
+      .supervisor-position {
+        min-width: 0;
+      }
+    }
+
+    .sponsor-card .sponsor-company {
+      gap: 10px !important;
     }
   }
 }
@@ -12721,9 +13084,9 @@
 // =====================================================
 .weekly-review-box {
   position: absolute;
-  left: 16px;                                        // [수정1] 좌측 여유
+  left: 16px; // [수정1] 좌측 여유
   bottom: 16px;
-  width: 349px !important;                           // 380 → 349 (-31px) star 아이콘 우측과 정렬
+  width: 349px !important; // 380 → 349 (-31px) star 아이콘 우측과 정렬
   height: 152px;
   z-index: 5;
 
@@ -12731,11 +13094,7 @@
   flex-direction: column;
   box-sizing: border-box;
 
-  background: linear-gradient(
-    135deg,
-    rgba(35, 25, 20, 0.45) 0%,
-    rgba(20, 15, 25, 0.5) 100%
-  ) !important;
+  background: linear-gradient(135deg, rgba(35, 25, 20, 0.45) 0%, rgba(20, 15, 25, 0.5) 100%) !important;
 
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -12743,8 +13102,7 @@
   border-radius: 16px !important;
 
   // [수정3] 외부 골드 글로우 제거 — 검은 그림자만 + 사방 골드 테두리
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 
   border: 1px solid rgba(250, 171, 7, 0.25) !important;
 
@@ -12774,15 +13132,11 @@
     align-items: center;
     gap: 10px;
 
-    background: linear-gradient(
-      180deg,
-      rgba(250, 171, 7, 0.05) 0%,
-      rgba(250, 171, 7, 0.01) 100%
-    ) !important;
+    background: linear-gradient(180deg, rgba(250, 171, 7, 0.05) 0%, rgba(250, 171, 7, 0.01) 100%) !important;
     border-bottom: 1px solid rgba(250, 171, 7, 0.25) !important;
 
     .review-book-icon {
-      width: 26px !important;                        // 22 → 26 (1.2배)
+      width: 26px !important; // 22 → 26 (1.2배)
       height: 26px !important;
       flex-shrink: 0;
       object-fit: contain;
@@ -12792,7 +13146,7 @@
       flex: 1;
       margin: 0;
       font-family: Pretendard, sans-serif;
-      font-size: 16px;                               // [수정5] 14 → 16
+      font-size: 16px; // [수정5] 14 → 16
       font-weight: 700;
       color: #fff;
       letter-spacing: 0.2px;
@@ -12800,7 +13154,7 @@
 
     .review-view-btn {
       flex-shrink: 0;
-      width: 28px;                                   // [수정5] 24 → 28
+      width: 28px; // [수정5] 24 → 28
       height: 28px;
       padding: 0;
       background: transparent;
@@ -12811,10 +13165,12 @@
       justify-content: center;
       transition: opacity 0.15s;
 
-      &:hover { opacity: 0.7; }
+      &:hover {
+        opacity: 0.7;
+      }
 
       .view-icon {
-        width: 22px;                                 // [수정5] 18 → 22
+        width: 22px; // [수정5] 18 → 22
         height: 22px;
         object-fit: contain;
       }
@@ -12830,8 +13186,8 @@
     .review-content {
       margin: 0;
       font-family: Pretendard, sans-serif;
-      font-size: 13px;                               // [수정5] 12 → 13
-      line-height: 1.35;                             // [수정5] 1.4 → 1.35
+      font-size: 13px; // [수정5] 12 → 13
+      line-height: 1.35; // [수정5] 1.4 → 1.35
       color: rgba(255, 255, 255, 0.85);
 
       display: -webkit-box;
@@ -12850,14 +13206,10 @@
     padding: 6px 16px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;                       // [수정4] 우측 정렬
+    justify-content: flex-end; // [수정4] 우측 정렬
     gap: 8px;
 
-    background: linear-gradient(
-      0deg,
-      rgba(250, 171, 7, 0.05) 0%,
-      rgba(250, 171, 7, 0.01) 100%
-    ) !important;
+    background: linear-gradient(0deg, rgba(250, 171, 7, 0.05) 0%, rgba(250, 171, 7, 0.01) 100%) !important;
     border-top: 1px solid rgba(250, 171, 7, 0.25) !important;
 
     // [수정4] 별점+카운터 그룹 wrapper
@@ -12870,17 +13222,18 @@
     .review-stars {
       position: relative;
       display: inline-block;
-      width: 88px;                                   // 16px × 5 + 2px × 4
+      width: 88px; // 16px × 5 + 2px × 4
       height: 16px;
       line-height: 0;
 
       &__base,
       &__fill {
         display: flex;
+        align-items: flex-start;
         gap: 2px;
 
         i {
-          font-size: 16px;                           // [수정5] 14 → 16
+          font-size: 16px; // [수정5] 14 → 16
           line-height: 1;
           flex-shrink: 0;
           display: block;
@@ -12901,22 +13254,24 @@
 
       &__fill {
         position: absolute;
-        top: 0;
+        top: -3px;
         left: 0;
-        height: 100%;
+        height: calc(100% + 3px);
+        padding-top: 3px;
+        box-sizing: border-box;
         overflow: hidden;
         white-space: nowrap;
         pointer-events: none;
 
         i {
-          color: #FAAB07;
+          color: #faab07;
         }
       }
     }
 
     .review-score {
       font-family: Pretendard, sans-serif;
-      font-size: 15px;                               // [수정5] 13 → 15
+      font-size: 15px; // [수정5] 13 → 15
       font-weight: 600;
       color: #fff;
       white-space: nowrap;
@@ -12926,7 +13281,8 @@
 
 // 부유 애니메이션 — .weekly-review-box.unfurled 전용
 @keyframes weekly-review-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -12990,7 +13346,9 @@
       font-size: 16px;
       color: #fff;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      transition:
+        border-color 0.15s,
+        background 0.15s;
 
       &:hover:not(.disabled) {
         border-color: rgba(255, 255, 255, 0.3);
@@ -13011,22 +13369,77 @@
 }
 
 // ============================================
+// Detail Log 모달 — 세로형_대 빈 컨테이너 (674×826)
+// 내부 콘텐츠는 추후 작업, 현재는 placeholder 영역만
+// ============================================
+.section-modal-detail-log {
+  width: min(674px, calc(100vw - 48px)) !important;
+  max-width: 674px !important;
+  height: 826px !important;
+  max-height: min(826px, calc(100dvh - 80px)) !important;
+
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+
+  .modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    z-index: 2;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    i {
+      font-size: 16px;
+      line-height: 1;
+    }
+  }
+
+  .detail-log-modal-body {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .detail-log-modal-placeholder {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// ============================================
 // 주차 리뷰 모달 (신규)
 // reputation-form 패턴 준용, 3행 세로 배치
 // ============================================
 .section-modal-weekly-review-form {
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
 
   display: flex;
   flex-direction: column;
 
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   // === 헤더 (reputation-form 동일) ===
@@ -13098,8 +13511,12 @@
       padding: 4px;
       line-height: 1;
 
-      i { font-size: 20px; }
-      &:hover { color: #faab07; }
+      i {
+        font-size: 20px;
+      }
+      &:hover {
+        color: #faab07;
+      }
     }
   }
 
@@ -13215,7 +13632,9 @@
         font-size: 16px;
         color: #fff;
         cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
 
         &:hover:not(.disabled) {
           border-color: rgba(255, 255, 255, 0.3);
@@ -13432,7 +13851,9 @@
       color: #ddd;
       resize: none !important;
 
-      &::placeholder { color: rgba(255, 255, 255, 0.3); }
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
 
       &:focus {
         outline: none;
@@ -13446,7 +13867,9 @@
         background: rgba(255, 255, 255, 0.02);
       }
 
-      &::-webkit-scrollbar { width: 4px; }
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
       &::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.2);
         border-radius: 2px;
@@ -13507,23 +13930,34 @@
     }
 
     .modal-help-icon {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-      color: #ddd;
-      font-size: 18px;
-      cursor: pointer;
       flex-shrink: 0;
+      width: 40px;
+      height: 36px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      font-size: 20px;
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      color: #fff;
 
-      &:hover {
-        background: rgba(250, 171, 7, 0.1);
-        border-color: rgba(250, 171, 7, 0.3);
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 46px;
+        height: 46px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        border-radius: 0;
+        z-index: -1;
       }
     }
 
@@ -13544,7 +13978,9 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      &:hover { background: #ffb820; }
+      &:hover {
+        background: #ffb820;
+      }
     }
 
     .modal-cancel-btn {
@@ -13556,7 +13992,10 @@
       font-family: "Pretendard", sans-serif;
       font-size: 14px;
       cursor: pointer;
-      &:hover { border-color: #fff; color: #fff; }
+      &:hover {
+        border-color: #fff;
+        color: #fff;
+      }
     }
 
     .modal-reset-btn {
@@ -13568,7 +14007,9 @@
       font-family: "Pretendard", sans-serif;
       font-size: 14px;
       cursor: pointer;
-      &:hover { background: rgba(76, 175, 80, 0.1); }
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
     }
 
     .modal-save-btn {
@@ -13581,8 +14022,13 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      &:hover:not(:disabled) { background: #ffb820; }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
+      &:hover:not(:disabled) {
+        background: #ffb820;
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
     .modal-footer-bottom {
@@ -13605,13 +14051,221 @@
   }
 }
 
+// =====================================================================
+// Zone A (< 1920px) — Weekly Review 모달 바디 스크롤 활성화
+// 사유: Cluster4CardContent.tsx의 Weekly Review 모달은 createPortal로
+//       document.body에 직접 렌더링되므로 .cluster4-card-content 스코프
+//       하위 규칙이 적용되지 않는다. 따라서 탑레벨 셀렉터로 작성한다.
+// 범위: Zone B (1920×1080) baseline 절대 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .section-modal-weekly-review-form {
+    .section-modal-body.weekly-review-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Weekly Reputation 모달 바디 스크롤 활성화
+// 사유: Weekly Review와 동일 패턴 적용. Zone A에서 모달이 뷰포트보다
+//       클 때 바디 영역만 스크롤되어야 함 (헤더/푸터는 flex-shrink: 0
+//       으로 이미 고정됨).
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.section-modal-reputation-form {
+    .section-modal-body.reputation-form-body {
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Colleague Card 모달 바디 스크롤 활성화
+// 사유: Weekly Review와 동일 패턴 적용.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.section-modal-colleague-edit {
+    .section-modal-body.colleague-edit-body {
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
 @keyframes weekly-review-field-error-flash {
-  0%, 100% {
+  0%,
+  100% {
     border-color: #e74c3c;
     box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
   }
   50% {
     border-color: #ff6b6b;
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
+  }
+}
+
+@keyframes weekConfirmPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 216, 122, 0.6);
+  }
+  30% {
+    transform: scale(1.15) rotate(-3deg);
+    box-shadow: 0 0 0 8px rgba(255, 216, 122, 0.35);
+    filter: brightness(1.4);
+  }
+  55% {
+    transform: scale(0.95) rotate(2deg);
+    box-shadow: 0 0 0 16px rgba(255, 216, 122, 0);
+  }
+  75% {
+    transform: scale(1.08) rotate(0deg);
+    background: rgba(180, 220, 140, 0.2);
+    border-color: rgba(160, 220, 160, 0.6);
+    color: #c8eec8;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    background: rgba(120, 200, 120, 0.18);
+    border-color: rgba(120, 200, 120, 0.55);
+    color: #a8e6a8;
+  }
+}
+
+@keyframes weekConfirmIconSpin {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.6) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+/* ============================================
+   cluster-4-card — 모달 자체 스크롤 통합 (Zone A)
+
+   문제: Zone A 환경(낮은 뷰포트 높이)에서 work-view-modal 4종(view + edit)의
+        .workinfo-text-section만 자체 스크롤되어 어색함.
+        편집 모드는 이중 스크롤(modal-body + text-section) 발생.
+
+   해결: workinfo-text-section의 자체 스크롤 제거 + 부모 height 제약 풀어
+        section-modal-body가 자연스럽게 모달 단일 스크롤을 담당하게 함.
+
+   selector 구분:
+   - .work-view-modal: view 모드와 편집 모드가 같은 클래스 사용
+   - 4개 카드 종류(workexp, workinfo, workability, workcareer) 모두
+     .workinfo-text-section / .workinfo-left / .workinfo-content-layout 공통 클래스 사용
+
+   Zone B(1920) / Zone C(>1920) 절대 보호:
+   @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .nftg-app:has(.cluster4-card-content) {
+    .section-modal.work-view-modal {
+      .workinfo-text-section {
+        overflow-y: visible !important;
+        height: auto !important;
+        max-height: none !important;
+      }
+
+      .workinfo-left {
+        height: auto !important;
+      }
+
+      .workinfo-content-layout {
+        height: auto !important;
+      }
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — work view 4종 가로 canvas 스크롤 복구
+// 사유: 뒤쪽/전용 규칙의 overflow-x:hidden 계열이 전역 modal safety layer의
+//       overflow-x:auto를 덮어 .workinfo-content-layout의 min-width가
+//       스크롤바로 이어지지 않는 문제를 work view 4종에만 한정 보정.
+// 범위: work info / work exp / work ability / work career view modal only.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
+  .cluster4-card-content .section-modal.work-view-modal.workcareer-view-modal {
+    .section-modal-body {
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+    }
+
+    .workinfo-content-layout {
+      min-width: 1388px !important;
+      flex-shrink: 0 !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-card 본인 헤더(work-edit) 모달 바디 스크롤 활성화
+// 사유: 사용자 헤더 편집 모달도 다른 폼 모달과 동일하게 viewport보다 클 때
+//       본문 영역에서 스크롤이 동작하도록 명시적 보장.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.section-modal-work-edit {
+    .section-modal-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — Reputation View / Colleague View 모달 바디 스크롤 보장
+// 사유: 두 모달은 createPortal로 document.body에 렌더링되어
+//       .cluster4-card-content 스코프 안의 default 스타일이 적용되지만
+//       Zone A 환경에서 viewport-aware max-height로 모달이 줄어들 때
+//       본문이 자연스럽게 스크롤되어야 함.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.reputation-view-modal {
+    .section-modal-body.reputation-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  .cluster4-card-content .section-modal.colleague-view-modal {
+    .section-modal-body,
+    .section-modal-body.colleague-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — 모달 body 직계 자식 flex 압축 방지
+// 사유: body가 display: flex; flex-direction: column 이라 자식들이
+//       flex-shrink: 1(default)로 압축되어 본질 height을 잃음.
+//       그 결과 body scrollHeight가 실제 필요 높이를 반영하지 못해
+//       overflow-y: auto가 발동하지 않음.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal.section-modal-reputation-form .section-modal-body.reputation-form-body > *,
+  .cluster4-card-content .section-modal.section-modal-colleague-edit .section-modal-body.colleague-edit-body > *,
+  .cluster4-card-content .section-modal.reputation-view-modal .section-modal-body.reputation-body > *,
+  .cluster4-card-content .section-modal.colleague-view-modal .section-modal-body.colleague-body > * {
+    flex-shrink: 0 !important;
   }
 }

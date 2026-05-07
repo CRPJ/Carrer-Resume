@@ -1219,20 +1219,24 @@ body:has(.mobile-layout) > button:has(.ti-pencil) {
 }
 
 .phone-comment-modal-overlay {
-  position: fixed;
-  inset: 0;
   z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background-color: rgba(0, 0, 0, 0.7);
+  overflow: auto;
+  padding: 40px 24px;
+}
+
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .phone-comment-modal-overlay {
+    display: grid !important;
+    place-items: center !important;
+  }
 }
 
 .edit-modal-content[data-modal="phone-comment"] {
-  width: 570px;
+  width: min(570px, calc(100vw - 48px));
   max-width: 570px;
   height: 449px;
-  max-height: 449px;
+  max-height: min(449px, calc(100dvh - 80px));
   border: 1px solid #FFA500;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -1240,10 +1244,6 @@ body:has(.mobile-layout) > button:has(.ti-pencil) {
   box-sizing: border-box;
 
   // reputation-form / reputation-view-modal와 동일 — 화면 정중앙 강제
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .edit-modal-header {

@@ -349,7 +349,13 @@
 
       // Cluster2와 동일하게 데스크탑에서만 살짝 우측 이동
       // @media (min-width: 1200px) unwrapped:
+      // <1920에서는 wrapper 폭(~1236)이 좁아 우측 28px만큼 wrapper 밖으로 튀어나가므로
+      // 작은 viewport에서만 transform을 비활성화. 1920+ 디자인은 그대로.
       transform: translateX(clamp(0px, 2.2vw, 72px));
+
+      @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+        transform: none;
+      }
 
       p {
         font-family: "HakgyoansimTuho", sans-serif;
@@ -594,7 +600,6 @@
             white-space: nowrap;
             transition: text-shadow 0.3s ease;
           }
-
         }
 
         .collection-card {
@@ -798,6 +803,13 @@
         align-items: flex-end;
         justify-content: flex-end;
         pointer-events: none !important;
+
+        // <1920에서는 wrapper 폭(~1236)이 좁아 right:-80px이 페이지 우측 밖으로
+        // 80px 밀려나가 가시 영역에서 잘림. absolute 구조와 size는 유지하고
+        // 우측 anchor만 0으로 끌어와 부모 안쪽으로 들어오게 한다.
+        @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+          right: 0;
+        }
 
         img {
           width: 100%;
@@ -1364,6 +1376,7 @@
             .row3 {
               display: flex;
               gap: 6px;
+              position: relative;
 
               .green-box,
               .yellow-box {
@@ -3503,6 +3516,84 @@
                   font-size: 16px;
                 }
               }
+
+              .fm-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-left: 44px;
+                white-space: nowrap;
+                flex-shrink: 0;
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                letter-spacing: normal !important;
+
+                .wifi-icon {
+                  width: 21px !important;
+                  height: 21px !important;
+                  object-fit: contain !important;
+                  flex-shrink: 0;
+                }
+
+                .fm-label {
+                  font: inherit !important;
+                  color: inherit !important;
+                }
+
+                .fm-value {
+                  font: inherit !important;
+                  color: inherit !important;
+                  display: inline-block;
+                  min-width: 3ch;
+                  text-align: right;
+                }
+              }
+
+              h4.section-title .fm-badge {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                white-space: nowrap !important;
+                line-height: 1 !important;
+                vertical-align: middle !important;
+                margin-left: 44px !important;
+                flex-shrink: 0 !important;
+              }
+
+              h4.section-title .fm-badge .wifi-icon {
+                width: 21px !important;
+                height: 21px !important;
+                object-fit: contain !important;
+                display: inline-block !important;
+                vertical-align: middle !important;
+                margin: 0 !important;
+                transform: none !important;
+                position: static !important;
+              }
+
+              h4.section-title .fm-badge .fm-label {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+                vertical-align: middle !important;
+              }
+
+              h4.section-title .fm-badge .fm-value {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+                vertical-align: middle !important;
+                min-width: 3ch;
+                text-align: right;
+              }
             }
 
             .status-badges {
@@ -3616,11 +3707,95 @@
 
           // 영역 9: 시즌 평판
           .area-9-season-reputation {
+            .season-reputation-header {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+
+              > *:not(.edit-icon) {
+                transform: translateY(-8px);
+              }
+              .section-icon {
+                width: 21px;
+                height: 21px;
+                object-fit: contain;
+                margin-top: -4px;
+                flex-shrink: 0;
+              }
+
+              .section-label {
+                font-family: "Chakra Petch", sans-serif;
+                font-size: 1rem;
+                color: #fff;
+                font-weight: 700;
+                letter-spacing: 0.7px;
+                line-height: 1;
+                flex-shrink: 0;
+              }
+
+              .section-count {
+                font-family: "Chakra Petch", sans-serif;
+                font-size: 14px;
+                color: #fff;
+                font-weight: 700;
+                margin-left: 8px;
+                flex-shrink: 0;
+
+                .count-num {
+                  display: inline-block;
+                  min-width: 2ch;
+                  text-align: right;
+                  font-family: "Chakra Petch", sans-serif;
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: #faab07;
+                }
+              }
+
+              .fm-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                white-space: nowrap;
+                line-height: 1;
+                margin-left: 44px;
+                flex-shrink: 0;
+                font-family: "Pretendard", sans-serif;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: 0;
+              }
+
+              .fm-badge .wifi-icon {
+                width: 21px !important;
+                height: 21px !important;
+                object-fit: contain !important;
+                flex-shrink: 0;
+              }
+
+              .fm-badge .fm-label {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 700 !important;
+                color: #fff !important;
+                letter-spacing: normal !important;
+              }
+
+              .fm-badge .fm-value {
+                min-width: 3ch;
+                text-align: right;
+                font-family: "Chakra Petch", sans-serif;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                color: #fff !important;
+                letter-spacing: normal !important;
+              }
+            }
             margin-top: 23px;
             width: 100%; // 370px → 100%
 
             // 단독 edit-icon (floating-icons 밖) — absolute로 부모 기준 배치
-            > div > .edit-icon {
+            .season-reputation-header .edit-icon {
               width: 33px;
               height: 33px;
               background: #faab07;
@@ -3631,7 +3806,7 @@
               cursor: pointer;
               transition: all 0.3s ease;
               position: absolute;
-              top: 1px;
+              top: calc(1px + 3.9cm);
               right: 0px;
 
               &:hover {
@@ -3642,6 +3817,8 @@
               i {
                 position: relative;
                 top: 2px;
+                font-size: 16px;
+                color: #1a1a1a;
               }
             }
 
@@ -3674,8 +3851,48 @@
                   display: inline-block;
                   min-width: 2ch;
                   text-align: right;
-                  font-size: 16px;
+                  font-size: 14px;
                 }
+              }
+
+              .fm-badge {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                white-space: nowrap !important;
+                line-height: 1 !important;
+                vertical-align: middle !important;
+                margin-left: 44px !important;
+                flex-shrink: 0 !important;
+              }
+
+              .fm-badge .wifi-icon {
+                width: 21px !important;
+                height: 21px !important;
+                object-fit: contain !important;
+                display: inline-block !important;
+                vertical-align: middle !important;
+                margin: 0 !important;
+                transform: none !important;
+                position: static !important;
+              }
+
+              .fm-badge .fm-label {
+                font: inherit !important;
+                letter-spacing: inherit !important;
+                color: inherit !important;
+              }
+
+              .fm-badge .fm-value {
+                font-size: 16px !important;
+                font-family: "Pretendard", sans-serif !important;
+                font-weight: 400 !important;
+                color: rgba(255, 255, 255, 0.5) !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+                vertical-align: middle !important;
+                min-width: 3ch;
+                text-align: right;
               }
             }
 
@@ -3693,6 +3910,18 @@
 
               &::-webkit-scrollbar {
                 display: none; /* Chrome */
+              }
+
+              &.season-reputation-list {
+                display: grid;
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+                align-items: start;
+              }
+
+              &.season-reputation-list .profile-card,
+              &.season-reputation-list .profile-card.season-reputation-waiting {
+                min-height: 150px;
               }
 
               .profile-card.season-reputation-waiting {
@@ -4281,7 +4510,7 @@
 
       // 왼쪽 구분선 — badge-tag 색상과 동적 일치
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 4px;
         top: 10%;
@@ -4820,6 +5049,37 @@
           visibility: hidden;
         }
       }
+
+      .weekly-card-extra-stats .stat.fm-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-left: 44px;
+        font-size: inherit !important;
+        font-family: inherit !important;
+        font-weight: inherit !important;
+        color: inherit !important;
+        letter-spacing: 0 !important;
+
+        .wifi-icon {
+          width: 21px !important;
+          height: 21px !important;
+          object-fit: contain;
+          flex-shrink: 0;
+        }
+
+        .fm-label {
+          font: inherit !important;
+        }
+
+        .fm-value {
+          font: inherit !important;
+          min-width: 3ch !important;
+          text-align: right;
+        }
+      }
     }
 
     // 우측 성장 상태 배지
@@ -4839,22 +5099,26 @@
         color: #9dfa07;
         text-transform: capitalize;
         line-height: 19px;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 1);
       }
 
       &.fail .status-text {
         color: #ff6b6b;
-        text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
       }
 
       &.rest-personal .status-text {
         color: #65e3ff;
-        text-shadow: 0 0 8px rgba(101, 227, 255, 0.5);
       }
 
       &.rest-official .status-text {
         color: #ffea48;
-        text-shadow: 0 0 8px rgba(255, 234, 72, 0.5);
+      }
+
+      &.in-progress .status-text {
+        color: #9b59b6;
+      }
+
+      &.counting .status-text {
+        color: #ff1493;
       }
 
       &.in-progress .status-text {
@@ -5370,29 +5634,25 @@
 // 시즌 평판 모달 스타일 (cluster4-card-content 스코프)
 // ============================================
 .cluster4-card-content .section-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 99999;
-  overflow-y: auto;
-  padding: 40px 0;
+  overflow: auto;
+  padding: 40px 24px;
 }
+
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-card-content .section-modal-overlay {
+    display: grid !important;
+    place-items: center !important;
+  }
+}
+
 .cluster4-card-content .section-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 504px;
+  width: min(504px, calc(100vw - 48px));
   height: 606px;
-  max-width: none;
-  max-height: 606px;
+  max-width: 504px;
+  max-height: min(606px, calc(100dvh - 80px));
   border: 1px solid #ffa500;
   border-radius: 0;
   overflow: hidden;
@@ -5400,7 +5660,8 @@
   flex-direction: column;
 
   &.section-modal-wide {
-    width: 700px;
+    width: min(700px, calc(100vw - 48px));
+    max-width: 700px;
   }
 
   .section-modal-header {
@@ -5447,6 +5708,7 @@
   .section-modal-body {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
     padding: 16px 24px;
 
     &::-webkit-scrollbar {
@@ -5808,13 +6070,12 @@
 
   &:hover {
     .badge-text {
-      color: #FFFFFF !important;
+      color: #ffffff !important;
       text-shadow: 0 0 6px rgba(221, 242, 71, 0.6) !important;
     }
 
     .badge-border {
-      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8))
-              drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
+      filter: drop-shadow(0 0 10px rgba(221, 242, 71, 0.8)) drop-shadow(0 0 20px rgba(221, 242, 71, 0.4)) !important;
     }
 
     .badge-outline {
@@ -5832,17 +6093,17 @@
 .season-reputation-view-overlay,
 .season-review-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
   z-index: 99999;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  overscroll-behavior: contain;
 }
 
 // ── 모달 1: 시즌 평판 작성/수정 ──
@@ -5850,16 +6111,12 @@
 // Season Reputation Form Modal (가로형_중 979×570)
 // ============================================
 .section-modal.section-modal-season-reputation-form {
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -5884,7 +6141,12 @@
       align-items: center;
       gap: 8px;
       width: 100%;
-      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
       h3 {
         margin: 0;
         font-family: "Pretendard", sans-serif;
@@ -5893,7 +6155,10 @@
         color: #faab07;
         line-height: 1.4;
         padding-top: 0;
-        &::before { content: none !important; display: none !important; }
+        &::before {
+          content: none !important;
+          display: none !important;
+        }
       }
     }
 
@@ -5918,8 +6183,12 @@
       cursor: pointer;
       padding: 4px;
       line-height: 1;
-      i { font-size: 20px; }
-      &:hover { color: #faab07; }
+      i {
+        font-size: 20px;
+      }
+      &:hover {
+        color: #faab07;
+      }
     }
   }
 
@@ -5953,8 +6222,19 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      .required-mark { color: #e74c3c !important; font-weight: 700 !important; font-size: 16px !important; margin-left: 4px; margin-right: 4px; }
-      .limit-hint { font-size: 11px; font-weight: 400; color: rgba(255, 255, 255, 0.5); margin-left: 8px; }
+      .required-mark {
+        color: #e74c3c !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+      .limit-hint {
+        font-size: 11px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+        margin-left: 8px;
+      }
     }
   }
 
@@ -5966,23 +6246,60 @@
       margin-left: 19px;
     }
 
-    .rating-field { display: flex; align-items: center; gap: 8px; }
+    .rating-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .star-rating {
-      display: flex; align-items: center; gap: 2px; height: 36px; flex-shrink: 0;
-      i { color: #faab07; font-size: 16px; }
-      .rating-text { margin-left: 6px; color: #faab07; font-size: 16px !important; font-weight: 600; white-space: nowrap; }
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 36px;
+      flex-shrink: 0;
+      i {
+        color: #faab07;
+        font-size: 16px;
+      }
+      .rating-text {
+        margin-left: 6px;
+        color: #faab07;
+        font-size: 16px !important;
+        font-weight: 600;
+        white-space: nowrap;
+      }
     }
     .custom-dropdown.small {
       position: relative;
       .dropdown-selected {
-        display: flex; align-items: center; justify-content: space-between; gap: 6px;
-        padding: 6px 10px; min-width: 55px;
-        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px;
-        font-family: "Pretendard", sans-serif; font-size: 16px; color: #fff; cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
-        &:hover:not(.disabled) { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
-        &.disabled { opacity: 0.5; cursor: not-allowed; }
-        i.ti-chevron-down { font-size: 12px; opacity: 0.7; }
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 6px 10px;
+        min-width: 55px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 16px;
+        color: #fff;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        &:hover:not(.disabled) {
+          border-color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+        }
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        i.ti-chevron-down {
+          font-size: 12px;
+          opacity: 0.7;
+        }
       }
     }
   }
@@ -5994,87 +6311,250 @@
       margin-bottom: 8px !important;
 
       label {
-        display: flex; align-items: center; gap: 6px; cursor: pointer;
-        color: #ddd; font-family: "Pretendard", sans-serif; font-size: 14px;
-        input[type="radio"] { cursor: pointer; accent-color: #faab07; }
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        color: #ddd;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        input[type="radio"] {
+          cursor: pointer;
+          accent-color: #faab07;
+        }
       }
     }
 
     .keyword-input-wrapper {
-      display: flex; align-items: center; gap: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
       .keyword-hash {
-        color: #faab07; font-family: "Pretendard", sans-serif; font-size: 16px; font-weight: 700;
+        color: #faab07;
+        font-family: "Pretendard", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
       }
 
       .keyword-input {
-        flex: 1; padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #ddd; font-family: "Pretendard", sans-serif; font-size: 12px;
-        border-radius: 4px; outline: none; transition: border-color 0.15s;
-        &::placeholder { color: rgba(255, 255, 255, 0.3); }
-        &:focus { border-color: #faab07; }
-        &[readonly], &:disabled { cursor: default; background: rgba(255, 255, 255, 0.08); opacity: 0.5; }
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ddd;
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.15s;
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+        &:focus {
+          border-color: #faab07;
+        }
+        &[readonly],
+        &:disabled {
+          cursor: default;
+          background: rgba(255, 255, 255, 0.08);
+          opacity: 0.5;
+        }
       }
     }
 
     // 시즌 평판 전용 — 슬롯 3개
     .season-keyword-row {
-      display: flex; align-items: center; gap: 8px;
-      & + .season-keyword-row { margin-top: 6px; }
-      .keyword-mode-select { margin-bottom: 0 !important; flex-shrink: 0; }
-      .keyword-input-wrapper { flex: 1; min-width: 0; }
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      & + .season-keyword-row {
+        margin-top: 6px;
+      }
+      .keyword-mode-select {
+        margin-bottom: 0 !important;
+        flex-shrink: 0;
+      }
+      .keyword-input-wrapper {
+        flex: 1;
+        min-width: 0;
+      }
     }
   }
 
   .season-content-section {
-    flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     .season-content-wrapper {
-      position: relative; flex: 1 1 auto; min-height: 0; display: flex;
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
       textarea.season-content-textarea {
-        width: 100%; flex: 1 1 auto; min-height: 100px; height: 100px; max-height: 100px; padding: 12px 16px 28px; box-sizing: border-box;
-        background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px;
-        font-family: "Pretendard", sans-serif; font-size: 14px; line-height: 1.5; color: #ddd; resize: none !important;
-        &::placeholder { color: rgba(255, 255, 255, 0.3); }
-        &:focus { outline: none; border-color: rgba(250, 171, 7, 0.5); }
-        &::-webkit-scrollbar { width: 4px; }
-        &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 2px; }
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 100px;
+        height: 100px;
+        max-height: 100px;
+        padding: 12px 16px 28px;
+        box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #ddd;
+        resize: none !important;
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+        &:focus {
+          outline: none;
+          border-color: rgba(250, 171, 7, 0.5);
+        }
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 2px;
+        }
       }
-      .char-count { position: absolute; bottom: 8px; right: 12px; font-family: "Pretendard", sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.5); pointer-events: none; }
+      .char-count {
+        position: absolute;
+        bottom: 8px;
+        right: 12px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+      }
     }
   }
 
   .section-modal-footer {
-    flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 16px 28px;
-    height: 118px; min-height: 118px; max-height: 118px; box-sizing: border-box; border-top: none; background: transparent;
-    .modal-footer-top { display: flex; align-items: center; justify-content: space-between; width: 100%; position: relative; }
-    .modal-help-icon {
-      flex-shrink: 0; width: 40px; height: 36px; padding: 0; border: none; background: transparent; border-radius: 0;
-      color: #fff; font-size: 20px; cursor: pointer; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center;
-      &::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: rgba(0, 0, 0, 0.6); border: none; border-radius: 0; z-index: -1; }
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 28px;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    box-sizing: border-box;
+    border-top: none;
+    background: transparent;
+    .modal-footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
     }
-    .modal-footer-right { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-shrink: 0; min-width: 160px; }
-    .modal-edit-btn, .modal-save-btn {
-      padding: 8px 20px; background: #faab07; border: 1px solid transparent; color: #1a1a1a; border-radius: 0;
-      font-family: "Pretendard", sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
-      &:hover:not(:disabled) { background: #ffb820; }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    .modal-help-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 36px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      border-radius: 0;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 46px;
+        height: 46px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        border-radius: 0;
+        z-index: -1;
+      }
+    }
+    .modal-footer-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      min-width: 160px;
+    }
+    .modal-edit-btn,
+    .modal-save-btn {
+      padding: 8px 20px;
+      background: #faab07;
+      border: 1px solid transparent;
+      color: #1a1a1a;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover:not(:disabled) {
+        background: #ffb820;
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
     .modal-cancel-btn {
-      padding: 8px 20px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #ddd;
-      border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer;
-      &:hover { border-color: #fff; color: #fff; }
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ddd;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        border-color: #fff;
+        color: #fff;
+      }
     }
     .modal-reset-btn {
-      padding: 8px 20px; background: transparent; border: 1px solid #4caf50; color: #4caf50;
-      border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer;
-      &:hover { background: rgba(76, 175, 80, 0.1); }
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid #4caf50;
+      color: #4caf50;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
     }
     .modal-footer-bottom {
-      width: 100%; display: flex; align-items: center; justify-content: flex-end; text-align: right; border: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      border: none;
       .modal-footer-notice {
-        margin: 0; text-align: right; font-family: "Pretendard", sans-serif; font-size: 13px; color: #faab07;
-        &.notice-error { color: #e74c3c !important; }
+        margin: 0;
+        text-align: right;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px;
+        color: #faab07;
+        &.notice-error {
+          color: #e74c3c !important;
+        }
       }
     }
   }
@@ -6083,7 +6563,9 @@
   .field-error {
     border-color: #e74c3c !important;
     box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
-    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
+    &.flash {
+      animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important;
+    }
   }
 
   .rating-field.field-error {
@@ -6092,7 +6574,9 @@
     box-shadow: none !important;
     padding: 4px 8px;
     border-radius: 4px;
-    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
+    &.flash {
+      animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important;
+    }
   }
 
   .season-keyword-row.field-error {
@@ -6101,14 +6585,26 @@
     box-shadow: none !important;
     padding: 4px 8px;
     border-radius: 4px;
-    &.flash { animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important; }
-    .keyword-input { border-color: rgba(255, 255, 255, 0.15) !important; box-shadow: none !important; }
+    &.flash {
+      animation: season-reputation-field-error-flash 0.3s ease-in-out 2 !important;
+    }
+    .keyword-input {
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      box-shadow: none !important;
+    }
   }
 }
 
 @keyframes season-reputation-field-error-flash {
-  0%, 100% { border-color: #e74c3c; box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2); }
-  50% { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5); }
+  0%,
+  100% {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+  }
+  50% {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
+  }
 }
 
 // ============================================
@@ -6118,22 +6614,21 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.68);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: auto;
+  padding: 40px 24px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
   z-index: 100020;
+  overscroll-behavior: contain;
 }
 
 .keyword-select-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   background: #121212;
   border: 1px solid rgba(250, 171, 7, 0.24);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
@@ -6162,7 +6657,12 @@
       gap: 8px;
       width: 100%;
 
-      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
 
       h3 {
         font-family: "Pretendard", sans-serif;
@@ -6185,8 +6685,12 @@
       padding: 4px;
       line-height: 1;
 
-      i { font-size: 20px; }
-      &:hover { color: #faab07; }
+      i {
+        font-size: 20px;
+      }
+      &:hover {
+        color: #faab07;
+      }
     }
 
     .btn-select-header {
@@ -6204,7 +6708,10 @@
       font-size: 14px;
       cursor: pointer;
 
-      &:disabled { opacity: 0.3; cursor: not-allowed; }
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
     }
   }
 
@@ -6214,12 +6721,18 @@
     padding: 16px 24px;
     box-sizing: border-box;
 
-    &::-webkit-scrollbar { width: 8px; }
-    &::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
     &::-webkit-scrollbar-thumb {
       background: rgba(250, 171, 7, 0.5);
       border-radius: 4px;
-      &:hover { background: #faab07; }
+      &:hover {
+        background: #faab07;
+      }
     }
   }
 
@@ -6235,14 +6748,29 @@
       padding-bottom: 8px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-      .group-count { font-size: 11px; font-weight: 400; color: #faab07; margin-left: 8px; }
+      .group-count {
+        font-size: 11px;
+        font-weight: 400;
+        color: #faab07;
+        margin-left: 8px;
+      }
     }
 
-    &.group-blue .group-title { border-bottom-color: rgba(82, 167, 255, 0.6); }
-    &.group-green .group-title { border-bottom-color: rgba(91, 209, 130, 0.6); }
-    &.group-yellow .group-title { border-bottom-color: rgba(255, 203, 70, 0.6); }
-    &.group-orange .group-title { border-bottom-color: rgba(255, 149, 63, 0.6); }
-    &.group-red .group-title { border-bottom-color: rgba(255, 99, 99, 0.6); }
+    &.group-blue .group-title {
+      border-bottom-color: rgba(82, 167, 255, 0.6);
+    }
+    &.group-green .group-title {
+      border-bottom-color: rgba(91, 209, 130, 0.6);
+    }
+    &.group-yellow .group-title {
+      border-bottom-color: rgba(255, 203, 70, 0.6);
+    }
+    &.group-orange .group-title {
+      border-bottom-color: rgba(255, 149, 63, 0.6);
+    }
+    &.group-red .group-title {
+      border-bottom-color: rgba(255, 99, 99, 0.6);
+    }
   }
 
   .keyword-grid {
@@ -6280,7 +6808,7 @@
       padding-right: 32px !important;
 
       &::after {
-        content: '✓' !important;
+        content: "✓" !important;
         position: absolute !important;
         right: 8px !important;
         top: 50% !important;
@@ -6328,17 +6856,13 @@
 // 가이드 §1 + §4 + §6 적용
 // ============================================
 .section-modal.section-modal-season-reputation-view {
-  width: 979px !important;
+  width: min(979px, calc(100vw - 48px)) !important;
   max-width: 979px !important;
   height: 570px !important;
-  max-height: 570px !important;
+  max-height: min(570px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
 
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -6386,7 +6910,12 @@
       gap: 8px;
       width: 100%;
 
-      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
 
       h3 {
         margin: 0;
@@ -6397,7 +6926,10 @@
         line-height: 1.4;
         padding-top: 0;
 
-        &::before { content: none !important; display: none !important; }
+        &::before {
+          content: none !important;
+          display: none !important;
+        }
       }
     }
 
@@ -6423,8 +6955,12 @@
       padding: 4px;
       line-height: 1;
 
-      i { font-size: 20px; }
-      &:hover { color: #faab07; }
+      i {
+        font-size: 20px;
+      }
+      &:hover {
+        color: #faab07;
+      }
     }
   }
 
@@ -6457,7 +6993,11 @@
       height: 64px !important;
       border-radius: 50%;
       overflow: hidden;
-      img { width: 100%; height: 100%; object-fit: cover; }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
 
     .personal-info {
@@ -6500,7 +7040,9 @@
       color: #ddd !important;
     }
 
-    .personal-field { display: contents !important; }
+    .personal-field {
+      display: contents !important;
+    }
 
     .field-value {
       font-family: "Pretendard", sans-serif !important;
@@ -6829,14 +7371,18 @@
         .rating-star {
           font-size: 16px;
           line-height: 1;
-          &.star-full { color: #faab07; }
+          &.star-full {
+            color: #faab07;
+          }
           &.star-half {
             background: linear-gradient(90deg, #faab07 50%, rgba(255, 255, 255, 0.3) 50%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
           }
-          &.star-empty { color: rgba(255, 255, 255, 0.3); }
+          &.star-empty {
+            color: rgba(255, 255, 255, 0.3);
+          }
         }
       }
 
@@ -6892,21 +7438,16 @@
       color: rgba(255, 255, 255, 0.4);
     }
   }
-
 }
 
 // ── 모달 3: 시즌 리뷰 (자기평가) ──
 .section-modal.section-modal-season-review {
-  width: 674px !important;
+  width: min(674px, calc(100vw - 48px)) !important;
   max-width: 674px !important;
   height: 826px !important;
-  max-height: 826px !important;
+  max-height: min(826px, calc(100dvh - 80px)) !important;
   display: flex;
   flex-direction: column;
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
 
   .section-modal-header {
@@ -6923,7 +7464,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      img { width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+      img {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
       h3 {
         margin: 0;
         font-family: "Pretendard", sans-serif;
@@ -6931,7 +7477,10 @@
         font-weight: 700;
         color: #faab07;
         line-height: 1.4;
-        &::before { content: none !important; display: none !important; }
+        &::before {
+          content: none !important;
+          display: none !important;
+        }
       }
     }
 
@@ -6956,8 +7505,12 @@
       cursor: pointer;
       padding: 4px;
       line-height: 1;
-      i { font-size: 20px; }
-      &:hover { color: #faab07; }
+      i {
+        font-size: 20px;
+      }
+      &:hover {
+        color: #faab07;
+      }
     }
   }
 
@@ -6987,8 +7540,19 @@
       font-weight: 700;
       color: #ddd;
       margin: 0 0 8px;
-      .required-mark { color: #e74c3c !important; font-weight: 700 !important; font-size: 16px !important; margin-left: 4px; margin-right: 4px; }
-      .limit-hint { font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.5); margin-left: 8px; }
+      .required-mark {
+        color: #e74c3c !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+      .limit-hint {
+        font-size: 12px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+        margin-left: 8px;
+      }
     }
   }
 
@@ -7013,9 +7577,13 @@
     display: flex;
     align-items: center;
 
-    h4 { display: none !important; }
+    h4 {
+      display: none !important;
+    }
 
-    .season-info-display { width: 100%; }
+    .season-info-display {
+      width: 100%;
+    }
   }
 
   .season-review-rating-section {
@@ -7029,17 +7597,38 @@
       white-space: nowrap;
     }
 
-    .rating-field { display: flex; align-items: center; gap: 8px; height: 36px; }
+    .rating-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+    }
     .star-rating {
-      display: flex; align-items: center; gap: 2px; flex-shrink: 0;
-      i { color: #faab07; font-size: 16px; }
-      .rating-text { margin-left: 6px; color: #faab07; font-size: 16px !important; font-weight: 600; white-space: nowrap; }
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+      i {
+        color: #faab07;
+        font-size: 16px;
+      }
+      .rating-text {
+        margin-left: 6px;
+        color: #faab07;
+        font-size: 16px !important;
+        font-weight: 600;
+        white-space: nowrap;
+      }
     }
     .custom-dropdown.small {
       position: relative;
       .dropdown-selected {
-        display: flex; align-items: center; justify-content: space-between; gap: 6px;
-        padding: 6px 10px; min-width: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 6px 10px;
+        min-width: 55px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 4px;
@@ -7047,10 +7636,21 @@
         font-size: 16px;
         color: #fff;
         cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
-        &:hover:not(.disabled) { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
-        &.disabled { opacity: 0.5; cursor: not-allowed; }
-        i.ti-chevron-down { font-size: 12px; opacity: 0.7; }
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        &:hover:not(.disabled) {
+          border-color: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+        }
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        i.ti-chevron-down {
+          font-size: 12px;
+          opacity: 0.7;
+        }
       }
     }
   }
@@ -7063,7 +7663,13 @@
     align-items: center;
     border-radius: 4px !important;
     flex-shrink: 0;
-    .personal-grid { width: 100%; display: grid; grid-template-columns: auto 1fr !important; gap: 4px 12px !important; align-items: center !important; }
+    .personal-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto 1fr !important;
+      gap: 4px 12px !important;
+      align-items: center !important;
+    }
     .personal-photo {
       grid-column: 1;
       grid-row: 1;
@@ -7073,7 +7679,12 @@
       overflow: hidden;
       flex-shrink: 0;
       align-self: center;
-      img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
     }
 
     .personal-info {
@@ -7124,11 +7735,36 @@
     }
 
     .personal-row-2,
-    .personal-row-3 { display: grid !important; grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto !important; align-items: center !important; column-gap: 6px !important; font-family: "Pretendard", sans-serif !important; font-size: 15px !important; color: #ddd !important; min-width: 0; }
-    .personal-field { display: contents !important; }
-    .field-value { font-size: 15px !important; color: #fff !important; font-weight: 700 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .field-label { font-size: 13px !important; color: #999 !important; }
-    .personal-separator { font-size: 15px !important; color: rgba(255, 255, 255, 0.3) !important; flex-shrink: 0; }
+    .personal-row-3 {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto !important;
+      align-items: center !important;
+      column-gap: 6px !important;
+      font-family: "Pretendard", sans-serif !important;
+      font-size: 15px !important;
+      color: #ddd !important;
+      min-width: 0;
+    }
+    .personal-field {
+      display: contents !important;
+    }
+    .field-value {
+      font-size: 15px !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .field-label {
+      font-size: 13px !important;
+      color: #999 !important;
+    }
+    .personal-separator {
+      font-size: 15px !important;
+      color: rgba(255, 255, 255, 0.3) !important;
+      flex-shrink: 0;
+    }
     .personal-tags {
       .tag-badge {
         min-width: 150px !important;
@@ -7144,12 +7780,25 @@
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
-        &.tag-role { background: rgba(250, 171, 7, 0.15) !important; border: 1px solid rgba(250, 171, 7, 0.3) !important; color: rgb(250, 171, 7) !important; }
-        &.tag-keyword { background: rgba(135, 206, 250, 0.15) !important; border: 1px solid rgba(135, 206, 250, 0.3) !important; color: rgb(135, 206, 235) !important; }
+        &.tag-role {
+          background: rgba(250, 171, 7, 0.15) !important;
+          border: 1px solid rgba(250, 171, 7, 0.3) !important;
+          color: rgb(250, 171, 7) !important;
+        }
+        &.tag-keyword {
+          background: rgba(135, 206, 250, 0.15) !important;
+          border: 1px solid rgba(135, 206, 250, 0.3) !important;
+          color: rgb(135, 206, 235) !important;
+        }
       }
     }
 
-    .personal-grid { display: grid; grid-template-columns: 64px 1fr 140px !important; gap: 3px 12px !important; align-items: center !important; }
+    .personal-grid {
+      display: grid;
+      grid-template-columns: 64px 1fr 140px !important;
+      gap: 3px 12px !important;
+      align-items: center !important;
+    }
     .personal-photo {
       grid-column: auto;
       grid-row: auto;
@@ -7180,8 +7829,15 @@
       align-items: center !important;
       font-size: 14px !important;
     }
-    .field-value { font-size: 14px !important; color: #ddd !important; font-weight: 400 !important; }
-    .field-label { font-size: 12px !important; color: rgba(255, 255, 255, 0.4) !important; }
+    .field-value {
+      font-size: 14px !important;
+      color: #ddd !important;
+      font-weight: 400 !important;
+    }
+    .field-label {
+      font-size: 12px !important;
+      color: rgba(255, 255, 255, 0.4) !important;
+    }
     .personal-row-2 .personal-field:nth-of-type(3) .field-label,
     .personal-row-3 .personal-field:nth-of-type(3) .field-label {
       transform: translateX(0.2cm);
@@ -7230,18 +7886,36 @@
         line-height: 1.5;
         color: #ddd;
         resize: none !important;
-        &::placeholder { color: rgba(255, 255, 255, 0.3); }
-        &:focus { outline: none; border-color: rgba(250, 171, 7, 0.5); }
-        &:disabled { opacity: 0.6; background: rgba(255, 255, 255, 0.02); }
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+        &:focus {
+          outline: none;
+          border-color: rgba(250, 171, 7, 0.5);
+        }
+        &:disabled {
+          opacity: 0.6;
+          background: rgba(255, 255, 255, 0.02);
+        }
       }
-      .char-count { position: absolute; bottom: 8px; right: 12px; font-family: "Pretendard", sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.5); pointer-events: none; }
+      .char-count {
+        position: absolute;
+        bottom: 8px;
+        right: 12px;
+        font-family: "Pretendard", sans-serif;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+      }
     }
   }
 
   .field-error {
     border-color: #e74c3c !important;
     box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2) !important;
-    &.flash { animation: season-review-field-error-flash 0.3s ease-in-out 2 !important; }
+    &.flash {
+      animation: season-review-field-error-flash 0.3s ease-in-out 2 !important;
+    }
   }
   .rating-field.field-error {
     background: rgba(231, 76, 60, 0.05);
@@ -7264,13 +7938,97 @@
     box-sizing: border-box;
     border-top: none;
     background: transparent;
-    .modal-footer-top { display: flex; align-items: center; justify-content: space-between; width: 100%; position: relative; }
-    .modal-help-icon { flex-shrink: 0; width: 40px; height: 36px; padding: 0; border: none; background: transparent; border-radius: 0; color: #fff; font-size: 20px; cursor: pointer; position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; &::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: rgba(0, 0, 0, 0.6); border: none; border-radius: 0; z-index: -1; } }
-    .modal-footer-right { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-shrink: 0; min-width: 160px; }
+    .modal-footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+    }
+    .modal-help-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 36px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      border-radius: 0;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 46px;
+        height: 46px;
+        background: rgba(0, 0, 0, 0.6);
+        border: none;
+        border-radius: 0;
+        z-index: -1;
+      }
+    }
+    .modal-footer-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      min-width: 160px;
+    }
     .modal-edit-btn,
-    .modal-save-btn { padding: 8px 20px; background: #faab07; border: 1px solid transparent; color: #1a1a1a; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; &:hover:not(:disabled) { background: #ffb820; } &:disabled { opacity: 0.5; cursor: not-allowed; } }
-    .modal-cancel-btn { padding: 8px 20px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #ddd; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer; &:hover { border-color: #fff; color: #fff; } }
-    .modal-reset-btn { padding: 8px 20px; background: transparent; border: 1px solid #4caf50; color: #4caf50; border-radius: 0; font-family: "Pretendard", sans-serif; font-size: 14px; cursor: pointer; &:hover { background: rgba(76, 175, 80, 0.1); } }
+    .modal-save-btn {
+      padding: 8px 20px;
+      background: #faab07;
+      border: 1px solid transparent;
+      color: #1a1a1a;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover:not(:disabled) {
+        background: #ffb820;
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+    .modal-cancel-btn {
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ddd;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        border-color: #fff;
+        color: #fff;
+      }
+    }
+    .modal-reset-btn {
+      padding: 8px 20px;
+      background: transparent;
+      border: 1px solid #4caf50;
+      color: #4caf50;
+      border-radius: 0;
+      font-family: "Pretendard", sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        background: rgba(76, 175, 80, 0.1);
+      }
+    }
     .modal-footer-bottom {
       width: 100%;
       display: flex;
@@ -7278,32 +8036,36 @@
       justify-content: flex-end;
       text-align: right;
       border: none;
-      .modal-notice { margin: 0; font-family: "Pretendard", sans-serif; font-size: 13px; color: #e74c3c; text-align: right; }
+      .modal-notice {
+        margin: 0;
+        font-family: "Pretendard", sans-serif;
+        font-size: 13px;
+        color: #e74c3c;
+        text-align: right;
+      }
     }
   }
 }
 
 .cluster4-content {
   .help-modal-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100%;
-    height: 100vh;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 100001 !important;
   }
 
+  @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+    .help-modal-overlay {
+      display: grid !important;
+      place-items: center !important;
+    }
+  }
+
   .help-modal {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
     margin: 0 !important;
-    width: 1024px;
+    width: min(1024px, calc(100vw - 48px));
+    max-width: 1024px;
     height: 794px;
+    max-height: min(794px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -7407,21 +8169,25 @@
 }
 
 @keyframes season-review-field-error-flash {
-  0%, 100% { border-color: #e74c3c; box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2); }
-  50% { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5); }
+  0%,
+  100% {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+  }
+  50% {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.5);
+  }
 }
 
 .season-review-modal {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
   margin: 0 !important;
-  width: 570px;
+  width: min(570px, calc(100vw - 48px));
+  max-width: 570px;
   height: 449px;
-  max-height: 449px;
+  max-height: min(449px, calc(100dvh - 80px));
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
-  border: 1px solid #FFA500;
+  border: 1px solid #ffa500;
   box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
   overflow: hidden;
   position: relative;
@@ -7435,8 +8201,16 @@
     border-color: #ffa500;
     border-style: solid;
   }
-  &::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-  &::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  &::before {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+  &::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+  }
 
   .edit-modal-header {
     padding: 20px 24px;
@@ -7467,5 +8241,115 @@
     max-height: 118px;
     flex-shrink: 0;
     box-sizing: border-box;
+  }
+}
+
+/* ============================================
+   cluster-4-1 — season-growth-card 이미지 겹침 보정
+
+   문제: Zone A에서 .card-right 이미지가 .season-badge(성장 진행 중)를 123px 가림
+   해결: card-right 이미지의 width와 left를 조정하여 badge와 겹치지 않게 함
+
+   selector 구분:
+   - .nftg-app:has(.cluster4-section3) → cluster-4-1만 매칭
+   - cluster-4 페이지에는 .cluster4-section3가 없으므로 영향 없음
+   - 콘솔 진단으로 확인됨 (cluster-4: section3 false, cluster-4-1: section3 true)
+
+   Zone B(1920) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .nftg-app:has(.cluster4-section3) .season-growth-card .card-right {
+    width: 600px !important;
+    left: 700px !important;
+  }
+}
+
+/* ============================================
+   cluster-4-1 — Zone A (< 1920px) 모달 스크롤 활성화
+
+   문제: 1366×768 / 1440×900 / 1536×864 등 1920px 미만 해상도에서
+        시즌 모달 4종(form/view/review/keyword-select)이 viewport보다
+        클 때 본문이 스크롤되지 않거나(overflow: hidden) 모달 밖으로
+        넘쳐(overflow: visible) 잘려 보이는 문제.
+
+   해결: Zone A에서만 본문 영역을 overflow-y: auto로 전환하여 모달
+        내부에서 스크롤이 동작하도록 함. 모달의 viewport-aware 사이즈
+        (width: min(N, 100vw-48px), max-height: min(N, 100dvh-80px))는
+        이미 적용돼 있어 모달이 화면을 벗어나지 않음.
+
+   Zone B (1920×1080) 절대 보호:
+   @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  // 모달 1: 시즌 평판 작성/수정 (section-modal-wide 패턴, 979×570)
+  .section-modal.section-modal-season-reputation-form {
+    .section-modal-body.season-reputation-form-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 2: 시즌 평판 상세 보기 (979×570) — 사용자 명시 "section-modal: 평판 상세 보기"
+  .section-modal.section-modal-season-reputation-view {
+    .section-modal-body.season-reputation-view-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 3: 시즌 리뷰 (자기평가, 674×826)
+  .section-modal.section-modal-season-review {
+    .section-modal-body.season-review-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+
+  // 모달 4: 키워드 선택 서브모달 (form 내부)
+  .section-modal.keyword-select-modal {
+    .section-modal-body.keyword-select-body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-1 모달 overlay 좌표계 보정
+// 사유: .cluster4-content 페이지가 Zone A에서 1920 캔버스로 강제 확장됨
+//       (_cluster-zone-a.scss). overlay가 normal flow면 1920 캔버스 안
+//       에 갇혀 모달이 viewport 중앙이 아닌 캔버스 중앙에 배치되어
+//       작은 viewport에서 모달 일부가 잘리는 문제 발생.
+// 해결: Zone A에서만 overlay를 position: fixed; inset: 0 으로 viewport
+//       좌표계로 끌어올림. cluster-4-card에서 검증된 패턴 그대로 적용.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-content .section-modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+}
+
+// =====================================================================
+// Zone A (< 1920px) — cluster-4-1 모달 body 직계 자식 flex 압축 방지
+// 사유: body가 display: flex; flex-direction: column 이라 자식들이
+//       flex-shrink: 1(default)로 압축되어 본질 height을 잃음.
+//       그 결과 body scrollHeight가 실제 필요 높이를 반영하지 못해
+//       overflow-y: auto 가 발동하지 않음.
+// 적용: form-body, view-body, review-body (3개). keyword-select-body는
+//       display: flex가 아니므로 제외.
+// 범위: Zone B (1920×1080) baseline 영향 없음.
+// =====================================================================
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster4-content .section-modal.section-modal-season-reputation-form
+    .section-modal-body.season-reputation-form-body > *,
+  .cluster4-content .section-modal.section-modal-season-reputation-view
+    .section-modal-body.season-reputation-view-body > *,
+  .cluster4-content .section-modal.section-modal-season-review
+    .section-modal-body.season-review-body > * {
+    flex-shrink: 0 !important;
   }
 }

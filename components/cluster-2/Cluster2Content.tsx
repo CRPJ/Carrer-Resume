@@ -10,6 +10,7 @@ import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { isAdminEmail } from "@/lib/admin";
 import { usePopup } from "@/components/ui/popup";
+import { logEvent } from "@/utils/blackScreenDiagnostics";
 import { CLUSTER2_DUMMY_PHOTOS, CLUSTER2_DUMMY_SLOGANS, CLUSTER2_DUMMY_VIDEOS, CLUSTER2_DUMMY_EDUCATIONS, CLUSTER2_DUMMY_REVIEWS, CLUSTER2_DUMMY_INTRO, CLUSTER2_DUMMY_BY_USER, DEFAULT_DEMO_USER } from "@/constants/dummyData";
 import { SECTION1_PHOTO_DEFAULTS } from "@/constants/dummyData/cluster2-section1-default";
 import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section2-default";
@@ -635,6 +636,7 @@ const Cluster2Content = () => {
   // 섹션 2-1 모달 (비디오 편집)
   const [section21ModalOpen, setSection21ModalOpen] = useState(false);
   const section21OverlayRef = useRef<HTMLDivElement>(null);
+  const introOverlayRef = useRef<HTMLDivElement>(null);
   // YouTube 비디오 ID 추출 함수
   const extractYouTubeId = (url: string): string | null => {
     if (!url) return null;
@@ -1089,6 +1091,38 @@ const Cluster2Content = () => {
   const anyModalOpen = section1ModalOpen || section2ModalOpen || section21ModalOpen || section3ModalOpen || section4ModalOpen || introModalOpen;
   useModalScroll(anyModalOpen);
 
+  useEffect(() => {
+    logEvent(section1ModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "section1-photo" });
+  }, [section1ModalOpen]);
+
+  useEffect(() => {
+    logEvent(section2ModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "section2-slogan" });
+  }, [section2ModalOpen]);
+
+  useEffect(() => {
+    logEvent(section21ModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "section21-video" });
+  }, [section21ModalOpen]);
+
+  useEffect(() => {
+    logEvent(section3ModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "section3-education" });
+  }, [section3ModalOpen]);
+
+  useEffect(() => {
+    logEvent(section4ModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "section4-review" });
+  }, [section4ModalOpen]);
+
+  useEffect(() => {
+    logEvent(introModalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "intro" });
+  }, [introModalOpen]);
+
+  useEffect(() => {
+    logEvent(modalOpen ? "modal-open" : "modal-close", { source: "cluster-2", name: "education-detail" });
+  }, [modalOpen]);
+
+  useEffect(() => {
+    logEvent(anyModalOpen ? "scroll-lock" : "scroll-unlock", { source: "cluster-2", reason: "anyModalOpen" });
+  }, [anyModalOpen]);
+
   // section21 모달 배경 스크롤 차단 (native listener — passive: false 필수)
   useEffect(() => {
     if (!section21ModalOpen) return;
@@ -1096,7 +1130,7 @@ const Cluster2Content = () => {
     if (!overlay) return;
 
     const handleWheel = (e: WheelEvent) => {
-      const body = overlay.querySelector(".section21-modal-body") as HTMLElement | null;
+      const body = document.querySelector(".section21-modal-body") as HTMLElement | null;
       if (!body) {
         e.preventDefault();
         return;
@@ -1106,17 +1140,87 @@ const Cluster2Content = () => {
         e.preventDefault();
         return;
       }
-      const remainingDown = body.scrollHeight - body.clientHeight - body.scrollTop;
-      const remainingUp = body.scrollTop;
-      const absDelta = Math.abs(e.deltaY);
-      const canScrollDown = e.deltaY > 0 && remainingDown >= absDelta;
-      const canScrollUp = e.deltaY < 0 && remainingUp >= absDelta;
-      if (!canScrollDown && !canScrollUp) e.preventDefault();
+
+      if (e.shiftKey) {
+        if (body.scrollWidth > body.clientWidth) {
+          const canScrollX =
+            (e.deltaY > 0 && body.scrollLeft + body.clientWidth < body.scrollWidth) ||
+            (e.deltaY < 0 && body.scrollLeft > 0);
+
+          if (canScrollX) {
+            body.scrollLeft += e.deltaY;
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+        }
+      }
+
+      const canScrollY =
+        (e.deltaY > 0 && body.scrollTop + body.clientHeight < body.scrollHeight) ||
+        (e.deltaY < 0 && body.scrollTop > 0);
+
+      if (canScrollY) {
+        body.scrollTop += e.deltaY;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      e.preventDefault();
     };
 
     overlay.addEventListener("wheel", handleWheel, { passive: false });
     return () => overlay.removeEventListener("wheel", handleWheel);
   }, [section21ModalOpen]);
+
+  // intro-modal Zone A 휠 스크롤 활성화 (native listener — passive: false 필수)
+  // useModalScroll의 >= absDelta 조건이 휠 끝부분에서 차단하는 문제 우회
+  // Zone A에서만 적용: 1920px 이상 환경에서는 등록 안 함
+  useEffect(() => {
+    if (!introModalOpen) return;
+
+    const isZoneAViewport =
+      window.innerWidth < 1920 ||
+      (window.innerWidth >= 1920 && window.innerWidth < 2560 && window.innerHeight >= 1200);
+    if (!isZoneAViewport) return;
+
+    const overlay = introOverlayRef.current;
+    if (!overlay) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const body = overlay.querySelector(".intro-modal-body") as HTMLElement | null;
+      if (!body) {
+        e.preventDefault();
+        return;
+      }
+
+      // 휠 target이 body 바깥이면 차단 (모달 외부 스크롤 방지)
+      if (!body.contains(e.target as Node)) {
+        e.preventDefault();
+        return;
+      }
+
+      // body 끝 도달 여부 판단 — useModalScroll보다 너그러운 조건 (>= absDelta가 아닌 > 0)
+      const remainingDown = body.scrollHeight - body.clientHeight - body.scrollTop;
+      const remainingUp = body.scrollTop;
+      const canScrollDown = e.deltaY > 0 && remainingDown > 0;
+      const canScrollUp = e.deltaY < 0 && remainingUp > 0;
+
+      if (canScrollDown || canScrollUp) {
+        // body가 직접 스크롤하도록 + 글로벌 useModalScroll 가드 차단
+        body.scrollTop += e.deltaY;
+        e.stopPropagation();
+        e.preventDefault();
+      } else {
+        // 끝 도달 시 페이지 스크롤 방지
+        e.preventDefault();
+      }
+    };
+
+    overlay.addEventListener("wheel", handleWheel, { passive: false });
+    return () => overlay.removeEventListener("wheel", handleWheel);
+  }, [introModalOpen]);
 
   const [reviewLinks, setReviewLinks] = useState<string[]>([
     "", // Total Complete (cluving_review_link)
@@ -3209,7 +3313,7 @@ const Cluster2Content = () => {
       )}
       {/* 섹션 5 모달 - 자기소개서 카드 상세/편집 */}
       {introModalOpen && selectedIntroCard !== null && (
-        <div className="intro-modal-overlay">
+        <div ref={introOverlayRef} className="intro-modal-overlay">
           <div className="modal-scroll-content">
             <div className="intro-modal" onClick={(e) => e.stopPropagation()}>
               <div className="intro-modal-header">

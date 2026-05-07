@@ -3,22 +3,41 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+type NavigatorWithUserAgentData = Navigator & {
+  userAgentData?: {
+    mobile?: boolean;
+  };
+};
+
+const isMobileDevice = () => {
+  const nav = navigator as NavigatorWithUserAgentData;
+  const uaMobile = nav.userAgentData?.mobile === true;
+  const userAgent = navigator.userAgent || "";
+  const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+  const noHover = window.matchMedia?.("(hover: none)").matches ?? false;
+  const touchCapable = navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+  const smallDeviceScreen = Math.min(screen.width, screen.height) < 1280;
+
+  return uaMobile || mobileUserAgent || (touchCapable && coarsePointer && noHover && smallDeviceScreen);
+};
+
 const MobileBlockScreen = () => {
   const [showBlock, setShowBlock] = useState(false);
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      // screen.width: 물리적 해상도 기준 (브라우저 zoom 무관)
-      setShowBlock(screen.width < 1280);
+    const checkDeviceType = () => {
+      setShowBlock(isMobileDevice());
+    };
+    const handleOrientationChange = () => {
+      setTimeout(checkDeviceType, 200);
     };
 
-    checkScreenSize();
-    window.addEventListener("orientationchange", () => {
-      setTimeout(checkScreenSize, 200);
-    });
+    checkDeviceType();
+    window.addEventListener("orientationchange", handleOrientationChange);
 
     return () => {
-      window.removeEventListener("orientationchange", checkScreenSize);
+      window.removeEventListener("orientationchange", handleOrientationChange);
     };
   }, []);
 

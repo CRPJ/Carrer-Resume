@@ -581,6 +581,32 @@
                 color: #fed402;
               }
 
+              .hl {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 4px;
+                border-radius: 4px;
+                color: #000;
+                font-weight: 700;
+
+                &.success {
+                  background: #9dfa07;
+                }
+
+                &.fail {
+                  background: #ff6b6b;
+                }
+
+                &.personal {
+                  background: #65e3ff;
+                }
+
+                &.official {
+                  background: #ffea48;
+                }
+              }
+
               .label-icon {
                 width: 18px;
                 height: 18px;
@@ -2698,25 +2724,17 @@
 
 // 섹션 3, 4, 5 모달 - 링크 편집
 .section-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 99999;
-  overflow-y: auto;
-  padding: 40px 0;
+  overflow: auto;
+  padding: 40px 24px;
 }
 
 .section-modal {
-  width: 1468px;
+  width: min(1468px, calc(100vw - 48px));
   height: 855px;
   max-width: 1468px;
-  max-height: 855px;
+  max-height: min(855px, calc(100dvh - 80px));
   border: 1px solid #ffa500 !important;
   border-radius: 0 !important;
   border-image: none !important;
@@ -3872,21 +3890,17 @@
 }
 
 // Output(Top Works) 모달 — 가로형_대 1468×855, 타입 B
+// position/inset/overflow/padding/grid centering은 _global.scss [class*="modal-overlay"] 글로벌 규칙에서 제공
 .output-modal-overlay {
-  position: fixed;
-  inset: 0;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 100000;
 }
 
 .output-modal {
-  width: 1468px;
+  width: min(1468px, calc(100vw - 48px));
   height: 855px;
   max-width: 1468px;
-  max-height: 855px;
+  max-height: min(855px, calc(100dvh - 80px));
   background: var(--template-bg, #1a1a2e);
   border: 1px solid #ffa500 !important;
   border-radius: 0 !important;
@@ -3973,10 +3987,15 @@
 
   .output-modal-body {
     flex: 1;
+    min-height: 0;
     overflow-y: scroll !important;
     padding: 20px 40px;
     display: flex;
     flex-direction: column;
+
+    // section-modal-body와 동일한 스크롤바 가시화 패턴
+    scrollbar-width: thin;
+    scrollbar-color: #ffa500 #252836;
 
     &::-webkit-scrollbar {
       width: 6px !important;
@@ -3984,10 +4003,14 @@
     }
     &::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.05) !important;
+      border-radius: 3px !important;
     }
     &::-webkit-scrollbar-thumb {
       background: rgba(250, 171, 7, 0.3) !important;
       border-radius: 3px !important;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(250, 171, 7, 0.5) !important;
     }
 
     .char-count {
@@ -4033,25 +4056,33 @@
       margin-bottom: 0;
       align-items: stretch;
       flex-shrink: 0;
+      min-width: 0;
     }
 
     .output-left-column {
-      flex: 1 0 auto;
+      flex: 1 1 0;
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
     .output-right-column {
-      flex: none;
-      width: 370px;
+      flex: 0 1 370px;
+      width: min(370px, 100%);
       max-width: 370px;
+      min-width: 0;
 
       .output-main-image {
+        width: 100%;
+        max-width: 100%;
         height: 100%;
         max-height: calc(100% - 19px);
+        min-width: 0;
 
         .image-preview {
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 100%;
           height: 100%;
         }
       }
@@ -4061,9 +4092,11 @@
     .output-role-links-row {
       display: flex;
       gap: 20px;
+      min-width: 0;
 
       .output-role-column {
-        flex: 0 0 628px;
+        flex: 0 1 628px;
+        min-width: 0;
         display: flex;
         flex-direction: column;
 
@@ -4092,10 +4125,12 @@
       display: flex;
       gap: 20px;
       flex-shrink: 0;
+      min-width: 0;
       margin-top: -14px;
 
       .output-bottom-left {
         flex: 0 0 50%;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -4111,6 +4146,7 @@
 
       .output-stats-column {
         flex: 1;
+        min-width: 0;
       }
     }
 
@@ -4796,19 +4832,23 @@
     // (12) 하단 이미지 그리드 2장
     .output-sub-images {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 12px;
       margin-top: 16px;
       min-height: 230px;
+      min-width: 0;
 
       .output-sub-image-slot {
         position: relative;
         height: 230px;
         max-height: 230px;
         overflow: hidden;
+        min-width: 0;
 
         .image-preview {
+          box-sizing: border-box;
           width: 100%;
+          max-width: 100%;
           height: 100%;
           max-height: 230px;
           cursor: pointer;
@@ -5164,11 +5204,14 @@
       height: 308px;
       max-height: 325px;
       min-height: 325px;
+      min-width: 0;
       margin-bottom: 16px;
       overflow: hidden;
 
       .image-preview {
+        box-sizing: border-box;
         width: 100%;
+        max-width: 100%;
         height: 100%;
         max-height: 325px;
         cursor: pointer;
@@ -5513,6 +5556,14 @@
   }
 }
 
+// Zone A: keep cluster3 channel modal bottom textareas as one horizontal canvas.
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .cluster3-content .section-modal .section-modal-body > .channel-bottom-section {
+    min-width: 1180px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
 .period-range-panel.calendar-popup {
   position: absolute;
   width: 286px;
@@ -5659,10 +5710,12 @@
   }
 }
 
-// 도움말 모달
+// 도움말 모달 — overlay는 JSX inline style + _global.scss [class*="modal-overlay"] 글로벌 규칙(grid centering)에서 처리
 .help-modal {
-  width: 1024px;
+  width: min(1024px, calc(100vw - 48px));
+  max-width: 1024px;
   height: 794px;
+  max-height: min(794px, calc(100dvh - 80px));
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
   border: 1px solid #ffa500;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
@@ -5743,33 +5796,99 @@
   padding: 20px;
 }
 
-// ===== Zone A (<1920): 모달 1920 baseline 고정 + 가로 스크롤 허용 =====
-// 페이지 본문과 별개 정책. viewport<1920 시 모달은 축소하지 않고 오버레이 내에서 스크롤.
-// Zone B(1920) / Zone C(>1920) 변화 없음.
-@media (max-width: 1919px) {
-  // Zone A에서 overlay를 block으로 전환 — flex의 "centered overflow 왼쪽 접근 불가" 버그를 근본 회피.
-  // help-modal-overlay는 JSX에 inline style이 있어 !important로 덮어쓰기.
-  .section-modal-overlay,
-  .output-modal-overlay,
-  .help-modal-overlay {
-    display: block !important;
-    overflow: auto !important;
+// .modal-scroll-content 무력화는 _global.scss에서 모든 viewport에 일괄 적용됨
+// (display: contents). cluster3 스코프 별도 규칙 불필요.
+
+/* ============================================
+   cluster3 — output/detail 모달 편집 모드 레이아웃 통합 보정
+
+   4가지 문제 보정:
+   1. [Zone A] 우측 링크 영역 좌측 잘림 — link-input/link-dot 폭 조정
+   2. [모든 zone] 역할 input-wrap min-width 612px이 부모 침범
+      (Zone A 81px / Zone B 85px / Zone C 84px — 모든 zone에서 발생하는 구조적 문제)
+   3. [Zone A] sub-title의 width 983px(SCSS 절대값) 부모 침범
+   4. [Zone A] meta-row platform 우측 침범 — contribution flex 폭 조정
+
+   selector 구분:
+   - .output-modal-overlay: output / detail 모달 동일 컴포넌트 재사용
+   - 보정 2번은 모든 zone 발생하는 구조적 문제 → @media 밖
+   - 나머지는 Zone A 한정 → @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안
+   ============================================ */
+
+/* 보정 2: role-input-wrap min-width 풀기 (모든 zone) */
+.output-modal-overlay {
+  .output-role-section .output-role-header .output-role-input-wrap {
+    min-width: 0 !important;
+  }
+}
+
+/* 보정 1, 3, 4: Zone A 전용 */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .output-modal-overlay {
+    /* 보정 1: 우측 링크 영역 폭 조정 */
+    .output-links-section {
+      .output-link-input {
+        max-width: 140px !important;
+      }
+
+      .link-dot {
+        margin-right: 8px !important;
+      }
+    }
+
+    /* 보정 3: sub-title 폭 보정 (SCSS 절대값 무력화) */
+    .output-modal .output-modal-body .output-sub-title {
+      width: auto !important;
+      max-width: 100% !important;
+    }
+
+    .output-modal .output-modal-body .output-sub-title .output-sub-title-input {
+      width: 100% !important;
+    }
+
+    /* 보정 4: meta-row contribution / platform 폭 조정
+       left-column이 좁을 때 contribution이 가용 공간으로 수축, 넉넉할 땐 560/470 상한 유지 */
+    .output-meta-row {
+      .output-contribution {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        max-width: 560px !important;
+
+        .contribution-bar-wrapper {
+          flex: 1 1 0 !important;
+          width: auto !important;
+          min-width: 0 !important;
+          max-width: 470px !important;
+        }
+      }
+    }
   }
 
-  // 스크롤 컨테이너: wrapper(1920) ≥ modal(1468)이라 wrapper 내부 flex center는 안전.
-  // overlay가 block이므로 wrapper가 x=0에서 시작 → 양방향 scroll 정상.
-  .modal-scroll-content {
-    min-width: 1920px;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-  }
+  /* 보정 5 (D-3): section3 채널 모달 자식 입력 폭 유연화
+     배경: 자식 width 233px가 부모 컬럼폭(.channel-info-section: 32%)이 좁아질 때 잘림 유발
+     1920(Zone B)는 base 정의 그대로 → max-width: 233px 상한이 그대로 작동하므로 변화 없음
+     .rating-field는 의도적으로 제외 (별점 영역 55px 제약 보호) */
+  .channel-info-field {
+    input,
+    .custom-dropdown,
+    .platform-dropdown,
+    .channel-date-input,
+    .channel-name-input-wrapper,
+    .link-field {
+      width: 100% !important;
+      max-width: 233px !important;
+      min-width: 0 !important;
+      flex: 1 1 0 !important;
+    }
 
-  // 가로형_대(1468×855)
-  .section-modal,
-  .output-modal {
-    flex-shrink: 0;
+    .link-field {
+      input,
+      .field-value {
+        width: 100% !important;
+        max-width: 233px !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+      }
+    }
   }
 }

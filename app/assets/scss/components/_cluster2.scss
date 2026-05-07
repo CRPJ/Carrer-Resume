@@ -2932,16 +2932,16 @@
   // 학력 상세 모달
   .edu-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 9999;
     animation: fadeIn 0.3s ease;
+    overscroll-behavior: contain;
   }
 
   @keyframes fadeIn {
@@ -2966,10 +2966,10 @@
 
   .edu-modal {
     position: relative;
-    width: 1024px;
+    width: min(1024px, calc(100vw - 48px));
     max-width: 1024px;
     height: 794px;
-    max-height: 794px;
+    max-height: min(794px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -3162,7 +3162,8 @@
 
     // 비고 내용만 표시하는 모달 스타일
     &.description-only {
-      width: 1024px;
+      width: min(1024px, calc(100vw - 48px));
+      max-width: 1024px;
 
       .modal-header {
         padding: 20px 40px 15px;
@@ -3221,22 +3222,22 @@
   // 섹션 4 모달 - 바로가기 링크 편집 (모달은 cluster2-content 직접 하위에 렌더)
   .section4-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
+    overscroll-behavior: contain;
   }
 
   .section4-modal {
-    width: 674px;
+    width: min(674px, calc(100vw - 48px));
     height: 826px;
     max-width: 674px;
-    max-height: 826px;
+    max-height: min(826px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -3515,23 +3516,22 @@
   // 섹션 5 모달 - 자기소개서 카드 상세/편집
   .intro-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
+    overscroll-behavior: contain;
   }
 
   .intro-modal {
-    width: 1468px;
+    width: min(1468px, calc(100vw - 48px));
     max-width: 1468px;
     height: 855px;
-    min-height: 855px;
-    max-height: 855px;
+    max-height: min(855px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #ffa500;
     border-radius: 0;
@@ -4054,23 +4054,22 @@
   // 섹션 2-1 모달 스타일
   .section21-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px 40px 68px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
-    padding-left: 68px;
+    overscroll-behavior: contain;
 
     .section21-modal {
       border: 1px solid #ffa500;
-      width: 1468px;
-      max-width: 95vw;
+      width: min(1468px, calc(100vw - 92px));
+      max-width: 1468px;
       height: 855px;
-      max-height: 855px;
+      max-height: min(855px, calc(100dvh - 80px));
       border-radius: 0;
       overflow: hidden;
       display: flex;
@@ -4362,27 +4361,25 @@
 
   .section1-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
     animation: modalFadeIn 0.3s ease;
-    overflow-y: auto;
-    padding: 20px 0;
+    overscroll-behavior: contain;
   }
 
   .section1-modal {
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 1468px;
-    max-width: 95vw;
+    width: min(1468px, calc(100vw - 48px));
+    max-width: 1468px;
     height: 855px;
-    max-height: 855px;
+    max-height: min(855px, calc(100dvh - 80px));
     margin: 0;
     overflow: hidden;
     position: relative;
@@ -4606,20 +4603,22 @@
 
       .photo-preview-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
+        inset: 0;
         background: rgba(0, 0, 0, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        overflow: auto;
+        padding: 40px 24px;
+        box-sizing: border-box;
+        display: grid;
+        place-items: center;
         z-index: 100002;
+        overscroll-behavior: contain;
       }
 
       .photo-preview-modal {
-        width: 979px;
+        width: min(979px, calc(100vw - 48px));
+        max-width: 979px;
         height: 570px;
+        max-height: min(570px, calc(100dvh - 80px));
         background: var(--template-bg, #1a1a2e);
         border: 1px solid #FFA500;
         box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -4737,17 +4736,16 @@
   // 섹션 2 모달 - 슬로건 편집
   .section2-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
     animation: modalFadeIn 0.3s ease;
-    overflow: hidden;
+    overscroll-behavior: contain;
   }
 
   @keyframes modalFadeIn {
@@ -4773,9 +4771,10 @@
   .section2-modal {
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 674px;
+    width: min(674px, calc(100vw - 48px));
+    max-width: 674px;
     height: 826px;
-    max-height: 826px;
+    max-height: min(826px, calc(100dvh - 80px));
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -5187,25 +5186,25 @@
   // 섹션 3 모달 - 학력 편집
   .section3-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 99999;
     animation: modalFadeIn 0.3s ease;
-    overflow: hidden;
+    overscroll-behavior: contain;
   }
 
   .section3-modal {
     border: 1px solid #ffa500;
     border-radius: 0;
-    width: 674px;
+    width: min(674px, calc(100vw - 48px));
+    max-width: 674px;
     height: 826px;
-    max-height: 826px;
+    max-height: min(826px, calc(100dvh - 80px));
     overflow: hidden;
     position: relative;
     animation: modalSlideIn 0.3s ease;
@@ -6385,16 +6384,16 @@
   // 삭제 확인 모달 스타일
   .delete-confirm-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 100000;
     animation: fadeIn 0.2s ease;
+    overscroll-behavior: contain;
   }
 
   .delete-confirm-modal {
@@ -6424,10 +6423,10 @@
     }
 
     padding: 40px;
-    width: 611px;
-    max-width: 95vw;
+    width: min(611px, calc(100vw - 48px));
+    max-width: 611px;
     height: 449px;
-    max-height: 449px;
+    max-height: min(449px, calc(100dvh - 80px));
     text-align: center;
     animation: deleteModalSlideUp 0.3s ease;
 
@@ -6705,20 +6704,22 @@
   // ===== 도움말 모달 =====
   .help-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
+    inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: auto;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
     z-index: 100001;
+    overscroll-behavior: contain;
   }
 
   .help-modal {
-    width: 1024px;
+    width: min(1024px, calc(100vw - 48px));
+    max-width: 1024px;
     height: 794px;
+    max-height: min(794px, calc(100dvh - 80px));
     background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
     border: 1px solid #FFA500;
     box-shadow: 0px 0px 60px 0px rgba(255, 165, 0, 0.15);
@@ -6825,66 +6826,86 @@
   }
 } // end .cluster2-content
 
-// ===== Zone A (<1920): 모달 1920 baseline 고정 + 가로 스크롤 허용 =====
-// 페이지 본문과 별개 정책. viewport<1920 시 모달은 축소하지 않고 오버레이 내에서 스크롤.
-// Zone B(1920) / Zone C(>1920) 변화 없음.
-@media (max-width: 1919px) {
-  // Zone A에서 overlay를 block으로 전환 — flex의 "centered overflow 왼쪽 접근 불가" 버그를 근본 회피.
-  // Zone B에서는 @media 밖이라 기존 flex/center 규칙 그대로 유지.
-  // !important 이유: Zone B nested selector(0,2,0) + inline style까지 모두 덮어쓰기 위함.
-  .section1-modal-overlay,
-  .section2-modal-overlay,
-  .section21-modal-overlay,
-  .section3-modal-overlay,
-  .section4-modal-overlay,
-  .intro-modal-overlay,
-  .edu-modal-overlay,
-  .help-modal-overlay,
-  .delete-confirm-overlay {
-    display: block !important;
-    overflow: auto !important;
-  }
+// .modal-scroll-content 무력화는 _global.scss에서 모든 viewport에 일괄 적용됨
+// (display: contents). cluster2 스코프 별도 규칙 불필요.
 
-  // section21 오버레이의 padding-left:68이 좌측을 잘라내므로 Zone A에서 제거
-  .section21-modal-overlay {
-    padding-left: 0;
-  }
+/* ============================================
+   Zone A 폭 확장 (cluster2 전용)
 
-  // 스크롤 컨테이너: 1468 모달을 감싸 오버레이 내부 자체 스크롤을 유발.
-  // overlay가 block이므로 wrapper는 overlay의 x=0 위치에서 시작 → scrollLeft [0, 480] 양방향 정상 동작.
-  // wrapper(1920) ≥ modal(1468)이라 wrapper 내부 flex center는 centered overflow 문제 없음.
-  // Zone B(1920)에서는 @media 밖이라 이 규칙 적용 안 됨.
-  .modal-scroll-content {
-    min-width: 1920px;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-  }
+   목적: Zone A 뷰포트(< 1920px)에서 cluster2 페이지가
+        Zone B(1920px)와 동일한 시각적 결과를 가로 스크롤로 보여주도록 함
 
-  // 가로형_대(1468×855): 기존 max-width:95vw 제약 제거, 축소 금지
-  .section1-modal,
-  .section21-modal,
-  .intro-modal {
-    max-width: 1468px !important;
-    flex-shrink: 0;
-  }
+   메커니즘:
+   - 부모 .nftg-app: 1920 → 1995 (= 1920 + nftg-sidebar 75px) 확장
+     → nftg-sidebar(75px sticky)의 자리를 확보
+   - 자식 .nftg-layout: flex: 1 1 0% → flex: 0 0 1920px 강제
+     → 메인 콘텐츠 영역이 1920px 전체를 받음
+   - .home-two-content-col은 flex 메커니즘에 의해 자동으로 75px 확장 (1238→1293)
+   - .nftg-sidebar는 변경 없음 (sticky 유지, 햄버거 메뉴 정상 표시)
 
-  // 세로형_대(674×826)
-  .section2-modal,
-  .section3-modal,
-  .section4-modal {
-    flex-shrink: 0;
-  }
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .nftg-app:has(.cluster2-content) {
+    width: 1995px !important;
+    min-width: 1995px !important;
 
-  // 보조(1024×794)
-  .edu-modal,
-  .help-modal {
-    flex-shrink: 0;
+    > .nftg-layout {
+      flex: 0 0 1920px !important;
+      width: 1920px !important;
+      min-width: 1920px !important;
+    }
   }
+}
 
-  .delete-confirm-modal {
-    flex-shrink: 0;
+/* ============================================
+   Cluster2 intro-modal Zone A 스크롤 활성화 (v2)
+
+   목적: Zone A 환경에서 intro-modal-body 콘텐츠가 길어질 때
+        body 영역에 스크롤바가 정상 발생하도록 함
+
+   진짜 원인:
+   - intro-modal-body 자체는 이미 overflow-y: scroll, flex: 1 1 0%,
+     min-height: 0 으로 올바르게 설정되어 있음
+   - 그러나 content-section이 flex: 1 0 0% (flex-grow: 1)로 설정되어
+     자기 자식(textarea-wrapper 336px)을 무시하고 부모의 남은 공간
+     (276px)만 받음
+   - 결과: textarea-wrapper가 content-section을 뚫고 나오지만
+     scrollHeight는 clientHeight와 같아 스크롤 활성화 안 됨
+
+   해결:
+   - content-section을 flex: 0 0 auto + height: auto로 변경
+     → 자기 자식 크기(textarea-wrapper 336px)를 자기 크기로 받음
+     → body의 scrollHeight가 자식 합계로 늘어남
+     → overflow-y: scroll 정상 활성화
+   - textarea-wrapper도 flex: 0 0 auto + flex-shrink: 0 추가
+     → 압축되지 않고 자기 크기 유지
+   - body의 모든 직속 자식에 flex-shrink: 0 추가
+     → subtitle-section 등 다른 자식도 압축되지 않음
+
+   부수 효과:
+   - 콘텐츠가 짧을 때(현재 정상 상태)에는 변화 없음
+   - 콘텐츠가 길어질 때만 스크롤로 접근 가능해짐
+   - char-count(0/1,000)가 정상 위치에 표시됨
+
+   Zone B(1920px) 절대 보호: @media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) 안에서만 동작
+   ============================================ */
+@media (max-width: 1919px), (min-width: 1920px) and (max-width: 2559px) and (min-height: 1200px) {
+  .nftg-app:has(.cluster2-content) {
+    .intro-modal-body {
+      > * {
+        flex-shrink: 0 !important;
+      }
+
+      .content-section {
+        flex: 0 0 auto !important;
+        height: auto !important;
+      }
+
+      .textarea-wrapper {
+        flex: 0 0 auto !important;
+        flex-shrink: 0 !important;
+      }
+    }
   }
 }

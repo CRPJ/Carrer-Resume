@@ -112,7 +112,13 @@
       "Bash(perl -i *)",
       "Bash(perl -i -pe 's/__POPUP_PH__\\\\\\(/await popup.alert\\(/g' components/cluster-4-card/Cluster4CardContent.tsx)",
       "Bash(perl -ne 'BEGIN { $/ = undef } while \\(/const \\(\\\\w+\\) = \\\\\\(\\\\\\) => \\\\{\\(.*?\\)^  \\\\};?$/gms\\) { my \\($name, $body\\) = \\($1, $2\\); if \\($body =~ /await popup\\\\.alert/\\) { print \"Sync handler with await: $name\\\\n\" } }' components/cluster-2/Cluster2Content.tsx)",
-      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\\" | Where-Object { $_.Name -match \"PHASE|alert|cluster4\" } | Select-Object Name, LastWriteTime | Format-Table -AutoSize)"
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\ynlee\\\\Downloads\\\\\" | Where-Object { $_.Name -match \"PHASE|alert|cluster4\" } | Select-Object Name, LastWriteTime | Format-Table -AutoSize)",
+      "Bash(echo \"exit=$?\")",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_take_screenshot",
+      "PowerShell(Move-Item *)",
+      "mcp__playwright__browser_navigate_back",
+      "mcp__playwright__browser_wait_for"
     ],
     "deny": [],
     "ask": []

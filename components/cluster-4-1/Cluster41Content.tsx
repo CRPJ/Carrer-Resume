@@ -1136,13 +1136,18 @@ const Cluster41Content = () => {
           const rawSeasonName = seasonData?.name || '';
           const { displayName: seasonName, isBreak: isBreakSeason, fromSeason: breakFromSeason, toSeason: breakToSeason } = parseBreakSeasonName(rawSeasonName);
 
-          // 성장 상태 결정 (온보딩 → break 시즌 → 개인 휴식 → 시간 phase → weeklyGrowth/폴백)
+          // 성장 상태 결정 (온보딩 → 공식 휴식 → 개인 휴식 → 시간 phase → weeklyGrowth/폴백)
           let status = '실패';
 
-          // 개인 휴식 여부 — phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 플래그를 본다.
+          // 휴식 여부 — phase(진행 중/집계 중) 와 무관하게 운영진이 마킹한 휴식 플래그를 본다.
           const weeklyGrowthForWeek = userWeeklyGrowthMap.get(week.id);
           const isOnboardingThisWeek = !!(apiOnboardingWeekId && week.id === apiOnboardingWeekId);
-          const userIsOnPersonalRestForWeek = !isOnboardingThisWeek && (
+          const userIsOnOfficialRestForWeek = !isOnboardingThisWeek && (
+            isBreakSeason
+            || !!weeklyGrowthForWeek?.is_club_break
+            || (!weeklyGrowthForWeek && !!week.is_club_break)
+          );
+          const userIsOnPersonalRestForWeek = !isOnboardingThisWeek && !userIsOnOfficialRestForWeek && (
             !!weeklyGrowthForWeek?.is_resting
             || (!weeklyGrowthForWeek && restWeekIds.has(week.id))
           );
@@ -1150,11 +1155,11 @@ const Cluster41Content = () => {
           // 온보딩 주차는 무조건 성공 처리
           if (isOnboardingThisWeek) {
             status = '성공';
-          } else if (isBreakSeason) {
-            // break 시즌(전환 주차)은 기본적으로 휴식(공식)
+          } else if (userIsOnOfficialRestForWeek) {
+            // 클럽 공식 휴식 주차(전환 주차 포함)는 phase 우회하고 카드 노출 시점부터 바로 '휴식(공식)'.
             status = '휴식(공식)';
           } else if (userIsOnPersonalRestForWeek) {
-            // 개인 휴식 크루는 phase(진행 중/집계 중) 를 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
+            // 개인 휴식 크루도 phase 우회하고 카드 노출 시점부터 바로 '휴식(개인)'.
             status = '휴식(개인)';
           } else {
             // 주차 시작(월 00:00 KST)으로부터 경과 시간 산출
@@ -1170,23 +1175,11 @@ const Cluster41Content = () => {
               // (일) 00:00 ~ N+1(목) 12:01 — 핑크 '집계 중'
               status = '집계 중';
             } else {
-              // N+1(목) 12:01 이후 — 성공/실패/휴식 결정 (weeklyGrowth 또는 폴백)
-              // ※ 개인 휴식은 위에서 이미 처리됨 — 여기는 개인 휴식이 아닌 케이스만 들어옴.
+              // N+1(목) 12:01 이후 — 성공/실패 결정 (휴식은 위에서 이미 처리됨)
               if (weeklyGrowthForWeek) {
-                if (weeklyGrowthForWeek.is_club_break) {
-                  status = '휴식(공식)';
-                } else if (weeklyGrowthForWeek.is_success) {
-                  status = '성공';
-                } else {
-                  status = '실패';
-                }
-              } else {
-                // user_weekly_growth 가 아직 없으면 기존 폴백 로직
-                if (week.is_club_break) {
-                  status = '휴식(공식)';
-                } else if (activityWeekIds.has(week.id)) {
-                  status = '성공';
-                }
+                status = weeklyGrowthForWeek.is_success ? '성공' : '실패';
+              } else if (activityWeekIds.has(week.id)) {
+                status = '성공';
               }
             }
           }

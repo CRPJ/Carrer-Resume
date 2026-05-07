@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect } from "react";
+import { logEvent } from "@/utils/blackScreenDiagnostics";
 
 /**
  * 고정 너비 레이아웃 헬퍼
@@ -17,6 +18,10 @@ const updateHeaderDividerY = () => {
   document.documentElement.style.setProperty("--header-divider-y", `${headerHeight}px`);
 };
 
+const isZoneAViewport = () =>
+  window.innerWidth < 1920 ||
+  (window.innerWidth >= 1920 && window.innerWidth < 2560 && window.innerHeight >= 1200);
+
 const ResponsiveScale = () => {
   // 초기 헤더 높이 측정: useLayoutEffect로 PageReveal(opacity:1)보다 먼저 실행
   useLayoutEffect(() => {
@@ -26,11 +31,16 @@ const ResponsiveScale = () => {
   useEffect(() => {
     // 1920px 초과 해상도에서만 10% 확대
     const applyZoom = () => {
-      if (screen.width > 1920) {
+      if (window.innerWidth > 1920 && !isZoneAViewport()) {
         document.documentElement.style.zoom = "1.08";
       } else {
         document.documentElement.style.zoom = "";
       }
+      logEvent("zoom-applied", {
+        zoom: document.documentElement.style.zoom || "1",
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+      });
     };
     applyZoom();
 
@@ -39,27 +49,29 @@ const ResponsiveScale = () => {
     window.addEventListener("resize", updateHeaderDividerY);
     window.addEventListener("resize", applyZoom);
 
-    // 모니터 변경 감지: screen.width는 resize 이벤트로 잡히지 않으므로 주기적 체크
-    // (2560 모니터에서 1920 모니터로 창 이동 시 레이아웃 깨짐 방지)
-    let lastScreenWidth = screen.width;
-    const checkMonitor = setInterval(() => {
-      if (screen.width !== lastScreenWidth) {
-        lastScreenWidth = screen.width;
-        applyZoom();
-      }
-    }, 1000);
-
+    // viewport 기준 CSS media query와 동일하게 resize에서만 갱신
     // 레이아웃 계산 완료 후 페이지 표시 (헤더-사이드바 flash 방지)
     requestAnimationFrame(() => {
-      document.querySelector(".nftg-app")?.classList.add("app-ready");
+      const appEl = document.querySelector(".nftg-app");
+      if (appEl) {
+        appEl.classList.add("app-ready");
+        logEvent("app-ready-add", {
+          at: "ResponsiveScale effect",
+          zoom: document.documentElement.style.zoom || "1",
+        });
+      }
     });
 
     return () => {
       window.removeEventListener("load", updateHeaderDividerY);
       window.removeEventListener("resize", updateHeaderDividerY);
       window.removeEventListener("resize", applyZoom);
-      clearInterval(checkMonitor);
       document.documentElement.style.removeProperty("--header-divider-y");
+      const appEl = document.querySelector(".nftg-app");
+      if (appEl?.classList.contains("app-ready")) {
+        appEl.classList.remove("app-ready");
+        logEvent("app-ready-remove", { at: "ResponsiveScale cleanup" });
+      }
     };
   }, []);
 

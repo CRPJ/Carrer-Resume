@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/contexts/ProfileContext";
 import { dedupedJson } from "@/lib/fetch-dedupe";
@@ -14,6 +14,7 @@ import { SECTION2_SLOGAN_DEFAULTS } from "@/constants/dummyData/cluster2-section
 import { useResumeCardHeight } from "@/hooks/useResumeCardHeight";
 import { useModalScroll } from "@/utils/useModalScroll";
 import { usePopup } from "@/components/ui/popup";
+import { logEvent } from "@/utils/blackScreenDiagnostics";
 import koreaRegionsData from "@/data/korea-regions.json";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
@@ -35,11 +36,15 @@ const Sidebar = () => {
   }, [popupConfirm]);
   // SSR-safe: 첫 렌더는 항상 [0], 마운트 후 useEffect에서 random 갱신
   const [tabBg, setTabBg] = useState(IDENTITY_TAB_IMAGES[0]);
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const { mask, isAdmin } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
+  const sessionUserId = session?.user?.id ?? null;
+  const shouldFetchProfile = !!targetUserId || sessionStatus === "authenticated";
+  const hasFetchIdentity = !!targetUserId || !!sessionUserId;
   const { fetchProfile: fetchCachedProfile, profileData: cachedProfile, clearCache: clearProfileCache } = useProfile();
 
   // 어드민이 다른 유저 편집 시 targetUserId를 API URL에 추가
@@ -169,11 +174,14 @@ const Sidebar = () => {
   useEffect(() => {
     if (isEditModalOpen) {
       document.body.style.overflow = "hidden";
+      logEvent("scroll-lock", { source: "sidebar", reason: "isEditModalOpen" });
     } else {
       document.body.style.overflow = "";
+      logEvent("scroll-unlock", { source: "sidebar", reason: "isEditModalOpen" });
     }
     return () => {
       document.body.style.overflow = "";
+      logEvent("scroll-unlock", { source: "sidebar", reason: "isEditModalOpen-cleanup" });
     };
   }, [isEditModalOpen]);
   const [isSaving, setIsSaving] = useState(false);
@@ -504,22 +512,21 @@ const Sidebar = () => {
       const BASE_CARD_HEIGHT = 810;
       const BASE_SIDEBAR_WIDTH = 497;
 
-      // 브라우저 zoom 보정: zoom 시 innerWidth/innerHeight가 줄어드므로
-      // 원래 뷰포트 기준으로 계산하기 위해 zoom 비율을 적용
-      const browserZoom = window.outerWidth / window.innerWidth || 1;
-
       // 높이 기반 스케일: 카드가 뷰포트 높이에 맞게 (zoom 전 원래 높이 기준)
       // ★ Zone A(<1920): 1920×1080 baseline과 동일한 sidebar 비율을 위해 viewportHeight = 1080 고정.
       //   1920px 고정 + 가로 스크롤 전략이므로 화면 자체가 1920×1080 그대로 표시되어야 함.
       //   (Zone B/C는 ternary 두 번째 분기 사용 → 기존 동작과 동일)
-      const viewportHeight = (window.innerWidth < 1920)
+      const originalWidth = window.innerWidth;
+      const isZoneAViewport =
+        originalWidth < 1920 ||
+        (originalWidth >= 1920 && originalWidth < 2560 && window.innerHeight >= 1200);
+      const viewportHeight = isZoneAViewport
         ? 1080
-        : window.innerHeight * browserZoom;
+        : window.innerHeight;
       console.log('[calculateScale]', {
-        screenWidth: screen.width,
+        innerWidth: originalWidth,
         innerHeight: window.innerHeight,
-        browserZoom: window.outerWidth / window.innerWidth,
-        계산값: window.innerHeight * (window.outerWidth / window.innerWidth),
+        viewportHeight,
       });
       const availableHeight = viewportHeight - 130;
       const scaleByHeight = availableHeight / BASE_CARD_HEIGHT;
@@ -530,8 +537,7 @@ const Sidebar = () => {
 
       // 1920 초과: 1920 비율(30.6%) 유지를 위해 scale 1.31 적용
       // 2125px 기준 sidebar 650px → 650/497 = 1.308 ≈ 1.31
-      const originalWidth = screen.width;
-      if (originalWidth > 1920) {
+      if (originalWidth > 1920 && !isZoneAViewport) {
         scale = 1.31;
       }
 
@@ -540,7 +546,7 @@ const Sidebar = () => {
 
       // 사이드바 폭: 1920 이하만 JS로 동적 설정
       // 1921px+ 는 SCSS @media (min-width: 1921px)에서 --sidebar-width: 651px 고정
-      if (originalWidth <= 1920) {
+      if (originalWidth <= 1920 || isZoneAViewport) {
         const effectiveSidebarWidth = Math.round(BASE_SIDEBAR_WIDTH * scale);
         document.documentElement.style.setProperty("--sidebar-width", `${effectiveSidebarWidth}px`);
       }
@@ -615,6 +621,27 @@ const Sidebar = () => {
   // Sidebar 모달 배경 스크롤 차단
   const isSidebarModalOpen = isEditModalOpen || isPhoneCommentModalOpen || isPhoneHelpModalOpen;
   useModalScroll(isSidebarModalOpen);
+
+  useEffect(() => {
+    logEvent(isEditModalOpen ? "modal-open" : "modal-close", {
+      source: "sidebar",
+      name: "profile-edit",
+    });
+  }, [isEditModalOpen]);
+
+  useEffect(() => {
+    logEvent(isPhoneCommentModalOpen ? "modal-open" : "modal-close", {
+      source: "sidebar",
+      name: "phone-comment",
+    });
+  }, [isPhoneCommentModalOpen]);
+
+  useEffect(() => {
+    logEvent(isPhoneHelpModalOpen ? "modal-open" : "modal-close", {
+      source: "sidebar",
+      name: "phone-help",
+    });
+  }, [isPhoneHelpModalOpen]);
 
   // 연락 가능 시간대 모달: 열릴 때 읽기전용 모드로 초기화
   useEffect(() => {
@@ -750,19 +777,35 @@ const Sidebar = () => {
 
   // 페이지 로드 시 프로필 데이터 가져오기 (캐시 활용)
   const fetchUserProfile = async (forceRefresh?: boolean) => {
-    // targetUserId가 있으면 해당 사용자, 없으면 로그인 사용자
-    if (!targetUserId && !session) return;
+    // targetUserId가 있으면 public profile lookup이므로 session 상태 무관하게 진행.
+    // targetUserId가 없으면 본인 프로필이므로 session이 확정될 때까지 대기.
+    if (!targetUserId) {
+      if (sessionStatus === "loading") {
+        console.log("[fetchUserProfile] skipped: sessionStatus=loading & no targetUserId", { hasSession: !!session });
+        return;
+      }
+      if (sessionStatus !== "authenticated") {
+        console.log("[fetchUserProfile] skipped: no targetUserId & session not authenticated", { sessionStatus });
+        return;
+      }
+      if (!sessionUserId) {
+        console.log("[fetchUserProfile] skipped: authenticated session has no user id", { sessionStatus, hasSession: !!session });
+        setHasData(false);
+        return;
+      }
+    }
+    console.log("[fetchUserProfile] started", { targetUserId, sessionStatus, sessionUserId, forceRefresh });
 
     try {
       // ProfileContext의 캐시된 데이터 사용 (페이지 이동 시 재호출 방지)
       let cachedResult = await fetchCachedProfile(targetUserId || undefined, forceRefresh);
 
       // targetUserId로 조회 실패 시, 로그인 사용자 본인 프로필로 폴백 시도
-      if ((!cachedResult || !cachedResult.data) && targetUserId && session?.user?.id) {
+      if ((!cachedResult || !cachedResult.data) && targetUserId && sessionUserId) {
         const fallbackResult = await fetchCachedProfile(undefined, true);
-        if (fallbackResult?.data?.id === session.user.id) {
+        if (fallbackResult?.data?.id === sessionUserId) {
           // 본인 프로필인지 확인: 세션 ID가 URL의 userId를 포함하는지 체크 (UUID 잘림 대응)
-          if (session.user.id === targetUserId || session.user.id.startsWith(targetUserId)) {
+          if (sessionUserId === targetUserId || sessionUserId.startsWith(targetUserId)) {
             cachedResult = fallbackResult;
             setIsOwner(true);
           }
@@ -980,13 +1023,44 @@ const Sidebar = () => {
   };
 
   // 세션 또는 targetUserId 변경 시 프로필 + 슬로건 병렬 로드 (플리커 최소화)
+  // sessionStatus를 deps에 포함 — loading→authenticated/unauthenticated 전환 시 effect 재실행 보장.
+  // (session reference가 null→null로 유지되는 unauthenticated 케이스에서 fetch가 영영 skip되던 회귀 방지)
+  // pathname을 deps에 포함 — 뒤로가기로 cluster-* 복귀 시 segment 재사용 케이스에서도 effect 재실행 보장.
+  // 정책: targetUserId가 있으면 session 상태 무관 fetch (fetchUserProfile 내부 가드 참조).
   useEffect(() => {
     if (demoMode) return; // 더미 모드면 API 안 부름
-    if (session || targetUserId) {
+    if (shouldFetchProfile) {
       fetchUserProfile();
       fetchSlogan();
     }
-  }, [session, targetUserId, demoMode]);
+  }, [shouldFetchProfile, sessionStatus, sessionUserId, targetUserId, demoMode, pathname]);
+
+  // [진단] 뒤로가기/마운트 직후 화면 상태 로깅. 검은 화면 시점에
+  // .page-reveal opacity / children 존재 여부를 함께 출력 → PageReveal 회귀인지,
+  // Sidebar/data 상태 문제인지 즉시 판별 가능.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const pageRevealEl = document.querySelector(".page-reveal") as HTMLElement | null;
+    const computedOpacity = pageRevealEl ? getComputedStyle(pageRevealEl).opacity : "(no .page-reveal)";
+    const childCount = pageRevealEl ? pageRevealEl.childElementCount : 0;
+    const innerHTMLLen = pageRevealEl ? pageRevealEl.innerHTML.length : 0;
+    // eslint-disable-next-line no-console
+    console.table({
+      pathname,
+      searchParams: searchParams?.toString() || "",
+      sessionStatus,
+      sessionUserId: session?.user?.id ?? null,
+      targetUserId: targetUserId ?? null,
+      hasData,
+      isMounted,
+      demoMode,
+      profileId: cachedProfile?.data?.id ?? null,
+      pageRevealExists: !!pageRevealEl,
+      pageRevealOpacity: computedOpacity,
+      pageRevealChildCount: childCount,
+      pageRevealInnerHTMLLen: innerHTMLLen,
+    });
+  }, [pathname, sessionStatus, targetUserId, hasData, isMounted, demoMode, session?.user?.id, cachedProfile?.data?.id, searchParams]);
 
   // 슬로건 변경 이벤트 수신 → .resume-card 즉시 반영
   useEffect(() => {
@@ -1623,7 +1697,49 @@ const Sidebar = () => {
     };
   }, [isDragging]);
 
-  // Hydration 에러 방지: 마운트 전에는 빈 placeholder 반환
+  // [렌더 게이트] 모든 상태에서 명시적 UI 보장 — 절대 blank frame 금지.
+  //   ┌──────────────────────────────────┬─────────────────────────────┐
+  //   │ 상태                              │ 렌더                         │
+  //   ├──────────────────────────────────┼─────────────────────────────┤
+  //   │ !isMounted                       │ 투명 placeholder (hydration) │
+  //   │ sessionStatus === "loading"       │ Skeleton ("Authenticating…") │
+  //   │ fetch 진행 중 (!hasData + 식별자) │ Skeleton ("Loading…")        │
+  //   │ unauthenticated + !targetUserId   │ defaultProfile로 정상 렌더   │
+  //   │ hasData=true / demoMode           │ 정상 sidebarContent          │
+  //   └──────────────────────────────────┴─────────────────────────────┘
+  //
+  // 식별자 보강: "session 있음"의 기준은 session?.user?.id 존재까지 확인.
+  // (NextAuth 일부 케이스에서 status="authenticated"이지만 user 정보가 비어있을 수 있음 →
+  //  이 상태로 fetch가 일어나면 own profile lookup이 깨지므로, fetch 흐름에서는
+  //  hasUserIdentity 기준으로만 식별자 인정)
+  const hasUserIdentity = hasFetchIdentity;
+
+  const renderSkeleton = (label: string) => (
+    <div className="home-two-sidebar-col">
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        style={{
+          width: "489px",
+          height: "1001px",
+          borderRadius: "12px",
+          backgroundColor: "rgba(255, 255, 255, 0.02)",
+          border: "1px solid rgba(255, 255, 255, 0.04)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "rgba(255, 255, 255, 0.4)",
+          fontSize: "13px",
+          fontFamily: "Pretendard, sans-serif",
+          letterSpacing: "1px",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+
+  // 1) Hydration 가드 (항상 첫 단계): SSR 첫 페인트와 일치시키기 위해 투명 reserve.
   if (!isMounted) {
     return (
       <div className="home-two-sidebar-col">
@@ -1631,12 +1747,23 @@ const Sidebar = () => {
           style={{
             width: "489px",
             height: "1001px",
-            backgroundColor: "#1a1a2e",
+            backgroundColor: "transparent",
             borderRadius: "12px",
           }}
         />
       </div>
     );
+  }
+
+  // 2) Session loading: blank frame 대신 명시적 skeleton 노출.
+  if (sessionStatus === "loading") {
+    return renderSkeleton("Authenticating…");
+  }
+
+  // 3) Fetch 대기 중: 식별자(targetUserId 또는 session.user.id)가 있는데 hasData=false → skeleton.
+  //    (식별자 없으면 fetch가 일어나지 않으므로 무한 skeleton 회피하고 정상 렌더로 fallthrough)
+  if (!demoMode && !hasData && hasUserIdentity) {
+    return renderSkeleton("Loading…");
   }
 
   // ★ 모바일: 슬라이드 패널 전체를 body에 Portal 렌더링
@@ -1878,7 +2005,9 @@ const Sidebar = () => {
                     return;
                   }
                   // 다른 페이지에 있으면 /cluster-3으로 이동 후 스크롤
-                  window.location.href = targetPath + '?scrollTo=' + targetSection;
+                  // SPA navigation 유지 — window.location.href(hard reload)는 RSC 캐시/React state를
+                  // 끊어 뒤로가기 복귀 시 빈 화면 유발. 도착지(/cluster-3)는 scrollTo query를 처리함.
+                  router.push(targetPath + '?scrollTo=' + targetSection);
                 }}
                 style={{
                   width: "24px",
