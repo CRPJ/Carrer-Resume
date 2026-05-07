@@ -2374,9 +2374,10 @@ const Cluster4Content = () => {
   // 시즌 리뷰 모달 열기
   const openSeasonReviewModal = () => {
     // 현재 시즌의 rating, review 값을 가져와서 초기화
+    // review 가 비어있으면 REVIEW_COMMENT_DEFAULT 로 폴백 — 초기화 버튼 동작과 동일한 디폴트 문구.
     setSeasonReviewEditData({
       rating: currentSeason.rating || 0,
-      review: currentSeason.review || "",
+      review: currentSeason.review || REVIEW_COMMENT_DEFAULT,
     });
     setSeasonReviewError(null);
     setSeasonReviewSuccess(false);
