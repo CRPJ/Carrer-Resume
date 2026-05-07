@@ -48,6 +48,14 @@ interface RankingUser {
   competencyRate: RateInfo;
   experienceRate: RateInfo;
   careerRate: RateInfo;
+  // pms1.5 calculate-weekly 산정 결과 (성공/실패 판정 근거).
+  failureReason: 'stars_insufficient' | 'experience_incomplete' | 'multiple' | null;
+  failureDetails: unknown;
+  earnedStars: number | null;
+  requiredStars: number | null;
+  experienceCompleted: number | null;
+  experienceRequired: number | null;
+  experienceMinRating: number | null;
 }
 
 interface TeamStats {
@@ -1260,7 +1268,7 @@ const Cluster4RankingContent = () => {
                     position: 'relative'
                   }}>
                     <Image
-                      src={user.profilePhotoUrl || "/images/streamer/t-two.png"}
+                      src={user.profilePhotoUrl || "/images/0/1.png"}
                       alt={`${user.displayName} profile`}
                       fill
                       style={{ objectFit: 'cover' }}
@@ -1383,8 +1391,8 @@ const Cluster4RankingContent = () => {
                         <div className={`weekly-card-stats-wrapper ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
                           <div className="weekly-card-stats">
                             <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>정보</span> 강화율 <strong>{isRest ? '-' : user.infoRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : user.infoRate.count}</span>/{isRest ? '-' : user.infoRate.total})</span></span>
-                            <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : user.competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : user.competencyRate.count}</span>/{isRest ? '-' : user.competencyRate.total})</span></span>
                             <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경험</span> 강화율 <strong>{isRest ? '-' : user.experienceRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : user.experienceRate.count}</span>/{isRest ? '-' : user.experienceRate.total})</span></span>
+                            <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>역량</span> 강화율 <strong>{isRest ? '-' : user.competencyRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : user.competencyRate.count}</span>/{isRest ? '-' : user.competencyRate.total})</span></span>
                             <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${user.growthStatus === '실패' ? 'fail' : ''} ${user.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${user.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>경력</span> 강화율 <strong>{isRest ? '-' : user.careerRate.rate}%</strong> <span className="gray">(<span className="num">{isRest ? '-' : user.careerRate.count}</span>/{isRest ? '-' : user.careerRate.total})</span></span>
                           </div>
                         </div>

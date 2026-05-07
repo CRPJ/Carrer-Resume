@@ -90,12 +90,10 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // default=true인 경우, 기본 주차를 자동 선택
+    // default=true인 경우, 기본 주차를 자동 선택 = 현재 진행 주차의 직전 주차(n-1).
+    // filteredWeeks 는 .lt('end_date', today) + start_date desc 정렬이므로 [0] 이 가장 최근에 종료된 주차.
     if (!weekId && useDefault && filteredWeeks.length > 0) {
-      const defaultWeek = filteredWeeks.find(
-        (w: { seasonYear: number; seasonName: string; weekNumber: number }) => w.seasonYear === 2026 && w.seasonName === '겨울' && w.weekNumber === 3
-      ) || filteredWeeks[0];
-      weekId = defaultWeek.id;
+      weekId = filteredWeeks[0].id;
     }
 
     // 주차 목록만 요청한 경우
@@ -189,12 +187,14 @@ export async function GET(request: NextRequest) {
       currentWeekCompletedResult,
       previousWeeksCompletedResult,
       careerRecordsResult,
-      careerProjectsResult
+      careerProjectsResult,
+      restRequestsResult,
+      introductionsResult
     ] = await Promise.all([
-      // 해당 주차의 성장 기록
+      // 해당 주차의 성장 기록 — 실패 사유까지 포함 (pms1.5 calculate-weekly 가 set 한 필드들).
       supabaseAdmin
         .from('user_weekly_growth')
-        .select('user_id, is_success, is_resting, is_club_break')
+        .select('user_id, is_success, is_resting, is_club_break, failure_reason, failure_details, earned_stars, required_stars, experience_completed, experience_required, experience_min_rating')
         .eq('week_id', weekId),
       // 누적 인정 주차 (user_growth_stats 테이블에서 직접 조회)
       supabaseAdmin
@@ -267,7 +267,21 @@ export async function GET(request: NextRequest) {
         .from('career_projects')
         .select('id')
         .eq('week_id', weekId)
-        .eq('is_active', true)
+        .eq('is_active', true),
+      // 휴식 신청(rest_requests, status=approved) — user_weekly_growth 레코드가 누락된 주차의
+      // '휴식(개인)' fallback 판정용. cluster-4-card(L1165-1168) 와 동일 source.
+      supabaseAdmin
+        .from('rest_requests')
+        .select('user_id')
+        .eq('week_id', weekId)
+        .eq('status', 'approved')
+        .in('user_id', userIdArray),
+      // 프로필 사진 폴백용 — user_profiles.profile_photo_url 비어있을 때 user_introductions
+      // sub_photo_5 → sub_photo_1~4 순으로 폴백 (crews/route.ts L177-187 와 동일 정책).
+      supabaseAdmin
+        .from('user_introductions')
+        .select('user_id, sub_photo_5, sub_photo_1, sub_photo_2, sub_photo_3, sub_photo_4')
+        .in('user_id', userIdArray)
     ]);
 
     const weeklyGrowthData = weeklyGrowthResult.data;
@@ -289,6 +303,23 @@ export async function GET(request: NextRequest) {
     const careerRecordsData = careerRecordsResult.data;
     // 그 주차에 어드민이 개설한 실무 경력 프로젝트 수 (모든 크루 공통 분모, max 5).
     const careerProjectsCount = (careerProjectsResult.data || []).length;
+    // 그 주차에 휴식 승인된 user_id 집합 — weeklyGrowth 누락 시 휴식(개인) fallback.
+    const usersOnApprovedRestForWeek = new Set<string>(
+      (restRequestsResult.data || []).map(r => r.user_id)
+    );
+    // 그 주차에 활동 1건이라도 완료한 user_id 집합 — weeklyGrowth 누락 시 성공 fallback.
+    // cluster-4-card 의 apiActivityWeekIds(L1194) 와 동일 의미.
+    const usersWithCompletedActivityForWeek = new Set<string>(
+      currentWeekCompleted.map(r => r.user_id)
+    );
+    // 프로필 사진 폴백 Map (user_introductions sub_photo) — crews/route.ts L177-187 와 동일 우선순위.
+    const subPhotoMap = new Map<string, string | null>();
+    (introductionsResult.data || []).forEach(intro => {
+      subPhotoMap.set(
+        intro.user_id,
+        intro.sub_photo_5 || intro.sub_photo_1 || intro.sub_photo_2 || intro.sub_photo_3 || intro.sub_photo_4 || null
+      );
+    });
 
     // 4. 사용자 프로필 정보 (이미 가져옴)
     const profiles = eligibleProfiles;
@@ -317,10 +348,23 @@ export async function GET(request: NextRequest) {
       userAllPointsMap.get(p.user_id)!.push(p);
     });
 
-    // 사용자별 성장 기록 Map
-    const userGrowthMap = new Map<string, { is_success: boolean; is_resting: boolean; is_club_break: boolean }>();
+    // 사용자별 성장 기록 Map — 실패 사유 / 별점 / 실무 경험 통계 모두 보존.
+    type WeeklyGrowthRow = {
+      is_success: boolean;
+      is_resting: boolean;
+      is_club_break: boolean;
+      failure_reason: string | null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      failure_details: any;
+      earned_stars: number | null;
+      required_stars: number | null;
+      experience_completed: number | null;
+      experience_required: number | null;
+      experience_min_rating: number | null;
+    };
+    const userGrowthMap = new Map<string, WeeklyGrowthRow>();
     (weeklyGrowthData || []).forEach(wg => {
-      userGrowthMap.set(wg.user_id, wg);
+      userGrowthMap.set(wg.user_id, wg as WeeklyGrowthRow);
     });
 
     // 사용자별 누적 인정 주차 Map (user_growth_stats 기반)
@@ -419,7 +463,8 @@ export async function GET(request: NextRequest) {
       const weeklyGrowth = userGrowthMap.get(userId);
       let growthStatus = '실패';
 
-      // 성장 상태 결정 (cluster-4-card와 동일한 로직)
+      // 성장 상태 결정 (cluster-4-card L1170-1196 과 동일한 로직)
+      // user_weekly_growth 레코드가 누락된 주차에 대비해 rest_requests / activity_records 를 fallback 으로 사용.
       if (isOnboardingWeek) {
         growthStatus = '성공';
       } else if (weeklyGrowth) {
@@ -431,9 +476,13 @@ export async function GET(request: NextRequest) {
           growthStatus = '성공';
         }
       } else {
-        // weeklyGrowth 레코드 없는 경우
+        // weeklyGrowth 레코드 없는 경우 — fallback 우선순위: 공식 휴식 > 개인 휴식 > 활동 완료(성공) > 실패
         if (selectedWeek.isClubBreak || selectedWeek.isBreakSeason) {
           growthStatus = '휴식(공식)';
+        } else if (usersOnApprovedRestForWeek.has(userId)) {
+          growthStatus = '휴식(개인)';
+        } else if (usersWithCompletedActivityForWeek.has(userId)) {
+          growthStatus = '성공';
         }
       }
 
@@ -519,7 +568,8 @@ export async function GET(request: NextRequest) {
       rankings.push({
         userId,
         displayName: profile.display_name,
-        profilePhotoUrl: profile.profile_photo_url,
+        // 사진[1] profile_photo_url → 사진[2~6] user_introductions sub_photo 폴백 (crews API 와 동일).
+        profilePhotoUrl: profile.profile_photo_url || subPhotoMap.get(userId) || null,
         status: profile.status,
         teamName: team?.name || null,
         partName: part?.name || null,
@@ -538,18 +588,36 @@ export async function GET(request: NextRequest) {
         infoRate: { total: infoTotal, count: infoCount, rate: infoTotal > 0 ? Math.round((infoCount / infoTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
         competencyRate: { total: competencyTotal, count: competencyCount, rate: competencyTotal > 0 ? Math.round((competencyCount / competencyTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
         experienceRate: { total: experienceTotal, count: experienceCount, rate: experienceTotal > 0 ? Math.round((experienceCount / experienceTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
-        careerRate: { total: careerTotal, count: careerCount, rate: careerTotal > 0 ? Math.round((careerCount / careerTotal) * 100) : (isOnboardingWeek ? 100 : 0) }
+        careerRate: { total: careerTotal, count: careerCount, rate: careerTotal > 0 ? Math.round((careerCount / careerTotal) * 100) : (isOnboardingWeek ? 100 : 0) },
+        // pms1.5 calculate-weekly 산정 결과 — 실패 사유 / 획득·필요 별점 / 실무 경험 통계 노출.
+        // weeklyGrowth 레코드 없으면 null (fallback 으로 성장 상태만 추정한 케이스).
+        failureReason: weeklyGrowth?.failure_reason ?? null,
+        failureDetails: weeklyGrowth?.failure_details ?? null,
+        earnedStars: weeklyGrowth?.earned_stars ?? null,
+        requiredStars: weeklyGrowth?.required_stars ?? null,
+        experienceCompleted: weeklyGrowth?.experience_completed ?? null,
+        experienceRequired: weeklyGrowth?.experience_required ?? null,
+        experienceMinRating: weeklyGrowth?.experience_min_rating ?? null
       });
     }
 
     // 단감(star) 순서로 정렬 (높은 순)
     rankings.sort((a, b) => b.star - a.star);
 
+    // 현재 운영 범위 = 엔터테인먼트팀 한정 — 다른 팀/팀 미배정 유저는 랭킹/팀 통계에서 제외.
+    // (teamStats 는 클라이언트에서 rankings 로 집계하므로 여기서 한 번만 필터링하면 충분.)
+    const ENTERTAINMENT_TEAM_NAME = '엔터테인먼트';
+    // 운영팀 요청으로 특정 크루 제외 (display_name 기준 — 동명이인 발생 시 user_id 로 교체 필요).
+    const EXCLUDED_DISPLAY_NAMES = new Set(['윤재윤']);
+    const filteredRankings = rankings.filter(
+      r => r.teamName === ENTERTAINMENT_TEAM_NAME && !EXCLUDED_DISPLAY_NAMES.has(r.displayName)
+    );
+
     return NextResponse.json({
       success: true,
       weeks: filteredWeeks,
       selectedWeek,
-      rankings,
+      rankings: filteredRankings,
     });
 
   } catch (error) {
