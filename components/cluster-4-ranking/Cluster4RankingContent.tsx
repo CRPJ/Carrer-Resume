@@ -684,7 +684,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%)',
                 getValue: (t) => t.avgGrowthRate,
                 format: (v) => `${v}%`,
-                getSubtext: (t) => `(${t.growthFullCount}/${t.activeCount}명)`,
+                getSubtext: () => '',
                 isPercentage: true
               },
               {
@@ -697,7 +697,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)',
                 getValue: (t) => t.avgInfoRate,
                 format: (v) => `${v}%`,
-                getSubtext: (t) => `(${t.infoFullCount}/${t.activeCount}명)`,
+                getSubtext: () => '',
                 isPercentage: true
               },
               {
@@ -710,7 +710,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)',
                 getValue: (t) => t.avgCompetencyRate,
                 format: (v) => `${v}%`,
-                getSubtext: (t) => `(${t.competencyFullCount}/${t.activeCount}명)`,
+                getSubtext: () => '',
                 isPercentage: true
               },
               {
@@ -723,7 +723,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(244, 114, 182, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%)',
                 getValue: (t) => t.avgExperienceRate,
                 format: (v) => `${v}%`,
-                getSubtext: (t) => `(${t.experienceFullCount}/${t.activeCount}명)`,
+                getSubtext: () => '',
                 isPercentage: true
               },
               {
@@ -736,7 +736,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
                 getValue: (t) => t.avgCareerRate,
                 format: (v) => `${v}%`,
-                getSubtext: (t) => `(${t.careerFullCount}/${t.activeCount}명)`,
+                getSubtext: () => '',
                 isPercentage: true
               }
             ];
@@ -1054,25 +1054,25 @@ const Cluster4RankingContent = () => {
                     borderRadius: '12px'
                   }}>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 성공</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>🥰주차 성장 성공</div>
                       <div style={{ fontSize: '26px', fontWeight: 800, color: '#4ADE80' }}>
                         {teamStats.reduce((sum, t) => sum + t.successCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 실패</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>😭주차 성장 실패</div>
                       <div style={{ fontSize: '26px', fontWeight: 800, color: '#EF4444' }}>
                         {teamStats.reduce((sum, t) => sum + t.failCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 휴식</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>😴주차 휴식</div>
                       <div style={{ fontSize: '26px', fontWeight: 800, color: '#6B7280' }}>
                         {teamStats.reduce((sum, t) => sum + t.restCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 승률</div>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>⚔️전체 승률</div>
                       <div style={{ fontSize: '26px', fontWeight: 800, color: '#8B5CF6' }}>
                         {(() => {
                           const totalSuccess = teamStats.reduce((sum, t) => sum + t.successCount, 0);
@@ -1096,7 +1096,7 @@ const Cluster4RankingContent = () => {
             ) : rankings.length === 0 ? (
               <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>해당 주차에 활동한 크루가 없습니다.</div>
             ) : rankings.map((user, index) => (
-              <Link href={`/cluster-4-card/${selectedWeekId}?userId=${user.userId}`} key={user.userId} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href={`/cluster-4-card/${selectedWeekId}?userId=${user.userId}`} key={user.userId} className={`weekly-card${user.growthStatus === '성공' ? ' weekly-card--success' : ''}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 {/* 왼쪽: 프로필 이미지 */}
                 <div className={`weekly-card-image ${user.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`} style={{
                   display: 'flex',
@@ -1122,24 +1122,100 @@ const Cluster4RankingContent = () => {
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
-                  {/* 랭킹 번호 */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '8px',
-                    left: '8px',
-                    background: index < 3 ? '#FFA500' : '#333',
-                    color: index < 3 ? '#000' : '#fff',
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '12px'
-                  }}>
-                    {index + 1}
-                  </div>
+                  {/* 랭킹 배지 — Top 3 금/은/동 메달, 4위 이하 다크 칩 */}
+                  {(() => {
+                    const rank = index + 1;
+                    const medal: Record<number, { bg: string; border: string; glow: string; text: string; crown?: string }> = {
+                      1: {
+                        bg: 'linear-gradient(135deg, #FFE066 0%, #FFC700 35%, #FF9500 75%, #E67E00 100%)',
+                        border: '2px solid rgba(255, 230, 100, 0.9)',
+                        glow: '0 0 14px rgba(255, 200, 0, 0.85), 0 0 28px rgba(255, 165, 0, 0.45), inset 0 1px 2px rgba(255,255,255,0.6)',
+                        text: '#3a2200',
+                        crown: '👑',
+                      },
+                      2: {
+                        bg: 'linear-gradient(135deg, #F5F5F5 0%, #D6D6D6 40%, #A8A8A8 100%)',
+                        border: '2px solid rgba(240, 240, 240, 0.9)',
+                        glow: '0 0 12px rgba(200, 200, 200, 0.7), 0 0 22px rgba(180, 180, 180, 0.35), inset 0 1px 2px rgba(255,255,255,0.7)',
+                        text: '#2a2a2a',
+                      },
+                      3: {
+                        bg: 'linear-gradient(135deg, #E8A878 0%, #C97D44 45%, #8B4513 100%)',
+                        border: '2px solid rgba(232, 168, 120, 0.9)',
+                        glow: '0 0 12px rgba(201, 125, 68, 0.7), 0 0 22px rgba(139, 69, 19, 0.35), inset 0 1px 2px rgba(255,255,255,0.4)',
+                        text: '#fff',
+                      },
+                    };
+                    if (rank <= 3) {
+                      const m = medal[rank];
+                      return (
+                        <>
+                          {m.crown && (
+                            <div className="rank-crown" style={{
+                              position: 'absolute',
+                              top: '-12px',
+                              left: '14px',
+                              fontSize: '20px',
+                              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+                              zIndex: 3,
+                            }}>
+                              {m.crown}
+                            </div>
+                          )}
+                          {rank === 1 && (
+                            <div className="rank-sparkles" aria-hidden="true">
+                              <span /><span /><span /><span />
+                            </div>
+                          )}
+                          <div className={`rank-medal rank-medal--${rank}`} style={{
+                            top: '6px',
+                            left: '6px',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '50%',
+                            background: m.bg,
+                            border: m.border,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: m.text,
+                            fontFamily: '"Cinzel", "Playfair Display", Georgia, serif',
+                            fontWeight: 900,
+                            fontSize: '17px',
+                            textShadow: '0 1px 2px rgba(255,255,255,0.4)',
+                            zIndex: 2,
+                          }}>
+                            {rank}
+                          </div>
+                        </>
+                      );
+                    }
+                    return (
+                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        left: '8px',
+                        minWidth: '26px',
+                        height: '26px',
+                        padding: '0 8px',
+                        borderRadius: '13px',
+                        background: 'linear-gradient(135deg, rgba(40,40,40,0.95) 0%, rgba(20,20,20,0.95) 100%)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#e0e0e0',
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        letterSpacing: '0.3px',
+                        zIndex: 2,
+                      }}>
+                        {rank}
+                      </div>
+                    );
+                  })()}
                   {user.growthStatus === '휴식(개인)' && (
                     <div className="rest-message">
                       <span className="rest-text-line">충분히</span>
