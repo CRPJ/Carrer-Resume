@@ -478,6 +478,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     line_code: string;
     cluster_id: string;
     description: string | null;
+    reward_star?: number; // 라인 이행 시 기본 보상 — 평점 표시 시 차감용
   }
   const [activityTypesMap, setActivityTypesMap] = useState<Map<string, ActivityTypeInfo>>(new Map());
   const [competencyTypeIds, setCompetencyTypeIds] = useState<string[]>([]);
@@ -1362,13 +1363,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
 
           // 13. 평점 매핑 — points.line_id (= activity_types.id) + 현재 주차 매칭.
-          //   어드민(compliance-manage)이 reward_star + 보너스 평점을 합쳐 저장하므로,
-          //   화면 표시는 (points - reward_star) 가 아니라 그대로 0~10 노출.
+          //   어드민(compliance-manage)은 (reward_star + 보너스 평점) 을 한 행에 합산해 저장하므로,
+          //   화면 표시는 라인의 reward_star 만큼 차감해 실제 평점(0~10) 만 노출.
+          //   (예: 26봄 9주차부터 실무 경험 reward_star=10 → 저장 20 = 평점 10 으로 환산)
           //   apiActivityPoints 는 given_at desc 정렬이므로 동일 키 중복 시 최신 값이 우선.
           const ratingsMap = new Map<string, number>();
           apiActivityPoints.forEach((p: { line_id: string | null; week_id: string | null; points: number }) => {
             if (p.line_id && p.week_id === weekId && !ratingsMap.has(p.line_id)) {
-              ratingsMap.set(p.line_id, p.points);
+              const baseStar = typesMap.get(p.line_id)?.reward_star || 0;
+              const rating = Math.max(0, (p.points || 0) - baseStar);
+              ratingsMap.set(p.line_id, rating);
             }
           });
           setActivityRatings(ratingsMap);
