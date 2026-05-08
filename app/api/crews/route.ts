@@ -48,7 +48,7 @@ export async function GET(request: Request) {
       }
     }
 
-    const baseSelect = "id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first, crew_unique_number";
+    const baseSelect = "id, display_name, gender, birth_date, profile_photo_url, vision, status, growth_status, club, university, major_first, crew_unique_number, onboarding_week_id";
     const allowedGrowthStatus = ["active", "suspended", "seasonal_rest", "graduated", "club_onboarding"];
     const buildBaseQuery = () => {
       let q = supabase
@@ -101,15 +101,22 @@ export async function GET(request: Request) {
     // 각 유저의 팀/파트 정보 조회
     const userIds = users.map(u => u.id);
 
-    // ============ 독립 쿼리 7개를 병렬 실행 ============
+    // ============ 독립 쿼리 병렬 실행 ============
+    // approved_weeks 는 user_growth_stats 캐시 대신 user_weekly_growth + 보조 테이블로 실시간 산출.
+    // 이유: 캐시(last_calculated_at)는 외부 시스템에서 며칠 단위로만 갱신되어 stale.
+    // 사이드바(/api/profile)와 동일 산식을 사용해 두 화면 값이 항상 일치하게 함.
     const [
       { data: educations },
       { data: userTeamParts },
       teams,
       parts,
       { data: cumulativePoints },
-      { data: growthStats },
       { data: introductions },
+      { data: allWeeks },
+      { data: allSeasons },
+      { data: restRequests },
+      { data: weeklySuccess },
+      { data: seasonHistories },
     ] = await Promise.all([
       supabase
         .from("user_educations")
@@ -127,15 +134,34 @@ export async function GET(request: Request) {
         .from("user_cumulative_points")
         .select("user_id, total_stars")
         .in("user_id", userIds),
-      supabase
-        .from("user_growth_stats")
-        .select("user_id, approved_weeks")
-        .in("user_id", userIds),
       // profile_photo_url 비어있을 때 폴백용 — cluster-2 사진[2] sub_photo_5 → 사진[3~6] sub_photo_1~4 순
       supabase
         .from("user_introductions")
         .select("user_id, sub_photo_5, sub_photo_1, sub_photo_2, sub_photo_3, sub_photo_4")
         .in("user_id", userIds),
+      // approved_weeks 실시간 계산용 (사이드바 /api/profile 와 동일 산식)
+      supabase
+        .from("weeks")
+        .select("id, start_date, end_date, is_club_break, season_id"),
+      supabase
+        .from("seasons")
+        .select("id, name"),
+      supabase
+        .from("rest_requests")
+        .select("user_id, week_id")
+        .in("user_id", userIds)
+        .eq("status", "approved"),
+      // hasActivity 판정 기준: user_weekly_growth.is_success (사이드바와 동일)
+      supabase
+        .from("user_weekly_growth")
+        .select("user_id, week_id")
+        .in("user_id", userIds)
+        .eq("is_success", true),
+      supabase
+        .from("user_season_histories")
+        .select("user_id, progress_status, season_id")
+        .in("user_id", userIds)
+        .eq("progress_status", "full_rest"),
     ] as const);
 
     // user_id별 학력 정보 Map (첫 번째 학력만 사용)
@@ -169,9 +195,77 @@ export async function GET(request: Request) {
       starsMap[cp.user_id] = cp.total_stars || 0;
     });
 
+    // ============ approved_weeks 실시간 계산 ============
+    // 사이드바(/api/profile)와 동일 산식. (목)12:01 KST 강화 결정 시점에
+    // user_weekly_growth.is_success 가 갱신되면 다음 요청부터 자동 반영.
+    const today = new Date().toISOString().split('T')[0];
+    const weeksList = allWeeks ?? [];
+    const seasonsList = allSeasons ?? [];
+
+    // break 시즌 ID (전환 주차) - 클럽 공식 휴식으로 처리
+    const breakSeasonIds = new Set(
+      seasonsList
+        .filter((s: any) => s.name?.toLowerCase().includes('break'))
+        .map((s: any) => s.id)
+    );
+
+    // user_id별 그룹핑
+    const successByUser = new Map<string, Set<string>>();
+    (weeklySuccess ?? []).forEach((r: any) => {
+      if (!successByUser.has(r.user_id)) successByUser.set(r.user_id, new Set());
+      successByUser.get(r.user_id)!.add(r.week_id);
+    });
+    const restByUser = new Map<string, Set<string>>();
+    (restRequests ?? []).forEach((r: any) => {
+      if (!restByUser.has(r.user_id)) restByUser.set(r.user_id, new Set());
+      restByUser.get(r.user_id)!.add(r.week_id);
+    });
+    const restSeasonByUser = new Map<string, Set<string>>();
+    (seasonHistories ?? []).forEach((sh: any) => {
+      if (!sh.season_id) return;
+      if (!restSeasonByUser.has(sh.user_id)) restSeasonByUser.set(sh.user_id, new Set());
+      restSeasonByUser.get(sh.user_id)!.add(sh.season_id);
+    });
+
+    // onboarding_week_id → start_date 룩업
+    const weekById = new Map<string, any>();
+    weeksList.forEach((w: any) => weekById.set(w.id, w));
+
     const weeksMap: { [key: string]: number } = {};
-    growthStats?.forEach(gs => {
-      weeksMap[gs.user_id] = gs.approved_weeks || 0;
+    users.forEach((u: any) => {
+      const onboardingWeekId: string | null = u.onboarding_week_id || null;
+      const onboardingWeek = onboardingWeekId ? weekById.get(onboardingWeekId) : null;
+      const growthStartDate: string | null = onboardingWeek?.start_date || null;
+      if (!growthStartDate) {
+        weeksMap[u.id] = 0;
+        return;
+      }
+
+      const successSet = successByUser.get(u.id) ?? new Set<string>();
+      const personalRestSet = restByUser.get(u.id) ?? new Set<string>();
+      const userRestingSeasonIds = restSeasonByUser.get(u.id) ?? new Set<string>();
+
+      let approved = 0;
+      for (const week of weeksList) {
+        // 가입 이후 + 이미 종료된 주차만
+        if (week.start_date < growthStartDate) continue;
+        if (week.end_date >= today) continue;
+
+        // 시즌 휴식 주차는 통계 제외
+        if (week.season_id && userRestingSeasonIds.has(week.season_id)) continue;
+
+        const hasActivity = successSet.has(week.id);
+        const hasPersonalRest = personalRestSet.has(week.id);
+        const isClubBreak = !!week.is_club_break || (week.season_id && breakSeasonIds.has(week.season_id));
+        const isOnboardingWeek = week.id === onboardingWeekId;
+
+        if (isOnboardingWeek) { approved++; continue; }
+        if (isClubBreak && hasActivity) { approved++; continue; }
+        if (isClubBreak) continue;
+        if (hasPersonalRest) continue;
+        if (hasActivity) approved++;
+      }
+      weeksMap[u.id] = approved;
     });
 
     // 폴백 우선순위: 사진[2] sub_photo_5 → 사진[3] sub_photo_1 → 사진[4] sub_photo_2 → 사진[5] sub_photo_3 → 사진[6] sub_photo_4
