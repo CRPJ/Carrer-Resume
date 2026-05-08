@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
 import { extractTargetUserId } from "@/lib/admin";
+import { normalizeSchool, normalizeMajor } from "@/lib/schoolNormalize";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -273,15 +274,21 @@ export async function PUT(request: Request) {
         const status = statusToDb[rawStatus] || rawStatus || null;
         const majorCategory = categoryToDb[rawCategory] || rawCategory || null;
 
+        // 표시 통일을 위해 저장 직전에 정규화 (약칭 '대' → '대학교', major suffix '학과' 자동 부착)
+        const schoolNormalized = edu.school ? normalizeSchool(edu.school) : null;
+        const major1Normalized = edu.major1 ? normalizeMajor(edu.major1) : null;
+        const major2Normalized = edu.major2 ? normalizeMajor(edu.major2) : null;
+        const major3Normalized = edu.major3 ? normalizeMajor(edu.major3) : null;
+
         return {
           user_id: profile.id,
           education_level: educationLevel,
-          school_name: edu.school || null,
+          school_name: schoolNormalized,
           status: status,
           major_category: majorCategory,
-          major_name_1: edu.major1 || null,
-          major_name_2: edu.major2 || null,
-          major_name_3: edu.major3 || null,
+          major_name_1: major1Normalized,
+          major_name_2: major2Normalized,
+          major_name_3: major3Normalized,
           admission_year: admissionYear,
           graduation_year: graduationYear,
           grade_max_type: edu.gradeMax === '-' ? null : (gradeMaxToDb[edu.gradeMax || ''] || edu.gradeMax || null),
