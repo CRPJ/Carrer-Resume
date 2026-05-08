@@ -660,7 +660,7 @@ const page = () => {
                                 </Link>
                               </div>
                               <div className="review">
-                                <span className="text-sm fw-6">
+                                <span className="text-sm fw-6" style={{ whiteSpace: 'nowrap' }}>
                                   <i className="ti ti-calendar-check"></i>{crew.approvedWeeks}주
                                 </span>
                               </div>
