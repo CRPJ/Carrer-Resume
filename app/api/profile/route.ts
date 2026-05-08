@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
       const weekQueries = weekId ? [
         // [10] activity_types (full columns for card page)
         supabaseAdmin.from("activity_types")
-          .select("id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total")
+          .select("id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total, reward_star")
           .eq("is_active", true),
         // [11] current week
         supabaseAdmin.from("weeks")
@@ -649,17 +649,14 @@ export async function GET(request: NextRequest) {
       console.log('[Profile API] filteredWeeks:', filteredWeeks.map((w: any) => ({ id: w.id, start_date: w.start_date, is_club_break: w.is_club_break })));
     }
 
-    // 일정 신뢰도: user_growth_stats 테이블 값 사용 (pms1.5와 동일하게)
+    // 일정 신뢰도: 실시간 계산값 사용 (user_growth_stats 캐시는 며칠 단위 stale).
     // i = (a+c)/(h-d) * 100, 올림 처리
     // a: 활동 인정, c: 휴식, h: 지나간 주차, d: 공식 휴식
-    const gsApprovedWeeks = growthStats?.approved_weeks ?? approvedWeeksCount;
-    const gsRestWeeks = growthStats?.rest_weeks ?? restWeeksCount;
-    const gsPassedWeeks = growthStats?.passed_weeks ?? (approvedWeeksCount + unapprovedWeeksCount + restWeeksCount + clubBreakWeeksCount);
-    const gsClubBreakWeeks = growthStats?.club_break_weeks ?? clubBreakWeeksCount;
-    const reliabilityDenominator = gsPassedWeeks - gsClubBreakWeeks; // h - d
+    const passedWeeksTotal = approvedWeeksCount + unapprovedWeeksCount + restWeeksCount + clubBreakWeeksCount;
+    const reliabilityDenominator = passedWeeksTotal - clubBreakWeeksCount; // h - d
     let calculatedReliabilityRate = 0;
     if (reliabilityDenominator > 0) {
-      calculatedReliabilityRate = Math.min(100, Math.ceil(((gsApprovedWeeks + gsRestWeeks) / reliabilityDenominator) * 100));
+      calculatedReliabilityRate = Math.min(100, Math.ceil(((approvedWeeksCount + restWeeksCount) / reliabilityDenominator) * 100));
     }
 
     // 항상 실시간 계산 값 사용 (현재 진행 중인 주차 제외)

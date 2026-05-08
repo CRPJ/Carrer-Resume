@@ -4,12 +4,6 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getFixedDropdownPosition } from "@/utils/documentZoom";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, EffectCoverflow } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-coverflow';
 
 interface WeekOption {
   id: string;
@@ -61,6 +55,8 @@ interface RankingUser {
 interface TeamStats {
   teamName: string;
   memberCount: number;
+  // rate 평균에 들어가는 비휴식 멤버 수 (모든 rate 배열의 분모와 동일).
+  activeCount: number;
   totalStar: number;
   totalInjeolmi: number;
   totalLightning: number;
@@ -69,6 +65,12 @@ interface TeamStats {
   avgCompetencyRate: number;
   avgExperienceRate: number;
   avgCareerRate: number;
+  // rate === 100 인 멤버 수 (각 라인을 100% 달성한 인원).
+  growthFullCount: number;
+  infoFullCount: number;
+  competencyFullCount: number;
+  experienceFullCount: number;
+  careerFullCount: number;
   successCount: number;
   failCount: number;
   restCount: number;
@@ -321,9 +323,11 @@ const Cluster4RankingContent = () => {
     const stats: TeamStats[] = [];
     teamMap.forEach((data, teamName) => {
       const avg = (arr: number[]) => arr.length > 0 ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
+      const fullCount = (arr: number[]) => arr.filter(r => r >= 100).length;
       stats.push({
         teamName,
         memberCount: data.members.length,
+        activeCount: data.growthRates.length,
         totalStar: data.totalStar,
         totalInjeolmi: data.totalInjeolmi,
         totalLightning: data.totalLightning,
@@ -332,6 +336,11 @@ const Cluster4RankingContent = () => {
         avgCompetencyRate: avg(data.competencyRates),
         avgExperienceRate: avg(data.experienceRates),
         avgCareerRate: avg(data.careerRates),
+        growthFullCount: fullCount(data.growthRates),
+        infoFullCount: fullCount(data.infoRates),
+        competencyFullCount: fullCount(data.competencyRates),
+        experienceFullCount: fullCount(data.experienceRates),
+        careerFullCount: fullCount(data.careerRates),
         successCount: data.successCount,
         failCount: data.failCount,
         restCount: data.restCount
@@ -365,25 +374,57 @@ const Cluster4RankingContent = () => {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .team-swiper-bullet {
-          width: 10px;
-          height: 10px;
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          display: inline-block;
-          margin: 0 5px;
-          cursor: pointer;
-          transition: all 0.3s;
+        .metric-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
         }
-        .team-swiper-bullet-active {
-          background: linear-gradient(135deg, #8A2BE2, #FFA500);
-          transform: scale(1.3);
-          box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+        @media (max-width: 900px) {
+          .metric-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        .team-swiper-prev:hover,
-        .team-swiper-next:hover {
-          background: rgba(255, 165, 0, 0.3) !important;
-          border-color: rgba(255, 165, 0, 0.5) !important;
+        @media (max-width: 480px) {
+          .metric-grid { grid-template-columns: 1fr; }
+        }
+        .metric-card {
+          position: relative;
+          border-radius: 16px;
+          padding: 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          overflow: hidden;
+          transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+          min-height: 160px;
+        }
+        .metric-card:hover {
+          transform: translateY(-3px);
+          filter: brightness(1.1);
+        }
+        .metric-card-watermark {
+          position: absolute;
+          top: -12px;
+          right: -8px;
+          font-size: 72px;
+          opacity: 0.08;
+          pointer-events: none;
+          line-height: 1;
+          user-select: none;
+        }
+        .metric-card-title {
+          font-size: 14px;
+          font-weight: 700;
+          color: #fff;
+          line-height: 1.25;
+          word-break: keep-all;
+          min-width: 0;
+          flex: 1;
+        }
+        .metric-card-team {
+          font-size: 13px;
+          font-weight: 700;
+          color: #fff;
+          word-break: keep-all;
+          line-height: 1.2;
         }
       `}</style>
 
@@ -586,24 +627,13 @@ const Cluster4RankingContent = () => {
               bgGradient: string;
               getValue: (t: TeamStats) => number;
               format: MetricFormat;
+              // 값 옆에 표시할 작은 컨텍스트 (예: '(3/12명)' / '총 12명 크루').
+              getSubtext: (t: TeamStats) => string;
               isPercentage: boolean;
               reverse?: boolean;
               isBattle?: boolean;
             }
             const metricSlides: MetricSlide[] = [
-              {
-                id: 'battle',
-                title: '성장 승패',
-                subtitle: 'Growth Battle Result',
-                icon: null,
-                emoji: '⚔️',
-                color: '#8B5CF6',
-                bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%)',
-                getValue: (t) => (t.successCount + t.failCount) > 0 ? Math.round((t.successCount / (t.successCount + t.failCount)) * 100) : 0,
-                format: (_, t) => `${t.successCount}승 ${t.failCount}패`,
-                isPercentage: true,
-                isBattle: true
-              },
               {
                 id: 'star',
                 title: '단감 획득',
@@ -614,6 +644,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.1) 100%)',
                 getValue: (t) => t.totalStar,
                 format: (v) => `${v}개`,
+                getSubtext: (t) => `총 ${t.memberCount}명 크루가 획득`,
                 isPercentage: false
               },
               {
@@ -626,11 +657,12 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(255, 105, 180, 0.15) 0%, rgba(219, 112, 147, 0.1) 100%)',
                 getValue: (t) => t.totalInjeolmi,
                 format: (v) => `${v}개`,
+                getSubtext: (t) => `총 ${t.memberCount}명 크루가 보유`,
                 isPercentage: false
               },
               {
                 id: 'lightning',
-                title: '어흥 누적',
+                title: '어흥 획득',
                 subtitle: 'Lightning Strikes',
                 icon: '/images/0/cluster4/icon/icon - 어흥.png',
                 emoji: '⚡',
@@ -638,6 +670,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%)',
                 getValue: (t) => t.totalLightning,
                 format: (v) => v > 0 ? `-${v}개` : '0개',
+                getSubtext: (t) => `총 ${t.memberCount}명 크루가 획득`,
                 isPercentage: false,
                 reverse: true
               },
@@ -651,6 +684,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%)',
                 getValue: (t) => t.avgGrowthRate,
                 format: (v) => `${v}%`,
+                getSubtext: (t) => `(${t.growthFullCount}/${t.activeCount}명)`,
                 isPercentage: true
               },
               {
@@ -663,6 +697,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)',
                 getValue: (t) => t.avgInfoRate,
                 format: (v) => `${v}%`,
+                getSubtext: (t) => `(${t.infoFullCount}/${t.activeCount}명)`,
                 isPercentage: true
               },
               {
@@ -675,6 +710,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)',
                 getValue: (t) => t.avgCompetencyRate,
                 format: (v) => `${v}%`,
+                getSubtext: (t) => `(${t.competencyFullCount}/${t.activeCount}명)`,
                 isPercentage: true
               },
               {
@@ -687,6 +723,7 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(244, 114, 182, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%)',
                 getValue: (t) => t.avgExperienceRate,
                 format: (v) => `${v}%`,
+                getSubtext: (t) => `(${t.experienceFullCount}/${t.activeCount}명)`,
                 isPercentage: true
               },
               {
@@ -699,288 +736,107 @@ const Cluster4RankingContent = () => {
                 bgGradient: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
                 getValue: (t) => t.avgCareerRate,
                 format: (v) => `${v}%`,
+                getSubtext: (t) => `(${t.careerFullCount}/${t.activeCount}명)`,
                 isPercentage: true
               }
             ];
 
             return (
               <div className="team-stats-section" style={{ marginBottom: '32px' }}>
-                {/* 섹션 헤더 */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '12px',
-                  marginBottom: '20px',
-                  padding: '16px 20px',
-                  background: 'linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%)',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(138, 43, 226, 0.4)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)',
-                    animation: 'shimmer 2s infinite'
-                  }} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1 }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg, #8A2BE2 0%, #FFA500 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 20px rgba(138, 43, 226, 0.5)',
-                      fontSize: '20px'
-                    }}>
-                      ⚔️
-                    </div>
-                    <div>
-                      <h3 style={{
-                        margin: 0,
-                        fontSize: '18px',
-                        fontWeight: 700,
-                        color: '#fff',
-                        textShadow: '0 0 10px rgba(138, 43, 226, 0.5)'
-                      }}>팀별 활동 인정률</h3>
-                      <p style={{ margin: 0, fontSize: '12px', color: '#888' }}>Team Activity Recognition Battle</p>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px', zIndex: 1 }}>
-                    <div className="team-swiper-prev" style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}>
-                      <span style={{ color: '#fff', fontSize: '14px' }}>◀</span>
-                    </div>
-                    <div className="team-swiper-next" style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}>
-                      <span style={{ color: '#fff', fontSize: '14px' }}>▶</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* 스와이퍼 - 지표별 팀 비교 */}
-                <Swiper
-                  modules={[Navigation, Pagination, EffectCoverflow]}
-                  spaceBetween={20}
-                  slidesPerView={1}
-                  navigation={{
-                    prevEl: '.team-swiper-prev',
-                    nextEl: '.team-swiper-next'
-                  }}
-                  pagination={{
-                    clickable: true,
-                    bulletClass: 'team-swiper-bullet',
-                    bulletActiveClass: 'team-swiper-bullet-active'
-                  }}
-                  loop={true}
-                  style={{ paddingBottom: '40px' }}
-                >
+                {/* 지표 카드 그리드 — 8개 metric 1등 팀을 4×2로 한눈에 */}
+                <div className="metric-grid">
                   {metricSlides.map((metric) => {
-                    // 해당 지표 기준으로 팀 정렬
                     const sortedTeams = [...teamStats].sort((a, b) => {
                       const aVal = metric.getValue(a);
                       const bVal = metric.getValue(b);
                       return metric.reverse ? aVal - bVal : bVal - aVal;
                     });
-                    const maxValue = Math.max(...sortedTeams.map(t => metric.getValue(t)), 1);
+                    const top = sortedTeams[0];
+                    if (!top) return null;
+                    const value = metric.getValue(top);
 
                     return (
-                      <SwiperSlide key={metric.id}>
-                        <div style={{
-                          background: metric.bgGradient,
-                          borderRadius: '20px',
-                          padding: '24px',
-                          border: `1px solid ${metric.color}40`,
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}>
-                          {/* 배경 장식 */}
-                          <div style={{
-                            position: 'absolute',
-                            top: '-50px',
-                            right: '-50px',
-                            width: '200px',
-                            height: '200px',
-                            background: `radial-gradient(circle, ${metric.color}20 0%, transparent 70%)`,
-                            borderRadius: '50%'
-                          }} />
+                      <div key={metric.id} className="metric-card" style={{
+                        background: metric.bgGradient,
+                        border: `1px solid ${metric.color}40`,
+                        boxShadow: `0 4px 20px ${metric.color}15`
+                      }}>
+                        {/* 우상단 워터마크 emoji */}
+                        <div className="metric-card-watermark">{metric.emoji}</div>
 
-                          {/* 슬라이드 헤더 */}
+                        {/* 헤더: 컬러 아이콘 + title */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative', zIndex: 1 }}>
                           <div style={{
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '10px',
+                            background: `linear-gradient(135deg, ${metric.color} 0%, ${metric.color}99 100%)`,
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '16px',
-                            marginBottom: '24px',
-                            position: 'relative',
-                            zIndex: 1
+                            justifyContent: 'center',
+                            fontSize: '18px',
+                            flexShrink: 0,
+                            boxShadow: `0 3px 12px ${metric.color}60`
                           }}>
-                            <div style={{
-                              width: '60px',
-                              height: '60px',
-                              borderRadius: '16px',
-                              background: `linear-gradient(135deg, ${metric.color} 0%, ${metric.color}99 100%)`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              boxShadow: `0 4px 20px ${metric.color}50`,
-                              fontSize: '28px'
-                            }}>
-                              {metric.icon ? (
-                                <Image src={metric.icon} alt={metric.title} width={36} height={36} />
-                              ) : (
-                                metric.emoji
-                              )}
-                            </div>
-                            <div>
-                              <h4 style={{
-                                margin: 0,
-                                fontSize: '22px',
-                                fontWeight: 800,
-                                color: '#fff',
-                                textShadow: `0 0 20px ${metric.color}50`
-                              }}>{metric.title}</h4>
-                              <p style={{ margin: 0, fontSize: '13px', color: '#888' }}>{metric.subtitle}</p>
-                            </div>
+                            {metric.icon ? (
+                              <Image src={metric.icon} alt={metric.title} width={20} height={20} />
+                            ) : (
+                              metric.emoji
+                            )}
                           </div>
+                          <div className="metric-card-title">{metric.title}</div>
+                        </div>
 
-                          {/* 팀별 바 차트 */}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 1 }}>
-                            {sortedTeams.map((team, idx) => {
-                              const value = metric.getValue(team);
-                              const barWidth = metric.isPercentage ? value : (maxValue > 0 ? (value / maxValue) * 100 : 0);
-
-                              return (
-                                <div key={team.teamName} style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '12px',
-                                  padding: '12px 16px',
-                                  background: idx === 0 ? 'rgba(255, 215, 0, 0.15)' : 'rgba(0, 0, 0, 0.2)',
-                                  borderRadius: '12px',
-                                  border: idx === 0 ? '2px solid rgba(255, 215, 0, 0.5)' : '1px solid rgba(255, 255, 255, 0.05)',
-                                  transition: 'all 0.3s ease'
-                                }}>
-                                  {/* 순위 */}
-                                  <div style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '8px',
-                                    background: idx === 0 ? 'linear-gradient(135deg, #FFD700, #FFA500)'
-                                      : idx === 1 ? 'linear-gradient(135deg, #C0C0C0, #A9A9A9)'
-                                      : idx === 2 ? 'linear-gradient(135deg, #CD7F32, #B8732D)'
-                                      : 'rgba(255, 255, 255, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 800,
-                                    fontSize: '14px',
-                                    color: idx < 3 ? '#000' : '#888',
-                                    flexShrink: 0
-                                  }}>
-                                    {idx + 1}
-                                  </div>
-
-                                  {/* 팀 정보 */}
-                                  <div style={{ width: '100px', flexShrink: 0 }}>
-                                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }}>{team.teamName}</div>
-                                    <div style={{ fontSize: '11px', color: '#666' }}>{team.memberCount}명</div>
-                                  </div>
-
-                                  {/* 프로그레스 바 */}
-                                  <div style={{ flex: 1, position: 'relative' }}>
-                                    <div style={{
-                                      height: '24px',
-                                      background: 'rgba(0, 0, 0, 0.3)',
-                                      borderRadius: '12px',
-                                      overflow: 'hidden',
-                                      position: 'relative'
-                                    }}>
-                                      <div style={{
-                                        height: '100%',
-                                        width: `${Math.min(barWidth, 100)}%`,
-                                        background: idx === 0
-                                          ? `linear-gradient(90deg, ${metric.color}, ${metric.color}DD)`
-                                          : `linear-gradient(90deg, ${metric.color}99, ${metric.color}66)`,
-                                        borderRadius: '12px',
-                                        boxShadow: idx === 0 ? `0 0 20px ${metric.color}60` : 'none',
-                                        transition: 'width 0.8s ease-out',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-end',
-                                        paddingRight: '8px'
-                                      }}>
-                                        {barWidth > 15 && (
-                                          <span style={{
-                                            fontSize: '12px',
-                                            fontWeight: 700,
-                                            color: idx === 0 ? '#000' : '#fff',
-                                            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-                                          }}>
-                                            {metric.format(value, team)}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* 값 표시 (바가 짧을 때) */}
-                                  {barWidth <= 15 && (
-                                    <div style={{
-                                      fontSize: '14px',
-                                      fontWeight: 700,
-                                      color: metric.color,
-                                      minWidth: '60px',
-                                      textAlign: 'right'
-                                    }}>
-                                      {metric.format(value, team)}
-                                    </div>
-                                  )}
-
-                                  {/* 1등 왕관 */}
-                                  {idx === 0 && (
-                                    <div style={{
-                                      fontSize: '24px',
-                                      animation: 'pulse-glow 2s infinite'
-                                    }}>
-                                      👑
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
+                        {/* 큰 값 + 작은 컨텍스트 */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'baseline',
+                          gap: '8px',
+                          flexWrap: 'wrap',
+                          position: 'relative',
+                          zIndex: 1
+                        }}>
+                          <div style={{
+                            fontSize: '28px',
+                            fontWeight: 800,
+                            color: metric.color,
+                            textShadow: `0 0 20px ${metric.color}60`,
+                            lineHeight: 1
+                          }}>
+                            {metric.format(value, top)}
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#aaa',
+                            fontWeight: 500,
+                            wordBreak: 'keep-all',
+                            lineHeight: 1.2
+                          }}>
+                            {metric.getSubtext(top)}
                           </div>
                         </div>
-                      </SwiperSlide>
+
+                        {/* 하단 1위 팀 칩 */}
+                        <div style={{
+                          marginTop: 'auto',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          position: 'relative',
+                          zIndex: 1,
+                          padding: '7px 10px',
+                          background: 'rgba(0, 0, 0, 0.3)',
+                          borderRadius: '8px',
+                          border: `1px solid ${metric.color}40`
+                        }}>
+                          <span style={{ fontSize: '14px', flexShrink: 0 }}>👑</span>
+                          <span className="metric-card-team">{top.teamName}</span>
+                        </div>
+                      </div>
                     );
                   })}
-                </Swiper>
+                </div>
 
                 {/* 팀별 성장 승패 세로 막대 그래프 */}
                 <div style={{
@@ -997,25 +853,25 @@ const Cluster4RankingContent = () => {
                     justifyContent: 'space-between',
                     marginBottom: '24px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ fontSize: '24px' }}>⚔️</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <span style={{ fontSize: '28px' }}>⚔️</span>
                       <div>
-                        <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#fff' }}>팀별 성장 승패 현황</h4>
-                        <p style={{ margin: 0, fontSize: '12px', color: '#888' }}>Team Growth Battle Overview</p>
+                        <h4 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#fff' }}>팀별 성장 승패 현황</h4>
+                        <p style={{ margin: 0, fontSize: '14px', color: '#888' }}>Team Growth Battle Overview</p>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
-                        <span style={{ color: '#888' }}>성공</span>
+                    <div style={{ display: 'flex', gap: '20px', fontSize: '15px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'linear-gradient(180deg, #4ADE80, #22C55E)' }} />
+                        <span style={{ color: '#ccc', fontWeight: 600 }}>성공</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'linear-gradient(180deg, #EF4444, #DC2626)' }} />
-                        <span style={{ color: '#888' }}>실패</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'linear-gradient(180deg, #EF4444, #DC2626)' }} />
+                        <span style={{ color: '#ccc', fontWeight: 600 }}>실패</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'linear-gradient(180deg, #6B7280, #4B5563)' }} />
-                        <span style={{ color: '#888' }}>휴식</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: 'linear-gradient(180deg, #6B7280, #4B5563)' }} />
+                        <span style={{ color: '#ccc', fontWeight: 600 }}>휴식</span>
                       </div>
                     </div>
                   </div>
@@ -1045,10 +901,11 @@ const Cluster4RankingContent = () => {
                       >
                         <span style={{
                           position: 'absolute',
-                          left: '-30px',
-                          top: '-8px',
-                          fontSize: '10px',
-                          color: '#666'
+                          left: '-34px',
+                          top: '-9px',
+                          fontSize: '13px',
+                          color: '#888',
+                          fontWeight: 600
                         }}>{val}%</span>
                       </div>
                     ))}
@@ -1077,8 +934,8 @@ const Cluster4RankingContent = () => {
                         >
                           {/* 승률 표시 */}
                           <div style={{
-                            fontSize: '14px',
-                            fontWeight: 700,
+                            fontSize: '18px',
+                            fontWeight: 800,
                             color: successRate >= 70 ? '#4ADE80' : successRate >= 50 ? '#FBBF24' : '#EF4444',
                             textShadow: `0 0 10px ${successRate >= 70 ? 'rgba(74, 222, 128, 0.5)' : successRate >= 50 ? 'rgba(251, 191, 36, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`
                           }}>
@@ -1110,7 +967,7 @@ const Cluster4RankingContent = () => {
                               boxShadow: '0 0 10px rgba(74, 222, 128, 0.3) inset'
                             }}>
                               {successHeight > 15 && (
-                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{team.successCount}</span>
+                                <span style={{ fontSize: '14px', fontWeight: 800, color: '#000' }}>{team.successCount}</span>
                               )}
                             </div>
                             {/* 실패 바 */}
@@ -1125,7 +982,7 @@ const Cluster4RankingContent = () => {
                               boxShadow: '0 0 10px rgba(239, 68, 68, 0.3) inset'
                             }}>
                               {failHeight > 15 && (
-                                <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{team.failCount}</span>
+                                <span style={{ fontSize: '14px', fontWeight: 800, color: '#fff' }}>{team.failCount}</span>
                               )}
                             </div>
                             {/* 휴식 바 */}
@@ -1140,7 +997,7 @@ const Cluster4RankingContent = () => {
                                 justifyContent: 'center'
                               }}>
                                 {restHeight > 15 && (
-                                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{team.restCount}</span>
+                                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#fff' }}>{team.restCount}</span>
                                 )}
                               </div>
                             )}
@@ -1161,11 +1018,11 @@ const Cluster4RankingContent = () => {
 
                           {/* 팀 이름 */}
                           <div style={{
-                            fontSize: '11px',
-                            fontWeight: 600,
+                            fontSize: '14px',
+                            fontWeight: 700,
                             color: idx === 0 ? '#FFD700' : '#fff',
                             textAlign: 'center',
-                            maxWidth: '80px',
+                            maxWidth: '90px',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
@@ -1175,8 +1032,9 @@ const Cluster4RankingContent = () => {
 
                           {/* 인원 수 */}
                           <div style={{
-                            fontSize: '10px',
-                            color: '#666'
+                            fontSize: '12px',
+                            color: '#888',
+                            fontWeight: 500
                           }}>
                             {team.memberCount}명
                           </div>
@@ -1189,33 +1047,33 @@ const Cluster4RankingContent = () => {
                   <div style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    gap: '32px',
-                    marginTop: '20px',
-                    padding: '12px',
+                    gap: '40px',
+                    marginTop: '24px',
+                    padding: '16px',
                     background: 'rgba(0, 0, 0, 0.2)',
                     borderRadius: '12px'
                   }}>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>전체 성공</div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#4ADE80' }}>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 성공</div>
+                      <div style={{ fontSize: '26px', fontWeight: 800, color: '#4ADE80' }}>
                         {teamStats.reduce((sum, t) => sum + t.successCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>전체 실패</div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#EF4444' }}>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 실패</div>
+                      <div style={{ fontSize: '26px', fontWeight: 800, color: '#EF4444' }}>
                         {teamStats.reduce((sum, t) => sum + t.failCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>전체 휴식</div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#6B7280' }}>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 휴식</div>
+                      <div style={{ fontSize: '26px', fontWeight: 800, color: '#6B7280' }}>
                         {teamStats.reduce((sum, t) => sum + t.restCount, 0)}
                       </div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '10px', color: '#888', marginBottom: '4px' }}>전체 승률</div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#8B5CF6' }}>
+                      <div style={{ fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>전체 승률</div>
+                      <div style={{ fontSize: '26px', fontWeight: 800, color: '#8B5CF6' }}>
                         {(() => {
                           const totalSuccess = teamStats.reduce((sum, t) => sum + t.successCount, 0);
                           const totalFail = teamStats.reduce((sum, t) => sum + t.failCount, 0);
