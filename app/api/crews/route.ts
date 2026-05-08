@@ -152,11 +152,25 @@ export async function GET(request: Request) {
         .in("user_id", userIds)
         .eq("status", "approved"),
       // hasActivity 판정 기준: user_weekly_growth.is_success (사이드바와 동일)
-      supabase
-        .from("user_weekly_growth")
-        .select("user_id, week_id")
-        .in("user_id", userIds)
-        .eq("is_success", true),
+      // PostgREST max-rows 1000 강제로 limit/range 무시 → range 페이지네이션으로 전체 수집.
+      // 안 그러면 일부 유저 success 행 누락되며 approved_weeks 가 잘림.
+      (async () => {
+        const PAGE = 1000;
+        const all: { user_id: string; week_id: string }[] = [];
+        for (let from = 0; ; from += PAGE) {
+          const { data, error } = await supabase
+            .from("user_weekly_growth")
+            .select("user_id, week_id")
+            .in("user_id", userIds)
+            .eq("is_success", true)
+            .range(from, from + PAGE - 1);
+          if (error) return { data: all, error };
+          if (!data || data.length === 0) break;
+          all.push(...data);
+          if (data.length < PAGE) break;
+        }
+        return { data: all, error: null };
+      })(),
       supabase
         .from("user_season_histories")
         .select("user_id, progress_status, season_id")

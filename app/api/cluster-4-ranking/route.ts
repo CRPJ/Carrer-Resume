@@ -199,11 +199,25 @@ export async function GET(request: NextRequest) {
       // 누적 인정 주차 실시간 계산용 — 전 주차의 success 행. user_growth_stats 캐시 대신 사용.
       // 이유: 캐시가 며칠 단위로만 갱신되어 stale → cluster-4-card 와 표시값 어긋남.
       // cluster-4-card L1276-1302 와 동일 산식: 온보딩 이후 success + 온보딩 +1 + 현재 주차 활동 시 +1.
-      supabaseAdmin
-        .from('user_weekly_growth')
-        .select('user_id, week_id')
-        .in('user_id', userIdArray)
-        .eq('is_success', true),
+      // PostgREST max-rows 가 서버측 1000 으로 강제돼 limit/range 모두 1000 으로 잘림 →
+      // range 페이지네이션으로 전체 행 수집 (안 그러면 일부 유저 success 행 누락되며 누적주차 잘림).
+      (async () => {
+        const PAGE = 1000;
+        const all: { user_id: string; week_id: string }[] = [];
+        for (let from = 0; ; from += PAGE) {
+          const { data, error } = await supabaseAdmin!
+            .from('user_weekly_growth')
+            .select('user_id, week_id')
+            .in('user_id', userIdArray)
+            .eq('is_success', true)
+            .range(from, from + PAGE - 1);
+          if (error) return { data: all, error };
+          if (!data || data.length === 0) break;
+          all.push(...data);
+          if (data.length < PAGE) break;
+        }
+        return { data: all, error: null };
+      })(),
       // 해당 주차 포인트
       supabaseAdmin
         .from('points')
