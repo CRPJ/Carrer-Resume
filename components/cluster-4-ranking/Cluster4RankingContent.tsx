@@ -106,7 +106,6 @@ const getStatusIcon = (status: string): string => {
 const isStatusPlusOne = (status: string): boolean => status === "진행 중" || status === "집계 중";
 
 const Cluster4RankingContent = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState("역대 시즌");
@@ -174,7 +173,6 @@ const Cluster4RankingContent = () => {
       }
     };
     fetchRankings();
-    setCurrentPage(1);
   }, [selectedWeekId]);
 
   // 시즌 옵션 추출
@@ -263,14 +261,6 @@ const Cluster4RankingContent = () => {
     const dayOfWeek = days[date.getDay()];
     return `${year} - ${month} - ${day} (${dayOfWeek})`;
   };
-
-  // 페이지네이션
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(rankings.length / itemsPerPage);
-  const paginatedRankings = rankings.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   // 팀별 통계 집계
   const teamStats = useMemo(() => {
@@ -1245,9 +1235,9 @@ const Cluster4RankingContent = () => {
           <div className="weekly-cards">
             {isLoading ? (
               <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>랭킹 데이터 로딩 중...</div>
-            ) : paginatedRankings.length === 0 ? (
+            ) : rankings.length === 0 ? (
               <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>해당 주차에 활동한 크루가 없습니다.</div>
-            ) : paginatedRankings.map((user, index) => (
+            ) : rankings.map((user, index) => (
               <Link href={`/cluster-4-card/${selectedWeekId}?userId=${user.userId}`} key={user.userId} className="weekly-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                 {/* 왼쪽: 프로필 이미지 */}
                 <div className={`weekly-card-image ${user.growthStatus === '휴식(개인)' ? 'rest-personal-overlay' : ''}`} style={{
@@ -1290,7 +1280,7 @@ const Cluster4RankingContent = () => {
                     fontWeight: 700,
                     fontSize: '12px'
                   }}>
-                    {(currentPage - 1) * itemsPerPage + index + 1}
+                    {index + 1}
                   </div>
                   {user.growthStatus === '휴식(개인)' && (
                     <div className="rest-message">
@@ -1416,23 +1406,6 @@ const Cluster4RankingContent = () => {
                 </div>
               </Link>
             ))}
-          </div>
-
-          {/* 페이지네이션 */}
-          <div className="weekly-pagination">
-            {totalPages > 0 ? (
-              Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-                <span
-                  key={num}
-                  className={`page-num ${currentPage === num ? 'active' : ''}`}
-                  onClick={() => setCurrentPage(num)}
-                >
-                  {num}
-                </span>
-              ))
-            ) : (
-              <span className="page-num active">1</span>
-            )}
           </div>
         </section>
       </div>
