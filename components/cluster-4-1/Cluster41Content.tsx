@@ -130,7 +130,11 @@ const Cluster41Content = () => {
     if (isDemoMode) return;
     if (sessionStatus !== 'authenticated') return;
     if (targetUserId) return;
-    if ((session?.user as any)?.isAdmin) return; // 어드민(마더 계정)은 user_profiles 에 없음
+    // 어드민(마더 계정)은 user_profiles 에 없어 /cluster-4 자체가 의미 없음 — 크루 관리 시작점인 /crews 로
+    if ((session?.user as any)?.isAdmin) {
+      router.replace('/crews');
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
