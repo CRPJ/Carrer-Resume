@@ -51,6 +51,11 @@ const Sidebar = () => {
   const handleCareerResumeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (session?.user) {
+      // 어드민(마더 계정)은 본인 프로필이 없어 /cluster-4 가 무의미 — 바로 크루 목록으로
+      if (session.user.isAdmin) {
+        router.push("/crews");
+        return;
+      }
       if (myProfileId) {
         router.push(`/cluster-4/?userId=${myProfileId}`);
       } else {
