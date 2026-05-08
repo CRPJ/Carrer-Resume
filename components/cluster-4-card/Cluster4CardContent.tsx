@@ -8819,9 +8819,6 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const crewSlotIdx = imageIdx - 2 // 슬롯 2,3 → 크루 image_urls[0,1]
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${isAdminSlot && !image ? " disabled" : ""}${isAdminSlot ? " admin-slot" : ""}`} style={{ position: "relative" }}>
-                          {isAdminSlot && image && (
-                            <span className="admin-badge" title="운영진 업로드" style={{ position: "absolute", top: 4, left: 4, zIndex: 2, background: "#7c3aed", color: "#fff", borderRadius: 4, padding: "0 6px", fontSize: 11 }}>A</span>
-                          )}
                           {image ? (
                             <div className="image-preview" onClick={() => !isAdminSlot && handleImagePreview(crewSlotIdx)}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
