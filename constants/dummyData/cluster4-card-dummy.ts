@@ -488,6 +488,10 @@ export const DUMMY_WEEK_CARD: Record<string, WeekCardDummyData> = {
       { week_id: "dw-01", activity_type_id: "exp-2", is_completed: true },
       { week_id: "dw-01", activity_type_id: "exp-3", is_completed: false },
       { week_id: "dw-01", activity_type_id: "exp-4", is_completed: false },
+      // 빈 카드(empty) 데모 항목 — work-experience 4번째 가시 카드(workExpCardLineCodes[3]="EX99A-ER0004")에 is_empty 마커.
+      // workExpCards 매핑이 activityTypeId(=lineCodeKey, 데모 모드 매칭 fallback)로 record 검색 →
+      // getEnhancementStatus가 is_empty를 최우선 검사하여 "empty" 반환.
+      { week_id: "dw-01", activity_type_id: "EX99A-ER0004", is_completed: true, is_empty: true },
     ],
     careerRecords: SHARED_CAREER_RECORDS,
   },
