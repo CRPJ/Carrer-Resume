@@ -14,6 +14,7 @@ import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES, REVIEW_COMMENT_DEFAULT } from "@/constants/dummyData";
 import { dedupedJson } from "@/lib/fetch-dedupe";
+import HelpModalBody from "@/components/shared/HelpModalBody";
 
 // 글자수 초과 시 '..' 표시 (CSS ellipsis '…' 대신 JS 처리)
 const truncate = (text: string | undefined | null, maxLen: number): string => {
@@ -3844,7 +3845,7 @@ const Cluster4Content = () => {
                 </button>
               </div>
             </div>
-            <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+            <HelpModalBody helpKey={helpModalKind} />
           </div>
         </div>
       )}

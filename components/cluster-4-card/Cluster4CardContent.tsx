@@ -14,6 +14,7 @@ import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constants/dummyData";
 import DetailLogModal from "./DetailLogModal";
 import confetti from "canvas-confetti";
+import HelpModalBody from "@/components/shared/HelpModalBody";
 
 // 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
 // 이 시점에 동시에 확정:
@@ -9440,7 +9441,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </button>
                   </div>
                 </div>
-                <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+                <HelpModalBody helpKey="exp" />
               </div>
             </div>
           )}
@@ -9838,7 +9839,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </button>
                   </div>
                 </div>
-                <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+                <HelpModalBody helpKey="ability" />
               </div>
             </div>
           )}
@@ -10364,7 +10365,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     </button>
                   </div>
                 </div>
-                <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+                <HelpModalBody helpKey="career" />
               </div>
             </div>
           )}
@@ -10384,7 +10385,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </button>
               </div>
             </div>
-            <div className="help-modal-body">도움말 내용은 추후 추가됩니다.</div>
+            <HelpModalBody helpKey={helpModalKind} />
           </div>
         </div>
       )}
