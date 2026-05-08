@@ -4973,7 +4973,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             statusBadge: getStatusBadge(computedStatus),
             grade: record.grade || "",
             isNotApplicable: computedStatus === "not_applicable",
-            isEmpty: false,
+            // work-info의 is_empty sentinel 패턴과 동일 — record.is_empty === true일 때만 isEmpty: true.
+            // 운영 데이터에는 is_empty 필드가 없으므로 항상 falsy → 기존 카드 동작 유지.
+            isEmpty: (record as { is_empty?: boolean }).is_empty === true,
             isFailed: computedStatus === "failed",
             // 추가 정보 (상세 보기용)
             projectDescription: (() => {
@@ -6205,12 +6207,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   <div
                     className={`work-career-card ${isEmpty ? "empty" : ""} ${card.isFailed ? "failed" : ""} ${card.isNotApplicable ? "not-applicable" : ""}`}
                     onClick={async () => {
-                      if (!isEmpty) {
+                      // record 기반 빈 카드(is_empty sentinel)는 모달 열어 void 상태 표시.
+                      // 무경력 placeholder(emptyCareerCard, recordId: null)는 기존대로 클릭 차단.
+                      if (!isEmpty || card.recordId) {
                         setSelectedWorkCareerCard(card);
                         setWorkCareerViewModalOpen(true);
                       }
                     }}
-                    style={{ cursor: isEmpty ? "default" : "pointer" }}
+                    style={{ cursor: !isEmpty || card.recordId ? "pointer" : "default" }}
                   >
                     {card.isFailed && <div className="card-overlay failed"></div>}
                     <div className="card-top-row">
