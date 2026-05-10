@@ -13,8 +13,9 @@
   flex-direction: column;
   gap: 24px;
 
-  // [v4] /crews 스타일 풀폭 wrapper에서 필터바/placeholder는 1400px 캡 + 중앙 정렬
-  .weekly-filter,
+  // [v14] /crews 스타일 풀폭 wrapper에서 필터바/placeholder는 1400px 캡 + 중앙 정렬
+  // .weekly-filter (BEM) → .weekly-filter-wrap (tournaments 패턴 outer)으로 교체
+  .weekly-filter-wrap,
   .weekly-team-stats-placeholder,
   .weekly-list-placeholder {
     width: 100%;
@@ -239,87 +240,48 @@
     }
   }
 
-  /* ---------- [2] Filter Bar ---------- */
-  .weekly-filter {
+  /* ---------- [2] Filter Bar — tournaments 패턴 차용 ---------- */
+  // 외곽(.tournaments__filter), nice-select 스타일은 sections/_all-sections.scss L2370 그대로 cascade
+  // 본 영역은 weekly 고유 요소(RESET 버튼 + 전체 수/검색 결과 read-only)만 정의
+
+  .weekly-filter-reset-btn {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    background: var(--quaternary-color);
+    border: none;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 13px;
+    color: #1a1a1a;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: var(--transition);
+
+    &:hover { opacity: 0.9; }
+    &:active { transform: translateY(1px); }
+  }
+
+  .weekly-filter-readonly {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 16px 24px;
-    background: #1a1a1a;
-    border: 2px solid #f0c419;
-    border-radius: 12px;
+    gap: 6px;
     color: #fff;
-    flex-wrap: wrap;
+    font-size: 14px;
+    white-space: nowrap;
 
-    &__reset {
-      flex-shrink: 0;
-      padding: 8px 18px;
-      background: #f5d54a;
-      border: 2px solid #1a1a1a;
-      border-radius: 6px;
-      font-weight: 800;
-      font-size: 14px;
-      color: #1a1a1a;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-
-      &:hover { background: #ffe16a; }
-      &:active { transform: translateY(1px); }
-    }
-
-    &__item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-
-      &--readonly { gap: 6px; }
-      &--right { margin-left: auto; }
-    }
-
-    &__dot {
-      color: #f0c419;
+    .weekly-filter-dot {
+      color: var(--quaternary-color);
       font-size: 10px;
       line-height: 1;
     }
-
-    &__label {
-      color: #fff;
+    .weekly-filter-label {
+      color: #999;
       font-weight: 500;
-      margin: 0;
-      white-space: nowrap;
     }
-
-    &__value {
-      color: #fff;
+    .weekly-filter-value {
+      color: var(--quaternary-color);
       font-weight: 700;
       font-variant-numeric: tabular-nums;
-    }
-
-    /* react-bootstrap Form.Select 외관 커스터마이즈 — 본 페이지 스코프 한정 */
-    &__select.form-select {
-      width: auto;
-      min-width: 96px;
-      padding: 4px 28px 4px 10px;
-      background-color: transparent;
-      color: #f5d54a;
-      border: 1.5px solid #f0c419;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f0c419' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-
-      &:focus {
-        box-shadow: 0 0 0 2px rgba(240, 196, 25, 0.25);
-        border-color: #f0c419;
-      }
-
-      option {
-        background-color: #1a1a1a;
-        color: #fff;
-      }
     }
   }
 

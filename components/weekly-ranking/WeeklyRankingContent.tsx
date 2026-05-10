@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import WeeklyFilterBar from "./WeeklyFilterBar";
+import WeeklyCardList from "./WeeklyCardList";
 
 const SORT_OPTIONS = [
   { value: "latest",         label: "최신 순" },
@@ -101,9 +102,7 @@ const WeeklyRankingContent = () => {
         <p>팀 통계 영역 (다음 회차 재통합 예정)</p>
       </div>
 
-      <div className="weekly-list-placeholder">
-        <p>주차 카드 목록 영역 (다음 회차 구현 예정)</p>
-      </div>
+      <WeeklyCardList />
 
     </section>
   );
