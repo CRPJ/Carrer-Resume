@@ -13,7 +13,6 @@ export type WeeklyCardData = {
   id: string;
   seasonName: string;     // 예: "2026년, 봄 시즌, 3주차" — 그대로 출력
   weekNumber: number;     // seasonName 에서 추출된 주차 숫자 (시즌 횡단 비교에는 부적절)
-  latestOrder: number;    // 최신 순 정렬 키 — 작을수록 최신 (display map 의 자연 순서)
   dateRangeText: string;  // 예: "26.03.16(월) - 26.03.22(일)" — 그대로 출력
   status: '정상 진행' | '대전 집계' | '휴식';
   leagueResultStatus: '정상 진행' | '심화 진행' | '공식 휴식';
@@ -206,7 +205,6 @@ export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = WEEKLY_RANKING_DISPLAY_MAP.ma
       // 표시 문자열은 매핑값 그대로 — 연도/시즌명/주차명/기간 재계산 금지.
       seasonName: display.seasonName,
       weekNumber: extractWeekNumber(display.seasonName),
-      latestOrder: i, // 매핑 배열의 자연 순서 = 최신 → 과거. 정렬 시 ASC 로 사용.
       dateRangeText: display.dateRangeText,
       imageUrl: display.imageUrl,
       // 그 외 필드는 기존 그대로 seeded random

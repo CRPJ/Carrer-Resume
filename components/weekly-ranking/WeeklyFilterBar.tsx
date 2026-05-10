@@ -151,26 +151,44 @@ const WeeklyFilterBar = ({
           <span className="weekly-filter-value">{totalCount}</span>
         </div>
 
-        <WeeklyFilterSelect
-          options={sortOptions}
-          value={sortValue}
-          onChange={onSortChange}
-          width={sortSelectWidth}
-        />
+        <div className="weekly-filter-group">
+          <div className="weekly-filter-group-label">
+            <span className="weekly-filter-dot" aria-hidden="true">●</span>
+            <span className="weekly-filter-group-text">정렬</span>
+          </div>
+          <WeeklyFilterSelect
+            options={sortOptions}
+            value={sortValue}
+            onChange={onSortChange}
+            width={sortSelectWidth}
+          />
+        </div>
 
-        <WeeklyFilterSelect
-          options={seasonOptions}
-          value={seasonValue}
-          onChange={onSeasonChange}
-          width={seasonSelectWidth}
-        />
+        <div className="weekly-filter-group">
+          <div className="weekly-filter-group-label">
+            <span className="weekly-filter-dot" aria-hidden="true">●</span>
+            <span className="weekly-filter-group-text">시즌</span>
+          </div>
+          <WeeklyFilterSelect
+            options={seasonOptions}
+            value={seasonValue}
+            onChange={onSeasonChange}
+            width={seasonSelectWidth}
+          />
+        </div>
 
-        <WeeklyFilterSelect
-          options={leagueOptions}
-          value={leagueValue}
-          onChange={onLeagueChange}
-          width={leagueSelectWidth}
-        />
+        <div className="weekly-filter-group">
+          <div className="weekly-filter-group-label">
+            <span className="weekly-filter-dot" aria-hidden="true">●</span>
+            <span className="weekly-filter-group-text">리그</span>
+          </div>
+          <WeeklyFilterSelect
+            options={leagueOptions}
+            value={leagueValue}
+            onChange={onLeagueChange}
+            width={leagueSelectWidth}
+          />
+        </div>
 
         <div className="weekly-filter-readonly">
           <span className="weekly-filter-dot" aria-hidden="true">●</span>

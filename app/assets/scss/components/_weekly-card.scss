@@ -364,42 +364,46 @@
     }
   }
 
-  /* ---------- 우승 placeholder (2행 3열) ---------- */
+  /* ---------- 우승 슬롯 — 다른 .skill-card 와 동일한 자연 흐름 ----------
+     이전: 80×80 정사각 박스 + 왕관/라벨 absolute(형광펜 + 사선 회전)
+     이후: .skill-card 패턴 (icon 34 + num-row 25 + label 18) 과 동일 사이즈/구조
+     절대 보호: placeholder gradient 자체 디자인 유지(사이즈만 num-row 영역과 동일).
+     order: 1 trophy → 2 image/placeholder → 3 label (다른 슬롯의 icon→num→label 순서) */
   .weekly-card__winner {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
-    max-height: 80px;
-    border-radius: 8px;
-    background: rgba(240, 196, 25, 0.08);
-    border: 1px solid rgba(240, 196, 25, 0.3);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    background: transparent;
+    border: none;
+    padding: 0;
     overflow: visible;
   }
 
   .weekly-card__winner-placeholder {
     width: 100%;
-    height: 100%;
+    height: 25px;
     background: linear-gradient(135deg, rgba(240, 196, 25, 0.15) 0%, rgba(240, 196, 25, 0.05) 100%);
     border-radius: 7px;
+    order: 2;
   }
 
   .weekly-card__winner-image {
     width: 100%;
-    height: 100%;
+    height: 25px;
     object-fit: cover;
     border-radius: 7px;
+    order: 2;
   }
 
   .weekly-card__winner-trophy {
-    position: absolute;
-    top: -12px;
-    left: 8px;
-    width: 48px;
-    height: 48px;
-    z-index: 2;
+    position: static;
+    width: 34px;
+    height: 34px;
+    order: 1;
+    margin-bottom: 4px;
 
     filter:
       drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
@@ -413,42 +417,26 @@
   }
 
   .weekly-card__winner-label {
-    position: absolute;
-    top: 0px;
-    left: 42px;
-    z-index: 1;
+    position: static;
+    order: 3;
+    display: block;
+    padding: 0;
+    margin-top: 2px;
 
-    display: inline-block;
+    background: none;
+    transform: none;
+    text-shadow: none;
+    letter-spacing: 0;
 
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 30%,
-      rgba(254, 212, 2, 0.85) 30%,
-      rgba(254, 212, 2, 0.85) 90%,
-      transparent 90%,
-      transparent 100%
-    );
-
-    padding: 2px 6px;
-
-    color: #fff;
+    font-family: "Pretendard", sans-serif;
     font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    line-height: 1.2;
+    font-weight: 500;
+    line-height: 18px;
+    color: #fff;
     white-space: nowrap;
-
-    text-shadow:
-      0 1px 0 rgba(0, 0, 0, 0.4),
-      0 0 4px rgba(255, 215, 0, 0.3);
-
-    transform: rotate(12deg);
-    transform-origin: center center;
 
     pointer-events: none;
     user-select: none;
-    font-family: inherit;
   }
 
   /* ---------- Top 3 크루 ---------- */

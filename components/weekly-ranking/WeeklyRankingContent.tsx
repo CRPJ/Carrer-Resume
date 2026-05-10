@@ -16,28 +16,39 @@ const SORT_OPTIONS = [
   { value: "crew-count",     label: "리그 크루 수" },
 ];
 
-const SEASON_OPTIONS = [
-  { value: "",            label: "-" },
-  { value: "2026-spring", label: "2026년, 봄 시즌" },
-];
-
-const LEAGUE_OPTIONS = [
-  { value: "",         label: "-" },
-  { value: "normal",   label: "정상 진행" },
-  { value: "advanced", label: "심화 진행" },
-  { value: "rest",     label: "휴식(공식)" },
-];
-
-// 필터 value → 카드 데이터 필드 매핑
-// (옵션 라벨은 UI 표시용. 실제 비교는 카드 데이터 문자열 기준.)
-const SEASON_VALUE_TO_DATA: Record<string, string> = {
-  "2026-spring": "2026년, 봄 시즌",
+const SEASON_ORDER: Record<string, number> = {
+  겨울: 1,
+  봄:   2,
+  여름: 3,
+  가을: 4,
 };
 
-const LEAGUE_VALUE_TO_DATA: Record<string, WeeklyCardData["leagueResultStatus"]> = {
-  normal:   "정상 진행",
-  advanced: "심화 진행",
-  rest:     "공식 휴식", // UI 라벨은 "휴식(공식)" 이지만 카드 데이터는 "공식 휴식"
+const parseYearSeason = (text: string) => {
+  const match = text.match(/(\d{4})년,?\s*(봄|여름|가을|겨울)\s*시즌/);
+  if (!match) return null;
+  return {
+    year: Number(match[1]),
+    season: match[2],
+    seasonOrder: SEASON_ORDER[match[2]] ?? 0,
+  };
+};
+
+const parseWeekSortKey = (seasonName: string) => {
+  const ys = parseYearSeason(seasonName);
+  const weekMatch = seasonName.match(/(\d+)주차/);
+  return {
+    year: ys?.year ?? 0,
+    seasonOrder: ys?.seasonOrder ?? 0,
+    week: weekMatch ? Number(weekMatch[1]) : 0,
+  };
+};
+
+// 카드 seasonName → 시즌 필터 value (= label).
+// 카드와 필터가 동일 문자열을 공유 → 별도 mapping 불필요.
+const getSeasonFilterValue = (seasonName: string) => {
+  const ys = parseYearSeason(seasonName);
+  if (!ys) return "";
+  return `${ys.year}년, ${ys.season} 시즌`;
 };
 
 const WeeklyRankingContent = () => {
@@ -56,32 +67,65 @@ const WeeklyRankingContent = () => {
     [demo]
   );
 
+  // 카드 데이터에 실제 존재하는 시즌만 옵션으로. 최신(year + seasonOrder DESC) 정렬.
+  const seasonOptions = useMemo(() => {
+    const set = new Set<string>();
+    allCards.forEach((card) => {
+      const v = getSeasonFilterValue(card.seasonName);
+      if (v) set.add(v);
+    });
+    const sorted = Array.from(set).sort((a, b) => {
+      const ay = parseYearSeason(a);
+      const by = parseYearSeason(b);
+      if (!ay || !by) return 0;
+      return by.year - ay.year || by.seasonOrder - ay.seasonOrder;
+    });
+    return [
+      { value: "", label: "-" },
+      ...sorted.map((s) => ({ value: s, label: s })),
+    ];
+  }, [allCards]);
+
+  // 카드 데이터의 leagueResultStatus 값을 그대로 옵션화 (value === label).
+  const leagueOptions = useMemo(() => {
+    const set = new Set<string>();
+    allCards.forEach((card) => {
+      if (card.leagueResultStatus) set.add(card.leagueResultStatus);
+    });
+    return [
+      { value: "", label: "-" },
+      ...Array.from(set).map((s) => ({ value: s, label: s })),
+    ];
+  }, [allCards]);
+
   // 필터 + 정렬 결과. useMemo로 ref 안정화 — 자식 페이지네이션 reset effect 트리거 적정화.
   const filteredAndSortedCards = useMemo<WeeklyCardData[]>(() => {
     let result = allCards;
 
     if (seasonValue) {
-      const targetSeason = SEASON_VALUE_TO_DATA[seasonValue];
-      if (targetSeason) {
-        result = result.filter((card) => card.seasonName === targetSeason);
-      }
+      result = result.filter(
+        (card) => getSeasonFilterValue(card.seasonName) === seasonValue
+      );
     }
 
     if (leagueValue) {
-      const targetLeague = LEAGUE_VALUE_TO_DATA[leagueValue];
-      if (targetLeague) {
-        result = result.filter(
-          (card) => card.leagueResultStatus === targetLeague
-        );
-      }
+      result = result.filter((card) => card.leagueResultStatus === leagueValue);
     }
 
     const sorted = [...result];
     switch (sortValue) {
       case "latest":
-        // 최신 순 — display map 자연 순서(latestOrder ASC). weekNumber 는 시즌이
-        // 다르면 의미가 어긋나 사용 부적합 (예: 봄 8주차 vs 겨울 8주차).
-        sorted.sort((a, b) => a.latestOrder - b.latestOrder);
+        // seasonName 에서 연도/시즌/주차 파싱 후 DESC 정렬.
+        // 시즌 우선순위: 가을 > 여름 > 봄 > 겨울 (같은 해 안에서).
+        sorted.sort((a, b) => {
+          const ak = parseWeekSortKey(a.seasonName);
+          const bk = parseWeekSortKey(b.seasonName);
+          return (
+            bk.year - ak.year ||
+            bk.seasonOrder - ak.seasonOrder ||
+            bk.week - ak.week
+          );
+        });
         break;
       case "growth-success":
         sorted.sort((a, b) => b.growthSuccessRate - a.growthSuccessRate);
@@ -187,8 +231,8 @@ const WeeklyRankingContent = () => {
         seasonValue={seasonValue}
         leagueValue={leagueValue}
         sortOptions={SORT_OPTIONS}
-        seasonOptions={SEASON_OPTIONS}
-        leagueOptions={LEAGUE_OPTIONS}
+        seasonOptions={seasonOptions}
+        leagueOptions={leagueOptions}
         resultCount={filteredAndSortedCards.length}
         onSortChange={setSortValue}
         onSeasonChange={setSeasonValue}

@@ -447,8 +447,8 @@
     flex-flow: row nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 108px !important;
-    column-gap: 108px !important;
+    gap: 72px !important;
+    column-gap: 72px !important;
     row-gap: 0 !important;
     padding: 18px 20px !important;
     flex-wrap: nowrap !important;
@@ -540,6 +540,35 @@
 
     &:hover { opacity: 0.9; }
     &:active { transform: translateY(1px); }
+  }
+
+  .weekly-filter-group {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .weekly-filter-group-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+    flex: 0 0 auto;
+    color: #fff;
+    font-size: 14px;
+    white-space: nowrap;
+
+    .weekly-filter-dot {
+      color: var(--quaternary-color);
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .weekly-filter-group-text {
+      color: #999;
+      font-weight: 500;
+    }
   }
 
   .weekly-filter-readonly {
