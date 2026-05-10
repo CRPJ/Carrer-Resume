@@ -166,7 +166,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #d4f1c5 0%, #c5e8b8 100%);
+    // hover 시 이미지(rotateY 360deg) 회전 중 노출되는 배경 — 카드 톤(.badge__single bg)과 어울리는 다크 톤으로 교체
+    background: #151f2b;
   }
 
   .weekly-card__thumb-image,
@@ -364,46 +365,45 @@
     }
   }
 
-  /* ---------- 우승 슬롯 — 다른 .skill-card 와 동일한 자연 흐름 ----------
-     이전: 80×80 정사각 박스 + 왕관/라벨 absolute(형광펜 + 사선 회전)
-     이후: .skill-card 패턴 (icon 34 + num-row 25 + label 18) 과 동일 사이즈/구조
-     절대 보호: placeholder gradient 자체 디자인 유지(사이즈만 num-row 영역과 동일).
-     order: 1 trophy → 2 image/placeholder → 3 label (다른 슬롯의 icon→num→label 순서) */
+  /* ---------- 우승 placeholder (2행 3열) ----------
+     [복구] 왕관 48×48 absolute + 라벨 형광펜 사선 12deg 등 시각 요소 100% 복구.
+     [통일] 컨테이너 사이즈만 다른 .skill-card 자연 영역(폭 1fr × 높이 83px = icon 34 + mb 4
+            + num-row 25 + mt 2 + label 18)과 동일하게 통일. placeholder 는 100%×100% 로 컨테이너 채움. */
   .weekly-card__winner {
     position: relative;
     width: 100%;
+    height: 83px;
+    min-height: 93px;            // [추가] 다른 slot 평균 높이(92.7) ≈ 93px 보장 (시각 통일)
+    border-radius: 8px;
+    background: rgba(240, 196, 25, 0.08);
+    border: 1px solid rgba(240, 196, 25, 0.3);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    background: transparent;
-    border: none;
-    padding: 0;
+    justify-content: center;
     overflow: visible;
   }
 
   .weekly-card__winner-placeholder {
     width: 100%;
-    height: 25px;
+    height: 100%;
     background: linear-gradient(135deg, rgba(240, 196, 25, 0.15) 0%, rgba(240, 196, 25, 0.05) 100%);
     border-radius: 7px;
-    order: 2;
   }
 
   .weekly-card__winner-image {
     width: 100%;
-    height: 25px;
+    height: 100%;
     object-fit: cover;
     border-radius: 7px;
-    order: 2;
   }
 
   .weekly-card__winner-trophy {
-    position: static;
-    width: 34px;
-    height: 34px;
-    order: 1;
-    margin-bottom: 4px;
+    position: absolute;
+    top: -12px;
+    left: 8px;
+    width: 48px;
+    height: 48px;
+    z-index: 2;
 
     filter:
       drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
@@ -417,26 +417,40 @@
   }
 
   .weekly-card__winner-label {
-    position: static;
-    order: 3;
-    display: block;
-    padding: 0;
-    margin-top: 2px;
+    position: absolute;
+    top: 0px;
+    left: 42px;
+    z-index: 1;
 
-    background: none;
-    transform: none;
-    text-shadow: none;
-    letter-spacing: 0;
+    display: inline-block;
 
-    font-family: "Pretendard", sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 18px;
-    color: #fff;
+    // [단순 노란 텍스트] 그라디언트/외곽선/filter/도장 효과 모두 제거 → 작은 슬롯에 안정적인 미니멀 톤.
+    // cluster-2 그라디언트 등에서 사용하는 표준 황금 #fed402 와 동일 톤.
+    color: #fed402;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.2;
     white-space: nowrap;
+
+    // 다크 배경 위 가독성 보강용 미세 양각 그림자
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+
+    transform: rotate(12deg);
+    transform-origin: center center;
+
+    // [명시 리셋] 직전 회차 황금 잉크 도장 효과의 잔존/상속 차단
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+    -webkit-text-stroke: 0;
+    filter: none;
+    padding: 0;
 
     pointer-events: none;
     user-select: none;
+    font-family: inherit;
   }
 
   /* ---------- Top 3 크루 ---------- */
