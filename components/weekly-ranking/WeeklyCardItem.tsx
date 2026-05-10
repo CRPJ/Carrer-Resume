@@ -14,10 +14,6 @@ interface Props {
 }
 
 export default function WeeklyCardItem({ data }: Props) {
-  const showProgress = data.status === '정상 진행';
-  const showAggregating = data.status === '대전 집계';
-  const showRest = data.status === '휴식';
-
   return (
     <Tilt
       tiltMaxAngleX={5}
@@ -35,10 +31,15 @@ export default function WeeklyCardItem({ data }: Props) {
               {data.dateRange.start} - {data.dateRange.end}
             </p>
           </div>
-          <div className="weekly-card__status">
-            {showProgress && <span className="weekly-card__badge weekly-card__badge--progress">정상 진행</span>}
-            {showAggregating && <span className="weekly-card__badge weekly-card__badge--aggregating">대전 집계</span>}
-            {showRest && <span className="weekly-card__badge weekly-card__badge--rest">휴식</span>}
+          <div className="weekly-card__status-panel">
+            <div className="weekly-card__status-row">
+              <span className="weekly-card__status-label">리그 결과</span>
+              <span className="weekly-card__status-value">{data.leagueResultStatus}</span>
+            </div>
+            <div className="weekly-card__status-row">
+              <span className="weekly-card__status-label">리그 기록</span>
+              <span className="weekly-card__status-value">{data.leagueRecordStatus}</span>
+            </div>
           </div>
         </div>
 
@@ -62,19 +63,23 @@ export default function WeeklyCardItem({ data }: Props) {
           <div className="stat-item">
             <div className="stat-row">
               <span className="stat-label"><span className="stat-dot">·</span> 성장 성공율</span>
-              <span className="stat-value">{data.growthSuccessRate}<span className="stat-unit">%</span></span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${data.growthSuccessRate}%` }} />
+              <div className="weekly-card__stat-meter">
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${data.growthSuccessRate}%` }} />
+                </div>
+                <span className="stat-value">{data.growthSuccessRate}<span className="stat-unit">%</span></span>
+              </div>
             </div>
           </div>
           <div className="stat-item">
             <div className="stat-row">
               <span className="stat-label"><span className="stat-dot">·</span> 성장 도전율</span>
-              <span className="stat-value">{data.growthChallengeRate}<span className="stat-unit">%</span></span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${data.growthChallengeRate}%` }} />
+              <div className="weekly-card__stat-meter">
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${data.growthChallengeRate}%` }} />
+                </div>
+                <span className="stat-value">{data.growthChallengeRate}<span className="stat-unit">%</span></span>
+              </div>
             </div>
           </div>
         </div>
@@ -84,6 +89,7 @@ export default function WeeklyCardItem({ data }: Props) {
             <Image src="/images/0/cluster4/icon/icon - cluv.png" alt="" width={34} height={34} className="skill-icon" />
             <div className="skill-num-row">
               <span className="skill-num">{data.totalCrews}</span>
+              <span className="skill-unit">명</span>
             </div>
             <span className="skill-label">전체 크루</span>
           </div>
@@ -92,6 +98,7 @@ export default function WeeklyCardItem({ data }: Props) {
             <Image src="/images/0/cluster4/icon/icon - 성장 (진행 중).png" alt="" width={34} height={34} className="skill-icon" />
             <div className="skill-num-row">
               <span className="skill-num">{data.growthChallenge}</span>
+              <span className="skill-unit">명</span>
             </div>
             <span className="skill-label">성장 도전</span>
           </div>
@@ -100,6 +107,7 @@ export default function WeeklyCardItem({ data }: Props) {
             <Image src="/images/0/cluster4/icon/icon - 성장(성공).png" alt="" width={34} height={34} className="skill-icon" />
             <div className="skill-num-row">
               <span className="skill-num">{data.growthSuccess}</span>
+              <span className="skill-unit">명</span>
             </div>
             <span className="skill-label">성장 성공</span>
           </div>
@@ -108,6 +116,7 @@ export default function WeeklyCardItem({ data }: Props) {
             <Image src="/images/0/cluster4/icon/icon - 성장(실패).png" alt="" width={34} height={34} className="skill-icon" />
             <div className="skill-num-row">
               <span className="skill-num">{data.growthFail}</span>
+              <span className="skill-unit">명</span>
             </div>
             <span className="skill-label">성장 실패</span>
           </div>
@@ -116,6 +125,7 @@ export default function WeeklyCardItem({ data }: Props) {
             <Image src="/images/0/cluster4/icon/icon - 휴식(개인).png" alt="" width={34} height={34} className="skill-icon" />
             <div className="skill-num-row">
               <span className="skill-num">{data.personalRest}</span>
+              <span className="skill-unit">명</span>
             </div>
             <span className="skill-label">개인 휴식</span>
           </div>

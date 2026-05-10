@@ -13,6 +13,8 @@ export type WeeklyCardData = {
   weekNumber: number;
   dateRange: { start: string; end: string };
   status: '정상 진행' | '대전 집계' | '휴식';
+  leagueResultStatus: '정상 진행' | '심화 진행' | '공식 휴식';
+  leagueRecordStatus: '대전 중' | '대전 집계' | '공표 중' | '검수 완료';
   imageUrl: string | null;
   growthSuccessRate: number;
   growthChallengeRate: number;
@@ -31,6 +33,19 @@ const baseTop3: WeeklyCardCrew[] = [
   { rank: 3, name: '이영희', team: '디자인 팀',     part: '프론트 파트' },
 ];
 
+const LEAGUE_RESULTS: WeeklyCardData['leagueResultStatus'][] = [
+  '정상 진행',
+  '심화 진행',
+  '공식 휴식',
+];
+
+const LEAGUE_RECORDS: WeeklyCardData['leagueRecordStatus'][] = [
+  '대전 중',
+  '대전 집계',
+  '공표 중',
+  '검수 완료',
+];
+
 const seededRandom = (seed: number, max: number, min: number = 0): number => {
   const x = Math.sin(seed) * 10000;
   const fractional = x - Math.floor(x);
@@ -47,6 +62,8 @@ export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = Array.from({ length: 24 }, (_
     weekNumber: weekNum,
     dateRange: { start: '26.03.03(월)', end: '26.03.03(토)' },
     status: isRest ? '휴식' : isAggregating ? '대전 집계' : '정상 진행',
+    leagueResultStatus: LEAGUE_RESULTS[seededRandom(i + 61, LEAGUE_RESULTS.length)],
+    leagueRecordStatus: LEAGUE_RECORDS[seededRandom(i + 71, LEAGUE_RECORDS.length)],
     imageUrl: null,
     growthSuccessRate: seededRandom(i + 1, 100, 40),
     growthChallengeRate: seededRandom(i + 11, 100, 50),
