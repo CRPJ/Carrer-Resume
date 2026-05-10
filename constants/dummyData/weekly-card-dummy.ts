@@ -1,4 +1,8 @@
 // Weekly Card 더미 — 12장 × 2페이지 = 24장 (페이지네이션 검증용)
+// 주차명/기간/이미지 3개 필드는 cluster-4-card 실데이터(data/weeklyData.ts) 에서 가져옴.
+// 그 외 통계/랭킹/크루 수/성장률/뱃지는 기존대로 seeded random 유지.
+
+import { weeklyData } from "@/data/weeklyData";
 
 export type WeeklyCardCrew = {
   rank: 1 | 2 | 3;
@@ -54,19 +58,42 @@ const seededRandom = (seed: number, max: number, min: number = 0): number => {
 
 const seededRate = (seed: number): number => seededRandom(seed, 101);
 
+// "2025 - 03 - 21 (금)" → "25.03.21(금)" (weekly-ranking 카드 표시 형식 정규화)
+const compactDatePart = (part: string): string => {
+  const match = part.trim().match(/(\d{4})\s*-\s*(\d{2})\s*-\s*(\d{2})\s*\((.)\)/);
+  if (!match) return part.trim();
+  const [, year, month, day, dayName] = match;
+  return `${year.slice(2)}.${month}.${day}(${dayName})`;
+};
+
+// "2025 - 03 - 21 (금) ~ 2025 - 03 - 27 (목)"
+//   → { start: "25.03.21(금)", end: "25.03.27(목)" }
+const splitDateRange = (range: string): { start: string; end: string } => {
+  const [start = "", end = ""] = range.split(" ~ ");
+  return { start: compactDatePart(start), end: compactDatePart(end) };
+};
+
+// "2025 봄 시즌, 3주차" → 3
+const extractWeekNumber = (shortTitle: string): number => {
+  const match = shortTitle.match(/(\d+)\s*주차/);
+  return match ? Number(match[1]) : 0;
+};
+
 export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = Array.from({ length: 24 }, (_, i) => {
-  const weekNum = 99 - i;
+  const week = weeklyData[i];
   const isRest = i % 7 === 6;
   const isAggregating = !isRest && i % 5 === 0;
   return {
-    id: `week-${weekNum}`,
-    seasonName: '2026년, 여름 시즌',
-    weekNumber: weekNum,
-    dateRange: { start: '26.03.03(월)', end: '26.03.03(토)' },
+    id: `week-${week?.id ?? i}`,
+    // cluster-4-card 실데이터에서 가져옴 — 시즌/주차명, 기간, 주차 이미지
+    seasonName: week?.shortTitle ?? '',
+    weekNumber: week ? extractWeekNumber(week.shortTitle) : 0,
+    dateRange: week ? splitDateRange(week.dateRange) : { start: '', end: '' },
+    imageUrl: week?.image ?? null,
+    // 그 외 필드는 기존 그대로 seeded random
     status: isRest ? '휴식' : isAggregating ? '대전 집계' : '정상 진행',
     leagueResultStatus: LEAGUE_RESULTS[seededRandom(i + 61, LEAGUE_RESULTS.length)],
     leagueRecordStatus: LEAGUE_RECORDS[seededRandom(i + 71, LEAGUE_RECORDS.length)],
-    imageUrl: null,
     growthSuccessRate: seededRate(i + 168),
     growthChallengeRate: seededRate(i + 915),
     totalCrews: 999,

@@ -119,7 +119,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transform: translateY(0);
+      // [수직 정렬 보정] icon이 텍스트 baseline 대비 살짝 위로 떠 보이는 현상
+      // 보정 — 약 0.1cm 아래로 nudge (브라우저 cm 렌더 차이 회피용 px 사용).
+      transform: translateY(2px);
     }
 
     &.status-green {

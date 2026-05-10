@@ -53,8 +53,10 @@ export default function WeeklyCardItem({ data }: Props) {
       <div className="badge__single weekly-card">
         <div className="weekly-card__header">
           <div className="weekly-card__title">
+            {/* 시즌/주차명: cluster-4-card 실데이터의 shortTitle 그대로 사용.
+                기간: weekly-ranking 컴팩트 형식 "YY.MM.DD(요일) - YY.MM.DD(요일)". */}
             <h4 className="weekly-card__season">
-              {data.seasonName}, {data.weekNumber} 주차
+              {data.seasonName}
             </h4>
             <p className="weekly-card__date">
               {data.dateRange.start} - {data.dateRange.end}
@@ -80,7 +82,7 @@ export default function WeeklyCardItem({ data }: Props) {
           {data.imageUrl ? (
             <Image
               src={data.imageUrl}
-              alt={`주차 ${data.weekNumber} 이미지`}
+              alt={data.seasonName}
               width={280}
               height={180}
               className="weekly-card__thumb-image"

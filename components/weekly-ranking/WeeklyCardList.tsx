@@ -1,28 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import WeeklyCardItem from "./WeeklyCardItem";
-import { WEEKLY_CARD_DUMMY } from "@/constants/dummyData/weekly-card-dummy";
-import { isDemoMode } from "@/utils/isDemoMode";
+import type { WeeklyCardData } from "@/constants/dummyData/weekly-card-dummy";
 
 const PAGE_SIZE = 12;
 
-export default function WeeklyCardList() {
+interface WeeklyCardListProps {
+  cards: WeeklyCardData[];
+}
+
+export default function WeeklyCardList({ cards }: WeeklyCardListProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [demo, setDemo] = useState(false);
 
-  // localStorage는 SSR에서 접근 불가 — 마운트 후 한 번 체크
+  // 필터/정렬 변경으로 cards가 갱신되면 1페이지로 리셋
   useEffect(() => {
-    setDemo(isDemoMode());
-  }, []);
+    setCurrentPage(1);
+  }, [cards]);
 
-  const allCards = useMemo(() => (demo ? WEEKLY_CARD_DUMMY : []), [demo]);
-
-  const totalPages = Math.max(1, Math.ceil(allCards.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const visibleCards = allCards.slice(startIdx, startIdx + PAGE_SIZE);
+  const visibleCards = cards.slice(startIdx, startIdx + PAGE_SIZE);
 
-  if (allCards.length === 0) {
+  if (cards.length === 0) {
     return (
       <div className="weekly-list-empty">
         <p>표시할 주차 카드가 없습니다.</p>

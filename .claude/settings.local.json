@@ -118,7 +118,8 @@
       "mcp__playwright__browser_take_screenshot",
       "PowerShell(Move-Item *)",
       "mcp__playwright__browser_navigate_back",
-      "mcp__playwright__browser_wait_for"
+      "mcp__playwright__browser_wait_for",
+      "Bash([ -f \"public/images/0/cluster4/icon/$f\" ])"
     ],
     "deny": [],
     "ask": []
