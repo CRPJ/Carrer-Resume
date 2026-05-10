@@ -486,36 +486,25 @@
     overflow: hidden;
   }
 
+  // [rank 이미지 교체] 원형 그라디언트 + 그림자 + border-radius 제거. rank PNG(first/second/third) 자체가 시각 강조.
+  // 폭/높이 28px 유지로 grid 정렬 변화 0.
   .weekly-card__crew-icon {
     flex-shrink: 0;
     width: 28px;
     height: 28px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #f0c419 0%, #d4a410 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: transparent;
+    border: 0;
+    padding: 0;
   }
 
-  .weekly-card__crew-rank {
-    font-family: var(--black-ops-one), cursive;
-    font-size: 14px;
-    font-weight: 700;
-    color: #1a1a1a;
-    line-height: 1;
-  }
-
-  /* 1/2/3등 차별 (placeholder — Envato 교체 시 이미지 덮어씀) */
-  .weekly-card__crew--rank1 .weekly-card__crew-icon {
-    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
-  }
-  .weekly-card__crew--rank2 .weekly-card__crew-icon {
-    background: linear-gradient(135deg, #c0c0c0 0%, #888 100%);
-  }
-  .weekly-card__crew--rank3 .weekly-card__crew-icon {
-    background: linear-gradient(135deg, #cd7f32 0%, #8b4513 100%);
+  .weekly-card__rank-image {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
   }
 
   .weekly-card__crew-info {

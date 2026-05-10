@@ -38,6 +38,12 @@ const STATUS_ICON_MAP: Record<string, string> = {
   '검수 완료': 'ti ti-shield-check',
 };
 
+const RANK_IMAGE_MAP: Record<number, string> = {
+  1: '/images/0/first.png',
+  2: '/images/0/second.png',
+  3: '/images/0/third.png',
+};
+
 interface Props {
   data: WeeklyCardData;
 }
@@ -185,7 +191,13 @@ export default function WeeklyCardItem({ data }: Props) {
           {data.top3.map((crew) => (
             <div key={crew.rank} className={`weekly-card__crew weekly-card__rank-row weekly-card__crew--rank${crew.rank}`}>
               <div className="weekly-card__crew-icon weekly-card__rank-badge">
-                <span className="weekly-card__crew-rank">{crew.rank}</span>
+                <Image
+                  src={RANK_IMAGE_MAP[crew.rank] ?? RANK_IMAGE_MAP[1]}
+                  alt={`${crew.rank}등`}
+                  width={28}
+                  height={28}
+                  className="weekly-card__rank-image"
+                />
               </div>
               <span className="weekly-card__rank-name">{truncate(crew.name, 3)}</span>
               <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
