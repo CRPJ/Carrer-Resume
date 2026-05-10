@@ -52,6 +52,8 @@ const seededRandom = (seed: number, max: number, min: number = 0): number => {
   return Math.floor(fractional * (max - min)) + min;
 };
 
+const seededRate = (seed: number): number => seededRandom(seed, 101);
+
 export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = Array.from({ length: 24 }, (_, i) => {
   const weekNum = 99 - i;
   const isRest = i % 7 === 6;
@@ -65,8 +67,8 @@ export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = Array.from({ length: 24 }, (_
     leagueResultStatus: LEAGUE_RESULTS[seededRandom(i + 61, LEAGUE_RESULTS.length)],
     leagueRecordStatus: LEAGUE_RECORDS[seededRandom(i + 71, LEAGUE_RECORDS.length)],
     imageUrl: null,
-    growthSuccessRate: seededRandom(i + 1, 100, 40),
-    growthChallengeRate: seededRandom(i + 11, 100, 50),
+    growthSuccessRate: seededRate(i + 168),
+    growthChallengeRate: seededRate(i + 915),
     totalCrews: 999,
     growthChallenge: seededRandom(i + 21, 1000, 200),
     growthSuccess: seededRandom(i + 31, 700, 100),

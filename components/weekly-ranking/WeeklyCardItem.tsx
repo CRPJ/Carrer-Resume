@@ -9,6 +9,35 @@ const truncate = (text: string | null | undefined, maxLen: number): string => {
   return text.length > maxLen ? text.slice(0, maxLen) + '..' : text;
 };
 
+const getStatusTone = (status: string): string => {
+  switch (status) {
+    case '정상 진행':
+    case '검수 완료':
+      return 'status-green';
+    case '심화 진행':
+    case '대전 집계':
+      return 'status-yellow';
+    case '공식 휴식':
+      return 'status-muted';
+    case '대전 중':
+      return 'status-blue';
+    case '공표 중':
+      return 'status-purple';
+    default:
+      return 'status-neutral';
+  }
+};
+
+const STATUS_ICON_MAP: Record<string, string> = {
+  '정상 진행': 'ti ti-circle-check',
+  '심화 진행': 'ti ti-flame',
+  '공식 휴식': 'ti ti-bed',
+  '대전 중': 'ti ti-swords',
+  '대전 집계': 'ti ti-chart-bar',
+  '공표 중': 'ti ti-speakerphone',
+  '검수 완료': 'ti ti-shield-check',
+};
+
 interface Props {
   data: WeeklyCardData;
 }
@@ -32,14 +61,18 @@ export default function WeeklyCardItem({ data }: Props) {
             </p>
           </div>
           <div className="weekly-card__status-panel">
-            <div className="weekly-card__status-row">
-              <span className="weekly-card__status-label">리그 결과</span>
-              <span className="weekly-card__status-value">{data.leagueResultStatus}</span>
-            </div>
-            <div className="weekly-card__status-row">
-              <span className="weekly-card__status-label">리그 기록</span>
-              <span className="weekly-card__status-value">{data.leagueRecordStatus}</span>
-            </div>
+            <span className={`weekly-card__status-badge ${getStatusTone(data.leagueResultStatus)}`}>
+              <span className="icon-shift">
+                <i className={STATUS_ICON_MAP[data.leagueResultStatus]}></i>
+              </span>
+              <span>{data.leagueResultStatus}</span>
+            </span>
+            <span className={`weekly-card__status-badge ${getStatusTone(data.leagueRecordStatus)}`}>
+              <span className="icon-shift">
+                <i className={STATUS_ICON_MAP[data.leagueRecordStatus]}></i>
+              </span>
+              <span>{data.leagueRecordStatus}</span>
+            </span>
           </div>
         </div>
 
@@ -142,17 +175,15 @@ export default function WeeklyCardItem({ data }: Props) {
 
         <div className="weekly-card__top3">
           {data.top3.map((crew) => (
-            <div key={crew.rank} className={`weekly-card__crew weekly-card__crew--rank${crew.rank}`}>
-              <div className="weekly-card__crew-icon">
+            <div key={crew.rank} className={`weekly-card__crew weekly-card__rank-row weekly-card__crew--rank${crew.rank}`}>
+              <div className="weekly-card__crew-icon weekly-card__rank-badge">
                 <span className="weekly-card__crew-rank">{crew.rank}</span>
               </div>
-              <div className="weekly-card__crew-info">
-                <span className="weekly-card__crew-name">{truncate(crew.name, 4)}</span>
-                <span className="weekly-card__crew-sep">|</span>
-                <span className="weekly-card__crew-team">{truncate(crew.team, 5)}</span>
-                <span className="weekly-card__crew-sep">|</span>
-                <span className="weekly-card__crew-part">{truncate(crew.part, 5)}</span>
-              </div>
+              <span className="weekly-card__rank-name">{truncate(crew.name, 3)}</span>
+              <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
+              <span className="weekly-card__rank-team">{truncate(crew.team, 5)}</span>
+              <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
+              <span className="weekly-card__rank-part">{truncate(crew.part, 5)}</span>
             </div>
           ))}
         </div>
