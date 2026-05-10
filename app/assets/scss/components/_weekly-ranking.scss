@@ -13,8 +13,6 @@
   flex-direction: column;
   gap: 24px;
 
-  // [v14] /crews 스타일 풀폭 wrapper에서 필터바/placeholder는 1400px 캡 + 중앙 정렬
-  // .weekly-filter (BEM) → .weekly-filter-wrap (tournaments 패턴 outer)으로 교체
   .weekly-filter-wrap,
   .weekly-team-stats-placeholder,
   .weekly-list-placeholder {
@@ -243,6 +241,19 @@
   /* ---------- [2] Filter Bar — tournaments 패턴 차용 ---------- */
   // 외곽(.tournaments__filter), nice-select 스타일은 sections/_all-sections.scss L2370 그대로 cascade
   // 본 영역은 weekly 고유 요소(RESET 버튼 + 전체 수/검색 결과 read-only)만 정의
+
+  .tournaments__filter {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    flex-wrap: nowrap;
+
+    .nice-select {
+      flex-shrink: 0;
+    }
+  }
 
   .weekly-filter-reset-btn {
     flex-shrink: 0;

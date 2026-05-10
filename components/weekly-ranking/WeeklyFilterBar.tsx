@@ -40,53 +40,47 @@ const WeeklyFilterBar = ({
   onReset,
 }: WeeklyFilterBarProps) => {
   return (
-    // .tournaments 클래스로 감싸야 sections/_all-sections.scss L2370의 cascade 적용됨
-    // .weekly-filter-wrap은 페이지 max-width 1400px 캡 적용용 hook
     <div className="tournaments weekly-filter-wrap">
       <div className="tournaments__filter fade-top">
-        <div className="tournaments__filter-left">
-          <button
-            type="button"
-            className="weekly-filter-reset-btn"
-            onClick={onReset}
-          >
-            RESET
-          </button>
+        <button
+          type="button"
+          className="weekly-filter-reset-btn"
+          onClick={onReset}
+        >
+          RESET
+        </button>
 
-          <div className="weekly-filter-readonly">
-            <span className="weekly-filter-dot" aria-hidden="true">●</span>
-            <span className="weekly-filter-label">전체 수</span>
-            <span className="weekly-filter-value">{totalCount}</span>
-          </div>
-
-          <NiceSelectComponent
-            options={toNiceOptions(sortOptions)}
-            defaultValue={sortValue}
-            onChange={onSortChange}
-            placeholder="정렬"
-          />
+        <div className="weekly-filter-readonly">
+          <span className="weekly-filter-dot" aria-hidden="true">●</span>
+          <span className="weekly-filter-label">전체 수</span>
+          <span className="weekly-filter-value">{totalCount}</span>
         </div>
 
-        <div className="torunaments__filter-right">
-          <NiceSelectComponent
-            options={toNiceOptions(seasonOptions)}
-            defaultValue={seasonValue}
-            onChange={onSeasonChange}
-            placeholder="시즌"
-          />
+        <NiceSelectComponent
+          options={toNiceOptions(sortOptions)}
+          defaultValue={sortValue}
+          onChange={onSortChange}
+          placeholder="정렬"
+        />
 
-          <NiceSelectComponent
-            options={toNiceOptions(leagueOptions)}
-            defaultValue={leagueValue}
-            onChange={onLeagueChange}
-            placeholder="리그"
-          />
+        <NiceSelectComponent
+          options={toNiceOptions(seasonOptions)}
+          defaultValue={seasonValue}
+          onChange={onSeasonChange}
+          placeholder="시즌"
+        />
 
-          <div className="weekly-filter-readonly">
-            <span className="weekly-filter-dot" aria-hidden="true">●</span>
-            <span className="weekly-filter-label">검색 결과</span>
-            <span className="weekly-filter-value">{resultCount}</span>
-          </div>
+        <NiceSelectComponent
+          options={toNiceOptions(leagueOptions)}
+          defaultValue={leagueValue}
+          onChange={onLeagueChange}
+          placeholder="리그"
+        />
+
+        <div className="weekly-filter-readonly">
+          <span className="weekly-filter-dot" aria-hidden="true">●</span>
+          <span className="weekly-filter-label">검색 결과</span>
+          <span className="weekly-filter-value">{resultCount}</span>
         </div>
       </div>
     </div>
