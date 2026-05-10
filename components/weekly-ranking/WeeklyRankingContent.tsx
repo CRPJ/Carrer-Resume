@@ -79,7 +79,9 @@ const WeeklyRankingContent = () => {
     const sorted = [...result];
     switch (sortValue) {
       case "latest":
-        sorted.sort((a, b) => b.weekNumber - a.weekNumber);
+        // 최신 순 — display map 자연 순서(latestOrder ASC). weekNumber 는 시즌이
+        // 다르면 의미가 어긋나 사용 부적합 (예: 봄 8주차 vs 겨울 8주차).
+        sorted.sort((a, b) => a.latestOrder - b.latestOrder);
         break;
       case "growth-success":
         sorted.sort((a, b) => b.growthSuccessRate - a.growthSuccessRate);

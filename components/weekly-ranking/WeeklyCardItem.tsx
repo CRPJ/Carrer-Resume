@@ -53,13 +53,13 @@ export default function WeeklyCardItem({ data }: Props) {
       <div className="badge__single weekly-card">
         <div className="weekly-card__header">
           <div className="weekly-card__title">
-            {/* 시즌/주차명: cluster-4-card 실데이터의 shortTitle 그대로 사용.
-                기간: weekly-ranking 컴팩트 형식 "YY.MM.DD(요일) - YY.MM.DD(요일)". */}
+            {/* 첨부 cluster-4-card 의 2026 표시 문자열을 그대로 출력.
+                연도/시즌명/주차명/기간 모두 재계산·재포맷·split 금지. */}
             <h4 className="weekly-card__season">
               {data.seasonName}
             </h4>
             <p className="weekly-card__date">
-              {data.dateRange.start} - {data.dateRange.end}
+              {data.dateRangeText}
             </p>
           </div>
           <div className="weekly-card__status-panel">
@@ -166,7 +166,13 @@ export default function WeeklyCardItem({ data }: Props) {
           </div>
 
           <div className="weekly-card__winner">
-            <span className="weekly-card__winner-tag">우승</span>
+            <img
+              className="weekly-card__winner-trophy"
+              src="/images/0/crown.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <span className="weekly-card__winner-label">우승</span>
             {data.winningTeamImage ? (
               <Image src={data.winningTeamImage} alt="우승 팀" width={80} height={80} className="weekly-card__winner-image" />
             ) : (

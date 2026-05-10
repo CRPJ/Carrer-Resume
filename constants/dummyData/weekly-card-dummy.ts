@@ -1,8 +1,6 @@
-// Weekly Card 더미 — 12장 × 2페이지 = 24장 (페이지네이션 검증용)
-// 주차명/기간/이미지 3개 필드는 cluster-4-card 실데이터(data/weeklyData.ts) 에서 가져옴.
+// Weekly Card 더미 — 주차명/기간/주차 이미지 3개 필드는 cluster-4-card 첨부 데이터(2026 기준)
+// 표시 문자열을 그대로 사용. data/weeklyData.ts (2024/2025) 는 사용하지 않음.
 // 그 외 통계/랭킹/크루 수/성장률/뱃지는 기존대로 seeded random 유지.
-
-import { weeklyData } from "@/data/weeklyData";
 
 export type WeeklyCardCrew = {
   rank: 1 | 2 | 3;
@@ -13,9 +11,10 @@ export type WeeklyCardCrew = {
 
 export type WeeklyCardData = {
   id: string;
-  seasonName: string;
-  weekNumber: number;
-  dateRange: { start: string; end: string };
+  seasonName: string;     // 예: "2026년, 봄 시즌, 3주차" — 그대로 출력
+  weekNumber: number;     // seasonName 에서 추출된 주차 숫자 (시즌 횡단 비교에는 부적절)
+  latestOrder: number;    // 최신 순 정렬 키 — 작을수록 최신 (display map 의 자연 순서)
+  dateRangeText: string;  // 예: "26.03.16(월) - 26.03.22(일)" — 그대로 출력
   status: '정상 진행' | '대전 집계' | '휴식';
   leagueResultStatus: '정상 진행' | '심화 진행' | '공식 휴식';
   leagueRecordStatus: '대전 중' | '대전 집계' | '공표 중' | '검수 완료';
@@ -58,7 +57,13 @@ const seededRandom = (seed: number, max: number, min: number = 0): number => {
 
 const seededRate = (seed: number): number => seededRandom(seed, 101);
 
-// "2025 - 03 - 21 (금)" → "25.03.21(금)" (weekly-ranking 카드 표시 형식 정규화)
+// "2026년, 봄 시즌, 3주차" → 3 (정렬용 숫자만 추출. 출력 문자열은 가공 금지.)
+const extractWeekNumber = (seasonName: string): number => {
+  const match = seasonName.match(/(\d+)\s*주차/);
+  return match ? Number(match[1]) : 0;
+};
+
+// "2026 - 03 - 16 (월)" → "26.03.16(월)" — weekly-ranking 컴팩트 형식 변환
 const compactDatePart = (part: string): string => {
   const match = part.trim().match(/(\d{4})\s*-\s*(\d{2})\s*-\s*(\d{2})\s*\((.)\)/);
   if (!match) return part.trim();
@@ -66,42 +71,157 @@ const compactDatePart = (part: string): string => {
   return `${year.slice(2)}.${month}.${day}(${dayName})`;
 };
 
-// "2025 - 03 - 21 (금) ~ 2025 - 03 - 27 (목)"
-//   → { start: "25.03.21(금)", end: "25.03.27(목)" }
-const splitDateRange = (range: string): { start: string; end: string } => {
-  const [start = "", end = ""] = range.split(" ~ ");
-  return { start: compactDatePart(start), end: compactDatePart(end) };
+// "2026 - 03 - 16 (월) ~ 2026 - 03 - 22 (일)" → "26.03.16(월) - 26.03.22(일)"
+const formatDateRangeForWeeklyRanking = (range: string): string => {
+  const [start = "", end = ""] = range.split("~");
+  return `${compactDatePart(start)} - ${compactDatePart(end)}`;
 };
 
-// "2025 봄 시즌, 3주차" → 3
-const extractWeekNumber = (shortTitle: string): number => {
-  const match = shortTitle.match(/(\d+)\s*주차/);
-  return match ? Number(match[1]) : 0;
-};
+// cluster-4-card 첨부 DOM 의 weekly-card 메타 — 20개 (2026 기준).
+// 주차 제목 / 기간 raw / 이미지 경로 3개만 사용. 그 외 필드는 무관.
+const CLUSTER4_WEEKLY_RAW: Array<{
+  seasonName: string;
+  periodRaw: string;
+  imageUrl: string;
+}> = [
+  // 봄 시즌 (최신 → 0주차 전환)
+  {
+    seasonName: "2026년, 봄 시즌, 3주차",
+    periodRaw:  "2026 - 03 - 16 (월) ~ 2026 - 03 - 22 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 3주차 (3월 3주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 2주차",
+    periodRaw:  "2026 - 03 - 09 (월) ~ 2026 - 03 - 15 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 2주차 (3월 2주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 1주차",
+    periodRaw:  "2026 - 03 - 02 (월) ~ 2026 - 03 - 08 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 1주차 (3월 1주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 0주차",
+    periodRaw:  "2026 - 02 - 23 (월) ~ 2026 - 03 - 01 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/휴식(개인,공식).png",
+  },
+  // 겨울 시즌 (8 → 5주차)
+  {
+    seasonName: "2026년, 겨울 시즌, 8주차",
+    periodRaw:  "2026 - 02 - 16 (월) ~ 2026 - 02 - 22 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 8주차 (2월 4주차).png",
+  },
+  {
+    seasonName: "2026년, 겨울 시즌, 7주차",
+    periodRaw:  "2026 - 02 - 09 (월) ~ 2026 - 02 - 15 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 7주차 (2월 3주차).png",
+  },
+  {
+    seasonName: "2026년, 겨울 시즌, 6주차",
+    periodRaw:  "2026 - 02 - 02 (월) ~ 2026 - 02 - 08 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/휴식(개인,공식).png",
+  },
+  {
+    seasonName: "2026년, 겨울 시즌, 5주차",
+    periodRaw:  "2026 - 01 - 26 (월) ~ 2026 - 02 - 01 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 5주차 (2월 1주차).png",
+  },
+  // 겨울 시즌 (4 → 2주차) — 2025 회피 위해 2026-01 범위 내에서 종료
+  {
+    seasonName: "2026년, 겨울 시즌, 4주차",
+    periodRaw:  "2026 - 01 - 19 (월) ~ 2026 - 01 - 25 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 4주차 (1월 4주차).png",
+  },
+  {
+    seasonName: "2026년, 겨울 시즌, 3주차",
+    periodRaw:  "2026 - 01 - 12 (월) ~ 2026 - 01 - 18 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 3주차 (1월 3주차).png",
+  },
+  {
+    seasonName: "2026년, 겨울 시즌, 2주차",
+    periodRaw:  "2026 - 01 - 05 (월) ~ 2026 - 01 - 11 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/겨울 2주차 (1월 2주차).png",
+  },
+  // 봄 시즌 4주차 ~ 12주차 — 11번부터 19번까지 (전부 2026 내, forward 연속)
+  {
+    seasonName: "2026년, 봄 시즌, 4주차",
+    periodRaw:  "2026 - 03 - 23 (월) ~ 2026 - 03 - 29 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 4주차 (3월 4주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 5주차",
+    periodRaw:  "2026 - 03 - 30 (월) ~ 2026 - 04 - 05 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 5주차 (4월 1주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 6주차",
+    periodRaw:  "2026 - 04 - 06 (월) ~ 2026 - 04 - 12 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 6주차 (4월 2주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 7주차",
+    periodRaw:  "2026 - 04 - 13 (월) ~ 2026 - 04 - 19 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 7주차 (4월 3주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 8주차",
+    periodRaw:  "2026 - 04 - 20 (월) ~ 2026 - 04 - 26 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 8주차 (4월 4주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 9주차",
+    periodRaw:  "2026 - 04 - 27 (월) ~ 2026 - 05 - 03 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 9주차 (5월 1주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 10주차",
+    periodRaw:  "2026 - 05 - 04 (월) ~ 2026 - 05 - 10 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 10주차 (5월 2주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 11주차",
+    periodRaw:  "2026 - 05 - 11 (월) ~ 2026 - 05 - 17 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 11주차 (5월 3주차).png",
+  },
+  {
+    seasonName: "2026년, 봄 시즌, 12주차",
+    periodRaw:  "2026 - 05 - 18 (월) ~ 2026 - 05 - 24 (일)",
+    imageUrl:   "/images/0/cluster4/주차 이미지/봄 12주차 (5월 4주차).png",
+  },
+];
 
-export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = Array.from({ length: 24 }, (_, i) => {
-  const week = weeklyData[i];
-  const isRest = i % 7 === 6;
-  const isAggregating = !isRest && i % 5 === 0;
-  return {
-    id: `week-${week?.id ?? i}`,
-    // cluster-4-card 실데이터에서 가져옴 — 시즌/주차명, 기간, 주차 이미지
-    seasonName: week?.shortTitle ?? '',
-    weekNumber: week ? extractWeekNumber(week.shortTitle) : 0,
-    dateRange: week ? splitDateRange(week.dateRange) : { start: '', end: '' },
-    imageUrl: week?.image ?? null,
-    // 그 외 필드는 기존 그대로 seeded random
-    status: isRest ? '휴식' : isAggregating ? '대전 집계' : '정상 진행',
-    leagueResultStatus: LEAGUE_RESULTS[seededRandom(i + 61, LEAGUE_RESULTS.length)],
-    leagueRecordStatus: LEAGUE_RECORDS[seededRandom(i + 71, LEAGUE_RECORDS.length)],
-    growthSuccessRate: seededRate(i + 168),
-    growthChallengeRate: seededRate(i + 915),
-    totalCrews: 999,
-    growthChallenge: seededRandom(i + 21, 1000, 200),
-    growthSuccess: seededRandom(i + 31, 700, 100),
-    growthFail: seededRandom(i + 41, 350, 50),
-    personalRest: seededRandom(i + 51, 100),
-    winningTeamImage: null,
-    top3: baseTop3,
-  };
-});
+// 표시용 메타 — periodRaw는 컴팩트 포맷으로 변환, 그 외 필드는 그대로.
+const WEEKLY_RANKING_DISPLAY_MAP = CLUSTER4_WEEKLY_RAW.map((entry) => ({
+  seasonName: entry.seasonName,
+  dateRangeText: formatDateRangeForWeeklyRanking(entry.periodRaw),
+  imageUrl: entry.imageUrl,
+}));
+
+export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = WEEKLY_RANKING_DISPLAY_MAP.map(
+  (display, i) => {
+    const isRest = i % 7 === 6;
+    const isAggregating = !isRest && i % 5 === 0;
+    return {
+      id: `week-${i}`,
+      // 표시 문자열은 매핑값 그대로 — 연도/시즌명/주차명/기간 재계산 금지.
+      seasonName: display.seasonName,
+      weekNumber: extractWeekNumber(display.seasonName),
+      latestOrder: i, // 매핑 배열의 자연 순서 = 최신 → 과거. 정렬 시 ASC 로 사용.
+      dateRangeText: display.dateRangeText,
+      imageUrl: display.imageUrl,
+      // 그 외 필드는 기존 그대로 seeded random
+      status: isRest ? '휴식' : isAggregating ? '대전 집계' : '정상 진행',
+      leagueResultStatus: LEAGUE_RESULTS[seededRandom(i + 61, LEAGUE_RESULTS.length)],
+      leagueRecordStatus: LEAGUE_RECORDS[seededRandom(i + 71, LEAGUE_RECORDS.length)],
+      growthSuccessRate: seededRate(i + 168),
+      growthChallengeRate: seededRate(i + 915),
+      totalCrews: 999,
+      growthChallenge: seededRandom(i + 21, 1000, 200),
+      growthSuccess: seededRandom(i + 31, 700, 100),
+      growthFail: seededRandom(i + 41, 350, 50),
+      personalRest: seededRandom(i + 51, 100),
+      winningTeamImage: null,
+      top3: baseTop3,
+    };
+  }
+);

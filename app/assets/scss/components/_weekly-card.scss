@@ -248,23 +248,40 @@
       }
     }
 
+    // [progress bar 폭 통일] grid track 155px + column-gap 41px (합계 242px 보존).
+    // _resume-card.scss:790 의 `.resume-stats .progress-bar { width: 138px }` 가
+    // 같은 element 에 매칭되므로 모든 width 속성을 !important 로 강제.
     .weekly-card__stat-meter {
-      display: flex;
+      display: grid !important;
+      grid-template-columns: 155px 46px !important;
+      column-gap: 41px !important;
       align-items: center;
-      gap: 10px;
+      justify-content: end;
       min-width: 0;
 
       .stat-value {
-        width: 48px;
-        flex: 0 0 48px;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        flex: none;
+        display: inline-flex;
+        justify-content: flex-end;
+        align-items: baseline;
         text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .stat-unit {
+        display: inline-block;
       }
     }
 
-    .progress-bar {
-      width: auto !important;
-      flex: 1 1 auto;
-      min-width: 0;
+    // 모든 카드의 .progress-bar 가 동일한 155px track 폭을 갖도록 강제.
+    .weekly-card__stat-meter .progress-bar {
+      width: 155px !important;
+      min-width: 155px !important;
+      max-width: 155px !important;
+      flex: none;
       height: 3px;
       background: #555555;
       border: none;
@@ -376,20 +393,62 @@
     border-radius: 7px;
   }
 
-  .weekly-card__winner-tag {
+  .weekly-card__winner-trophy {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #f0c419;
-    color: #1a1a1a;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 999px;
-    line-height: 1.4;
-    letter-spacing: 0.3px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    top: -12px;
+    left: 8px;
+    width: 48px;
+    height: 48px;
     z-index: 2;
+
+    filter:
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .weekly-card__winner-label {
+    position: absolute;
+    top: 0px;
+    left: 42px;
+    z-index: 1;
+
+    display: inline-block;
+
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(254, 212, 2, 0.85) 30%,
+      rgba(254, 212, 2, 0.85) 90%,
+      transparent 90%,
+      transparent 100%
+    );
+
+    padding: 2px 6px;
+
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.4),
+      0 0 4px rgba(255, 215, 0, 0.3);
+
+    transform: rotate(12deg);
+    transform-origin: center center;
+
+    pointer-events: none;
+    user-select: none;
+    font-family: inherit;
   }
 
   /* ---------- Top 3 크루 ---------- */
@@ -413,7 +472,9 @@
 
   .weekly-card__rank-row {
     display: grid;
-    grid-template-columns: auto var(--weekly-rank-name-width) auto 80px auto minmax(0, 1fr);
+    // [team col] 80 → 96px — 한글 5자(JS truncate "커머커머스" + "..") 가 13px 폰트에서
+    // CSS ellipsis 없이 그대로 보이도록 폭 확장. 이름/파트 컬럼은 그대로.
+    grid-template-columns: auto var(--weekly-rank-name-width) auto 96px auto minmax(0, 1fr);
     align-items: center;
     column-gap: 8px;
     font-size: 13px;
