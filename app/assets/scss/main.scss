@@ -156,4 +156,5 @@
 @import "./components/cluster4-week-responsive";
 
 // 모바일/태블릿 오버라이드(반드시 마지막)
-@import "./components/mobile-responsive";
+// Desktop-fixed project: keep mobile responsive overrides opt-in only.
+// @import "./components/mobile-responsive";
