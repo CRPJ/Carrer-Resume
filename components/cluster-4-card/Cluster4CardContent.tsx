@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { getFixedDropdownPosition } from "@/utils/documentZoom";
 import { useModalScroll } from "@/utils/useModalScroll";
+import { useDebugLayout } from "@/utils/debugLayout";
 import { usePopup } from "@/components/ui/popup";
 import { supabase } from "@/lib/supabase";
 import { useDataMasking } from "@/hooks/useDataMasking";
@@ -3219,6 +3220,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   // 모달 열릴 때 배경 스크롤 잠금
   const anyModalOpen = workInfoModalOpen || workAbilityModalOpen || workExpModalOpen || workCareerModalOpen || headerModalOpen || reputationViewModalOpen || colleagueViewModalOpen || workInfoViewModalOpen || workAbilityViewModalOpen || workExpViewModalOpen || workCareerViewModalOpen;
   useModalScroll(anyModalOpen);
+
+  // [임시 진단] cluster-4 work-view-modal 깨짐 원인 추적 — ?debugLayout=1 일 때만 콘솔 로그.
+  // 사용자 환경(zoom/DPR/viewport)에서 재현 시 정보 수집용. 검증 후 호출부 제거할 것.
+  useDebugLayout(workInfoViewModalOpen, "workinfo-view-modal");
+  useDebugLayout(workExpViewModalOpen, "workexp-view-modal");
+  useDebugLayout(workAbilityViewModalOpen, "workability-view-modal");
+  useDebugLayout(workCareerViewModalOpen, "workcareer-view-modal");
 
   // card-desc의 … → .. 교체 (line-clamp 렌더링 완료 후)
   useEffect(() => {
