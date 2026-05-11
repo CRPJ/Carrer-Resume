@@ -590,11 +590,14 @@
     .weekly-filter-label {
       color: #999;
       font-weight: 500;
+      margin-right: 4px;
     }
     .weekly-filter-value {
       color: var(--quaternary-color);
       font-weight: 700;
       font-variant-numeric: tabular-nums;
+      font-size: calc(1em + 1pt);
+      line-height: 1;
     }
   }
 

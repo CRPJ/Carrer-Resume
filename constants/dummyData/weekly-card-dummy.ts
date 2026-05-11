@@ -29,10 +29,21 @@ export type WeeklyCardData = {
   top3: WeeklyCardCrew[];
 };
 
-const baseTop3: WeeklyCardCrew[] = [
-  { rank: 1, name: '홍길동', team: '커머커머스 팀', part: '커커커스도 파트' },
-  { rank: 2, name: '김철수', team: '데이터 팀',     part: '백엔드 파트' },
-  { rank: 3, name: '이영희', team: '디자인 팀',     part: '프론트 파트' },
+// TOP3 표시 규칙 검증용 — 이름(3/4/5+), 팀(3/5/6+), 파트(3/5/6+) 케이스를
+// suffix 포함/미포함 혼합으로 노출. WeeklyCardItem 의 stripSuffix + truncate 로 표시 가공.
+const TOP3_TEMPLATES: WeeklyCardCrew[][] = [
+  // Template A: 짧은 / 정확히 4 / 5+ 이름, suffix 포함 팀·파트
+  [
+    { rank: 1, name: '홍길동',     team: '데이터 팀',          part: '백엔드 파트' },
+    { rank: 2, name: '김민수진',   team: '마케팅전략팀',       part: '브랜드콘텐츠' },
+    { rank: 3, name: '알렉산드로', team: '엔터테인먼트',       part: '프론트엔드개발 파트' },
+  ],
+  // Template B: 정확히 5글자 팀/파트 + 6+ 케이스, suffix 미포함 혼합
+  [
+    { rank: 1, name: '이서연',     team: '커머커머스',         part: '디자인엔지니어링' },
+    { rank: 2, name: '박지호',     team: '디자인 팀',          part: '백엔드' },
+    { rank: 3, name: '남궁민수',   team: '데이터과학팀',       part: 'AI모델링 파트' },
+  ],
 ];
 
 const LEAGUE_RESULTS: WeeklyCardData['leagueResultStatus'][] = [
@@ -219,7 +230,7 @@ export const WEEKLY_CARD_DUMMY: WeeklyCardData[] = WEEKLY_RANKING_DISPLAY_MAP.ma
       growthFail: seededRandom(i + 41, 350, 50),
       personalRest: seededRandom(i + 51, 100),
       winningTeamImage: null,
-      top3: baseTop3,
+      top3: TOP3_TEMPLATES[i % TOP3_TEMPLATES.length],
     };
   }
 );

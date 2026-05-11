@@ -45,16 +45,78 @@
   }
 
   /* ---------- 헤더 ---------- */
+  // [정렬 기준] 좌측 title(시즌/날짜) 하단과 우측 status-panel 하단을 같은 y좌표로 맞추기 위해
+  // cross-axis를 flex-end로 변경. title 텍스트 1줄/2줄 변화나 status badge 개수 변화에 모두 대응.
   .weekly-card__header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 12px;
   }
 
   .weekly-card__title {
     flex: 1;
     min-width: 0;
+    align-self: flex-end;
+  }
+
+  // [Weekly League 버튼] title 위 줄에 표시. 상세 페이지 연결은 추후 — 현재는 보기/접근성만 보장.
+  // hover 시 box-shadow glow + 미세 배경으로 클릭 affordance 강조(레이아웃 시프트 없음).
+  .weekly-card__league-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    margin-bottom: 4px;
+
+    border: 0;
+    background: transparent;
+    color: var(--primary-color);
+    font-family: "Pretendard", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 999px;
+
+    transition:
+      color 180ms ease,
+      transform 180ms ease,
+      box-shadow 220ms ease,
+      background-color 220ms ease;
+
+    &:hover {
+      color: #ffe082;
+      background: rgba(255, 214, 87, 0.08);
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 0 1px rgba(255, 214, 87, 0.18),
+        0 0 10px rgba(255, 214, 87, 0.18),
+        0 0 18px rgba(255, 214, 87, 0.10);
+
+      .weekly-card__league-icon {
+        transform: scale(1.08) rotate(-6deg);
+        filter: drop-shadow(0 0 6px rgba(255, 214, 87, 0.35));
+      }
+    }
+
+    &:focus-visible {
+      outline: 1px solid rgba(255, 214, 87, 0.8);
+      outline-offset: 3px;
+    }
+  }
+
+  .weekly-card__league-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    transition:
+      transform 180ms ease,
+      filter 220ms ease;
   }
 
   .weekly-card__season {
@@ -454,8 +516,10 @@
   }
 
   /* ---------- Top 3 크루 ---------- */
+  // [width 재조정] 이름 truncate 결과 "AAA.." (3 Korean + 2 dots) 가 13px Pretendard 에서
+  // 안전하게 보이도록 52 → 60px. 그리드 column-gap 8px + 셀 boundary 누락 보정 마진 포함.
   .weekly-card__top3 {
-    --weekly-rank-name-width: 52px;
+    --weekly-rank-name-width: 60px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -527,12 +591,39 @@
     opacity: 1;
   }
 
-  .weekly-card__rank-name,
-  .weekly-card__rank-team,
-  .weekly-card__rank-part {
+  .weekly-card__rank-name {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // [suffix x좌표 고정] wrapper 를 inner grid 로 — 1fr 본문 + auto suffix.
+  // 외부 grid 의 team(96px 고정) / part(minmax(0,1fr)) cell 폭을 그대로 채우므로
+  // 카드 안의 모든 row 에서 suffix 오른쪽 끝 x좌표가 동일하게 정렬됨.
+  // (wrapper 에 fixed width 를 주지 않음 — 좁은 뷰포트에서 outer cell 폭을 초과해
+  //  overflow 가 나는 것을 회피하기 위함.)
+  .weekly-card__rank-team,
+  .weekly-card__rank-part {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .weekly-card__rank-team-text,
+  .weekly-card__rank-part-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .weekly-card__rank-team-suffix,
+  .weekly-card__rank-part-suffix {
+    justify-self: end;
+    margin-left: 2px;
     white-space: nowrap;
   }
 

@@ -4,9 +4,22 @@ import Image from "next/image";
 import Tilt from "react-parallax-tilt";
 import type { WeeklyCardData } from "@/constants/dummyData/weekly-card-dummy";
 
-const truncate = (text: string | null | undefined, maxLen: number): string => {
-  if (!text) return '';
-  return text.length > maxLen ? text.slice(0, maxLen) + '..' : text;
+const stripSuffix = (value: string | null | undefined, suffix: string): string => {
+  if (!value) return '';
+  const trimmed = value.trim();
+  return trimmed.endsWith(suffix) ? trimmed.slice(0, -suffix.length).trim() : trimmed;
+};
+
+const truncateName = (value: string | null | undefined): string => {
+  if (!value) return '';
+  return value.length >= 5 ? `${value.slice(0, 3)}..` : value;
+};
+
+// max = 표시할 최대 본문 글자수 (말줄임표 제외). 본문 길이가 max+1 이상이면 first(max) + ".." 로 잘라낸다.
+// 검증 케이스: "마케팅전략"(5) → "마케팅전..", "브랜드콘텐츠"(6) → "브랜드콘..".
+const truncateLabel = (value: string, max = 4): string => {
+  if (!value) return '';
+  return value.length >= max + 1 ? `${value.slice(0, max)}..` : value;
 };
 
 const getStatusTone = (status: string): string => {
@@ -59,6 +72,17 @@ export default function WeeklyCardItem({ data }: Props) {
       <div className="badge__single weekly-card">
         <div className="weekly-card__header">
           <div className="weekly-card__title">
+            {/* [상세 페이지 라우팅 자리] href/onClick 자리는 비워두고, 추후 상세 페이지 연결 시 추가. */}
+            <button
+              type="button"
+              className="weekly-card__league-link"
+              aria-label="Weekly League 상세 페이지 준비 중"
+            >
+              <span className="weekly-card__league-icon" aria-hidden="true">
+                <i className="ti ti-trophy" />
+              </span>
+              <span>Weekly League</span>
+            </button>
             {/* 첨부 cluster-4-card 의 2026 표시 문자열을 그대로 출력.
                 연도/시즌명/주차명/기간 모두 재계산·재포맷·split 금지. */}
             <h4 className="weekly-card__season">
@@ -199,11 +223,21 @@ export default function WeeklyCardItem({ data }: Props) {
                   className="weekly-card__rank-image"
                 />
               </div>
-              <span className="weekly-card__rank-name">{truncate(crew.name, 3)}</span>
+              <span className="weekly-card__rank-name">{truncateName(crew.name)}</span>
               <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
-              <span className="weekly-card__rank-team">{truncate(crew.team, 5)}</span>
+              <span className="weekly-card__rank-team">
+                <span className="weekly-card__rank-team-text">
+                  {truncateLabel(stripSuffix(crew.team, '팀'))}
+                </span>
+                <span className="weekly-card__rank-team-suffix">팀</span>
+              </span>
               <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
-              <span className="weekly-card__rank-part">{truncate(crew.part, 5)}</span>
+              <span className="weekly-card__rank-part">
+                <span className="weekly-card__rank-part-text">
+                  {truncateLabel(stripSuffix(crew.part, '파트'))}
+                </span>
+                <span className="weekly-card__rank-part-suffix">파트</span>
+              </span>
             </div>
           ))}
         </div>
