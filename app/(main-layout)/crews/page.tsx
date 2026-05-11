@@ -39,6 +39,9 @@ const clubOptions = ["엥크레", "오랑캐", "팔랑크스"];
 const statusOptions = ["활동 중", "활동 졸업", "활동 중단"];
 const ITEMS_PER_PAGE = 50;
 
+// 베타 테스터 화이트리스트는 서버측(/api/crews)에서 raw display_name 으로 필터링
+// — 비로그인 마스킹 후 이름과 매칭 실패하던 버그 수정 (2026-04)
+
 const page = () => {
   const { mask } = useDataMasking();
   const [demoMode, setDemoMode] = useState(false);
@@ -100,9 +103,10 @@ const page = () => {
         const res = await fetch("/api/crews");
         const result = await res.json();
         if (result.success) {
-          setCrews(result.data);
-          const active = result.data.filter((c: Crew) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
-          active.sort((a: Crew, b: Crew) => b.approvedWeeks - a.approvedWeeks);
+          const data = result.data as Crew[];
+          setCrews(data);
+          const active = data.filter((c) => c.growthStatus !== "graduated" && c.growthStatus !== "suspended");
+          active.sort((a, b) => b.approvedWeeks - a.approvedWeeks);
           setFilteredCrews(active);
         }
       } catch (err) {
