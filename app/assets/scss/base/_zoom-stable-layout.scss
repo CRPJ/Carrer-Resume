@@ -38,7 +38,7 @@
 
 // ===== 초기 로딩 flash 방지 =====
 .nftg-app {
-  opacity: 0;
+  opacity: 1;
 }
 .nftg-app.app-ready {
   opacity: 1;
