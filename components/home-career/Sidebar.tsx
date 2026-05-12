@@ -2177,8 +2177,8 @@ const Sidebar = () => {
                           setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 });
                         }}
                       >
-                        <span style={{ color: currentProfile.lightColor }}>·</span> {mask.major(currentProfile.major)}
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, marginLeft: "5px" }}>
+                        <span style={{ color: currentProfile.lightColor }}>·</span>{mask.major(currentProfile.major)}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M8.33 6.67L11.67 10L8.33 13.33" stroke="#FFEC8F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
