@@ -620,7 +620,7 @@ const page = () => {
                         <div className="content-wrapper">
                           <div className="info">
                             <p className="text-sm fw-6">
-                              <Link href={resolveHref(crew)} style={{ backgroundColor: "#FFC300", color: "#000", padding: "2px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center"}}>{crew.club}</Link>
+                              <Link href={resolveHref(crew)} className="crew-club-badge">{crew.club}</Link>
                             </p>
                             <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", flexWrap: "nowrap", minWidth: 0, overflow: "hidden" }} title={`${mask.school(crew.university)} ${mask.major(crew.major)}`}>
                               <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
@@ -664,7 +664,7 @@ const page = () => {
                                 </Link>
                               </div>
                               <div className="review">
-                                <span className="text-sm fw-6">
+                                <span className="text-sm fw-6" style={{ whiteSpace: 'nowrap' }}>
                                   <i className="ti ti-calendar-check"></i>{crew.approvedWeeks}주
                                 </span>
                               </div>
