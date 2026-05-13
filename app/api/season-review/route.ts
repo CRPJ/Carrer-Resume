@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
-import { extractTargetUserId } from "@/lib/admin";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 시즌 리뷰 조회
+// GET: 시즌 리뷰 조회 + 작성 가능 여부 (canEdit / grantDeadline)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from("user_season_histories")
-      .select("rating, review")
+      .select("user_id, season_id, rating, review")
       .eq("id", seasonHistoryId)
       .maybeSingle();
 
@@ -31,12 +33,43 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "시즌 리뷰 조회에 실패했습니다." }, { status: 500 });
     }
 
+    // 작성권 판정: 어드민이거나, 본인 데이터이며 (user_id, season_id) 에 활성 grant 가 있으면 true
+    const session = await getServerSession(authOptions);
+    const viewerIsAdmin = isAdminEmail(session?.user?.email);
+
+    let canEdit = viewerIsAdmin;
+    let grantDeadline: string | null = null;
+
+    if (!viewerIsAdmin && data?.user_id && data?.season_id) {
+      try {
+        const viewerProfile = await getUserProfile();
+        if (
+          viewerProfile.profile &&
+          (viewerProfile.profile as { id: string }).id === data.user_id
+        ) {
+          const { data: grant } = await supabaseAdmin
+            .from("season_review_grants")
+            .select("deadline")
+            .eq("user_id", data.user_id)
+            .eq("season_id", data.season_id)
+            .maybeSingle();
+          grantDeadline = grant?.deadline ?? null;
+          canEdit =
+            !!grantDeadline && new Date(grantDeadline).getTime() > Date.now();
+        }
+      } catch {
+        // viewerProfile 조회 실패 시 canEdit 은 false 로 유지
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         rating: data?.rating || 0,
         review: data?.review || "",
       },
+      canEdit,
+      grantDeadline,
     });
   } catch (error) {
     console.error("시즌 리뷰 조회 API 오류:", error);

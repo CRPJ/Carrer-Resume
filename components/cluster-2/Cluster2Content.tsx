@@ -1297,6 +1297,10 @@ const Cluster2Content = () => {
             return newLinks;
           });
         }
+        // 어드민이 부여한 마감일이 미래면 작성 가능, 어드민이면 항상 가능
+        if (typeof result.data.canEdit === "boolean") {
+          setCanEditClubReview(result.data.canEdit);
+        }
       }
     } catch (error) {
       console.error("리뷰 링크 로드 오류:", error);

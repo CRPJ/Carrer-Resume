@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getUserProfile } from "@/lib/get-user-profile";
-import { extractTargetUserId } from "@/lib/admin";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET: 클럽 리뷰 링크 조회 (userId 파라미터로 다른 유저 조회 가능)
+// GET: 클럽 리뷰 링크 조회 + 작성 가능 여부 (canEdit / deadline)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -37,10 +39,24 @@ export async function GET(request: Request) {
       .eq("user_id", userId)
       .maybeSingle();
 
+    // club_review_grants 에서 마감일 조회 (어드민이 아닌 본인 조회일 때 작성권 판정)
+    const { data: grant } = await supabaseAdmin
+      .from("club_review_grants")
+      .select("deadline")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const session = await getServerSession(authOptions);
+    const viewerIsAdmin = isAdminEmail(session?.user?.email);
+    const grantActive = !!grant?.deadline && new Date(grant.deadline).getTime() > Date.now();
+    const canEdit = viewerIsAdmin || grantActive;
+
     return NextResponse.json({
       success: true,
       data: {
         cluvingReviewLink: introduction?.cluving_review_link || null,
+        canEdit,
+        deadline: grant?.deadline || null,
       },
     });
   } catch (error) {
@@ -56,7 +72,7 @@ export async function GET(request: Request) {
 export async function PUT(request: Request) {
   try {
     const targetUserId = extractTargetUserId(request);
-    const { profile, error } = await getUserProfile("id", targetUserId);
+    const { session, profile, error } = await getUserProfile("id", targetUserId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: error.status });
@@ -64,6 +80,23 @@ export async function PUT(request: Request) {
 
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    }
+
+    // 작성 권한 검증: 어드민이거나, 본인의 club_review_grants.deadline 이 미래여야 함
+    const writerIsAdmin = isAdminEmail(session?.user?.email);
+    if (!writerIsAdmin) {
+      const { data: grant } = await supabaseAdmin
+        .from("club_review_grants")
+        .select("deadline")
+        .eq("user_id", profile.id)
+        .maybeSingle();
+      const active = !!grant?.deadline && new Date(grant.deadline).getTime() > Date.now();
+      if (!active) {
+        return NextResponse.json(
+          { error: "작성할 수 있는 기간이 아닙니다." },
+          { status: 403 }
+        );
+      }
     }
 
     const body = await request.json();

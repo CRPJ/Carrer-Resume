@@ -4,6 +4,7 @@ import { getUserProfile } from "@/lib/get-user-profile";
 import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { canWriteWeeklyReview } from "@/lib/weekly-review-permission";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -123,6 +124,26 @@ export async function PUT(
         { error: "본인의 리뷰만 수정할 수 있습니다." },
         { status: 403 }
       );
+    }
+
+    // 작성/수정 가능 기간 검증 (어드민은 우회)
+    if (!isAdmin) {
+      // existing 에 week_card_id 가 있어야 함 → 추가 조회
+      const { data: row } = await supabase
+        .from("weekly_reviews")
+        .select("week_card_id")
+        .eq("id", reviewId)
+        .maybeSingle();
+      const weekCardId = row?.week_card_id;
+      if (weekCardId) {
+        const perm = await canWriteWeeklyReview(supabase, profile.id, weekCardId);
+        if (!perm.allowed) {
+          return NextResponse.json(
+            { error: "수정할 수 있는 기간이 아닙니다." },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     const { data: updated, error: updateError } = await supabase

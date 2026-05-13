@@ -1787,6 +1787,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     created_at?: string;
     updated_at?: string;
   } | null>(null);
+  // 서버에서 판정한 Weekly Review 작성 가능 여부 (어드민 OR 기본 윈도우 OR 운영진 grant)
+  const [weeklyReviewCanEdit, setWeeklyReviewCanEdit] = useState<boolean>(false);
 
   // reputation-view-modal [수정] 버튼 승인 상태 — 4개 모달 canEditWorkInfo 패턴 동기화
   // 데모 모드 = true(수정 가능), 일반 = false(관리자 승인 필요)
@@ -1809,6 +1811,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const requireWriteWindow = async (): Promise<boolean> => {
     if (isDemoMode) return true;
     if (session?.user?.isAdmin) return true;
+    // 운영진이 부여한 weekly_review_grants.deadline 이 활성이면 시간 윈도우 무시하고 통과
+    if (weeklyReviewCanEdit) return true;
     if (!weekData?.startDate) {
       await popup.alert("주차 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
       return false;
@@ -3696,6 +3700,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const res = await fetch(`/api/weekly-reviews?${params.toString()}`);
       if (!res.ok) {
         setWeeklyReviewFromDB(null);
+        setWeeklyReviewCanEdit(false);
         return;
       }
       const json = await res.json();
@@ -3712,9 +3717,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       } else {
         setWeeklyReviewFromDB(null);
       }
+      if (typeof json?.canEdit === "boolean") {
+        setWeeklyReviewCanEdit(json.canEdit);
+      }
     } catch (err) {
       console.error("[weekly-review] fetch 예외:", err);
       setWeeklyReviewFromDB(null);
+      setWeeklyReviewCanEdit(false);
     }
   };
 

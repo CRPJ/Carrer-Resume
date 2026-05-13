@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase-server";
 import { getUserProfile } from "@/lib/get-user-profile";
-import { extractTargetUserId } from "@/lib/admin";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { canWriteWeeklyReview } from "@/lib/weekly-review-permission";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -90,9 +93,18 @@ export async function GET(request: Request) {
       );
     }
 
+    // 작성 가능 여부 (어드민 OR 기본 윈도우 OR grant active)
+    const session = await getServerSession(authOptions);
+    const viewerIsAdmin = isAdminEmail(session?.user?.email);
+    const perm = await canWriteWeeklyReview(supabase, targetUserId, weekCardId);
+    const canEdit = viewerIsAdmin || perm.allowed;
+
     return NextResponse.json({
       success: true,
       data: data ? toClient(data as WeeklyReviewRow) : null,
+      canEdit,
+      inDefaultWindow: perm.inDefaultWindow,
+      grantDeadline: perm.grantDeadline,
     });
   } catch (err) {
     console.error("[weekly-reviews] 조회 API 오류:", err);
@@ -156,6 +168,19 @@ export async function POST(request: Request) {
     }
 
     const supabase = createAdminClient();
+
+    // 작성 권한 검증: 어드민 OR (기본 윈도우 OR grant active)
+    const session = await getServerSession(authOptions);
+    const writerIsAdmin = isAdminEmail(session?.user?.email);
+    if (!writerIsAdmin) {
+      const perm = await canWriteWeeklyReview(supabase, profile.id, weekCardId);
+      if (!perm.allowed) {
+        return NextResponse.json(
+          { error: "작성할 수 있는 기간이 아닙니다." },
+          { status: 403 }
+        );
+      }
+    }
 
     // 중복 방지 — 이미 존재하면 클라이언트가 PUT을 사용해야 함
     const { data: existing } = await supabase

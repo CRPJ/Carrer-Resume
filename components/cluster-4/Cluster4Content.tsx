@@ -1247,6 +1247,30 @@ const Cluster4Content = () => {
       ? seasonHistories[section3Page] || seasonHistories[0]
       : (defaultSeasonData as SeasonHistoryData);
 
+  // 운영진이 부여한 season_review_grants 활성 여부 → canEditSeasonReview 와 OR
+  // (시즌 변경 시 재조회: 시즌별로 grant 가 다를 수 있음)
+  useEffect(() => {
+    if (isDemoMode) return;
+    if (session?.user?.isAdmin) return;
+    if (!currentSeason?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/season-review?seasonHistoryId=${currentSeason.id}`);
+        const json = await res.json();
+        if (cancelled) return;
+        if (json?.canEdit === true) {
+          setCanEditSeasonReview(true);
+        }
+      } catch {
+        // 무시: 기존 approved 로직 결과 유지
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isDemoMode, session?.user?.isAdmin, currentSeason?.id]);
+
   // 현재 시즌 정보 가져오기
   useEffect(() => {
     if (isDemoMode) return; // 데모 모드에서는 API 호출 스킵
