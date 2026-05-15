@@ -3051,7 +3051,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     }
     // 모든 필드 옵셔널 — 일부만 기입해도 저장 가능
     if (!(await popup.confirm("저장하시겠습니까?"))) return;
-    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    // 실무 경력 cluster 는 activity_type 가 'practical_project' 1개뿐이고, 카드(=career_projects)는 여러 개 가능.
+    // card.id 는 project 인덱스라서 workCareerActivityTypes 인덱싱에 쓰면 안 됨 (id≥2 → undefined → 저장 silent fail).
+    const activityType = workCareerActivityTypes[0];
     if (activityType) {
       const newSubTitle = editingCareerSubTitle.trim() || null;
       const newOutputLinks = editingCareerOutputLinks;
@@ -3143,7 +3145,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleCareerOutputLinkChange = (idx: number, field: "desc" | "url", value: string) => {
-    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    // 실무 경력 cluster 는 activity_type 가 'practical_project' 1개뿐이고, 카드(=career_projects)는 여러 개 가능.
+    // card.id 는 project 인덱스라서 workCareerActivityTypes 인덱싱에 쓰면 안 됨 (id≥2 → undefined → 저장 silent fail).
+    const activityType = workCareerActivityTypes[0];
     if (!activityType) return;
     const adminCount = getAdminOutputLinksCount(activityType);
     if (idx < adminCount) return;
@@ -3155,7 +3159,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleCareerOutputLinkDelete = (idx: number) => {
-    const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+    // 실무 경력 cluster 는 activity_type 가 'practical_project' 1개뿐이고, 카드(=career_projects)는 여러 개 가능.
+    // card.id 는 project 인덱스라서 workCareerActivityTypes 인덱싱에 쓰면 안 됨 (id≥2 → undefined → 저장 silent fail).
+    const activityType = workCareerActivityTypes[0];
     if (!activityType) return;
     const adminCount = getAdminOutputLinksCount(activityType);
     if (idx < adminCount) return;
@@ -5576,8 +5582,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           // 중복 노출 방지를 위해, 크루 슬롯에서 어드민 URL 과 동일한 항목은 걸러냄.
           const adminImgs = (record.output_images || []).filter((i) => i?.url?.trim());
           const adminUrlSet = new Set(adminImgs.map((i) => i.url));
-          const careerActivityType = workCareerActivityTypes[index];
+          // 실무 경력은 activity_type 가 'practical_project' 1개뿐 — 모든 career 카드가 동일 activity_type 공유.
+          // index 기반 인덱싱은 careerRecords 가 여러 개일 때 undefined 가 되어 카드별 detail 매칭 실패.
+          const careerActivityType = workCareerActivityTypes[0];
           const careerDetail = careerActivityType ? weekActivityDetails.find((d) => d.activity_type_id === careerActivityType) : null;
+          // output_links 병합: admin(career_records.output_links) + 크루(user_activity_details.output_links) → 5슬롯.
+          // 미병합 시 크루가 저장한 링크가 화면에 안 돌아옴 (모달 재오픈 시 사라진 것처럼 보임).
+          const adminCareerLinks = (record.output_links || []) as { desc: string; url: string }[];
+          const userCareerLinks = (careerDetail?.output_links || []) as { desc: string; url: string }[];
+          const adminCareerCount = adminCareerLinks.filter((l) => l.url?.trim()).length;
+          const mergedCareerOutputLinks: { desc: string; url: string }[] = [];
+          for (let i = 0; i < 5; i++) {
+            if (i < adminCareerCount && adminCareerLinks[i]?.url?.trim()) {
+              mergedCareerOutputLinks.push({ desc: adminCareerLinks[i].desc || "", url: adminCareerLinks[i].url || "" });
+            } else {
+              const userIdx = i - adminCareerCount;
+              if (userCareerLinks[userIdx]?.url?.trim()) {
+                mergedCareerOutputLinks.push({ desc: userCareerLinks[userIdx].desc || "", url: userCareerLinks[userIdx].url || "" });
+              } else {
+                mergedCareerOutputLinks.push({ desc: "", url: "" });
+              }
+            }
+          }
           const rawCrewImgs = careerDetail?.image_urls || [];
           const rawCrewCaps = careerDetail?.image_captions || [];
           const crewImgs: (string | null)[] = [];
@@ -5608,7 +5634,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             verified: computedStatus === "enhanced",
             date: weekData?.startDate ? formatDate(weekData.startDate) : formatDate(record.created_at),
             likes: "0,99",
-            hasWeb: (record.output_links?.length || 0) > 0,
+            hasWeb: ((record.output_links?.length || 0) > 0) || ((careerDetail?.output_links?.length || 0) > 0),
             icon: record.company_logo_url || "/images/0/cluster4/icon/default-company.png",
             companyHomepageUrl: (record.company_homepage_links && record.company_homepage_links[0]) || null,
             supervisorImg: record.supervisor_profile_img || "/images/0/cluster4/icon/실무 경력/감독자.jpg",
@@ -5623,16 +5649,20 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             isFailed: computedStatus === "failed",
             // 추가 정보 (상세 보기용)
             projectDescription: (() => {
-              const activityType = workCareerActivityTypes[index];
+              // index 가 아닌 [0] 사용 — 위 careerActivityType 와 동일 사유.
+              const activityType = workCareerActivityTypes[0];
               const detail = activityType ? weekActivityDetails.find((d) => d.activity_type_id === activityType) : null;
               return detail?.sub_title && detail.sub_title.trim() !== "" ? detail.sub_title : record.project_description || null;
             })(),
+            // user_activity_details.growth_point — 모달 재오픈 시 editingCareerGrowthPoint 복원용
+            // (workInfo/workAbility/workExp 카드와 동일 패턴, 누락 시 저장된 값이 사라진 것처럼 보임)
+            growthPoint: careerDetail?.growth_point || "",
             gradePoints: record.grade_points,
             recordId: record.record_id,
             projectId: record.project_id,
             lineCode: record.line_code,
             lineName: record.line_name,
-            outputLinks: record.output_links,
+            outputLinks: mergedCareerOutputLinks,
             secondaryInfoDeadline: record.secondary_info_deadline || null,
             // 어드민 output_images 우선, 남은 슬롯은 크루 user_activity_details.image_urls 로 채움
             images: mergedImages,
@@ -7770,7 +7800,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {(() => {
                           const isDeadlineActive = card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
                           const isDeadlineExpired = card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) <= new Date();
-                          const activityType = workCareerActivityTypes[card.id - 1];
+                          // card.id 는 project 인덱스 — activity_type 는 cluster 당 1개라서 [0] 고정.
+                          const activityType = workCareerActivityTypes[0];
                           if (card.isFailed)
                             return (
                               <div style={{ padding: "16px", backgroundColor: "#fee2e2", border: "1px solid #ef4444", borderRadius: "8px", marginBottom: "16px" }}>
@@ -7794,7 +7825,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                         {/* Sub Title - 마감 기한 이내만 수정 가능 */}
                         {(() => {
-                          const activityType = workCareerActivityTypes[card.id - 1];
+                          // card.id 는 project 인덱스 — activity_type 는 cluster 당 1개라서 [0] 고정.
+                          const activityType = workCareerActivityTypes[0];
                           const isEditable = !card.isFailed && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
                           return activityType ? (
                             <div className="modal-input-group">
@@ -7831,7 +7863,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
                         {/* Output Link - 마감 기한 이내만 수정 가능 */}
                         {(() => {
-                          const activityType = workCareerActivityTypes[card.id - 1];
+                          // card.id 는 project 인덱스 — activity_type 는 cluster 당 1개라서 [0] 고정.
+                          const activityType = workCareerActivityTypes[0];
                           const isEditable = !card.isFailed && card.secondaryInfoDeadline && new Date(card.secondaryInfoDeadline) > new Date();
                           const adminCount = activityType ? getAdminOutputLinksCount(activityType) : 0;
                           return activityType ? (
@@ -10015,7 +10048,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="workinfo-output-links">
                         {[0, 1, 2, 3, 4].map((i) => {
                           const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
-                          const activityType = workCareerActivityTypes[(selectedWorkCareerCard?.id || 1) - 1];
+                          // 실무 경력 cluster 는 activity_type 가 'practical_project' 1개뿐이고, 카드(=career_projects)는 여러 개 가능.
+    // card.id 는 project 인덱스라서 workCareerActivityTypes 인덱싱에 쓰면 안 됨 (id≥2 → undefined → 저장 silent fail).
+    const activityType = workCareerActivityTypes[0];
                           const adminCount = activityType ? getAdminOutputLinksCount(activityType) : 0;
                           const isAdminLink = i < adminCount;
                           const link = workCareerViewIsEditing ? editingCareerOutputLinks[i] || { desc: "", url: "" } : selectedWorkCareerCard.outputLinks?.[i] || { desc: "", url: "" };

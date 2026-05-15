@@ -659,6 +659,41 @@ export async function GET(request: NextRequest) {
       calculatedReliabilityRate = Math.min(100, Math.ceil(((approvedWeeksCount + restWeeksCount) / reliabilityDenominator) * 100));
     }
 
+    // cluster-4-1 의 getCumulativeApprovedWeeks 와 동일 기준:
+    // user_weekly_growth.is_success=true 또는 (user_weekly_growth 레코드 없음 AND activity_records.is_completed=true)
+    // 인 과거 주차 카운트. cron 지연으로 user_weekly_growth 가 아직 생성 안 된 주차도 활동 인정.
+    const userWeeklyGrowthAllRecords = userWeeklyGrowthResult.data || [];
+    const userWeeklyGrowthByWeekId = new Map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      userWeeklyGrowthAllRecords.map((wg: any) => [wg.week_id, wg])
+    );
+    const completedActivityWeekIds = new Set(
+      activitiesData.map((a: { week_id: string }) => a.week_id)
+    );
+    let cumulativeApprovedWeeksCount = 0;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passedWeeksForUser.forEach((week: any) => {
+      if (seasonRestWeekIds.has(week.id)) return;
+      if (week.id === profile.onboarding_week_id) {
+        cumulativeApprovedWeeksCount++;
+        return;
+      }
+      const wg = userWeeklyGrowthByWeekId.get(week.id) as { is_success?: boolean } | undefined;
+      const isOfficialBreak = week.is_club_break || breakSeasonIds.has(week.season_id);
+      if (isOfficialBreak) {
+        if (wg?.is_success === true || (wg === undefined && completedActivityWeekIds.has(week.id))) {
+          cumulativeApprovedWeeksCount++;
+        }
+        return;
+      }
+      if (userRestWeekIds.has(week.id)) return;
+      if (wg !== undefined) {
+        if (wg.is_success === true) cumulativeApprovedWeeksCount++;
+        return;
+      }
+      if (completedActivityWeekIds.has(week.id)) cumulativeApprovedWeeksCount++;
+    });
+
     // 항상 실시간 계산 값 사용 (현재 진행 중인 주차 제외)
     const finalGrowthPeriodStats = {
       approvedWeeks: approvedWeeksCount,        // 성장 성공 주차
@@ -670,6 +705,9 @@ export async function GET(request: NextRequest) {
       restSeasons: 0,      // 나중에 실시간 계산 값으로 덮어씀
       approvedSeasons: 0,  // 나중에 실시간 계산 값으로 덮어씀
       reliabilityRate: calculatedReliabilityRate,
+      // cluster-4-1/weekly-ranking 의 'X / 25 주차' 와 정렬된 값. user_weekly_growth 미생성 주차의
+      // activity_records 폴백 포함 — Sidebar medal-week-num 등 누적 표시용 단일 소스.
+      cumulativeApprovedWeeks: cumulativeApprovedWeeksCount,
     };
 
     // activity_type_id → cluster_id 매핑 생성
@@ -1252,6 +1290,7 @@ export async function GET(request: NextRequest) {
         availableSeasons: availableSeasonsCount,                       // 실시간 계산 값 사용 (현재 시즌 제외)
         restSeasons: restSeasonsCount,                                 // 실시간 계산 값 사용
         approvedSeasons: approvedSeasonsCount,                         // 실시간 계산 값 사용
+        cumulativeApprovedWeeks: finalGrowthPeriodStats.cumulativeApprovedWeeks, // Sidebar medal 용 (activity_records 폴백 포함)
       },
       // 온보딩 주차 ID (클라이언트에서 성공 처리용)
       onboardingWeekId: profile.onboarding_week_id || null,

@@ -442,7 +442,11 @@ const Sidebar = () => {
       setSeasonHistories(cachedProfile.seasonHistories);
       setHasSeasonData(true);
     }
-    if (cachedProfile.growthPeriodStats?.approvedWeeks !== undefined) {
+    // medal-week-num: cluster-4-1/weekly-ranking 의 'X / 25 주차' 와 동일 기준 사용
+    // (user_weekly_growth 미생성 주차의 activity_records 폴백 포함). 폴백 없는 approvedWeeks 는 cron 지연 시 1 작게 표시되는 회귀가 있었음.
+    if (cachedProfile.growthPeriodStats?.cumulativeApprovedWeeks !== undefined) {
+      setApprovedWeeksCount(cachedProfile.growthPeriodStats.cumulativeApprovedWeeks);
+    } else if (cachedProfile.growthPeriodStats?.approvedWeeks !== undefined) {
       setApprovedWeeksCount(cachedProfile.growthPeriodStats.approvedWeeks);
     }
   }, [cachedProfile]);
@@ -950,8 +954,11 @@ const Sidebar = () => {
           setHasSeasonData(false);
         }
 
-        // 성장 성공 주차 수 (cluster-4-card의 cumulativeApprovedWeeks와 동일 소스)
-        if (result.growthPeriodStats?.approvedWeeks !== undefined) {
+        // 성장 성공 주차 수 — cluster-4-1/weekly-ranking 의 'X / 25 주차' 와 동일 기준.
+        // cumulativeApprovedWeeks: user_weekly_growth.is_success=true 또는 (없을 시) activity_records 폴백 포함.
+        if (result.growthPeriodStats?.cumulativeApprovedWeeks !== undefined) {
+          setApprovedWeeksCount(result.growthPeriodStats.cumulativeApprovedWeeks);
+        } else if (result.growthPeriodStats?.approvedWeeks !== undefined) {
           setApprovedWeeksCount(result.growthPeriodStats.approvedWeeks);
         } else {
           setApprovedWeeksCount(null);
