@@ -766,7 +766,9 @@ const Cluster41Content = () => {
 
   // 주차별 실무 경력 강화율 (career) - career_projects 기반, 최대 5개 제한
   // P(분모) = 해당 주차에 개설된 경력 프로젝트 수 (career_projects)
-  // R(분자) = 해당 주차에 완료(enhanced)한 경력 프로젝트 수 (career_records)
+  // R(분자) = 해당 주차에 완료한 경력 프로젝트 수
+  //   - enhancement_status='enhanced' (legacy)
+  //   - OR enhancement_status='pending' AND 결정 시점(N+1주 목 12:01 KST) 도달 (Cluster4CardContent/ranking API 와 정합)
   const getWeeklyCareerRate = (weekId: string) => {
     if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].careerRate;
     if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };
@@ -776,10 +778,16 @@ const Cluster41Content = () => {
     const rawTotal = careerProjectsByWeek.get(weekId) || 0;
     const total = Math.min(rawTotal, 5);
 
-    // R(분자) = enhanced 상태인 경력 프로젝트 수 (최대 P개)
+    // 결정 시점 도달 여부
+    const week = dbWeeklyData.find(w => w.id === weekId);
+    const resultsDecided = !!week?.startDate && Date.now() >= computeResultDecidedMs(week.startDate);
+
+    // R(분자) = 강화 성공 카운트 (enhanced OR pending+결정시점후)
     const weekCareerRecords = userCareerRecords.filter(cr => cr.week_id === weekId);
-    const enhancedCount = weekCareerRecords.filter(cr => cr.enhancement_status === 'enhanced').length;
-    const count = Math.min(enhancedCount, total);
+    const successCount = weekCareerRecords.filter(cr =>
+      cr.enhancement_status === 'enhanced' || (cr.enhancement_status === 'pending' && resultsDecided)
+    ).length;
+    const count = Math.min(successCount, total);
 
     // 소수점 올림 처리
     return { count, total, rate: total > 0 ? Math.ceil((count / total) * 100) : 0 };
