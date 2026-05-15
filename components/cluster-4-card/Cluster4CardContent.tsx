@@ -3114,6 +3114,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           ? {
               ...prev,
               subTitle: newSubTitle || "",
+              // 뷰 모드 fallback 은 'sub_title 비었으면 record.project_description'.
+              // sub_title 만 갱신하고 projectDescription 을 그대로 두면, 빈 값 저장 시 옛 sub_title 이 fallback 으로 표시됨 (새로고침해야 사라짐).
+              projectDescription: newSubTitle && newSubTitle.trim() !== ""
+                ? newSubTitle
+                : (careerRecords[careerIdx]?.project_description || null),
               outputLinks: newOutputLinks,
               growthPoint: editingCareerGrowthPoint,
               images: mergedImages,
