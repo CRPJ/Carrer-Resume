@@ -11421,7 +11421,7 @@
       display: flex;
       justify-content: flex-end;
       box-sizing: border-box;
-      margin-top: 20px !important; // 媛뺥솕 ?곹깭 ?됯낵 ?섏쭅 寃뱀묠 諛⑹?
+      margin-top: -20px !important; // output-links 블록만 위로 보정 (Main Title 영역과 겹침 해소). 원값 20px → -20px (총 40px 위로)
     }
   }
 
@@ -11591,6 +11591,7 @@
     min-width: 0;
     box-sizing: border-box;
     transform: none !important; // DPR/subpixel rounding에 따른 수직 밀림 방지
+    margin-top: -30px !important; // 1cm 위 보정 후 0.2cm(8px) 아래로 미세 조정 (-38 → -30)
 
     .output-link-row {
       display: flex;
@@ -11713,7 +11714,7 @@
   // 醫뚰븯?? Main Title / Sub Title / Growth Point
   // ?ъ슜???붿껌: Main Title 0.5cm(??-19px) ?꾨줈 ??text-section留?異붽? 蹂댁젙
   .workinfo-text-section {
-    margin-top: -73px !important;
+    margin-top: -40px !important; // 과보정값(-73px) 완화 — output-links와 시각적 겹침 해소, 1차 보정값
     display: flex;
     flex-direction: column;
     gap: 16px !important;
