@@ -119,7 +119,13 @@
       "PowerShell(Move-Item *)",
       "mcp__playwright__browser_navigate_back",
       "mcp__playwright__browser_wait_for",
-      "Bash([ -f \"public/images/0/cluster4/icon/$f\" ])"
+      "Bash([ -f \"public/images/0/cluster4/icon/$f\" ])",
+      "PowerShell(Test-Path *)",
+      "PowerShell(git config *)",
+      "PowerShell(Get-Service *)",
+      "PowerShell(ssh-keygen *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(ssh -T -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 git@github-aurum 2>&1; Write-Output \"---exit: $LASTEXITCODE---\")"
     ],
     "deny": [],
     "ask": []

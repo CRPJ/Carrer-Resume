@@ -8,6 +8,9 @@ type CrewRow = WeeklyCardCrew & { isPlaceholder?: boolean };
 
 const PLACEHOLDER_TEXT = '-';
 
+// placeholder 표시 형태: "- | -    팀 | -    파트"
+// 실제 데이터 row 와 동일한 inner grid(minmax(0,1fr) auto + suffix justify-self:end) 를 그대로 사용.
+// text span 에 "-" 를 채워 좌측 정렬, suffix span 의 "팀"/"파트" 는 기존처럼 우측 정렬 유지.
 const buildPlaceholderRow = (rank: 1 | 2 | 3): CrewRow => ({
   rank,
   name: PLACEHOLDER_TEXT,
@@ -285,18 +288,14 @@ export default function WeeklyCardItem({ data }: Props) {
                 <span className="weekly-card__rank-team-text">
                   {crew.isPlaceholder ? PLACEHOLDER_TEXT : truncateLabel(stripSuffix(crew.team, '팀'))}
                 </span>
-                {!crew.isPlaceholder && (
-                  <span className="weekly-card__rank-team-suffix">팀</span>
-                )}
+                <span className="weekly-card__rank-team-suffix">팀</span>
               </span>
               <span className="weekly-card__rank-separator" aria-hidden="true">|</span>
               <span className="weekly-card__rank-part">
                 <span className="weekly-card__rank-part-text">
                   {crew.isPlaceholder ? PLACEHOLDER_TEXT : truncateLabel(stripSuffix(crew.part, '파트'))}
                 </span>
-                {!crew.isPlaceholder && (
-                  <span className="weekly-card__rank-part-suffix">파트</span>
-                )}
+                <span className="weekly-card__rank-part-suffix">파트</span>
               </span>
             </div>
           ))}
