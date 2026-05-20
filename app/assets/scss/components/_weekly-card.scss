@@ -337,6 +337,15 @@
       .stat-unit {
         display: inline-block;
       }
+
+      // [작은 데스크톱 보정] xl 브레이크포인트(1200~1399.98px)에서 3-col 레이아웃이 되면
+      // 카드 내부 폭(약 332px)이 좁아지면서 label(106) + 12 + bar(155) + 41 + percent(46) = 360px 가
+      // 셀을 초과 → 성공률/도전율 row 가 percent 위로 겹친다.
+      // 해당 범위에서만 bar track 을 1fr 로 유동화하고 column-gap 을 축소해 겹침 제거.
+      @media (min-width: 1200px) and (max-width: 1399.98px) {
+        grid-template-columns: minmax(0, 1fr) 46px !important;
+        column-gap: 12px !important;
+      }
     }
 
     // 모든 카드의 .progress-bar 가 동일한 155px track 폭을 갖도록 강제.
@@ -358,6 +367,14 @@
         border-radius: 5px;
         transition: width 0.3s ease;
         display: block;
+      }
+
+      // [작은 데스크톱 보정] 위 .weekly-card__stat-meter 의 1fr 트랙에 맞춰
+      // bar 자체도 셀을 가득 채우도록 유동 폭으로 전환. 155px 강제값 해제가 핵심.
+      @media (min-width: 1200px) and (max-width: 1399.98px) {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
       }
     }
   }
@@ -476,6 +493,17 @@
     pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
+  }
+
+  // [icon 변형] 대전 중 / 대전 집계 상태에서 trophy 자리를 모래시계 폰트 아이콘으로 swap.
+  // 동일 absolute 슬롯(48×48, top:-12px, left:8px) 유지 — layout shift 방지.
+  i.weekly-card__winner-trophy--icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    line-height: 1;
+    color: #fed402;
   }
 
   .weekly-card__winner-label {
