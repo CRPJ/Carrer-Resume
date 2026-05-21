@@ -1283,6 +1283,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }).length;
         }
 
+        // user_weekly_growth.is_success 행이 없지만 activity_records 폴백으로 인정된 주차 추가.
+        // profile API 의 cumulativeApprovedWeeks 와 동일 기준 — cron 지연으로 success 행 미생성 시 1 부족 회귀 방지.
+        const fallbackApprovedWeekIds: string[] = profileResult.fallbackApprovedWeekIds || [];
+        if (fallbackApprovedWeekIds.length > 0) {
+          const weekById = new Map<string, any>(allUserWeeksData.map((w: any) => [w.id, w]));
+          const fallbackInRange = fallbackApprovedWeekIds.filter((wId) => {
+            const w = weekById.get(wId);
+            return w?.end_date && w.end_date <= currentWeek.end_date && w.end_date >= userStartDate;
+          }).length;
+          currentApprovedCount += fallbackInRange;
+        }
+
         // 온보딩 주차(무적 주차)는 성공 주차에 포함 (user_weekly_growth에 레코드가 없어도)
         const onboardingWeekIdForCount = profileResult.onboardingWeekId;
         if (onboardingWeekIdForCount) {
@@ -1297,9 +1309,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           }
         }
         // 현재 주차가 활동 주차이면 eligible 체크에 포함 (+1)
+        // 단, 이미 fallbackApprovedWeekIds 로 카운트된 경우는 중복 방지.
         const currentWeekIsActive = !currentWeek.is_club_break && weekId !== onboardingWeekIdForCount;
         const currentWeekAlreadyInSuccess = successWeeksData.some((sw: any) => sw.week_id === weekId);
-        const cumulativeForEligible = currentApprovedCount + (currentWeekIsActive && !currentWeekAlreadyInSuccess ? 1 : 0);
+        const currentWeekInFallback = fallbackApprovedWeekIds.includes(weekId);
+        const cumulativeForEligible = currentApprovedCount + (currentWeekIsActive && !currentWeekAlreadyInSuccess && !currentWeekInFallback ? 1 : 0);
         setCumulativeApprovedWeeks(cumulativeForEligible);
 
         // 이전/다음 주차 ID 가져오기

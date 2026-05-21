@@ -671,6 +671,9 @@ export async function GET(request: NextRequest) {
       activitiesData.map((a: { week_id: string }) => a.week_id)
     );
     let cumulativeApprovedWeeksCount = 0;
+    // user_weekly_growth.is_success=true 행이 없지만 activity_records 폴백으로 인정된 주차 ID.
+    // 모달(Cluster4CardContent) 등 successWeeks 기반 자체 카운트하는 곳에서 동일 폴백을 적용할 수 있도록 노출.
+    const fallbackApprovedWeekIds: string[] = [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passedWeeksForUser.forEach((week: any) => {
       if (seasonRestWeekIds.has(week.id)) return;
@@ -681,8 +684,11 @@ export async function GET(request: NextRequest) {
       const wg = userWeeklyGrowthByWeekId.get(week.id) as { is_success?: boolean } | undefined;
       const isOfficialBreak = week.is_club_break || breakSeasonIds.has(week.season_id);
       if (isOfficialBreak) {
-        if (wg?.is_success === true || (wg === undefined && completedActivityWeekIds.has(week.id))) {
+        if (wg?.is_success === true) {
           cumulativeApprovedWeeksCount++;
+        } else if (wg === undefined && completedActivityWeekIds.has(week.id)) {
+          cumulativeApprovedWeeksCount++;
+          fallbackApprovedWeekIds.push(week.id);
         }
         return;
       }
@@ -691,7 +697,10 @@ export async function GET(request: NextRequest) {
         if (wg.is_success === true) cumulativeApprovedWeeksCount++;
         return;
       }
-      if (completedActivityWeekIds.has(week.id)) cumulativeApprovedWeeksCount++;
+      if (completedActivityWeekIds.has(week.id)) {
+        cumulativeApprovedWeeksCount++;
+        fallbackApprovedWeekIds.push(week.id);
+      }
     });
 
     // 항상 실시간 계산 값 사용 (현재 진행 중인 주차 제외)
@@ -1294,6 +1303,9 @@ export async function GET(request: NextRequest) {
       },
       // 온보딩 주차 ID (클라이언트에서 성공 처리용)
       onboardingWeekId: profile.onboarding_week_id || null,
+      // user_weekly_growth.is_success=true 행은 없지만 activity_records 폴백으로 인정된 과거 주차 ID.
+      // 모달의 자체 카운트가 sidebar 의 cumulativeApprovedWeeks 와 같은 값을 산출하도록 동기화.
+      fallbackApprovedWeekIds,
       // 활동/휴식 주차 ID 목록 (클라이언트에서 사용)
       activityWeekIds: activitiesData?.map((a: { week_id: string }) => a.week_id) || [],
       restWeekIds: allRests?.map((r: { week_id: string }) => r.week_id) || [],
