@@ -8,9 +8,12 @@ const PAGE_SIZE = 12;
 
 interface WeeklyCardListProps {
   cards: WeeklyCardData[];
+  isLoading?: boolean;
 }
 
-export default function WeeklyCardList({ cards }: WeeklyCardListProps) {
+const SKELETON_COUNT = 6;
+
+export default function WeeklyCardList({ cards, isLoading = false }: WeeklyCardListProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   // 필터/정렬 변경으로 cards가 갱신되면 1페이지로 리셋
@@ -21,6 +24,21 @@ export default function WeeklyCardList({ cards }: WeeklyCardListProps) {
   const totalPages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
   const startIdx = (currentPage - 1) * PAGE_SIZE;
   const visibleCards = cards.slice(startIdx, startIdx + PAGE_SIZE);
+
+  // 로딩 중에는 스켈레톤 그리드 노출 (빈 "없습니다" 문구가 잠깐 잘못 노출되는 회귀 차단).
+  if (isLoading) {
+    return (
+      <div className="weekly-card-list weekly-card-list--loading">
+        <div className="row vertical-column-gap">
+          {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+            <div key={i} className="col-12 col-md-6 col-xl-4">
+              <div className="weekly-card-skeleton" aria-hidden="true" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (cards.length === 0) {
     return (

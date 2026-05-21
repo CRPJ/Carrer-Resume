@@ -97,14 +97,28 @@ export async function GET() {
 
     const weekIds = validWeeks.map((w) => w.id)
 
-    const { data: growthData, error: growthErr } = await supabase
-      .from('user_weekly_growth')
-      .select('week_id, user_id, is_success, is_resting, is_club_break')
-      .in('week_id', weekIds)
+    // weekIds 만 의존하는 두 쿼리는 병렬 실행 — round-trip latency 절감.
+    const [growthRes, pointsRes] = await Promise.all([
+      supabase
+        .from('user_weekly_growth')
+        .select('week_id, user_id, is_success, is_resting, is_club_break')
+        .in('week_id', weekIds),
+      supabase
+        .from('points')
+        .select('week_id, user_id, points')
+        .in('week_id', weekIds)
+        .eq('point_type', 'star'),
+    ])
+    const { data: growthData, error: growthErr } = growthRes
+    const { data: pointsData, error: pointsErr } = pointsRes
 
     if (growthErr) {
       console.error('[weekly-cards] growth error:', growthErr)
       return NextResponse.json({ success: false, error: growthErr.message }, { status: 500 })
+    }
+    if (pointsErr) {
+      console.error('[weekly-cards] points error:', pointsErr)
+      return NextResponse.json({ success: false, error: pointsErr.message }, { status: 500 })
     }
 
     type Stat = {
@@ -134,17 +148,6 @@ export async function GET() {
       }
     }
 
-    const { data: pointsData, error: pointsErr } = await supabase
-      .from('points')
-      .select('week_id, user_id, points')
-      .in('week_id', weekIds)
-      .eq('point_type', 'star')
-
-    if (pointsErr) {
-      console.error('[weekly-cards] points error:', pointsErr)
-      return NextResponse.json({ success: false, error: pointsErr.message }, { status: 500 })
-    }
-
     const starByWeekUser: Record<string, Record<string, number>> = {}
     for (const p of (pointsData || [])) {
       if (!starByWeekUser[p.week_id]) starByWeekUser[p.week_id] = {}
@@ -167,10 +170,20 @@ export async function GET() {
     const teamPartMap: Record<string, { team_name: string; part_name: string }> = {}
 
     if (allTop3UserIds.length > 0) {
-      const { data: profiles, error: profErr } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, status')
-        .in('id', allTop3UserIds)
+      // profiles + team_parts 도 병렬 — 동일 user_ids 만 의존, 서로 독립.
+      const [profilesRes, tpRes] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('id, display_name, status')
+          .in('id', allTop3UserIds),
+        supabase
+          .from('user_team_parts')
+          .select('user_id, teams!user_team_parts_team_id_fkey(name), parts(name)')
+          .in('user_id', allTop3UserIds)
+          .is('left_at', null),
+      ])
+      const { data: profiles, error: profErr } = profilesRes
+      const { data: tpRows, error: tpErr } = tpRes
       if (profErr) {
         console.error('[weekly-cards] profiles error:', profErr)
       }
@@ -178,12 +191,6 @@ export async function GET() {
         if (p.status === 'suspended') continue
         profilesMap[p.id] = { display_name: p.display_name || '이름 없음' }
       }
-
-      const { data: tpRows, error: tpErr } = await supabase
-        .from('user_team_parts')
-        .select('user_id, teams!user_team_parts_team_id_fkey(name), parts(name)')
-        .in('user_id', allTop3UserIds)
-        .is('left_at', null)
       if (tpErr) {
         console.error('[weekly-cards] team_parts error:', tpErr)
       }

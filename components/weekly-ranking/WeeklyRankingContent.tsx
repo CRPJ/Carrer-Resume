@@ -130,6 +130,7 @@ const WeeklyRankingContent = () => {
   const [leagueValue, setLeagueValue] = useState<string>("");
   const [demo, setDemo] = useState(false);
   const [apiCards, setApiCards] = useState<WeeklyCardData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // localStorage는 SSR 접근 불가 — 마운트 후 한 번 체크
   useEffect(() => {
@@ -138,8 +139,12 @@ const WeeklyRankingContent = () => {
 
   // demo 모드가 아니면 supabase 연동 API 호출. 응답을 더미 매핑(이미지/기간)과 합쳐 WeeklyCardData 로 변환.
   useEffect(() => {
-    if (demo) return;
+    if (demo) {
+      setIsLoading(false);
+      return;
+    }
     let cancelled = false;
+    setIsLoading(true);
     (async () => {
       try {
         const res = await fetch('/api/weekly-cards', { cache: 'no-store' });
@@ -156,6 +161,8 @@ const WeeklyRankingContent = () => {
         if (cancelled) return;
         console.error('[weekly-ranking] fetch error:', e);
         setApiCards([]);
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
     })();
     return () => {
@@ -321,7 +328,7 @@ const WeeklyRankingContent = () => {
         </div>
       */}
 
-      <WeeklyCardList cards={filteredAndSortedCards} />
+      <WeeklyCardList cards={filteredAndSortedCards} isLoading={isLoading} />
     </section>
   );
 };
