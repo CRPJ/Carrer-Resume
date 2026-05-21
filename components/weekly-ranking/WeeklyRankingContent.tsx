@@ -188,7 +188,7 @@ const WeeklyRankingContent = () => {
   const leagueOptions = useMemo(() => {
     const FIXED: WeeklyCardData['leagueResultStatus'][] = ['정상 진행', '심화 진행', '공식 휴식'];
     return [
-      { value: "", label: "-" },
+      { value: "", label: "종합" },
       ...FIXED.map((s) => ({ value: s, label: s })),
     ];
   }, []);

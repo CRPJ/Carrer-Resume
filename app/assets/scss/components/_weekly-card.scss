@@ -543,6 +543,203 @@
     font-family: inherit;
   }
 
+  /* ---------- 미확정 단계 (대전 중 / 대전 집계 / 공표 중) ----------
+     yellow 박스 전체를 큰 모래시계가 채우고, 단계 라벨이 중앙에 오버레이.
+     박스(컨테이너) 자체에 단계별 색상 테두리/배경 — '우승' 의 노란색 톤과 동일 구조. */
+  .weekly-card__winner-pending-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+
+    img {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      opacity: 0.9;
+      transform-origin: center center;
+      animation: weekly-card-hourglass-flip 3.2s ease-in-out infinite;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+  }
+
+  .weekly-card__winner-pending-label {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // 동글동글 강조체 임팩트 — HakgyoansimTuho. cluster-4-week/season 등에서 이미 로드된 폰트 재활용.
+    font-family: 'HakgyoansimTuho', 'Pretendard', sans-serif;
+    font-size: 28px;                                           // 24 → 28 살짝 키움
+    font-weight: 400;                                          // HakgyoansimTuho 자체가 굵어서 weight 키울 필요 X
+    letter-spacing: 2.5px;
+    line-height: 1;
+    white-space: nowrap;
+
+    // 하드 다크 그림자 (blur 없음) — 글자 가독성 ↑ 입체감, 흐림은 없음.
+    text-shadow:
+      0 2px 0  rgba(0, 0, 0, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.6);
+
+    animation: weekly-card-pending-pulse 1.8s ease-in-out infinite;
+  }
+
+  // 단계별: 박스(컨테이너) 배경/테두리 색상 + 라벨은 네온톤 쨍한 색 + 같은 톤 글로우.
+  // '우승' 박스의 노란 배경/border 동일 구조를 라임/황금/핑크로 변형.
+  // 팔레트: 아케이드/네온 톤 (#00E5FF 시안 / #FFE66D 옐로우 / #FF2DAA 마젠타).
+  // [핵심] 글자 자체는 글로우/stroke 전혀 없이 sharp solid color — 가독성 100% 보장.
+  // 화려함은 박스의 inset 글로우 + 외곽 헤일로 + 모래시계 아이콘 + scale pulse 가 담당.
+  .weekly-card__winner--battle {
+    background: rgba(132, 255, 0, 0.14);
+    border-color: rgba(132, 255, 0, 0.75);
+    box-shadow:
+      inset 0 0 22px rgba(132, 255, 0, 0.35),
+      0 0 18px rgba(132, 255, 0, 0.5);
+
+    // 좌상단 LIVE 도트 — 방송 LIVE 시그널처럼 깜빡임
+    &::before {
+      content: 'LIVE';
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px 2px 16px;
+      font-family: 'HakgyoansimTuho', 'Pretendard', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+      background: rgba(132, 255, 0, 0.25);
+      border: 1px solid rgba(132, 255, 0, 0.8);
+      border-radius: 999px;
+      box-shadow: 0 0 8px rgba(132, 255, 0, 0.6);
+      pointer-events: none;
+      animation: weekly-card-live-pulse 1s ease-in-out infinite;
+    }
+    // 도트 자체 (LIVE 글자 앞 ●)
+    &::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      z-index: 6;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #84ff00;
+      box-shadow: 0 0 6px #84ff00, 0 0 12px rgba(132, 255, 0, 0.8);
+      pointer-events: none;
+      animation: weekly-card-live-dot-blink 0.9s steps(2, end) infinite;
+    }
+
+    .weekly-card__winner-pending-label {
+      color: #84ff00;                                          // sharp 네온 라임
+    }
+  }
+
+  .weekly-card__winner--aggregate {
+    background: rgba(255, 230, 109, 0.14);
+    border-color: rgba(255, 230, 109, 0.75);
+    box-shadow:
+      inset 0 0 22px rgba(255, 230, 109, 0.35),
+      0 0 18px rgba(255, 230, 109, 0.5);
+    .weekly-card__winner-pending-label {
+      color: #ffe66d;                                          // sharp 옐로우
+    }
+  }
+
+  .weekly-card__winner--announce {
+    background: rgba(255, 45, 170, 0.16);
+    border-color: rgba(255, 45, 170, 0.75);
+    box-shadow:
+      inset 0 0 22px rgba(255, 45, 170, 0.4),
+      0 0 18px rgba(255, 45, 170, 0.55);
+
+    // 좌상단 ON AIR 뱃지 — 대전 중 LIVE 와 동일 구조 (마젠타 톤)
+    &::before {
+      content: 'ON AIR';
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px 2px 16px;
+      font-family: 'HakgyoansimTuho', 'Pretendard', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+      background: rgba(255, 45, 170, 0.25);
+      border: 1px solid rgba(255, 45, 170, 0.85);
+      border-radius: 999px;
+      box-shadow: 0 0 8px rgba(255, 45, 170, 0.7);
+      pointer-events: none;
+      animation: weekly-card-onair-pulse 1s ease-in-out infinite;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      z-index: 6;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff2daa;
+      box-shadow: 0 0 6px #ff2daa, 0 0 12px rgba(255, 45, 170, 0.9);
+      pointer-events: none;
+      animation: weekly-card-live-dot-blink 0.9s steps(2, end) infinite;
+    }
+
+    .weekly-card__winner-pending-label {
+      color: #ff2daa;                                          // sharp 마젠타
+    }
+  }
+
+  @keyframes weekly-card-hourglass-flip {
+    0%   { transform: rotate(0deg);   opacity: 0.35; }
+    45%  { transform: rotate(0deg);   opacity: 0.5;  }
+    50%  { transform: rotate(180deg); opacity: 0.5;  }
+    95%  { transform: rotate(180deg); opacity: 0.35; }
+    100% { transform: rotate(360deg); opacity: 0.35; }
+  }
+
+  @keyframes weekly-card-pending-pulse {
+    0%, 100% { transform: scale(1);    opacity: 1;    }
+    50%      { transform: scale(1.07); opacity: 0.85; }
+  }
+
+  // 3) LIVE 뱃지 미세 펄스 (전체 뱃지가 살짝 호흡)
+  @keyframes weekly-card-live-pulse {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 8px rgba(132, 255, 0, 0.6);  }
+    50%      { transform: scale(1.05); box-shadow: 0 0 14px rgba(132, 255, 0, 0.9); }
+  }
+
+  // 3) LIVE 도트 ● 깜빡임 — 0.9s 주기 ON/OFF
+  @keyframes weekly-card-live-dot-blink {
+    0%, 49%   { opacity: 1; }
+    50%, 100% { opacity: 0.15; }
+  }
+
+  // 3-2) ON AIR 뱃지 펄스 (LIVE 와 동일 구조, 마젠타 톤)
+  @keyframes weekly-card-onair-pulse {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 8px rgba(255, 45, 170, 0.7);  }
+    50%      { transform: scale(1.05); box-shadow: 0 0 14px rgba(255, 45, 170, 0.95); }
+  }
+
   /* ---------- Top 3 크루 ---------- */
   // [width 재조정] 이름 truncate 결과 "AAA.." (3 Korean + 2 dots) 가 13px Pretendard 에서
   // 안전하게 보이도록 52 → 60px. 그리드 column-gap 8px + 셀 boundary 누락 보정 마진 포함.
