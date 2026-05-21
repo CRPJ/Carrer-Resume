@@ -172,7 +172,7 @@ export default function WeeklyCardItem({ data }: Props) {
               <div className="stat-item">
                 <div className="stat-row">
                   <span className="stat-label"><span className="stat-dot">·</span> 성장 성공율</span>
-                  <div className="weekly-card__stat-meter">
+                  <div className={`weekly-card__stat-meter ${isOngoing ? 'weekly-card__stat-meter--ongoing' : ''}`}>
                     <div className="progress-bar">
                       <div className="progress-fill" style={{ width: `${successFillWidth}%` }} />
                     </div>
@@ -183,7 +183,7 @@ export default function WeeklyCardItem({ data }: Props) {
               <div className="stat-item">
                 <div className="stat-row">
                   <span className="stat-label"><span className="stat-dot">·</span> 성장 도전율</span>
-                  <div className="weekly-card__stat-meter">
+                  <div className={`weekly-card__stat-meter ${isOngoing ? 'weekly-card__stat-meter--ongoing' : ''}`}>
                     <div className="progress-bar">
                       <div className="progress-fill" style={{ width: `${challengeFillWidth}%` }} />
                     </div>

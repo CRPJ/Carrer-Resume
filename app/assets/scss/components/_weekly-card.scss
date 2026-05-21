@@ -348,6 +348,64 @@
       }
     }
 
+    // [대전 중 indeterminate] 혼합 — 사선 stripe 배경 흐름 + Material 2-band L→R + bar vertical breathing.
+    .weekly-card__stat-meter--ongoing .progress-bar {
+      height: 6px !important;                                  // 3px → 6px 키워서 vertical 모션이 보이게
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(132, 255, 0, 0.32) 0,
+        rgba(132, 255, 0, 0.32) 4px,
+        rgba(132, 255, 0, 0.1) 4px,
+        rgba(132, 255, 0, 0.1) 8px
+      ) !important;
+      background-size: 11.3px 100% !important;
+      animation:
+        weekly-card-stripe-flow 6s linear infinite,
+        weekly-card-bar-breathe 7.2s ease-in-out infinite;
+      transform-origin: center center;
+
+      // band 1 — lead (빠르게 전진, ease-out)
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          #84ff00 50%,
+          transparent 100%
+        );
+        box-shadow: 0 0 8px rgba(132, 255, 0, 0.9);
+        border-radius: 5px;
+        animation: weekly-card-band-lead 10.5s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+        pointer-events: none;
+      }
+
+      // band 2 — follow (느리게 따라옴, delay 1.15s)
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(132, 255, 0, 0.75) 50%,
+          transparent 100%
+        );
+        border-radius: 5px;
+        animation: weekly-card-band-follow 10.5s cubic-bezier(0.165, 0.84, 0.44, 1) infinite 5.7s;
+        pointer-events: none;
+      }
+
+      .progress-fill {
+        display: none;                                          // 0% 빈 fill 숨김
+      }
+    }
+
     // 모든 카드의 .progress-bar 가 동일한 155px track 폭을 갖도록 강제.
     .weekly-card__stat-meter .progress-bar {
       width: 155px !important;
@@ -738,6 +796,32 @@
   @keyframes weekly-card-onair-pulse {
     0%, 100% { transform: scale(1);    box-shadow: 0 0 8px rgba(255, 45, 170, 0.7);  }
     50%      { transform: scale(1.05); box-shadow: 0 0 14px rgba(255, 45, 170, 0.95); }
+  }
+
+  // 5-0) 사선 stripe 흐름 (좌→우 방향, background-position 음수로 이동)
+  @keyframes weekly-card-stripe-flow {
+    0%   { background-position: 0 0; }
+    100% { background-position: -11.3px 0; }
+  }
+
+  // 5-1) 대전 중 progress bar — vertical breathing (위아래 호흡)
+  @keyframes weekly-card-bar-breathe {
+    0%, 100% { transform: scaleY(1);   }
+    50%      { transform: scaleY(1.4); }
+  }
+
+  // 5-2) Material Design indeterminate — band 1 (lead, 빠르게 좌→우)
+  @keyframes weekly-card-band-lead {
+    0%   { left: -35%; width: 35%; }
+    60%  { left: 100%; width: 90%; }
+    100% { left: 100%; width: 10%; }
+  }
+
+  // 5-3) Material Design indeterminate — band 2 (follow, 느리게 좌→우)
+  @keyframes weekly-card-band-follow {
+    0%   { left: -25%; width: 25%; }
+    60%  { left: 107%; width: 65%; }
+    100% { left: 107%; width: 10%; }
   }
 
   /* ---------- Top 3 크루 ---------- */
