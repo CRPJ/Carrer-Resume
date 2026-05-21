@@ -6109,7 +6109,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                   인절미
                   <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                    {Math.abs(weekPoints.shield - weekPoints.lightning)}
+                    {cumulativeInjeolmi}
                   </strong>
                   <span className="unit-text">개</span>
                 </span>
