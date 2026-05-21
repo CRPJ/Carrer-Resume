@@ -51,20 +51,124 @@ const getSeasonFilterValue = (seasonName: string) => {
   return `${ys.year}년, ${ys.season} 시즌`;
 };
 
+type ApiCard = {
+  id: string;
+  weekNumber: number;
+  startDate: string;
+  endDate: string;
+  isClubBreak: boolean;
+  seasonYear: number;
+  seasonNameEn: string;
+  seasonNameKo: string;
+  status: WeeklyCardData['status'];
+  leagueResultStatus: WeeklyCardData['leagueResultStatus'];
+  leagueRecordStatus: WeeklyCardData['leagueRecordStatus'];
+  totalCrews: number;
+  growthChallenge: number;
+  growthSuccess: number;
+  growthFail: number;
+  personalRest: number;
+  growthSuccessRate: number;
+  growthChallengeRate: number;
+  top3: WeeklyCardData['top3'];
+};
+
+// 더미 매핑 lookup — seasonName(예: "2026년, 봄 시즌, 3주차") → 주차 헤더 이미지.
+// 운영진이 새 주차 이미지를 더미에 등록만 해주면 그대로 카드에 반영. 기간 텍스트는 더미를 쓰지 않고 항상 API 기준으로 재계산.
+const DUMMY_IMAGE_BY_KEY = new Map<string, string | null>(
+  WEEKLY_CARD_DUMMY.map((d) => [d.seasonName, d.imageUrl])
+);
+
+const KOREAN_WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
+
+// "YYYY-MM-DD" → "YY.MM.DD(요일)". 요일 계산은 UTC 기준 — 브라우저 timezone 영향 차단.
+const formatIsoToCompact = (iso: string): string => {
+  if (!iso) return '';
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  const [, year, month, day] = m;
+  const dow = KOREAN_WEEKDAY[new Date(`${iso}T00:00:00Z`).getUTCDay()] ?? '';
+  return `${year.slice(2)}.${month}.${day}(${dow})`;
+};
+
+// "YYYY-MM-DD" 에 days 만큼 더한 ISO 날짜 문자열. UTC 기준으로 계산 — DST/timezone 영향 없음.
+const shiftDateIso = (iso: string, days: number): string => {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  const [, y, mo, d] = m;
+  const dt = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d)));
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+};
+
+const apiToCardData = (c: ApiCard): WeeklyCardData => {
+  const seasonName = `${c.seasonYear}년, ${c.seasonNameKo} 시즌, ${c.weekNumber}주차`;
+  // DB는 월~일로 저장되어 있지만 크루 대상 표기는 월~토. endDate 에서 하루 빼서 토요일로 표시.
+  const displayEndIso = shiftDateIso(c.endDate, -1);
+  const dateRangeText = `${formatIsoToCompact(c.startDate)} - ${formatIsoToCompact(displayEndIso)}`;
+  return {
+    id: c.id,
+    seasonName,
+    weekNumber: c.weekNumber,
+    dateRangeText,
+    status: c.status,
+    leagueResultStatus: c.leagueResultStatus,
+    leagueRecordStatus: c.leagueRecordStatus,
+    imageUrl: DUMMY_IMAGE_BY_KEY.get(seasonName) ?? null,
+    growthSuccessRate: c.growthSuccessRate,
+    growthChallengeRate: c.growthChallengeRate,
+    totalCrews: c.totalCrews,
+    growthChallenge: c.growthChallenge,
+    growthSuccess: c.growthSuccess,
+    growthFail: c.growthFail,
+    personalRest: c.personalRest,
+    winningTeamImage: null,
+    top3: c.top3,
+  };
+};
+
 const WeeklyRankingContent = () => {
   const [sortValue,   setSortValue]   = useState<string>("latest");
   const [seasonValue, setSeasonValue] = useState<string>("");
   const [leagueValue, setLeagueValue] = useState<string>("");
   const [demo, setDemo] = useState(false);
+  const [apiCards, setApiCards] = useState<WeeklyCardData[]>([]);
 
   // localStorage는 SSR 접근 불가 — 마운트 후 한 번 체크
   useEffect(() => {
     setDemo(isDemoMode());
   }, []);
 
+  // demo 모드가 아니면 supabase 연동 API 호출. 응답을 더미 매핑(이미지/기간)과 합쳐 WeeklyCardData 로 변환.
+  useEffect(() => {
+    if (demo) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/weekly-cards', { cache: 'no-store' });
+        const json = await res.json();
+        if (cancelled) return;
+        if (!json?.success) {
+          console.error('[weekly-ranking] api error:', json?.error);
+          setApiCards([]);
+          return;
+        }
+        const cards: ApiCard[] = json?.data?.cards || [];
+        setApiCards(cards.map(apiToCardData));
+      } catch (e) {
+        if (cancelled) return;
+        console.error('[weekly-ranking] fetch error:', e);
+        setApiCards([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [demo]);
+
   const allCards = useMemo<WeeklyCardData[]>(
-    () => (demo ? WEEKLY_CARD_DUMMY : []),
-    [demo]
+    () => (demo ? WEEKLY_CARD_DUMMY : apiCards),
+    [demo, apiCards]
   );
 
   // 카드 데이터에 실제 존재하는 시즌만 옵션으로. 최신(year + seasonOrder DESC) 정렬.
@@ -86,17 +190,14 @@ const WeeklyRankingContent = () => {
     ];
   }, [allCards]);
 
-  // 카드 데이터의 leagueResultStatus 값을 그대로 옵션화 (value === label).
+  // 리그 결과 옵션은 운영 정책상 고정 노출 — '심화 진행' 은 아직 케이스 없어도 드롭다운에는 노출(필터 결과 0).
   const leagueOptions = useMemo(() => {
-    const set = new Set<string>();
-    allCards.forEach((card) => {
-      if (card.leagueResultStatus) set.add(card.leagueResultStatus);
-    });
+    const FIXED: WeeklyCardData['leagueResultStatus'][] = ['정상 진행', '심화 진행', '공식 휴식'];
     return [
       { value: "", label: "-" },
-      ...Array.from(set).map((s) => ({ value: s, label: s })),
+      ...FIXED.map((s) => ({ value: s, label: s })),
     ];
-  }, [allCards]);
+  }, []);
 
   // 필터 + 정렬 결과. useMemo로 ref 안정화 — 자식 페이지네이션 reset effect 트리거 적정화.
   const filteredAndSortedCards = useMemo<WeeklyCardData[]>(() => {
