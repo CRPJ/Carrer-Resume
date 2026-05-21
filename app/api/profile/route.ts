@@ -225,6 +225,7 @@ export async function GET(request: NextRequest) {
         joinedWeekResult,
         allRestsResult,
         userActivitiesResult,
+        userWeeklyGrowthAllResult,
         userRoleHistoryResult,
         activityRecordsResult,
         userActivityDetailsResult,
@@ -239,6 +240,8 @@ export async function GET(request: NextRequest) {
           : Promise.resolve({ data: null }),
         supabaseAdmin.from("rest_requests").select("week_id").eq("user_id", profile.id).eq("status", "approved"),
         supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
+        // fallbackApprovedWeekIds 계산용 — user_weekly_growth 모든 행(is_success 무관) week_id 집합
+        supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id),
         supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
         supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
@@ -266,6 +269,28 @@ export async function GET(request: NextRequest) {
           if (wa.team_id == null) return true
           return wa.team_id === userCurrentTeamId
         })
+
+      // fallbackApprovedWeekIds — cluster-4-card 모달이 sidebar/cluster-4-1 과 동일한 누적 주차를 계산하도록 폴백 정보 전달.
+      // user_weekly_growth 행이 없지만 activity_records.is_completed=true 가 있는 과거 주차(가입 이후, 현재 진행중 제외).
+      // 시즌 휴식 / 브레이크 시즌까지 정확히 처리하지는 않음 (full profile 응답의 cumulativeApprovedWeeks 계산이 정밀판).
+      const cardTodayIso = new Date().toISOString().split('T')[0];
+      const cardUserStartDate = joinedWeekResult.data?.start_date || null;
+      const cardAllWeeks: Array<{ id: string; start_date: string; end_date: string }> = (weekResults[2]?.data as any[]) || [];
+      const cardUserGrowthWeekIds = new Set<string>(((userWeeklyGrowthAllResult.data as any[]) || []).map((r) => r.week_id));
+      const cardCompletedWeekIds = new Set<string>(completedActivities.map((a: any) => a.week_id));
+      const cardUserRestWeekIds = new Set<string>(((allRestsResult.data as any[]) || []).map((r) => r.week_id));
+      const cardFallbackApprovedWeekIds: string[] = [];
+      if (cardUserStartDate) {
+        for (const w of cardAllWeeks) {
+          if (w.start_date < cardUserStartDate) continue;
+          if (w.end_date >= cardTodayIso) continue;
+          if (w.id === profile.onboarding_week_id) continue;
+          if (cardUserRestWeekIds.has(w.id)) continue;
+          if (cardUserGrowthWeekIds.has(w.id)) continue;
+          if (!cardCompletedWeekIds.has(w.id)) continue;
+          cardFallbackApprovedWeekIds.push(w.id);
+        }
+      }
 
       // weekId가 있으면 주차 번들 데이터 포함
       const weekBundle = weekId && weekResults.length === 8 ? {
@@ -297,6 +322,7 @@ export async function GET(request: NextRequest) {
         teams: teamsData || [],
         parts: partsData || [],
         weekBundle,
+        fallbackApprovedWeekIds: cardFallbackApprovedWeekIds,
       });
     }
 
