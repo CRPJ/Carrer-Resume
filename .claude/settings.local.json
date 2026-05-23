@@ -125,7 +125,9 @@
       "PowerShell(Get-Service *)",
       "PowerShell(ssh-keygen *)",
       "PowerShell(Get-Content *)",
-      "PowerShell(ssh -T -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 git@github-aurum 2>&1; Write-Output \"---exit: $LASTEXITCODE---\")"
+      "PowerShell(ssh -T -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 git@github-aurum 2>&1; Write-Output \"---exit: $LASTEXITCODE---\")",
+      "Bash(gh --version)",
+      "PowerShell(Get-Command *)"
     ],
     "deny": [],
     "ask": []

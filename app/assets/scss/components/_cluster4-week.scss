@@ -11116,7 +11116,7 @@
       grid-row: 1;
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 2px;
       min-width: 0;
       padding: 3px 8px 3px 0;
       position: relative;
@@ -11132,7 +11132,7 @@
       align-items: center;
       gap: 5px;
       font-family: "Pretendard", sans-serif;
-      font-size: 13px !important; // ?몄쟻?ы빆 蹂몃Ц pt ?듭씪
+      font-size: 14px !important; // ?몄쟻?ы빆 蹂몃Ц pt ?듭씪
       line-height: 1.14;
       color: #ddd;
       min-width: 0;
@@ -11172,7 +11172,7 @@
       color: rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
       padding-left: 6px !important; // ?쇰꺼怨?| 援щ텇???ъ씠 ?щ갚
-      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
+      font-size: 14px !important; // 蹂몃Ц pt ?듭씪
     }
 
     // 1????怨좎젙??(留먯쨪???놁쓬, 理쒕? 湲?먯닔 ?낅젰 李⑤떒?쇰줈 蹂댁옣)
@@ -11187,19 +11187,19 @@
       border: 1px solid rgba(255, 165, 0, 0.3);
       background: rgb(26, 26, 46);
       white-space: nowrap;
-      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
+      font-size: 14px !important; // 蹂몃Ц pt ?듭씪
     }
     .personal-gender {
       min-width: 16px; // 1??
       display: inline-block;
       white-space: nowrap;
-      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
+      font-size: 14px !important; // 蹂몃Ц pt ?듭씪
     }
     .personal-age {
       min-width: 48px; // "22 ??
       display: inline-block;
       white-space: nowrap;
-      font-size: 13px !important; // 蹂몃Ц pt ?듭씪
+      font-size: 14px !important; // 蹂몃Ц pt ?듭씪
     }
 
     // ??븷/?ㅼ썙???쒓렇 ??row-1 ?대? 媛濡?諛곗튂 (?몃? override??.personal-row-1 .personal-tags)
@@ -11368,7 +11368,7 @@
 
       .field-value {
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important; // ?꾨뱶媛?pt ?듭씪
+        font-size: 14px !important; // ?꾨뱶媛?pt ?듭씪
         line-height: 1.14;
         color: #ddd;
         display: block;
@@ -11378,7 +11378,7 @@
 
       .field-label {
         font-family: "Pretendard", sans-serif;
-        font-size: 13px !important; // ?꾨뱶 ?쇰꺼 pt ?듭씪
+        font-size: 14px !important; // ?꾨뱶 ?쇰꺼 pt ?듭씪
         line-height: 1.14;
         color: rgba(255, 255, 255, 0.4);
         flex-shrink: 0;
@@ -11410,7 +11410,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: 4px;
+      margin-top: 12px;
       box-sizing: border-box;
     }
 
@@ -11584,40 +11584,40 @@
   .workinfo-output-links {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     flex: 0 0 54%;
     width: 54%;
     max-width: 270px;
     min-width: 0;
     box-sizing: border-box;
     transform: none !important; // DPR/subpixel rounding에 따른 수직 밀림 방지
-    margin-top: -30px !important; // 1cm 위 보정 후 0.2cm(8px) 아래로 미세 조정 (-38 → -30)
+    margin-top: -22px !important; // 1cm 위 보정 후 0.4cm(16px) 아래로 미세 조정 (-38 → -22)
 
     .output-link-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-height: 28px;
+      gap: 6px;
+      min-height: 22px;
       position: relative;
       width: 100%;
       min-width: 0;
-      padding-left: 10px;
+      padding-left: 8px;
       box-sizing: border-box;
     }
 
     .admin-badge {
       background: #faab07;
       color: #1a1a1a;
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 700;
-      padding: 1px 5px;
+      padding: 1px 4px;
       line-height: 1;
     }
 
     // cluster3 .link-dot ?⑦꽩
     .link-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -11627,7 +11627,7 @@
       flex: 1;
       min-width: 0;
       max-width: none;
-      font-size: 13px;
+      font-size: 10px;
       color: rgba(255, 255, 255, 0.7);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -11643,13 +11643,13 @@
       flex: 1;
       min-width: 0;
       max-width: none;
-      font-size: 11px !important;
+      font-size: 9px !important;
       color: #fff;
       font-family: "Pretendard", sans-serif;
       background: transparent;
       border: 1px solid rgba(255, 165, 0, 0.3);
-      padding: 3px 6px !important;
-      height: 24px;
+      padding: 2px 5px !important;
+      height: 19px;
       box-sizing: border-box;
 
       &:focus {
@@ -11664,8 +11664,8 @@
 
     // cluster3 .link-open-btn ?ㅽ???洹몃?濡?
     .link-open-btn {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       background: #faab07;
       border: none;
       color: #1a1a1a;
@@ -11674,7 +11674,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-size: 14px;
+      font-size: 11px;
       padding: 0;
 
       &:disabled {
@@ -11683,7 +11683,7 @@
       }
 
       i {
-        font-size: 14px;
+        font-size: 11px;
       }
     }
 
@@ -11693,8 +11693,8 @@
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: rgba(255, 255, 255, 0.5);
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -11706,7 +11706,7 @@
         border-color: #ff4444;
       }
       i {
-        font-size: 12px;
+        font-size: 10px;
       }
     }
   }
@@ -11714,7 +11714,11 @@
   // 醫뚰븯?? Main Title / Sub Title / Growth Point
   // ?ъ슜???붿껌: Main Title 0.5cm(??-19px) ?꾨줈 ??text-section留?異붽? 蹂댁젙
   .workinfo-text-section {
-    margin-top: -40px !important; // 과보정값(-73px) 완화 — output-links와 시각적 겹침 해소, 1차 보정값
+    // 4종 모달 공통: text-section.bottom을 좌측 컬럼 하단(= 우측 image-line-code.bottom)에 정렬.
+    // align-items:stretch로 좌/우 컬럼 같은 높이 → margin-top:auto가 남은 free space를 흡수해
+    // 마지막 child(text-section)를 컬럼 하단으로 푸시. 구 -40px 수동 오프셋 대체.
+    // (workcareer는 workinfo-right 말미 grade-section overhang(~9px)을 modal-scope에서 별도 보정.)
+    margin-top: auto !important;
     display: flex;
     flex-direction: column;
     gap: 16px !important;
@@ -12532,6 +12536,14 @@
     align-self: stretch !important;
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
+  }
+
+  // workcareer 전용: workinfo-right 말미의 .workcareer-grade-section 이 image-line-code 아래로
+  // 약 9px 돌출(gap 8 + grade-row height 32 + margin-top -31 = +9). 좌측 컬럼이 그만큼 더 늘어나므로
+  // text-section bottom = workinfo-left.bottom - 9 = image-line-code.bottom 이 되도록 margin-bottom 보정.
+  // (다른 3종 모달엔 grade-section 이 없어 보정 불필요 — 공통 margin-top:auto 만으로 정렬됨.)
+  .workinfo-text-section {
+    margin-bottom: 9px !important;
   }
 
   // (?대?吏 洹몃━??洹쒖튃? 怨듭슜 scope L8910???뺤쓽 ??workInfo 湲곗? ?듭씪. 以묐났 ?쒓굅)
