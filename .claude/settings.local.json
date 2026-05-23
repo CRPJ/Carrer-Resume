@@ -127,7 +127,11 @@
       "PowerShell(Get-Content *)",
       "PowerShell(ssh -T -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 git@github-aurum 2>&1; Write-Output \"---exit: $LASTEXITCODE---\")",
       "Bash(gh --version)",
-      "PowerShell(Get-Command *)"
+      "PowerShell(Get-Command *)",
+      "Bash(gh auth *)",
+      "Bash(Select-String \"688caba\")",
+      "PowerShell(git log origin/Tuna --format=\"%H %an <%ae> | %s\" -3; \"---\"; \"Local HEAD == origin/Tuna?:\"; if \\(\\(git rev-parse HEAD\\) -eq \\(git rev-parse origin/Tuna\\)\\) { \"YES - already in sync\" } else { \"NO - diverged\" })",
+      "Bash(python *)"
     ],
     "deny": [],
     "ask": []
