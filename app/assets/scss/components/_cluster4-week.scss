@@ -11447,6 +11447,28 @@
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    position: relative; // .workinfo-mid-divider absolute 기준점 (overflow:visible 보장됨)
+
+    // mid-col1 ↔ text-section 사이 시각적 구분선 — flow 비점유, .workinfo-left 의 overflow-y:auto 영향 X
+    // 위치: mid-section 하단 + 58px (≈ 1.5cm) → text-section 상단 영역
+    .workinfo-mid-divider {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: calc(50% - 30px);
+      transform: translateX(-50%);
+      width: 180px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #faab07,
+        transparent
+      );
+      box-shadow: 0 0 4px rgba(250, 171, 7, 0.28);
+      pointer-events: none;
+      z-index: 10;
+    }
 
     .workinfo-mid-col1 {
       flex: 1;
@@ -11767,6 +11789,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px !important;
+    // (구 ::before gold divider 제거 — .workinfo-mid-section > .workinfo-mid-divider 로 이전)
 
     .workinfo-text-block {
       display: flex;

@@ -8755,6 +8755,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         })}
                       </div>
                     </div>
+                    <div className="workinfo-mid-divider" aria-hidden="true" />
                   </div>
 
                   {/* 좌하단: Main Title (운영진 read-only) + Sub Title 200자 + Growth Point 100자 */}
@@ -9182,6 +9183,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         })}
                       </div>
                     </div>
+                    <div className="workinfo-mid-divider" aria-hidden="true" />
                   </div>
 
                   {/* 좌하단: Main Title + Sub Title + Growth Point */}
@@ -9625,6 +9627,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         })}
                       </div>
                     </div>
+                    <div className="workinfo-mid-divider" aria-hidden="true" />
                   </div>
 
                   <div className="workinfo-text-section">
@@ -10037,6 +10040,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         })}
                       </div>
                     </div>
+                    <div className="workinfo-mid-divider" aria-hidden="true" />
                   </div>
 
                   {/* 좌하단: Main Title(읽기전용) + Sub Title + Growth Point */}
