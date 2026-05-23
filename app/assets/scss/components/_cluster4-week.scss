@@ -11228,7 +11228,10 @@
       min-width: 180px;
       padding-left: 0; // 박스 가로 중앙 정렬을 위해 비대칭 좌측 패딩 제거 (16 → 0)
       transform: translateX(4px) !important; // 4개 모달 공통: output-links 우측 정렬 기준 미세 조정 (-19 → 4, +23px 우측)
-      position: relative; // ::before 테두리 기준점
+      position: relative; // ::before 배경 레이어 기준점
+      border: none;
+      outline: none;
+      box-shadow: none;
 
       // 비-void 상태(강화 성공/대기/실패/해당없음)에서만 아이콘+문구 묶음을 ~8px 좌측 이동.
       // 박스 자체는 이동하지 않고 padding-right 로 중앙 정렬의 기준선만 좌측으로 옮김 (padding-right N → 컨텐츠 N/2 좌측 이동).
@@ -11237,14 +11240,35 @@
         padding-right: 16px; // 컨텐츠 8px 좌측 이동 (더 필요시 20px=-10px, 24px=-12px)
       }
 
-      // personal-grid::before와 동일한 테두리 (top/bottom y 일치). grid row 1 전체 높이를 따라 그려짐.
       // .personal-line-status는 transform으로 이미 stacking context 보유 → z-index:-1로 자식(icon/text) 뒤에 안전 배치.
+      // 배경 아트(/images/0/bg01.png) + radial(중앙 보호) + 대각선 linear(컬러 톤) 조합.
+      // 단색 black 필터가 아닌 "딥네이비 → 자수정" 톤으로 살짝 물들여 "배경 효과" 느낌 유지.
+      // 텍스트/아이콘이 자리한 중앙은 radial로 더 어둡게, 가장자리로 갈수록 이미지가 자연스럽게 살아남.
       &::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-image:
+          radial-gradient(
+            ellipse 85% 95% at 50% 50%,
+            rgba(8, 12, 22, 0.72) 0%,
+            rgba(8, 12, 22, 0.45) 60%,
+            rgba(8, 12, 22, 0.2) 100%
+          ),
+          linear-gradient(
+            135deg,
+            rgba(30, 45, 85, 0.4) 0%,
+            rgba(20, 18, 38, 0.25) 50%,
+            rgba(60, 30, 95, 0.4) 100%
+          ),
+          url("/images/0/bg01.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: saturate(0.9) brightness(0.92);
+        border: none;
+        outline: none;
+        box-shadow: none;
         pointer-events: none;
         z-index: -1;
       }
