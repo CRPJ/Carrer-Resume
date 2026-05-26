@@ -11460,7 +11460,7 @@
     // 위치: mid-section 하단 + 58px (≈ 1.5cm) → text-section 상단 영역
     .workinfo-mid-divider {
       position: absolute;
-      top: calc(100% + 12px);
+      top: calc(100% + 16px);
       left: calc(50% - 30px);
       transform: translateX(-50%);
       width: 180px;
@@ -11542,16 +11542,9 @@
       line-height: 1;
       color: #ddd;
       margin: 0;
-      width: 100%; // ??(.line-name min-width 560px)怨??? ?곗륫 ??x醫뚰몴 ?뺣젹
-    }
-
-    // ??: 而댄뙥??????二쇰? ?붿냼 ?꾩튂 遺덈?
-    .line-info-row:nth-child(1) {
-      height: 44px !important; // ?꾩씠肄?40px + ?ъ쑀
-      min-height: 44px !important;
-      max-height: 44px !important;
+      width: 100%;
+      min-height: 44px;
       overflow: visible;
-      align-items: center;
     }
 
     // ??: 媛뺥솕 ?곹깭媛 ?⑥? 怨듦컙 李⑥? + ?쇱씤肄붾뱶???곗륫 ?앹뿉 怨좎젙
@@ -11587,11 +11580,14 @@
 
     // ?쇱씤紐낆? 理쒕? 20???쒗븳 ??min-width濡?line-code ?쒖옉 x 醫뚰몴 怨좎젙 (20??횞 28px ??560px)
     .line-name {
-      display: inline-block;
+      display: block;
       min-width: 560px;
-      white-space: nowrap;
-      font-size: 20px !important; // 16 ??20
-      line-height: 1;
+      white-space: normal !important;
+      text-overflow: unset !important;
+      font-size: 20px !important;
+      line-height: 26px !important;
+      height: 26px;
+      overflow: visible !important;
     }
 
     .line-enhance-status {
@@ -11660,7 +11656,7 @@
   .workinfo-output-links {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 9px;
     flex: 0 0 54%;
     width: 54%;
     max-width: 270px;
@@ -11696,6 +11692,8 @@
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      position: relative;
+      top: -2px;
     }
 
     // cluster3 .output-link-text ?ㅽ???洹몃?濡?
@@ -11703,7 +11701,8 @@
       flex: 1;
       min-width: 0;
       max-width: none;
-      font-size: 10px;
+      font-size: 14px !important;
+      line-height: 20px;
       color: rgba(255, 255, 255, 0.7);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -14733,51 +14732,42 @@
 }
 
 // =====================================================================
-// Zone C (> 1920px) — work-view-modal 4종 큰 해상도 비율 보정 (v3: uniform scale)
+// Zone C (> 1920px) — work-view-modal 4종 큰 해상도 비율 보정 (v5: flex-center scale)
 //
-// 시도 이력:
-//   v1: width: min(76.5vw, 2400px) — 외곽만 커지고 내부 px-고정 요소들은
-//       그대로 → 좌측 컬럼만 늘고 우측 컬럼/폰트/gap/아이콘 비율 깨짐.
-//   v2: height 추가 min(79vh, 1700px) — 가로/세로는 함께 컸지만 여전히
-//       내부 (workinfo-right 552px, mid-col2 360px, font 13~24px, gap,
-//       header 110px, icon 72/28px 등) 모든 px-고정값이 스케일 안되어
-//       "외곽만 크고 내부가 작게 떠 보이는" 현상 지속.
+// 1920×1080 baseline:
+//   _global.scss: position:fixed, display:grid, place-items:safe center,
+//   padding:40px 24px → modal(1468×855) viewport 정중앙.
 //
-// 근본 원인:
-//   work-view-modal 내부 거의 모든 치수가 px 고정 (개별 보정 시 4종 모달
-//   × 수십 selector 의 회귀 위험). 외곽 박스만 vw/vh 로 키워서는 1920
-//   baseline 비율 재현 불가.
+// 처방 (v5):
+//   1) overlay: display:flex + align-items:center + justify-content:center
+//      → layout box(1468×855)를 viewport 정중앙 배치.
+//      _global.scss 의 place-items:safe center 를 specificity(0,2,0)으로 override.
+//   2) transform: scale(K), transform-origin: center center
+//      → center 기준 균등 확대로 visual center = layout center = viewport center.
+//      K = max(1, min(100vw/1920px, 100vh/1080px)) (CSS Values 4).
+//   3) 1920 baseline과 동일한 padding(40px 24px) 유지.
 //
-// 처방 (v3):
-//   1) 모달 layout box 는 1920 baseline 사이즈(1468×855) 그대로 보존.
-//   2) transform: scale(K) 로 modal 전체를 통째로 비례 확대.
-//      K = max(1, min(100vw / 1920px, 100vh / 1080px))
-//      - <length>/<length> = <number> (CSS Values 4, modern browsers).
-//      - min() 로 viewport 가로/세로 중 더 빡빡한 쪽 기준 → 절대 overflow X.
-//      - max(1, …) 로 ≤ 1920 비표준 viewport 에서 축소 방지.
-//   3) overlay 는 position:fixed + grid place-items:center 로 layout box
-//      (1468×855) 를 viewport 정중앙 배치. transform 은 center origin 으로
-//      균등 확대 → 시각적으로도 정중앙.
+// 비율 검증 (2560×1440):
+//   K = min(2560/1920, 1440/1080) = 1.333
+//   visual: 1957×1140, center = (1280, 720) = viewport center
+//   top/bottom gap = (1440−1140)/2 = 150px = 10.42% ✓
+//   width ratio = 1957/2560 = 76.4% ≈ baseline 76.5% ✓
 //
-// 효과:
-//   1920 baseline 의 모든 내부 비율(좌:우 컬럼 904:552, 폰트, gap, icon,
-//   header, image grid, output-links, footer) 이 임의 해상도에서 정확히
-//   동일 비율로 함께 확대됨. 개별 selector 수정 없이 4종 모달 공통 적용.
-//
-// 범위: width > 1920px (=1920 이하 구간 전체 절대 무변경)
+// 범위: width > 1920px (≤1920 구간 절대 무변경)
 // =====================================================================
 @media (min-width: 1921px) {
-  // (1) overlay 를 viewport 정중앙 centering — 부모 .cluster4-card-content
-  //     (max-width: 1330px, overflow-x: clip) 컨테이너 탈출 강제.
+  // (1) overlay: flex 정중앙 배치 (place-items 미사용)
   .cluster4-card-content .section-modal-overlay {
     position: fixed !important;
     inset: 0 !important;
-    display: grid !important;
-    place-items: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 40px 24px !important;
     overflow: auto !important;
   }
 
-  // (2) 모달 layout box 는 1920 baseline 그대로, transform 으로 균등 확대.
+  // (2) 모달 layout box 1920 baseline 유지 + 정중앙 기준 균등 확대
   .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
@@ -14786,8 +14776,6 @@
     max-width: 1468px !important;
     height: 855px !important;
     max-height: 855px !important;
-    // Sass 가 calc() 내부 '/' 를 division 으로 잡아 단위 불일치 에러를 내므로
-    // 전체 식을 문자열 보간으로 통째로 raw CSS 출력 (Sass 파서 우회).
     transform: scale(#{"max(1, min(calc(100vw / 1920px), calc(100vh / 1080px)))"}) !important;
     transform-origin: center center !important;
   }

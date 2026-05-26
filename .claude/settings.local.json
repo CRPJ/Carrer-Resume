@@ -131,7 +131,15 @@
       "Bash(gh auth *)",
       "Bash(Select-String \"688caba\")",
       "PowerShell(git log origin/Tuna --format=\"%H %an <%ae> | %s\" -3; \"---\"; \"Local HEAD == origin/Tuna?:\"; if \\(\\(git rev-parse HEAD\\) -eq \\(git rev-parse origin/Tuna\\)\\) { \"YES - already in sync\" } else { \"NO - diverged\" })",
-      "Bash(python *)"
+      "Bash(python *)",
+      "PowerShell(git stash *)",
+      "PowerShell(git add *)",
+      "PowerShell(git push *)",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_fill_form",
+      "Bash(timeout 3)",
+      "Bash(Select-Object -Last 30)"
     ],
     "deny": [],
     "ask": []
