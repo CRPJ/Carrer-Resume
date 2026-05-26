@@ -1084,6 +1084,7 @@
         height: 36px;
         border-radius: 0;
         overflow: hidden;
+        transform: translateY(-4px);
 
         img {
           display: block;
@@ -1096,6 +1097,7 @@
       .activity-content {
         flex: 1;
         padding-left: 0;
+        transform: translateY(-4px);
 
         .activity-line {
           display: flex;
@@ -1211,24 +1213,33 @@
   // Skills
   // Skills — 피그마: 4열 가로 배치, 각 카드는 세로(아이콘→숫자+단위→라벨)
   .resume-skills {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     align-items: flex-start;
-    justify-content: center;
-    gap: 18px;
-    padding: 30px 0 0;
+    padding: 30px 17px 0 28px;
     margin: 0;
     width: 100%;
     position: relative;
     z-index: 3;
+    box-sizing: border-box;
 
     .skill-card {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-self: center;
       position: relative;
       background: transparent;
       border: none;
       padding: 0;
+
+      &:first-child {
+        justify-self: start;
+      }
+
+      &:last-child {
+        justify-self: end;
+      }
 
       .skill-icon {
         width: 34px;
