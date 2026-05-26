@@ -139,7 +139,12 @@
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_fill_form",
       "Bash(timeout 3)",
-      "Bash(Select-Object -Last 30)"
+      "Bash(Select-Object -Last 30)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Start-Sleep -Seconds 12; \\(Invoke-WebRequest -Uri \"http://localhost:3002\" -UseBasicParsing -TimeoutSec 5\\).StatusCode)",
+      "PowerShell(Start-Sleep -Seconds 15; try { \\(Invoke-WebRequest -Uri \"http://localhost:3002/cluster-4-card/1\" -UseBasicParsing -TimeoutSec 10\\).StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(Start-Sleep -Seconds 20; try { \\(Invoke-WebRequest -Uri \"http://localhost:3002\" -UseBasicParsing -TimeoutSec 10 -MaximumRedirection 5\\).StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(Get-Process *)"
     ],
     "deny": [],
     "ask": []

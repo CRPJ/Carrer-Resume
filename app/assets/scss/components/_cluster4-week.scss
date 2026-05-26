@@ -14732,31 +14732,34 @@
 }
 
 // =====================================================================
-// Zone C (> 1920px) — work-view-modal 4종 큰 해상도 비율 보정 (v5: flex-center scale)
+// Zone C (> 1920px) — work-view-modal 4종 큰 해상도 시각 보정 (v7: gradual-fill scale)
 //
-// 1920×1080 baseline:
-//   _global.scss: position:fixed, display:grid, place-items:safe center,
-//   padding:40px 24px → modal(1468×855) viewport 정중앙.
+// 1920×1080 baseline: modal(1468×855) → 76.5vw × 79.2vh, 정중앙.
 //
-// 처방 (v5):
-//   1) overlay: display:flex + align-items:center + justify-content:center
-//      → layout box(1468×855)를 viewport 정중앙 배치.
-//      _global.scss 의 place-items:safe center 를 specificity(0,2,0)으로 override.
-//   2) transform: scale(K), transform-origin: center center
-//      → center 기준 균등 확대로 visual center = layout center = viewport center.
-//      K = max(1, min(100vw/1920px, 100vh/1080px)) (CSS Values 4).
-//   3) 1920 baseline과 동일한 padding(40px 24px) 유지.
+// v6 문제:
+//   참조 치수 1788×1006 적용 시 1920→1921에서 +5.6pp 즉시 점프.
 //
-// 비율 검증 (2560×1440):
-//   K = min(2560/1920, 1440/1080) = 1.333
-//   visual: 1957×1140, center = (1280, 720) = viewport center
-//   top/bottom gap = (1440−1140)/2 = 150px = 10.42% ✓
-//   width ratio = 1957/2560 = 76.4% ≈ baseline 76.5% ✓
+// 처방 (v7 — gradual ramp + cap):
+//   scale K 를 두 항의 min() 으로 구성:
+//   ① 선형 ramp: K = 1 + (viewport − baseline) / divisor
+//      → 1920 에서 K=1.0, viewport 커질수록 선형 증가.
+//      width divisor 1484 = 640 / 0.4315 (2560 에서 K=1.431 도달)
+//      height divisor 835 = 360 / 0.4314
+//   ② 상한 캡: K ≤ viewport / ref (ref=1788/1006)
+//      → 2560 이상에서 82vw / 85vh 상한 유지.
+//   min(①, ②) 로 1920~2560 구간은 선형, 2560+ 는 캡.
+//
+// 해상도별 점유율:
+//   1920×1080  K=1.000  76.5%×79.2%  top 10.42%  (baseline, Zone C 미적용)
+//   1921×1080  K=1.000  76.5%×79.2%  top 10.42%  (no jump ✓)
+//   2048×1152  K=1.086  77.8%×80.6%  top  9.69%  (gradual ✓)
+//   2560×1440  K=1.431  82.0%×85.0%  top  7.50%  (target ✓)
+//   3840×2160  K=2.147  82.1%×85.0%  top  7.50%  (capped ✓)
 //
 // 범위: width > 1920px (≤1920 구간 절대 무변경)
 // =====================================================================
 @media (min-width: 1921px) {
-  // (1) overlay: flex 정중앙 배치 (place-items 미사용)
+  // (1) overlay: flex 정중앙 배치
   .cluster4-card-content .section-modal-overlay {
     position: fixed !important;
     inset: 0 !important;
@@ -14767,7 +14770,7 @@
     overflow: auto !important;
   }
 
-  // (2) 모달 layout box 1920 baseline 유지 + 정중앙 기준 균등 확대
+  // (2) 모달 layout box 1920 baseline 유지 + 점진적 시각 보정 스케일
   .cluster4-card-content .section-modal.work-view-modal.workinfo-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workexp-view-modal,
   .cluster4-card-content .section-modal.work-view-modal.workability-view-modal,
@@ -14776,7 +14779,7 @@
     max-width: 1468px !important;
     height: 855px !important;
     max-height: 855px !important;
-    transform: scale(#{"max(1, min(calc(100vw / 1920px), calc(100vh / 1080px)))"}) !important;
+    transform: scale(#{"max(1, min(calc(1 + (100vw - 1920px) / 1484px), calc(1 + (100vh - 1080px) / 835px), calc(100vw / 1788px), calc(100vh / 1006px)))"}) !important;
     transform-origin: center center !important;
   }
 }
