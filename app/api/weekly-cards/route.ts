@@ -32,6 +32,7 @@ type WeekRow = {
   start_date: string
   end_date: string
   is_club_break: boolean | null
+  holiday_name: string | null
   league_record_status: RecordStatus | null
   announced_at: string | null
   reviewed_at: string | null
@@ -73,7 +74,7 @@ export async function GET() {
 
     const { data: weeksData, error: weeksErr } = await supabase
       .from('weeks')
-      .select('id, week_number, start_date, end_date, is_club_break, league_record_status, announced_at, reviewed_at, seasons(id, year, name)')
+      .select('id, week_number, start_date, end_date, is_club_break, holiday_name, league_record_status, announced_at, reviewed_at, seasons(id, year, name)')
       .lte('start_date', today)
       .order('start_date', { ascending: false })
 
@@ -221,7 +222,9 @@ export async function GET() {
       })
       const isClubBreak = !!w.is_club_break
       const leagueResultStatus = isClubBreak ? '공식 휴식' : '정상 진행'
-      const leagueRecordStatus = resolveRecordStatus(w.end_date, w.league_record_status, now)
+      const leagueRecordStatus = isClubBreak
+        ? '대전 휴식' as const
+        : resolveRecordStatus(w.end_date, w.league_record_status, now)
       const status =
         isClubBreak ? '휴식' : leagueRecordStatus === '대전 집계' ? '대전 집계' : '정상 진행'
       return {
@@ -236,6 +239,7 @@ export async function GET() {
         status,
         leagueResultStatus,
         leagueRecordStatus,
+        holidayName: w.holiday_name || null,
         totalCrews: stat.total,
         growthChallenge: stat.challenge,
         growthSuccess: stat.success,

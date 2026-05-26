@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import WeeklyFilterBar from "./WeeklyFilterBar";
 import WeeklyCardList from "./WeeklyCardList";
-import { WEEKLY_CARD_DUMMY, type WeeklyCardData } from "@/constants/dummyData/weekly-card-dummy";
+import { WEEKLY_CARD_DUMMY, type WeeklyCardData, type RestReason } from "@/constants/dummyData/weekly-card-dummy";
 import { isDemoMode } from "@/utils/isDemoMode";
 
 const SORT_OPTIONS = [
@@ -60,6 +60,7 @@ type ApiCard = {
   status: WeeklyCardData['status'];
   leagueResultStatus: WeeklyCardData['leagueResultStatus'];
   leagueRecordStatus: WeeklyCardData['leagueRecordStatus'];
+  holidayName: string | null;
   totalCrews: number;
   growthChallenge: number;
   growthSuccess: number;
@@ -98,6 +99,30 @@ const shiftDateIso = (iso: string, days: number): string => {
   return dt.toISOString().slice(0, 10);
 };
 
+const HOLIDAY_TO_REST_REASON: Record<string, RestReason> = {
+  '중간고사': '중간고사',
+  '기말고사': '기말고사',
+  '구정(설) 공휴일': '설 연휴',
+  '설 연휴': '설 연휴',
+  '추석': '한가위',
+  '한가위': '한가위',
+  '시즌 전환': '시즌 전환',
+};
+
+const MID_TERM_WEEKS = [6, 7, 8];
+const FINAL_WEEKS = [14, 15, 16];
+
+const resolveRestReason = (holidayName: string | null, weekNumber: number): RestReason | undefined => {
+  if (!holidayName) return undefined;
+  if (HOLIDAY_TO_REST_REASON[holidayName]) return HOLIDAY_TO_REST_REASON[holidayName];
+  if (holidayName === '시험 기간' || holidayName === '시험기간') {
+    if (MID_TERM_WEEKS.includes(weekNumber)) return '중간고사';
+    if (FINAL_WEEKS.includes(weekNumber)) return '기말고사';
+    return '중간고사';
+  }
+  return undefined;
+};
+
 const apiToCardData = (c: ApiCard): WeeklyCardData => {
   const seasonName = `${c.seasonYear}년, ${c.seasonNameKo} 시즌, ${c.weekNumber}주차`;
   // DB는 월~일로 저장되어 있지만 크루 대상 표기는 월~토. endDate 에서 하루 빼서 토요일로 표시.
@@ -121,6 +146,7 @@ const apiToCardData = (c: ApiCard): WeeklyCardData => {
     personalRest: c.personalRest,
     winningTeamImage: null,
     top3: c.top3,
+    restReason: resolveRestReason(c.holidayName, c.weekNumber),
   };
 };
 
