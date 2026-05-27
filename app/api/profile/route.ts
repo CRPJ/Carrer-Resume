@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getCachedTeams, getCachedParts, getCachedActivityTypes } from "@/lib/cached-data";
+import { extractTargetUserId, isAdminEmail } from "@/lib/admin";
+import { maskProfileForResponse, normalizePhoneForStorage } from "@/lib/dataMasking";
+import { getViewerContext, getActiveTeamPart, canSeePersonalInfo } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -150,10 +153,74 @@ export async function GET(request: NextRequest) {
 
     }
 
+    // 마스킹 옵션 결정 (세션 기반 + 역할 기반 권한)
+    const maskSession = await getServerSession(authOptions);
+    const maskIsAdmin = !!maskSession?.user?.isAdmin || isAdminEmail(maskSession?.user?.email);
+    const maskIsLoggedIn = !!maskSession;
+
+    // 역할 기반 개인정보 열람 권한: 로그인 비어드민에 한해 viewer/target 컨텍스트로 판정
+    let canSeePersonal = false;
+    if (maskIsLoggedIn && !maskIsAdmin && maskSession?.user?.id) {
+      const [viewerCtx, targetTP] = await Promise.all([
+        getViewerContext(supabaseAdmin, maskSession.user.id, false),
+        getActiveTeamPart(supabaseAdmin, profile.id),
+      ]);
+      canSeePersonal = canSeePersonalInfo(viewerCtx, {
+        userId: profile.id,
+        teamId: targetTP.teamId,
+        partId: targetTP.partId,
+      });
+    }
+
+    const maskOpts = { isAdmin: maskIsAdmin, isLoggedIn: maskIsLoggedIn, canSeePersonal };
+
     const context = searchParams.get('context');
 
     // ========== context=card: 카드 페이지용 경량 응답 (시즌 통계/계산 전부 스킵) ==========
     if (context === 'card') {
+      const weekId = searchParams.get('weekId');
+
+      // weekId가 있으면 주차 관련 데이터도 함께 번들 (클라이언트 Supabase 직접 쿼리 제거)
+      const weekQueries = weekId ? [
+        // [10] activity_types (full columns for card page)
+        supabaseAdmin.from("activity_types")
+          .select("id, name, line_code, cluster_id, description, eligible_min_approved_weeks, eligible_max_approved_weeks, count_once_in_total, reward_star")
+          .eq("is_active", true),
+        // [11] current week
+        supabaseAdmin.from("weeks")
+          .select("id, week_number, start_date, end_date, is_club_break, holiday_name, seasons (id, year, name)")
+          .eq("id", weekId)
+          .single(),
+        // [12] all weeks (for prev/next navigation)
+        supabaseAdmin.from("weeks")
+          .select("id, start_date, end_date, season_id, seasons(name)")
+          .order("start_date", { ascending: false }),
+        // [13] weekly_activities for this week
+        supabaseAdmin.from("weekly_activities")
+          .select("id, activity_type_id, title, is_active, opened_at, deadline, output_links, output_images, team_id")
+          .eq("week_id", weekId),
+        // [14] user_weekly_growth for this week
+        supabaseAdmin.from("user_weekly_growth")
+          .select("is_success, is_resting, is_club_break, failure_reason")
+          .eq("user_id", profile.id)
+          .eq("week_id", weekId)
+          .maybeSingle(),
+        // [15] all points for user (all types)
+        supabaseAdmin.from("points")
+          .select("week_id, point_type, points")
+          .eq("user_id", profile.id),
+        // [16] success weeks for cumulative count
+        supabaseAdmin.from("user_weekly_growth")
+          .select("week_id, weeks!inner(end_date)")
+          .eq("user_id", profile.id)
+          .eq("is_success", true),
+        // [17] secondary_info_grants for this user+week (어드민 개별 권한 부여)
+        supabaseAdmin.from("secondary_info_grants")
+          .select("activity_type_id, deadline")
+          .eq("user_id", profile.id)
+          .eq("week_id", weekId),
+      ] as const : [];
+
       const [
         joinedWeekResult,
         allRestsResult,
@@ -165,6 +232,7 @@ export async function GET(request: NextRequest) {
         userTeamPartsResult,
         teamsData,
         partsData,
+        ...weekResults
       ] = await Promise.all([
         profile.onboarding_week_id
           ? supabaseAdmin.from("weeks").select("start_date").eq("id", profile.onboarding_week_id).maybeSingle()
@@ -173,20 +241,47 @@ export async function GET(request: NextRequest) {
         supabaseAdmin.from("user_weekly_growth").select("week_id").eq("user_id", profile.id).eq("is_success", true),
         supabaseAdmin.from("user_role_history").select("id, user_id, role, started_at, ended_at").eq("user_id", profile.id),
         supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
-        supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
-        supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+        supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
+        // points: 어드민(points/save)은 line_id(activity_types.id) + week_id 로 별점을 저장. 최신 우선.
+        supabaseAdmin.from("points").select("line_id, week_id, points, given_at").eq("user_id", profile.id).eq("point_type", "star").order("given_at", { ascending: false }),
         supabaseAdmin.from("user_team_parts").select("user_id, team_id, part_id, joined_at, left_at, generation, managed_team_id").eq("user_id", profile.id),
         getCachedTeams(),
         getCachedParts(),
+        ...weekQueries,
       ]);
 
       const activityRecordsData = activityRecordsResult.data || [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const completedActivities = activityRecordsData.filter((ar: any) => ar.is_completed);
 
+      // 유저의 현재 팀 (실무경험 weekly_activities 필터링용)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userTeamParts = (userTeamPartsResult.data || []) as Array<any>
+      const userCurrentTeamId: string | null = userTeamParts.find((tp) => !tp.left_at)?.team_id || null
+
+      // 실무경험 클러스터(team_id IS NOT NULL)는 유저 팀 일치만, 그 외는 team_id IS NULL 만 노출
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const filterWeeklyActivitiesByTeam = (rows: any[]) =>
+        rows.filter((wa) => {
+          if (wa.team_id == null) return true
+          return wa.team_id === userCurrentTeamId
+        })
+
+      // weekId가 있으면 주차 번들 데이터 포함
+      const weekBundle = weekId && weekResults.length === 8 ? {
+        activityTypes: weekResults[0]?.data || [],
+        currentWeek: weekResults[1]?.data || null,
+        allWeeks: weekResults[2]?.data || [],
+        weeklyActivities: filterWeeklyActivitiesByTeam(weekResults[3]?.data || []),
+        weeklyGrowth: weekResults[4]?.data || null,
+        allPoints: weekResults[5]?.data || [],
+        successWeeks: weekResults[6]?.data || [],
+        secondaryInfoGrants: weekResults[7]?.data || [],
+      } : null;
+
       return NextResponse.json({
         success: true,
-        data: profile,
+        data: maskProfileForResponse(profile, maskOpts),
         onboardingWeekId: profile.onboarding_week_id || null,
         growthInfo: { startDate: joinedWeekResult.data?.start_date || null },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -201,6 +296,7 @@ export async function GET(request: NextRequest) {
         userTeamParts: userTeamPartsResult.data || [],
         teams: teamsData || [],
         parts: partsData || [],
+        weekBundle,
       });
     }
 
@@ -268,7 +364,6 @@ export async function GET(request: NextRequest) {
         is_qualified,
         rating,
         review,
-        review_link,
         seasons (
           id,
           year,
@@ -302,14 +397,14 @@ export async function GET(request: NextRequest) {
       // 해당 유저의 활동 이행 기록 (강화 상태 판단용) - id 추가 (points 매핑용)
       supabaseAdmin.from("activity_records").select("id, week_id, activity_type_id, is_completed").eq("user_id", profile.id),
 
-      // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크)
-      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links").eq("user_id", profile.id),
+      // 해당 유저의 2차 정보 (서브타이틀, 아웃풋링크, 성장 포인트, 이미지)
+      supabaseAdmin.from("user_activity_details").select("week_id, activity_type_id, sub_title, output_links, growth_point, image_urls, image_captions").eq("user_id", profile.id),
 
       // activity_types (cluster_id 기반 분류용) - 캐시 사용
       getCachedActivityTypes(),
 
-      // 해당 유저의 활동별 포인트 (평점용) - star 타입만
-      supabaseAdmin.from("points").select("activity_id, points").eq("user_id", profile.id).eq("point_type", "star").not("activity_id", "is", null),
+      // 해당 유저의 활동별 포인트 (평점용) - star 타입만 (어드민 points/save 가 line_id 기반 저장)
+      supabaseAdmin.from("points").select("line_id, week_id, points, given_at").eq("user_id", profile.id).eq("point_type", "star").order("given_at", { ascending: false }),
 
       // 해당 유저의 시즌별 포인트 (week_id를 통해 season 조인)
       supabaseAdmin.from("points").select("week_id, point_type, points, weeks!inner(season_id)").eq("user_id", profile.id),
@@ -324,7 +419,7 @@ export async function GET(request: NextRequest) {
       getCachedParts(),
 
       // user_weekly_growth (시즌별 성공 주차 실시간 계산용)
-      supabaseAdmin.from("user_weekly_growth").select("week_id, is_success, is_resting, weeks!inner(season_id)").eq("user_id", profile.id)
+      supabaseAdmin.from("user_weekly_growth").select("week_id, is_success, is_resting, weeks!inner(season_id, start_date)").eq("user_id", profile.id)
     ]);
 
     // 시즌 이름 변환 맵 (영문 → 한글)
@@ -554,17 +649,14 @@ export async function GET(request: NextRequest) {
       console.log('[Profile API] filteredWeeks:', filteredWeeks.map((w: any) => ({ id: w.id, start_date: w.start_date, is_club_break: w.is_club_break })));
     }
 
-    // 일정 신뢰도: user_growth_stats 테이블 값 사용 (pms1.5와 동일하게)
+    // 일정 신뢰도: 실시간 계산값 사용 (user_growth_stats 캐시는 며칠 단위 stale).
     // i = (a+c)/(h-d) * 100, 올림 처리
     // a: 활동 인정, c: 휴식, h: 지나간 주차, d: 공식 휴식
-    const gsApprovedWeeks = growthStats?.approved_weeks ?? approvedWeeksCount;
-    const gsRestWeeks = growthStats?.rest_weeks ?? restWeeksCount;
-    const gsPassedWeeks = growthStats?.passed_weeks ?? (approvedWeeksCount + unapprovedWeeksCount + restWeeksCount + clubBreakWeeksCount);
-    const gsClubBreakWeeks = growthStats?.club_break_weeks ?? clubBreakWeeksCount;
-    const reliabilityDenominator = gsPassedWeeks - gsClubBreakWeeks; // h - d
+    const passedWeeksTotal = approvedWeeksCount + unapprovedWeeksCount + restWeeksCount + clubBreakWeeksCount;
+    const reliabilityDenominator = passedWeeksTotal - clubBreakWeeksCount; // h - d
     let calculatedReliabilityRate = 0;
     if (reliabilityDenominator > 0) {
-      calculatedReliabilityRate = Math.min(100, Math.ceil(((gsApprovedWeeks + gsRestWeeks) / reliabilityDenominator) * 100));
+      calculatedReliabilityRate = Math.min(100, Math.ceil(((approvedWeeksCount + restWeeksCount) / reliabilityDenominator) * 100));
     }
 
     // 항상 실시간 계산 값 사용 (현재 진행 중인 주차 제외)
@@ -759,7 +851,6 @@ export async function GET(request: NextRequest) {
             is_qualified,
             rating,
             review,
-            review_link,
             seasons (
               id,
               year,
@@ -815,7 +906,7 @@ export async function GET(request: NextRequest) {
           .from('user_season_histories')
           .select(`
             id, role_in_season, approved_weeks, total_weeks, progress_status,
-            review_status, is_qualified, rating, review, review_link,
+            review_status, is_qualified, rating, review,
             seasons (id, year, name, start_date, end_date)
           `)
           .eq('user_id', profile.id);
@@ -854,13 +945,14 @@ export async function GET(request: NextRequest) {
       });
 
     // 시즌별 휴식/성공 시즌 수 실시간 계산 (sortedSeasonHistories 기반)
+    // 현재 진행 중인 시즌(end_date >= today)은 제외 — UI에서 'in_progress'로 보정되므로 카운트에서도 빼야 일치함
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const restSeasonsCount = sortedSeasonHistories.filter((item: any) =>
-      item.progress_status === 'full_rest'
+      item.progress_status === 'full_rest' && !(item.seasons?.end_date >= today)
     ).length;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const approvedSeasonsCount = sortedSeasonHistories.filter((item: any) =>
-      item.progress_status === 'completed'
+      item.progress_status === 'completed' && !(item.seasons?.end_date >= today)
     ).length;
 
     // 클럽 온보딩 주차 반영: 온보딩 시즌의 approved_weeks에 +1
@@ -915,11 +1007,14 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     userWeeklyGrowthData.forEach((wg: any) => {
       const seasonId = wg.weeks?.season_id;
+      const wgStartDate = wg.weeks?.start_date;
+      // 온보딩 주차 이전(=합류 전) 성장 기록은 카운트에서 제외
+      const isBeforeJoin = joinedWeekStartDate && wgStartDate && wgStartDate < joinedWeekStartDate;
 
-      if (wg.is_success && seasonId) {
+      if (wg.is_success && seasonId && !isBeforeJoin) {
         seasonSuccessWeeksMap.set(seasonId, (seasonSuccessWeeksMap.get(seasonId) || 0) + 1);
       }
-      if (wg.is_resting) {
+      if (wg.is_resting && !isBeforeJoin) {
         allRestingWeekIds.add(wg.week_id);
       }
     });
@@ -1114,15 +1209,26 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: profile,
+      data: maskProfileForResponse(profile, maskOpts),
       practicalCounts,
       reliabilityRate: finalGrowthPeriodStats.reliabilityRate,
       completionRate,
-      badges: {
-        stars: cumulativePoints?.total_stars || 0,
-        lightnings: cumulativePoints?.total_lightnings || 0,
-        shields: cumulativePoints?.total_shields || 0,
-      },
+      badges: (() => {
+        // 가입 이후 주차의 포인트만 합산 (user_cumulative_points는 가입 전 포인트도 포함할 수 있음)
+        const validWeekIds = new Set(passedWeeksForUser.map((w: any) => w.id));
+        let totalStars = 0, totalLightnings = 0, totalShields = 0;
+        seasonPointsData.forEach((p: any) => {
+          if (!validWeekIds.has(p.week_id)) return;
+          if (p.point_type === 'star') totalStars += p.points || 0;
+          else if (p.point_type === 'lightning') totalLightnings += p.points || 0;
+          else if (p.point_type === 'shield') totalShields += p.points || 0;
+        });
+        return {
+          stars: totalStars,
+          lightnings: totalLightnings,
+          shields: totalShields - totalLightnings,
+        };
+      })(),
       seasonHistories: finalSeasonHistoriesWithOnboarding,
       growthInfo: {
         status: profile.status,
@@ -1197,67 +1303,78 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
     }
 
-    // user_profiles에서 기존 프로필 확인 (1차: email, 2차: auth_email)
+    // 어드민이 다른 유저를 대상으로 편집하는 경우
+    const targetUserId = extractTargetUserId(request);
     let existingProfile: { id: string } | null = null;
 
-    const { data: profileByEmail } = await supabaseAdmin
-      .from("user_profiles")
-      .select("id")
-      .eq("email", email)
-      .maybeSingle();
-
-    if (profileByEmail) {
-      existingProfile = profileByEmail;
-    }
-
-    if (!existingProfile) {
-      const { data: profileByAuth } = await supabaseAdmin
+    if (targetUserId && isAdminEmail(email)) {
+      const { data: targetProfile } = await supabaseAdmin
         .from("user_profiles")
         .select("id")
-        .eq("auth_email", email)
+        .eq("id", targetUserId)
         .maybeSingle();
-
-      if (profileByAuth) {
-        existingProfile = profileByAuth;
-      }
-    }
-
-    // 3차: 카카오 이름으로 display_name 매칭
-    if (!existingProfile && session.user?.name) {
-      const cleanName = session.user.name.replace(/\s+/g, "");
-      const { data: profileByName } = await supabaseAdmin
+      existingProfile = targetProfile;
+    } else {
+      // user_profiles에서 기존 프로필 확인 (1차: email, 2차: auth_email)
+      const { data: profileByEmail } = await supabaseAdmin
         .from("user_profiles")
         .select("id")
-        .eq("display_name", cleanName)
+        .eq("email", email)
         .maybeSingle();
 
-      if (profileByName) {
-        existingProfile = profileByName;
-        await supabaseAdmin
-          .from("user_profiles")
-          .update({ auth_email: email })
-          .eq("id", profileByName.id);
+      if (profileByEmail) {
+        existingProfile = profileByEmail;
       }
-    }
 
-    // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
-    if (!existingProfile && session.user?.id) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidRegex.test(session.user.id)) {
-        const { data: profileById } = await supabaseAdmin
+      if (!existingProfile) {
+        const { data: profileByAuth } = await supabaseAdmin
           .from("user_profiles")
           .select("id")
-          .eq("id", session.user.id)
+          .eq("auth_email", email)
           .maybeSingle();
 
-        if (profileById) {
-          existingProfile = profileById;
+        if (profileByAuth) {
+          existingProfile = profileByAuth;
+        }
+      }
+
+      // 3차: 카카오 이름으로 display_name 매칭
+      if (!existingProfile && session.user?.name) {
+        const cleanName = session.user.name.replace(/\s+/g, "");
+        const { data: profileByName } = await supabaseAdmin
+          .from("user_profiles")
+          .select("id")
+          .eq("display_name", cleanName)
+          .maybeSingle();
+
+        if (profileByName) {
+          existingProfile = profileByName;
           await supabaseAdmin
             .from("user_profiles")
             .update({ auth_email: email })
+            .eq("id", profileByName.id);
+        }
+      }
+
+      // 4차: JWT에서 매칭된 profile UUID로 직접 조회 (카카오 이름/이메일이 모두 다른 경우)
+      if (!existingProfile && session.user?.id) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(session.user.id)) {
+          const { data: profileById } = await supabaseAdmin
+            .from("user_profiles")
+            .select("id")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileById) {
+            existingProfile = profileById;
+            await supabaseAdmin
+              .from("user_profiles")
+              .update({ auth_email: email })
             .eq("id", profileById.id)
             .is("auth_email", null);
         }
+      }
       }
     }
 
@@ -1273,14 +1390,21 @@ export async function PUT(request: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    // 필드 매핑
-    if (body.display_name !== undefined) updateData.display_name = body.display_name;
-    if (body.eng_name !== undefined) updateData.eng_name = body.eng_name;
-    if (body.gender !== undefined) updateData.gender = body.gender;
-    if (body.birth_date !== undefined) updateData.birth_date = body.birth_date || null;
-    if (body.address !== undefined) updateData.address = body.address;
-    if (body.phone !== undefined) updateData.phone = body.phone;
-    if (body.email !== undefined) updateData.email = body.email;
+    // 마스킹된 값 판별 (****가 포함된 값은 무시)
+    const isMasked = (value: unknown): boolean =>
+      typeof value === 'string' && value.includes('****');
+
+    // 필드 매핑 (마스킹된 값은 업데이트에서 제외)
+    if (body.display_name !== undefined && !isMasked(body.display_name)) updateData.display_name = body.display_name;
+    if (body.eng_name !== undefined && !isMasked(body.eng_name)) updateData.eng_name = body.eng_name;
+    if (body.gender !== undefined && !isMasked(body.gender)) updateData.gender = body.gender;
+    if (body.birth_date !== undefined && !isMasked(body.birth_date)) {
+      const dateStr = body.birth_date;
+      updateData.birth_date = (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) ? dateStr : null;
+    }
+    if (body.address !== undefined && !isMasked(body.address)) updateData.address = body.address;
+    if (body.phone !== undefined && !isMasked(body.phone)) updateData.phone = normalizePhoneForStorage(body.phone);
+    if (body.email !== undefined && !isMasked(body.email)) updateData.email = body.email;
     if (body.bio !== undefined) updateData.bio = body.bio;
     if (body.vision !== undefined) updateData.vision = body.vision;
     if (body.profile_photo_url !== undefined) updateData.profile_photo_url = body.profile_photo_url;

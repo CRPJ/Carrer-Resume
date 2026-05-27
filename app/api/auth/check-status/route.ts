@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,6 +19,22 @@ export async function GET() {
     }
 
     const email = session.user.email;
+
+    // 어드민(마더) 계정은 항상 approved
+    if (isAdminEmail(email)) {
+      return NextResponse.json({
+        success: true,
+        status: "approved",
+        message: "어드민(마더) 계정입니다.",
+        data: {
+          id: session.user.id || "admin",
+          displayName: "Admin",
+          email: email,
+          growthStatus: null,
+          isAdmin: true,
+        },
+      });
+    }
 
     if (!supabaseAdmin) {
       return NextResponse.json(
