@@ -1962,8 +1962,10 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const olTooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const showOlTooltip = (e: React.MouseEvent, text: string) => {
     if (!text) return;
+    const el = e.currentTarget as HTMLElement;
+    if (el.scrollWidth <= el.clientWidth) return;
     if (olTooltipTimer.current) clearTimeout(olTooltipTimer.current);
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
     setOlTooltip({ text, x: rect.left + rect.width / 2, y: rect.top - 6 });
   };
   const hideOlTooltip = () => {
