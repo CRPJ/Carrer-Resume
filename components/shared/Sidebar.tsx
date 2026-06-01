@@ -16,18 +16,31 @@ import { usePopup } from "@/components/ui/popup";
 interface Game {
   id: number;
   image: StaticImageData;
+  target: string;
 }
+// 좌측 네비 슬라이드 이미지 → 계열별 랜딩 분기.
+//   one   = 엔터테인먼트 → /index-two-ec
+//   two   = 마케팅       → /index-two-ok
+//   three = 컨설팅       → /index-two-px
 const games: Game[] = [
-  { id: 1, image: one },
-  { id: 2, image: two },
-  { id: 3, image: three },
-  { id: 4, image: one },
-  { id: 5, image: two },
-  { id: 6, image: three },
-  { id: 7, image: one },
-  { id: 8, image: two },
-  { id: 9, image: three },
+  { id: 1, image: one, target: "/index-two-ec" },
+  { id: 2, image: two, target: "/index-two-ok" },
+  { id: 3, image: three, target: "/index-two-px" },
+  { id: 4, image: one, target: "/index-two-ec" },
+  { id: 5, image: two, target: "/index-two-ok" },
+  { id: 6, image: three, target: "/index-two-px" },
+  { id: 7, image: one, target: "/index-two-ec" },
+  { id: 8, image: two, target: "/index-two-ok" },
+  { id: 9, image: three, target: "/index-two-px" },
 ];
+
+// 조직(org) 컨텍스트 → 계열 랜딩 분기.
+//   encre(엔터) → ec / oranke(마케팅) → ok / phalanx(컨설팅) → px
+const ORG_TO_INDEX_TWO: Record<string, string> = {
+  encre: "/index-two-ec",
+  oranke: "/index-two-ok",
+  phalanx: "/index-two-px",
+};
 const Sidebar = () => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -48,15 +61,18 @@ const Sidebar = () => {
       .catch(() => {});
   }, [session]);
 
-  // 왼쪽 네비게이션 게임/헥사곤 슬라이드 → /index-two 로 이동.
-  // 현재 URL 에 org 쿼리가 있으면 그대로 보존(프론트 전용 처리).
-  const goIndexTwo = (e: React.MouseEvent) => {
-    e.preventDefault();
+  // 로고 클릭: 현재 org 컨텍스트가 있으면 해당 계열 랜딩 분기로, 없으면 홈("/")으로.
+  const handleLogoClick = (e: React.MouseEvent) => {
     const org =
       typeof window !== "undefined"
         ? new URLSearchParams(window.location.search).get("org")
         : null;
-    router.push(org ? `/index-two?org=${org}` : "/index-two");
+    const target = org ? ORG_TO_INDEX_TWO[org] : null;
+    if (target) {
+      e.preventDefault();
+      router.push(target);
+    }
+    // org 컨텍스트가 없으면 기본 href="/" 동작을 그대로 둔다.
   };
 
   const handleCareerResumeClick = async (e: React.MouseEvent) => {
@@ -84,7 +100,7 @@ const Sidebar = () => {
           <div className="col-12">
             <div className="sidebar__wrapper">
               <div className="sidebar__widget">
-                <Link href="/" className="sidebar__logo not-cursor" aria-label="home page" title="logo">
+                <Link href="/" onClick={handleLogoClick} className="sidebar__logo not-cursor" aria-label="home page" title="logo">
                   <Image src={logo} alt="Logo" 
                     className="w-16 h-16 left-0 top-[4px] absolute"
                     width={64} height={64} />
@@ -146,7 +162,7 @@ const Sidebar = () => {
                     {games.map((game) => (
                       <SwiperSlide key={game.id} className="swiper-slide">
                         <div className="sidebar-slider__single">
-                          <Link href="/index-two" onClick={goIndexTwo} aria-label="open landing page" title="open landing page">
+                          <Link href={game.target} aria-label="open landing page" title="open landing page">
                             <Image src={game.image} alt="Image" />
                             <svg viewBox="-3 -3 106 106" xmlns="http://www.w3.org/2000/svg" fill="none" className="hexagon-border">
                               <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />

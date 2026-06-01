@@ -39,6 +39,9 @@ const ORG_THEME: Record<string, OrgTheme> = {
 // pathname 기반 index-two 계열 강조 테마(route-theme--* + --quaternary-color).
 const ROUTE_THEME: Record<string, { name: string; accent: string }> = {
   "/index-two": { name: "mint", accent: "#B2FF8F" },
+  "/index-two-ec": { name: "pink", accent: "#FF98A6" },
+  "/index-two-ok": { name: "yellow", accent: "#FFEC8F" },
+  "/index-two-px": { name: "mint", accent: "#B2FF8F" },
 };
 
 // 매 적용마다 초기화할 테마 클래스/변수 목록. app-ready·a-cursor 등 외부에서

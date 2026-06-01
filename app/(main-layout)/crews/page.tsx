@@ -39,18 +39,33 @@ const clubOptions = ["엥크레", "오랑캐", "팔랑크스"];
 const statusOptions = ["활동 중", "활동 졸업", "활동 중단"];
 const ITEMS_PER_PAGE = 50;
 
+// 조직(org) 컨텍스트 → 계열 상세 페이지 분기.
+//   encre(엔터) → entertainment / phalanx(컨설팅) → consulting / oranke(마케팅) → marketing
+const CLUSTER_BY_ORG: Record<string, string> = {
+  encre: "/cluster-4-entertainment",
+  phalanx: "/cluster-4-consulting",
+  oranke: "/cluster-4-marketing",
+};
+
 // 베타 테스터 화이트리스트는 서버측(/api/crews)에서 raw display_name 으로 필터링
 // — 비로그인 마스킹 후 이름과 매칭 실패하던 버그 수정 (2026-04)
 
 const page = () => {
   const { mask } = useDataMasking();
   const [demoMode, setDemoMode] = useState(false);
-  useEffect(() => { setDemoMode(checkDemoMode()); }, []);
+  const [org, setOrg] = useState<string | null>(null);
+  useEffect(() => {
+    setDemoMode(checkDemoMode());
+    setOrg(new URLSearchParams(window.location.search).get("org"));
+  }, []);
   const resolveHref = (crew: Crew) => {
-    if (demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)) {
-      return `/cluster-4?userId=${crew.id}&demoName=${encodeURIComponent(crew.name)}`;
-    }
-    return `/cluster-4?userId=${crew.id}`;
+    // org 컨텍스트가 있으면 계열 상세로, 없으면 기존 /cluster-4 유지. userId 는 그대로 보존.
+    const base = (org && CLUSTER_BY_ORG[org]) || "/cluster-4";
+    const demoSuffix =
+      demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)
+        ? `&demoName=${encodeURIComponent(crew.name)}`
+        : "";
+    return `${base}?userId=${crew.id}${demoSuffix}`;
   };
   const [crews, setCrews] = useState<Crew[]>([]);
   const [loading, setLoading] = useState(true);
