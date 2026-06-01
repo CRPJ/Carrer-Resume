@@ -48,6 +48,17 @@ const Sidebar = () => {
       .catch(() => {});
   }, [session]);
 
+  // 왼쪽 네비게이션 게임/헥사곤 슬라이드 → /index-two 로 이동.
+  // 현재 URL 에 org 쿼리가 있으면 그대로 보존(프론트 전용 처리).
+  const goIndexTwo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const org =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("org")
+        : null;
+    router.push(org ? `/index-two?org=${org}` : "/index-two");
+  };
+
   const handleCareerResumeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (session?.user) {
@@ -135,7 +146,7 @@ const Sidebar = () => {
                     {games.map((game) => (
                       <SwiperSlide key={game.id} className="swiper-slide">
                         <div className="sidebar-slider__single">
-                          <Link href={`/games/show-${game.id}`} aria-label="latest games" title="view game details">
+                          <Link href="/index-two" onClick={goIndexTwo} aria-label="open landing page" title="open landing page">
                             <Image src={game.image} alt="Image" />
                             <svg viewBox="-3 -3 106 106" xmlns="http://www.w3.org/2000/svg" fill="none" className="hexagon-border">
                               <polygon points="50 0, 100 25, 100 75, 50 100, 0 75, 0 25" />
