@@ -230,8 +230,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  borderColor: nameQuery.trim() ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: nameQuery.trim() ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: nameQuery.trim() ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.12)',
+                  background: nameQuery.trim() ? 'color-mix(in srgb, var(--primary-color) 10%, transparent)' : 'transparent',
                 }}
               >
                 <div className="card-left" style={{ flex: 1 }}>
@@ -246,7 +246,7 @@ const page = () => {
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: nameQuery.trim() ? '#FFA500' : '#fff',
+                      color: nameQuery.trim() ? 'var(--primary-color)' : '#fff',
                       fontFamily: "'Pretendard', sans-serif",
                       fontSize: 14,
                       fontWeight: 600,
@@ -262,8 +262,8 @@ const page = () => {
                 ref={clubRef}
                 className="filter-card filter-dropdown"
                 style={{
-                  borderColor: clubFilter ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: clubFilter ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: clubFilter ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.12)',
+                  background: clubFilter ? 'color-mix(in srgb, var(--primary-color) 10%, transparent)' : 'transparent',
                 }}
                 onClick={() => {
                   setClubDropdownOpen(!clubDropdownOpen);
@@ -272,11 +272,11 @@ const page = () => {
               >
                 <div className="card-left">
                   <img src="/images/0/cluster4/icon/icon - cluv.png" alt="club" className="card-icon" />
-                  <span className="card-label" style={{ color: clubFilter ? '#FFA500' : '#fff' }}>
+                  <span className="card-label" style={{ color: clubFilter ? 'var(--primary-color)' : '#fff' }}>
                     {clubFilter || "클럽 전체"}
                   </span>
                 </div>
-                <span className={`card-arrow ${clubDropdownOpen ? 'open' : ''}`} style={{ color: clubFilter ? '#FFA500' : '#fff' }}>▼</span>
+                <span className={`card-arrow ${clubDropdownOpen ? 'open' : ''}`} style={{ color: clubFilter ? 'var(--primary-color)' : '#fff' }}>▼</span>
 
                 {clubDropdownOpen && (
                   <div className="dropdown-menu" style={{ display: 'block' }} onClick={(e) => e.stopPropagation()}>
@@ -303,8 +303,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  borderColor: schoolQuery.trim() ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: schoolQuery.trim() ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: schoolQuery.trim() ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.12)',
+                  background: schoolQuery.trim() ? 'color-mix(in srgb, var(--primary-color) 10%, transparent)' : 'transparent',
                 }}
               >
                 <div className="card-left" style={{ flex: 1 }}>
@@ -319,7 +319,7 @@ const page = () => {
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: schoolQuery.trim() ? '#FFA500' : '#fff',
+                      color: schoolQuery.trim() ? 'var(--primary-color)' : '#fff',
                       fontFamily: "'Pretendard', sans-serif",
                       fontSize: 14,
                       fontWeight: 600,
@@ -335,8 +335,8 @@ const page = () => {
                 ref={statusRef}
                 className="filter-card filter-dropdown"
                 style={{
-                  borderColor: statusFilter ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: statusFilter ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: statusFilter ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.12)',
+                  background: statusFilter ? 'color-mix(in srgb, var(--primary-color) 10%, transparent)' : 'transparent',
                 }}
                 onClick={() => {
                   setStatusDropdownOpen(!statusDropdownOpen);
@@ -345,11 +345,11 @@ const page = () => {
               >
                 <div className="card-left">
                   <img src="/images/0/cluster4/icon/icon - 3.png" alt="status" className="card-icon" />
-                  <span className="card-label" style={{ color: statusFilter ? '#FFA500' : '#fff' }}>
+                  <span className="card-label" style={{ color: statusFilter ? 'var(--primary-color)' : '#fff' }}>
                     {statusFilter || "상태 전체"}
                   </span>
                 </div>
-                <span className={`card-arrow ${statusDropdownOpen ? 'open' : ''}`} style={{ color: statusFilter ? '#FFA500' : '#fff' }}>▼</span>
+                <span className={`card-arrow ${statusDropdownOpen ? 'open' : ''}`} style={{ color: statusFilter ? 'var(--primary-color)' : '#fff' }}>▼</span>
 
                 {statusDropdownOpen && (
                   <div className="dropdown-menu" style={{ display: 'block' }} onClick={(e) => e.stopPropagation()}>
@@ -385,8 +385,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  background: hasActiveFilter ? '#FAAB07' : 'rgba(255, 255, 255, 0.06)',
-                  borderColor: hasActiveFilter ? '#FAAB07' : 'rgba(255, 255, 255, 0.12)',
+                  background: hasActiveFilter ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.06)',
+                  borderColor: hasActiveFilter ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.12)',
                   cursor: 'pointer',
                   width: 100,
                 }}
@@ -711,9 +711,9 @@ const page = () => {
                           width: 40, height: 40, borderRadius: 10,
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                           padding: 0, lineHeight: 1,
-                          border: p === currentPage ? '1px solid #FAAB07' : '1px solid rgba(255,255,255,0.12)',
-                          background: p === currentPage ? 'rgba(250,171,7,0.15)' : 'transparent',
-                          color: p === currentPage ? '#FAAB07' : '#fff',
+                          border: p === currentPage ? '1px solid var(--primary-color)' : '1px solid rgba(255,255,255,0.12)',
+                          background: p === currentPage ? 'color-mix(in srgb, var(--primary-color) 15%, transparent)' : 'transparent',
+                          color: p === currentPage ? 'var(--primary-color)' : '#fff',
                           cursor: 'pointer',
                           fontSize: 14, fontWeight: 700,
                           fontFamily: "'Pretendard', sans-serif",
