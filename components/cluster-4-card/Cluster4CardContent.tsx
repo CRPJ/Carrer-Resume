@@ -243,15 +243,29 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const searchParams = useSearchParams();
   const orgParam = searchParams.get("org");
   const orgContent = getOrgContent(orgParam);
-  // 참고 브랜치 기준: cluster-4-card 헤더 포인트는 EC(encre)에서만 별/방패/번개로
-  // 치환하고(아이콘도 Graphic10/Shield/Graphic13), oranke·PX 는 base 단감/인절미/어흥 +
-  // 기본 아이콘을 그대로 쓴다(PX 별칭 미적용).
-  const isEC = orgContent.key === "encre";
-  const EC_HEADER_POINT: Record<"단감" | "인절미" | "어흥", { label: string; icon: string }> = {
-    단감: { label: "별", icon: "/images/0/Graphic10.png" },
-    인절미: { label: "방패", icon: "/images/0/Shield.png" },
-    어흥: { label: "번개", icon: "/images/0/Graphic13.png" },
-  };
+  // 참고 기준: cluster-4-card 헤더 포인트(별·방패·번개 영역)는 org 별로 라벨/아이콘을 치환한다.
+  //   oranke·org 없음 → base 단감/인절미/어흥 + 기본 아이콘
+  //   encre        → 별/방패/번개 + Graphic10/Shield/Graphic13
+  //   phalanx      → 투구/방패/화살 + PX01/pX02/PX03
+  // weekPoints 값/계산은 미터치 — 표기(라벨/아이콘)만 분기한다.
+  const HEADER_POINT: Record<"단감" | "인절미" | "어흥", { label: string; icon: string }> =
+    orgContent.key === "encre"
+      ? {
+          단감: { label: "별", icon: "/images/0/Graphic10.png" },
+          인절미: { label: "방패", icon: "/images/0/Shield.png" },
+          어흥: { label: "번개", icon: "/images/0/Graphic13.png" },
+        }
+      : orgContent.key === "phalanx"
+      ? {
+          단감: { label: "투구", icon: "/images/0/cluster 1/PX01.png" },
+          인절미: { label: "방패", icon: "/images/0/cluster 1/pX02.png" },
+          어흥: { label: "화살", icon: "/images/0/cluster 1/PX03.png" },
+        }
+      : {
+          단감: { label: "단감", icon: "/images/0/cluster4/icon/icon - 단감.png" },
+          인절미: { label: "인절미", icon: "/images/0/cluster4/icon/icon - 인절미.png" },
+          어흥: { label: "어흥", icon: "/images/0/cluster4/icon/icon - 어흥.png" },
+        };
   const withOrgQuery = (href: string) => {
     if (!orgParam) return href;
     return `${href}${href.includes("?") ? "&" : "?"}org=${encodeURIComponent(orgParam)}`;
@@ -6131,8 +6145,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-group right" style={{ gap: "8px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "0px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  {isEC ? EC_HEADER_POINT.단감.label : "단감"}
-                  <img src={isEC ? EC_HEADER_POINT.단감.icon : "/images/0/cluster4/icon/icon - 단감.png"} alt={isEC ? EC_HEADER_POINT.단감.label : "단감"} className="item-icon" />
+                  {HEADER_POINT.단감.label}
+                  <img src={HEADER_POINT.단감.icon} alt={HEADER_POINT.단감.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {weekPoints.star}
                   </strong>
@@ -6140,8 +6154,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  {isEC ? EC_HEADER_POINT.인절미.label : "인절미"}
-                  <img src={isEC ? EC_HEADER_POINT.인절미.icon : "/images/0/cluster4/icon/icon - 인절미.png"} alt={isEC ? EC_HEADER_POINT.인절미.label : "인절미"} className="item-icon" />
+                  {HEADER_POINT.인절미.label}
+                  <img src={HEADER_POINT.인절미.icon} alt={HEADER_POINT.인절미.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {Math.abs(weekPoints.shield - weekPoints.lightning)}
                   </strong>
@@ -6149,8 +6163,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  {isEC ? EC_HEADER_POINT.어흥.label : "어흥"}
-                  <img src={isEC ? EC_HEADER_POINT.어흥.icon : "/images/0/cluster4/icon/icon - 어흥.png"} alt={isEC ? EC_HEADER_POINT.어흥.label : "어흥"} className="item-icon" />
+                  {HEADER_POINT.어흥.label}
+                  <img src={HEADER_POINT.어흥.icon} alt={HEADER_POINT.어흥.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {Math.abs(weekPoints.lightning)}
                   </strong>
