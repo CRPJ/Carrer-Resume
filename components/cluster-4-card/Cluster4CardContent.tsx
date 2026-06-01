@@ -16,6 +16,7 @@ import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constant
 import DetailLogModal from "./DetailLogModal";
 import confetti from "canvas-confetti";
 import HelpModalBody from "@/components/shared/HelpModalBody";
+import { getOrgContent } from "@/components/orgContent";
 
 // 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
 // 이 시점에 동시에 확정:
@@ -240,6 +241,21 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const orgParam = searchParams.get("org");
+  const orgContent = getOrgContent(orgParam);
+  // 참고 브랜치 기준: cluster-4-card 헤더 포인트는 EC(encre)에서만 별/방패/번개로
+  // 치환하고(아이콘도 Graphic10/Shield/Graphic13), oranke·PX 는 base 단감/인절미/어흥 +
+  // 기본 아이콘을 그대로 쓴다(PX 별칭 미적용).
+  const isEC = orgContent.key === "encre";
+  const EC_HEADER_POINT: Record<"단감" | "인절미" | "어흥", { label: string; icon: string }> = {
+    단감: { label: "별", icon: "/images/0/Graphic10.png" },
+    인절미: { label: "방패", icon: "/images/0/Shield.png" },
+    어흥: { label: "번개", icon: "/images/0/Graphic13.png" },
+  };
+  const withOrgQuery = (href: string) => {
+    if (!orgParam) return href;
+    return `${href}${href.includes("?") ? "&" : "?"}org=${encodeURIComponent(orgParam)}`;
+  };
   const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   // ?admin=true — Output Link 2차 모달 UI 테스트용 프론트 전용 override (DB/API/권한 변경 없음)
@@ -5827,12 +5843,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             style={{ cursor: "pointer", width: "44px", height: "44px" }}
           >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`} className="tab-badge" onClick={(e) => e.stopPropagation()}>
+            <Link href={withOrgQuery(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="tab-badge" onClick={(e) => e.stopPropagation()}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </Link>
           </div>
-          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`} className="tab" style={{ width: "44px", height: "44px" }}>
+          <Link href={withOrgQuery(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="tab" style={{ width: "44px", height: "44px" }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
@@ -5846,7 +5862,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
         <div className="nav-buttons">
           {prevWeekId ? (
-            <Link href={`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`} className="nav-btn-prev">
+            <Link href={withOrgQuery(`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="nav-btn-prev">
               <span>이전 주</span>
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
             </Link>
@@ -5857,7 +5873,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </button>
           )}
           {nextWeekId ? (
-            <Link href={`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`} className="nav-btn-next">
+            <Link href={withOrgQuery(`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="nav-btn-next">
               <span>다음 주</span>
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </Link>
@@ -5867,7 +5883,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}#weekly-filter-bar`} className="nav-btn-filled">
+          <Link href={`${withOrgQuery(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`)}#weekly-filter-bar`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -6115,8 +6131,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-group right" style={{ gap: "8px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "0px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  단감
-                  <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                  {isEC ? EC_HEADER_POINT.단감.label : "단감"}
+                  <img src={isEC ? EC_HEADER_POINT.단감.icon : "/images/0/cluster4/icon/icon - 단감.png"} alt={isEC ? EC_HEADER_POINT.단감.label : "단감"} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {weekPoints.star}
                   </strong>
@@ -6124,8 +6140,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  인절미
-                  <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                  {isEC ? EC_HEADER_POINT.인절미.label : "인절미"}
+                  <img src={isEC ? EC_HEADER_POINT.인절미.icon : "/images/0/cluster4/icon/icon - 인절미.png"} alt={isEC ? EC_HEADER_POINT.인절미.label : "인절미"} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {Math.abs(weekPoints.shield - weekPoints.lightning)}
                   </strong>
@@ -6133,8 +6149,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  어흥
-                  <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                  {isEC ? EC_HEADER_POINT.어흥.label : "어흥"}
+                  <img src={isEC ? EC_HEADER_POINT.어흥.icon : "/images/0/cluster4/icon/icon - 어흥.png"} alt={isEC ? EC_HEADER_POINT.어흥.label : "어흥"} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {Math.abs(weekPoints.lightning)}
                   </strong>
