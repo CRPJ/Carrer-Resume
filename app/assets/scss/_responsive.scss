@@ -5,14 +5,20 @@
 // Home 페이지에서 body/html 설정 - 푸터 표시를 위해 스크롤 허용
 // NOTE: html + body 모두에 overflow-y를 주면(특히 Windows) "이중 스크롤바"가 보일 수 있음
 // → 스크롤 컨테이너를 html로 통일하고, body는 overflow-y를 풀어준다.
-html:has(.nftg-content-home) {
+// 변형 클래스(.nftg-content-home-one for /, .nftg-content-home-two for /index-two*)도
+// 반드시 포함해야 .nftg-sidebar가 스크롤 끝까지 sticky로 유지된다.
+html:has(.nftg-content-home),
+html:has(.nftg-content-home-one),
+html:has(.nftg-content-home-two) {
   // overflow-x는 JS(ResponsiveScale)에서 동적 제어: 100%→hidden, 확대→auto
   overflow-y: auto !important;
   height: auto !important;
   min-height: 100vh !important;
 }
 
-body:has(.nftg-content-home) {
+body:has(.nftg-content-home),
+body:has(.nftg-content-home-one),
+body:has(.nftg-content-home-two) {
   overflow-x: visible !important;
   overflow-y: visible !important;
   height: auto !important;
@@ -21,7 +27,10 @@ body:has(.nftg-content-home) {
 
 
 // Home two layout - 사이드바와 메인콘텐츠 고정 레이아웃
-.nftg-content-home {
+// 같은 normalization을 -one(/) / -two(/index-two*) 변형에도 적용한다.
+.nftg-content-home,
+.nftg-content-home-one,
+.nftg-content-home-two {
   height: auto !important;
   min-height: calc(100vh - var(--header-divider-y, var(--header-height, 66px)) - 16px) !important;
   overflow: visible !important;
@@ -2544,6 +2553,100 @@ body:has(.nftg-content-home) {
   }
 }
 
-/* ==== 
+// Featured Games + Trending NFT — desktop typography & spacing.
+// Tightens .pt-120 / .pb-120 / .mt-60 utilities (120 / 120 / 60 → 70 / 70 / 32)
+// and restores a larger section title size. Below 1200px the existing
+// responsive cascade keeps mobile/tablet sizes intact.
+//
+// Scope notes:
+//   - Title rule is restricted to .feature and .trending/.trending-nft so it
+//     does NOT touch Banner/Hero h2.title-animation.
+//   - SplitType (`new SplitType('.title-animation')` in TitleAnimations.tsx)
+//     wraps text in .line / .word / .char children; we force them to inherit
+//     font-size / line-height so the visible glyphs actually resize.
+//   - Feature card image rules (.feature-slider__single .thumb) are untouched.
+@media (min-width: 1200px) {
+  // ── Featured Games ──────────────────────────────────────────────────────
+  .feature.pt-120 {
+    padding-top: 70px !important;     // 120 → 70 above section title
+  }
+
+  .feature {
+    padding-bottom: 70px !important;  // explicit floor below pagination/nav
+  }
+
+  .feature .feature-wrapper.mt-60 {
+    margin-top: 32px !important;      // 60 → 32 between title and cards
+  }
+
+  .feature .slider-footer.mt-60 {
+    margin-top: 32px !important;      // 60 → 32 between cards and pagination
+  }
+
+  // ── Trending NFT ────────────────────────────────────────────────────────
+  .trending-nft.pt-120,
+  section.trending-nft.pt-120 {
+    padding-top: 70px !important;     // 120 → 70
+  }
+
+  .trending-nft.pb-120,
+  section.trending-nft.pb-120 {
+    padding-bottom: 70px !important;  // 120 → 70
+  }
+
+  // Title row owns no bottom margin — gap comes from the slider's .mt-60.
+  .trending-nft .row.align-items-center {
+    margin-bottom: 0 !important;
+  }
+
+  // Slider gap (NFT slider uses .trending-slider-wrapper.mt-60).
+  .trending-nft .trending-slider-wrapper.mt-60 {
+    margin-top: 32px !important;      // 60 → 32
+  }
+
+  // Trending Games (home /) variant uses .trending__wrapper.mt-60.
+  .trending .trending__wrapper.mt-60 {
+    margin-top: 32px !important;      // 60 → 32
+  }
+
+  // ── Section title typography (Featured Games + Trending) ───────────────
+  // Specificity bumped via h2.title-animation; !important defeats utility
+  // .mt-* and any inline styles SplitType might leave behind.
+  .feature h2.title-animation,
+  .feature h2,
+  .trending-nft h2.title-animation,
+  .trending-nft h2,
+  .trending h2.title-animation {
+    font-size: clamp(48px, 3.6vw, 68px) !important;
+    line-height: 1.08 !important;
+    margin-bottom: 0 !important;
+  }
+
+  // Force SplitType wrappers (.line / .word / .char) to inherit, so the
+  // glyphs that are actually rendered pick up the new size.
+  .feature h2.title-animation .line,
+  .feature h2.title-animation .word,
+  .feature h2.title-animation .char,
+  .trending-nft h2.title-animation .line,
+  .trending-nft h2.title-animation .word,
+  .trending-nft h2.title-animation .char,
+  .trending h2.title-animation .line,
+  .trending h2.title-animation .word,
+  .trending h2.title-animation .char {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  // Fire icon next to the Trending NFT title — sit on text baseline.
+  .trending-nft h2 img,
+  .trending h2 img {
+    width: 44px !important;
+    height: 44px !important;
+    margin-top: 0 !important;
+    vertical-align: -0.12em !important;
+  }
+}
+
+/* ====
  --------- (6.0) responsive styles end ---------
  ==== */

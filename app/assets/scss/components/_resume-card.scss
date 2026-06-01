@@ -108,7 +108,7 @@
     right: 0;
     height: 35px;
     background:
-      linear-gradient(to right, rgba(0, 0, 0, var(--identity-tab-overlay, 0.45)), rgba(250, 171, 7, 0.75)),
+      linear-gradient(to right, rgba(0, 0, 0, var(--identity-tab-overlay, 0.45)), var(--identity-tab-accent, rgba(250, 171, 7, 0.75))),
       var(--identity-tab-bg) center 42% / cover no-repeat;
     z-index: 1;
   }
@@ -693,6 +693,8 @@
     position: relative;
 
     // 왼쪽 금색 바 - 시안 Vector 9.svg (75px, round cap)
+    // Phase D5-D: var(--org-accent-soft) cascade — PX 라우트에선 #B2FF8F,
+    // EC 라우트에선 #FF98A6, 원본/non-themed 라우트에선 fallback #ffc300 유지.
     &::before {
       content: "";
       position: absolute;
@@ -701,7 +703,7 @@
       transform: translateY(-50%);
       width: 2px;
       height: 75px;
-      background: #ffc300;
+      background: var(--org-accent-soft, #ffc300);
       border-radius: 1px;
     }
 
