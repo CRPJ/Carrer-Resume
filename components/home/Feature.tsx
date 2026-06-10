@@ -1,8 +1,8 @@
 "use client";
-import four from "@/public/images/games/featured/four.png";
-import one from "@/public/images/games/featured/one.png";
-import three from "@/public/images/games/featured/three.png";
-import two from "@/public/images/games/featured/two.png";
+import four from "@/public/images/home-random/intro-5.png";
+import one from "@/public/images/home-random/intro-2.png";
+import three from "@/public/images/home-random/intro-4.png";
+import two from "@/public/images/home-random/intro-3.png";
 import Image from "next/image";
 import Link from "next/link";
 import { Autoplay, FreeMode, Navigation, Pagination } from "swiper/modules";

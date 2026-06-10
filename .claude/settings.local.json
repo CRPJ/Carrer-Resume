@@ -144,7 +144,14 @@
       "PowerShell(Start-Sleep -Seconds 12; \\(Invoke-WebRequest -Uri \"http://localhost:3002\" -UseBasicParsing -TimeoutSec 5\\).StatusCode)",
       "PowerShell(Start-Sleep -Seconds 15; try { \\(Invoke-WebRequest -Uri \"http://localhost:3002/cluster-4-card/1\" -UseBasicParsing -TimeoutSec 10\\).StatusCode } catch { $_.Exception.Message })",
       "PowerShell(Start-Sleep -Seconds 20; try { \\(Invoke-WebRequest -Uri \"http://localhost:3002\" -UseBasicParsing -TimeoutSec 10 -MaximumRedirection 5\\).StatusCode } catch { $_.Exception.Message })",
-      "PowerShell(Get-Process *)"
+      "PowerShell(Get-Process *)",
+      "Bash(Select-String -Path \"components\\\\cluster-4-card\\\\Cluster4CardContent.tsx\" -Pattern \"editingOutputLinks\")",
+      "Bash(Select-String -NotMatch -Pattern \"editingExpOutputLinks|editingAbilityOutputLinks|editingCareerOutputLinks\")",
+      "Bash(Select-Object -First 15 LineNumber, Line)",
+      "PowerShell(Select-String -Path \"C:\\\\Users\\\\ynlee\\\\OneDrive\\\\바탕 화면\\\\커리어레쥬메\\\\Carrer-Resume\\\\components\\\\cluster-4-card\\\\Cluster4CardContent.tsx\" -Pattern \"editingOutputLinks\" | Where-Object { $_.Line -notmatch \"editingExpOutputLinks|editingAbilityOutputLinks|editingCareerOutputLinks\" } | Select-Object -First 15 LineNumber, Line)",
+      "PowerShell(Select-String -Path \"C:\\\\Users\\\\ynlee\\\\OneDrive\\\\바탕 화면\\\\커리어레쥬메\\\\Carrer-Resume\\\\app\\\\assets\\\\scss\\\\components\\\\_cluster4-week.scss\" -Pattern \"\\\\.work-view-modal|\\\\.section-modal\\\\b\" | Where-Object { $_.LineNumber -lt 11843 } | Select-Object -Last 5 LineNumber, Line)",
+      "PowerShell(git rev-list *)",
+      "Bash(Get-ChildItem *)"
     ],
     "deny": [],
     "ask": []

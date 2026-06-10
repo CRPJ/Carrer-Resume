@@ -3,6 +3,7 @@ import Header from "@/components/shared/Header";
 import Sidebar from "@/components/shared/Sidebar";
 import DemoToggle from "@/components/common/DemoToggle";
 import ProfileApprovalGate from "@/components/shared/ProfileApprovalGate";
+import RouteThemeShell from "@/components/shared/RouteThemeShell";
 
 export default function RootLayout({
   children,
@@ -10,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="nftg-app a-cursor">
+    <RouteThemeShell>
       <ProfileApprovalGate />
       <Sidebar />
       <div className="nftg-layout">
@@ -19,6 +20,6 @@ export default function RootLayout({
         <Footer />
       </div>
       <DemoToggle />
-    </div>
+    </RouteThemeShell>
   );
 }

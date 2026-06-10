@@ -16,6 +16,7 @@ import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA, DUMMY_WEEK_CARD } from "@/constant
 import DetailLogModal from "./DetailLogModal";
 import confetti from "canvas-confetti";
 import HelpModalBody from "@/components/shared/HelpModalBody";
+import { getOrgContent } from "@/components/orgContent";
 
 // 주차 결과 결정 시점 = N+1주(목) 12:01 KST = N(월) 00:00 + 10일 12시간 1분
 // 이 시점에 동시에 확정:
@@ -240,8 +241,39 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const orgParam = searchParams.get("org");
+  const orgContent = getOrgContent(orgParam);
+  // 참고 기준: cluster-4-card 헤더 포인트(별·방패·번개 영역)는 org 별로 라벨/아이콘을 치환한다.
+  //   oranke·org 없음 → base 단감/인절미/어흥 + 기본 아이콘
+  //   encre        → 별/방패/번개 + Graphic10/Shield/Graphic13
+  //   phalanx      → 투구/방패/화살 + PX01/pX02/PX03
+  // weekPoints 값/계산은 미터치 — 표기(라벨/아이콘)만 분기한다.
+  const HEADER_POINT: Record<"단감" | "인절미" | "어흥", { label: string; icon: string }> =
+    orgContent.key === "encre"
+      ? {
+          단감: { label: "별", icon: "/images/0/Graphic10.png" },
+          인절미: { label: "방패", icon: "/images/0/Shield.png" },
+          어흥: { label: "번개", icon: "/images/0/Graphic13.png" },
+        }
+      : orgContent.key === "phalanx"
+      ? {
+          단감: { label: "투구", icon: "/images/0/cluster 1/PX01.png" },
+          인절미: { label: "방패", icon: "/images/0/cluster 1/pX02.png" },
+          어흥: { label: "화살", icon: "/images/0/cluster 1/PX03.png" },
+        }
+      : {
+          단감: { label: "단감", icon: "/images/0/cluster4/icon/icon - 단감.png" },
+          인절미: { label: "인절미", icon: "/images/0/cluster4/icon/icon - 인절미.png" },
+          어흥: { label: "어흥", icon: "/images/0/cluster4/icon/icon - 어흥.png" },
+        };
+  const withOrgQuery = (href: string) => {
+    if (!orgParam) return href;
+    return `${href}${href.includes("?") ? "&" : "?"}org=${encodeURIComponent(orgParam)}`;
+  };
   const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
+  // ?admin=true — Output Link 2차 모달 UI 테스트용 프론트 전용 override (DB/API/권한 변경 없음)
+  const isAdminPreview = searchParams.get("admin") === "true";
   // SSR/client hydration 일관성을 위해 stateful — 첫 렌더 SSR=client=false, 마운트 후 localStorage 값 반영
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -1963,6 +1995,31 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   const [editingSubTitle, setEditingSubTitle] = useState<string>("");
   const [editingGrowthPoint, setEditingGrowthPoint] = useState<string>("");
   const [editingOutputLinks, setEditingOutputLinks] = useState<{ desc: string; url: string }[]>(Array(5).fill({ desc: "", url: "" }));
+  // Output Link 2차 모달 (URL/설명 분리 입력)
+  const [outputLinkEditModal, setOutputLinkEditModal] = useState<{
+    modalType: "workInfo" | "workExp" | "workAbility" | "workCareer";
+    linkIdx: number;
+    url: string;
+    desc: string;
+    error: string;
+  } | null>(null);
+  // admin preview 저장 값 — edit mode가 false로 돌아가도 유지 (새로고침 시 초기화)
+  const [adminSavedOutputLinks, setAdminSavedOutputLinks] = useState<Record<string, { desc: string; url: string }[]>>({});
+  // Output Link 커스텀 툴팁 (보기 모드 hover)
+  const [olTooltip, setOlTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const olTooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showOlTooltip = (e: React.MouseEvent, text: string) => {
+    if (!text) return;
+    const el = e.currentTarget as HTMLElement;
+    if (el.scrollWidth <= el.clientWidth) return;
+    if (olTooltipTimer.current) clearTimeout(olTooltipTimer.current);
+    const rect = el.getBoundingClientRect();
+    setOlTooltip({ text, x: rect.left + rect.width / 2, y: rect.top - 6 });
+  };
+  const hideOlTooltip = () => {
+    if (olTooltipTimer.current) clearTimeout(olTooltipTimer.current);
+    olTooltipTimer.current = setTimeout(() => setOlTooltip(null), 80);
+  };
   const [editingImages, setEditingImages] = useState<(string | null)[]>(createEmptyWorkInfoImages);
   const imageFileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -2133,15 +2190,22 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
 
   // workInfo View 모달 — 보기/편집 토글 핸들러 (Type B 푸터 규칙 + 관리자 승인)
   const handleEditWorkInfo = async () => {
-    if (!canEditWorkInfo) {
+    if (!canEditWorkInfo && !isAdminPreview) {
       await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
     const card = selectedWorkInfoCard;
     // 스냅샷: 비교 대상 필드만 (subTitle/growthPoint/outputLinks/images)
     const initialOutputLinks = card?.outputLinks && card.outputLinks.length > 0 ? card.outputLinks.map((l: { desc: string; url: string }) => ({ desc: l.desc || "", url: l.url || "" })) : Array(5).fill({ desc: "", url: "" });
-    const initialImages = normalizeWorkInfoImages(card?.images);
-    const initialCaptions = normalizeWorkInfoCaptions(card?.imageCaptions);
+    let initialImages = normalizeWorkInfoImages(card?.images);
+    let initialCaptions = normalizeWorkInfoCaptions(card?.imageCaptions);
+    if (isAdminPreview) {
+      const adminImgs = card?.activityType ? getAdminOutputImages(card.activityType) : [];
+      const crewImages = normalizeWorkInfoImages(card?.images);
+      const crewCaptions = normalizeWorkInfoCaptions(card?.imageCaptions);
+      initialImages = Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }, (_, i) => (i < 2 ? adminImgs[i]?.url || null : crewImages[i - 2] || null));
+      initialCaptions = Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }, (_, i) => (i < 2 ? adminImgs[i]?.caption || "" : crewCaptions[i - 2] || ""));
+    }
     workInfoSnapshot.current = {
       subTitle: card?.subTitle || "",
       growthPoint: card?.growthPoint || "",
@@ -2176,7 +2240,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkInfo = async () => {
-    if (!isDemoMode && !canEditWorkInfo) {
+    if (!isDemoMode && !canEditWorkInfo && !isAdminPreview) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2267,7 +2331,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkInfo = async () => {
-    if (!isDemoMode && !canEditWorkInfo) {
+    if (!isDemoMode && !canEditWorkInfo && !isAdminPreview) {
+      console.log("[AdminApprovalPopupCalled]", { isAdminPreview, caller: "handleSaveWorkInfo" });
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2288,20 +2353,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const newOutputLinks = editingOutputLinks;
       const newGrowthPoint = editingGrowthPoint.trim() || null;
       let persistedImages: (string | null)[] = editingImages;
-      try {
-        const persisted = await persistActivityDetailToServer({
-          activityTypeId: selectedWorkInfoCard.activityType,
-          subTitle: newSubTitle,
-          outputLinks: newOutputLinks,
-          growthPoint: newGrowthPoint,
-          images: editingImages,
-          imageCaptions: editingImageCaptions,
-        });
-        persistedImages = persisted.images;
-      } catch (err) {
-        console.error("workInfo 저장 실패:", err);
-        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
-        return;
+      if (isAdminPreview) {
+        console.log("[AdminPreview] workInfo 저장 — API 호출 생략, local state만 반영");
+      } else {
+        try {
+          const persisted = await persistActivityDetailToServer({
+            activityTypeId: selectedWorkInfoCard.activityType,
+            subTitle: newSubTitle,
+            outputLinks: newOutputLinks,
+            growthPoint: newGrowthPoint,
+            images: editingImages,
+            imageCaptions: editingImageCaptions,
+          });
+          persistedImages = persisted.images;
+        } catch (err) {
+          console.error("workInfo 저장 실패:", err);
+          alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+          return;
+        }
       }
       setEditingImages(persistedImages);
       setWeekActivityDetails((prev) => {
@@ -2376,6 +2445,91 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       while (next.length < 5) next.push({ desc: "", url: "" });
       return next;
     });
+  };
+
+  // Output Link 2차 모달 — 열기
+  const openOutputLinkEditModal = (modalType: "workInfo" | "workExp" | "workAbility" | "workCareer", idx: number) => {
+    let link = { desc: "", url: "" };
+    switch (modalType) {
+      case "workInfo":
+        link = editingOutputLinks[idx] || { desc: "", url: "" };
+        break;
+      case "workExp":
+        link = editingExpOutputLinks[idx] || { desc: "", url: "" };
+        break;
+      case "workAbility":
+        link = editingAbilityOutputLinks[idx] || { desc: "", url: "" };
+        break;
+      case "workCareer":
+        link = editingCareerOutputLinks[idx] || { desc: "", url: "" };
+        break;
+    }
+    setOutputLinkEditModal({ modalType, linkIdx: idx, url: link.url || "", desc: link.desc || "", error: "" });
+  };
+
+  // Output Link 2차 모달 — 저장
+  const saveOutputLinkEdit = () => {
+    if (!outputLinkEditModal) return;
+    const { modalType, linkIdx, url, desc } = outputLinkEditModal;
+    const trimmedUrl = url.trim();
+    console.log("[OutputLinkSave]", { isAdminPreview, modalType, linkIdx, url: trimmedUrl, desc: desc.trim() });
+    if (trimmedUrl && !trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
+      setOutputLinkEditModal((prev) => (prev ? { ...prev, error: "URL은 http:// 또는 https://로 시작해야 합니다." } : null));
+      return;
+    }
+    const newLink = { desc: desc.trim(), url: trimmedUrl };
+    if (isAdminPreview) {
+      // 프론트 테스트용: API/권한 체크 우회, editing state에만 직접 저장
+      const directSet = (setter: React.Dispatch<React.SetStateAction<{ desc: string; url: string }[]>>) => {
+        setter((prev) => {
+          const next = [...prev];
+          next[linkIdx] = newLink;
+          return next;
+        });
+      };
+      switch (modalType) {
+        case "workInfo":
+          directSet(setEditingOutputLinks);
+          break;
+        case "workExp":
+          directSet(setEditingExpOutputLinks);
+          break;
+        case "workAbility":
+          directSet(setEditingAbilityOutputLinks);
+          break;
+        case "workCareer":
+          directSet(setEditingCareerOutputLinks);
+          break;
+      }
+      // edit mode가 false로 돌아가도 값이 유지되도록 별도 state에도 저장
+      setAdminSavedOutputLinks((prev) => {
+        const arr = [...(prev[modalType] || createEmptyOutputLinks())];
+        arr[linkIdx] = newLink;
+        return { ...prev, [modalType]: arr };
+      });
+      console.log("[OutputLinkSave:AdminPreview] saved to local state:", { modalType, linkIdx, newLink });
+      setOutputLinkEditModal(null);
+      return;
+    }
+    switch (modalType) {
+      case "workInfo":
+        handleOutputLinkChange(linkIdx, "url", trimmedUrl);
+        handleOutputLinkChange(linkIdx, "desc", desc.trim());
+        break;
+      case "workExp":
+        handleExpOutputLinkChange(linkIdx, "url", trimmedUrl);
+        handleExpOutputLinkChange(linkIdx, "desc", desc.trim());
+        break;
+      case "workAbility":
+        handleAbilityOutputLinkChange(linkIdx, "url", trimmedUrl);
+        handleAbilityOutputLinkChange(linkIdx, "desc", desc.trim());
+        break;
+      case "workCareer":
+        handleCareerOutputLinkChange(linkIdx, "url", trimmedUrl);
+        handleCareerOutputLinkChange(linkIdx, "desc", desc.trim());
+        break;
+    }
+    setOutputLinkEditModal(null);
   };
 
   // workInfo View 모달 — 이미지 업로드/삭제/확대 핸들러
@@ -2453,7 +2607,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("해당 카드는 비어있습니다");
       return;
     }
-    if (!canEditWorkAbility) {
+    if (!canEditWorkAbility && !isAdminPreview) {
       await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
@@ -2494,7 +2648,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkAbility = async () => {
-    if (!isDemoMode && !canEditWorkAbility) {
+    if (!isDemoMode && !canEditWorkAbility && !isAdminPreview) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2508,7 +2662,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkAbility = async () => {
-    if (!isDemoMode && !canEditWorkAbility) {
+    if (!isDemoMode && !canEditWorkAbility && !isAdminPreview) {
+      console.log("[AdminApprovalPopupCalled]", { isAdminPreview, caller: "handleSaveWorkAbility" });
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2528,20 +2683,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const newOutputLinks = editingAbilityOutputLinks;
       const newGrowthPoint = editingAbilityGrowthPoint.trim() || null;
       let persistedImages: (string | null)[] = editingAbilityImages;
-      try {
-        const persisted = await persistActivityDetailToServer({
-          activityTypeId: selectedWorkAbilityCard.activityTypeId,
-          subTitle: newSubTitle,
-          outputLinks: newOutputLinks,
-          growthPoint: newGrowthPoint,
-          images: editingAbilityImages,
-          imageCaptions: editingAbilityImageCaptions,
-        });
-        persistedImages = persisted.images;
-      } catch (err) {
-        console.error("workAbility 저장 실패:", err);
-        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
-        return;
+      if (isAdminPreview) {
+        console.log("[AdminPreview] workAbility 저장 — API 호출 생략, local state만 반영");
+      } else {
+        try {
+          const persisted = await persistActivityDetailToServer({
+            activityTypeId: selectedWorkAbilityCard.activityTypeId,
+            subTitle: newSubTitle,
+            outputLinks: newOutputLinks,
+            growthPoint: newGrowthPoint,
+            images: editingAbilityImages,
+            imageCaptions: editingAbilityImageCaptions,
+          });
+          persistedImages = persisted.images;
+        } catch (err) {
+          console.error("workAbility 저장 실패:", err);
+          alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+          return;
+        }
       }
       setEditingAbilityImages(persistedImages);
       setWeekActivityDetails((prev) => {
@@ -2692,7 +2851,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("해당 카드는 비어있습니다");
       return;
     }
-    if (!canEditWorkExp) {
+    if (!canEditWorkExp && !isAdminPreview) {
       await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
@@ -2736,7 +2895,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkExp = async () => {
-    if (!isDemoMode && !canEditWorkExp) {
+    if (!isDemoMode && !canEditWorkExp && !isAdminPreview) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2750,7 +2909,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkExp = async () => {
-    if (!isDemoMode && !canEditWorkExp) {
+    if (!isDemoMode && !canEditWorkExp && !isAdminPreview) {
+      console.log("[AdminApprovalPopupCalled]", { isAdminPreview, caller: "handleSaveWorkExp" });
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -2770,20 +2930,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const newOutputLinks = editingExpOutputLinks;
       const newGrowthPoint = editingExpGrowthPoint.trim() || null;
       let persistedImages: (string | null)[] = editingExpImages;
-      try {
-        const persisted = await persistActivityDetailToServer({
-          activityTypeId: selectedWorkExpCard.activityTypeId,
-          subTitle: newSubTitle,
-          outputLinks: newOutputLinks,
-          growthPoint: newGrowthPoint,
-          images: editingExpImages,
-          imageCaptions: editingExpImageCaptions,
-        });
-        persistedImages = persisted.images;
-      } catch (err) {
-        console.error("workExp 저장 실패:", err);
-        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
-        return;
+      if (isAdminPreview) {
+        console.log("[AdminPreview] workExp 저장 — API 호출 생략, local state만 반영");
+      } else {
+        try {
+          const persisted = await persistActivityDetailToServer({
+            activityTypeId: selectedWorkExpCard.activityTypeId,
+            subTitle: newSubTitle,
+            outputLinks: newOutputLinks,
+            growthPoint: newGrowthPoint,
+            images: editingExpImages,
+            imageCaptions: editingExpImageCaptions,
+          });
+          persistedImages = persisted.images;
+        } catch (err) {
+          console.error("workExp 저장 실패:", err);
+          alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+          return;
+        }
       }
       setEditingExpImages(persistedImages);
       setWeekActivityDetails((prev) => {
@@ -2931,7 +3095,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       await popup.alert("해당 카드는 비어있습니다");
       return;
     }
-    if (!canEditWorkCareer) {
+    if (!canEditWorkCareer && !isAdminPreview) {
       await popup.alert("작성할 수 있는 기간이 아닙니다. 😊");
       return;
     }
@@ -2972,7 +3136,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleResetWorkCareer = async () => {
-    if (!isDemoMode && !canEditWorkCareer) {
+    if (!isDemoMode && !canEditWorkCareer && !isAdminPreview) {
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -3009,7 +3173,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
   };
 
   const handleSaveWorkCareer = async () => {
-    if (!isDemoMode && !canEditWorkCareer) {
+    if (!isDemoMode && !canEditWorkCareer && !isAdminPreview) {
+      console.log("[AdminApprovalPopupCalled]", { isAdminPreview, caller: "handleSaveWorkCareer" });
       await popup.alert("관리자 승인 후 수정할 수 있습니다.");
       return;
     }
@@ -3040,20 +3205,24 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       const crewImagesToSave = editingCareerImages.slice(adminImgCount);
       const crewCaptionsToSave = editingCareerImageCaptions.slice(adminImgCount);
       let persistedCrewImages: (string | null)[] = crewImagesToSave;
-      try {
-        const persisted = await persistActivityDetailToServer({
-          activityTypeId: activityType,
-          subTitle: newSubTitle,
-          outputLinks: newOutputLinks,
-          growthPoint: newGrowthPoint,
-          images: crewImagesToSave,
-          imageCaptions: crewCaptionsToSave,
-        });
-        persistedCrewImages = persisted.images;
-      } catch (err) {
-        console.error("workCareer 저장 실패:", err);
-        alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
-        return;
+      if (isAdminPreview) {
+        console.log("[AdminPreview] workCareer 저장 — API 호출 생략, local state만 반영");
+      } else {
+        try {
+          const persisted = await persistActivityDetailToServer({
+            activityTypeId: activityType,
+            subTitle: newSubTitle,
+            outputLinks: newOutputLinks,
+            growthPoint: newGrowthPoint,
+            images: crewImagesToSave,
+            imageCaptions: crewCaptionsToSave,
+          });
+          persistedCrewImages = persisted.images;
+        } catch (err) {
+          console.error("workCareer 저장 실패:", err);
+          alert(err instanceof Error ? err.message : "저장 중 오류가 발생했습니다.");
+          return;
+        }
       }
       // 화면 상태는 어드민 + 크루 머지 결과로 복원
       const mergedImages: (string | null)[] = [];
@@ -5746,12 +5915,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             style={{ cursor: "pointer", width: "44px", height: "44px" }}
           >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`} className="tab-badge" onClick={(e) => e.stopPropagation()}>
+            <Link href={withOrgQuery(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="tab-badge" onClick={(e) => e.stopPropagation()}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </Link>
           </div>
-          <Link href={`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`} className="tab" style={{ width: "44px", height: "44px" }}>
+          <Link href={withOrgQuery(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="tab" style={{ width: "44px", height: "44px" }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
               <span className="badge-text">Season Growth</span>
@@ -5765,7 +5934,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
         </div>
         <div className="nav-buttons">
           {prevWeekId ? (
-            <Link href={`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`} className="nav-btn-prev">
+            <Link href={withOrgQuery(`/cluster-4-card/${prevWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="nav-btn-prev">
               <span>이전 주</span>
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20left.png" alt="left" className="arrow-icon" />
             </Link>
@@ -5776,7 +5945,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
             </button>
           )}
           {nextWeekId ? (
-            <Link href={`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`} className="nav-btn-next">
+            <Link href={withOrgQuery(`/cluster-4-card/${nextWeekId}${urlUserId ? `?userId=${urlUserId}` : ""}`)} className="nav-btn-next">
               <span>다음 주</span>
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </Link>
@@ -5786,7 +5955,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <img src="/images/0/cluster4/icon/icon%20-%20arrow%20right.png" alt="right" className="arrow-icon" />
             </button>
           )}
-          <Link href={`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}#weekly-filter-bar`} className="nav-btn-filled">
+          <Link href={`${withOrgQuery(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`)}#weekly-filter-bar`} className="nav-btn-filled">
             <img src="/images/0/cluster4/icon/icon%20-%201.png" alt="list" className="list-icon" />
             <span>전체 목록으로 돌아가기</span>
           </Link>
@@ -6034,8 +6203,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div className="info-group right" style={{ gap: "8px", fontSize: "16px", fontFamily: "'Pretendard', sans-serif", marginLeft: "0px" }}>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  단감
-                  <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                  {HEADER_POINT.단감.label}
+                  <img src={HEADER_POINT.단감.icon} alt={HEADER_POINT.단감.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {weekPoints.star}
                   </strong>
@@ -6043,8 +6212,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  인절미
-                  <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                  {HEADER_POINT.인절미.label}
+                  <img src={HEADER_POINT.인절미.icon} alt={HEADER_POINT.인절미.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {cumulativeInjeolmi}
                   </strong>
@@ -6052,8 +6221,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                 </span>
                 <span className="info-divider">·</span>
                 <span className="info-item with-icon">
-                  어흥
-                  <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                  {HEADER_POINT.어흥.label}
+                  <img src={HEADER_POINT.어흥.icon} alt={HEADER_POINT.어흥.label} className="item-icon" />
                   <strong className="number-value" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                     {Math.abs(weekPoints.lightning)}
                   </strong>
@@ -8713,14 +8882,16 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         {/* 1행: 활동 카테고리 — 기존 매핑 activityTypeConfig[activityType].icon (selectedWorkInfoCard.icon) 사용 */}
                         <div className="line-info-row">
                           {selectedWorkInfoCard.icon ? <img className="line-activity-icon" src={selectedWorkInfoCard.icon} alt={selectedWorkInfoCard.category || "활동"} /> : <span className="line-status-icon">●</span>}
-                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>{"인포데스크 — 데모 확인용 매우 긴 텍스트 두 줄 줄바꿈 테스트입니다 테스트입니다"}</span>
+                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>
+                            {"인포데스크"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* 2열: Output Link 5개 — cluster3 output modal 패턴 (dot + input/text + open-btn) + adminCount 보호 + 순차 입력 */}
                     <div className="workinfo-mid-col2">
-                      <div className="workinfo-output-links">
+                      <div className="workinfo-output-links" onWheel={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                         {[0, 1, 2, 3, 4].map((i) => {
                           // cluster3 dot 색상(3개) → 5개 확장
                           const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
@@ -8734,21 +8905,35 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             { desc: "커리어 트랙 로드맵", url: "https://example.com/career-roadmap" },
                             { desc: "주차별 성장 기록 아카이브", url: "https://example.com/growth-history" },
                           ];
-                          // 보기 모드는 데모 데이터, 편집 모드는 editingOutputLinks
-                          const link = workInfoViewIsEditing ? editingOutputLinks[i] || { desc: "", url: "" } : demoOutputLinks[i] || { desc: "", url: "" };
+                          // 표시 우선순위: 1) editing state (수정 모드) 2) admin preview 저장 값 3) card/demo data
+                          const adminOverride = isAdminPreview ? adminSavedOutputLinks["workInfo"]?.[i] : null;
+                          const link = workInfoViewIsEditing
+                            ? editingOutputLinks[i] || { desc: "", url: "" }
+                            : (adminOverride?.url?.trim() ? adminOverride : demoOutputLinks[i]) || { desc: "", url: "" };
                           const hasUrl = !!link.url?.trim();
-                          // 순차 입력: 사용자 링크 영역(idx >= adminCount)에서 이전 칸 비어있으면 disabled
-                          const prevUserLink = i > adminCount ? editingOutputLinks[i - 1] : null;
-                          const sequentialDisabled = workInfoViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const prevLink = workInfoViewIsEditing ? editingOutputLinks[i - 1] : (isAdminPreview ? adminSavedOutputLinks["workInfo"]?.[i - 1] : null);
+                          const sequentialDisabled = workInfoViewIsEditing && !isAdminLink && i > adminCount && !prevLink?.url?.trim();
                           const displayText = link.desc?.trim() || link.url;
+                          if (isAdminPreview && i === 0) console.log("[RenderWorkInfo]", { isEditing: workInfoViewIsEditing, link, adminOverride });
                           return (
                             <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
-                              {/* cluster3 패턴: dot + input/text + open-btn */}
                               <span className="link-dot" style={{ backgroundColor: dotColor }} />
-                              {workInfoViewIsEditing && !isAdminLink ? (
-                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleOutputLinkChange(i, "url", e.target.value)} />
+                              {workInfoViewIsEditing && (!isAdminLink || isAdminPreview) ? (
+                                <span
+                                  className={`output-link-text output-link-editable${hasUrl ? "" : " output-link-empty"}${sequentialDisabled ? " output-link-disabled" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    if (!sequentialDisabled) openOutputLinkEditModal("workInfo", i);
+                                  }}
+                                  title={hasUrl ? link.desc?.trim() || link.url : undefined}
+                                >
+                                  {sequentialDisabled ? "먼저 상위 Output Link를 입력해주세요" : hasUrl ? displayText || "" : `Output Link ${i + 1}`}
+                                </span>
                               ) : hasUrl ? (
-                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                                <span className="output-link-text output-link-clickable" onMouseEnter={(e) => showOlTooltip(e, link.desc?.trim() || link.url || "")} onMouseLeave={hideOlTooltip} onClick={() => window.open(ensureProtocol(link.url), "_blank")}>
+                                  {displayText}
+                                </span>
                               ) : (
                                 <span className="output-link-text output-link-empty">-</span>
                               )}
@@ -8847,7 +9032,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const crewCaptionsForState = workInfoViewIsEditing ? editingImageCaptions : viewCaptions;
                       let image: string | null = null;
                       let caption = "";
-                      if (isAdminSlot) {
+                      const effectiveIsAdmin = !isAdminPreview && isAdminSlot;
+                      if (isAdminPreview) {
+                        image = crewImagesForState[imageIdx] || null;
+                        caption = crewCaptionsForState[imageIdx] || "";
+                      } else if (isAdminSlot) {
                         const adminImg = adminImages[imageIdx];
                         image = adminImg?.url || null;
                         caption = adminImg?.caption || "";
@@ -8856,13 +9045,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         image = crewImagesForState[crewSlotIdx] || null;
                         caption = crewCaptionsForState[crewSlotIdx] || "";
                       }
-                      // 어드민 슬롯은 클릭/편집/삭제 모두 비활성, 크루 슬롯만 편집 가능
-                      const slotIsEditable = workInfoViewIsEditing && !isAdminSlot;
-                      const crewSlotIdx = imageIdx - 2; // 슬롯 2,3 → 크루 image_urls[0,1]
+                      const slotIsEditable = workInfoViewIsEditing && (isAdminPreview || !isAdminSlot);
+                      const crewSlotIdx = imageIdx - 2;
+                      const effectiveIdx = isAdminPreview ? imageIdx : crewSlotIdx;
                       return (
-                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${isAdminSlot && !image ? " disabled" : ""}${isAdminSlot ? " admin-slot" : ""}`} style={{ position: "relative" }}>
+                        <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${effectiveIsAdmin && !image ? " disabled" : ""}${effectiveIsAdmin ? " admin-slot" : ""}`} style={{ position: "relative" }}>
                           {image ? (
-                            <div className="image-preview" onClick={() => !isAdminSlot && handleImagePreview(crewSlotIdx)}>
+                            <div className="image-preview" onClick={() => { if (image) setPreviewImageUrl(image); }}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
                               {slotIsEditable && (
                                 <div className="image-actions-overlay">
@@ -8871,7 +9060,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                     className="image-action-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      triggerImageUpload(crewSlotIdx);
+                                      triggerImageUpload(effectiveIdx);
                                     }}
                                     title="교체"
                                     aria-label="교체"
@@ -8883,7 +9072,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                     className="image-action-btn image-delete-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleImageDelete(crewSlotIdx);
+                                      handleImageDelete(effectiveIdx);
                                     }}
                                     title="삭제"
                                     aria-label="삭제"
@@ -8897,7 +9086,18 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <div
                               className="image-preview"
                               onClick={async () => {
-                                if (slotIsEditable) triggerImageUpload(crewSlotIdx);
+                                if (isAdminPreview && workInfoViewIsEditing) {
+                                  triggerImageUpload(effectiveIdx);
+                                } else if (isAdminSlot && workInfoViewIsEditing) {
+                                  await popup.alert("이 칸은 운영진이 업로드하는 공간입니다.");
+                                } else if (!isAdminSlot && workInfoViewIsEditing) {
+                                  const isCrewEnabled = crewSlotIdx === 0 || !!crewImagesForState[crewSlotIdx - 1];
+                                  if (!isCrewEnabled) {
+                                    await popup.alert("먼저 앞 순서의 이미지를 업로드해주세요.");
+                                  } else {
+                                    triggerImageUpload(crewSlotIdx);
+                                  }
+                                }
                               }}
                             >
                               {slotIsEditable && (
@@ -8907,7 +9107,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                     className="image-action-btn"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      triggerImageUpload(crewSlotIdx);
+                                      triggerImageUpload(effectiveIdx);
                                     }}
                                     title="업로드"
                                     aria-label="업로드"
@@ -8916,29 +9116,28 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                                   </button>
                                 </div>
                               )}
-                              <div className="empty-slot">{isAdminSlot ? <span style={{ color: "#aaa", fontSize: 12 }}>운영진 미업로드</span> : <i className="ti ti-photo-plus"></i>}</div>
+                              <div className="empty-slot"><i className="ti ti-photo-plus"></i></div>
                             </div>
                           )}
-                          {!isAdminSlot && (
+                          {(isAdminPreview || !isAdminSlot) && (
                             <input
                               type="file"
                               accept="image/*"
                               ref={(el) => {
-                                imageFileInputRefs.current[crewSlotIdx] = el;
+                                imageFileInputRefs.current[effectiveIdx] = el;
                               }}
                               style={{ display: "none" }}
-                              onChange={(e) => handleImageFileChange(e, crewSlotIdx)}
+                              onChange={(e) => handleImageFileChange(e, effectiveIdx)}
                             />
                           )}
-                          {/* 캡션 바 — 어드민 슬롯은 보기 전용, 크루 슬롯만 편집 가능 */}
                           <div className="image-caption-overlay">
-                            {slotIsEditable && activeCaptionIdx === crewSlotIdx ? (
+                            {slotIsEditable && activeCaptionIdx === effectiveIdx ? (
                               <input
                                 type="text"
                                 className="caption-input"
-                                value={editingImageCaptions[crewSlotIdx] || ""}
+                                value={editingImageCaptions[effectiveIdx] || ""}
                                 onChange={(e) => {
-                                  if (e.target.value.length <= 20) handleCaptionChange(crewSlotIdx, e.target.value);
+                                  if (e.target.value.length <= 20) handleCaptionChange(effectiveIdx, e.target.value);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 placeholder="캡션 입력 (최대 20자)"
@@ -8952,12 +9151,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                           {slotIsEditable && (
                             <button
                               type="button"
-                              className={`image-action-btn image-caption-btn${activeCaptionIdx === crewSlotIdx ? " active" : ""}`}
+                              className={`image-action-btn image-caption-btn${activeCaptionIdx === effectiveIdx ? " active" : ""}`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setActiveCaptionIdx(activeCaptionIdx === crewSlotIdx ? null : crewSlotIdx);
+                                setActiveCaptionIdx(activeCaptionIdx === effectiveIdx ? null : effectiveIdx);
                               }}
-                              title={activeCaptionIdx === crewSlotIdx ? "캡션 저장" : "캡션 편집"}
+                              title={activeCaptionIdx === effectiveIdx ? "캡션 저장" : "캡션 편집"}
                               aria-label="캡션"
                               style={{ position: "absolute", bottom: "8px", right: "8px", zIndex: 3 }}
                             >
@@ -8985,8 +9184,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const locked = isLineLocked(selectedWorkInfoCard);
                       const isEmptyStatus = (selectedWorkInfoCard?.status as string) === "empty";
-                      const disabled = !canEditWorkInfo || locked || isEmptyStatus;
-                      const title = isEmptyStatus ? "빈 카드 상태에서는 수정할 수 없습니다." : locked ? LINE_LOCKED_TITLE : canEditWorkInfo ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
+                      const disabled = !isAdminPreview && (!canEditWorkInfo || locked || isEmptyStatus);
+                      const title = isEmptyStatus ? "빈 카드 상태에서는 수정할 수 없습니다." : locked ? LINE_LOCKED_TITLE : canEditWorkInfo || isAdminPreview ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkInfo} disabled={disabled} aria-disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -9149,30 +9348,48 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="workinfo-line-info">
                         <div className="line-info-row">
                           <img className="line-activity-icon" src={getWorkExpIcon(lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "")} alt={selectedWorkExpCard.badge || "활동"} />
-                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>{lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "—"}</span>
+                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>
+                            {lookupWorkExpMapping(selectedWorkExpCard.code)?.lineName || selectedWorkExpCard.badge || "—"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Output Link 5개 */}
                     <div className="workinfo-mid-col2">
-                      <div className="workinfo-output-links">
+                      <div className="workinfo-output-links" onWheel={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                         {[0, 1, 2, 3, 4].map((i) => {
                           const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
                           const adminCount = selectedWorkExpCard?.activityTypeId ? getAdminOutputLinksCount(selectedWorkExpCard.activityTypeId) : 0;
                           const isAdminLink = i < adminCount;
-                          const link = workExpViewIsEditing ? editingExpOutputLinks[i] || { desc: "", url: "" } : selectedWorkExpCard.outputLinks?.[i] || { desc: "", url: "" };
+                          const adminOverride = isAdminPreview ? adminSavedOutputLinks["workExp"]?.[i] : null;
+                          const link = workExpViewIsEditing
+                            ? editingExpOutputLinks[i] || { desc: "", url: "" }
+                            : (adminOverride?.url?.trim() ? adminOverride : selectedWorkExpCard.outputLinks?.[i]) || { desc: "", url: "" };
                           const hasUrl = !!link.url?.trim();
-                          const prevUserLink = i > adminCount ? editingExpOutputLinks[i - 1] : null;
-                          const sequentialDisabled = workExpViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const prevLink = workExpViewIsEditing ? editingExpOutputLinks[i - 1] : (isAdminPreview ? adminSavedOutputLinks["workExp"]?.[i - 1] : null);
+                          const sequentialDisabled = workExpViewIsEditing && !isAdminLink && i > adminCount && !prevLink?.url?.trim();
                           const displayText = link.desc?.trim() || link.url;
+                          if (isAdminPreview && i === 0) console.log("[RenderWorkExp]", { isEditing: workExpViewIsEditing, link, adminOverride });
                           return (
                             <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
                               <span className="link-dot" style={{ backgroundColor: dotColor }} />
-                              {workExpViewIsEditing && !isAdminLink ? (
-                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleExpOutputLinkChange(i, "url", e.target.value)} />
+                              {workExpViewIsEditing && (!isAdminLink || isAdminPreview) ? (
+                                <span
+                                  className={`output-link-text output-link-editable${hasUrl ? "" : " output-link-empty"}${sequentialDisabled ? " output-link-disabled" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    if (!sequentialDisabled) openOutputLinkEditModal("workExp", i);
+                                  }}
+                                  title={hasUrl ? link.desc?.trim() || link.url : undefined}
+                                >
+                                  {sequentialDisabled ? "먼저 상위 Output Link를 입력해주세요" : hasUrl ? displayText || "" : `Output Link ${i + 1}`}
+                                </span>
                               ) : hasUrl ? (
-                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                                <span className="output-link-text output-link-clickable" onMouseEnter={(e) => showOlTooltip(e, link.desc?.trim() || link.url || "")} onMouseLeave={hideOlTooltip} onClick={() => window.open(ensureProtocol(link.url), "_blank")}>
+                                  {displayText}
+                                </span>
                               ) : (
                                 <span className="output-link-text output-link-empty">-</span>
                               )}
@@ -9260,12 +9477,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const captionsForState = workExpViewIsEditing ? editingExpImageCaptions : viewCaptions;
                       const image = imagesForState[imageIdx] || null;
                       const caption = captionsForState[imageIdx] || "";
-                      const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
+                      const isEnabled = isAdminPreview || imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2;
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {image ? (
-                            <div className="image-preview" onClick={() => handleExpImagePreview(imageIdx)}>
+                            <div className="image-preview" onClick={() => { if (image) setPreviewExpImageUrl(image); }}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
                               {workExpViewIsEditing && (
                                 <div className="image-actions-overlay">
@@ -9300,7 +9517,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <div
                               className="image-preview"
                               onClick={async () => {
-                                if (workExpViewIsEditing && isEnabled) triggerExpImageUpload(imageIdx);
+                                if (workExpViewIsEditing) {
+                                  if (!isEnabled) {
+                                    await popup.alert("먼저 앞 순서의 이미지를 업로드해주세요.");
+                                  } else {
+                                    triggerExpImageUpload(imageIdx);
+                                  }
+                                }
                               }}
                             >
                               {workExpViewIsEditing && (
@@ -9427,8 +9650,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const empty = selectedWorkExpCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkExpCard);
-                      const disabled = !canEditWorkExp || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkExp ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
+                      const disabled = !isAdminPreview && (!canEditWorkExp || empty || locked);
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkExp || isAdminPreview ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkExp} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -9592,29 +9815,46 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       <div className="workinfo-line-info">
                         <div className="line-info-row">
                           {selectedWorkAbilityCard.icon ? <img className="line-activity-icon" src={selectedWorkAbilityCard.icon} alt={selectedWorkAbilityCard.lineName || "활동"} /> : <span className="line-status-icon">●</span>}
-                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>{selectedWorkAbilityCard.lineName || "—"}</span>
+                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>
+                            {selectedWorkAbilityCard.lineName || "—"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="workinfo-mid-col2">
-                      <div className="workinfo-output-links">
+                      <div className="workinfo-output-links" onWheel={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                         {[0, 1, 2, 3, 4].map((i) => {
                           const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
                           const adminCount = selectedWorkAbilityCard?.activityTypeId ? getAdminOutputLinksCount(selectedWorkAbilityCard.activityTypeId) : 0;
                           const isAdminLink = i < adminCount;
-                          const link = workAbilityViewIsEditing ? editingAbilityOutputLinks[i] || { desc: "", url: "" } : selectedWorkAbilityCard.outputLinks?.[i] || { desc: "", url: "" };
+                          const adminOverride = isAdminPreview ? adminSavedOutputLinks["workAbility"]?.[i] : null;
+                          const link = workAbilityViewIsEditing
+                            ? editingAbilityOutputLinks[i] || { desc: "", url: "" }
+                            : (adminOverride?.url?.trim() ? adminOverride : selectedWorkAbilityCard.outputLinks?.[i]) || { desc: "", url: "" };
                           const hasUrl = !!link.url?.trim();
-                          const prevUserLink = i > adminCount ? editingAbilityOutputLinks[i - 1] : null;
-                          const sequentialDisabled = workAbilityViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const prevLink = workAbilityViewIsEditing ? editingAbilityOutputLinks[i - 1] : (isAdminPreview ? adminSavedOutputLinks["workAbility"]?.[i - 1] : null);
+                          const sequentialDisabled = workAbilityViewIsEditing && !isAdminLink && i > adminCount && !prevLink?.url?.trim();
                           const displayText = link.desc?.trim() || link.url;
                           return (
                             <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
                               <span className="link-dot" style={{ backgroundColor: dotColor }} />
-                              {workAbilityViewIsEditing && !isAdminLink ? (
-                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleAbilityOutputLinkChange(i, "url", e.target.value)} />
+                              {workAbilityViewIsEditing && (!isAdminLink || isAdminPreview) ? (
+                                <span
+                                  className={`output-link-text output-link-editable${hasUrl ? "" : " output-link-empty"}${sequentialDisabled ? " output-link-disabled" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    if (!sequentialDisabled) openOutputLinkEditModal("workAbility", i);
+                                  }}
+                                  title={hasUrl ? link.desc?.trim() || link.url : undefined}
+                                >
+                                  {sequentialDisabled ? "먼저 상위 Output Link를 입력해주세요" : hasUrl ? displayText || "" : `Output Link ${i + 1}`}
+                                </span>
                               ) : hasUrl ? (
-                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                                <span className="output-link-text output-link-clickable" onMouseEnter={(e) => showOlTooltip(e, link.desc?.trim() || link.url || "")} onMouseLeave={hideOlTooltip} onClick={() => window.open(ensureProtocol(link.url), "_blank")}>
+                                  {displayText}
+                                </span>
                               ) : (
                                 <span className="output-link-text output-link-empty">-</span>
                               )}
@@ -9698,12 +9938,12 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                       const captionsForState = workAbilityViewIsEditing ? editingAbilityImageCaptions : viewCaptions;
                       const image = imagesForState[imageIdx] || null;
                       const caption = captionsForState[imageIdx] || "";
-                      const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
+                      const isEnabled = isAdminPreview || imageIdx === 0 || !!imagesForState[imageIdx - 1];
                       const isRequired = imageIdx < 2;
                       return (
                         <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
                           {image ? (
-                            <div className="image-preview" onClick={() => handleAbilityImagePreview(imageIdx)}>
+                            <div className="image-preview" onClick={() => { if (image) setPreviewAbilityImageUrl(image); }}>
                               <img src={image} alt={`이미지 ${imageIdx + 1}`} />
                               {workAbilityViewIsEditing && (
                                 <div className="image-actions-overlay">
@@ -9738,7 +9978,13 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                             <div
                               className="image-preview"
                               onClick={async () => {
-                                if (workAbilityViewIsEditing && isEnabled) triggerAbilityImageUpload(imageIdx);
+                                if (workAbilityViewIsEditing) {
+                                  if (!isEnabled) {
+                                    await popup.alert("먼저 앞 순서의 이미지를 업로드해주세요.");
+                                  } else {
+                                    triggerAbilityImageUpload(imageIdx);
+                                  }
+                                }
                               }}
                             >
                               {workAbilityViewIsEditing && (
@@ -9827,8 +10073,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const empty = selectedWorkAbilityCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkAbilityCard);
-                      const disabled = !canEditWorkAbility || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkAbility ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
+                      const disabled = !isAdminPreview && (!canEditWorkAbility || empty || locked);
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkAbility || isAdminPreview ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkAbility} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -10004,13 +10250,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>-</span>
                             </div>
                           )}
-                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>{selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "—"}</span>
+                          <span className="line-name" style={{ lineHeight: "26px", height: "26px", overflow: "visible" }}>
+                            {selectedWorkCareerCard.lineName || selectedWorkCareerCard.badge || "—"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="workinfo-mid-col2">
-                      <div className="workinfo-output-links">
+                      <div className="workinfo-output-links" onWheel={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                         {[0, 1, 2, 3, 4].map((i) => {
                           const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07", "#6BCB77", "#A084DC"][i];
                           // 실무 경력 cluster 는 activity_type 가 'practical_project' 1개뿐이고, 카드(=career_projects)는 여러 개 가능.
@@ -10018,18 +10266,33 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const activityType = workCareerActivityTypes[0];
                           const adminCount = activityType ? getAdminOutputLinksCount(activityType) : 0;
                           const isAdminLink = i < adminCount;
-                          const link = workCareerViewIsEditing ? editingCareerOutputLinks[i] || { desc: "", url: "" } : selectedWorkCareerCard.outputLinks?.[i] || { desc: "", url: "" };
+                          const adminOverride = isAdminPreview ? adminSavedOutputLinks["workCareer"]?.[i] : null;
+                          const link = workCareerViewIsEditing
+                            ? editingCareerOutputLinks[i] || { desc: "", url: "" }
+                            : (adminOverride?.url?.trim() ? adminOverride : selectedWorkCareerCard.outputLinks?.[i]) || { desc: "", url: "" };
                           const hasUrl = !!link.url?.trim();
-                          const prevUserLink = i > adminCount ? editingCareerOutputLinks[i - 1] : null;
-                          const sequentialDisabled = workCareerViewIsEditing && !isAdminLink && i > adminCount && !prevUserLink?.url?.trim();
+                          const prevLink = workCareerViewIsEditing ? editingCareerOutputLinks[i - 1] : (isAdminPreview ? adminSavedOutputLinks["workCareer"]?.[i - 1] : null);
+                          const sequentialDisabled = workCareerViewIsEditing && !isAdminLink && i > adminCount && !prevLink?.url?.trim();
                           const displayText = link.desc?.trim() || link.url;
                           return (
                             <div className={`output-link-row ${isAdminLink ? "admin-link" : ""}`} key={i}>
                               <span className="link-dot" style={{ backgroundColor: dotColor }} />
-                              {workCareerViewIsEditing && !isAdminLink ? (
-                                <input type="url" className="output-link-input" placeholder={sequentialDisabled ? "이전 링크를 먼저 입력하세요" : "https://..."} value={link.url} disabled={sequentialDisabled} onChange={(e) => handleCareerOutputLinkChange(i, "url", e.target.value)} />
+                              {workCareerViewIsEditing && (!isAdminLink || isAdminPreview) ? (
+                                <span
+                                  className={`output-link-text output-link-editable${hasUrl ? "" : " output-link-empty"}${sequentialDisabled ? " output-link-disabled" : ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    if (!sequentialDisabled) openOutputLinkEditModal("workCareer", i);
+                                  }}
+                                  title={hasUrl ? link.desc?.trim() || link.url : undefined}
+                                >
+                                  {sequentialDisabled ? "먼저 상위 Output Link를 입력해주세요" : hasUrl ? displayText || "" : `Output Link ${i + 1}`}
+                                </span>
                               ) : hasUrl ? (
-                                <span className="output-link-text">{displayText.length > 20 ? displayText.substring(0, 20) + ".." : displayText}</span>
+                                <span className="output-link-text output-link-clickable" onMouseEnter={(e) => showOlTooltip(e, link.desc?.trim() || link.url || "")} onMouseLeave={hideOlTooltip} onClick={() => window.open(ensureProtocol(link.url), "_blank")}>
+                                  {displayText}
+                                </span>
                               ) : (
                                 <span className="output-link-text output-link-empty">-</span>
                               )}
@@ -10120,9 +10383,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                         const captionsForState = workCareerViewIsEditing ? editingCareerImageCaptions : viewCaptions;
                         const image = imagesForState[imageIdx] || null;
                         const caption = captionsForState[imageIdx] || "";
-                        const isEnabled = imageIdx === 0 || !!imagesForState[imageIdx - 1];
+                        const isEnabled = isAdminPreview || imageIdx === 0 || !!imagesForState[imageIdx - 1];
                         const isRequired = imageIdx < 2;
-                        const isAdminLocked = imageIdx < adminImgCountForLock;
+                        const isAdminLocked = !isAdminPreview && imageIdx < adminImgCountForLock;
                         const showEditingActions = workCareerViewIsEditing && !isAdminLocked;
                         return (
                           <div key={imageIdx} className={`workinfo-image-slot image-slot${imageIdx === 0 ? " large" : " small"}${!isEnabled ? " disabled" : ""}${isAdminLocked ? " admin-locked" : ""}`} {...(isRequired ? { "data-field": `image${imageIdx}` } : {})}>
@@ -10162,7 +10425,15 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                               <div
                                 className="image-preview"
                                 onClick={async () => {
-                                  if (showEditingActions && isEnabled) triggerCareerImageUpload(imageIdx);
+                                  if (isAdminLocked && workCareerViewIsEditing) {
+                                    await popup.alert("이 칸은 운영진이 업로드하는 공간입니다.");
+                                  } else if (workCareerViewIsEditing && !isAdminLocked) {
+                                    if (!isEnabled) {
+                                      await popup.alert("먼저 앞 순서의 이미지를 업로드해주세요.");
+                                    } else {
+                                      triggerCareerImageUpload(imageIdx);
+                                    }
+                                  }
                                 }}
                               >
                                 {showEditingActions && (
@@ -10353,8 +10624,8 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
                     (() => {
                       const empty = selectedWorkCareerCard?.isEmpty;
                       const locked = isLineLocked(selectedWorkCareerCard);
-                      const disabled = !canEditWorkCareer || empty || locked;
-                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkCareer ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
+                      const disabled = !isAdminPreview && (!canEditWorkCareer || empty || locked);
+                      const title = empty ? "비어있는 카드입니다" : locked ? LINE_LOCKED_TITLE : canEditWorkCareer || isAdminPreview ? "수정" : "작성할 수 있는 기간이 아닙니다. 😊";
                       return (
                         <button className="modal-edit-btn" onClick={handleEditWorkCareer} disabled={disabled} style={disabled ? { opacity: 0.3, cursor: "not-allowed" } : undefined} title={title}>
                           수정
@@ -10664,8 +10935,80 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           document.body,
         )}
 
+      {/* Output Link 커스텀 툴팁 — 보기 모드 hover 시 전체 설명 표시 */}
+      {olTooltip &&
+        createPortal(
+          <div className="ol-custom-tooltip" style={{ left: olTooltip.x, top: olTooltip.y }}>
+            {olTooltip.text}
+          </div>,
+          document.body,
+        )}
+
       {/* Detail Log 모달 — 빈 placeholder 컨테이너 (674×826) */}
       <DetailLogModal show={showDetailLogModal} onHide={() => setShowDetailLogModal(false)} />
+
+      {/* Output Link 2차 모달 — Portal로 document.body에 직접 렌더링 (1차 모달 위에 뜸) */}
+      {outputLinkEditModal &&
+        createPortal(
+          <div
+            className="output-link-edit-overlay"
+            onMouseDown={(e) => e.stopPropagation()}
+            onWheel={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            <div className="output-link-edit-modal" onMouseDown={(e) => e.stopPropagation()}>
+              <h3 className="output-link-edit-title">
+                <i className="ti ti-link" />
+                Output Link {outputLinkEditModal.linkIdx + 1} 편집
+              </h3>
+              <div className="output-link-edit-field">
+                <label>Output Link 주소</label>
+                <input
+                  type="url"
+                  className="output-link-edit-input"
+                  value={outputLinkEditModal.url}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 1000) setOutputLinkEditModal((prev) => (prev ? { ...prev, url: e.target.value, error: "" } : null));
+                  }}
+                  placeholder="https://..."
+                  maxLength={1000}
+                  autoFocus
+                />
+                <div className="output-link-edit-field-footer">
+                  <span className="char-count">{outputLinkEditModal.url.length} / 1,000</span>
+                  {outputLinkEditModal.error && <span className="field-error">{outputLinkEditModal.error}</span>}
+                </div>
+              </div>
+              <div className="output-link-edit-field">
+                <label>Output Link 설명</label>
+                <input
+                  type="text"
+                  className="output-link-edit-input"
+                  value={outputLinkEditModal.desc}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 30) setOutputLinkEditModal((prev) => (prev ? { ...prev, desc: e.target.value } : null));
+                  }}
+                  placeholder="링크에 대한 설명을 입력하세요"
+                  maxLength={30}
+                />
+                <div className="output-link-edit-field-footer">
+                  <span className="char-count">{outputLinkEditModal.desc.length} / 30</span>
+                </div>
+              </div>
+              <div className="output-link-edit-buttons">
+                <button type="button" className="btn-cancel" onClick={() => setOutputLinkEditModal(null)}>
+                  취소
+                </button>
+                <button type="button" className="btn-save" onClick={saveOutputLinkEdit}>
+                  저장
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

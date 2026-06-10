@@ -25,6 +25,7 @@ import {
 import { CLUSTER3_CHANNEL_DEFAULTS, createInitialChannelCards } from "@/constants/dummyData/cluster3-section-default";
 import { OUTPUT_CARD_1_DEFAULT } from "@/constants/dummyData/cluster3-output-default";
 import { DETAIL_CARD_1_DEFAULT, createInitialDetailCardsWithDefault } from "@/constants/dummyData/cluster3-detail-default";
+import { getOrgContent } from "@/components/orgContent";
 
 // Zone C(>1920px, ResponsiveScale.tsx에서 documentElement에 zoom:1.08 적용) 대응.
 // getBoundingClientRect는 zoom 적용 후 좌표를 반환하지만 position:fixed의 top/left는 CSS 픽셀 기준이라 좌표가 어긋난다.
@@ -116,6 +117,7 @@ const PeriodRangePicker = ({
   onToday,
   onClear,
   position,
+  themeClassName,
 }: {
   range: PeriodDateRange;
   month: Date;
@@ -124,6 +126,7 @@ const PeriodRangePicker = ({
   onToday: () => void;
   onClear: () => void;
   position: CalendarPosition;
+  themeClassName?: string;
 }) => {
   const monthStart = new Date(month.getFullYear(), month.getMonth(), 1);
   const calendarStart = new Date(monthStart);
@@ -136,8 +139,12 @@ const PeriodRangePicker = ({
   const today = toDateOnly(new Date());
   const helperText = range.startDate && !range.endDate ? "종료일을 선택해주세요" : "시작일과 종료일을 선택해주세요";
 
+  // 포털(createPortal → document.body 직속)이라 descendant cascade 가 닿지 않아
+  // theme class 를 root 패널에 직접 부착해야 PX/EC 톤이 적용된다.
+  const panelClassName = ["period-range-panel", "calendar-popup", themeClassName].filter(Boolean).join(" ");
+
   return (
-    <div className="period-range-panel calendar-popup" style={{ top: position.top, left: position.left }}>
+    <div className={panelClassName} style={{ top: position.top, left: position.left }}>
       <div className="period-range-helper">{helperText}</div>
       <div className="period-range-header">
         <button type="button" className="period-month-btn" onClick={() => onMonthChange(new Date(month.getFullYear(), month.getMonth() - 1, 1))}>
@@ -192,12 +199,24 @@ const PeriodRangePicker = ({
   );
 };
 
+// PX/EC 테마 hex 토큰 — 참고 브랜치 ORGANIZATION_CONFIG 값과 동일(인라인 style 분기 전용).
+const PX_ACCENT = "#1E9503";
+const PX_ACCENT_SOFT = "#B2FF8F";
+const EC_ACCENT = "#FF4B70";
+const EC_ACCENT_SOFT = "#FF98A6";
+
 const Cluster3Content = () => {
   // 세션 및 본인 프로필 여부 확인
   const { data: session } = useSession();
   // Sidebar와 동일한 ProfileContext 캐시 — display_name 등 공통 프로필 정보 빠르게 접근
   const { profileData: cachedProfile } = useProfile();
   const searchParams = useSearchParams();
+  const orgContent = getOrgContent(searchParams.get("org"));
+  // PX / EC 컨텍스트 진입 시 inline style 들이 해당 톤으로 전환된다(현재 구조: ?org= 기반).
+  const isPX = orgContent.key === "phalanx";
+  const isEC = orgContent.key === "encre";
+  // 포털 패널에 부착할 theme class (SCSS .period-range-panel.cluster-px-theme / .encre-theme 와 짝).
+  const periodPickerThemeClass = isPX ? "cluster-px-theme" : isEC ? "encre-theme" : "";
   const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const demoNameParam = searchParams.get("demoName");
@@ -1227,7 +1246,7 @@ const Cluster3Content = () => {
   const ROLE_OPTIONS = [
     { key: "leading", label: "리딩", color: "#FF4444" },
     { key: "following", label: "팔로잉", color: "#FF8C00" },
-    { key: "management", label: "관리", color: "#FFD700" },
+    { key: "management", label: "관리", color: isPX ? PX_ACCENT_SOFT : isEC ? EC_ACCENT_SOFT : "#FFD700" },
     { key: "planning", label: "기획", color: "#32CD32" },
     { key: "execution", label: "진행", color: "#00CED1" },
     { key: "analysis", label: "분석", color: "#4169E1" },
@@ -2225,13 +2244,13 @@ const Cluster3Content = () => {
           <div className="progress-semi-circle">
             <svg viewBox="0 0 300 170">
               {/* 배경 반원 */}
-              <path className="progress-bg" d="M 25 150 A 125 125 0 0 1 275 150" fill="none" stroke="rgba(250, 171, 7, 0.5)" strokeWidth="20" strokeLinecap="butt" />
+              <path className="progress-bg" d="M 25 150 A 125 125 0 0 1 275 150" fill="none" stroke={isPX ? "rgba(30, 149, 3, 0.5)" : isEC ? "rgba(255, 75, 112, 0.5)" : "rgba(250, 171, 7, 0.5)"} strokeWidth="20" strokeLinecap="butt" />
               {/* 진행 반원 (애니메이션) */}
               <path className="progress-bar" d="M 25 150 A 125 125 0 0 1 275 150" fill="none" stroke="url(#progressGradient)" strokeWidth="20" strokeDasharray="393" strokeDashoffset={progressOffset} strokeLinecap="butt" style={{ transition: "stroke-dashoffset 1.5s ease-out" }} />
               <defs>
                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#FAAB07" />
-                  <stop offset="100%" stopColor="#FFC919" />
+                  <stop offset="0%" stopColor={isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07"} />
+                  <stop offset="100%" stopColor={isPX ? PX_ACCENT_SOFT : isEC ? EC_ACCENT_SOFT : "#FFC919"} />
                 </linearGradient>
               </defs>
             </svg>
@@ -2370,34 +2389,36 @@ const Cluster3Content = () => {
               </div>
               <h3 className="card-title">성장 점수 기록(Point)</h3>
             </div>
+            {/* 참고 브랜치 기준: 기본(oranke)은 cluster3 전용 아이콘(Ok01/OK02/Ok03),
+                EC/PX 는 badge-icon(CSS background)으로 라벨/아이콘 치환. 값은 미터치. */}
             <div className="card-body">
-              <div className="info-row">
-                <span className="info-label">
-                  <span className="dot">·</span> 단감(총합) <img src="/images/0/cluster 3/icon/Ok01.png" alt="단감" className="label-icon orange" />
-                </span>
-                <span className="info-value number">
-                  {pointsData.dangam.toLocaleString()}
-                  <span className="unit">개</span>
-                </span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">
-                  <span className="dot">·</span> 인절미(총합) <img src="/images/0/cluster 3/icon/OK02.png" alt="인절미" className="label-icon" />
-                </span>
-                <span className="info-value number">
-                  {pointsData.injeolmi.toLocaleString()}
-                  <span className="unit">개</span>
-                </span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">
-                  <span className="dot">·</span> 어흥(총합) <img src="/images/0/cluster 3/icon/Ok03.png" alt="어흥" className="label-icon" />
-                </span>
-                <span className="info-value number">
-                  {Math.abs(pointsData.eoheung).toLocaleString()}
-                  <span className="unit">개</span>
-                </span>
-              </div>
+              {(() => {
+                const rows = [
+                  { slot: "star", value: pointsData.dangam, defaultSrc: "/images/0/cluster 3/icon/Ok01.png", defaultIconClass: "label-icon orange" },
+                  { slot: "shield", value: pointsData.injeolmi, defaultSrc: "/images/0/cluster 3/icon/OK02.png", defaultIconClass: "label-icon" },
+                  { slot: "lightning", value: Math.abs(pointsData.eoheung), defaultSrc: "/images/0/cluster 3/icon/Ok03.png", defaultIconClass: "label-icon" },
+                ] as const;
+                return rows.map((row) => {
+                  const point = orgContent.points[row.slot];
+                  const aliased = isPX || isEC;
+                  return (
+                    <div className="info-row" key={row.slot}>
+                      <span className="info-label">
+                        <span className="dot">·</span> {point.label}(총합){" "}
+                        {aliased ? (
+                          <span className={`${row.defaultIconClass} badge-icon ${point.badgeClassName}`} aria-hidden="true" />
+                        ) : (
+                          <img src={row.defaultSrc} alt={point.label} className={row.defaultIconClass} />
+                        )}
+                      </span>
+                      <span className="info-value number">
+                        {row.value.toLocaleString()}
+                        <span className="unit">개</span>
+                      </span>
+                    </div>
+                  );
+                });
+              })()}
             </div>
             <div className="card-footer">
               <span className="watch-pricing">
@@ -2455,7 +2476,11 @@ const Cluster3Content = () => {
                 className={`rank-card ${rank === (gradeStats?.grade || 10) ? "active" : "inactive"}`}
                 style={{
                   transform: !animationComplete && highlightedRank !== -1 && highlightedRank >= rank ? `scale(${1 + 0.08 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}) translateY(${-5 * Math.max(0, 1 - Math.abs(highlightedRank - rank) * 0.3)}px)` : undefined,
-                  boxShadow: !animationComplete && highlightedRank === rank ? "0 8px 25px rgba(250, 171, 7, 0.6)" : !animationComplete && highlightedRank !== -1 && Math.abs(highlightedRank - rank) === 1 ? "0 4px 15px rgba(250, 171, 7, 0.3)" : undefined,
+                  boxShadow: !animationComplete && highlightedRank === rank
+                    ? (isPX ? "0 8px 25px rgba(30, 149, 3, 0.6)" : isEC ? "0 8px 25px rgba(255, 75, 112, 0.6)" : "0 8px 25px rgba(250, 171, 7, 0.6)")
+                    : !animationComplete && highlightedRank !== -1 && Math.abs(highlightedRank - rank) === 1
+                    ? (isPX ? "0 4px 15px rgba(30, 149, 3, 0.3)" : isEC ? "0 4px 15px rgba(255, 75, 112, 0.3)" : "0 4px 15px rgba(250, 171, 7, 0.3)")
+                    : undefined,
                   transition: !animationComplete ? "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)" : undefined,
                   zIndex: !animationComplete && highlightedRank === rank ? 10 : undefined,
                 }}
@@ -2464,7 +2489,7 @@ const Cluster3Content = () => {
                   <img src={`/images/0/cluster 3/icon/medal ${rank}.png`} alt={`Medal ${rank}`} />
                 </div>
                 <div className="rank-card-image">
-                  <img src={`/images/0/cluster 3/image/정 ${rank} 품.png`} alt={`Rank ${rank}`} />
+                  <img src={`${isPX ? "/images/0/cluster 3/image/px" : isEC ? "/images/0/cluster 3/image/ec" : "/images/0/cluster 3/image"}/정 ${rank} 품.png`} alt={`Rank ${rank}`} />
                 </div>
                 <div className="rank-label">
                   {displayRank === "정승" ? (
@@ -2550,7 +2575,7 @@ const Cluster3Content = () => {
                 }}
               >
                 <div className="card-image">
-                  <img src={`/images/0/cluster 3/image/1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
+                  <img src={`/images/0/cluster 3/image/${isPX ? "px/" : isEC ? "ec/" : ""}1-${((card.id - 1) % 8) + 1}.png`} alt="Channel" />
                   <div className="card-tag">{card.startYear && card.startMonth && card.startDay ? `${card.startYear}년 ${String(card.startMonth).padStart(2, "0")}월 ${String(card.startDay).padStart(2, "0")}일` : card.tag}</div>
                   <div className="card-like">
                     <svg viewBox="0 0 24 24" fill={card.status === "운영 중" ? "#ff4444" : card.status === "운영 중단" ? "#4488ff" : card.status === "운영 보류" ? "#44bb44" : "none"} stroke={card.status ? "none" : "currentColor"} strokeWidth="2">
@@ -2881,7 +2906,7 @@ const Cluster3Content = () => {
                       <div key={f.key} className="channel-info-field" data-field={f.key === "date" ? "startDate" : f.key === "platformDropdown" ? "platform" : f.key}>
                         <label>
                           {f.label}
-                          {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                          {isEditMode && <span style={{ color: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07", marginLeft: "2px" }}>*</span>}
                         </label>
                         {f.type === "text" && (isEditMode ? <input type="text" value={(card as any)[f.key] || ""} onChange={(e) => handleCardChange(f.key, e.target.value)} placeholder={f.placeholder} /> : <span className="field-value">{(card as any)[f.key] || "-"}</span>)}
                         {f.type === "channelNameInput" &&
@@ -3060,7 +3085,7 @@ const Cluster3Content = () => {
                     <div key={box.key} className="channel-textarea-box" data-field={box.key}>
                       <h5 className="textarea-title">
                         {box.title}
-                        {isEditMode && <span style={{ color: "#FAAB07", marginLeft: "2px" }}>*</span>}
+                        {isEditMode && <span style={{ color: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07", marginLeft: "2px" }}>*</span>}
                       </h5>
                       <div className="textarea-wrapper">
                         {isEditMode ? (
@@ -3222,7 +3247,7 @@ const Cluster3Content = () => {
             const selectedTools = detail.tools || [];
             return (
               <div className="dropdown-options-fixed" style={{ position: "fixed", top: dropdownPosition.top, left: dropdownPosition.left, width: Math.max(dropdownPosition.width, 200), zIndex: 100010 }} onWheel={(e) => e.stopPropagation()}>
-                <div className="dropdown-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "8px", padding: "6px 10px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)" }}>
+                <div className="dropdown-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "8px", padding: "6px 10px", borderBottom: `1px solid ${isPX ? "rgba(30, 149, 3, 0.2)" : isEC ? "rgba(255, 75, 112, 0.2)" : "rgba(255, 165, 0, 0.2)"}` }}>
                   <button
                     className="dropdown-action-btn"
                     onClick={() => {
@@ -3238,7 +3263,7 @@ const Cluster3Content = () => {
                       setOpenDropdownId(null);
                       setDropdownPosition(null);
                     }}
-                    style={{ background: "#FAAB07", border: "none", color: "#000", padding: "3px 10px", fontSize: "12px", cursor: "pointer", borderRadius: "3px", fontWeight: "bold" }}
+                    style={{ background: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07", border: "none", color: "#000", padding: "3px 10px", fontSize: "12px", cursor: "pointer", borderRadius: "3px", fontWeight: "bold" }}
                   >
                     저장
                   </button>
@@ -3317,7 +3342,7 @@ const Cluster3Content = () => {
             const selectedTools = output.tools || [];
             return (
               <div className="dropdown-options-fixed" style={{ position: "fixed", top: dropdownPosition.top, left: dropdownPosition.left, width: Math.max(dropdownPosition.width, 200), zIndex: 100010 }} onWheel={(e) => e.stopPropagation()}>
-                <div className="dropdown-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "8px", padding: "6px 10px", borderBottom: "1px solid rgba(255, 165, 0, 0.2)" }}>
+                <div className="dropdown-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "8px", padding: "6px 10px", borderBottom: `1px solid ${isPX ? "rgba(30, 149, 3, 0.2)" : isEC ? "rgba(255, 75, 112, 0.2)" : "rgba(255, 165, 0, 0.2)"}` }}>
                   <button
                     className="dropdown-action-btn"
                     onClick={() => {
@@ -3333,7 +3358,7 @@ const Cluster3Content = () => {
                       setOpenDropdownId(null);
                       setDropdownPosition(null);
                     }}
-                    style={{ background: "#FAAB07", border: "none", color: "#000", padding: "3px 10px", fontSize: "12px", cursor: "pointer", borderRadius: "3px", fontWeight: "bold" }}
+                    style={{ background: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07", border: "none", color: "#000", padding: "3px 10px", fontSize: "12px", cursor: "pointer", borderRadius: "3px", fontWeight: "bold" }}
                   >
                     저장
                   </button>
@@ -3456,6 +3481,7 @@ const Cluster3Content = () => {
               applyOutputDateRange({ startDate: today, endDate: today });
             }}
             onClear={() => applyOutputDateRange({ startDate: null, endDate: null })}
+            themeClassName={periodPickerThemeClass}
           />,
           document.body,
         )}
@@ -3475,6 +3501,7 @@ const Cluster3Content = () => {
               applyDetailDateRange({ startDate: today, endDate: today });
             }}
             onClear={() => applyDetailDateRange({ startDate: null, endDate: null })}
+            themeClassName={periodPickerThemeClass}
           />,
           document.body,
         )}
@@ -3483,7 +3510,7 @@ const Cluster3Content = () => {
           <div
             className="image-preview-modal"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: "1px solid rgba(255, 165, 0, 0.3)", padding: "0px", boxShadow: "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+            style={{ width: "1020px", height: "794px", background: "#1a1a2e", border: `1px solid ${isPX ? "rgba(30, 149, 3, 0.3)" : isEC ? "rgba(255, 75, 112, 0.3)" : "rgba(255, 165, 0, 0.3)"}`, padding: "0px", boxShadow: isPX ? "0 0 60px rgba(30,149,3,0.15)" : isEC ? "0 0 60px rgba(255,75,112,0.15)" : "0 0 60px rgba(255,165,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
           >
             <img src={previewImage} alt="확대 보기" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
           </div>
@@ -3532,7 +3559,7 @@ const Cluster3Content = () => {
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
                     <span className="output-user-title">
                       <span className="user-name">{displayName || "크루"} 님</span>
-                      <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Top 5 [{currentOutputIndex + 1}]</span>
+                      <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#faab07" }}>의 Output Top 5 [{currentOutputIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">
                       <div className="period-wrapper" ref={outputPeriodPickerRef}>
@@ -3731,7 +3758,7 @@ const Cluster3Content = () => {
                     <div className="output-links-section" data-field="links">
                       {[0, 1, 2].map((i) => {
                         const link = (outputCards[currentOutputIndex].links || ["", "", ""])[i];
-                        const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07"][i];
+                        const dotColor = ["#FF6B6B", "#4ECDC4", isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07"][i];
                         return (
                           <div className="output-link-row" key={i} style={!isOutputEditMode ? { marginLeft: "9px" } : undefined}>
                             <span className="link-dot" style={{ backgroundColor: dotColor, marginLeft: "auto", ...(i === 0 ? { marginRight: "18px" } : (isOutputEditMode ? { marginRight: "15px" } : {})) }} />
@@ -4284,7 +4311,7 @@ const Cluster3Content = () => {
                     <img src="/images/0/portfolio.png" alt="portfolio" className="title-icon" />
                     <span className="output-user-title">
                       <span className="user-name">{displayName || "크루"} 님</span>
-                      <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: "#faab07" }}>의 Output Detail 10 [{currentDetailIndex + 1}]</span>
+                      <span style={{ marginLeft: "4px", fontSize: "23px", fontWeight: 700, color: isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#faab07" }}>의 Output Detail 10 [{currentDetailIndex + 1}]</span>
                     </span>
                     <div className="output-period" data-field="period">
                       <div className="period-wrapper" ref={detailPeriodPickerRef}>
@@ -4483,7 +4510,7 @@ const Cluster3Content = () => {
                     <div className="output-links-section" data-field="links">
                       {[0, 1, 2].map((i) => {
                         const link = (detailCards[currentDetailIndex].links || ["", "", ""])[i];
-                        const dotColor = ["#FF6B6B", "#4ECDC4", "#FAAB07"][i];
+                        const dotColor = ["#FF6B6B", "#4ECDC4", isPX ? PX_ACCENT : isEC ? EC_ACCENT : "#FAAB07"][i];
                         return (
                           <div className="output-link-row" key={i} style={!isDetailEditMode ? { marginLeft: "9px" } : undefined}>
                             <span className="link-dot" style={{ backgroundColor: dotColor, marginLeft: "auto", ...(i === 0 ? { marginRight: "18px" } : (isDetailEditMode ? { marginRight: "15px" } : {})) }} />

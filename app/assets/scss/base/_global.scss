@@ -950,6 +950,38 @@ svg {
   }
 }
 
+.route-theme {
+  transition: var(--transition);
+}
+
+// 라우트별 강조색 fallback — RouteThemeShell의 inline style이 우선 적용되지만,
+// 어떤 이유로 inline style이 사라져도 클래스 기반으로 색상이 보존되도록 명시.
+// header/sidebar/footer/콘텐츠 모두 var(--quaternary-color)를 사용하므로
+// 이 변수만 라우트별로 바꿔주면 전체에 일괄 반영됨.
+// --quaternary-hover는 호버 시 살짝 진한 톤으로 페이지별 차이를 부여.
+.route-theme--mint   { --quaternary-color: #B2FF8F; --quaternary-hover: #7AE852; }
+.route-theme--pink   { --quaternary-color: #FF98A6; --quaternary-hover: #FF6B7E; }
+.route-theme--yellow { --quaternary-color: #FFEC8F; --quaternary-hover: #FFD24A; }
+
+// 라우트별 --primary-color override (#FAAB07 자리에 페이지 고유색 주입).
+// data-route-path attribute selector를 쓰면 mint를 공유하는 /index-two와
+// /index-two-px가 서로 다른 primary 색을 가질 수 있다.
+// Sweep 대상이 var(--primary-color)로 통일되어 있어야 자동 반영됨
+// (_sidebar.scss / _all-sections.scss의 12곳 hardcoded #faab07 → var(...) 처리됨).
+[data-route-path="/index-two-ec"] { --primary-color: #FF4B70; }
+[data-route-path="/index-two-ok"] { --primary-color: #FFC300; }
+[data-route-path="/index-two-px"] { --primary-color: #1E9503; }
+
+// header navbar / sidebar / footer 안의 a·button 호버 색을 페이지별 hover 변수로
+// override. fallback으로 강조색을 두므로 .route-theme이 없는 라우트(/)는 기존 동작 유지.
+// !important는 _header/_sidebar/_footer SCSS의 기존 :hover { color: var(--quaternary-color) }
+// 룰을 명확히 이기기 위해 사용.
+.route-theme .header :is(a, button):hover,
+.route-theme .nftg-sidebar :is(a, button):hover,
+.route-theme .footer :is(a, button):hover {
+  color: var(--quaternary-hover, var(--quaternary-color)) !important;
+}
+
 .nftg-app.sidebar-remove {
   display: flex;
   .nftg-sidebar {
@@ -1017,7 +1049,7 @@ svg {
     left: -5px;
     z-index: -1;
     color: var(--black);
-    -webkit-text-stroke: 1px #45f88290;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--quaternary-color) 56%, transparent);
     transition: var(--transition);
   }
 
@@ -1476,11 +1508,15 @@ svg {
 }
 
 // 2. Modal Header — divider + title/subtitle styles
+//    Phase C: yellow/gold legacy 톤을 CSS 변수로 토큰화. 변수 미정의 시 (=
+//    원본 라우트, theme wrapper 없음) fallback 으로 종전 yellow 가 그대로
+//    유지된다. .cluster-px-theme / .encre-theme 스코프에서 변수가 덮여쓰여
+//    각 org accent 로 분기. 변수 정의 위치: _px-tokens.scss / _theme-tokens.scss.
 [class*="modal-header"] {
-  border-bottom: 1px solid rgba(255, 165, 0, 0.2) !important;
+  border-bottom: 1px solid var(--modal-divider-color, rgba(255, 165, 0, 0.2)) !important;
 
   h3 {
-    color: #FAAB07 !important;
+    color: var(--modal-title-color, #FAAB07) !important;
     font-family: 'Pretendard', sans-serif !important;
     font-size: 21px !important;
     font-weight: 800 !important;
@@ -1514,14 +1550,14 @@ svg {
   transition: all 0.3s ease;
 
   &:hover {
-    color: #ffa500 !important;
-    border-color: #ffa500 !important;
+    color: var(--modal-close-hover-color, #ffa500) !important;
+    border-color: var(--modal-close-hover-color, #ffa500) !important;
   }
 }
 
 // 4. Modal Footer — divider + button fonts
 [class*="modal-footer"] {
-  border-top: 1px solid rgba(255, 165, 0, 0.2) !important;
+  border-top: 1px solid var(--modal-divider-color, rgba(255, 165, 0, 0.2)) !important;
 
   button,
   .cancel-btn,
@@ -1593,6 +1629,8 @@ svg {
 }
 
 // 7. 모달 본문 스크롤바 — cluster4-1 스타일 복사 + thumb 색상 교체
+//    Phase C: thumb/track scrollbar-color 도 CSS 변수로 토큰화. fallback 으로
+//    종전 yellow 유지. theme wrapper 스코프 내에선 org accent 로 분기.
 .section1-modal-body,
 .section2-modal-body,
 .section21-modal-body,
@@ -1606,7 +1644,7 @@ svg {
 .edit-modal-body,
 .modal-body {
   scrollbar-width: thin !important;
-  scrollbar-color: rgba(250, 171, 7, 1) #252836 !important;
+  scrollbar-color: var(--modal-scrollbar-thumb, rgba(250, 171, 7, 1)) #252836 !important;
 
   &::-webkit-scrollbar {
     width: 3px !important;
@@ -1616,7 +1654,7 @@ svg {
     border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(250, 171, 7, 1) !important;
+    background: var(--modal-scrollbar-thumb, rgba(250, 171, 7, 1)) !important;
     border-radius: 2px;
   }
   &::-webkit-scrollbar-button {

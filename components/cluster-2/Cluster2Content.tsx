@@ -97,6 +97,15 @@ const Cluster2Content = () => {
   const demoNameParam = searchParams.get("demoName");
   const demoLookupName = demoNameParam || urlUserId;
 
+  // cluster 2 마스코트 이미지 — 현재 URL의 org 값으로 분기. org 없으면 기존 oranke(ok 01) 유지.
+  const cluster2Org = searchParams.get("org");
+  const cluster2MascotSrc =
+    cluster2Org === "encre"
+      ? "/images/0/cluster 2/ec 01.png"
+      : cluster2Org === "phalanx"
+      ? "/images/0/cluster 2/px 01.png"
+      : "/images/0/cluster 2/ok 01.png";
+
   // 본인 프로필인지 확인: URL에 userId가 없거나, 로그인한 사용자 ID와 같으면 본인
   // 어드민(마더) 계정은 모든 프로필 편집 가능
   const isOwner = session?.user?.isAdmin || !urlUserId || (session?.user?.id === urlUserId);
@@ -1801,7 +1810,7 @@ const Cluster2Content = () => {
         {/* 오른쪽 카드 */}
         <div className="frame-right">
           <div className="mascot-icon">
-            <img src="/images/0/cluster 2/ok 01.png" alt="" />
+            <img src={cluster2MascotSrc} alt="" />
             <div className="speech-bubble">안녕 !</div>
           </div>
           <span className="progress-label">OH, MY DREAM</span>

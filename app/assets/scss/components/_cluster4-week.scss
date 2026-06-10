@@ -4656,9 +4656,21 @@
       .work-career-card {
         .grade-row {
           display: flex;
+          align-items: center;
           gap: 5px;
           margin-top: 16px;
           margin-bottom: 10px;
+
+          // career line score (DTO careerGradePoints): 10/8/6/4/2 점, unevaluated -> "-"
+          .grade-points {
+            margin-left: 4px;
+            font-family: "Chakra Petch", sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+            color: #faab07;
+            white-space: nowrap;
+          }
 
           .grade {
             width: 36px;
@@ -11455,6 +11467,7 @@
     max-width: 100% !important;
     box-sizing: border-box !important;
     position: relative; // .workinfo-mid-divider absolute 기준점 (overflow:visible 보장됨)
+    z-index: 2; // output-links transform(34px)이 아래 .workinfo-text-section과 시각적으로 겹침 — 클릭 이벤트가 text-section으로 빠지지 않도록 stacking context 확보
 
     // mid-col1 ↔ text-section 사이 시각적 구분선 — flow 비점유, .workinfo-left 의 overflow-y:auto 영향 X
     // 위치: mid-section 하단 + 58px (≈ 1.5cm) → text-section 상단 영역
@@ -11489,12 +11502,13 @@
 
     .workinfo-mid-col2 {
       flex: none !important;
-      width: 360px !important; // Output Link ?곸뿭 怨좎젙??(220 + 76 ??2cm ?뺤옣)
+      width: 360px !important;
       min-width: 0;
       display: flex;
       justify-content: flex-end;
       box-sizing: border-box;
-      margin-top: -20px !important; // output-links 블록만 위로 보정 (Main Title 영역과 겹침 해소). 원값 20px → -20px (총 40px 위로)
+      margin-top: -20px !important;
+      position: relative; // .workinfo-output-links absolute 배치 기준점
     }
   }
 
@@ -11656,20 +11670,22 @@
   .workinfo-output-links {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    flex: 0 0 54%;
+    gap: 5px;
     width: 54%;
     max-width: 270px;
     min-width: 0;
     box-sizing: border-box;
-    margin-top: 2px !important; // base 위치 — flow 차지 공간 변경 없음 (margin-top 증가 시 col2 가 col1 보다 커서 .workinfo-mid-section 의 min/실효 높이가 같이 커져 .workinfo-text-section 까지 밀어내는 부작용 있었음. 그래서 시각 이동은 transform 으로만.)
-    transform: translateY(34px) !important; // output-links 영역만 시각적으로 아래로 이동 — layout box 영향 없음 → downstream flow(.workinfo-text-section / .workinfo-image-grid / .workcareer-grade-section 등) y 좌표 보존. 4개 모달 공통.
+    position: absolute;
+    top: 36px; // 실제 layout 위치 = old margin-top(2px) + old translateY(34px). hit-test 영역이 시각 위치와 일치.
+    right: 0;
+    z-index: 3;
+    pointer-events: auto;
 
     .output-link-row {
       display: flex;
       align-items: center;
       gap: 6px;
-      min-height: 22px;
+      min-height: 20px;
       position: relative;
       width: 100%;
       min-width: 0;
@@ -11701,9 +11717,12 @@
       flex: 1;
       min-width: 0;
       max-width: none;
-      font-size: 14px !important;
-      line-height: 20px;
+      font-size: 12px !important;
+      line-height: 1.3;
       color: rgba(255, 255, 255, 0.7);
+      display: inline-flex;
+      align-items: center;
+      min-height: 18px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -11782,6 +11801,57 @@
       }
       i {
         font-size: 10px;
+      }
+    }
+
+    // 편집 모드 — 클릭 가능 텍스트 (2차 모달 트리거)
+    .output-link-editable {
+      cursor: pointer;
+      border: 1px solid rgba(255, 165, 0, 0.25);
+      border-radius: 3px;
+      padding: 2px 8px;
+      min-height: 18px;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      pointer-events: auto !important;
+      transition: border-color 0.2s, background 0.2s;
+
+      &:hover:not(.output-link-disabled) {
+        border-color: #faab07;
+        background: rgba(255, 165, 0, 0.08);
+      }
+
+      &.output-link-disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+        border-color: rgba(255, 255, 255, 0.1);
+        font-size: 9px !important;
+        pointer-events: none;
+      }
+
+      &.output-link-empty:not(.output-link-disabled) {
+        font-style: italic;
+        font-size: 10px !important;
+      }
+    }
+
+    // 보기 모드 — 클릭 시 URL 열기
+    .output-link-clickable {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      min-height: 18px;
+      padding: 1px 0;
+      transition: color 0.15s;
+
+      &:hover {
+        color: #faab07;
+        text-decoration: underline;
       }
     }
   }
@@ -12547,20 +12617,28 @@
   // grade/grade-row ?먰삎 ?ㅽ??쇱? L6732??.work-view-title-section ?ㅼ퐫?꾩? 遺꾨━?섏뼱 ?덉쑝誘濡?
   // ?ш린???숈씪 ?ㅽ럺?쇰줈 ?ъ꽑?명븳??(? ?곸뿭 ?곹뼢 ?놁쓬)
   // ??????????????????????????????????????????????????????????????????????
+  // 하단 정렬 행: 좌측 .image-line-code + 우측 .workcareer-grade-section 를 한 줄에 두고
+  // align-items:flex-end 로 WCBS-NL0000 하단선과 등급 버튼 하단선을 일치시킨다(absolute 보정 제거).
+  .workcareer-bottom-row {
+    display: flex;
+    align-items: flex-end; // 두 영역의 하단 기준선 일치
+    justify-content: space-between; // 좌: line-code, 우: grade-section
+    gap: 8px;
+    width: 100%;
+  }
+
   .workcareer-grade-section {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: flex-end !important; // ?곗륫 ?뺣젹 (?대?吏 洹몃━??醫낅즺 x醫뚰몴 ?쇱튂)
     gap: 6px; // workCareer downsize: 8 -> 6 (label <-> grade-row tighter)
     width: auto; // shrink to content (was 100% as flex item; now absolute-positioned)
     border: none !important;
     background: transparent !important;
     margin: 0 !important; // 紐⑤뱺 margin 由ъ뀑
-    // bottom: -12px — grade circles (28px) are 12px taller than (image-line-code.height + .workinfo-right gap = 16px).
-    // Hanging the wrapper 12px below .workinfo-right bottom moves grade.top down to exactly meet imageGrid.bottom.
-    // The 12px hang sits inside .section-modal-body's 20px bottom padding, so it doesn't visually overflow the modal.
-    // Grade is now positioned independently of line-code's bottom (per the explicit allowance to decouple).
-    position: absolute !important; right: 0; bottom: -12px; // anchor to .workinfo-right bottom-right (== .image-line-code bottom). Out of flex flow so .workinfo-image-grid flex: 1 1 0 stretches normally.
+    // (제거됨) position:absolute + bottom:-12px 임시 보정 — 이제 .workcareer-bottom-row 의
+    // flex(align-items:flex-end) 정렬로 line-code 와 하단선을 맞춘다. 정상 flow 로 복귀.
+    flex: 0 0 auto; // .workcareer-bottom-row 안에서 내용 폭만큼만 차지 (우측 고정)
     padding: 0 !important; // 紐⑤뱺 padding 由ъ뀑
     flex-shrink: 0 !important;
 
@@ -12571,6 +12649,10 @@
       color: #ddd !important;
       white-space: nowrap;
     }
+
+    // (제거됨) .grade-points / .grade-rating-status / .grade-reason-note — 점수·평가 상태·강화 사유는
+    // 노출 정책상 렌더하지 않으므로 스타일도 함께 삭제. 모달은 "라인 평점" 라벨 + S/A/B/C/D 등급만 유지.
+    // ※ 카드 미리보기의 .grade-points(.work-career-card .grade-row 하위)는 별개 스코프 — 그대로 유지.
 
     .grade-row {
       display: flex;
@@ -12617,7 +12699,7 @@
 
   // ?곗륫 而щ읆??醫뚯륫 ?꾩껜 ?믪씠??留욎떠 stretch (workexp? ?듭씪)
   .workinfo-right {
-    position: relative; // workcareer-only: positioning context for absolute-positioned .workcareer-grade-section
+    position: relative; // (legacy) grade-section 이 absolute 였을 때의 containing block — 현재 absolute 자식 없음, 무해하게 유지
     display: flex;
     flex-direction: column;
     gap: 22px !important; // L10822 selector .workinfo-content-layout .workinfo-right has higher specificity (0,6,0) and applies gap:8px. !important needed to win over that.
@@ -12634,8 +12716,8 @@
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
   }
 
-  // workCareer only: .workcareer-grade-section uses absolute positioning (right:0 bottom:0) inside .workinfo-right (position: relative).
-  // Removed from flex flow so .workinfo-image-grid (flex:1 1 0) can stretch and grid-template-rows resolve to equal heights.
+  // workCareer only: line-code + grade-section 은 .workcareer-bottom-row(flex, align-items:flex-end) 한 줄에 정렬한다.
+  // grade-section 이 정상 flow 로 복귀했지만 .workinfo-image-grid(flex:1 1 0)가 남은 높이를 흡수하므로 stretch/equal-rows 유지.
 
 
   .workinfo-text-section {
@@ -12811,16 +12893,17 @@
 }
 
 .image-preview-modal {
-  width: 1020px;
-  height: 794px;
+  width: min(1468px, calc(100vw - 48px));
+  height: min(855px, calc(100dvh - 48px));
   background: #1a1a2e;
   border: 1px solid rgba(255, 165, 0, 0.3);
-  padding: 0;
+  padding: 12px;
   box-shadow: 0 0 60px rgba(255, 165, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-sizing: border-box;
 
   img {
     max-width: 100%;
@@ -14781,5 +14864,180 @@
     max-height: 855px !important;
     transform: scale(#{"max(1, min(calc(1 + (100vw - 1920px) / 1484px), calc(1 + (100vh - 1080px) / 835px), calc(100vw / 1788px), calc(100vh / 1006px)))"}) !important;
     transform-origin: center center !important;
+  }
+}
+
+// ============================================================
+// Output Link 2차 모달 — Portal로 document.body에 렌더링 (전역 스코프)
+// ============================================================
+.output-link-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.output-link-edit-modal {
+  background: #1e1e1e;
+  // 조직 테마: portal root(.output-link-edit-overlay)에 부착된 theme class가
+  // --org-accent 를 정의 → marketing 은 미정의이므로 fallback(#faab07) 유지.
+  border: 1px solid color-mix(in srgb, var(--org-accent, #faab07) 35%, transparent);
+  border-radius: 12px;
+  padding: 24px 28px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+
+  .output-link-edit-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--org-accent, #faab07);
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      font-size: 20px;
+    }
+  }
+
+  .output-link-edit-field {
+    margin-bottom: 16px;
+
+    label {
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 6px;
+    }
+
+    .output-link-edit-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 17px;
+      font-family: "Pretendard", sans-serif;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: var(--org-accent, #faab07);
+      }
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 17px;
+      }
+    }
+
+    .output-link-edit-field-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+
+      .char-count {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .field-error {
+        font-size: 15px;
+        color: #ff4444;
+      }
+    }
+  }
+
+  .output-link-edit-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+
+    button {
+      padding: 9px 22px;
+      border-radius: 6px;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.6);
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #fff;
+      }
+    }
+
+    .btn-save {
+      background: var(--org-accent, #faab07);
+      border: 1px solid var(--org-accent, #faab07);
+      color: #1a1a1a;
+      font-weight: 600;
+
+      &:hover {
+        background: color-mix(in srgb, var(--org-accent, #faab07) 88%, #000);
+        border-color: color-mix(in srgb, var(--org-accent, #faab07) 88%, #000);
+      }
+    }
+  }
+}
+
+// ============================================================
+// Output Link 커스텀 툴팁 — Portal로 document.body에 렌더링 (전역 스코프)
+// ============================================================
+.ol-custom-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  width: 150px;
+  max-width: 150px;
+  padding: 7px 14px;
+  background: #1a3a4a;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.45;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 300000;
+  pointer-events: none;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  height: auto;
+  animation: olTooltipFadeIn 0.12s ease-out;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1a3a4a;
+  }
+}
+
+@keyframes olTooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% + 4px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
   }
 }

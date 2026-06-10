@@ -1,12 +1,16 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { orgFromPathname } from "@/components/orgContent";
 
 const ClusterTabs = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId") || searchParams.get("userID");
   const demoName = searchParams.get("demoName");
+  // 현재 조직 컨텍스트 — ?org= 쿼리 우선, 없으면 라우트 suffix(-ec/-px/-ok 등)에서 판별.
+  // 클러스터 탭 이동 시 이 값을 다음 링크에 보존해야 조직 테마가 풀리지 않는다.
+  const org = searchParams.get("org") || orgFromPathname(pathname);
 
   const tabs = [
     { name: "PERSONAL PROFILE", path: "/cluster-2", cluster: 2 },
@@ -58,10 +62,19 @@ const ClusterTabs = () => {
     </>
   );
 
+  // 탭 링크 — userId / demoName 에 더해 org 컨텍스트도 함께 보존한다.
+  const buildTabHref = (path: string) => {
+    if (!path) return path;
+    const params = new URLSearchParams();
+    if (userId) params.set("userId", userId);
+    if (demoName) params.set("demoName", demoName);
+    if (org) params.set("org", org);
+    const qs = params.toString();
+    return qs ? `${path}?${qs}` : path;
+  };
+
   const renderTab = (tab: typeof tabs[0], index: number) => {
-    const tabHref = tab.path && userId
-      ? `${tab.path}?userId=${userId}${demoName ? `&demoName=${encodeURIComponent(demoName)}` : ''}`
-      : tab.path;
+    const tabHref = buildTabHref(tab.path);
     const active = tab.path ? isActive(tab.path) : false;
 
     if (tab.path) {

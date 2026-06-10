@@ -1,10 +1,10 @@
 "use client";
-import five from "@/public/images/banner-slider/five.png";
-import four from "@/public/images/banner-slider/four.png";
-import one from "@/public/images/banner-slider/one.png";
-import three from "@/public/images/banner-slider/three.png";
-import two from "@/public/images/banner-slider/two.png";
-import bannerThumb from "@/public/images/banner/banner-thumb.png";
+import five from "@/public/images/home-random/intro-10.png";
+import four from "@/public/images/home-random/intro-9.png";
+import one from "@/public/images/home-random/intro-6.png";
+import three from "@/public/images/home-random/intro-8.png";
+import two from "@/public/images/home-random/intro-7.png";
+import bannerThumb from "@/public/images/home-random/intro-1.png";
 import sword from "@/public/images/banner/sword.png";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -34,7 +34,7 @@ const Banner = () => {
         duration: 3,
       });
       tl.to(".banner__thumb img", {
-        transform: "scale(0.7)",
+        scale: 1,
         y: "100px",
         opacity: 0.4,
         duration: 3,

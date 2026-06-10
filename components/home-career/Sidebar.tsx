@@ -16,6 +16,7 @@ import { useModalScroll } from "@/utils/useModalScroll";
 import { usePopup } from "@/components/ui/popup";
 import { logEvent } from "@/utils/blackScreenDiagnostics";
 import koreaRegionsData from "@/data/korea-regions.json";
+import { getOrgContent, orgFromPathname } from "@/components/orgContent";
 
 const koreaRegions: { [key: string]: string[] } = koreaRegionsData;
 const DEFAULT_PHONE_COMMENT = "평일 오전 10시 ~ 오후 20시 사이에 언제든지 연락가능합니다. 주말은 문자나 텍스트로만 부탁드려요! 😊";
@@ -40,6 +41,8 @@ const Sidebar = () => {
   const { mask, isAdmin } = useDataMasking();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const orgContent = getOrgContent(searchParams.get("org"), pathname);
+  const activePanelType = orgContent.panelType;
   const router = useRouter();
   const targetUserId = searchParams.get("userId") || searchParams.get("userID");
   const sessionUserId = session?.user?.id ?? null;
@@ -611,7 +614,6 @@ const Sidebar = () => {
   const [showSearchTooltip, setShowSearchTooltip] = useState(false);
   const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
   const [debugProfileType, setDebugProfileType] = useState<"본인" | "타크루">("본인");
-  const [debugPanelType, setDebugPanelType] = useState<"OK" | "EC" | "PX">("OK");
   const [crewStatus, setCrewStatus] = useState<"Running" | "Complete" | "On Rest" | "Recharging" | "Next Challenge">("Running");
   const [approvedWeeksCount, setApprovedWeeksCount] = useState<number | null>(null);
   const [isArrowShaking, setIsArrowShaking] = useState(false);
@@ -754,7 +756,7 @@ const Sidebar = () => {
   };
 
   // 현재 선택된 프로필 가져오기 (기본값)
-  const defaultProfile = profileData[debugPanelType];
+  const defaultProfile = profileData[activePanelType];
 
   // 실제 표시할 프로필 (마운트 후 유저 프로필이 있으면 사용, 없으면 기본값)
   const currentProfile =
@@ -1625,7 +1627,7 @@ const Sidebar = () => {
       },
     };
 
-    const currentStats = profileStats[debugPanelType];
+    const currentStats = profileStats[activePanelType];
 
     const timers = [
       animateNumber(setStat1, currentStats.stat1, 1000),
@@ -1643,7 +1645,7 @@ const Sidebar = () => {
     return () => {
       timers.forEach((timer) => clearInterval(timer));
     };
-  }, [debugPanelType, hasBadgeData, badgeData]);
+  }, [activePanelType, hasBadgeData, badgeData]);
 
   // 커스텀 스크롤바 업데이트
   const updateScrollbar = useCallback(() => {
@@ -1667,7 +1669,7 @@ const Sidebar = () => {
 
     container.scrollTop = 0;
     setScrollThumbTop(0);
-  }, [debugPanelType]);
+  }, [activePanelType]);
 
   // 드래그 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -1851,7 +1853,7 @@ const Sidebar = () => {
       >
         <div
           ref={cardRef}
-          className={`resume-card ${debugPanelType === "EC" ? "ec-theme" : debugPanelType === "PX" ? "px-theme" : ""}`}
+          className={`resume-card ${activePanelType === "EC" ? "ec-theme" : activePanelType === "PX" ? "px-theme" : ""}`}
           style={
             {
               position: "relative",
@@ -1981,7 +1983,7 @@ const Sidebar = () => {
                 onMouseLeave={() => setTooltipVisible(null)}
                 onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
               >
-                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
+                <Image src={orgContent.smallLogoSrc} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
                 <Image src="/images/0/cluster 1/001.png" alt="" width={12} height={12} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
               </button>
 
@@ -2002,7 +2004,7 @@ const Sidebar = () => {
                 onMouseLeave={() => setTooltipVisible(null)}
                 onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
               >
-                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
+                <Image src={orgContent.smallLogoSrc} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
                 <Image src="/images/0/cluster 1/002.png" alt="" width={12} height={12} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
               </button>
 
@@ -2022,7 +2024,12 @@ const Sidebar = () => {
                   // 다른 페이지에 있으면 /cluster-3으로 이동 후 스크롤
                   // SPA navigation 유지 — window.location.href(hard reload)는 RSC 캐시/React state를
                   // 끊어 뒤로가기 복귀 시 빈 화면 유발. 도착지(/cluster-3)는 scrollTo query를 처리함.
-                  router.push(targetPath + '?scrollTo=' + targetSection);
+                  // org 컨텍스트(쿼리 또는 라우트 suffix)를 보존해 조직 테마가 풀리지 않게 한다.
+                  const navOrg = searchParams.get("org") || orgFromPathname(pathname);
+                  const navParams = new URLSearchParams();
+                  navParams.set('scrollTo', targetSection);
+                  if (navOrg) navParams.set('org', navOrg);
+                  router.push(`${targetPath}?${navParams.toString()}`);
                 }}
                 style={{
                   width: "24px",
@@ -2039,7 +2046,7 @@ const Sidebar = () => {
                 onMouseLeave={() => setTooltipVisible(null)}
                 onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 10, y: e.clientY + 10 })}
               >
-                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/PX06.png" : "/images/0/cluster 1/00.png"} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
+                <Image src={orgContent.smallLogoSrc} alt="" width={24} height={24} className="hexagon-border" style={{ display: "block" }} />
                 <Image src="/images/0/cluster 1/003.png" alt="" width={12} height={12} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
               </button>
             </div>
@@ -2063,11 +2070,11 @@ const Sidebar = () => {
 
                   <div className="resume-details">
                     <div className="detail-row">
-                      <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/User_01-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/User_01-px.png" : "/images/0/cluster 1/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
+                      <Image src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/User_01-ec.png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/User_01-px.png" : "/images/0/cluster 1/small icon/User_01.png"} alt="" width={16} height={16} className="detail-icon" />
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {currentProfile.gender}{" "}
                         <Image
-                          src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Gift-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Gift-px.png" : "/images/0/cluster 1/small icon/Gift.png"}
+                          src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/Gift-ec.png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/Gift-px.png" : "/images/0/cluster 1/small icon/Gift.png"}
                           alt=""
                           width={13}
                           height={13}
@@ -2078,14 +2085,14 @@ const Sidebar = () => {
                       </span>
                     </div>
                     <div className="detail-row">
-                      <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
+                      <Image src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (2).png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/House_01-px.png" : "/images/0/cluster 1/small icon/House_01.png"} alt="" width={16} height={16} className="detail-icon" />
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", display: "inline-block" }}>
                         <span style={{ color: currentProfile.lightColor }}>·</span> {mask.address((currentProfile.city || "") + " " + (currentProfile.district || ""))}
                       </span>
                     </div>
                     <div className="detail-row" style={{ overflow: "hidden" }}>
                       <Image
-                        src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"}
+                        src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/Mobile_Button-ec.png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/Mobile_Button-px.png" : "/images/0/cluster 1/small icon/Mobile_Button.png"}
                         alt=""
                         width={16}
                         height={16}
@@ -2136,7 +2143,7 @@ const Sidebar = () => {
                       </span>
                     </div>
                     <div className="detail-row">
-                      <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Mail -ec.png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Mail-px.png" : "/images/0/cluster 1/small icon/Mail.png"} alt="" width={16} height={16} className="detail-icon" />
+                      <Image src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/Mail -ec.png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/Mail-px.png" : "/images/0/cluster 1/small icon/Mail.png"} alt="" width={16} height={16} className="detail-icon" />
                       <span
                         onMouseEnter={() => setTooltipVisible("email")}
                         onMouseMove={(e) => setTooltipPosition({ x: e.clientX + 12, y: e.clientY - 8 })}
@@ -2154,7 +2161,7 @@ const Sidebar = () => {
                     </div>
                     <div className="detail-row">
                       <Image
-                        src={debugPanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (1).png" : debugPanelType === "PX" ? "/images/0/cluster 1/small icon/Building_03-px.png" : "/images/0/cluster 1/small icon/Building_03.png"}
+                        src={activePanelType === "EC" ? "/images/0/cluster 1/small icon/Building_03-ec (1).png" : activePanelType === "PX" ? "/images/0/cluster 1/small icon/Building_03-px.png" : "/images/0/cluster 1/small icon/Building_03.png"}
                         alt=""
                         width={16}
                         height={16}
@@ -2279,15 +2286,15 @@ const Sidebar = () => {
             {/* Badges Section - 영역 5 */}
             <div className="resume-badges">
               <div className="badge-group">
-                <span className="badge-icon icon-graphic10"></span>
+                <span className={`badge-icon ${orgContent.points.star.badgeClassName}`}></span>
                 <span className="badge-num">{hasData ? badge1.toLocaleString() : "-"}</span>
               </div>
               <div className="badge-group">
-                <span className="badge-icon icon-shield"></span>
+                <span className={`badge-icon ${orgContent.points.shield.badgeClassName}`}></span>
                 <span className="badge-num">{hasData ? badge2.toLocaleString() : "-"}</span>
               </div>
               <div className="badge-group">
-                <span className="badge-icon icon-graphic13"></span>
+                <span className={`badge-icon ${orgContent.points.lightning.badgeClassName}`}></span>
                 <span className="badge-num red">{hasData ? badge3.toLocaleString() : "-"}</span>
               </div>
             </div>
@@ -2295,7 +2302,7 @@ const Sidebar = () => {
             {/* Medal Badge - 영역 6 */}
             <div className={`resume-medal ${crewStatus === "Complete" ? "no-overlay" : ""}`}>
               <div className="medal-image-wrapper">
-                <Image src={debugPanelType === "EC" ? "/images/0/cluster 1/금장_EC.png" : debugPanelType === "PX" ? "/images/0/cluster 1/금장_PX.png" : "/images/0/cluster 1/금장_OK.png"} alt="Medal" width={512} height={512} />
+                <Image src={orgContent.medalSrc} alt="Medal" width={512} height={512} />
                 <span className="medal-week-num">{demoMode ? 12 : (approvedWeeksCount ?? 0)}</span>
               </div>
               <div
@@ -2389,7 +2396,9 @@ const Sidebar = () => {
                       top: `${scrollThumbTop}px`,
                       width: "100%",
                       height: 44,
-                      background: "#FFC300",
+                      // 활동 리스트 스크롤바 thumb 색 — 조직 테마에 맞춤(참고 브랜치 기준).
+                      // PX 그린 / EC 핑크 / 그 외(oranke) 골드.
+                      background: orgContent.key === "phalanx" ? "#1E9503" : orgContent.key === "encre" ? "#FF4B70" : "#FFC300",
                       borderRadius: "2px",
                       cursor: "pointer",
                     }}
@@ -2478,7 +2487,7 @@ const Sidebar = () => {
             <div className="resume-notices">
               <div className="notice-box yellow">
                 <Image src="/images/0/cluster 1/Star Badge.png" alt="" width={25} height={25} className="notice-icon-img" />
-                <span className="notice-text notice-text-top">{debugPanelType === "EC" ? "전국청춘연합 엔터테인먼트/미디어 클럽, 엥크레" : debugPanelType === "PX" ? "전국청춘연합 기획/컨설팅 클럽, 팔랑크스" : "전국청춘연합 마케팅/퍼포먼스 클럽, 오랑캐"}</span>
+                <span className="notice-text notice-text-top">{orgContent.fullClubName}</span>
                 <div className={`notice-stamp-wrapper${crewStatus === "Complete" ? " stamped" : ""}`}>{crewStatus === "Complete" && <Image src="/images/0/cluster 1/오랑캐 도장.png" alt="" width={46} height={46} />}</div>
               </div>
               <div className="notice-box green">

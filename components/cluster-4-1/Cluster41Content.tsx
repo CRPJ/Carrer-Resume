@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { dedupedJson } from "@/lib/fetch-dedupe";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_WEEKLY_LIST, DUMMY_WEEK_EXTRA } from "@/constants/dummyData";
+import { getOrgContent } from "@/components/orgContent";
 
 // 글자수 기반 말줄임 (info-badge role 8자 초과 시 "..")
 const truncate = (text: string | null | undefined, maxLen: number = 5): string => {
@@ -29,7 +30,27 @@ const computeResultDecidedMs = (startDate: string): number => {
 const Cluster41Content = () => {
   // URL에서 userId 파라미터 읽기 (다른 유저 조회 시 사용)
   const searchParams = useSearchParams();
+  const orgParam = searchParams.get("org");
+  const orgContent = getOrgContent(orgParam);
+  // 참고 브랜치 기준 조직별 필터 강조색 — OK #FAAB07 / EC #FF4B70 / PX #1E9503.
+  const isECOrg = orgContent.key === "encre";
+  const isPXOrg = orgContent.key === "phalanx";
+  const filterAccent = isPXOrg ? "#1E9503" : isECOrg ? "#FF4B70" : "#FAAB07";
+  const filterAccentBg = isPXOrg
+    ? "rgba(30, 149, 3, 0.1)"
+    : isECOrg
+    ? "rgba(255, 75, 112, 0.1)"
+    : "rgba(255, 165, 0, 0.1)";
+  const filterAccentBgSelected = isPXOrg
+    ? "rgba(30, 149, 3, 0.2)"
+    : isECOrg
+    ? "rgba(255, 75, 112, 0.2)"
+    : "rgba(255, 165, 0, 0.2)";
   const targetUserId = searchParams.get('userId') || searchParams.get('userID');
+  const withOrgQuery = (href: string) => {
+    if (!orgParam) return href;
+    return `${href}${href.includes("?") ? "&" : "?"}org=${encodeURIComponent(orgParam)}`;
+  };
   const isDemoMode = checkDemoMode();
 
   // 데모 모드에서 사용자별 collection-content 문구 분기용
@@ -1500,14 +1521,14 @@ const Cluster41Content = () => {
         <div className="top-tabs">
           <div className="tab" style={{ width: '44px', height: '44px', background: '#FAAB07' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
-            <div className="tab-badge" onClick={() => router.push(`/cluster-4${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
+            <div className="tab-badge" onClick={() => router.push(withOrgQuery(`/cluster-4${targetUserId ? `?userId=${targetUserId}` : ''}`))}>
               <span className="badge-text">Weekly Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
           </div>
           <div className="tab" style={{ width: '44px', height: '44px', background: '#161816' }}>
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
-            <div className="tab-badge" onClick={() => router.push(`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`)}>
+            <div className="tab-badge" onClick={() => router.push(withOrgQuery(`/cluster-4-1${targetUserId ? `?userId=${targetUserId}` : ''}`))}>
               <span className="badge-text">Season Growth</span>
               <img src="/images/0/cluster4/icon/icon%20-%20wallet.png" alt="wallet" className="badge-icon" />
             </div>
@@ -1783,8 +1804,8 @@ const Cluster41Content = () => {
               ref={seasonBtnRef}
               className="filter-card filter-dropdown"
               style={{
-                borderColor: selectedSeason !== "역대 시즌" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedSeason !== "역대 시즌" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                borderColor: selectedSeason !== "역대 시즌" ? filterAccent : 'rgba(255, 255, 255, 0.12)',
+                background: selectedSeason !== "역대 시즌" ? filterAccentBg : 'transparent',
                 position: 'relative'
               }}
               onClick={() => {
@@ -1795,9 +1816,9 @@ const Cluster41Content = () => {
             >
               <div className="card-left">
                 <img src="/images/0/cluster4/icon/icon - 2.png" alt="calendar" className="card-icon" />
-                <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>{selectedSeason}</span>
+                <span className="card-label" style={{ color: selectedSeason !== "역대 시즌" ? filterAccent : '#fff' }}>{selectedSeason}</span>
               </div>
-              <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? '#FFA500' : '#fff' }}>▼</span>
+              <span className={`card-arrow ${seasonDropdownOpen ? 'open' : ''}`} style={{ color: selectedSeason !== "역대 시즌" ? filterAccent : '#fff' }}>▼</span>
               {seasonDropdownOpen && (
                 <div
                   style={{
@@ -1819,8 +1840,8 @@ const Cluster41Content = () => {
                       key={index}
                       style={{
                         padding: '12px 16px',
-                        color: selectedSeason === option ? '#FFA500' : '#fff',
-                        background: selectedSeason === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        color: selectedSeason === option ? filterAccent : '#fff',
+                        background: selectedSeason === option ? filterAccentBgSelected : 'transparent',
                         cursor: 'pointer',
                         borderBottom: index < seasonOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
                       }}
@@ -1830,7 +1851,7 @@ const Cluster41Content = () => {
                       }}
                       onMouseEnter={(e) => {
                         if (selectedSeason !== option) {
-                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                          e.currentTarget.style.background = filterAccentBg;
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -1850,8 +1871,8 @@ const Cluster41Content = () => {
               ref={resultBtnRef}
               className="filter-card filter-dropdown"
               style={{
-                borderColor: selectedResult !== "주차 결과" ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                background: selectedResult !== "주차 결과" ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                borderColor: selectedResult !== "주차 결과" ? filterAccent : 'rgba(255, 255, 255, 0.12)',
+                background: selectedResult !== "주차 결과" ? filterAccentBg : 'transparent',
                 position: 'relative'
               }}
               onClick={() => {
@@ -1862,9 +1883,9 @@ const Cluster41Content = () => {
             >
               <div className="card-left">
                 <img src="/images/0/cluster4/icon/icon - 3.png" alt="setting" className="card-icon" />
-                <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>{selectedResult}</span>
+                <span className="card-label" style={{ color: selectedResult !== "주차 결과" ? filterAccent : '#fff' }}>{selectedResult}</span>
               </div>
-              <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? '#FFA500' : '#fff' }}>▼</span>
+              <span className={`card-arrow ${resultDropdownOpen ? 'open' : ''}`} style={{ color: selectedResult !== "주차 결과" ? filterAccent : '#fff' }}>▼</span>
               {resultDropdownOpen && (
                 <div
                   style={{
@@ -1886,8 +1907,8 @@ const Cluster41Content = () => {
                       key={index}
                       style={{
                         padding: '12px 16px',
-                        color: selectedResult === option ? '#FFA500' : '#fff',
-                        background: selectedResult === option ? 'rgba(255,165,0,0.2)' : 'transparent',
+                        color: selectedResult === option ? filterAccent : '#fff',
+                        background: selectedResult === option ? filterAccentBgSelected : 'transparent',
                         cursor: 'pointer',
                         borderBottom: index < resultOptions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
                       }}
@@ -1897,7 +1918,7 @@ const Cluster41Content = () => {
                       }}
                       onMouseEnter={(e) => {
                         if (selectedResult !== option) {
-                          e.currentTarget.style.background = 'rgba(255,165,0,0.1)';
+                          e.currentTarget.style.background = filterAccentBg;
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -2008,7 +2029,7 @@ const Cluster41Content = () => {
             <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>현재 해당하는 주차가 없습니다.</div>
           ) : (
             (isMobile ? filteredDbData.slice(0, mobileVisibleCount) : paginatedDbData).map((week) => {
-              const weekHref = `/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`;
+              const weekHref = withOrgQuery(`/cluster-4-card/${week.id}${targetUserId ? `?userId=${targetUserId}` : ''}`);
               const isExpanded = expandedWeekId === week.id;
               const isRest = week.growthStatus.includes('휴식');
               // 개인 휴식 → 항상 '-'. 공식 휴식 → 이 크루에게 활동 기록 있을 때만 정상 계산 (예외 케이스).
@@ -2118,9 +2139,9 @@ const Cluster41Content = () => {
                               </div>
 
                               <div className="weekly-card-details-bottom">
-                                <div className="metric">단감 <strong>{weekPoints.star}</strong></div>
-                                <div className="metric">인절미 <strong>{injeolmi}</strong></div>
-                                <div className="metric">어흥 <strong>{Math.abs(weekPoints.lightning)}</strong></div>
+                                <div className="metric">{orgContent.points.star.label} <strong>{weekPoints.star}</strong></div>
+                                <div className="metric">{orgContent.points.shield.label} <strong>{injeolmi}</strong></div>
+                                <div className="metric">{orgContent.points.lightning.label} <strong>{Math.abs(weekPoints.lightning)}</strong></div>
                                 <div className="metric">주차 평판 <strong>{weeklyReputationCounts[week.id] || 0}</strong><span className="sub">/4</span></div>
                               </div>
                             </>
@@ -2217,22 +2238,22 @@ const Cluster41Content = () => {
                           <div className="info-group items">
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
-                              단감
-                              <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="item-icon" />
+                              {orgContent.points.star.label}
+                              <img src={orgContent.points.star.iconSrc} alt={orgContent.points.star.label} className="item-icon" />
                               <strong className="number-value num-3">{weekPoints.star}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
-                              인절미
-                              <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="item-icon" />
+                              {orgContent.points.shield.label}
+                              <img src={orgContent.points.shield.iconSrc} alt={orgContent.points.shield.label} className="item-icon" />
                               <strong className="number-value num-3">{injeolmi}</strong>
                               개
                             </span>
                             <span className="info-divider">·</span>
                             <span className="info-item with-icon">
-                              어흥
-                              <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="item-icon" />
+                              {orgContent.points.lightning.label}
+                              <img src={orgContent.points.lightning.iconSrc} alt={orgContent.points.lightning.label} className="item-icon" />
                               <strong className="number-value num-3">{Math.abs(weekPoints.lightning)}</strong>
                               개
                             </span>
@@ -2276,8 +2297,8 @@ const Cluster41Content = () => {
                           <div className={`weekly-card-stats-wrapper ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''}`}>
                             <div className="weekly-card-stats">
                               <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>정보</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : infoRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : infoRate.count}</span>/<span className="num-2">{hideStats ? '-' : infoRate.total}</span>)</span></span>
-                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>역량</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : competencyRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : competencyRate.count}</span>/<span className="num-2">{hideStats ? '-' : competencyRate.total}</span>)</span></span>
                               <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>경험</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : experienceRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : experienceRate.count}</span>/<span className="num-2">{hideStats ? '-' : experienceRate.total}</span>)</span></span>
+                              <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>역량</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : competencyRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : competencyRate.count}</span>/<span className="num-2">{hideStats ? '-' : competencyRate.total}</span>)</span></span>
                               <span className="stat"><span className="dot">·</span> 실무 <span className={`highlight ${week.growthStatus === '실패' ? 'fail' : ''} ${week.growthStatus === '휴식(개인)' ? 'rest-personal' : ''} ${week.growthStatus === '휴식(공식)' ? 'rest-official' : ''} ${week.growthStatus === '진행 중' ? 'in-progress' : ''} ${week.growthStatus === '집계 중' ? 'counting' : ''}`}>경력</span> 강화율 <strong><span className="num-3">{hideStats ? '-' : careerRate.rate}</span>%</strong> <span className="gray">(<span className="num num-2">{hideStats ? '-' : careerRate.count}</span>/<span className="num-2">{hideStats ? '-' : careerRate.total}</span>)</span></span>
                             </div>
                             <div className="weekly-card-extra-stats">

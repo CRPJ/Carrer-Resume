@@ -6,6 +6,7 @@ import Breadcrumb from "@/components/shared/Breadcrumb";
 import { useDataMasking } from "@/hooks/useDataMasking";
 import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DEMO_CREW_MEMBERS } from "@/constants/dummyData";
+import { getOrgContent } from "@/components/orgContent";
 
 interface Crew {
   id: string;
@@ -39,18 +40,40 @@ const clubOptions = ["엥크레", "오랑캐", "팔랑크스"];
 const statusOptions = ["활동 중", "활동 졸업", "활동 중단"];
 const ITEMS_PER_PAGE = 50;
 
+const VALID_ORGS = new Set(["encre", "phalanx", "oranke"]);
+
 // 베타 테스터 화이트리스트는 서버측(/api/crews)에서 raw display_name 으로 필터링
 // — 비로그인 마스킹 후 이름과 매칭 실패하던 버그 수정 (2026-04)
 
-const page = () => {
+const Page = () => {
   const { mask } = useDataMasking();
   const [demoMode, setDemoMode] = useState(false);
-  useEffect(() => { setDemoMode(checkDemoMode()); }, []);
+  const [org, setOrg] = useState<string | null>(null);
+  useEffect(() => {
+    setDemoMode(checkDemoMode());
+    setOrg(new URLSearchParams(window.location.search).get("org"));
+  }, []);
+  const orgContent = getOrgContent(org);
+  // org 컨텍스트(?org=)가 있을 때만 분기 테마/명칭을 적용한다.
+  // org 가 없으면 기존 Tuna 기본 /crews 화면을 그대로 유지해야 한다.
+  const hasOrg = Boolean(org && VALID_ORGS.has(org));
+  // 강조색: 분기 테마(.encre-theme/.phalanx-theme)가 부여하는 --crews-* 변수 사용.
+  // 테마 클래스가 없는 기본(org 없음) 화면에서는 fallback 으로 기존 Tuna 값
+  // (var(--primary-color) 등)을 그대로 사용 → 기본 화면이 원본과 동일하게 유지된다.
+  const filterAccentColor = "var(--crews-filter-accent, var(--primary-color))";
+  const filterAccentBackground = "var(--crews-filter-accent-bg, color-mix(in srgb, var(--primary-color) 10%, transparent))";
+  const primaryAccentColor = "var(--crews-primary-accent, var(--primary-color))";
+  const primaryAccentBackground = "var(--crews-primary-accent-bg, color-mix(in srgb, var(--primary-color) 15%, transparent))";
+  const primaryAccentContrast = "var(--crews-primary-accent-contrast, #111)";
+  const schoolDotBackground = "var(--crews-school-dot-bg, #FED402)";
+  const totalStarsLabel = hasOrg ? orgContent.points.star.label : "단감";
   const resolveHref = (crew: Crew) => {
-    if (demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)) {
-      return `/cluster-4?userId=${crew.id}&demoName=${encodeURIComponent(crew.name)}`;
-    }
-    return `/cluster-4?userId=${crew.id}`;
+    const orgSuffix = org && VALID_ORGS.has(org) ? `&org=${org}` : "";
+    const demoSuffix =
+      demoMode && (DEMO_CREW_MEMBERS as readonly string[]).includes(crew.name)
+        ? `&demoName=${encodeURIComponent(crew.name)}`
+        : "";
+    return `/cluster-4?userId=${crew.id}${orgSuffix}${demoSuffix}`;
   };
   const [crews, setCrews] = useState<Crew[]>([]);
   const [loading, setLoading] = useState(true);
@@ -187,9 +210,14 @@ const page = () => {
   ].filter(Boolean).join(" · ") || "필터 선택";
 
   return (
-    <main className="nftg-content nftg-content-home" style={{ padding: 0 }}>
+    <main
+      className={`nftg-content nftg-content-home${
+        org === "phalanx" ? " phalanx-theme" : org === "encre" ? " encre-theme" : ""
+      }`}
+      style={{ padding: 0 }}
+    >
       <Animations />
-      <Breadcrumb title="크루 명단" />
+      <Breadcrumb title={hasOrg ? `크루 명단 · ${orgContent.displayName}` : "크루 명단"} />
       <section className="pb-120 trending trending-nft" style={{ paddingLeft: 0, paddingRight: 0, paddingTop: 30 }}>
         <div className="container-fluid" style={{ paddingLeft: 15, paddingRight: 15, maxWidth: '100%' }}>
 
@@ -230,8 +258,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  borderColor: nameQuery.trim() ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: nameQuery.trim() ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: nameQuery.trim() ? filterAccentColor : 'rgba(255, 255, 255, 0.12)',
+                  background: nameQuery.trim() ? filterAccentBackground : 'transparent',
                 }}
               >
                 <div className="card-left" style={{ flex: 1 }}>
@@ -246,7 +274,7 @@ const page = () => {
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: nameQuery.trim() ? '#FFA500' : '#fff',
+                      color: nameQuery.trim() ? filterAccentColor : '#fff',
                       fontFamily: "'Pretendard', sans-serif",
                       fontSize: 14,
                       fontWeight: 600,
@@ -262,8 +290,8 @@ const page = () => {
                 ref={clubRef}
                 className="filter-card filter-dropdown"
                 style={{
-                  borderColor: clubFilter ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: clubFilter ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: clubFilter ? filterAccentColor : 'rgba(255, 255, 255, 0.12)',
+                  background: clubFilter ? filterAccentBackground : 'transparent',
                 }}
                 onClick={() => {
                   setClubDropdownOpen(!clubDropdownOpen);
@@ -272,11 +300,11 @@ const page = () => {
               >
                 <div className="card-left">
                   <img src="/images/0/cluster4/icon/icon - cluv.png" alt="club" className="card-icon" />
-                  <span className="card-label" style={{ color: clubFilter ? '#FFA500' : '#fff' }}>
+                  <span className="card-label" style={{ color: clubFilter ? filterAccentColor : '#fff' }}>
                     {clubFilter || "클럽 전체"}
                   </span>
                 </div>
-                <span className={`card-arrow ${clubDropdownOpen ? 'open' : ''}`} style={{ color: clubFilter ? '#FFA500' : '#fff' }}>▼</span>
+                <span className={`card-arrow ${clubDropdownOpen ? 'open' : ''}`} style={{ color: clubFilter ? filterAccentColor : '#fff' }}>▼</span>
 
                 {clubDropdownOpen && (
                   <div className="dropdown-menu" style={{ display: 'block' }} onClick={(e) => e.stopPropagation()}>
@@ -303,8 +331,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  borderColor: schoolQuery.trim() ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: schoolQuery.trim() ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: schoolQuery.trim() ? filterAccentColor : 'rgba(255, 255, 255, 0.12)',
+                  background: schoolQuery.trim() ? filterAccentBackground : 'transparent',
                 }}
               >
                 <div className="card-left" style={{ flex: 1 }}>
@@ -319,7 +347,7 @@ const page = () => {
                       background: 'transparent',
                       border: 'none',
                       outline: 'none',
-                      color: schoolQuery.trim() ? '#FFA500' : '#fff',
+                      color: schoolQuery.trim() ? filterAccentColor : '#fff',
                       fontFamily: "'Pretendard', sans-serif",
                       fontSize: 14,
                       fontWeight: 600,
@@ -335,8 +363,8 @@ const page = () => {
                 ref={statusRef}
                 className="filter-card filter-dropdown"
                 style={{
-                  borderColor: statusFilter ? '#FFA500' : 'rgba(255, 255, 255, 0.12)',
-                  background: statusFilter ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                  borderColor: statusFilter ? filterAccentColor : 'rgba(255, 255, 255, 0.12)',
+                  background: statusFilter ? filterAccentBackground : 'transparent',
                 }}
                 onClick={() => {
                   setStatusDropdownOpen(!statusDropdownOpen);
@@ -345,11 +373,11 @@ const page = () => {
               >
                 <div className="card-left">
                   <img src="/images/0/cluster4/icon/icon - 3.png" alt="status" className="card-icon" />
-                  <span className="card-label" style={{ color: statusFilter ? '#FFA500' : '#fff' }}>
+                  <span className="card-label" style={{ color: statusFilter ? filterAccentColor : '#fff' }}>
                     {statusFilter || "상태 전체"}
                   </span>
                 </div>
-                <span className={`card-arrow ${statusDropdownOpen ? 'open' : ''}`} style={{ color: statusFilter ? '#FFA500' : '#fff' }}>▼</span>
+                <span className={`card-arrow ${statusDropdownOpen ? 'open' : ''}`} style={{ color: statusFilter ? filterAccentColor : '#fff' }}>▼</span>
 
                 {statusDropdownOpen && (
                   <div className="dropdown-menu" style={{ display: 'block' }} onClick={(e) => e.stopPropagation()}>
@@ -385,8 +413,8 @@ const page = () => {
               <div
                 className="filter-card"
                 style={{
-                  background: hasActiveFilter ? '#FAAB07' : 'rgba(255, 255, 255, 0.06)',
-                  borderColor: hasActiveFilter ? '#FAAB07' : 'rgba(255, 255, 255, 0.12)',
+                  background: hasActiveFilter ? primaryAccentColor : 'rgba(255, 255, 255, 0.06)',
+                  borderColor: hasActiveFilter ? primaryAccentColor : 'rgba(255, 255, 255, 0.12)',
                   cursor: 'pointer',
                   width: 100,
                 }}
@@ -394,7 +422,7 @@ const page = () => {
               >
                 <div className="card-left" style={{ width: '100%', justifyContent: 'center' }}>
                   <span style={{
-                    color: hasActiveFilter ? '#111' : '#fff',
+                    color: hasActiveFilter ? primaryAccentContrast : '#fff',
                     fontFamily: "'Pretendard', sans-serif",
                     fontSize: 14,
                     fontWeight: 800,
@@ -513,7 +541,13 @@ const page = () => {
                     minHeight: 'calc(100vh - 200px)',
                   }}>
                     <img
-                      src="/images/0/금장_OK.png"
+                      src={
+                        org === "phalanx"
+                          ? "/images/0/금장_PX.png"
+                          : org === "encre"
+                          ? "/images/0/금장_EC.png"
+                          : "/images/0/금장_OK.png"
+                      }
                       alt="로딩 중"
                       style={{
                         width: '120px',
@@ -590,6 +624,27 @@ const page = () => {
                       .crews-grid .price-inner .cmn-shape { display: none !important; }
                       /* 학교/학과: flex 부모의 wrap 해제 (SCSS .info p { flex-wrap: wrap } 오버라이드) */
                       .crews-grid .info p { flex-wrap: nowrap !important; }
+                      ${hasOrg ? `
+                      /* 카드 푸터 (분기 화면 전용): 좌측 .price-inner 와 우측 .review 를 한 행에 유지. */
+                      .crews-grid .price-footer {
+                        flex-wrap: nowrap !important;
+                        gap: 8px !important;
+                        width: 100% !important;
+                      }
+                      .crews-grid .price-footer .review {
+                        flex-shrink: 0;
+                        margin-left: auto;
+                      }
+                      .crews-grid .review .text-sm.fw-6 {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        white-space: nowrap;
+                        flex-wrap: nowrap;
+                        min-width: max-content;
+                      }
+                      .crews-grid .review .text-sm.fw-6 i { flex-shrink: 0; }
+                      ` : ""}
                     `}</style>
                     {paginatedCrews.map((crew) => (
                       <div key={crew.id} className="trending__single" style={{ height: "100%" }}>
@@ -620,10 +675,10 @@ const page = () => {
                         <div className="content-wrapper">
                           <div className="info">
                             <p className="text-sm fw-6">
-                              <Link href={resolveHref(crew)} className="crew-club-badge">{crew.club}</Link>
+                              <Link href={resolveHref(crew)} className="crew-club-badge">{hasOrg ? ([crew.team, crew.club].find((v) => v && v !== "-") ?? "-") : crew.club}</Link>
                             </p>
                             <p className="text-sm" style={{ marginTop: "18px", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "3px", flexWrap: "nowrap", minWidth: 0, overflow: "hidden" }} title={`${mask.school(crew.university)} ${mask.major(crew.major)}`}>
-                              <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#FED402", flexShrink: 0, position: "relative", top: "-1px" }} />
+                              <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", backgroundColor: schoolDotBackground, flexShrink: 0, position: "relative", top: "-1px" }} />
                               <span style={{ minWidth: 0, flex: "1 1 auto", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mask.school(crew.university)} {mask.major(crew.major)}</span>
                             </p>
                           </div>
@@ -656,7 +711,7 @@ const page = () => {
                               <div className="price-inner">
                                 <p className="price text-sm fw-6">
                                   {crew.totalStars.toLocaleString()}{" "}
-                                  <span className="currency">단감</span>
+                                  <span className="currency">{totalStarsLabel}</span>
                                 </p>
                                 <Link href={resolveHref(crew)} className="btn--primary text-sm" style={{ fontSize: 12 }}>
                                   보기
@@ -711,9 +766,9 @@ const page = () => {
                           width: 40, height: 40, borderRadius: 10,
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                           padding: 0, lineHeight: 1,
-                          border: p === currentPage ? '1px solid #FAAB07' : '1px solid rgba(255,255,255,0.12)',
-                          background: p === currentPage ? 'rgba(250,171,7,0.15)' : 'transparent',
-                          color: p === currentPage ? '#FAAB07' : '#fff',
+                          border: p === currentPage ? `1px solid ${primaryAccentColor}` : '1px solid rgba(255,255,255,0.12)',
+                          background: p === currentPage ? primaryAccentBackground : 'transparent',
+                          color: p === currentPage ? primaryAccentColor : '#fff',
                           cursor: 'pointer',
                           fontSize: 14, fontWeight: 700,
                           fontFamily: "'Pretendard', sans-serif",
@@ -749,4 +804,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

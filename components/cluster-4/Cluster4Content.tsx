@@ -15,6 +15,7 @@ import { isDemoMode as checkDemoMode } from "@/utils/isDemoMode";
 import { DUMMY_SEASON_DATA, DUMMY_SEASON_HISTORIES, REVIEW_COMMENT_DEFAULT } from "@/constants/dummyData";
 import { dedupedJson } from "@/lib/fetch-dedupe";
 import HelpModalBody from "@/components/shared/HelpModalBody";
+import { getOrgContent } from "@/components/orgContent";
 
 // 글자수 초과 시 '..' 표시 (CSS ellipsis '…' 대신 JS 처리)
 const truncate = (text: string | undefined | null, maxLen: number): string => {
@@ -311,6 +312,12 @@ const Cluster4Content = () => {
   const { data: session } = useSession();
   const { mask } = useDataMasking();
   const searchParams = useSearchParams();
+  const orgParam = searchParams.get("org");
+  const orgContent = getOrgContent(orgParam);
+  const withOrgQuery = (href: string) => {
+    if (!orgParam) return href;
+    return `${href}${href.includes("?") ? "&" : "?"}org=${encodeURIComponent(orgParam)}`;
+  };
   const popup = usePopup();
   const urlUserId = searchParams.get("userId") || searchParams.get("userID");
   const isDemoMode = checkDemoMode();
@@ -2690,7 +2697,7 @@ const Cluster4Content = () => {
           <div
             className="tab"
             style={{ width: "44px", height: "44px", background: "#161816" }}
-            onClick={() => router.push(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`)}
+            onClick={() => router.push(withOrgQuery(`/cluster-4${urlUserId ? `?userId=${urlUserId}` : ""}`))}
           >
             <img src="/images/0/cluster4/icon/icon%20-%20%EC%A0%84%EA%B5%AC.png" alt="전구" className="tab-icon" />
             <div className="tab-badge">
@@ -2701,7 +2708,7 @@ const Cluster4Content = () => {
           <div
             className="tab"
             style={{ width: "44px", height: "44px", background: "#FAAB07" }}
-            onClick={() => router.push(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`)}
+            onClick={() => router.push(withOrgQuery(`/cluster-4-1${urlUserId ? `?userId=${urlUserId}` : ""}`))}
           >
             <img src="/images/0/cluster4/icon/icon%20-%20book.png" alt="book" className="tab-icon" />
             <div className="tab-badge">
@@ -2946,20 +2953,24 @@ const Cluster4Content = () => {
 
             {/* 중앙 열 (영역 4, 5, 6, 7) */}
             <div className={`center-column ${isTextFading ? "fading" : ""}`}>
-              {/* 영역 4: 통계 바 */}
+              {/* 영역 4: 통계 바 — EC(encre)는 cluster-4 전용 별/방패/번개 그래픽
+                  (Graphic10/Shield/Graphic13)을 쓴다. resume-card 의 badge(Star Badge.png)와
+                  다른 자산 — 참고 브랜치 기준. oranke·PX 는 orgContent.points 자산이 그대로 일치. */}
               <div className="area-4-stats" style={{ transform: "translateX(44px)" }}>
-                <span className="stat">
-                  단감 <img src="/images/0/cluster4/icon/icon - 단감.png" alt="단감" className="stat-icon" /> <strong className="number">{Math.abs(currentSeason.stats.dangam)}</strong>
-                  <span className="unit">개</span>
-                </span>
-                <span className="stat">
-                  인절미 <img src="/images/0/cluster4/icon/icon - 인절미.png" alt="인절미" className="stat-icon" /> <strong className="number">{Math.abs(currentSeason.stats.injeolmi)}</strong>
-                  <span className="unit">개</span>
-                </span>
-                <span className="stat">
-                  어흥 <img src="/images/0/cluster4/icon/icon - 어흥.png" alt="어흥" className="stat-icon" /> <strong className="number">{Math.abs(currentSeason.stats.eoheung)}</strong>
-                  <span className="unit">개</span>
-                </span>
+                {([
+                  { slot: "star", value: currentSeason.stats.dangam, ecSrc: "/images/0/Graphic10.png" },
+                  { slot: "shield", value: currentSeason.stats.injeolmi, ecSrc: "/images/0/Shield.png" },
+                  { slot: "lightning", value: currentSeason.stats.eoheung, ecSrc: "/images/0/Graphic13.png" },
+                ] as const).map(({ slot, value, ecSrc }) => {
+                  const point = orgContent.points[slot];
+                  const iconSrc = orgContent.key === "encre" ? ecSrc : point.iconSrc;
+                  return (
+                    <span className="stat" key={slot}>
+                      {point.label} <img src={iconSrc} alt={point.label} className="stat-icon" /> <strong className="number">{Math.abs(value)}</strong>
+                      <span className="unit">개</span>
+                    </span>
+                  );
+                })}
               </div>
 
               {/* 영역 5: 평점 및 리뷰 */}
