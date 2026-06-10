@@ -24,7 +24,7 @@ const ROW = {
   count_once_in_total: false,
   reward_star: 0, reward_shield: 0, reward_lightning: 0,
   penalty_star: 0, penalty_shield: 0, penalty_lightning: 0,
-  line_code: "EX00C-CLUB10",
+  line_code: "AA00A-PR2606",
   sort_order: 99,
   description: "클럽 1.0 활동 내역 마이그레이션 라인 (per-user, weekly_activities 무관).",
   eligible_min_approved_weeks: null,
