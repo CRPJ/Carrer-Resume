@@ -86,6 +86,12 @@ const formatMajor = (value: string) => {
   return value;
 };
 
+// 클럽 1.0 → 1.5 마이그레이션 전용 실무 경험 라인 id. 이 라인은 weekly_activities(전역 개설)가
+// 아니라 크루 본인의 activity_record 로만 평가된다(per-user). getEnhancementStatus 특수 분기 참조.
+const CLUB1_LEGACY_LINE_ID = "club1_legacy_data";
+// 클럽1.0 통합 라인의 메인 타이틀(전 크루 공통). 라인명은 DB activity_types.name 사용.
+const CLUB1_LEGACY_TITLE = "한 주 동안 클럽에서 진행한 <중앙>, <팀> 활동 내역을 아우르는 통합 기록입니다. (26년 6월 이전)";
+
 const WORKINFO_IMAGE_SLOT_COUNT = 4;
 
 const createEmptyWorkInfoImages = (): (string | null)[] => Array.from({ length: WORKINFO_IMAGE_SLOT_COUNT }, () => null);
@@ -4983,6 +4989,14 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     // phase(집계 중/진행 중) 와 무관하게 적용 — growthStatus 가 phase 로 가려져도 휴식 플래그를 본다.
     if (weekData?.isPersonalRest) return "not_applicable";
 
+    // '클럽 1.0 임시데이터' 라인(마이그레이션 전용): weekly_activities(전역 개설) 와 무관하게
+    // 이 크루 본인의 activity_record 존재 여부만으로 판정한다. 레코드가 없는 다른 크루에게는
+    // 애초에 카드가 렌더되지 않으므로(per-user 렌더), 전역 개설 없이도 폴루션 없이 강화 성공 처리됨.
+    if (activityType === CLUB1_LEGACY_LINE_ID) {
+      const rec = weekActivityRecords.find((ar) => ar.activity_type_id === activityType);
+      return rec?.is_completed ? "success" : "not_applicable";
+    }
+
     // 매니징 라인 — 사용자 역할이 다른 역할용 라인이면 '해당 없음'
     // 단, 실제 이행 기록이 있으면 운영진이 예외 부여한 케이스이므로 일반 흐름 유지
     if (isLineForOtherRole(activityType)) {
@@ -5572,7 +5586,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
     const enhStatus = getEnhancementStatus(activityTypeId);
     const lineCodeKey = (activityType?.line_code || "").replace(/\s+/g, "");
     const fallbackMapping = workExpLineMap[lineCodeKey];
-    const hasActivity = !!activity;
+    // 클럽1.0 라인은 weekly_activities(전역 개설) 없이 크루 record 로만 평가 → 평점·강화상태 표시를 위해
+    // hasActivity 를 record 존재로 인정한다(per-user). 그 외 라인은 기존대로 weekly_activities 기준.
+    const hasActivity = activityTypeId === CLUB1_LEGACY_LINE_ID ? true : !!activity;
 
     // 별점 계산 (points 테이블에서 가져온 평점 사용, 0~10 정수)
     const ratingScore = activityRatings.get(activityTypeId) || 0;
@@ -5630,7 +5646,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
       activityTypeId,
       code: activityType?.line_code || fallbackMapping?.lineCode || "-",
       badge: activityType?.name || fallbackMapping?.lineName || "-",
-      title: activity?.title || fallbackMapping?.mainTitle || "-",
+      title: activityTypeId === CLUB1_LEGACY_LINE_ID ? CLUB1_LEGACY_TITLE : (activity?.title || fallbackMapping?.mainTitle || "-"),
       subTitle: detail?.sub_title || "",
       growthPoint: detail?.growth_point || "",
       outputLinks: mergedOutputLinks,
@@ -6632,11 +6648,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="growth-count">
                 <img src="/images/0/cluster4/icon/icon - 0 - 3star.png" alt="star" className="star-icon" /> 총{" "}
                 <span style={{ display: "inline-block", minWidth: "2ch", textAlign: "right", color: "white", fontSize: 19, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>
-                  {isRestMode ? "-" : infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total}
+                  {isOnboardingWeek || isRestMode ? "-" : infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total}
                 </span>{" "}
                 개 중{" "}
                 <span className="highlight" style={{ display: "inline-block", minWidth: "2ch", textAlign: "right" }}>
-                  {isRestMode ? "-" : infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success}
+                  {isOnboardingWeek || isRestMode ? "-" : infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success}
                 </span>
                 개
               </span>
@@ -6645,9 +6661,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <div
                 className="progress-bar"
                 style={{
-                  width: isRestMode
+                  width: isRestMode || isOnboardingWeek
                     ? "100%"
-                    : `${infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total)) * 100) : isOnboardingWeek ? 100 : 0}%`,
+                    : `${infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total > 0 ? Math.ceil(((infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total)) * 100) : 0}%`,
                 }}
               ></div>
               {isRestMode && <span className="rest-message">휴식주차로서 집계되지 않습니다</span>}
@@ -6656,13 +6672,11 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
           <div className="growth-center">
             <span className="progress-percent">
               <span className="number">
-                {isRestMode
+                {isOnboardingWeek || isRestMode
                   ? "-"
                   : infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total > 0
                     ? Math.ceil(((infoStats.success + competencyStats.success + experienceStatsDisplay.success + careerStats.success) / (infoStats.total + competencyStats.total + experienceStatsDisplay.total + careerStats.total)) * 100)
-                    : isOnboardingWeek
-                      ? 100
-                      : 0}
+                    : 0}
               </span>
               <span className="percent">%</span>
             </span>
@@ -6718,9 +6732,9 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               </span>
             </div>
             <span className="section-count">
-              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isRestMode ? "-" : infoStats.total}</span> 개 중{" "}
+              총 <span style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right", color: "white", fontSize: 24, fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, textTransform: "uppercase" as const, lineHeight: "31px" }}>{isOnboardingWeek || isRestMode ? "-" : infoStats.total}</span> 개 중{" "}
               <span className="highlight" style={{ display: "inline-block", minWidth: "2.5ch", textAlign: "right" }}>
-                {isRestMode ? "-" : infoStats.success}
+                {isOnboardingWeek || isRestMode ? "-" : infoStats.success}
               </span>{" "}
               개
             </span>
@@ -6728,7 +6742,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               <span className="rate-label">파트 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
-                  {isRestMode ? "-" : infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}
+                  {isOnboardingWeek || isRestMode ? "-" : infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}
                 </span>
                 %
               </span>
