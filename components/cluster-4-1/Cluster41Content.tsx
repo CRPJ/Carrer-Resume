@@ -808,7 +808,7 @@ const Cluster41Content = () => {
 
   // 주차별 전체 성장률(k) 계산 (모든 실무 카테고리 합산)
   // k = {(a' + b' + c' + d') / (a + b + c + d)} * 100% (소수점 올림)
-  // 주의: 각 파트 강화율(p,q,r,s)은 k 계산에 포함되지 않음
+  // 주의: 각 허브 강화율(p,q,r,s)은 k 계산에 포함되지 않음
   const getWeeklyGrowthRate = (weekId: string) => {
     if (DUMMY_WEEK_EXTRA[weekId]) return DUMMY_WEEK_EXTRA[weekId].growthRate;
     if (weekId.startsWith('dummy') || weekId.startsWith('dw-')) return { rate: 0, count: 0, total: 0 };

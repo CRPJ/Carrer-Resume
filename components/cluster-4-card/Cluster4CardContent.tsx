@@ -6667,7 +6667,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               개
             </span>
             <div className="section-title-right">
-              <span className="rate-label">파트 강화율</span>
+              <span className="rate-label">허브 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                   {isRestMode ? "-" : infoStats.total > 0 ? Math.ceil((infoStats.success / infoStats.total) * 100) : 0}
@@ -6763,7 +6763,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               개
             </span>
             <div className="section-title-right">
-              <span className="rate-label">파트 강화율</span>
+              <span className="rate-label">허브 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                   {isOnboardingWeek || isRestMode ? "-" : experienceStatsDisplay.total > 0 ? Math.ceil((experienceStatsDisplay.success / experienceStatsDisplay.total) * 100) : 0}
@@ -6922,7 +6922,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               개
             </span>
             <div className="section-title-right">
-              <span className="rate-label">파트 강화율</span>
+              <span className="rate-label">허브 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                   {isOnboardingWeek || isRestMode ? "-" : competencyStats.total > 0 ? Math.ceil((competencyStats.success / competencyStats.total) * 100) : 0}
@@ -7030,7 +7030,7 @@ const Cluster4CardContent = ({ weekId }: Cluster4CardContentProps) => {
               개
             </span>
             <div className="section-title-right">
-              <span className="rate-label">파트 강화율</span>
+              <span className="rate-label">허브 강화율</span>
               <span className="rate-value">
                 <span className="highlight" style={{ display: "inline-block", minWidth: "3ch", textAlign: "right" }}>
                   {isOnboardingWeek || isRestMode ? "-" : careerStats.total > 0 ? Math.ceil((careerStats.success / careerStats.total) * 100) : 0}
