@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import Tilt from "react-parallax-tilt";
 import type { WeeklyCardCrew, WeeklyCardData, RestReason } from "@/constants/dummyData/weekly-card-dummy";
 
@@ -160,20 +161,21 @@ export default function WeeklyCardItem({ data }: Props) {
       transitionSpeed={400}
       className="col-12 col-md-6 col-xl-4"
     >
-      <div className="badge__single weekly-card">
+      {/* 카드 전체가 클릭 영역 — 해당 주차 상세(랭킹) 페이지로 이동. */}
+      <Link
+        href={`/weekly-ranking/${data.id}`}
+        className="badge__single weekly-card"
+        aria-label={`${data.seasonName} 상세 보기`}
+      >
         <div className="weekly-card__header">
           <div className="weekly-card__title">
-            {/* [상세 페이지 라우팅 자리] href/onClick 자리는 비워두고, 추후 상세 페이지 연결 시 추가. */}
-            <button
-              type="button"
-              className="weekly-card__league-link"
-              aria-label="Weekly League 상세 페이지 준비 중"
-            >
+            {/* 카드 전체가 Link 이므로 중첩 <a> 방지를 위해 span 으로 표시(시각 라벨 역할). */}
+            <span className="weekly-card__league-link">
               <span className="weekly-card__league-icon" aria-hidden="true">
                 <i className="ti ti-trophy" />
               </span>
               <span>Weekly League</span>
-            </button>
+            </span>
             {/* 첨부 cluster-4-card 의 2026 표시 문자열을 그대로 출력.
                 연도/시즌명/주차명/기간 모두 재계산·재포맷·split 금지. */}
             <h4 className="weekly-card__season">
@@ -395,7 +397,7 @@ export default function WeeklyCardItem({ data }: Props) {
             </div>
           </>
         )}
-      </div>
+      </Link>
     </Tilt>
   );
 }

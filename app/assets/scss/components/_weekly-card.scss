@@ -33,6 +33,10 @@
     flex-direction: column;
     gap: 20px;
     height: 100%;
+    // 카드 전체가 <a> 링크 — 링크 기본 스타일 제거(밑줄/상속색)하고 클릭 affordance만 부여.
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 
     &:hover {
       border-color: var(--primary-color);
