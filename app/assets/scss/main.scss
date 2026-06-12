@@ -174,7 +174,8 @@
 @import "./components/weekly-card";     // Weekly League 주차 카드
 @import "./components/weekly-detail";   // Weekly League 주차 상세(랭킹) 페이지 — 테마 A(ARENA)
 @import "./components/weekly-theme-ragnarok"; // 테마 B(RAGNAROK)
-@import "./components/weekly-theme-cyber";      // 테마 C(CYBER HUD)
+@import "./components/weekly-theme-cyber";      // 테마 C(체스판 / CHESSBOARD)
+@import "./components/weekly-theme-steampunk";  // 테마 D(STEAMPUNK 황동 계기판)
 
 // Phase B — Portal modal/popup theme override (CustomPopup, DetailLogModal).
 // 결합 selector(.section-modal-overlay.cluster-px-theme 등)로 portal root 에
