@@ -1,0 +1,887 @@
+/* ============================================================
+ * Weekly League 상세 — 테마 E "NEON ARCADE" (네온 아케이드)
+ * 딥 바이올렛 + 네온 마젠타/시안 글로우, 글래스 게임 카드, 잭팟 미터.
+ * 슬롯게임 대시보드 무드: 아웃라인 마스트헤드 + CTA 배너.
+ * Scope: .weekly-neon 하위로만 한정.
+ * 레이아웃 가드: minmax(min(px,100%),1fr) + overflow:hidden.
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+.weekly-neon {
+  // 팔레트 — 딥 바이올렛 + 네온
+  --nx-void: #07030f;
+  --nx-deep: #0e0620;
+  --nx-panel: rgba(26, 12, 48, 0.72);
+  --nx-panel-2: rgba(34, 16, 62, 0.6);
+  --nx-line: rgba(168, 85, 247, 0.32);
+  --nx-magenta: #ff2dd0;
+  --nx-magenta-soft: #ff7ae8;
+  // 보조 액센트 — 원본은 시안 대신 보라/페리윙클 계열의 단색 무드.
+  --nx-cyan: #9d7bff;
+  --nx-violet: #a855f7;
+  --nx-gold: #ffd45e;
+  --nx-rose: #ff5e8a;
+  --nx-ink: #f3eaff;
+  --nx-ink-dim: #b7a6d8;
+
+  position: relative;
+  color: var(--nx-ink);
+  font-family: 'Noto Sans KR', sans-serif;
+  padding: 22px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(80% 120% at 0% 0%, rgba(124, 58, 237, 0.5) 0%, transparent 42%),
+    radial-gradient(70% 90% at 100% 40%, rgba(255, 45, 208, 0.16) 0%, transparent 46%),
+    radial-gradient(120% 90% at 50% -10%, #24103f 0%, var(--nx-deep) 48%, var(--nx-void) 100%);
+  box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.18), 0 30px 80px rgba(0, 0, 0, 0.55);
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  // ─────────── 배경 데코 ───────────
+  .neon-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+
+    &__orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.55;
+      &--1 { width: 420px; height: 420px; top: -120px; left: -80px; background: #ff3df0; }
+      &--2 { width: 480px; height: 480px; top: 30%; right: -140px; background: #2ee6ff; opacity: 0.4; }
+      &--3 { width: 360px; height: 360px; bottom: -120px; left: 30%; background: #a855f7; opacity: 0.45; }
+    }
+    &__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(120% 80% at 50% 0%, #000 30%, transparent 85%);
+    }
+    &__scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 4px);
+      mix-blend-mode: overlay;
+    }
+  }
+
+  .neon-stage {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  // ─────────── 공통 ───────────
+  .neon-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font: 700 11px/1 'Rajdhani', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    &--magenta { color: var(--nx-magenta-soft); background: rgba(255, 61, 240, 0.12); box-shadow: 0 0 16px rgba(255, 61, 240, 0.35); }
+    &--cyan { color: var(--nx-cyan); background: rgba(46, 230, 255, 0.12); box-shadow: 0 0 16px rgba(46, 230, 255, 0.3); }
+  }
+
+  .neon-btn {
+    appearance: none;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font: 800 13px/1 'Rajdhani', sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+    &--magenta {
+      color: #1a0322;
+      background: linear-gradient(135deg, #ff7ae8, #ff3df0 55%, #b023d6);
+      box-shadow: 0 0 22px rgba(255, 61, 240, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    &--ghost {
+      color: var(--nx-ink);
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid var(--nx-line);
+    }
+    &:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    &:active { transform: translateY(0); }
+  }
+
+  .neon-panel {
+    position: relative;
+    background: var(--nx-panel);
+    border: 1px solid var(--nx-line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    &__cap {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font: 700 12px/1 'Rajdhani', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--nx-cyan);
+      margin-bottom: 10px;
+    }
+  }
+
+  // ─────────── 마스트헤드 ───────────
+  .neon-masthead {
+    position: relative;
+    text-align: center;
+    padding-top: 6px;
+
+    .neon-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--nx-line);
+      background: rgba(168, 85, 247, 0.1);
+      color: var(--nx-ink-dim);
+      font: 700 12px/1 'Rajdhani', sans-serif;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: color 0.16s ease, box-shadow 0.16s ease;
+      &:hover { color: var(--nx-magenta-soft); box-shadow: 0 0 18px rgba(255, 61, 240, 0.35); }
+    }
+    &__eyebrow {
+      margin: 0 0 6px;
+      font: 700 12px/1 'Rajdhani', sans-serif;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--nx-cyan);
+      text-shadow: 0 0 12px rgba(46, 230, 255, 0.6);
+    }
+    &__title {
+      position: relative;
+      margin: 0;
+      font: 900 clamp(34px, 6vw, 62px)/0.96 'Orbitron', sans-serif;
+      letter-spacing: 0.08em;
+      color: transparent;
+      -webkit-text-stroke: 1.4px var(--nx-magenta-soft);
+      text-transform: uppercase;
+      &::after {
+        content: attr(data-text);
+        position: absolute;
+        inset: 0;
+        color: transparent;
+        background: linear-gradient(180deg, rgba(255, 122, 232, 0.95), rgba(168, 85, 247, 0.18));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-stroke: 0;
+        filter: drop-shadow(0 0 22px rgba(255, 61, 240, 0.55));
+      }
+    }
+    &__season {
+      margin: 12px 0 0;
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font: 600 14px/1.4 'Rajdhani', sans-serif;
+      color: var(--nx-ink-dim);
+      i { color: var(--nx-magenta-soft); }
+    }
+    &__dot { width: 4px; height: 4px; border-radius: 50%; background: var(--nx-violet); }
+  }
+
+  // ─────────── 섹션 헤더 ───────────
+  .neon-section { position: relative; }
+  .neon-shead {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px;
+    font: 800 15px/1 'Rajdhani', sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--nx-ink);
+    &::before {
+      // 좌측 마젠타 액센트 바 — 원본 섹션 헤더 시그니처.
+      content: "";
+      width: 4px;
+      height: 16px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--nx-magenta-soft), var(--nx-magenta));
+      box-shadow: 0 0 12px rgba(255, 45, 208, 0.6);
+    }
+    &__no {
+      font: 800 12px/1 'Orbitron', sans-serif;
+      letter-spacing: 0.05em;
+      color: var(--nx-magenta-soft);
+    }
+    em {
+      margin-left: auto;
+      font: 600 10px/1 'Rajdhani', sans-serif;
+      letter-spacing: 0.2em;
+      color: var(--nx-ink-dim);
+      text-transform: uppercase;
+    }
+  }
+
+  // ─────────── HERO ───────────
+  .neon-hero {
+    display: grid;
+    grid-template-columns: minmax(min(340px, 100%), 1.4fr) minmax(min(260px, 100%), 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .neon-hero__media {
+    position: relative;
+    min-height: 260px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--nx-line);
+    background: linear-gradient(135deg, #1c0b38, #0e0620);
+    box-shadow: 0 0 40px rgba(255, 61, 240, 0.18);
+
+    img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .neon-hero__ph {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--nx-ink-dim);
+      font: 700 14px 'Rajdhani', sans-serif;
+      i { font-size: 38px; color: var(--nx-violet); }
+    }
+    .neon-hero__scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 30%, rgba(7, 3, 15, 0.85) 100%);
+    }
+    .neon-hero__edge {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255, 122, 232, 0.4), inset 0 0 40px rgba(255, 61, 240, 0.2);
+    }
+    .neon-hero__overlay {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .neon-hero__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .neon-hero__tagline {
+      font: 800 16px/1 'Orbitron', sans-serif;
+      letter-spacing: 0.12em;
+      color: var(--nx-gold);
+      text-shadow: 0 0 16px rgba(255, 212, 94, 0.6);
+    }
+  }
+
+  // 잭팟 미터
+  .neon-meters {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--nx-panel);
+    border: 1px solid var(--nx-line);
+    backdrop-filter: blur(10px);
+  }
+  .neon-meter {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    --ring: var(--nx-magenta);
+    &--magenta { --ring: var(--nx-magenta); }
+    &--cyan { --ring: var(--nx-cyan); }
+    &__ring {
+      position: relative;
+      width: 78px;
+      height: 78px;
+      flex: none;
+      border-radius: 50%;
+      background:
+        radial-gradient(closest-side, var(--nx-deep) 0 64%, transparent 65%),
+        conic-gradient(var(--ring) calc(var(--val) * 1%), rgba(168, 85, 247, 0.16) 0);
+      box-shadow: 0 0 22px color-mix(in srgb, var(--ring) 45%, transparent);
+      display: grid;
+      place-items: center;
+    }
+    &__num {
+      font: 800 19px/1 'Orbitron', sans-serif;
+      color: var(--nx-ink);
+      em { font-size: 11px; font-style: normal; color: var(--nx-ink-dim); margin-left: 1px; }
+    }
+    &__label { font: 700 14px 'Rajdhani', sans-serif; color: var(--nx-ink-dim); letter-spacing: 0.04em; }
+  }
+  .neon-dist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--nx-line);
+    &__row {
+      display: grid;
+      grid-template-columns: 10px 36px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      font: 600 12px 'Rajdhani', sans-serif;
+      --c: var(--nx-violet);
+      &--cyan { --c: var(--nx-cyan); }
+      &--rose { --c: var(--nx-rose); }
+      &--violet { --c: var(--nx-violet); }
+    }
+    &__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+    &__label { color: var(--nx-ink); }
+    &__bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(168, 85, 247, 0.16);
+      overflow: hidden;
+      span { display: block; height: 100%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+    }
+    &__val { color: var(--nx-ink-dim); white-space: nowrap; font-size: 11px; }
+  }
+
+  // ─────────── 네온 카드 ───────────
+  .neon-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .neon-card {
+    position: relative;
+    overflow: hidden;
+    padding: 16px 14px;
+    border-radius: 16px;
+    text-align: center;
+    background: var(--nx-panel-2);
+    border: 1px solid var(--nx-line);
+    --c: var(--nx-magenta);
+    &--cyan { --c: var(--nx-cyan); }
+    &--gold { --c: var(--nx-gold); }
+    &--rose { --c: var(--nx-rose); }
+    &--violet { --c: var(--nx-violet); }
+    &--magenta { --c: var(--nx-magenta); }
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    &:hover { transform: translateY(-3px); box-shadow: 0 0 26px color-mix(in srgb, var(--c) 40%, transparent); }
+    &__glow {
+      position: absolute;
+      top: -30%;
+      left: 50%;
+      width: 130px;
+      height: 130px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--c);
+      opacity: 0.28;
+      filter: blur(36px);
+    }
+    // 글로시 3D 타일 — 원본 상점 카드의 중앙 아이콘 자리.
+    &__tile {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      margin: 4px auto 12px;
+      border-radius: 18px;
+      color: #fff;
+      font-size: 30px;
+      background:
+        radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 55%, color-mix(in srgb, var(--c) 55%, #1a0322) 100%);
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.5),
+        inset 0 -6px 12px rgba(0, 0, 0, 0.35),
+        0 8px 22px color-mix(in srgb, var(--c) 50%, transparent);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+    &__label { display: block; font: 700 13px 'Rajdhani', sans-serif; color: var(--nx-ink); letter-spacing: 0.03em; }
+    // 마젠타 가격 pill — 원본 "$ 19.99" 자리.
+    &__pill {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font: 800 14px 'Orbitron', sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, #ff7ae8, var(--nx-magenta) 60%, #b023d6);
+      box-shadow: 0 4px 16px rgba(255, 45, 208, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      em { font-size: 10px; font-style: normal; opacity: 0.85; margin-left: 2px; }
+    }
+  }
+
+  // ─────────── 개요/소식 ───────────
+  .neon-info {
+    display: grid;
+    grid-template-columns: minmax(min(320px, 100%), 1.2fr) minmax(min(280px, 100%), 1fr);
+    gap: 16px;
+  }
+  .neon-overview p { margin: 0; font-size: 13.5px; line-height: 1.75; color: var(--nx-ink); }
+  .neon-news {
+    &__item {
+      display: grid;
+      grid-template-columns: auto auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.14);
+      &:last-child { border-bottom: none; }
+    }
+    &__idx { font: 800 12px 'Orbitron', sans-serif; color: var(--nx-magenta-soft); }
+    &__cat {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font: 700 10px 'Rajdhani', sans-serif;
+      color: var(--nx-cyan);
+      background: rgba(46, 230, 255, 0.1);
+      border: 1px solid rgba(46, 230, 255, 0.3);
+      white-space: nowrap;
+    }
+    &__title { font-size: 12.5px; color: var(--nx-ink); line-height: 1.4; }
+  }
+
+  // ─────────── 리더보드 ───────────
+  .neon-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .neon-tab {
+    appearance: none;
+    cursor: pointer;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--nx-line);
+    background: rgba(168, 85, 247, 0.08);
+    color: var(--nx-ink-dim);
+    font: 700 13px 'Rajdhani', sans-serif;
+    letter-spacing: 0.03em;
+    transition: all 0.16s ease;
+    &:hover { color: var(--nx-ink); }
+    &.is-active {
+      color: #1a0322;
+      background: linear-gradient(135deg, var(--nx-magenta-soft), var(--nx-magenta));
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(255, 61, 240, 0.5);
+    }
+  }
+  // 베팅 테이블 — 원본의 MY BETS 표 구조(아바타 행 + 컬러 pill).
+  .neon-bettable {
+    margin-bottom: 18px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--nx-line);
+    background: var(--nx-panel);
+    &__head,
+    &__row {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 0 18px;
+    }
+    &__head {
+      height: 42px;
+      background: rgba(168, 85, 247, 0.14);
+      span {
+        font: 700 11px 'Rajdhani', sans-serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--nx-ink-dim);
+        &.is-r { text-align: right; }
+      }
+    }
+    &__row {
+      min-height: 56px;
+      border-top: 1px solid rgba(168, 85, 247, 0.12);
+      transition: background 0.14s ease;
+      &:hover { background: rgba(168, 85, 247, 0.08); }
+      &.is-top { background: linear-gradient(90deg, rgba(255, 45, 208, 0.12), transparent 70%); }
+    }
+    &__pos {
+      font: 800 16px/1 'Orbitron', sans-serif;
+      color: var(--nx-magenta-soft);
+      text-align: center;
+    }
+    &__user { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    &__av {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      flex: none;
+      border-radius: 50%;
+      color: var(--nx-magenta-soft);
+      background: radial-gradient(closest-side, rgba(255, 45, 208, 0.2), transparent);
+      border: 1px solid rgba(255, 122, 232, 0.4);
+      font-size: 16px;
+    }
+    &__name { font: 700 13.5px 'Rajdhani', sans-serif; color: var(--nx-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    &__rank {
+      justify-self: start;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font: 700 11.5px 'Rajdhani', sans-serif;
+      color: var(--nx-violet);
+      background: rgba(168, 85, 247, 0.14);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      white-space: nowrap;
+    }
+    &__val {
+      justify-self: end;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font: 800 12.5px 'Rajdhani', sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, var(--nx-magenta-soft), var(--nx-magenta));
+      box-shadow: 0 0 14px rgba(255, 45, 208, 0.4);
+      white-space: nowrap;
+    }
+  }
+  .neon-team {
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: var(--nx-panel);
+    border: 1px solid var(--nx-line);
+    &__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    &__name { font: 800 16px 'Rajdhani', sans-serif; color: var(--nx-ink); i { color: var(--nx-magenta-soft); margin-right: 6px; } }
+    &__win {
+      font: 800 13px 'Orbitron', sans-serif;
+      color: var(--nx-cyan);
+      text-shadow: 0 0 14px rgba(46, 230, 255, 0.5);
+    }
+    &__meta { margin: 8px 0 12px; font-size: 12.5px; color: var(--nx-ink-dim); }
+    &__stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr));
+      gap: 10px;
+      div {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(168, 85, 247, 0.08);
+        border: 1px solid var(--nx-line);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        span { font: 600 11px 'Rajdhani', sans-serif; color: var(--nx-ink-dim); }
+        strong { font: 800 18px 'Orbitron', sans-serif; color: var(--nx-ink); &.is-win { color: var(--nx-cyan); } }
+      }
+    }
+    &__mentor {
+      margin: 12px 0 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(46, 230, 255, 0.06);
+      border-left: 3px solid var(--nx-cyan);
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--nx-ink);
+      i { color: var(--nx-cyan); margin-right: 4px; }
+    }
+  }
+
+  // ─────────── 필터 ───────────
+  .neon-filters {
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: var(--nx-panel);
+    border: 1px solid var(--nx-line);
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    &__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; &--sort { justify-content: space-between; } }
+    &__label { font: 700 11px 'Rajdhani', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--nx-cyan); margin-right: 4px; }
+    &__sort { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  }
+  .neon-fbtn {
+    appearance: none;
+    cursor: pointer;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--nx-line);
+    background: rgba(168, 85, 247, 0.06);
+    color: var(--nx-ink-dim);
+    font: 600 12px 'Rajdhani', sans-serif;
+    transition: all 0.14s ease;
+    &:hover { color: var(--nx-ink); border-color: rgba(255, 122, 232, 0.45); }
+    &.is-active {
+      color: #1a0322;
+      background: linear-gradient(135deg, var(--nx-magenta-soft), var(--nx-magenta));
+      border-color: transparent;
+      box-shadow: 0 0 14px rgba(255, 61, 240, 0.45);
+    }
+  }
+  .neon-sorttag {
+    font: 600 11.5px 'Rajdhani', sans-serif;
+    color: var(--nx-ink-dim);
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(168, 85, 247, 0.08);
+    &.is-trig { color: var(--nx-cyan); box-shadow: inset 0 0 0 1px rgba(46, 230, 255, 0.35); }
+  }
+  .neon-official {
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(46, 230, 255, 0.4);
+    background: rgba(46, 230, 255, 0.08);
+    color: var(--nx-cyan);
+    font: 700 12px 'Rajdhani', sans-serif;
+    transition: box-shadow 0.16s ease;
+    &:hover { box-shadow: 0 0 18px rgba(46, 230, 255, 0.4); }
+  }
+
+  // ─────────── 크루 카드 ───────────
+  .neon-crews {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: 14px;
+  }
+  .neon-crew {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: var(--nx-panel);
+    border: 1px solid var(--nx-line);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    --c: var(--nx-cyan);
+    &.is-success { --c: var(--nx-cyan); }
+    &.is-fail { --c: var(--nx-rose); }
+    &:hover { transform: translateY(-3px); box-shadow: 0 0 30px color-mix(in srgb, var(--c) 35%, transparent); }
+    &__edge {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      box-shadow: inset 3px 0 0 var(--c), inset 0 0 30px color-mix(in srgb, var(--c) 14%, transparent);
+      pointer-events: none;
+    }
+    &__badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font: 700 10px 'Rajdhani', sans-serif;
+      color: var(--nx-gold);
+      background: rgba(255, 212, 94, 0.1);
+      border: 1px solid rgba(255, 212, 94, 0.35);
+    }
+    &__head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-right: 70px; }
+    &__av {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      flex: none;
+      border-radius: 14px;
+      font-size: 20px;
+      color: var(--c);
+      background: color-mix(in srgb, var(--c) 14%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 18px color-mix(in srgb, var(--c) 30%, transparent);
+    }
+    &__id { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    &__name { font: 800 15px 'Rajdhani', sans-serif; color: var(--nx-ink); em { font-style: normal; font-weight: 600; font-size: 12px; color: var(--nx-ink-dim); } }
+    &__sub { font: 500 11.5px 'Rajdhani', sans-serif; color: var(--nx-ink-dim); }
+    &__result {
+      position: absolute;
+      bottom: 14px;
+      right: 16px;
+      padding: 3px 11px;
+      border-radius: 999px;
+      font: 800 11px 'Rajdhani', sans-serif;
+      &.is-win { color: var(--nx-cyan); background: rgba(46, 230, 255, 0.12); box-shadow: 0 0 12px rgba(46, 230, 255, 0.3); }
+      &.is-lose { color: var(--nx-rose); background: rgba(255, 94, 138, 0.12); }
+    }
+    &__line { font-size: 12px; color: var(--nx-ink-dim); margin-bottom: 12px; }
+    &__bars { display: flex; flex-direction: column; gap: 7px; }
+    &__bar { display: grid; grid-template-columns: 96px 1fr 34px; align-items: center; gap: 8px; }
+    &__bname { font: 600 11px 'Rajdhani', sans-serif; color: var(--nx-ink-dim); }
+    &__btrack { height: 6px; border-radius: 999px; background: rgba(168, 85, 247, 0.16); overflow: hidden; }
+    &__bfill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 50%, #fff)); box-shadow: 0 0 10px var(--c); }
+    &__bcount { font: 700 11px 'Orbitron', sans-serif; color: var(--nx-ink); text-align: right; }
+    &__stamps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  }
+  .neon-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font: 700 11px 'Rajdhani', sans-serif;
+    &.is-checked { color: var(--nx-cyan); background: rgba(46, 230, 255, 0.1); border: 1px solid rgba(46, 230, 255, 0.35); }
+    &.is-admin { color: var(--nx-gold); background: rgba(255, 212, 94, 0.1); border: 1px solid rgba(255, 212, 94, 0.35); }
+  }
+
+  // ─────────── 행정 ───────────
+  .neon-admin {
+    display: grid;
+    grid-template-columns: minmax(min(340px, 100%), 1.3fr) minmax(min(280px, 100%), 1fr);
+    gap: 16px;
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: 800 14px 'Rajdhani', sans-serif;
+      color: var(--nx-magenta-soft);
+      margin-bottom: 8px;
+      &--magenta { color: var(--nx-magenta-soft); }
+      i { color: var(--nx-magenta); }
+    }
+    &__notice p { margin: 0 0 12px; font-size: 12.5px; line-height: 1.7; color: var(--nx-ink); strong { color: var(--nx-cyan); } }
+    &__sign { display: flex; flex-direction: column; gap: 16px; justify-content: space-between; }
+    &__desc { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--nx-ink-dim); }
+    &__btns { display: flex; flex-direction: column; gap: 10px; }
+  }
+  .neon-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid var(--nx-line);
+      text-align: left;
+      vertical-align: top;
+      color: var(--nx-ink);
+    }
+    th { background: rgba(168, 85, 247, 0.12); color: var(--nx-cyan); font: 700 11px 'Rajdhani', sans-serif; letter-spacing: 0.04em; }
+    td strong { color: var(--nx-magenta-soft); }
+  }
+
+  // ─────────── CTA 배너 ───────────
+  .neon-cta {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 26px 30px;
+    border-radius: 20px;
+    background: linear-gradient(120deg, rgba(255, 61, 240, 0.16), rgba(168, 85, 247, 0.14) 50%, rgba(46, 230, 255, 0.12));
+    border: 1px solid rgba(255, 122, 232, 0.4);
+    box-shadow: 0 0 40px rgba(255, 61, 240, 0.22);
+    &__glow {
+      position: absolute;
+      top: -60%;
+      left: 20%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--nx-magenta);
+      opacity: 0.25;
+      filter: blur(60px);
+    }
+    &__txt { position: relative; display: flex; flex-direction: column; gap: 4px; }
+    &__eyebrow { font: 700 12px 'Rajdhani', sans-serif; letter-spacing: 0.2em; color: var(--nx-cyan); text-transform: uppercase; }
+    &__title {
+      font: 900 clamp(22px, 4vw, 34px)/1 'Orbitron', sans-serif;
+      letter-spacing: 0.06em;
+      color: var(--nx-ink);
+      text-shadow: 0 0 22px rgba(255, 61, 240, 0.5);
+    }
+    &__btn { position: relative; }
+  }
+
+  // ─────────── 모달 ───────────
+  .neon-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(7, 3, 15, 0.78);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    &.is-open { opacity: 1; visibility: visible; }
+    &__card {
+      width: min(520px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      padding: 22px;
+      border-radius: 20px;
+      background: linear-gradient(160deg, #1c0b38, #0e0620);
+      border: 1px solid rgba(255, 122, 232, 0.45);
+      box-shadow: 0 0 50px rgba(255, 61, 240, 0.35);
+    }
+    &__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      h3 { margin: 0; font: 800 16px 'Rajdhani', sans-serif; color: var(--nx-ink); i { color: var(--nx-magenta-soft); margin-right: 6px; } }
+    }
+    &__close {
+      appearance: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--nx-line);
+      background: rgba(168, 85, 247, 0.1);
+      color: var(--nx-ink);
+      font-size: 18px;
+      line-height: 1;
+      &:hover { color: var(--nx-magenta-soft); box-shadow: 0 0 16px rgba(255, 61, 240, 0.4); }
+    }
+    &__hl { color: var(--nx-gold); font-weight: 700; }
+    &__note { margin: 14px 0; font-size: 11.5px; line-height: 1.6; color: var(--nx-ink-dim); }
+    &__btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  }
+
+  // ─────────── 반응형 ───────────
+  @media (max-width: 860px) {
+    padding: 16px;
+    .neon-hero,
+    .neon-info,
+    .neon-admin { grid-template-columns: minmax(0, 1fr); }
+    .neon-masthead .neon-back { position: static; margin-bottom: 14px; }
+    .neon-masthead { text-align: center; }
+  }
+}

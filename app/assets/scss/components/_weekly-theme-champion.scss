@@ -1,0 +1,1185 @@
+/* ============================================================
+ * Weekly League 상세 — 테마 F "GRAND FINALE" (챔피언십)
+ * 다크 + 골드(Cinzel Decorative) + 네온 블루/퍼플/오렌지(Orbitron).
+ * 토너먼트 전광판 · 시상대 포디움 · 클랜 매치보드 · 판타지 크루 카드.
+ * Scope: .weekly-champion 하위로만 한정.
+ * 레이아웃 가드: minmax(min(px,100%),1fr) + overflow:hidden.
+ * ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700;900&family=Black+Ops+One&family=MedievalSharp&family=Press+Start+2P&family=Orbitron:wght@600;900&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+.weekly-champion {
+  // 팔레트
+  --gold-gradient: linear-gradient(135deg, #ffe5a3 0%, #d4af37 50%, #aa7c11 100%);
+  --cm-gold: #d4af37;
+  --cm-gold-bright: #ffd76a;
+  --cm-blue: #00f0ff;
+  --cm-purple: #bd00ff;
+  --cm-magenta: #ff3df5;
+  --cm-orange: #ff6b00;
+  --cm-bg: #05060a;
+  --cm-border: rgba(212, 175, 55, 0.3);
+  // 에픽 그라데이션 액센트
+  --epic-grad: linear-gradient(120deg, #00f0ff 0%, #6a5bff 45%, #bd00ff 75%, #ffd76a 100%);
+  --epic-grad-soft: linear-gradient(120deg, rgba(0,240,255,0.18), rgba(189,0,255,0.18), rgba(255,215,106,0.16));
+  // 오너먼트 골드 프레임 (탐정 어드벤처 풍)
+  --gold-frame: linear-gradient(150deg, #fff1c4 0%, #ffd76a 22%, #c79320 52%, #8a5e0c 78%, #ffe6a0 100%);
+  --leather-red: linear-gradient(180deg, #6a2420 0%, #481715 55%, #2c0d0c 100%);
+  --leather-navy: linear-gradient(180deg, #1a2b53 0%, #122042 55%, #0a1428 100%);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 40px 20px;
+  color: #f1f5f9;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: var(--cm-bg);
+  background-image:
+    radial-gradient(circle at 50% 10%, rgba(93, 63, 211, 0.2) 0%, transparent 60%),
+    linear-gradient(to bottom, rgba(5, 6, 10, 0.8), rgba(5, 6, 10, 0.95)),
+    url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80');
+  background-size: cover;
+  background-position: center;
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  .champ-wrap {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  // ═════ 대형 전광판 헤더 ═════
+  .champ-header {
+    text-align: center;
+    position: relative;
+    padding: 60px 20px;
+    background: linear-gradient(to right, transparent, rgba(20, 15, 35, 0.8), transparent);
+    border-top: 2px solid var(--cm-gold);
+    border-bottom: 2px solid var(--cm-gold);
+    box-shadow: inset 0 0 30px rgba(214, 175, 55, 0.2), 0 0 50px rgba(0, 0, 0, 0.9);
+    &::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 12px;
+      background: var(--cm-gold);
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+    }
+  }
+  .champ-title {
+    font-family: 'Black Ops One', 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.55)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6));
+    margin-bottom: 10px;
+  }
+  .champ-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--cm-blue);
+    text-shadow: 0 0 10px var(--cm-blue);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+  }
+
+  // ═════ 패널 베이스 ═════
+  .champ-panel {
+    background: rgba(10, 11, 18, 0.9);
+    border: 1px solid var(--cm-border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 40px;
+      height: 40px;
+      border-right: 2px solid var(--cm-blue);
+      border-bottom: 2px solid var(--cm-blue);
+      border-bottom-right-radius: 16px;
+      pointer-events: none;
+    }
+  }
+  .champ-phead {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 5px solid var(--cm-gold);
+    padding-left: 15px;
+    line-height: 1.3;
+  }
+
+  // ═════ 섹션 1 — 주차 정보 (탐정 어드벤처 · 오너먼트 골드) ═════
+  @keyframes champ-flow { to { background-position: 200% center; } }
+  @keyframes champ-blink { 50% { opacity: 0.4; } }
+  @keyframes champ-sheen { 0% { transform: translateX(-120%); } 60%, 100% { transform: translateX(360%); } }
+  @keyframes champ-gleam { 0%, 100% { filter: drop-shadow(0 0 6px rgba(255,215,106,0.5)); } 50% { filter: drop-shadow(0 0 14px rgba(255,215,106,0.95)); } }
+
+  // 골드 프레임 헬퍼 (border-box 그라데이션 보더 + 양각)
+  %champ-frame {
+    border: 3px solid transparent;
+    border-radius: 12px;
+    background-clip: padding-box, border-box;
+    background-origin: border-box;
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(0, 0, 0, 0.5),
+      inset 0 0 0 1px rgba(255, 233, 168, 0.22),
+      inset 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  // 퀘스트 데이터 태그 [1.x] — 골드 인장
+  .champ-qtag {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 0.62rem;
+    line-height: 1;
+    color: #2c1c04;
+    background: var(--gold-frame);
+    padding: 4px 7px;
+    border-radius: 5px;
+    margin-right: 8px;
+    border: 1px solid rgba(120, 84, 16, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    &--sm { font-size: 0.55rem; padding: 3px 5px; margin-right: 6px; }
+    &--abs { position: absolute; top: 12px; right: 12px; margin: 0; z-index: 3; }
+  }
+
+  // ── 퀘스트 로그 컨테이너 (다크 네이비) ──
+  .champ-quest {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% -12%, rgba(70, 95, 180, 0.2), transparent 55%),
+      linear-gradient(180deg, #0f1830 0%, #0a1020 70%);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.85), inset 0 0 70px rgba(0, 0, 0, 0.55);
+
+    // 상단 골드 리본 배너
+    &__top {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 28px;
+      border: 3px solid transparent;
+      border-radius: 40px;
+      background:
+        linear-gradient(180deg, #2a4bb8 0%, #1a2f78 55%, #112055 100%) padding-box,
+        var(--gold-frame) border-box;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6), 0 0 22px rgba(80, 110, 220, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    &__rune {
+      font-size: 1.25rem;
+      background: var(--gold-frame);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      animation: champ-gleam 2.8s ease-in-out infinite;
+    }
+    &__heading { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+    &__title {
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #fff3cf 0%, #ffd76a 45%, #c7902a 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+    }
+    &__sub {
+      font-family: 'Cinzel', serif; font-weight: 700;
+      font-size: 0.72rem; color: #cdd9ff; letter-spacing: 2px;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: minmax(min(330px, 100%), 0.95fr) minmax(min(320px, 100%), 1.3fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+  }
+
+  // ── [1.9]/[1.1]/[1.2] 퀘스트 포스터 (가죽 + 골드 더블 프레임) ──
+  .champ-quest__poster {
+    @extend %champ-frame;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+    background:
+      linear-gradient(180deg, #1a0f0d, #0d0807) padding-box,
+      var(--gold-frame) border-box;
+    img,
+    &-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) contrast(1.1) saturate(1.15); }
+    // 골드 내부 더블 라인
+    &::before {
+      content: '';
+      position: absolute; inset: 7px; z-index: 2; pointer-events: none;
+      border: 1px solid rgba(255, 215, 106, 0.55);
+      border-radius: 7px;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
+    }
+    &-ph {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      font-family: 'Cinzel', serif; color: #7a5a2e; letter-spacing: 2px;
+    }
+    &-idx {
+      position: absolute; top: 13px; left: 13px; z-index: 4;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.6rem;
+      color: #ffe6a0; background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 215, 106, 0.6); border-radius: 5px; padding: 4px 8px;
+    }
+    &-scan { display: none; }
+    &-frame { display: none; }
+    &-body {
+      position: absolute; bottom: 0; left: 0; width: 100%; z-index: 3;
+      padding: 28px 24px 22px;
+      background: linear-gradient(to top, rgba(8, 5, 4, 0.97) 14%, rgba(30, 16, 10, 0.55) 60%, transparent 100%);
+    }
+  }
+  .champ-quest__eyebrow {
+    display: inline-block;
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: 0.72rem;
+    color: #ffce4d;
+    letter-spacing: 2px;
+    text-shadow: 0 0 12px rgba(255, 180, 40, 0.7);
+    animation: champ-blink 1.5s steps(2) infinite;
+  }
+  .champ-quest__name {
+    display: flex; align-items: center; flex-wrap: wrap;
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: 1.5rem; font-weight: 900;
+    margin-top: 12px; line-height: 1.3;
+    background: linear-gradient(180deg, #ffffff 0%, #ffe6a0 70%, #d4af37 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
+  }
+  .champ-quest__period {
+    display: flex; align-items: center; margin-top: 10px;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.95rem; color: #f0d79a;
+  }
+
+  // ── 우측 일지 ──
+  .champ-quest__journal { display: flex; flex-direction: column; gap: 14px; }
+
+  // [1.3] 퀘스트 로어 (버건디 가죽 패널)
+  .champ-quest__lore {
+    @extend %champ-frame;
+    background: var(--leather-red) padding-box, var(--gold-frame) border-box;
+    padding: 15px 17px;
+    .champ-quest__lh { display: flex; align-items: center; margin-bottom: 8px; }
+    &-text {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.9rem; color: #f1ddc4; line-height: 1.7; font-style: italic;
+    }
+  }
+  .champ-quest__lh-name {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.92rem; letter-spacing: 0.5px;
+    background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  // [1.4]~[1.8] 파티 스테이터스 — 보석 게이지 (네이비 가죽)
+  .champ-party {
+    @extend %champ-frame;
+    background: var(--leather-navy) padding-box, var(--gold-frame) border-box;
+    padding: 15px 17px;
+    &__head {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: 0.85rem; letter-spacing: 1px;
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+  }
+  // 차트 대시보드 (도넛 + 막대 그래프)
+  .champ-pdash {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+
+  // 도넛 — 성장 성공률
+  .champ-donut {
+    flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px;
+    margin: 0 auto;
+    &__ring {
+      width: 120px; height: 120px; border-radius: 50%;
+      display: grid; place-items: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(212, 175, 55, 0.35);
+      transition: background 0.8s ease;
+    }
+    &__hole {
+      width: 78px; height: 78px; border-radius: 50%;
+      background: radial-gradient(circle, #131a30 0%, #070a16 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
+    }
+    &__pct {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.6rem; line-height: 1;
+      background: linear-gradient(180deg, #fff3cf, #ffd76a 60%, #c7902a);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      i { font-style: normal; font-size: 0.78rem; }
+    }
+    &__cap { font-family: 'Cinzel', serif; font-size: 0.62rem; color: #c9b27a; margin-top: 4px; letter-spacing: 1px; }
+    &__legend { display: flex; gap: 16px; }
+    &__lg {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.74rem; color: #cdd6ee;
+      i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+      b { font-family: 'Cinzel', serif; color: #fff; }
+      &--win i { background: var(--cm-gold-bright); box-shadow: 0 0 7px var(--cm-gold-bright); }
+      &--lose i { background: #ff5a4d; box-shadow: 0 0 7px #ff5a4d; }
+    }
+  }
+
+  // 막대 그래프 — 크루 5종
+  .champ-bars {
+    flex: 1; min-width: 210px;
+    display: flex; align-items: flex-end; justify-content: space-around; gap: 6px;
+    height: 156px;
+    padding: 6px 0 0 16px;
+    border-left: 1px solid rgba(212, 175, 55, 0.18);
+  }
+  .champ-bar {
+    flex: 1; height: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    color: #8a7c5c;
+    &__val {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.8rem; color: #fff;
+      text-shadow: 0 0 7px currentColor;
+    }
+    &__track {
+      flex: 1; width: 64%; max-width: 28px; min-width: 12px;
+      display: flex; align-items: flex-end;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.14); border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7);
+    }
+    &__fill {
+      width: 100%; border-radius: 6px 6px 0 0;
+      transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.06) 42%, rgba(0, 0, 0, 0.2)),
+        linear-gradient(180deg, currentColor, color-mix(in srgb, currentColor 55%, #000));
+      box-shadow: 0 0 10px currentColor, inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+    &__lab {
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; color: #c9b27a; font-weight: 700;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    &__ic { font-size: 0.9rem; }
+    &--active { color: #4f8cff; }
+    &--rest   { color: #3fcf6a; }
+    &--season { color: #b06bff; }
+    &--win    { color: var(--cm-gold-bright); }
+    &--lose   { color: #ff5a4d; }
+  }
+
+  // [1.11] 퀘스트 클리어율 (대형 보석 게이지)
+  .champ-quest__clear {
+    @extend %champ-frame;
+    position: relative;
+    overflow: hidden;
+    background: var(--leather-navy) padding-box, var(--gold-frame) border-box;
+    padding: 15px 17px;
+    &-cap {
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.78rem;
+      color: #e7dcc6; letter-spacing: 0.5px; margin-bottom: 12px;
+    }
+    &-row { display: flex; align-items: center; gap: 14px; }
+    &-bar {
+      position: relative;
+      flex: 1; height: 20px;
+      border: 2px solid transparent;
+      border-radius: 11px;
+      background: linear-gradient(180deg, #0a0705, #140d09) padding-box, var(--gold-frame) border-box;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.85);
+    }
+    &-fill {
+      position: relative;
+      display: block; height: 100%; border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(0, 0, 0, 0.25) 100%),
+        linear-gradient(90deg, #7b2ff7, #b06bff 60%, #ffd76a);
+      box-shadow: 0 0 16px rgba(176, 107, 255, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      &::after {
+        content: '';
+        position: absolute; top: 0; bottom: 0; width: 30%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+        animation: champ-sheen 2.8s ease-in-out infinite;
+      }
+    }
+    &-pct {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900;
+      font-size: 1.5rem; line-height: 1; white-space: nowrap;
+      background: linear-gradient(180deg, #fff3cf, #ffd76a 55%, #c7902a);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+      span { font-size: 0.85rem; }
+    }
+  }
+
+  // [1.10] 월드 루머 게시판 (가죽 + 골드)
+  .champ-rumor {
+    @extend %champ-frame;
+    background: var(--leather-red) padding-box, var(--gold-frame) border-box;
+    padding: 15px 17px;
+    &__head { display: flex; align-items: center; margin-bottom: 12px; }
+    &__head-name {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+    &__item {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 215, 106, 0.18);
+      border-left: 3px solid var(--cm-gold);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      &:hover { transform: translateX(4px); background: rgba(212, 175, 55, 0.1); box-shadow: 0 0 16px rgba(212, 175, 55, 0.2); }
+    }
+    &__mark {
+      font-size: 0.7rem;
+      background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__cat {
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.62rem;
+      color: #ffe6a0; border: 1px solid rgba(255, 215, 106, 0.45);
+      border-radius: 5px; padding: 3px 7px; white-space: nowrap;
+      background: rgba(212, 175, 55, 0.1);
+    }
+    &__title {
+      font-family: 'Noto Sans KR', sans-serif; font-weight: 600;
+      font-size: 0.86rem; color: #f3e8d2; line-height: 1.4;
+    }
+    &__src { font-family: 'Cinzel', serif; font-size: 0.74rem; color: #b89b6a; white-space: nowrap; }
+    @media (max-width: 560px) {
+      &__item { grid-template-columns: auto auto 1fr; }
+      &__src { grid-column: 2 / 4; text-align: right; }
+    }
+  }
+
+  // ═════ 공통 버튼 ═════
+  .champ-btn {
+    background: #16192b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.8rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    &:hover,
+    &.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+    &--reset {
+      background: linear-gradient(135deg, var(--cm-purple), #8200ff);
+      color: #fff;
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+      margin-left: auto;
+      box-shadow: 0 0 15px rgba(189, 0, 255, 0.4);
+      &:hover { color: #fff; background: linear-gradient(135deg, #d23bff, #9a1aff); }
+    }
+    &--sign {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: var(--gold-gradient);
+      color: #000;
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+      &:hover { filter: brightness(1.08); color: #000; background: var(--gold-gradient); box-shadow: 0 0 18px rgba(212, 175, 55, 0.5); }
+    }
+    &--dispute {
+      width: 100%;
+      padding: 12px;
+      background: var(--cm-orange);
+      color: #000;
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+      &:hover { color: #000; background: #ff8526; box-shadow: 0 0 18px rgba(255, 107, 0, 0.5); }
+    }
+    &--ok { background: var(--gold-gradient); color: #000; border: none; &:hover { color: #000; background: var(--gold-gradient); filter: brightness(1.08); } }
+  }
+
+  // ═════ 섹션 2 — 크루 & 팀 (다크 럭셔리) ═════
+  .champ-arena {
+    --tone: var(--cm-gold);
+    background:
+      radial-gradient(circle at 18% 8%, rgba(212, 175, 55, 0.1), transparent 42%),
+      radial-gradient(circle at 82% 4%, rgba(120, 90, 220, 0.12), transparent 46%),
+      linear-gradient(180deg, #0c0a08 0%, #08070c 70%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+  }
+
+  // 오너먼트 골드 배너 헤더
+  .champ-arena__banner {
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 26px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 34px;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #14110a, #0a0806) padding-box, var(--gold-frame) border-box;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7), 0 0 26px rgba(212, 175, 55, 0.18), inset 0 0 22px rgba(0, 0, 0, 0.6);
+  }
+  .champ-arena__rune {
+    font-size: 1.35rem;
+    background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: champ-gleam 3s ease-in-out infinite;
+  }
+  .champ-arena__heading { text-align: center; }
+  .champ-arena__title {
+    font-family: 'Cinzel Decorative', serif; font-weight: 900;
+    font-size: 1.45rem; letter-spacing: 3px;
+    background: linear-gradient(180deg, #fff3cf, #ffd76a 50%, #c7902a);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+  }
+  .champ-arena__sub {
+    display: block; margin-top: 3px;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.72rem;
+    color: #c9b27a; letter-spacing: 2px;
+  }
+
+  // ── 리더보드 ──
+  .champ-board2 {
+    margin-bottom: 30px;
+    &__tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;
+      @media (max-width: 560px) { grid-template-columns: repeat(2, 1fr); } }
+    &__tab {
+      --tone: var(--cm-gold);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 8px;
+      border: 2px solid transparent; border-radius: 8px;
+      background: linear-gradient(180deg, #15130d, #0c0a08) padding-box, linear-gradient(180deg, #4a4030, #221c12) border-box;
+      color: #b9a987; cursor: pointer;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
+      &-ic { font-size: 1.1rem; }
+      &:hover { transform: translateY(-2px); color: #f0e2c0; }
+      &--dangam { --tone: #ff9a3c; }
+      &--injeol { --tone: #ff8fb3; }
+      &--growth { --tone: #3fcf6a; }
+      &--jeong  { --tone: #b06bff; }
+      &.is-active {
+        color: #fff;
+        background: linear-gradient(180deg, color-mix(in srgb, var(--tone) 22%, #0c0a08), #0c0a08) padding-box, var(--gold-frame) border-box;
+        box-shadow: 0 0 18px color-mix(in srgb, var(--tone) 45%, transparent), inset 0 0 16px color-mix(in srgb, var(--tone) 18%, transparent);
+      }
+    }
+    &__panel {
+      --tone: var(--cm-gold);
+      position: relative;
+      border: 3px solid transparent; border-radius: 12px;
+      background: linear-gradient(180deg, rgba(20, 16, 10, 0.95), rgba(8, 7, 12, 0.96)) padding-box, var(--gold-frame) border-box;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 0, 0, 0.5);
+      padding: 16px 18px;
+      &--dangam { --tone: #ff9a3c; }
+      &--injeol { --tone: #ff8fb3; }
+      &--growth { --tone: #3fcf6a; }
+      &--jeong  { --tone: #b06bff; }
+    }
+    &__cap {
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+    }
+    &__cap-ic { font-size: 1.2rem; }
+    &__cap-name {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1rem;
+      color: var(--tone); text-shadow: 0 0 12px color-mix(in srgb, var(--tone) 50%, transparent);
+    }
+    &__cap-sub { font-family: 'Cinzel', serif; font-size: 0.72rem; color: #8a7c5c; }
+  }
+
+  // 랭킹 리스트
+  .champ-rank {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 7px;
+    counter-reset: none;
+    &__row {
+      display: grid;
+      grid-template-columns: 34px minmax(72px, max-content) 1fr 2fr auto;
+      align-items: center; gap: 12px;
+      padding: 8px 10px; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.15s ease, transform 0.15s ease;
+      &:hover { background: rgba(255, 255, 255, 0.05); transform: translateX(3px); }
+      &.is-top { border-color: rgba(212, 175, 55, 0.4); background: rgba(212, 175, 55, 0.06); }
+      &.is-top1 { box-shadow: inset 0 0 16px rgba(255, 215, 106, 0.15); }
+      @media (max-width: 560px) { grid-template-columns: 30px 1fr auto; .champ-rank__meta, .champ-rank__bar { display: none; } }
+    }
+    &__no {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1rem;
+      text-align: center; color: #9a8c6c;
+      .is-top & { font-size: 1.2rem; }
+    }
+    &__name { font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 0.9rem; color: #f1e6cf; white-space: nowrap; }
+    &__meta { font-size: 0.74rem; color: #94886a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    &__bar {
+      height: 9px; border-radius: 6px; overflow: hidden;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    &__fill {
+      display: block; height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 55%, #000), var(--tone));
+      box-shadow: 0 0 10px var(--tone);
+    }
+    &__val {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.92rem;
+      color: var(--tone); text-shadow: 0 0 10px color-mix(in srgb, var(--tone) 45%, transparent);
+      min-width: 56px; text-align: right; white-space: nowrap;
+    }
+  }
+
+  // 품계 정승 명단
+  .champ-jeong {
+    list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px;
+    &__row {
+      display: grid; grid-template-columns: minmax(120px, max-content) 1fr; align-items: center; gap: 14px;
+      padding: 10px 12px; border-radius: 8px;
+      background: rgba(176, 107, 255, 0.06);
+      border: 1px solid rgba(176, 107, 255, 0.25);
+      border-left: 3px solid #b06bff;
+    }
+    &__grade {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.85rem;
+      color: #d9c2ff; text-shadow: 0 0 10px rgba(176, 107, 255, 0.4);
+      white-space: nowrap;
+    }
+    &__names { font-family: 'Noto Sans KR', sans-serif; font-weight: 600; font-size: 0.88rem; color: #efe9fb; }
+  }
+
+  // 서브 섹션 헤더
+  .champ-sub2 {
+    display: flex; align-items: center; gap: 10px;
+    margin: 28px 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+    &__rune {
+      font-size: 1.05rem;
+      background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__title {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.05rem;
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__count { font-family: 'Cinzel', serif; font-size: 0.82rem; color: #c9b27a; b { color: #ffd76a; font-size: 1rem; margin: 0 2px; } }
+    &__tag {
+      margin-left: auto;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.62rem;
+      color: #2c1c04; background: var(--gold-frame);
+      padding: 3px 8px; border-radius: 5px; border: 1px solid rgba(120, 84, 16, 0.7);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  // [2.4] 팀별 우수 크루 MVP
+  .champ-mvp {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 14px;
+  }
+  .champ-mvp__card {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 15px;
+    border: 2px solid transparent; border-radius: 12px;
+    background: var(--leather-navy) padding-box, var(--gold-frame) border-box;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55), inset 0 0 24px rgba(0, 0, 0, 0.4);
+  }
+  .champ-mvp__avatar {
+    flex: 0 0 56px; width: 56px; height: 56px; border-radius: 50%;
+    padding: 2px; background: var(--gold-frame);
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+    img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  }
+  .champ-mvp__body { flex: 1; min-width: 0; }
+  .champ-mvp__top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .champ-mvp__name {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 1rem;
+    background: linear-gradient(180deg, #fff3cf, #ffd76a); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .champ-mvp__team { font-family: 'Cinzel', serif; font-size: 0.68rem; color: #9fb0d8; letter-spacing: 1px; }
+  .champ-mvp__quote {
+    margin: 8px 0 6px; font-family: 'Noto Sans KR', sans-serif; font-style: italic;
+    font-size: 0.84rem; color: #e7ddc8; line-height: 1.6;
+  }
+  .champ-mvp__by { font-family: 'Cinzel', serif; font-size: 0.72rem; color: #b89b6a; }
+
+  // [2.5][2.6][2.7] 팀 목록
+  .champ-teams {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 16px;
+  }
+  .champ-team {
+    position: relative;
+    border: 2px solid transparent; border-radius: 14px;
+    background: var(--leather-red) padding-box, var(--gold-frame) border-box;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.45);
+    padding: 16px 17px;
+    &.is-lose { background: linear-gradient(180deg, #2a1530, #160a1c) padding-box, linear-gradient(150deg, #c98bff, #6a3fa0 60%, #3a2150) border-box; }
+    &__head { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+    &__emblem {
+      width: 52px; height: 52px; border-radius: 10px; object-fit: cover;
+      border: 2px solid rgba(255, 215, 106, 0.6); box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+    }
+    &__id { min-width: 0; }
+    &__name {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.05rem;
+      background: linear-gradient(180deg, #ffffff, #ffe6a0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__captain { font-size: 0.74rem; color: #e8d6bb; margin-top: 2px; }
+    &__parts { font-size: 0.72rem; color: #c2a98a; margin-top: 2px; }
+    &__verdict { text-align: right; }
+    &__wl {
+      display: block; font-family: 'Cinzel Decorative', serif; font-weight: 900; font-size: 1.15rem; line-height: 1;
+      &.win { color: #ffd76a; text-shadow: 0 0 14px rgba(255, 215, 106, 0.7); }
+      &.lose { color: #c98bff; text-shadow: 0 0 14px rgba(176, 107, 255, 0.6); }
+    }
+    &__rate { display: block; margin-top: 4px; font-family: 'Cinzel', serif; font-size: 0.72rem; color: #e7d9bf; }
+
+    &__avg { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin: 14px 0; }
+    &__avg-cap { font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 0.72rem; color: #f0dcc0; white-space: nowrap; }
+    &__avg-bar {
+      height: 14px; border-radius: 8px; overflow: hidden;
+      border: 2px solid transparent;
+      background: linear-gradient(180deg, #0a0705, #140d09) padding-box, var(--gold-frame) border-box;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    &__avg-fill {
+      display: block; height: 100%; border-radius: 6px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.05) 45%, rgba(0,0,0,0.2)), linear-gradient(90deg, #b8860b, #ffd76a);
+      box-shadow: 0 0 12px rgba(255, 215, 106, 0.7);
+    }
+    &__avg-pct { font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.92rem; color: #ffd76a; min-width: 40px; text-align: right; }
+
+    &__stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px;
+      margin-bottom: 14px;
+    }
+    &__stat {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 6px; border-radius: 8px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(255, 215, 106, 0.16);
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; color: #d8c6a8; text-align: center;
+      b { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; }
+      &.is-win { border-color: rgba(255, 215, 106, 0.45); b { color: #ffd76a; } }
+      &.is-lose { border-color: rgba(255, 90, 77, 0.45); b { color: #ff7a5c; } }
+    }
+
+    &__field { margin-top: 10px; }
+    &__field-k { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.74rem; color: #ffd76a; }
+    &__field-v { margin-top: 4px; font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: #ecdcc2; line-height: 1.55; }
+  }
+
+  // ═════ 섹션 3 — 크루 명부 (LEGENDARY LEADERBOARD) ═════
+  $rank1: #ffd700;
+  $rank2: #e1e4e6;
+  $rank3: #cd7f32;
+
+  .champ-roster {
+    background:
+      radial-gradient(circle at center, #1a1226 0%, #0a0710 70%, #020203 100%);
+    border: 2px solid var(--gold-dark, #3a2e1a);
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.9), inset 0 0 80px rgba(0, 0, 0, 0.92);
+
+    &__banner {
+      position: relative; width: fit-content; max-width: 100%;
+      margin: 0 auto 30px; display: flex; align-items: center; gap: 18px;
+      padding: 10px 30px; border: 3px solid transparent; border-radius: 8px;
+      background: linear-gradient(180deg, #14110a, #0a0806) padding-box, var(--gold-frame) border-box;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7), 0 0 26px rgba(255, 215, 0, 0.12);
+    }
+    &__rune {
+      font-size: 1.3rem;
+      background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      animation: champ-gleam 3s ease-in-out infinite;
+    }
+    &__heading { text-align: center; }
+    &__title {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.6rem; letter-spacing: 4px;
+      background: linear-gradient(to bottom, #fff 30%, #b39359 95%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.3));
+    }
+    &__sub { display: block; margin-top: 3px; font-family: 'Cinzel', serif; font-size: 0.72rem; color: #b39359; letter-spacing: 2px; }
+  }
+
+  // 제어 대시보드
+  .champ-ctrl {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(179, 147, 89, 0.2);
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    border-radius: 6px;
+    &__group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    &__lbl { font-family: 'Cinzel', serif; font-size: 0.7rem; color: #b39359; letter-spacing: 1px; margin-right: 2px; }
+  }
+  .champ-gbtn {
+    background: #0d0a12; border: 1px solid rgba(179, 147, 89, 0.3);
+    color: #7e7769; padding: 7px 14px; font-size: 0.74rem; cursor: pointer; font-weight: bold;
+    font-family: 'Noto Sans KR', sans-serif; border-radius: 4px;
+    transition: all 0.15s ease;
+    &:hover { color: #f5eedc; border-color: rgba(255, 215, 0, 0.5); }
+    &.is-active {
+      background: linear-gradient(180deg, #302416 0%, #120e09 100%);
+      border-color: $rank1; color: $rank1;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+    &--formal {
+      margin-left: auto; background: #3a080d; border-color: #ff2233; color: #ff9999;
+      &:hover { color: #ffd6d6; border-color: #ff2233; }
+    }
+  }
+
+  // 크루 카드 리스트
+  .champ-cl { display: flex; flex-direction: column; gap: 18px; }
+  .champ-cc {
+    position: relative;
+    background: linear-gradient(90deg, rgba(22, 17, 28, 0.95) 0%, rgba(10, 8, 14, 0.7) 100%);
+    border: 1px solid rgba(179, 147, 89, 0.25);
+    border-radius: 4px;
+    padding: 18px 22px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease-out, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    &:hover {
+      border-color: $rank1;
+      background: linear-gradient(90deg, rgba(36, 28, 16, 0.95) 0%, rgba(16, 13, 23, 0.85) 100%);
+      transform: translateX(5px);
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.05);
+    }
+
+    // 랭킹 1·2·3 한정판 테두리
+    &--rank1 { border: 2px solid $rank1; background: linear-gradient(90deg, rgba(45,36,12,0.95) 0%, rgba(12,10,15,0.8) 100%); box-shadow: 0 0 25px rgba(255,215,0,0.25), inset 0 0 30px rgba(255,215,0,0.12); }
+    &--rank2 { border: 2px solid $rank2; background: linear-gradient(90deg, rgba(28,32,36,0.95) 0%, rgba(12,10,15,0.8) 100%); box-shadow: 0 0 20px rgba(225,228,230,0.15), inset 0 0 25px rgba(225,228,230,0.07); }
+    &--rank3 { border: 2px solid $rank3; background: linear-gradient(90deg, rgba(38,25,15,0.95) 0%, rgba(12,10,15,0.8) 100%); box-shadow: 0 0 15px rgba(205,127,50,0.15), inset 0 0 20px rgba(205,127,50,0.07); }
+
+    &.is-verified { border-color: #00ff66; .champ-cc__check { display: block; } }
+
+    // 랭킹 배지
+    &__rank { min-width: 52px; text-align: center; font-family: 'Cinzel', serif; font-weight: 900; }
+    &__crown { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+    &__rtext { font-size: 0.9rem; letter-spacing: 1px; font-weight: bold; color: #9a8c6c; }
+    &__rnormal { color: #7e7769; font-size: 0.95rem; }
+    &--rank1 { .champ-cc__crown, .champ-cc__rtext { color: $rank1; text-shadow: 0 0 10px $rank1; } }
+    &--rank2 { .champ-cc__crown, .champ-cc__rtext { color: $rank2; text-shadow: 0 0 10px $rank2; } }
+    &--rank3 { .champ-cc__crown, .champ-cc__rtext { color: $rank3; text-shadow: 0 0 10px $rank3; } }
+
+    // 마름모 아바타
+    &__avatar {
+      width: 54px; height: 54px; border: 1px solid #b39359;
+      transform: rotate(45deg); overflow: hidden; background: #000; flex-shrink: 0;
+      img { width: 142%; height: 142%; transform: rotate(-45deg) translate(-15%, -15%); object-fit: cover; }
+    }
+    &--rank1 &__avatar { border-color: $rank1; box-shadow: 0 0 12px $rank1; }
+
+    // 프로필
+    &__profile { min-width: 150px; flex-grow: 1; }
+    &__name { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    &__grade { font-family: 'Cinzel', serif; font-size: 0.68rem; font-weight: bold; margin-top: 4px; letter-spacing: 1px; color: #b39359; }
+    &--eoheung &__grade { color: #ff3b53; text-shadow: 0 0 8px rgba(255, 17, 51, 0.5); }
+    &--dangam &__grade { color: #ff8c2b; text-shadow: 0 0 8px rgba(255, 119, 0, 0.5); }
+    &--injeol &__grade { color: #5fe0c0; text-shadow: 0 0 8px rgba(95, 224, 192, 0.5); }
+
+    // 메타
+    &__meta { min-width: 140px; font-size: 0.8rem; line-height: 1.5; }
+    &__univ { color: #f5eedc; font-weight: 500; }
+    &__dept { color: #7e7769; font-size: 0.74rem; }
+    &__role {
+      display: inline-block; margin-top: 4px;
+      background: rgba(255, 215, 0, 0.07); border: 1px solid var(--gold-dark, #3a2e1a);
+      padding: 1px 6px; font-size: 0.6rem; color: #b39359; font-family: 'Cinzel', serif;
+    }
+
+    // 타임라인
+    &__timeline { min-width: 84px; text-align: center; }
+    &__wcount { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; color: $rank1; }
+    &__pill {
+      font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border: 1px solid #00ff66;
+      background: rgba(0, 255, 102, 0.1); color: #00ff66; border-radius: 2px; margin-top: 4px; display: inline-block;
+      &.is-rest { border-color: #6b7280; background: rgba(107, 114, 128, 0.12); color: #9aa3b2; }
+    }
+
+    // 스탯 매트릭스
+    &__stats { display: flex; flex-wrap: wrap; gap: 8px; min-width: 440px; flex-grow: 2;
+      @media (max-width: 720px) { min-width: 100%; } }
+    &__stat {
+      background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(179, 147, 89, 0.12);
+      padding: 8px 12px; min-width: 78px; flex-grow: 1; text-align: center; border-radius: 2px;
+      &.is-epic { border-color: #b39359; background: linear-gradient(180deg, rgba(255,215,0,0.08) 0%, transparent 100%); }
+    }
+    &__s-label { font-size: 0.6rem; color: #7e7769; display: block; margin-bottom: 2px; }
+    &__s-icon { margin-right: 2px; color: #b39359; }
+    &__s-value { font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: bold; color: #fff; }
+    &__stat.is-epic &__s-value { color: $rank1; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); font-size: 0.82rem; }
+    &--rank1 &__stat.is-epic { border-color: $rank1; background: rgba(255, 215, 0, 0.15); }
+
+    // 검증 인장
+    &__seal { min-width: 38px; text-align: right; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    &__adminbadge {
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.58rem;
+      color: #00ff66; border: 1px solid #00ff66; border-radius: 4px;
+      padding: 2px 6px; white-space: nowrap; background: rgba(0, 255, 102, 0.1);
+    }
+    &__check {
+      width: 32px; height: 32px; line-height: 30px; text-align: center;
+      border: 1px solid #00ff66; background: rgba(0, 255, 102, 0.15);
+      color: #00ff66; border-radius: 50%; font-size: 0.8rem; font-weight: bold;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4); display: none; margin-left: auto;
+    }
+  }
+
+  // ═════ 섹션 4 — 행정 처리 (ADMINISTRATIVE ORDER) ═════
+  .champ-admin2 {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(212, 175, 55, 0.08), transparent 45%),
+      linear-gradient(180deg, #0c0a08 0%, #08070c 70%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+  }
+
+  // [4.1] 안내문
+  .champ-notice {
+    border: 2px solid transparent; border-radius: 12px;
+    background: linear-gradient(180deg, #1c1206, #0e0a06) padding-box, var(--gold-frame) border-box;
+    padding: 18px 20px; margin-bottom: 20px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+    &__head {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__body { font-family: 'Noto Sans KR', sans-serif; font-size: 0.86rem; color: #e7dcc6; line-height: 1.7;
+      strong { color: #ffd76a; font-weight: 700; } }
+    &__deadlines { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  }
+  .champ-dl {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 16px; border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 215, 106, 0.3);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; color: #c9b27a;
+    b { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #ffd76a; margin-bottom: 2px; }
+    &--final { border-color: rgba(255, 90, 77, 0.5); b { color: #ff7a5c; } }
+    &--ask { border-color: rgba(79, 140, 255, 0.5); b { color: #7fb0ff; } }
+  }
+
+  // [4.2][4.3] 행정 카드
+  .champ-acard {
+    border: 2px solid transparent; border-radius: 12px;
+    background: var(--leather-navy) padding-box, var(--gold-frame) border-box;
+    padding: 16px 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55), inset 0 0 24px rgba(0, 0, 0, 0.4);
+    display: flex; flex-direction: column;
+    &__head {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.92rem; margin-bottom: 12px;
+      padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    &__desc { font-family: 'Noto Sans KR', sans-serif; font-size: 0.82rem; color: #d8e0f2; line-height: 1.6; strong { color: #ffd76a; } }
+    &__cta { margin-top: auto; align-self: flex-start; padding: 9px 18px; font-family: 'Cinzel', serif; }
+    &__done {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 8px;
+      background: rgba(0, 255, 102, 0.08); border: 1px solid rgba(0, 255, 102, 0.4);
+      p { font-size: 0.84rem; color: #d6f5e2; line-height: 1.5; strong { color: #00ff66; } }
+    }
+    &__done-ic {
+      flex: 0 0 32px; width: 32px; height: 32px; line-height: 30px; text-align: center;
+      border-radius: 50%; border: 1px solid #00ff66; color: #00ff66; background: rgba(0, 255, 102, 0.15);
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4); font-weight: bold;
+    }
+    &__confirm p { font-family: 'Noto Sans KR', sans-serif; font-size: 0.84rem; color: #f0dcc0; line-height: 1.6; margin-bottom: 12px; strong { color: #ffd76a; } }
+    &__btns { display: flex; gap: 10px; }
+  }
+  .champ-gbtn--ok {
+    background: linear-gradient(180deg, #d5b990 0%, #836740 100%) !important;
+    border-color: #ffd700 !important; color: #1c1304 !important; font-weight: 900;
+    &:hover { box-shadow: 0 0 14px rgba(255, 215, 0, 0.5); }
+  }
+
+  // 조정 문의 게시판
+  .champ-qboard {
+    margin: 4px 0 14px; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; overflow: hidden;
+    &__row {
+      display: grid; grid-template-columns: 60px 1fr 54px; align-items: center; gap: 10px;
+      padding: 9px 12px; font-size: 0.78rem; color: #e7dcc6;
+      & + & { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+      &--h { background: rgba(212, 175, 55, 0.1); font-family: 'Cinzel', serif; font-weight: 700; color: #c9b27a; font-size: 0.68rem; }
+    }
+    &__tag {
+      font-family: 'Cinzel', serif; font-size: 0.62rem; color: #ffe6a0; text-align: center;
+      border: 1px solid rgba(255, 215, 106, 0.4); border-radius: 4px; padding: 2px 4px; background: rgba(212, 175, 55, 0.08);
+    }
+    &__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    &__state {
+      font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; text-align: center;
+      padding: 2px 4px; border-radius: 4px;
+      &.is-done { color: #00ff66; border: 1px solid rgba(0, 255, 102, 0.4); }
+      &.is-ing { color: #ffd76a; border: 1px solid rgba(255, 215, 106, 0.4); }
+      &.is-new { color: #7fb0ff; border: 1px solid rgba(79, 140, 255, 0.4); }
+    }
+  }
+
+  // [4.4] 증빙 예시 & 양식
+  .champ-evid2 {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 14px;
+  }
+  .champ-ex2 {
+    border: 2px solid transparent; border-radius: 12px; overflow: hidden;
+    background: var(--leather-red) padding-box, var(--gold-frame) border-box;
+    &--no { background: linear-gradient(180deg, #2a1530, #160a1c) padding-box, linear-gradient(150deg, #c98bff, #6a3fa0 60%, #3a2150) border-box; }
+    &__imgwrap { position: relative; height: 120px; }
+    &__imgwrap img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) contrast(1.05); }
+    &__tag {
+      position: absolute; top: 10px; left: 10px;
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.72rem; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 5px; color: #0d0a06;
+    }
+    &--ok &__tag { background: linear-gradient(180deg, #aef5c2, #00d65a); box-shadow: 0 0 12px rgba(0, 214, 90, 0.5); }
+    &--no &__tag { background: linear-gradient(180deg, #ffb0a6, #ff4d3d); color: #fff; box-shadow: 0 0 12px rgba(255, 77, 61, 0.5); }
+    &__list {
+      list-style: none; margin: 0; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: #ecdcc2; line-height: 1.5;
+      li { position: relative; padding-left: 16px;
+        &::before { content: '◆'; position: absolute; left: 0; font-size: 0.6rem; top: 3px; }
+      }
+      b { display: inline-block; min-width: 38px; font-family: 'Cinzel', serif; }
+    }
+    &--ok &__list li::before { color: #00d65a; }
+    &--ok &__list b { color: #ffe6a0; }
+    &--no &__list li::before { color: #ff5a4d; }
+    &--no &__list b { color: #e9c6ff; }
+  }
+  .champ-form {
+    border: 2px solid transparent; border-radius: 12px;
+    background: linear-gradient(180deg, #1c1206, #0e0a06) padding-box, var(--gold-frame) border-box;
+    padding: 14px 16px;
+    &__head { font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.85rem; margin-bottom: 10px;
+      background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    &__list { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: #ecdcc2; line-height: 1.5;
+      b { color: #ffd76a; margin-right: 4px; } }
+    &__note { font-size: 0.72rem; color: #b89b6a; line-height: 1.5; }
+  }
+
+  .champ-back {
+    display: inline-block;
+    margin-top: 22px;
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--cm-gold);
+    text-decoration: none;
+    letter-spacing: 1px;
+    &:hover { text-shadow: 0 0 12px rgba(212, 175, 55, 0.6); }
+  }
+
+  // ═════ 포탈 모달 ═════
+  .champ-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 4, 7, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    &.active { opacity: 1; visibility: visible; backdrop-filter: blur(8px); }
+    &__card {
+      position: relative;
+      background: radial-gradient(circle at center, #221833 0%, #0b0812 100%);
+      border: 2px solid #ffd700;
+      border-radius: 6px;
+      width: 90%;
+      max-width: 440px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      max-height: 90vh;
+      overflow: auto;
+      &.is-verified .champ-modal__seal { display: block; }
+    }
+    &__seal {
+      position: absolute; top: 18px; right: 18px;
+      color: #00ff66; border: 1px solid #00ff66;
+      padding: 3px 8px; font-size: 0.6rem; font-weight: bold; display: none;
+      font-family: 'Cinzel', serif; letter-spacing: 1px;
+    }
+    &__rhombus {
+      width: 76px; height: 76px; border: 2px solid #ffd700;
+      margin: 0 auto 18px; transform: rotate(45deg); overflow: hidden;
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+      img { width: 142%; height: 142%; transform: rotate(-45deg) translate(-15%, -15%); object-fit: cover; }
+    }
+    &__name { font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.5rem; color: #fff; margin: 6px 0; }
+    &__rank { font-family: 'Cinzel', serif; color: #ffd700; font-size: 0.78rem; letter-spacing: 1px; margin-bottom: 22px; }
+    &__quote {
+      font-size: 0.84rem; color: #d6cbb0; line-height: 1.7;
+      background: rgba(0, 0, 0, 0.6); border: 1px solid var(--gold-dark, #3a2e1a);
+      padding: 18px; margin-bottom: 24px; text-align: left;
+    }
+    &__btns { display: flex; gap: 15px; .champ-btn { flex: 1; padding: 12px; } }
+  }
+
+  // 반응형
+  @media (max-width: 860px) {
+    padding: 24px 14px;
+    .champ-quest__grid,
+    .champ-admin2__grid { grid-template-columns: minmax(0, 1fr); }
+    .champ-header { padding: 36px 16px; }
+  }
+}

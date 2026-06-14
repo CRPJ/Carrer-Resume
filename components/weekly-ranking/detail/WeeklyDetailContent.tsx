@@ -10,6 +10,9 @@ import { isDemoMode } from "@/utils/isDemoMode";
 import RagnarokTheme from "./themes/RagnarokTheme";
 import CyberTheme from "./themes/CyberTheme";
 import SteampunkTheme from "./themes/SteampunkTheme";
+import NeonTheme from "./themes/NeonTheme";
+import ChampionTheme from "./themes/ChampionTheme";
+import CasinoTheme from "./themes/CasinoTheme";
 
 interface Props {
   weekId: string;
@@ -44,7 +47,7 @@ export default function WeeklyDetailContent({ weekId }: Props) {
   const [demoResolved, setDemoResolved] = useState(false);
   const [apiCards, setApiCards] = useState<WeeklyCardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [theme, setTheme] = useState<"t1" | "t2" | "t3" | "t4">("t1");
+  const [theme, setTheme] = useState<"t1" | "t2" | "t3" | "t4" | "t5" | "t6" | "t7">("t1");
 
   useEffect(() => {
     setDemo(isDemoMode());
@@ -52,13 +55,13 @@ export default function WeeklyDetailContent({ weekId }: Props) {
     // 디자인 비교용 — 선택한 테마를 localStorage 에 보존(새로고침/이동에도 유지).
     try {
       const saved = localStorage.getItem("weeklyArenaTheme");
-      if (saved === "t1" || saved === "t2" || saved === "t3" || saved === "t4") setTheme(saved);
+      if (saved === "t1" || saved === "t2" || saved === "t3" || saved === "t4" || saved === "t5" || saved === "t6" || saved === "t7") setTheme(saved);
     } catch {
       /* localStorage 접근 불가 환경 무시 */
     }
   }, []);
 
-  const selectTheme = (t: "t1" | "t2" | "t3" | "t4") => {
+  const selectTheme = (t: "t1" | "t2" | "t3" | "t4" | "t5" | "t6" | "t7") => {
     setTheme(t);
     try {
       localStorage.setItem("weeklyArenaTheme", t);
@@ -72,6 +75,9 @@ export default function WeeklyDetailContent({ weekId }: Props) {
     { id: "t2" as const, key: "B", label: "RAGNAROK" },
     { id: "t3" as const, key: "C", label: "체스판" },
     { id: "t4" as const, key: "D", label: "STEAMPUNK" },
+    { id: "t5" as const, key: "E", label: "ARCADE" },
+    { id: "t6" as const, key: "F", label: "FINALE" },
+    { id: "t7" as const, key: "G", label: "CASINO" },
   ];
 
   // 모든 테마 위에 항상 떠 있는 디자인 전환 스위처(테마 독립 스타일).
@@ -182,6 +188,30 @@ export default function WeeklyDetailContent({ weekId }: Props) {
       <>
         {switcher}
         <SteampunkTheme card={card} detail={detail} />
+      </>
+    );
+  }
+  if (theme === "t5") {
+    return (
+      <>
+        {switcher}
+        <NeonTheme card={card} detail={detail} />
+      </>
+    );
+  }
+  if (theme === "t6") {
+    return (
+      <>
+        {switcher}
+        <ChampionTheme card={card} detail={detail} />
+      </>
+    );
+  }
+  if (theme === "t7") {
+    return (
+      <>
+        {switcher}
+        <CasinoTheme card={card} detail={detail} />
       </>
     );
   }
