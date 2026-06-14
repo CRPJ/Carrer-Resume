@@ -19,6 +19,48 @@ interface Props {
 }
 
 /* ═══════════ 섹션 2 더미 — 크루 & 팀 ═══════════ */
+// [2.1][2.2][2.3]/품계 — 우수 크루 랭킹 데이터 (ELITE 쇼케이스 필터 소스)
+type RankRow = { rank: number; name: string; meta: string; val: string; pct: number };
+
+const DANGAM_TOP: RankRow[] = [
+  { rank: 1, name: "김철수", meta: "정1품 단감킹", val: "98.4%", pct: 98 },
+  { rank: 2, name: "박민수", meta: "정3품 단감소드", val: "92.0%", pct: 92 },
+  { rank: 3, name: "이진아", meta: "종2품 단감가디언", val: "84.1%", pct: 84 },
+  { rank: 4, name: "정해린", meta: "정4품 단감레인저", val: "80.6%", pct: 81 },
+  { rank: 5, name: "오세훈", meta: "종3품 단감메이지", val: "77.2%", pct: 77 },
+  { rank: 6, name: "한가람", meta: "정5품 단감로그", val: "73.8%", pct: 74 },
+  { rank: 7, name: "서지우", meta: "종4품 단감워든", val: "70.1%", pct: 70 },
+  { rank: 8, name: "문도윤", meta: "정6품 단감스카웃", val: "66.5%", pct: 67 },
+  { rank: 9, name: "배수아", meta: "종5품 단감팔라딘", val: "62.9%", pct: 63 },
+  { rank: 10, name: "임재현", meta: "정7품 단감랜서", val: "59.3%", pct: 59 },
+];
+const INJEOL_TOP: RankRow[] = [
+  { rank: 1, name: "발라카스 지원", meta: "정1품 인절미대장", val: "99.1%", pct: 99 },
+  { rank: 2, name: "최지원", meta: "종1품 인절미가드", val: "89.7%", pct: 90 },
+  { rank: 3, name: "윤도현", meta: "정3품 인절미전사", val: "81.2%", pct: 81 },
+  { rank: 4, name: "강하늘", meta: "종3품 인절미클레릭", val: "75.4%", pct: 75 },
+  { rank: 5, name: "노유진", meta: "정5품 인절미아처", val: "68.0%", pct: 68 },
+];
+const GROWTH_TOP: RankRow[] = [
+  { rank: 1, name: "발라카스 지원", meta: "인절미", val: "+24.5%", pct: 100 },
+  { rank: 2, name: "김철수", meta: "단감", val: "+18.2%", pct: 74 },
+  { rank: 3, name: "이영희", meta: "단감", val: "+12.9%", pct: 53 },
+  { rank: 4, name: "최지원", meta: "인절미", val: "+11.4%", pct: 47 },
+  { rank: 5, name: "정해린", meta: "단감", val: "+9.8%", pct: 40 },
+  { rank: 6, name: "윤도현", meta: "인절미", val: "+8.1%", pct: 33 },
+  { rank: 7, name: "오세훈", meta: "단감", val: "+6.7%", pct: 27 },
+  { rank: 8, name: "강하늘", meta: "인절미", val: "+5.2%", pct: 21 },
+  { rank: 9, name: "한가람", meta: "단감", val: "+3.9%", pct: 16 },
+  { rank: 10, name: "노유진", meta: "인절미", val: "+2.4%", pct: 10 },
+];
+type JeongRow = { grade: string; names: string };
+const JEONGSEUNG: JeongRow[] = [
+  { grade: "정1품 영의정", names: "김철수 · 발라카스 지원" },
+  { grade: "종1품 좌의정", names: "이영희" },
+  { grade: "정2품 우의정", names: "박민수" },
+  { grade: "종2품 좌찬성", names: "최지원 · 이진아" },
+  { grade: "정3품 도승지", names: "윤도현 · 정해린" },
+];
 // [2.4]/[2.6]/[2.7] 팀 — 우수 크루 멘트 + 상세 스탯 + 승패
 type Team = {
   name: string;
@@ -72,6 +114,83 @@ const TEAMS: Team[] = [
     overview: "데이터 라벨링 병목을 자동화로 돌파하며 모델 실험 사이클을 두 배로 단축, 안정적인 성장세를 이어간 한 주였습니다.",
     mvpName: "안중근", mvpComment: "라벨링 자동화 스크립트로 팀 전체 시간을 수십 시간 아껴줬습니다. 감마의 숨은 엔진이었습니다.",
     emblem: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "DELTA DIVISION",
+    captain: "신사임당", captainAcad: "연세대 디자인공학 20학번",
+    growthAvg: 81,
+    parts: "프로덕트 · UX · 리서치",
+    partLeads: 2, agents: 3, totalCrews: 10, restCrews: 1, successCrews: 7, failCrews: 2, normalCrews: 5,
+    projectGoal: "프로덕트 분석 대시보드 구축 및 핵심 지표 자동 리포팅",
+    overview: "사용자 인터뷰 12건을 한 주에 소화하며 가설 검증 속도를 끌어올렸고, 데이터 기반 의사결정 루틴을 정착시켰습니다.",
+    mvpName: "정약용", mvpComment: "흩어진 지표를 한 화면에 모은 대시보드로 모두의 회의 시간을 절반으로 줄였습니다. 델타의 등대였어요.",
+    emblem: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "EPSILON DIVISION",
+    captain: "장영실", captainAcad: "카이스트 기계공학 19학번",
+    growthAvg: 69,
+    parts: "임베디드 · 하드웨어",
+    partLeads: 2, agents: 2, totalCrews: 9, restCrews: 2, successCrews: 5, failCrews: 2, normalCrews: 5,
+    projectGoal: "IoT 센서 펌웨어 안정화 및 OTA 업데이트 체계 구축",
+    overview: "하드웨어 수급 지연 속에서도 시뮬레이터로 개발을 병행해 일정을 사수, 핵심 펌웨어를 안정화했습니다.",
+    mvpName: "최무선", mvpComment: "부품이 없는 상황에서 시뮬레이션 환경을 직접 구축해 팀을 멈추지 않게 했습니다. 진짜 해결사입니다.",
+    emblem: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "ZETA DIVISION",
+    captain: "허준", captainAcad: "고려대 바이오의공학 21학번",
+    growthAvg: 58,
+    parts: "데이터 · 바이오",
+    partLeads: 1, agents: 2, totalCrews: 8, restCrews: 2, successCrews: 4, failCrews: 3, normalCrews: 5,
+    projectGoal: "임상 데이터 파이프라인 정제 및 이상치 탐지 모델 PoC",
+    overview: "데이터 품질 이슈로 초반 고전했으나, 정제 규칙을 표준화하며 후반 모델 정확도를 끌어올렸습니다.",
+    mvpName: "이제마", mvpComment: "지저분한 임상 데이터를 끈질기게 정제해 모델이 돌아가게 만들었습니다. 제타의 뚝심.",
+    emblem: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "ETA DIVISION",
+    captain: "김홍도", captainAcad: "홍익대 시각디자인 20학번",
+    growthAvg: 92,
+    parts: "브랜드 · 모션 · 콘텐츠",
+    partLeads: 3, agents: 4, totalCrews: 13, restCrews: 1, successCrews: 10, failCrews: 1, normalCrews: 6,
+    projectGoal: "리그 브랜드 리뉴얼 및 시즌 모션 그래픽 패키지 제작",
+    overview: "브랜드 가이드 전면 개편과 모션 패키지를 동시에 완주, 한 주 만에 시즌 비주얼을 통일했습니다.",
+    mvpName: "신윤복", mvpComment: "밤새 모션 12종을 뽑아내며 시즌 무드를 단숨에 끌어올렸습니다. 에타의 예술혼.",
+    emblem: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "THETA DIVISION",
+    captain: "세종", captainAcad: "성균관대 컴퓨터교육 19학번",
+    growthAvg: 64,
+    parts: "에듀테크 · 백엔드",
+    partLeads: 2, agents: 3, totalCrews: 10, restCrews: 3, successCrews: 5, failCrews: 3, normalCrews: 5,
+    projectGoal: "학습 진도 추적 API 고도화 및 알림 시스템 도입",
+    overview: "휴식 인원이 많은 주였지만 핵심 인력이 알림 시스템을 안정적으로 출시하며 평균을 지켜냈습니다.",
+    mvpName: "최항", mvpComment: "적은 인원으로 알림 시스템을 완성도 높게 출시했습니다. 세타의 기둥.",
+    emblem: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "IOTA DIVISION",
+    captain: "정조", captainAcad: "한국대 산업공학 20학번",
+    growthAvg: 73,
+    parts: "그로스 · 마케팅 · 데이터",
+    partLeads: 2, agents: 4, totalCrews: 11, restCrews: 1, successCrews: 7, failCrews: 3, normalCrews: 6,
+    projectGoal: "리텐션 개선 실험 설계 및 온보딩 퍼널 A/B 테스트",
+    overview: "5개 실험을 동시 가동해 리텐션 가설을 빠르게 검증, 유의미한 개선 신호를 확보한 주차였습니다.",
+    mvpName: "채제공", mvpComment: "실험 설계부터 분석까지 혼자 끌고 가며 그로스 사이클을 돌렸습니다. 이오타의 엔진.",
+    emblem: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    name: "KAPPA DIVISION",
+    captain: "이황", captainAcad: "서강대 정보통신 21학번",
+    growthAvg: 54,
+    parts: "보안 · 인프라",
+    partLeads: 1, agents: 2, totalCrews: 8, restCrews: 2, successCrews: 4, failCrews: 4, normalCrews: 5,
+    projectGoal: "취약점 점검 자동화 및 접근 권한 체계 재정비",
+    overview: "보안 점검 범위가 방대해 진척이 더뎠지만, 자동화 스캐너 도입으로 반복 작업을 크게 줄였습니다.",
+    mvpName: "이이", mvpComment: "권한 체계를 처음부터 다시 설계해 잠재 사고를 막았습니다. 카파의 방패.",
+    emblem: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400&q=80",
   },
 ];
 
@@ -139,10 +258,104 @@ const CREWS: Crew[] = [
     photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
     stats: mkStats(0, 0, 0, 0, 0),
   },
+  // 페이지네이션 시연용 대량 더미 (curated 5명 + 생성 45명 = 50명)
+  ...(() => {
+    const seeded = (n: number) => { const x = Math.sin(n * 99.71) * 10000; return x - Math.floor(x); };
+    const NAMES = ["강민준", "윤서윤", "임도현", "한지우", "오예준", "서수아", "신하준", "권유나", "황시우", "안채원", "송지호", "류나윤", "전우진", "고은서", "문하율", "배준우", "조아인", "백시현", "남도경", "심예린", "하준서", "주다은", "구민재", "태유진", "선우진", "방서현", "노하랑", "추민결", "표은우", "감하늘", "독고윤", "사공민", "제갈량", "탁재이", "위지호", "마동석", "범준영", "엄지원", "공유나", "반하준", "차은우", "라온유", "피세진", "용하린", "초아진"];
+    const UNIVS = ["가온 대학교", "청운 대학교", "서리 대학교", "북천 대학교", "해솔 대학교", "미르 대학교", "노을 대학교"];
+    const DEPTS = ["전산학", "소프트웨어공학", "데이터과학", "디자인공학", "산업공학", "바이오공학", "정보보안", "미디어학"];
+    const ROLES = ["ATTACKER", "SUPPORTER", "BUILDER", "SCOUT", "HEALER", "STRATEGIST", "MEMBER"];
+    const TITLES = ["WARRIOR", "KNIGHT", "RANGER", "MAGE", "GUARDIAN", "ROGUE", "ELITE", "MEMBER"];
+    const TEAMS_K = ["ALPHA", "BETA", "GAMMA", "DELTA", "EPSILON", "ZETA", "ETA", "THETA", "IOTA", "KAPPA"];
+    const LGS: { aura: CrewAura; ko: string }[] = [{ aura: "dangam", ko: "단감" }, { aura: "injeol", ko: "인절미" }, { aura: "eoheung", ko: "어흥" }];
+    const PHOTOS = [
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=150&q=80",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&q=80",
+      "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=150&q=80",
+    ];
+    return Array.from({ length: 45 }, (_, k) => {
+      const i = k + 6;
+      const lg = LGS[k % LGS.length];
+      const rest = k % 8 === 7;
+      const g = rest ? 0 : Math.round(30 + seeded(i) * 68);
+      const info = rest ? 0 : Math.round(20 + seeded(i + 1) * 78);
+      const skill = rest ? 0 : Math.round(25 + seeded(i + 2) * 73);
+      const exp = rest ? 0 : Math.round(15 + seeded(i + 3) * 70);
+      const career = rest ? 0 : Math.round(10 + seeded(i + 4) * 60);
+      return {
+        key: `g${i}`, rank: i, name: NAMES[k % NAMES.length],
+        grade: `${lg.ko} [${TITLES[k % TITLES.length]}]`, aura: lg.aura,
+        univ: UNIVS[k % UNIVS.length], dept: `${DEPTS[k % DEPTS.length]} 전공`,
+        role: ROLES[k % ROLES.length], team: TEAMS_K[k % TEAMS_K.length],
+        status: (rest ? "주차 휴식" : "주차 활동") as Crew["status"],
+        wcount: 1 + (i % 13), success: !rest && seeded(i + 5) > 0.28,
+        photo: PHOTOS[k % PHOTOS.length], stats: mkStats(g, info, skill, exp, career),
+      };
+    });
+  })(),
 ];
 
+const CREW_PAGE_SIZE = 20;
 const STATE_FILTERS = ["전체", "주차 활동", "주차 휴식"] as const;
 const ALLIANCE_FILTERS = ["전체", "ALPHA", "BETA", "GAMMA", "DELTA"] as const;
+
+/* ═══════════ 우수 크루 TOP 10 쇼케이스 (엘리트 카드) ═══════════ */
+type EliteLeague = "dangam" | "injeol" | "eoheung";
+type Elite = { rank: number; name: string; grade: string; league: EliteLeague; emblem: string; rate: number; photo: string };
+const ELITE_PHOTOS = [
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
+  "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=160&q=80",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=160&q=80",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80",
+];
+const ELITE_EMBLEM: Record<EliteLeague, string> = { dangam: "🍊", injeol: "🍡", eoheung: "🐯" };
+const ELITES: Elite[] = [
+  { rank: 1, name: "이순신", grade: "정1품 영의정", league: "eoheung", rate: 98, photo: ELITE_PHOTOS[0], emblem: ELITE_EMBLEM.eoheung },
+  { rank: 2, name: "발라카스 지원", grade: "정1품 인절미대장", league: "injeol", rate: 95, photo: ELITE_PHOTOS[1], emblem: ELITE_EMBLEM.injeol },
+  { rank: 3, name: "김철수", grade: "정1품 단감킹", league: "dangam", rate: 92, photo: ELITE_PHOTOS[2], emblem: ELITE_EMBLEM.dangam },
+  { rank: 4, name: "이영희", grade: "정2품 우의정", league: "dangam", rate: 88, photo: ELITE_PHOTOS[3], emblem: ELITE_EMBLEM.dangam },
+  { rank: 5, name: "최지원", grade: "종1품 인절미가드", league: "injeol", rate: 84, photo: ELITE_PHOTOS[4], emblem: ELITE_EMBLEM.injeol },
+  { rank: 6, name: "박민수", grade: "정3품 단감소드", league: "dangam", rate: 80, photo: ELITE_PHOTOS[2], emblem: ELITE_EMBLEM.dangam },
+  { rank: 7, name: "윤도현", grade: "정3품 인절미전사", league: "injeol", rate: 76, photo: ELITE_PHOTOS[1], emblem: ELITE_EMBLEM.injeol },
+  { rank: 8, name: "정해린", grade: "정4품 단감레인저", league: "dangam", rate: 72, photo: ELITE_PHOTOS[3], emblem: ELITE_EMBLEM.dangam },
+  { rank: 9, name: "강하늘", grade: "종3품 인절미클레릭", league: "injeol", rate: 67, photo: ELITE_PHOTOS[0], emblem: ELITE_EMBLEM.injeol },
+  { rank: 10, name: "배수아", grade: "종5품 어흥워든", league: "eoheung", rate: 61, photo: ELITE_PHOTOS[4], emblem: ELITE_EMBLEM.eoheung },
+];
+
+// 우수 크루 쇼케이스 — 필터 카테고리 (ELITE 카드로 렌더)
+type EliteItem = { key: string; rank: number; name: string; grade: string; league: EliteLeague | "growth" | "jeong"; emblem: string; val: string; tier: number; photo: string };
+type EliteCat = { key: string; label: string; icon: string; items: EliteItem[] };
+const toTier = (pct: number) => Math.max(1, Math.min(5, Math.round(pct / 20)));
+const leagueOf = (meta: string): EliteLeague =>
+  meta.includes("인절미") ? "injeol" : meta.includes("어흥") ? "eoheung" : "dangam";
+const ELITE_CATS: EliteCat[] = [
+  {
+    key: "all", label: "우수 TOP 10", icon: "✦",
+    items: ELITES.map((e) => ({ key: `all${e.rank}`, rank: e.rank, name: e.name, grade: e.grade, league: e.league, emblem: e.emblem, val: `${e.rate}%`, tier: toTier(e.rate), photo: e.photo })),
+  },
+  {
+    key: "dan", label: "단감 우수", icon: "🍊",
+    items: DANGAM_TOP.map((r, i) => ({ key: `dan${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "dangam", emblem: "🍊", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+  },
+  {
+    key: "injeol", label: "인절미 우수", icon: "🍡",
+    items: INJEOL_TOP.map((r, i) => ({ key: `inj${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "injeol", emblem: "🍡", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+  },
+  {
+    key: "growth", label: "성장률 TOP", icon: "📈",
+    items: GROWTH_TOP.map((r, i) => ({ key: `grw${r.rank}`, rank: r.rank, name: r.name, grade: `${r.meta} 리그`, league: "growth", emblem: "📈", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+  },
+  {
+    key: "jeong", label: "품계 정승", icon: "⚖️",
+    items: JEONGSEUNG.flatMap((j, gi) =>
+      j.names.split(" · ").map((nm, ni) => ({ key: `jng${gi}_${ni}`, rank: gi + 1, name: nm, grade: j.grade, league: "jeong" as const, emblem: "👑", val: "정승", tier: 5, photo: ELITE_PHOTOS[(gi + ni) % ELITE_PHOTOS.length] })),
+    ),
+  },
+];
 
 /* ═══════════ 섹션 4 더미 — 행정 처리 ═══════════ */
 type Inquiry = { tag: string; text: string; state: "접수" | "처리중" | "완료" };
@@ -157,20 +370,26 @@ export default function ChampionTheme({ card, detail }: Props) {
     card.leagueRecordStatus === "대전 중" || card.leagueRecordStatus === "대전 집계";
   const numOrN = (v: number) => (isOngoing ? "N" : v.toLocaleString());
 
+  const [eliteCatIdx, setEliteCatIdx] = useState(0);
   const [stateIdx, setStateIdx] = useState(0);
   const [allianceIdx, setAllianceIdx] = useState(0);
+  const [crewPage, setCrewPage] = useState(0);
   const [modalCrew, setModalCrew] = useState<Crew | null>(null);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [adminDone, setAdminDone] = useState(false);
   const [adminConfirming, setAdminConfirming] = useState(false);
 
   const winRate = isOngoing ? "N" : `${card.growthSuccessRate}`;
+  const eliteCat = ELITE_CATS[eliteCatIdx] ?? ELITE_CATS[0];
 
   const visibleCrews = CREWS.filter(
     (c) =>
       (STATE_FILTERS[stateIdx] === "전체" || c.status === STATE_FILTERS[stateIdx]) &&
       (ALLIANCE_FILTERS[allianceIdx] === "전체" || c.team === ALLIANCE_FILTERS[allianceIdx])
   );
+  const crewPageCount = Math.max(1, Math.ceil(visibleCrews.length / CREW_PAGE_SIZE));
+  const safeCrewPage = Math.min(crewPage, crewPageCount - 1);
+  const pagedCrews = visibleCrews.slice(safeCrewPage * CREW_PAGE_SIZE, (safeCrewPage + 1) * CREW_PAGE_SIZE);
 
   // ── 섹션 1 파티 스탯 [1.4]~[1.8] (차트) ──
   const section1Stats = [
@@ -195,6 +414,7 @@ export default function ChampionTheme({ card, detail }: Props) {
     setChecked({});
     setStateIdx(0);
     setAllianceIdx(0);
+    setCrewPage(0);
     if (typeof window !== "undefined") {
       window.alert("🔮 FORMAL MODE: 모든 검색 고정 필터 해제 및 동기화 상태가 초기 리셋되었습니다.");
     }
@@ -203,10 +423,34 @@ export default function ChampionTheme({ card, detail }: Props) {
   return (
     <div className="weekly-champion">
       <div className="champ-wrap">
-        {/* ═════ 대형 전광판 헤더 ═════ */}
-        <header className="champ-header">
-          <h1 className="champ-title">CREW LEAGUE CHAMPIONSHIP</h1>
-          <div className="champ-subtitle">WEEKLY ROUND {card.weekNumber} STATUS</div>
+        {/* ═════ 시네마틱 히어로 ═════ */}
+        <header className="champ-hero">
+          <video
+            className="champ-hero__video"
+            src="/videos/quest-banner.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={card.imageUrl ?? undefined}
+          />
+          <span className="champ-hero__veil" aria-hidden="true" />
+          <div className="champ-hero__inner">
+            <div className="champ-hero__crest" aria-hidden="true">
+              <span>⚜</span>
+              <span className="champ-hero__crown">♛</span>
+              <span>⚜</span>
+            </div>
+            <h1 className="champ-hero__title">CREW LEAGUE CHAMPIONSHIP</h1>
+            <div className="champ-hero__div" aria-hidden="true">
+              <i />
+              <span>◆</span>
+              <i />
+            </div>
+            <div className="champ-hero__sub">
+              WEEKLY ROUND {card.weekNumber} · {card.seasonName}
+            </div>
+          </div>
         </header>
 
         {/* ═════ 섹션 1 — 주차 정보 (RPG 퀘스트 로그) ═════ */}
@@ -249,13 +493,25 @@ export default function ChampionTheme({ card, detail }: Props) {
 
             {/* ── 우측: 퀘스트 일지 ── */}
             <div className="champ-quest__journal">
-              {/* [1.3] 퀘스트 설명 (플레이버 텍스트) */}
-              <div className="champ-quest__lore">
-                <div className="champ-quest__lh">
-                  <span className="champ-qtag">1.3</span>
-                  <span className="champ-quest__lh-name">✦ QUEST LORE · 주차 개요</span>
+              {/* [1.3] 퀘스트 설명 — 양피지 문서 */}
+              <div className="champ-lore">
+                <span className="champ-lore__roll champ-lore__roll--top" aria-hidden="true" />
+                <div className="champ-lore__paper">
+                  <div className="champ-lore__head">
+                    <span className="champ-qtag">1.3</span>
+                    <span className="champ-lore__title">QUEST BRIEFING · 주차 개요</span>
+                    <span className="champ-lore__wax" aria-hidden="true">✦</span>
+                  </div>
+                  <p className="champ-lore__text">
+                    <span className="champ-lore__drop">{detail.overview.charAt(0)}</span>
+                    {detail.overview.slice(1)}
+                  </p>
+                  <div className="champ-lore__sign">
+                    <span className="champ-lore__sign-rule" />
+                    <span className="champ-lore__sign-by">— 운영진 주차 일지</span>
+                  </div>
                 </div>
-                <p className="champ-quest__lore-text">&ldquo;{detail.overview}&rdquo;</p>
+                <span className="champ-lore__roll champ-lore__roll--bot" aria-hidden="true" />
               </div>
 
               {/* [1.4]~[1.8] 파티 스테이터스 — RPG 스탯 게이지 */}
@@ -339,6 +595,164 @@ export default function ChampionTheme({ card, detail }: Props) {
           </div>
         </section>
 
+        {/* ═════ 우수 크루 쇼케이스 (필터) ═════ */}
+        <section className="champ-panel champ-elite">
+          <div className="champ-elite__head">
+            <span className="champ-elite__rune">✦</span>
+            <h2 className="champ-elite__title">ELITE&nbsp;SHOWCASE</h2>
+            <span className="champ-elite__sub">우수 크루 명예의 전당</span>
+            <span className="champ-elite__rune">✦</span>
+          </div>
+
+          {/* 카테고리 필터 */}
+          <div className="champ-elite__tabs">
+            {ELITE_CATS.map((c, i) => (
+              <button
+                key={c.key}
+                type="button"
+                className={`champ-elite__tab ${eliteCatIdx === i ? "is-active" : ""}`}
+                onClick={() => setEliteCatIdx(i)}
+              >
+                <span className="champ-elite__tab-ic" aria-hidden="true">{c.icon}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="champ-elite__row">
+            {eliteCat.items.map((e) => {
+              const rankClass = e.rank <= 3 ? `champ-ecard--rank${e.rank}` : "";
+              return (
+                <div key={e.key} className={`champ-ecard champ-ecard--${e.league} ${rankClass}`}>
+                  <div className="champ-ecard__body">
+                    <span className="champ-ecard__rank">{e.rank}</span>
+                    <div className="champ-ecard__portrait"><img src={e.photo} alt="" /></div>
+                    <div className="champ-ecard__name">{e.name}</div>
+                    <div className="champ-ecard__grade">{e.grade}</div>
+                    <div className="champ-ecard__emblem" aria-hidden="true">
+                      <span className="champ-ecard__glow" />
+                      <span className="champ-ecard__sym">{e.emblem}</span>
+                    </div>
+                    <div className="champ-ecard__rate">{isOngoing ? "N" : e.val}</div>
+                    <div className="champ-ecard__pips">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <i key={i} className={i < e.tier && !isOngoing ? "on" : ""} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ── [2.4] 팀별 우수 크루 (MVP + 팀장 멘트) ── */}
+          <div className="champ-sub2 champ-sub2--first">
+            <span className="champ-sub2__rune">★</span>
+            <h3 className="champ-sub2__title">팀별 우수 크루 · MVP</h3>
+            <span className="champ-sub2__tag">2.4</span>
+          </div>
+          <div className="champ-mvp">
+            {TEAMS.map((t) => (
+              <div key={t.name} className="champ-mvp__card">
+                <div className="champ-mvp__avatar"><img src={t.emblem} alt="" /></div>
+                <div className="champ-mvp__body">
+                  <div className="champ-mvp__top">
+                    <span className="champ-mvp__name">{t.mvpName}</span>
+                    <span className="champ-mvp__team">{t.name}</span>
+                  </div>
+                  <p className="champ-mvp__quote">&ldquo;{t.mvpComment}&rdquo;</p>
+                  <span className="champ-mvp__by">— 팀장 {t.captain}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── [2.5][2.6][2.7] 팀 목록 ── */}
+          <div className="champ-sub2">
+            <span className="champ-sub2__rune">⚔</span>
+            <h3 className="champ-sub2__title">팀 목록 · TEAM ROSTER</h3>
+            <span className="champ-sub2__count">활동 팀 <b>{TEAMS.length}</b></span>
+            <span className="champ-sub2__tag">2.5–2.7</span>
+          </div>
+          <div className="champ-troster">
+            {[...TEAMS]
+              .sort((a, b) => b.growthAvg - a.growthAvg)
+              .map((t, idx) => {
+                const rank = idx + 1;
+                // 성공/실패/휴식 = 100% 분포 (도넛)
+                const dist = t.successCrews + t.failCrews + t.restCrews || 1;
+                const sp = Math.round((t.successCrews / dist) * 100);
+                const fp = Math.round((t.failCrews / dist) * 100);
+                const rp = 100 - sp - fp;
+                const wr = t.successCrews + t.failCrews ? Math.round((t.successCrews / (t.successCrews + t.failCrews)) * 100) : 0;
+                const win = wr >= 50;
+                const rankClass = rank <= 3 ? `champ-tcard--rank${rank}` : "";
+                const donut = `conic-gradient(#ffd76a 0 ${sp}%, #ff5a4d ${sp}% ${sp + fp}%, #8a93a8 ${sp + fp}% 100%)`;
+                return (
+                  <div key={t.name} className={`champ-tcard ${win ? "is-win" : "is-lose"} ${rankClass}`}>
+                    <div className="champ-tcard__top">
+                      <span className="champ-tcard__rank">{rank}</span>
+                      <img className="champ-tcard__emblem" src={t.emblem} alt="" />
+                      <div className="champ-tcard__id">
+                        <div className="champ-tcard__nameline">
+                          <h4 className="champ-tcard__name">{t.name}</h4>
+                          <span className={`champ-tcard__wl ${win ? "win" : "lose"}`}>{win ? "WIN" : "LOSE"}</span>
+                        </div>
+                        <p className="champ-tcard__captain">팀장 {t.captain} · {t.captainAcad}</p>
+                      </div>
+                    </div>
+
+                    <div className="champ-tcard__parts">
+                      {t.parts.split(" · ").map((p) => (
+                        <span key={p} className="champ-tcard__chip">{p}</span>
+                      ))}
+                    </div>
+
+                    {/* 성공/실패/휴식 도넛 차트 (100%) */}
+                    <div className="champ-tcard__dist">
+                      <div className="champ-tcard__donut" style={{ background: donut }}>
+                        <div className="champ-tcard__donut-hole">
+                          <span className="champ-tcard__donut-pct">{sp}<i>%</i></span>
+                          <span className="champ-tcard__donut-cap">성공</span>
+                        </div>
+                      </div>
+                      <ul className="champ-tcard__legend">
+                        <li className="is-s"><i />성공<b>{t.successCrews}</b><em>{sp}%</em></li>
+                        <li className="is-f"><i />실패<b>{t.failCrews}</b><em>{fp}%</em></li>
+                        <li className="is-r"><i />휴식<b>{t.restCrews}</b><em>{rp}%</em></li>
+                      </ul>
+                    </div>
+
+                    {/* 성장 성공율(평균) + 승률 */}
+                    <div className="champ-tcard__metrics">
+                      <div className="champ-tcard__metric">
+                        <div className="champ-tcard__mrow"><span>성장 성공율</span><b>{t.growthAvg}%</b></div>
+                        <span className="champ-tcard__bar"><span className="champ-tcard__fill" style={{ width: `${t.growthAvg}%` }} /></span>
+                      </div>
+                      <div className="champ-tcard__metric">
+                        <div className="champ-tcard__mrow"><span>승률</span><b>{wr}%</b></div>
+                        <span className="champ-tcard__bar"><span className="champ-tcard__fill champ-tcard__fill--wr" style={{ width: `${wr}%` }} /></span>
+                      </div>
+                    </div>
+
+                    {/* 인원 구성 */}
+                    <div className="champ-tcard__counts">
+                      <span><b>{t.totalCrews}</b>전체</span>
+                      <span><b>{t.partLeads}</b>파트장</span>
+                      <span><b>{t.agents}</b>에이전트</span>
+                      <span><b>{t.normalCrews}</b>일반</span>
+                    </div>
+
+                    <div className="champ-tcard__fields">
+                      <p className="champ-tcard__field"><span className="champ-tcard__fk">🎯</span>{t.projectGoal}</p>
+                      <p className="champ-tcard__field"><span className="champ-tcard__fk">📜</span>{t.overview}</p>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </section>
+
         {/* ═════ 섹션 2 — 크루 & 팀 (다크 럭셔리) ═════ */}
         <section className="champ-panel champ-arena">
           {/* 오너먼트 배너 헤더 */}
@@ -364,15 +778,17 @@ export default function ChampionTheme({ card, detail }: Props) {
           {/* 제어 대시보드 */}
           <div className="champ-ctrl">
             <div className="champ-ctrl__group">
+
+
               <span className="champ-ctrl__lbl">STATE</span>
               {STATE_FILTERS.map((f, i) => (
-                <button key={f} className={`champ-gbtn ${stateIdx === i ? "is-active" : ""}`} onClick={() => setStateIdx(i)}>{f}</button>
+                <button key={f} className={`champ-gbtn ${stateIdx === i ? "is-active" : ""}`} onClick={() => { setStateIdx(i); setCrewPage(0); }}>{f}</button>
               ))}
             </div>
             <div className="champ-ctrl__group">
               <span className="champ-ctrl__lbl">ALLIANCE</span>
               {ALLIANCE_FILTERS.map((f, i) => (
-                <button key={f} className={`champ-gbtn ${allianceIdx === i ? "is-active" : ""}`} onClick={() => setAllianceIdx(i)}>{f}</button>
+                <button key={f} className={`champ-gbtn ${allianceIdx === i ? "is-active" : ""}`} onClick={() => { setAllianceIdx(i); setCrewPage(0); }}>{f}</button>
               ))}
             </div>
             <button className="champ-gbtn champ-gbtn--formal" onClick={resetOfficial}>FORMAL MODE</button>
@@ -380,7 +796,7 @@ export default function ChampionTheme({ card, detail }: Props) {
 
           {/* 크루 카드 리스트 */}
           <div className="champ-cl">
-            {visibleCrews.map((c) => {
+            {pagedCrews.map((c) => {
               const isChecked = checked[c.key] || (adminDone && c.key === "self");
               const rankClass = c.rank <= 3 ? `champ-cc--rank${c.rank}` : "";
               return (
@@ -445,85 +861,38 @@ export default function ChampionTheme({ card, detail }: Props) {
             })}
           </div>
 
-          {/* ── [2.4] 팀별 우수 크루 (MVP + 팀장 멘트) ── */}
-          <div className="champ-sub2">
-            <span className="champ-sub2__rune">★</span>
-            <h3 className="champ-sub2__title">팀별 우수 크루 · MVP</h3>
-            <span className="champ-sub2__tag">2.4</span>
-          </div>
-          <div className="champ-mvp">
-            {TEAMS.map((t) => (
-              <div key={t.name} className="champ-mvp__card">
-                <div className="champ-mvp__avatar"><img src={t.emblem} alt="" /></div>
-                <div className="champ-mvp__body">
-                  <div className="champ-mvp__top">
-                    <span className="champ-mvp__name">{t.mvpName}</span>
-                    <span className="champ-mvp__team">{t.name}</span>
-                  </div>
-                  <p className="champ-mvp__quote">&ldquo;{t.mvpComment}&rdquo;</p>
-                  <span className="champ-mvp__by">— 팀장 {t.captain}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* 페이지네이션 (20명/페이지) */}
+          {crewPageCount > 1 && (
+            <div className="champ-pager">
+              <button
+                className="champ-pager__btn"
+                disabled={safeCrewPage === 0}
+                onClick={() => setCrewPage(Math.max(0, safeCrewPage - 1))}
+              >
+                ‹
+              </button>
+              {Array.from({ length: crewPageCount }).map((_, i) => (
+                <button
+                  key={i}
+                  className={`champ-pager__num ${i === safeCrewPage ? "is-active" : ""}`}
+                  onClick={() => setCrewPage(i)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                className="champ-pager__btn"
+                disabled={safeCrewPage >= crewPageCount - 1}
+                onClick={() => setCrewPage(Math.min(crewPageCount - 1, safeCrewPage + 1))}
+              >
+                ›
+              </button>
+              <span className="champ-pager__info">
+                {visibleCrews.length}명 · {safeCrewPage + 1}/{crewPageCount}
+              </span>
+            </div>
+          )}
 
-          {/* ── [2.5][2.6][2.7] 팀 목록 ── */}
-          <div className="champ-sub2">
-            <span className="champ-sub2__rune">⚔</span>
-            <h3 className="champ-sub2__title">팀 목록 · TEAM ROSTER</h3>
-            <span className="champ-sub2__count">활동 팀 <b>{TEAMS.length}</b></span>
-            <span className="champ-sub2__tag">2.5–2.7</span>
-          </div>
-          <div className="champ-teams">
-            {TEAMS.map((t) => {
-              const total = t.successCrews + t.failCrews;
-              const rate = total ? Math.round((t.successCrews / total) * 100) : 0;
-              const win = !isOngoing && rate >= 50;
-              return (
-                <div key={t.name} className={`champ-team ${win ? "is-win" : "is-lose"}`}>
-                  <div className="champ-team__head">
-                    <img className="champ-team__emblem" src={t.emblem} alt="" />
-                    <div className="champ-team__id">
-                      <h4 className="champ-team__name">{t.name}</h4>
-                      <p className="champ-team__captain">팀장 {t.captain} · {t.captainAcad}</p>
-                      <p className="champ-team__parts">{t.parts}</p>
-                    </div>
-                    <div className="champ-team__verdict">
-                      <span className={`champ-team__wl ${win ? "win" : "lose"}`}>{isOngoing ? "—" : win ? "WIN" : "LOSE"}</span>
-                      <span className="champ-team__rate">승률 {isOngoing ? "N" : `${rate}%`}</span>
-                    </div>
-                  </div>
-
-                  <div className="champ-team__avg">
-                    <span className="champ-team__avg-cap">주차 성장 성공율(평균)</span>
-                    <span className="champ-team__avg-bar">
-                      <span className="champ-team__avg-fill" style={{ width: isOngoing ? "0%" : `${t.growthAvg}%` }} />
-                    </span>
-                    <span className="champ-team__avg-pct">{isOngoing ? "N" : `${t.growthAvg}%`}</span>
-                  </div>
-
-                  <div className="champ-team__stats">
-                    <span className="champ-team__stat"><b>{numOrN(t.totalCrews)}</b>전체 크루</span>
-                    <span className="champ-team__stat"><b>{t.partLeads}</b>파트장</span>
-                    <span className="champ-team__stat"><b>{t.agents}</b>에이전트</span>
-                    <span className="champ-team__stat"><b>{numOrN(t.normalCrews)}</b>일반 크루</span>
-                    <span className="champ-team__stat is-win"><b>{numOrN(t.successCrews)}</b>주차 성공(승)</span>
-                    <span className="champ-team__stat is-lose"><b>{numOrN(t.failCrews)}</b>주차 실패(패)</span>
-                    <span className="champ-team__stat"><b>{numOrN(t.restCrews)}</b>휴식 크루</span>
-                  </div>
-
-                  <div className="champ-team__field">
-                    <span className="champ-team__field-k">🎯 실무 프로젝트 목표</span>
-                    <p className="champ-team__field-v">{t.projectGoal}</p>
-                  </div>
-                  <div className="champ-team__field">
-                    <span className="champ-team__field-k">📜 주차 진행 개요</span>
-                    <p className="champ-team__field-v">{t.overview}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </section>
 
         {/* ═════ 섹션 4 — 행정 처리 (ADMINISTRATIVE ORDER) ═════ */}
