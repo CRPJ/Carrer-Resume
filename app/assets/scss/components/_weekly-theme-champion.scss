@@ -6,13 +6,57 @@
  * 레이아웃 가드: minmax(min(px,100%),1fr) + overflow:hidden.
  * ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700;900&family=Black+Ops+One&family=MedievalSharp&family=Press+Start+2P&family=Orbitron:wght@600;900&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700;900&family=Black+Ops+One&family=MedievalSharp&family=Press+Start+2P&family=Orbitron:wght@600;900&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;700;900&display=swap');
 
 // 도넛 conic 호 드로잉용 애니메이터블 각도 (mask sweep)
 @property --champ-arc {
   syntax: '<angle>';
   inherits: false;
   initial-value: 0deg;
+}
+
+/* ── 승리의 그날까지 (TillVictoryComes) by MOLDU — 디스플레이 폰트, 서브셋 분할 로드 ── */
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular.woff2') format('woff2');
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular-latin.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2000-206F, U+20A0-20CF;
+}
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular-hcore.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+  unicode-range: U+1100-11FF, U+3130-318F;
+}
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular-hsyll-a.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+  unicode-range: U+AC00-C0FF;
+}
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular-hsyll-b.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+  unicode-range: U+C100-D0FF;
+}
+@font-face {
+  font-family: 'TillVictoryComes';
+  src: url('https://cdn.jsdelivr.net/gh/tillvictorycomes/TillVictoryComes-font/tillvictorycomes-Regular-hsyll-c.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
+  unicode-range: U+D100-D7A3;
+}
+
+/* ── 온글잎 의연체 (Uiyeun) by 김의연/보이저엑스 — 손글씨 폰트 (MVP 멘트용) ── */
+@font-face {
+  font-family: 'Uiyeun';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105@1.1/Uiyeun.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: swap;
 }
 
 .weekly-champion {
@@ -105,7 +149,38 @@
       display: flex; align-items: center; gap: 18px; font-size: 1.4rem;
       span { background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     }
-    &__crown { font-size: 2rem !important; -webkit-text-fill-color: initial !important; filter: drop-shadow(0 0 12px rgba(255, 215, 106, 0.85)); animation: champ-gleam 2.8s ease-in-out infinite; }
+    // 메탈릭 골드 3D 크라운 — 그라데이션 채움 + 다층 압출 베벨 + 부유 모션
+    &__crown {
+      position: relative;
+      font-size: 2.6rem !important;
+      line-height: 1;
+      // 위→아래 골드 메탈 그라데이션 (하이라이트→딥 브론즈)
+      background: linear-gradient(180deg, #fff7da 0%, #ffe28c 24%, #f6c64f 48%, #c78a1f 72%, #6f4a0b 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent !important; color: transparent;
+      // 다층 그림자 = 아래로 깔리는 두께(압출) + 접지 그림자 + 골드 후광
+      text-shadow:
+        0 1px 0 #d9a52e,
+        0 2px 0 #bd8a20,
+        0 3px 0 #9c6f16,
+        0 4px 0 #7c560f,
+        0 5px 0 #5e410a,
+        0 7px 9px rgba(0, 0, 0, 0.55),
+        0 0 20px rgba(255, 215, 106, 0.7);
+      animation: champ-crown-bob 3.6s ease-in-out infinite;
+      // 글래스 하이라이트 스윕 — 왕관 위를 천천히 지나가는 광택
+      &::after {
+        content: '♛';
+        position: absolute; inset: 0;
+        background: linear-gradient(110deg, transparent 36%, rgba(255, 255, 255, 0.9) 50%, transparent 64%);
+        background-size: 280% 100%;
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent; color: transparent;
+        text-shadow: none;
+        animation: champ-crown-sheen 4.2s ease-in-out infinite;
+        pointer-events: none;
+      }
+    }
     &__title {
       font-family: 'Cinzel Decorative', serif; font-weight: 900;
       font-size: clamp(2rem, 5.5vw, 3.8rem); letter-spacing: 4px; line-height: 1.15;
@@ -155,6 +230,21 @@
   @keyframes champ-rays-spin { to { transform: translateX(-50%) rotate(360deg); } }
   @keyframes champ-embers-rise {
     to { background-position: 0 -220px, 0 -240px, 0 -260px, 0 -200px; }
+  }
+  // 크라운 부유 — 위아래로 살짝 떠오르며 후광이 호흡
+  @keyframes champ-crown-bob {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.04); }
+  }
+  // 크라운 광택 스윕 — 표면을 가로지르는 하이라이트
+  @keyframes champ-crown-sheen {
+    0%, 100% { background-position: 220% 0; }
+    50% { background-position: -120% 0; }
+  }
+  // 검 — 살짝 들렸다 내려오며 칼날에 빛이 번뜩
+  @keyframes champ-sword-gleam {
+    0%, 100% { transform: rotate(-9deg) translateY(0); filter: drop-shadow(0 0 5px rgba(255, 215, 106, 0.35)); }
+    50% { transform: rotate(-9deg) translateY(-2px); filter: drop-shadow(0 0 12px rgba(255, 235, 180, 0.8)); }
   }
 
   // ═════ 등장 모션 — 스크롤 진입 연출 (translate/scale 독립 속성 → hover transform과 비충돌) ═════
@@ -406,6 +496,9 @@
   .champ-lore {
     position: relative;
     padding: 0 4px;
+    // 두루마리 언롤 — 3행 그리드(봉/본문/봉), 본문 행을 0fr→1fr로 펼침
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     // 스크롤 봉(roller)
     &__roll {
       display: block; height: 16px; position: relative; z-index: 2;
@@ -428,6 +521,7 @@
     // 양피지 본문
     &__paper {
       position: relative; z-index: 1;
+      min-height: 0; overflow: hidden; // 그리드 행 0fr일 때 본문이 봉 뒤로 말려 들어가도록
       padding: 22px 22px 18px;
       background:
         radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.35), transparent 45%),
@@ -474,6 +568,26 @@
       font-family: 'Cinzel', serif; font-style: italic; font-size: 0.74rem; color: #6b4a2a; white-space: nowrap;
     }
   }
+  // 두루마리 언롤 모션 — 뷰포트 진입(.is-in) 시 위 봉에서 본문이 스르륵 펼쳐지고 아래 봉이 따라 내려옴
+  @media (prefers-reduced-motion: no-preference) {
+    .champ-lore[data-grow="scroll"] {
+      grid-template-rows: auto 0fr auto;
+      transition: grid-template-rows 2s cubic-bezier(0.22, 1, 0.36, 1);
+      .champ-lore__paper {
+        opacity: 0;
+        transition: opacity 1s ease 0.5s;
+      }
+      // 아래 봉 — 펼쳐지는 동안 살짝 흔들리며 안착
+      .champ-lore__roll--bot {
+        filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.55));
+      }
+    }
+    .champ-lore[data-grow="scroll"].is-in {
+      grid-template-rows: auto 1fr auto;
+      .champ-lore__paper { opacity: 1; }
+      .champ-lore__roll--bot { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4)); transition: filter 1.8s ease; }
+    }
+  }
 
   // [1.4]~[1.8] 파티 스테이터스 — 보석 게이지 (네이비 가죽)
   .champ-party {
@@ -487,6 +601,26 @@
       border-bottom: 1px solid rgba(212, 175, 55, 0.3);
       background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
+    // 3D 메탈릭 검 — 폴리시드 스틸+골드 그라데이션 + 압출 베벨 + 글린트
+    &__sword {
+      display: inline-block;
+      vertical-align: -0.22em; margin-right: 7px;
+      font-size: 1.55rem; line-height: 1;
+      // 강철 광택(상단 화이트) → 골드 → 다크 스틸(하단)
+      background: linear-gradient(145deg, #ffffff 0%, #ffeeb6 28%, #d6dded 52%, #9aa3b6 76%, #5c6376 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      // 아래로 깔리는 두께(압출) + 접지 그림자 + 골드 후광
+      text-shadow:
+        0 1px 0 #c2c9d8,
+        0 2px 0 #99a1b3,
+        0 3px 0 #6e7588,
+        0 4px 1px #4c5366,
+        0 5px 7px rgba(0, 0, 0, 0.6),
+        0 0 16px rgba(255, 215, 106, 0.5);
+      transform: rotate(-9deg);
+      animation: champ-sword-gleam 3.2s ease-in-out infinite;
+    }
   }
   // 차트 대시보드 (도넛 + 막대 그래프)
   .champ-pdash {
@@ -499,9 +633,15 @@
     margin: 0 auto;
     &__ring {
       position: relative;
-      width: 120px; height: 120px; border-radius: 50%;
+      width: 126px; height: 126px; border-radius: 50%;
       display: grid; place-items: center;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(212, 175, 55, 0.35);
+      // 입체 림 — 외곽 드롭섀도 + 골드 글로우 + 골드 베벨 테두리 + 상단 하이라이트/하단 음영
+      box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.6),
+        0 0 26px rgba(212, 175, 55, 0.22),
+        inset 0 0 0 2px rgba(212, 175, 55, 0.55),
+        inset 0 2px 5px rgba(255, 235, 180, 0.22),
+        inset 0 -8px 16px rgba(0, 0, 0, 0.7);
       // conic 색면은 ::before가 담고, mask 각도(--champ-arc)로 시계방향 드로잉
       &::before {
         content: ""; position: absolute; inset: 0; z-index: 0; border-radius: 50%;
@@ -511,21 +651,37 @@
         transition: --champ-arc 1.35s cubic-bezier(0.33, 1, 0.4, 1) 0.18s;
       }
       &.is-in::before { --champ-arc: 360deg; }
+      // 글로시 광택 — 상단 림에 반사광 (가운데 홀은 radial 마스크로 제외 → 띠에만 표시)
+      &::after {
+        content: ''; position: absolute; inset: 0; z-index: 2; border-radius: 50%;
+        background: linear-gradient(152deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.1) 24%, transparent 44%);
+        -webkit-mask: radial-gradient(circle at 50% 50%, transparent 58%, #000 59%);
+        mask: radial-gradient(circle at 50% 50%, transparent 58%, #000 59%);
+        pointer-events: none;
+      }
     }
     &__hole {
       position: relative; z-index: 1;
-      width: 78px; height: 78px; border-radius: 50%;
-      background: radial-gradient(circle, #131a30 0%, #070a16 100%);
+      width: 82px; height: 82px; border-radius: 50%;
+      // 안으로 파인 음각 — 상단 하이라이트 + 깊은 내부 그림자 + 골드 림 라인
+      background: radial-gradient(circle at 50% 34%, #1d2542 0%, #0c1124 60%, #060912 100%);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
+      box-shadow:
+        inset 0 3px 10px rgba(0, 0, 0, 0.9),
+        inset 0 -2px 5px rgba(255, 255, 255, 0.06),
+        0 0 0 1px rgba(212, 175, 55, 0.32),
+        0 0 16px rgba(0, 0, 0, 0.6);
     }
+    // TEAM ROSTER 도넛과 동일한 텍스트 스타일 (단색 크림 + 글로우)
     &__pct {
-      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.6rem; line-height: 1;
-      background: linear-gradient(180deg, #fff3cf, #ffd76a 60%, #c7902a);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-      i { font-style: normal; font-size: 0.78rem; }
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 2rem; line-height: 1; color: #fff1c2;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 210, 100, 0.55);
+      i { font-style: normal; font-size: 0.84rem; }
     }
-    &__cap { font-family: 'Cinzel', serif; font-size: 0.62rem; color: #c9b27a; margin-top: 4px; letter-spacing: 1px; }
+    &__cap {
+      font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 0.66rem;
+      color: #ffe6a0; margin-top: 5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    }
     &__legend { display: flex; gap: 16px; }
     &__lg {
       display: flex; align-items: center; gap: 5px;
@@ -571,15 +727,18 @@
       box-shadow: 0 0 10px currentColor, inset 0 1px 0 rgba(255, 255, 255, 0.45);
     }
     &__lab {
-      font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; color: #c9b27a; font-weight: 700;
+      // 막대 톤(currentColor)을 라벨에도 그대로 — 카테고리별 색 구분
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.66rem; color: currentColor; font-weight: 800;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
     &__ic { font-size: 0.9rem; }
-    &--active { color: #4f8cff; }
-    &--rest   { color: #3fcf6a; }
-    &--season { color: #b06bff; }
+    // 톤 색을 약간 밝혀 라벨 가독성 확보 (다크 배경 대비)
+    &--active { color: #6ba2ff; }
+    &--rest   { color: #4bdc79; }
+    &--season { color: #c189ff; }
     &--win    { color: var(--cm-gold-bright); }
-    &--lose   { color: #ff5a4d; }
+    &--lose   { color: #ff7468; }
   }
 
   // [1.11] 퀘스트 클리어율 (대형 보석 게이지)
@@ -726,12 +885,14 @@
       linear-gradient(180deg, #0c0a12 0%, #08070c 70%);
     border: 1px solid rgba(212, 175, 55, 0.4);
     &__head {
-      display: flex; align-items: center; justify-content: center; gap: 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
       margin-bottom: 22px; padding-bottom: 14px;
       position: relative;
       &::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 0; height: 2px;
         background: linear-gradient(90deg, transparent, var(--cm-gold), transparent); }
     }
+    // [✦ ELITE SHOWCASE ✦] 한 행, '우수 크루 명예의 전당'은 아래 행
+    &__headrow { display: flex; align-items: center; justify-content: center; gap: 14px; }
     &__rune { font-size: 1.2rem; background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: champ-gleam 3s ease-in-out infinite; }
     &__title {
       font-family: 'Cinzel Decorative', serif; font-weight: 900; font-size: 1.4rem; letter-spacing: 3px;
@@ -905,6 +1066,23 @@
       font-size: 1.2rem;
       background: var(--gold-frame); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
+    // 3D 메탈릭 검 룬 (팀 목록 헤더) — 스틸+골드 그라데이션 + 압출 베벨 + 글린트
+    &__rune--sword {
+      display: inline-block; flex: none;
+      font-size: 1.55rem; line-height: 1;
+      background: linear-gradient(145deg, #ffffff 0%, #ffeeb6 28%, #d6dded 52%, #9aa3b6 76%, #5c6376 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      text-shadow:
+        0 1px 0 #c2c9d8,
+        0 2px 0 #99a1b3,
+        0 3px 0 #6e7588,
+        0 4px 1px #4c5366,
+        0 5px 7px rgba(0, 0, 0, 0.6),
+        0 0 16px rgba(255, 215, 106, 0.5);
+      transform: rotate(-9deg);
+      animation: champ-sword-gleam 3.2s ease-in-out infinite;
+    }
     &__title {
       font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.5rem; letter-spacing: 0.5px;
       background: linear-gradient(180deg, #ffe6a0, #d4af37); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
@@ -926,29 +1104,48 @@
     grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 14px;
   }
+  // 세로 레이아웃 — [프사 + 이름/팀명] 헤더 위, 멘트는 카드 전체 너비 사용
   .champ-mvp__card {
-    display: flex; gap: 14px; align-items: flex-start;
+    display: flex; flex-direction: column; gap: 10px;
     padding: 15px;
     border: 2px solid transparent; border-radius: 12px;
     background: var(--leather-navy) padding-box, var(--gold-frame) border-box;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55), inset 0 0 24px rgba(0, 0, 0, 0.4);
   }
+  .champ-mvp__head {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 9px; border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+  }
   .champ-mvp__avatar {
-    flex: 0 0 56px; width: 56px; height: 56px; border-radius: 50%;
+    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 50%;
     padding: 2px; background: var(--gold-frame);
     box-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
     img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
   }
-  .champ-mvp__body { flex: 1; min-width: 0; }
-  .champ-mvp__top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .champ-mvp__top { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
   .champ-mvp__name {
-    font-family: 'Cinzel', serif; font-weight: 900; font-size: 1rem;
-    background: linear-gradient(180deg, #fff3cf, #ffd76a); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.35rem; line-height: 1.1;
+    background: linear-gradient(180deg, #fff8e2, #ffd76a); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
   }
-  .champ-mvp__team { font-family: 'Cinzel', serif; font-size: 0.68rem; color: #9fb0d8; letter-spacing: 1px; }
+  // 팀명 + 파트 — 한 가로줄, 흰 글씨로 크게 (사이 구분선)
+  .champ-mvp__meta {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 9px;
+  }
+  .champ-mvp__team {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.96rem;
+    color: #ffffff; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  .champ-mvp__parts {
+    font-family: 'Noto Sans KR', sans-serif; font-weight: 600; font-size: 0.82rem;
+    color: #eef2fb; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    &::before { content: '│'; margin-right: 9px; color: rgba(255, 255, 255, 0.3); font-weight: 400; }
+  }
   .champ-mvp__quote {
-    margin: 8px 0 6px; font-family: 'Noto Sans KR', sans-serif; font-style: italic;
-    font-size: 0.84rem; color: #e7ddc8; line-height: 1.6;
+    // 온글잎 의연체 — 손글씨라 italic 제거(이미 손글씨 기울기), 크게 + 밝은 흰색 + 또렷
+    margin: 0; font-family: 'Uiyeun', 'Noto Sans KR', sans-serif;
+    font-size: 1.56rem; color: #fdfbf6; line-height: 1.38; letter-spacing: 0.2px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   }
   .champ-mvp__by { font-family: 'Cinzel', serif; font-size: 0.72rem; color: #b89b6a; }
 
@@ -1058,7 +1255,8 @@
 
     &__id { min-width: 0; }
     &__name {
-      font-family: 'Noto Sans KR', sans-serif; font-weight: 900; font-size: 1.02rem; line-height: 1.15; letter-spacing: 0.5px;
+      // 승리의 그날까지 — 단일 weight(normal)라 faux-bold 방지 위해 400 사용
+      font-family: 'TillVictoryComes', 'Noto Sans KR', sans-serif; font-weight: 400; font-size: 1.18rem; line-height: 1.15; letter-spacing: 0.5px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       background: linear-gradient(180deg, #fff, #ffe6a0); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
@@ -1113,14 +1311,20 @@
       position: relative; z-index: 2;
       width: 52px; height: 52px; border-radius: 50%;
       background: radial-gradient(circle at 38% 30%, #221a36 0%, #0a0712 100%);
+      // 숫자 블록을 다크 원 안에서 살짝 아래로 — 상단 그래프 링과 겹침 방지
       display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding-top: 7px;
       box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 -2px 4px rgba(255, 255, 255, 0.08), 0 1px 2px rgba(255,255,255,0.1);
     }
     &__donut-pct {
-      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.05rem; line-height: 1; color: #ffd76a;
-      i { font-style: normal; font-size: 0.6rem; }
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.2rem; line-height: 1; color: #fff1c2;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 210, 100, 0.55);
+      i { font-style: normal; font-size: 0.62rem; }
     }
-    &__donut-cap { font-family: 'Noto Sans KR', sans-serif; font-size: 0.55rem; color: #b7a988; margin-top: 2px; }
+    &__donut-cap {
+      font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 0.6rem;
+      color: #ffe6a0; margin-top: 2px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    }
     &__legend {
       list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: 5px;
       li {
@@ -1140,8 +1344,9 @@
     &__metric { display: flex; flex-direction: column; gap: 4px; }
     &__mrow {
       display: flex; align-items: baseline; justify-content: space-between;
-      font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 0.66rem; color: #cdbfa0;
-      b { font-family: 'Cinzel', serif; font-size: 0.82rem; color: #ffd76a; }
+      // 성장 성공율 / 승률 라벨 — 승리의 그날까지 (단일 weight라 400)
+      font-family: 'TillVictoryComes', 'Noto Sans KR', sans-serif; font-weight: 400; font-size: 0.8rem; letter-spacing: 0.3px; color: #cdbfa0;
+      b { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.82rem; color: #ffd76a; }
     }
     @keyframes champ-breathe {
       0%, 100% { opacity: 0.42; transform: scale(0.985); }
@@ -1344,16 +1549,17 @@
 
     // 프로필
     &__profile { min-width: 150px; flex-grow: 1; }
-    &__name { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    // 크루명 — 골드 Cinzel과 어울리는 한글 명조(우아한 세리프)
+    &__name { font-family: 'Nanum Myeongjo', serif; font-size: 1.34rem; font-weight: 800; color: #fff; }
     &__grade { font-family: 'Cinzel', serif; font-size: 0.68rem; font-weight: bold; margin-top: 4px; letter-spacing: 1px; color: #b39359; }
     &--eoheung &__grade { color: #ff3b53; text-shadow: 0 0 8px rgba(255, 17, 51, 0.5); }
     &--dangam &__grade { color: #ff8c2b; text-shadow: 0 0 8px rgba(255, 119, 0, 0.5); }
     &--injeol &__grade { color: #5fe0c0; text-shadow: 0 0 8px rgba(95, 224, 192, 0.5); }
 
-    // 메타
-    &__meta { min-width: 140px; font-size: 0.8rem; line-height: 1.5; }
-    &__univ { color: #f5eedc; font-weight: 500; }
-    &__dept { color: #7e7769; font-size: 0.74rem; }
+    // 메타 — 대학/전공도 한글 명조로 (Cinzel 골드와 톤 통일)
+    &__meta { min-width: 140px; font-size: 0.8rem; line-height: 1.55; }
+    &__univ { font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 0.9rem; color: #f5eedc; }
+    &__dept { font-family: 'Nanum Myeongjo', serif; font-weight: 400; font-size: 0.8rem; color: #a99f8a; }
     &__role {
       display: inline-block; margin-top: 4px;
       background: rgba(255, 215, 0, 0.07); border: 1px solid var(--gold-dark, #3a2e1a);
@@ -1779,5 +1985,53 @@
     padding: 24px 14px;
     .champ-quest__grid,
     .champ-decree__grid { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  // ── 태블릿 (≤768px) — 데스크톱 미영향 ──
+  @media (max-width: 768px) {
+    .champ-wrap { gap: 42px; }
+    .champ-panel { padding: 26px 18px; }
+    .champ-hero { min-height: 260px; }
+    .champ-hero__inner { padding: 32px 16px; gap: 12px; }
+    .champ-arena__banner { padding: 10px 18px; gap: 12px; }
+    .champ-arena__title { letter-spacing: 1.5px; }
+    .champ-ctrl { padding: 13px 14px; }
+    // 팀/크루 카드 칸 폭 여유 — 좁아도 안 넘치게
+    .champ-troster { grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr)); }
+  }
+
+  // ── 모바일 (≤480px) — 데스크톱 미영향 ──
+  @media (max-width: 480px) {
+    padding: 16px 10px;
+    .champ-wrap { gap: 30px; }
+    .champ-panel { padding: 18px 13px; border-radius: 12px; }
+
+    // 히어로 — 높이/여백/자간 축소
+    .champ-hero { min-height: 200px; }
+    .champ-hero__inner { padding: 24px 12px; }
+    .champ-hero__title { letter-spacing: 1.5px; }
+    .champ-hero__crest { gap: 10px; font-size: 1rem; }
+    .champ-hero__sub { letter-spacing: 1px; }
+
+    // 섹션 헤더 자간 축소(클리핑 방지)
+    .champ-arena__banner { padding: 9px 14px; }
+    .champ-arena__title { font-size: 1.15rem; letter-spacing: 1px; }
+    .champ-quest__title,
+    .champ-elite__title { letter-spacing: 1.5px; }
+
+    // 필터 컨트롤/버튼 컴팩트
+    .champ-ctrl { padding: 11px 11px; gap: 9px; }
+    .champ-gbtn { padding: 6px 9px; font-size: 0.66rem; }
+
+    // 카드 그리드 1열
+    .champ-mvp { grid-template-columns: minmax(0, 1fr); }
+    .champ-troster { grid-template-columns: minmax(0, 1fr); }
+
+    // 크루 명부 행 — 좁은 화면에서 세로로 가지런히
+    .champ-cc { padding: 14px 14px; gap: 10px 14px; }
+    .champ-cc__profile { min-width: 0; flex: 1 1 55%; }
+    .champ-cc__meta { min-width: 0; flex: 1 1 100%; }
+    .champ-cc__timeline { min-width: 0; }
+    .champ-cc__stats { min-width: 100%; }
   }
 }

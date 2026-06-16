@@ -360,26 +360,36 @@ function useReveal<T extends HTMLElement>() {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const targets = Array.from(
+    const all = Array.from(
       root.querySelectorAll<HTMLElement>("[data-rise],[data-stagger],[data-grow],[data-slidein]")
     );
+    // 두루마리 언롤은 별도 옵저버 — 사용자가 실제로 해당 영역에 도달했을 때만 실행
+    const scrolls = all.filter((el) => el.getAttribute("data-grow") === "scroll");
+    const targets = all.filter((el) => el.getAttribute("data-grow") !== "scroll");
     if (typeof IntersectionObserver === "undefined") {
-      targets.forEach((t) => t.classList.add("is-in"));
+      [...targets, ...scrolls].forEach((t) => t.classList.add("is-in"));
       return;
     }
+    const reveal = (obs: IntersectionObserver) => (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-in");
+          obs.unobserve(e.target);
+        }
+      });
+    };
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            io.unobserve(e.target);
-          }
-        });
-      },
+      (entries) => reveal(io)(entries),
       { threshold: 0.12, rootMargin: "0px 0px -7% 0px" }
     );
     targets.forEach((t) => io.observe(t));
-    return () => io.disconnect();
+    // 화면 중상단까지 올라왔을 때만 발화 → 페이지 로드 시 선실행 방지
+    const ioScroll = new IntersectionObserver(
+      (entries) => reveal(ioScroll)(entries),
+      { threshold: 0, rootMargin: "0px 0px -35% 0px" }
+    );
+    scrolls.forEach((t) => ioScroll.observe(t));
+    return () => { io.disconnect(); ioScroll.disconnect(); };
   }, []);
   return ref;
 }
@@ -557,18 +567,18 @@ export default function ChampionTheme({ card, detail }: Props) {
               <div className="champ-quest__poster-body">
                 <span className="champ-quest__eyebrow">❗ ACTIVE QUEST</span>
                 <h3 className="champ-quest__name">
-                  <span className="champ-qtag">1.1</span>{card.seasonName}
+                  {card.seasonName}
                 </h3>
                 <span className="champ-quest__period">
-                  <span className="champ-qtag">1.2</span>⏳ {card.dateRangeText}
+                  ⏳ {card.dateRangeText}
                 </span>
               </div>
             </div>
 
             {/* ── 우측: 퀘스트 일지 ── */}
             <div className="champ-quest__journal">
-              {/* [1.3] 퀘스트 설명 — 양피지 문서 */}
-              <div className="champ-lore">
+              {/* [1.3] 퀘스트 설명 — 양피지 문서 (두루마리 언롤) */}
+              <div className="champ-lore" data-grow="scroll">
                 <span className="champ-lore__roll champ-lore__roll--top" aria-hidden="true" />
                 <div className="champ-lore__paper">
                   <div className="champ-lore__head">
@@ -590,7 +600,7 @@ export default function ChampionTheme({ card, detail }: Props) {
 
               {/* [1.4]~[1.8] 파티 스테이터스 — RPG 스탯 게이지 */}
               <div className="champ-party">
-                <div className="champ-party__head">⚔ PARTY STATUS · 크루 현황</div>
+                <div className="champ-party__head"><span className="champ-party__sword" aria-hidden="true">⚔</span>PARTY STATUS · 크루 현황</div>
                 <div className="champ-pdash">
                   {/* 도넛 차트 — 성장 성공률 [1.7]/[1.8] */}
                   <div className="champ-donut">
@@ -673,10 +683,12 @@ export default function ChampionTheme({ card, detail }: Props) {
         {/* ═════ 우수 크루 쇼케이스 (필터) ═════ */}
         <section className="champ-panel champ-elite" data-rise>
           <div className="champ-elite__head">
-            <span className="champ-elite__rune">✦</span>
-            <h2 className="champ-elite__title">ELITE&nbsp;SHOWCASE</h2>
+            <div className="champ-elite__headrow">
+              <span className="champ-elite__rune">✦</span>
+              <h2 className="champ-elite__title">ELITE&nbsp;SHOWCASE</h2>
+              <span className="champ-elite__rune">✦</span>
+            </div>
             <span className="champ-elite__sub">우수 크루 명예의 전당</span>
-            <span className="champ-elite__rune">✦</span>
           </div>
 
           {/* 카테고리 필터 */}
@@ -729,22 +741,25 @@ export default function ChampionTheme({ card, detail }: Props) {
           <div className="champ-mvp" data-stagger>
             {TEAMS.map((t) => (
               <div key={t.name} className="champ-mvp__card">
-                <div className="champ-mvp__avatar"><img src={t.emblem} alt="" /></div>
-                <div className="champ-mvp__body">
+                <div className="champ-mvp__head">
+                  <div className="champ-mvp__avatar"><img src={t.emblem} alt="" /></div>
                   <div className="champ-mvp__top">
                     <span className="champ-mvp__name">{t.mvpName}</span>
-                    <span className="champ-mvp__team">{t.name}</span>
+                    <span className="champ-mvp__meta">
+                      <span className="champ-mvp__team">{t.name}</span>
+                      <span className="champ-mvp__parts">{t.parts}</span>
+                    </span>
                   </div>
-                  <p className="champ-mvp__quote">&ldquo;{t.mvpComment}&rdquo;</p>
-                  <span className="champ-mvp__by">— 팀장 {t.captain}</span>
                 </div>
+                <p className="champ-mvp__quote">&ldquo;{t.mvpComment}&rdquo;</p>
+                <span className="champ-mvp__by">— 팀장 {t.captain}</span>
               </div>
             ))}
           </div>
 
           {/* ── [2.5][2.6][2.7] 팀 목록 ── */}
           <div className="champ-sub2">
-            <span className="champ-sub2__rune">⚔</span>
+            <span className="champ-sub2__rune champ-sub2__rune--sword" aria-hidden="true">⚔</span>
             <h3 className="champ-sub2__title">팀 목록 · TEAM ROSTER</h3>
             <span className="champ-sub2__count">활동 팀 <b>{TEAMS.length}</b></span>
             <span className="champ-sub2__tag">2.5–2.7</span>
