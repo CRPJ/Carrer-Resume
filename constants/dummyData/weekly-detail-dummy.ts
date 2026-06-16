@@ -19,7 +19,7 @@ export type WeeklyDetailInfo = {
 const DETAIL_BY_SEASON: Record<string, WeeklyDetailInfo> = {
   "2026년, 봄 시즌, 3주차": {
     overview:
-      "봄 시즌의 흐름이 완연히 자리 잡은 한 주였습니다. 신규 합류 크루들이 첫 성장 사이클을 완주하며 도전율이 크게 올랐고, 팀별 실무 프로젝트가 본격 궤도에 올랐어요. 중간 점검을 앞두고 전반적으로 밀도 높은 활동이 이어진 주차였습니다.",
+      "봄 시즌의 흐름이 완연히 자리 잡은 한 주였습니다.팀 목록 · TEAM ROSTER\n 신규 합류 크루들이 첫 성장 사이클을 완주하며 도전율이 크게 올랐고, 팀별 실무 프로젝트가 본격 궤도에 올랐어요. 중간 점검을 앞두고 전반적으로 밀도 높은 활동이 이어진 주차였습니다.",
     seasonRestCrews: 12,
     socialNews: [
       { category: "기술", title: "차세대 온디바이스 AI, 모바일 시장 판도를 흔들다", source: "테크리뷰" },
@@ -36,6 +36,7 @@ const DETAIL_BY_SEASON: Record<string, WeeklyDetailInfo> = {
       { category: "문화", title: "도심 속 팝업 전시, MZ세대 발길 이어져", source: "컬처위크" },
       { category: "경제", title: "고용 지표 개선세… 청년 취업률 소폭 상승", source: "경제일보" },
     ],
+
   },
   "2026년, 봄 시즌, 1주차": {
     overview:

@@ -47,18 +47,12 @@ export default function WeeklyDetailContent({ weekId }: Props) {
   const [demoResolved, setDemoResolved] = useState(false);
   const [apiCards, setApiCards] = useState<WeeklyCardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [theme, setTheme] = useState<"t1" | "t2" | "t3" | "t4" | "t5" | "t6" | "t7">("t1");
+  const [theme, setTheme] = useState<"t1" | "t2" | "t3" | "t4" | "t5" | "t6" | "t7">("t6");
 
   useEffect(() => {
     setDemo(isDemoMode());
     setDemoResolved(true);
-    // 디자인 비교용 — 선택한 테마를 localStorage 에 보존(새로고침/이동에도 유지).
-    try {
-      const saved = localStorage.getItem("weeklyArenaTheme");
-      if (saved === "t1" || saved === "t2" || saved === "t3" || saved === "t4" || saved === "t5" || saved === "t6" || saved === "t7") setTheme(saved);
-    } catch {
-      /* localStorage 접근 불가 환경 무시 */
-    }
+    // 항상 F(FINALE)로 시작 — 저장된 테마 복원하지 않음.
   }, []);
 
   const selectTheme = (t: "t1" | "t2" | "t3" | "t4" | "t5" | "t6" | "t7") => {

@@ -8,7 +8,8 @@
  * Scope: .weekly-champion 하위로만 한정.
  * ============================================================ */
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import type { WeeklyCardData } from "@/constants/dummyData/weekly-card-dummy";
 import type { WeeklyDetailInfo } from "@/constants/dummyData/weekly-detail-dummy";
@@ -66,6 +67,7 @@ type Team = {
   name: string;
   captain: string;
   captainAcad: string;
+  captainPhoto: string; // 팀장 프로필 — 게임/AI 캐릭터 아바타
   growthAvg: number;
   parts: string;
   partLeads: number;
@@ -83,8 +85,9 @@ type Team = {
 };
 const TEAMS: Team[] = [
   {
-    name: "ALPHA DIVISION",
+    name: "알파팀",
     captain: "이순신", captainAcad: "한국대 컴퓨터공학 19학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Yi-Sunsin&backgroundType=gradientLinear&backgroundColor=ffd76a,ff9d3f",
     growthAvg: 88,
     parts: "백엔드 · 인프라 · 데이터",
     partLeads: 3, agents: 4, totalCrews: 14, restCrews: 2, successCrews: 9, failCrews: 3, normalCrews: 7,
@@ -94,8 +97,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "BETA DIVISION",
+    name: "베타팀",
     captain: "강감찬", captainAcad: "한양대 소프트웨어 20학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Gang-Gamchan&backgroundType=gradientLinear&backgroundColor=c98bff,6a3fa0",
     growthAvg: 47,
     parts: "프론트엔드 · 디자인",
     partLeads: 2, agents: 3, totalCrews: 11, restCrews: 3, successCrews: 4, failCrews: 6, normalCrews: 6,
@@ -105,8 +109,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "GAMMA DIVISION",
+    name: "감마팀",
     captain: "유관순", captainAcad: "서울대 데이터사이언스 21학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Yu-Gwansun&backgroundType=gradientLinear&backgroundColor=00f0ff,6a5bff",
     growthAvg: 75,
     parts: "AI · 데이터 · 리서치",
     partLeads: 2, agents: 5, totalCrews: 12, restCrews: 1, successCrews: 8, failCrews: 2, normalCrews: 6,
@@ -116,8 +121,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "DELTA DIVISION",
+    name: "델타팀",
     captain: "신사임당", captainAcad: "연세대 디자인공학 20학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Shin-Saimdang&backgroundType=gradientLinear&backgroundColor=ff3df5,bd00ff",
     growthAvg: 81,
     parts: "프로덕트 · UX · 리서치",
     partLeads: 2, agents: 3, totalCrews: 10, restCrews: 1, successCrews: 7, failCrews: 2, normalCrews: 5,
@@ -127,8 +133,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "EPSILON DIVISION",
+    name: "엡실론팀",
     captain: "장영실", captainAcad: "카이스트 기계공학 19학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Jang-Yeongsil&backgroundType=gradientLinear&backgroundColor=ff6b00,ffd76a",
     growthAvg: 69,
     parts: "임베디드 · 하드웨어",
     partLeads: 2, agents: 2, totalCrews: 9, restCrews: 2, successCrews: 5, failCrews: 2, normalCrews: 5,
@@ -138,8 +145,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "ZETA DIVISION",
+    name: "제타팀",
     captain: "허준", captainAcad: "고려대 바이오의공학 21학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Heo-Jun&backgroundType=gradientLinear&backgroundColor=2a7d46,3fcf6a",
     growthAvg: 58,
     parts: "데이터 · 바이오",
     partLeads: 1, agents: 2, totalCrews: 8, restCrews: 2, successCrews: 4, failCrews: 3, normalCrews: 5,
@@ -149,8 +157,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "ETA DIVISION",
+    name: "에타팀",
     captain: "김홍도", captainAcad: "홍익대 시각디자인 20학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Kim-Hongdo&backgroundType=gradientLinear&backgroundColor=ffe6a0,c7902a",
     growthAvg: 92,
     parts: "브랜드 · 모션 · 콘텐츠",
     partLeads: 3, agents: 4, totalCrews: 13, restCrews: 1, successCrews: 10, failCrews: 1, normalCrews: 6,
@@ -160,8 +169,9 @@ const TEAMS: Team[] = [
     emblem: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=400&q=80",
   },
   {
-    name: "THETA DIVISION",
+    name: "세타팀",
     captain: "세종", captainAcad: "성균관대 컴퓨터교육 19학번",
+    captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sejong&backgroundType=gradientLinear&backgroundColor=4f7bd0,213f7d",
     growthAvg: 64,
     parts: "에듀테크 · 백엔드",
     partLeads: 2, agents: 3, totalCrews: 10, restCrews: 3, successCrews: 5, failCrews: 3, normalCrews: 5,
@@ -169,28 +179,6 @@ const TEAMS: Team[] = [
     overview: "휴식 인원이 많은 주였지만 핵심 인력이 알림 시스템을 안정적으로 출시하며 평균을 지켜냈습니다.",
     mvpName: "최항", mvpComment: "적은 인원으로 알림 시스템을 완성도 높게 출시했습니다. 세타의 기둥.",
     emblem: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    name: "IOTA DIVISION",
-    captain: "정조", captainAcad: "한국대 산업공학 20학번",
-    growthAvg: 73,
-    parts: "그로스 · 마케팅 · 데이터",
-    partLeads: 2, agents: 4, totalCrews: 11, restCrews: 1, successCrews: 7, failCrews: 3, normalCrews: 6,
-    projectGoal: "리텐션 개선 실험 설계 및 온보딩 퍼널 A/B 테스트",
-    overview: "5개 실험을 동시 가동해 리텐션 가설을 빠르게 검증, 유의미한 개선 신호를 확보한 주차였습니다.",
-    mvpName: "채제공", mvpComment: "실험 설계부터 분석까지 혼자 끌고 가며 그로스 사이클을 돌렸습니다. 이오타의 엔진.",
-    emblem: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    name: "KAPPA DIVISION",
-    captain: "이황", captainAcad: "서강대 정보통신 21학번",
-    growthAvg: 54,
-    parts: "보안 · 인프라",
-    partLeads: 1, agents: 2, totalCrews: 8, restCrews: 2, successCrews: 4, failCrews: 4, normalCrews: 5,
-    projectGoal: "취약점 점검 자동화 및 접근 권한 체계 재정비",
-    overview: "보안 점검 범위가 방대해 진척이 더뎠지만, 자동화 스캐너 도입으로 반복 작업을 크게 줄였습니다.",
-    mvpName: "이이", mvpComment: "권한 체계를 처음부터 다시 설계해 잠재 사고를 막았습니다. 카파의 방패.",
-    emblem: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400&q=80",
   },
 ];
 
@@ -365,7 +353,92 @@ const INQUIRIES: Inquiry[] = [
   { tag: "캡처", text: "증빙 캡처 재제출 (날짜 표기 누락분)", state: "접수" },
 ];
 
+/* ═══════════ 모션 헬퍼 — 뷰포트 진입 시 등장 / 카운트업 ═══════════ */
+// 스크롤 진입 시 [data-rise]/[data-stagger]/[data-grow] 요소에 .is-in 부여
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const targets = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-rise],[data-stagger],[data-grow],[data-slidein]")
+    );
+    if (typeof IntersectionObserver === "undefined") {
+      targets.forEach((t) => t.classList.add("is-in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -7% 0px" }
+    );
+    targets.forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
+  return ref;
+}
+
+// 뷰포트 진입 시 0 → value 카운트업 (Cinzel 대형 수치 연출용)
+function CountUp({
+  value,
+  duration = 1200,
+  className,
+}: {
+  value: number;
+  duration?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    let start = 0;
+    const run = () => {
+      const step = (ts: number) => {
+        if (!start) start = ts;
+        const p = Math.min(1, (ts - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setN(Math.round(value * eased));
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    if (typeof IntersectionObserver === "undefined") {
+      run();
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          run();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [value, duration]);
+  return (
+    <span ref={ref} className={className}>
+      {n}
+    </span>
+  );
+}
+
 export default function ChampionTheme({ card, detail }: Props) {
+  const wrapRef = useReveal<HTMLDivElement>();
   const isOngoing =
     card.leagueRecordStatus === "대전 중" || card.leagueRecordStatus === "대전 집계";
   const numOrN = (v: number) => (isOngoing ? "N" : v.toLocaleString());
@@ -379,7 +452,6 @@ export default function ChampionTheme({ card, detail }: Props) {
   const [adminDone, setAdminDone] = useState(false);
   const [adminConfirming, setAdminConfirming] = useState(false);
 
-  const winRate = isOngoing ? "N" : `${card.growthSuccessRate}`;
   const eliteCat = ELITE_CATS[eliteCatIdx] ?? ELITE_CATS[0];
 
   const visibleCrews = CREWS.filter(
@@ -422,9 +494,9 @@ export default function ChampionTheme({ card, detail }: Props) {
 
   return (
     <div className="weekly-champion">
-      <div className="champ-wrap">
+      <div className="champ-wrap" ref={wrapRef}>
         {/* ═════ 시네마틱 히어로 ═════ */}
-        <header className="champ-hero">
+        <header className="champ-hero" data-rise>
           <video
             className="champ-hero__video"
             src="/videos/quest-banner.mp4"
@@ -435,6 +507,8 @@ export default function ChampionTheme({ card, detail }: Props) {
             poster={card.imageUrl ?? undefined}
           />
           <span className="champ-hero__veil" aria-hidden="true" />
+          <span className="champ-hero__rays" aria-hidden="true" />
+          <span className="champ-hero__embers" aria-hidden="true" />
           <div className="champ-hero__inner">
             <div className="champ-hero__crest" aria-hidden="true">
               <span>⚜</span>
@@ -454,7 +528,7 @@ export default function ChampionTheme({ card, detail }: Props) {
         </header>
 
         {/* ═════ 섹션 1 — 주차 정보 (RPG 퀘스트 로그) ═════ */}
-        <section className="champ-panel champ-quest">
+        <section className="champ-panel champ-quest" data-rise>
           {/* 퀘스트 로그 헤더 */}
           <div className="champ-quest__top">
             <span className="champ-quest__rune">❖</span>
@@ -522,14 +596,15 @@ export default function ChampionTheme({ card, detail }: Props) {
                   <div className="champ-donut">
                     <div
                       className="champ-donut__ring"
+                      data-grow="arc"
                       style={{
-                        background: isOngoing
+                        ["--ring-grad" as string]: isOngoing
                           ? "conic-gradient(#2a2536 0 100%)"
                           : `conic-gradient(var(--cm-gold-bright) 0 ${winLossRate}%, #ff5a4d ${winLossRate}% 100%)`,
-                      }}
+                      } as CSSProperties}
                     >
                       <div className="champ-donut__hole">
-                        <span className="champ-donut__pct">{isOngoing ? "N" : winLossRate}<i>%</i></span>
+                        <span className="champ-donut__pct">{isOngoing ? "N" : <CountUp value={winLossRate} />}<i>%</i></span>
                         <span className="champ-donut__cap">성공률</span>
                       </div>
                     </div>
@@ -540,7 +615,7 @@ export default function ChampionTheme({ card, detail }: Props) {
                   </div>
 
                   {/* 막대 그래프 — 크루 5종 [1.4]~[1.8] */}
-                  <div className="champ-bars">
+                  <div className="champ-bars" data-grow="y">
                     {section1Stats.map((s) => (
                       <div key={s.idx} className={`champ-bar champ-bar--${s.tone}`}>
                         <span className="champ-bar__val">{numOrN(s.raw)}</span>
@@ -564,13 +639,13 @@ export default function ChampionTheme({ card, detail }: Props) {
                 <span className="champ-qtag champ-qtag--abs">1.11</span>
                 <div className="champ-quest__clear-cap">QUEST CLEAR RATE · 평균 성장 성공율</div>
                 <div className="champ-quest__clear-row">
-                  <div className="champ-quest__clear-bar">
+                  <div className="champ-quest__clear-bar" data-grow="x">
                     <span
                       className="champ-quest__clear-fill"
                       style={{ width: isOngoing ? "0%" : `${card.growthSuccessRate}%` }}
                     />
                   </div>
-                  <div className="champ-quest__clear-pct">{winRate}<span>%</span></div>
+                  <div className="champ-quest__clear-pct">{isOngoing ? "N" : <CountUp value={card.growthSuccessRate} />}<span>%</span></div>
                 </div>
               </div>
 
@@ -596,7 +671,7 @@ export default function ChampionTheme({ card, detail }: Props) {
         </section>
 
         {/* ═════ 우수 크루 쇼케이스 (필터) ═════ */}
-        <section className="champ-panel champ-elite">
+        <section className="champ-panel champ-elite" data-rise>
           <div className="champ-elite__head">
             <span className="champ-elite__rune">✦</span>
             <h2 className="champ-elite__title">ELITE&nbsp;SHOWCASE</h2>
@@ -619,7 +694,7 @@ export default function ChampionTheme({ card, detail }: Props) {
             ))}
           </div>
 
-          <div className="champ-elite__row">
+          <div className="champ-elite__row" data-stagger>
             {eliteCat.items.map((e) => {
               const rankClass = e.rank <= 3 ? `champ-ecard--rank${e.rank}` : "";
               return (
@@ -651,7 +726,7 @@ export default function ChampionTheme({ card, detail }: Props) {
             <h3 className="champ-sub2__title">팀별 우수 크루 · MVP</h3>
             <span className="champ-sub2__tag">2.4</span>
           </div>
-          <div className="champ-mvp">
+          <div className="champ-mvp" data-stagger>
             {TEAMS.map((t) => (
               <div key={t.name} className="champ-mvp__card">
                 <div className="champ-mvp__avatar"><img src={t.emblem} alt="" /></div>
@@ -674,7 +749,7 @@ export default function ChampionTheme({ card, detail }: Props) {
             <span className="champ-sub2__count">활동 팀 <b>{TEAMS.length}</b></span>
             <span className="champ-sub2__tag">2.5–2.7</span>
           </div>
-          <div className="champ-troster">
+          <div className="champ-troster" data-stagger>
             {[...TEAMS]
               .sort((a, b) => b.growthAvg - a.growthAvg)
               .map((t, idx) => {
@@ -690,15 +765,30 @@ export default function ChampionTheme({ card, detail }: Props) {
                 const donut = `conic-gradient(#ffd76a 0 ${sp}%, #ff5a4d ${sp}% ${sp + fp}%, #8a93a8 ${sp + fp}% 100%)`;
                 return (
                   <div key={t.name} className={`champ-tcard ${win ? "is-win" : "is-lose"} ${rankClass}`}>
+                    {rank === 1 && (
+                      <span className="champ-tcard__laurel" aria-hidden="true">
+                        <span className="champ-tcard__laurel-crown">👑</span>
+                        <span className="champ-tcard__laurel-txt">CHAMPION</span>
+                      </span>
+                    )}
+                    {/* 승패 메달리온 — 코너 배지 */}
+                    <span className={`champ-wl ${win ? "is-win" : "is-lose"}`} aria-label={win ? "승리" : "패배"}>
+                      <span className="champ-wl__ico" aria-hidden="true">{win ? "👑" : "🥀"}</span>
+                      <span className="champ-wl__txt">{win ? "WIN" : "LOSE"}</span>
+                      <span className="champ-wl__ray" aria-hidden="true" />
+                    </span>
+
                     <div className="champ-tcard__top">
                       <span className="champ-tcard__rank">{rank}</span>
-                      <img className="champ-tcard__emblem" src={t.emblem} alt="" />
+                      <div className="champ-tcard__cap">
+                        <span className="champ-tcard__cap-aura" aria-hidden="true" />
+                        <img className="champ-tcard__cap-img" src={t.captainPhoto} alt={`팀장 ${t.captain}`} />
+                        <span className="champ-tcard__cap-frame" aria-hidden="true" />
+                      </div>
                       <div className="champ-tcard__id">
-                        <div className="champ-tcard__nameline">
-                          <h4 className="champ-tcard__name">{t.name}</h4>
-                          <span className={`champ-tcard__wl ${win ? "win" : "lose"}`}>{win ? "WIN" : "LOSE"}</span>
-                        </div>
-                        <p className="champ-tcard__captain">팀장 {t.captain} · {t.captainAcad}</p>
+                        <h4 className="champ-tcard__name">{t.name}</h4>
+                        <p className="champ-tcard__captain"><span className="champ-tcard__caplabel">팀장</span>{t.captain}</p>
+                        <p className="champ-tcard__acad">{t.captainAcad}</p>
                       </div>
                     </div>
 
@@ -710,7 +800,8 @@ export default function ChampionTheme({ card, detail }: Props) {
 
                     {/* 성공/실패/휴식 도넛 차트 (100%) */}
                     <div className="champ-tcard__dist">
-                      <div className="champ-tcard__donut" style={{ background: donut }}>
+                      <div className="champ-tcard__donut" data-grow="arc" style={{ ["--donut-grad" as string]: donut } as CSSProperties}>
+                        <span className="champ-tcard__donut-gloss" aria-hidden="true" />
                         <div className="champ-tcard__donut-hole">
                           <span className="champ-tcard__donut-pct">{sp}<i>%</i></span>
                           <span className="champ-tcard__donut-cap">성공</span>
@@ -754,7 +845,7 @@ export default function ChampionTheme({ card, detail }: Props) {
         </section>
 
         {/* ═════ 섹션 2 — 크루 & 팀 (다크 럭셔리) ═════ */}
-        <section className="champ-panel champ-arena">
+        <section className="champ-panel champ-arena" data-rise>
           {/* 오너먼트 배너 헤더 */}
           <div className="champ-arena__banner">
             <span className="champ-arena__rune">⚜</span>
@@ -795,7 +886,7 @@ export default function ChampionTheme({ card, detail }: Props) {
           </div>
 
           {/* 크루 카드 리스트 */}
-          <div className="champ-cl">
+          <div className="champ-cl" data-slidein>
             {pagedCrews.map((c) => {
               const isChecked = checked[c.key] || (adminDone && c.key === "self");
               const rankClass = c.rank <= 3 ? `champ-cc--rank${c.rank}` : "";
@@ -895,80 +986,123 @@ export default function ChampionTheme({ card, detail }: Props) {
 
         </section>
 
-        {/* ═════ 섹션 4 — 행정 처리 (ADMINISTRATIVE ORDER) ═════ */}
-        <section className="champ-panel champ-admin2">
-          <div className="champ-roster__banner">
-            <span className="champ-roster__rune">📜</span>
-            <div className="champ-roster__heading">
-              <h2 className="champ-roster__title">ADMINISTRATIVE ORDER</h2>
-              <span className="champ-roster__sub">SECTION 4 · 행정 처리</span>
+        {/* ═════ 섹션 4 — 행정 처리 (ROYAL DECREE · 어명) ═════ */}
+        <section className="champ-panel champ-decree">
+          {/* 교지 두루마리 배너 */}
+          <div className="champ-decree__banner">
+            <span className="champ-decree__rune">⚜</span>
+            <div className="champ-decree__heading">
+              <h2 className="champ-decree__title">ROYAL DECREE</h2>
+              <span className="champ-decree__sub">SECTION 4 · 어명 · 행정 처리</span>
             </div>
-            <span className="champ-roster__rune">📜</span>
+            <span className="champ-decree__rune">⚜</span>
           </div>
 
-          {/* [4.1] 안내문 */}
-          <div className="champ-notice">
-            <div className="champ-notice__head">⚠ DIRECTIVE NOTICE · 행정 처리 안내</div>
-            <p className="champ-notice__body">
-              아래 안내문을 정독한 뒤, 로그인하여 <strong>본인 위클리 카드</strong>에서 행정 처리를 <strong>확인</strong>하세요.
-              확인·전송은 <strong>당일 20:00</strong>까지 마쳐야 하며, 모든 행정 처리는 <strong>금요일 14:00</strong>까지 완료해야 합니다.
-              데이터 오차·이의가 있으면 조정 문의를 <strong>당일 22:00</strong>까지 등록하십시오.
-            </p>
-            <div className="champ-notice__deadlines">
-              <span className="champ-dl"><b>20:00</b>당일 제출·확인</span>
-              <span className="champ-dl champ-dl--final"><b>금 14:00</b>행정 마감</span>
-              <span className="champ-dl champ-dl--ask"><b>22:00</b>조정 문의 마감</span>
+          {/* [4.1] 칙령문 — 두루마리 양피지 + 봉인 마감 시각 */}
+          <div className="champ-edict">
+            <span className="champ-edict__roll champ-edict__roll--top" aria-hidden="true" />
+            <div className="champ-edict__paper">
+              <div className="champ-edict__head">
+                <span className="champ-edict__crest" aria-hidden="true">㊞</span>
+                <div className="champ-edict__headtxt">
+                  <span className="champ-edict__kicker">EDICT · 4.1 행정 칙령</span>
+                  <span className="champ-edict__lead">이번 주차의 기록을 갈무리하여 봉(封)합니다.</span>
+                </div>
+              </div>
+              <p className="champ-edict__body">
+                로그인 후 <strong>본인 위클리 카드</strong>에서 행정 처리를 <strong>확인·날인</strong>해 주세요.
+                확인은 <strong>당일 20:00</strong>까지, 모든 행정 봉인은 <strong>금요일 14:00</strong>까지 마쳐 주시면 됩니다.
+                집계에 오차·이의가 있으면 <strong>상소함</strong>에 조정 문의를 남겨 주세요 — <strong>당일 22:00</strong>까지 접수됩니다.
+              </p>
+              <div className="champ-edict__deadlines">
+                <span className="champ-dl"><span className="champ-dl__wax" aria-hidden="true">封</span><b>20:00</b>당일 제출·확인</span>
+                <span className="champ-dl champ-dl--final"><span className="champ-dl__wax" aria-hidden="true">封</span><b>금 14:00</b>행정 마감</span>
+                <span className="champ-dl champ-dl--ask"><span className="champ-dl__wax" aria-hidden="true">疏</span><b>22:00</b>상소 마감</span>
+              </div>
             </div>
+            <span className="champ-edict__roll champ-edict__roll--bot" aria-hidden="true" />
           </div>
 
-          <div className="champ-admin2__grid">
-            {/* [4.2] 행정 확인 서명 */}
-            <div className="champ-acard">
-              <div className="champ-acard__head">🪪 나의 위클리 카드 · 행정 확인</div>
+          <div className="champ-decree__grid">
+            {/* [4.2] 옥새 날인 의식 — 본인 카드 행정 확인 */}
+            <div className={`champ-rite ${adminDone ? "is-sealed" : ""} ${adminConfirming ? "is-arming" : ""}`}>
+              <div className="champ-rite__head">
+                <span className="champ-rite__tag">4.2</span>玉璽 · 옥새 날인 · 본인 카드 행정 확인
+              </div>
+
+              {/* 옥새 날인 무대 */}
+              <div className="champ-rite__stage">
+                <span className="champ-rite__paper-mark" aria-hidden="true">本人 週次 카드</span>
+                <button
+                  type="button"
+                  className="champ-seal"
+                  aria-label={adminDone ? "봉인 완료" : "옥새 날인"}
+                  disabled={adminDone}
+                  onClick={() => {
+                    if (adminDone) return;
+                    if (!adminConfirming) { setAdminConfirming(true); return; }
+                    setAdminDone(true);
+                    setAdminConfirming(false);
+                    if (typeof window !== "undefined") window.alert("이순신 크루 옥새 날인 완료 — 명부에 [행정 확인]이 봉인되었습니다.");
+                  }}
+                >
+                  <span className="champ-seal__cord" aria-hidden="true" />
+                  <span className="champ-seal__disc">
+                    <span className="champ-seal__glyph">{adminDone ? "封" : "印"}</span>
+                    <span className="champ-seal__ring" aria-hidden="true" />
+                  </span>
+                  <span className="champ-seal__shadow" aria-hidden="true" />
+                </button>
+                {adminDone && <span className="champ-rite__stamped" aria-hidden="true">封</span>}
+              </div>
+
+              {/* 상태별 안내 + 버튼 */}
               {adminDone ? (
-                <div className="champ-acard__done">
-                  <span className="champ-acard__done-ic">✔</span>
-                  <p>행정 확인 완료 — 명부 목록 칸에 <strong>[행정 확인]</strong> 상태가 반영되었습니다.</p>
+                <div className="champ-rite__done">
+                  <span className="champ-rite__done-ic">✔</span>
+                  <p>옥새 날인 완료 — 명부 목록 칸에 <strong>[행정 확인]</strong>이 봉인되었습니다.</p>
                 </div>
               ) : adminConfirming ? (
-                <div className="champ-acard__confirm">
-                  <p>한 번 더 <strong>확인</strong>하면 명부 목록 칸에 <strong>[행정 확인]</strong>이 기록됩니다. 진행할까요?</p>
-                  <div className="champ-acard__btns">
-                    <button className="champ-gbtn" onClick={() => setAdminConfirming(false)}>취소</button>
+                <div className="champ-rite__confirm">
+                  <p>옥새가 준비되었습니다. 한 번 더 날인하면 명부에 <strong>[행정 확인]</strong>이 영구 기록됩니다.</p>
+                  <div className="champ-rite__btns">
+                    <button className="champ-gbtn" onClick={() => setAdminConfirming(false)}>물러나기</button>
                     <button
                       className="champ-gbtn champ-gbtn--ok"
                       onClick={() => {
                         setAdminDone(true);
                         setAdminConfirming(false);
-                        if (typeof window !== "undefined") window.alert("이순신 크루 행정 확인 완료 — 명부에 [행정 확인]이 반영되었습니다.");
+                        if (typeof window !== "undefined") window.alert("이순신 크루 옥새 날인 완료 — 명부에 [행정 확인]이 봉인되었습니다.");
                       }}
                     >
-                      확인
+                      옥새 날인 ㊞
                     </button>
                   </div>
                 </div>
               ) : (
                 <>
-                  <p className="champ-acard__desc">
-                    로그인 후 본인 위클리 카드의 집계 데이터를 점검하고, 이상이 없으면 <strong>확인</strong>을 눌러 서명하세요.
-                    (확인 → 확인 2단계)
+                  <p className="champ-rite__desc">
+                    로그인 후 본인 위클리 카드의 집계 데이터를 점검하고, 이상이 없으면 <strong>옥새</strong>를 들어 날인하라.
+                    (옥새 준비 → 날인 2단계)
                   </p>
-                  <button className="champ-gbtn champ-gbtn--ok champ-acard__cta" onClick={() => setAdminConfirming(true)}>
-                    행정 처리 확인
+                  <button className="champ-gbtn champ-gbtn--ok champ-rite__cta" onClick={() => setAdminConfirming(true)}>
+                    옥새 들기 · 행정 확인
                   </button>
                 </>
               )}
             </div>
 
-            {/* [4.3] 조정 문의 게시판 */}
-            <div className="champ-acard">
-              <div className="champ-acard__head">📨 조정 문의 게시판</div>
-              <p className="champ-acard__desc">
-                데이터 오차·이의가 있으면 문의 게시판에서 조정 문의를 작성하세요. <strong>당일 22:00</strong>까지 입력 완료해야 합니다.
+            {/* [4.3] 상소함 — 조정 문의 게시판 */}
+            <div className="champ-petition">
+              <div className="champ-petition__head">
+                <span className="champ-rite__tag">4.3</span>上疏函 · 상소함 · 조정 문의
+              </div>
+              <p className="champ-petition__desc">
+                집계에 오차·이의가 있으면 상소함에 조정 문의를 남겨 주세요. <strong>당일 22:00</strong>까지 접수됩니다.
               </p>
               <div className="champ-qboard">
                 <div className="champ-qboard__row champ-qboard__row--h">
-                  <span>구분</span><span>내용</span><span>상태</span>
+                  <span>구분</span><span>상소 내용</span><span>처결</span>
                 </div>
                 {INQUIRIES.map((q, i) => (
                   <div key={i} className="champ-qboard__row">
@@ -979,18 +1113,19 @@ export default function ChampionTheme({ card, detail }: Props) {
                 ))}
               </div>
               <button
-                className="champ-gbtn champ-gbtn--formal champ-acard__cta"
-                onClick={() => { if (typeof window !== "undefined") window.alert("조정 문의 게시판 페이지로 이동합니다."); }}
+                className="champ-gbtn champ-gbtn--formal champ-petition__cta"
+                onClick={() => { if (typeof window !== "undefined") window.alert("상소함(조정 문의) 게시판 페이지로 이동합니다."); }}
               >
-                ✍ 문의 작성하기 →
+                ✍ 상소 올리기 →
               </button>
             </div>
           </div>
 
-          {/* [4.4] 증빙 예시 & 양식 */}
+          {/* [4.4] 증표 감정소 — 증빙 예시 & 양식 */}
           <div className="champ-sub2">
-            <span className="champ-sub2__rune">📸</span>
-            <h3 className="champ-sub2__title">증빙 예시 &amp; 양식 · EVIDENCE STANDARDS</h3>
+            <span className="champ-sub2__rune">🔍</span>
+            <h3 className="champ-sub2__title">證票 鑑定所 · 증표 감정소 · 증빙 예시 &amp; 양식</h3>
+            <span className="champ-sub2__tag">4.4</span>
           </div>
           <div className="champ-evid2">
             <div className="champ-ex2 champ-ex2--ok">
