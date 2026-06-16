@@ -37,6 +37,44 @@
   font-style: normal;
 }
 
+// 더잠실체(The Jamsil) — Detail Log H(TERMINAL) 요약 헤딩 전용. weight 100~800.
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil1Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil2Light.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil3Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil4Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil5Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Daeojamjil";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/TheJamsil6ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+
 // 怨듯넻 ?쒓렇 ?ㅽ???
 .tag {
   border-radius: 4px;
@@ -15656,7 +15694,8 @@
       gap: 10px;
     }
     &__id {
-      h4 {
+      h4,
+      h2 {
         margin: 0;
         font-family: "Black Han Sans", "Jua", "Noto Sans KR", sans-serif;
         font-size: 23px;
@@ -16560,31 +16599,54 @@
   --dlog-gold: #39ff14;
 
   color: #cfe9c9;
-  font-family: "SF Mono", "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+  // 라틴/숫자 → IBM Plex Mono, 한글 → IBM Plex Sans KR 로 폴백해 터미널 톤 일관.
+  font-family: "IBM Plex Mono", "IBM Plex Sans KR", "SF Mono", ui-monospace, monospace;
   background: #060a06;
-  border: 1px solid rgba(57, 255, 20, 0.35);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 60px rgba(0, 0, 0, 0.6);
+  // cluster4 기본 모달의 주황(#ffa500) 테두리/글로우를 덮어 터미널 그린으로 강제.
+  border: 1px solid rgba(57, 255, 20, 0.35) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 60px rgba(0, 0, 0, 0.6) !important;
 
+  // cluster4 기본 모달의 주황 L자 코너(::before 20×20) 제거 → 상단 그린 액센트 라인으로.
   &::before {
+    content: "";
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto !important;
+    height: 2px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
     background: linear-gradient(90deg, transparent, #39ff14, transparent);
     opacity: 0.6;
   }
 
-  // 미세 스캔라인
+  // 미세 스캔라인 (cluster4 ::after 주황 코너 속성 리셋 + 전체 커버)
   &::after {
     content: "";
     position: absolute;
     inset: 0;
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
     pointer-events: none;
     background: repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.03) 0 1px, transparent 1px 3px);
     z-index: 4;
+  }
+
+  // 닫기(X) 버튼 — 터미널 바 하단 그린 라인과 겹치지 않게 위로 올림.
+  .modal-close-btn {
+    top: 7px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
   }
 
   .dv-term__bar {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 2px 0 12px;
+    // 하단 패딩을 키워 그린 구분선을 아래로 내림 — 우측 상단 X 버튼과 겹치지 않게.
+    padding: 6px 0 22px;
     margin-bottom: 12px;
     border-bottom: 1px solid rgba(57, 255, 20, 0.25);
   }
@@ -16630,6 +16692,16 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+
+    // 터미널 디자인 — 우측 기본 스크롤바 숨김(휠/트랙패드 스크롤 기능은 유지)
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // 구 Edge/IE
+    &::-webkit-scrollbar {
+      // Chrome/Edge/Safari
+      width: 0;
+      height: 0;
+      display: none;
+    }
   }
 
   .dlog-term {
@@ -16706,6 +16778,93 @@
     }
   }
 
+  // 요약 헤딩(주간 액트 결과 / 액트 결과 요약) — 더잠실체(Daeojamjil).
+  .alog-sum__id h4,
+  .alog-sum__id h2,
+  .alog-sum__result .rs-title {
+    font-family: "Daeojamjil", "IBM Plex Sans KR", sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  // '주간 액트 결과' — 형광펜으로 글자 하단을 살짝 덮은 느낌.
+  // 배경 그라데이션이 글자(텍스트) 뒤에 깔려 글자 하단과 겹친다.
+  .alog-sum__id h2 {
+    display: inline-block;
+    line-height: 1.05; // 글자 아래 빈 여백 줄여 밴드가 글자에만 겹치게
+    background-image: linear-gradient(
+      to top,
+      transparent 12%,
+      rgba(57, 255, 20, 0.4) 12%,
+      rgba(57, 255, 20, 0.4) 48%,
+      transparent 48%
+    );
+    background-repeat: no-repeat;
+  }
+
+  // 액트 테이블 + 결과 요약/범례 — 콘솔 톤(Space Mono 숫자 + IBM Plex Sans KR 한글).
+  // (.rs-title 은 위 그리운 경찰감성체 규칙이 더 구체적이라 그대로 유지됨)
+  .dlog-aterm,
+  .alog-sum__result {
+    font-family: "Space Mono", "IBM Plex Sans KR", ui-monospace, monospace;
+  }
+
+  .alog-sum__result {
+    // 위(스탯/주간 액트 결과) 와의 간격을 더 여유롭게.
+    margin-top: 22px;
+    padding-top: 18px;
+
+    // 제목(액트 결과 요약) 과 그래프 사이 약간의 간격.
+    .rs-bar {
+      margin-top: 13px;
+    }
+    // 범례 — 아이콘을 키우고 글자와 광학적으로 가운데 정렬.
+    .rs-legend {
+      margin-top: 11px;
+      gap: 22px; // 체크 성공 / 체크 실패 사이 간격 더 벌림
+      font-family: "Do Hyeon", "IBM Plex Sans KR", sans-serif; // 라벨 톤(헤더와 통일)
+      font-size: 11px;
+
+      > span {
+        gap: 6px;
+      }
+      i {
+        font-size: 15px;
+        line-height: 1;
+        position: relative;
+        top: 1px; // 글리프가 박스 상단으로 치우쳐 1px 내려 광학 정렬
+      }
+    }
+  }
+
+  // 우측 상단 주차 뱃지(26 봄 12주차) — 테이블과 톤 통일.
+  .alog-sum__week {
+    font-family: "Space Mono", "IBM Plex Sans KR", ui-monospace, monospace;
+  }
+
+  // "액트 결과 요약" 좌측 아이콘 — 플랫 라인 아이콘 대신 광택 입체 배지(3D)로.
+  .alog-sum__result .rs-title i {
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 17px;
+    // 글리프는 어두운 톤으로 — 밝은 그린 배지 위에서 음각처럼 또렷하게.
+    color: #04210a;
+    // 위쪽이 밝은 구체형 그라데이션 → 솟아오른 입체감.
+    background:
+      radial-gradient(120% 120% at 30% 22%, #d6ffce 0%, #7dff5a 32%, #2fe61a 60%, #16a30c 100%);
+    border: 1px solid rgba(217, 255, 206, 0.55);
+    box-shadow:
+      0 6px 14px rgba(11, 160, 12, 0.45),          // 바닥 드롭 섀도(깊이)
+      0 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 1.5px 1px rgba(255, 255, 255, 0.85),  // 상단 하이라이트(베벨)
+      inset 0 -3px 6px rgba(3, 60, 4, 0.55);        // 하단 음영(베벨)
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
   // 액트 인덱스 콘솔 피드 — 그린 터미널 팔레트
   .alog__bar {
     border-color: rgba(57, 255, 20, 0.3);
@@ -16732,6 +16891,10 @@
     font-size: 12.5px;
     line-height: 1.7;
 
+    // 날짜(발생/체크 시점)가 "..."로 잘리지 않게 칸을 확보하고, 컬럼 간격은 좁혀 답답하지 않게.
+    // 크루는 박스 제거로 좁혀지고, 관련 포인트는 3개 간격을 위해 넓게 배분.
+    --aterm-cols: 158px minmax(116px, 0.9fr) 60px 88px 80px 72px minmax(250px, 1.5fr) 78px 158px;
+
     &__intro .prompt,
     &__end .prompt {
       color: #39ff14;
@@ -16740,12 +16903,23 @@
       background: #39ff14;
     }
     &__cols {
+      gap: 9px;
+      font-family: "Do Hyeon", "IBM Plex Sans KR", sans-serif; // 인덱스 헤더 전용
       color: rgba(57, 255, 20, 0.75);
       border-bottom-color: rgba(57, 255, 20, 0.3);
       background: #060a06;
     }
 
     &__line {
+      gap: 9px;
+
+      // 날짜 칸은 넉넉하므로 말줄임 없이 항상 전부 노출.
+      .a-time,
+      .a-chk {
+        overflow: visible;
+        text-overflow: clip;
+      }
+
       &:hover {
         background: rgba(57, 255, 20, 0.07);
       }
@@ -16754,9 +16928,12 @@
         background: rgba(255, 93, 122, 0.07);
       }
 
+      // 발생/체크 시점 — 본문 Space Mono 와 다르게, 더 얇은 IBM Plex Mono 300 으로.
       .a-time,
       .a-chk {
-        color: rgba(207, 233, 201, 0.45);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-weight: 300;
+        color: rgba(207, 233, 201, 0.5);
       }
       .a-res.ok {
         color: #5dff9b;
@@ -16779,17 +16956,53 @@
         color: #ffd166;
       }
       .a-pts {
+        gap: 24px; // 단감/인절미/어흥 3개 간격 더 벌림
+        font-weight: 400; // 기존 800 → 얇게
+
         .p-a,
         .p-b,
         .p-c {
+          font-weight: 400;
+        }
+        // 색은 타입 기준 — 단감/인절미=획득(초록), 어흥=벌점(빨강), 0개=중립(회색)
+        .is-good {
           color: #5dff9b;
         }
-        .is-neg {
+        .is-bad {
           color: #ff5d7a;
         }
+        .is-zero {
+          color: rgba(255, 255, 255, 0.4);
+        }
       }
+      // 크루 — 네모 박스/테두리 제거. 발광 상태 점 + 타입색 텍스트만(타입색은 base 유지).
       .a-crew {
-        color: rgba(160, 200, 160, 0.75);
+        gap: 7px;
+        min-width: 0;
+        font-size: 11.5px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        padding: 0;
+        border: none;
+        background: none;
+
+        &.crew-req,
+        &.crew-opt,
+        &.crew-pick,
+        &.crew-none {
+          background: none;
+          border: none;
+        }
+
+        &::before {
+          content: "";
+          flex-shrink: 0;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: currentColor;
+          box-shadow: 0 0 7px currentColor;
+        }
       }
     }
   }

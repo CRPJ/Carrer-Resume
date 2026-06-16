@@ -32,19 +32,7 @@ type VariantKey =
   | "leaderboard"
   | "casino";
 
-const VARIANT_OPTIONS: { id: VariantKey; key: string; label: string }[] = [
-  { id: "scroll", key: "A", label: "SCROLL" },
-  { id: "ledger", key: "B", label: "LEDGER" },
-  { id: "champion", key: "C", label: "CHAMPION" },
-  { id: "arcade", key: "D", label: "ARCADE" },
-  { id: "relic", key: "E", label: "RELIC" },
-  { id: "dash", key: "F", label: "DASH" },
-  { id: "neon", key: "G", label: "NEON" },
-  { id: "terminal", key: "H", label: "TERMINAL" },
-  { id: "finale", key: "I", label: "FINALE" },
-  { id: "leaderboard", key: "J", label: "BOARD" },
-  { id: "casino", key: "K", label: "CASINO" },
-];
+// 디자인 후보 스위처(VARIANT_OPTIONS)는 제거 — TERMINAL 고정. 필요 시 git 히스토리에서 복원.
 
 const POINT_ORDER: DetailLogPointType[] = ["단감", "인절미", "어흥"];
 
@@ -103,7 +91,8 @@ const ACT_ROWS = [...ACT_LOG_ENTRIES].sort(
 
 const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
   const [filter, setFilter] = useState<FilterKey>("all");
-  const [variant, setVariant] = useState<VariantKey>("scroll");
+  // 디자인은 TERMINAL(H) 고정 (스위처 제거). 다른 후보 뷰 함수는 보존(git).
+  const [variant] = useState<VariantKey>("terminal");
   // J(LEADERBOARD) 카테고리 탭
   const [lbCat, setLbCat] = useState(0);
   // 진입 연출용 — show 직후 한 틱 뒤 is-entered 로 전환해 stagger 발동
@@ -286,7 +275,7 @@ const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
     <div className="alog-sum">
       <div className="alog-sum__top">
         <div className="alog-sum__id">
-          <h4>주간 액트 결과</h4>
+          <h2>Weekly Act Log</h2>
           <p>한 주간 수행한 액트 · {ACT_ROWS.length}건</p>
         </div>
         <span className="alog-sum__week">
@@ -326,7 +315,7 @@ const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
       <div className="alog-sum__result">
         <div className="rs-top">
           <span className="rs-title">
-            <i className="ti ti-checklist" /> 액트 결과 요약
+            <i className="ti ti-clipboard-check" /> 액트 결과 요약
           </span>
           <span className="rs-rate">
             성공률 <b>{actRate}%</b>
@@ -438,12 +427,18 @@ const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
           <span className="a-line">{e.line}</span>
           <span className="a-dur">{e.duration}m</span>
           <span className="a-pts">
-            {POINT_ORDER.map((t, idx) => (
-              <em key={t} className={`${["p-a", "p-b", "p-c"][idx]}${e.points[t] < 0 ? " is-neg" : ""}`}>
-                <img src={DETAIL_LOG_POINT_ICON[t]} alt="" aria-hidden />
-                {t} {fmtPoint(e.points[t])}
-              </em>
-            ))}
+            {POINT_ORDER.map((t, idx) => {
+              const v = e.points[t];
+              // 색은 타입 기준 — 단감/인절미=획득(초록), 어흥=벌점(빨강, +여도 빨강), 0개=중립(회색).
+              // 단감은 마이너스 개념이 없어 부호(−) 없이 개수만 표기.
+              const tone = v === 0 ? "is-zero" : t === "어흥" ? "is-bad" : "is-good";
+              return (
+                <em key={t} className={`${["p-a", "p-b", "p-c"][idx]} ${tone}`}>
+                  <img src={DETAIL_LOG_POINT_ICON[t]} alt="" aria-hidden />
+                  {t} {v === 0 ? "0" : `+${Math.abs(v)}`}
+                </em>
+              );
+            })}
           </span>
           <span className={`a-crew crew-${CREW_KEY[e.crew]}`}>{e.crew}</span>
           <span className="a-chk">
@@ -830,23 +825,7 @@ const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
           <i className="ti ti-x"></i>
         </button>
 
-        {/* ── 디자인 후보 전환 스위처 ── */}
-        <div className="dlog-switch" role="group" aria-label="디자인 후보 선택">
-          <span className="dlog-switch__caption">DESIGN</span>
-          {VARIANT_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={`dlog-switch__btn${variant === opt.id ? " is-active" : ""}`}
-              onClick={() => setVariant(opt.id)}
-              aria-pressed={variant === opt.id}
-            >
-              <b>{opt.key}</b>
-              <span>{opt.label}</span>
-            </button>
-          ))}
-        </div>
-
+        {/* 디자인 후보 전환 스위처는 제거 — 현재 TERMINAL(H) 고정. 다른 후보는 git 히스토리에서 복원 가능 */}
         {VIEWS[variant]()}
       </div>
     </div>,

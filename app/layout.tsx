@@ -44,6 +44,13 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Detail Log H(TERMINAL) 디자인 본문 폰트 — IBM Plex Mono/Sans KR(요약 상단) +
+            Space Mono(액트 테이블·범례 숫자, 콘솔 톤).
+            (SCSS @import url(...) 는 Next 빌드에서 무시되므로 head link 로 직접 로드) */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+        />
       </head>
       <body className={`${khula.variable} ${blackOpsOne.variable} ${chakraPetch.variable} ${lobster.variable} ${rajdhani.variable}`}>
         <MobileBlockScreen />
