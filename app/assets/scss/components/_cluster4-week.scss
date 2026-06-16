@@ -13660,8 +13660,10 @@
 // 내부 콘텐츠는 추후 작업, 현재는 placeholder 영역만
 // ============================================
 .section-modal-detail-log {
-  width: min(674px, calc(100vw - 48px)) !important;
-  max-width: 674px !important;
+  // 액트 로그 표(9개 컬럼)가 한눈에 들어오도록 너비 확대.
+  // 이 클래스는 Detail Log 모달 전용이라 다른 모달 규격엔 영향 없음.
+  width: min(1280px, calc(100vw - 48px)) !important;
+  max-width: 1280px !important;
   height: 826px !important;
   max-height: min(826px, calc(100dvh - 80px)) !important;
 
@@ -13701,16 +13703,3940 @@
 
   .detail-log-modal-body {
     flex: 1;
-    display: flex;
-    align-items: stretch;
-    padding: 0;
-    overflow: hidden;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ============================================
+// Detail Log — 게임형 포인트 변동 로그 (.dlog)
+// 더미데이터 기반 UI. 기존 톤과 별개의 네온/게임 테마.
+// ============================================
+.section-modal-detail-log.dlog {
+  --dlog-bg: #0c0e1a;
+  --dlog-panel: rgba(255, 255, 255, 0.04);
+  --dlog-border: rgba(255, 255, 255, 0.09);
+  --dlog-gold: #ffcf5c;
+  --dlog-cyan: #43e7ff;
+  --dlog-violet: #a874ff;
+  --dlog-green: #4ade80;
+  --dlog-red: #ff6b81;
+
+  position: relative;
+  padding: 0 !important;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(168, 116, 255, 0.18), transparent 55%),
+    radial-gradient(120% 80% at 100% 0%, rgba(67, 231, 255, 0.14), transparent 50%),
+    linear-gradient(180deg, #14172a 0%, #0c0e1a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  // 상단 흐르는 라이트 라인
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--dlog-cyan), var(--dlog-violet), transparent);
+    opacity: 0.7;
+    z-index: 3;
   }
 
-  .detail-log-modal-placeholder {
+  .modal-close-btn {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.2);
+    z-index: 5;
+  }
+
+  // 진입 stagger — is-entered 가 모달 자기 자신에 붙으므로 &.is-entered 로 매칭한다.
+  &.is-entered {
+    .dlog-row {
+      animation: dlogRowIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i, 0) * 40ms);
+    }
+    .dlog-card {
+      animation: dlogCardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i, 0) * 50ms);
+    }
+    .dlog-term__line {
+      animation: dlogRowIn 0.28s ease both;
+      animation-delay: calc(var(--i, 0) * 28ms);
+    }
+    .dlog-cas__row:not(.dlog-cas__row--head) {
+      animation: dlogRowIn 0.34s ease both;
+      animation-delay: calc(var(--i, 0) * 32ms);
+    }
+    .dlog-ftab__row:not(.dlog-ftab__row--head) {
+      animation: dlogRowIn 0.34s ease both;
+      animation-delay: calc(var(--i, 0) * 32ms);
+    }
+  }
+
+  // ── 디자인 후보 스위처 ──
+  .dlog-switch {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 14px 56px 12px 20px;
+
+    &__caption {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-right: 2px;
+    }
+
+    &__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.18s ease;
+
+      b {
+        font-size: 11px;
+        font-weight: 900;
+        opacity: 0.7;
+      }
+
+      span {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      &:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &.is-active {
+        color: #0c0e1a;
+        background: linear-gradient(135deg, var(--dlog-cyan), var(--dlog-violet));
+        border-color: transparent;
+        box-shadow: 0 3px 12px rgba(67, 231, 255, 0.4);
+
+        b {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  // ── 헤더 ──
+  .dlog-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 56px 16px 24px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    &__icon {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--dlog-violet), var(--dlog-cyan));
+      box-shadow: 0 6px 18px rgba(67, 231, 255, 0.35);
+
+      i {
+        font-size: 22px;
+        color: #0c0e1a;
+      }
+    }
+
+    &__text h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      background: linear-gradient(90deg, #fff, #c6d3ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    &__text p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+      font-family: "Pretendard", sans-serif;
+    }
+
+    &__week {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--dlog-gold);
+      border: 1px solid rgba(255, 207, 92, 0.45);
+      border-radius: 999px;
+      background: rgba(255, 207, 92, 0.08);
+      box-shadow: inset 0 0 12px rgba(255, 207, 92, 0.15);
+    }
+  }
+
+  // ── 히어로 요약 ──
+  .dlog-hero {
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 20px 14px;
+    padding: 18px 20px;
+    border-radius: 18px;
+    border: 1px solid var(--dlog-border);
+    background:
+      linear-gradient(135deg, rgba(168, 116, 255, 0.12), rgba(67, 231, 255, 0.06)),
+      var(--dlog-panel);
+    overflow: hidden;
+
+    &__glow {
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 207, 92, 0.35), transparent 60%);
+      filter: blur(10px);
+      pointer-events: none;
+      animation: dlogPulse 3.5s ease-in-out infinite;
+    }
+
+    &__total {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    &__total-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    &__total-value {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+
+      em {
+        font-style: normal;
+        font-size: 46px;
+        font-weight: 900;
+        line-height: 1;
+        color: var(--dlog-gold);
+        text-shadow: 0 0 24px rgba(255, 207, 92, 0.5);
+      }
+
+      small {
+        font-size: 16px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &__meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    &__streak {
+      color: #ff9a5c;
+      i {
+        color: #ff7a2e;
+      }
+    }
+
+    &__rank.up {
+      color: var(--dlog-green);
+    }
+    &__rank.down {
+      color: var(--dlog-red);
+    }
+
+    &__types {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    &__gauge {
+      margin-top: 16px;
+    }
+
+    &__gauge-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+
+      strong {
+        color: var(--dlog-cyan);
+        font-size: 14px;
+      }
+    }
+
+    &__gauge-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    &__gauge-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--dlog-cyan), var(--dlog-violet));
+      box-shadow: 0 0 12px rgba(67, 231, 255, 0.6);
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+    }
+  }
+
+  .dlog-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    &__icon {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+      }
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+
+      em {
+        font-style: normal;
+        font-size: 17px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      small {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+
+  // ── 필터 탭 ──
+  .dlog-tabs {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+    padding: 0 20px 12px;
+  }
+
+  .dlog-tab {
     flex: 1;
-    width: 100%;
-    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &.is-active {
+      color: #0c0e1a;
+      background: linear-gradient(135deg, var(--dlog-cyan), var(--dlog-violet));
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(67, 231, 255, 0.35);
+    }
+  }
+
+  // ── 로그 피드 ──
+  .dlog-feed {
+    position: relative;
+    padding: 4px 20px 22px 22px;
+
+    // 좌측 타임라인 세로선
+    &__line {
+      position: absolute;
+      left: 41px;
+      top: 0;
+      bottom: 18px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(67, 231, 255, 0.5), rgba(168, 116, 255, 0.25), transparent);
+      pointer-events: none;
+    }
+  }
+
+  // ── 로그 카드 ──
+  .dlog-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-left: 14px;
+    padding: 12px 14px 12px 12px;
+    border-radius: 14px;
+    background: var(--dlog-panel);
+    border: 1px solid var(--dlog-border);
+    overflow: hidden;
+
+    & + & {
+      margin-top: 10px;
+    }
+
+    // 등급 좌측 액센트 바
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--rarity-color, rgba(255, 255, 255, 0.3));
+    }
+
+    // 타임라인 노드
+    &__node {
+      position: absolute;
+      left: -19px;
+      top: 22px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--rarity-color, #fff);
+      box-shadow: 0 0 0 4px rgba(12, 14, 26, 1), 0 0 12px var(--rarity-color, #fff);
+    }
+
+    &__icon {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--rarity-color, #fff) 18%, transparent);
+      border: 1px solid color-mix(in srgb, var(--rarity-color, #fff) 40%, transparent);
+
+      i {
+        font-size: 22px;
+        color: var(--rarity-color, #fff);
+      }
+    }
+
+    &__main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &__top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    &__cat {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &__rarity {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--rarity-color, #fff);
+    }
+
+    &__combo {
+      display: inline-flex;
+      align-items: center;
+      gap: 1px;
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--dlog-gold);
+
+      i {
+        font-size: 13px;
+      }
+    }
+
+    &__title {
+      margin: 2px 0 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__desc {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.58);
+      font-family: "Pretendard", sans-serif;
+    }
+
+    &__related {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 5px;
+      padding: 2px 8px;
+      align-self: flex-start;
+      max-width: 100%;
+      font-size: 11px;
+      color: color-mix(in srgb, var(--rarity-color, #fff) 85%, #fff);
+      background: color-mix(in srgb, var(--rarity-color, #fff) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--rarity-color, #fff) 28%, transparent);
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      i {
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+    }
+
+    &__time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 5px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+
+      i {
+        font-size: 13px;
+      }
+    }
+
+    &__delta {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding-left: 6px;
+    }
+
+    &__delta-num {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--dlog-green);
+      text-shadow: 0 0 14px color-mix(in srgb, var(--dlog-green) 50%, transparent);
+    }
+
+    &__delta-type {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+
+      img {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+      }
+
+      small {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.55);
+      }
+    }
+
+    &.is-loss &__delta-num {
+      color: var(--dlog-red);
+      text-shadow: 0 0 14px color-mix(in srgb, var(--dlog-red) 50%, transparent);
+    }
+
+    // 등급별 색/글로우
+    &.rarity-common {
+      --rarity-color: #9aa6c2;
+    }
+    &.rarity-rare {
+      --rarity-color: var(--dlog-cyan);
+      box-shadow: inset 0 0 18px rgba(67, 231, 255, 0.07);
+    }
+    &.rarity-epic {
+      --rarity-color: var(--dlog-violet);
+      box-shadow: inset 0 0 22px rgba(168, 116, 255, 0.12);
+    }
+    &.rarity-legendary {
+      --rarity-color: var(--dlog-gold);
+      border-color: rgba(255, 207, 92, 0.4);
+      box-shadow:
+        inset 0 0 26px rgba(255, 207, 92, 0.16),
+        0 6px 24px rgba(255, 207, 92, 0.18);
+
+      // legendary 카드 빛 흐름 오버레이
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 30%, rgba(255, 207, 92, 0.18) 50%, transparent 70%);
+        background-size: 250% 100%;
+        animation: dlogShine 3s linear infinite;
+        pointer-events: none;
+      }
+    }
+
+    &:hover {
+      border-color: color-mix(in srgb, var(--rarity-color, #fff) 55%, transparent);
+      transform: translateX(2px);
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+  }
+
+  // ── 단순 리스트(행) 기본형 — A/D/E 공용. 색/프레임은 variant 가 덮는다. ──
+  .dlog-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dlog-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--dlog-panel);
+    border: 1px solid var(--dlog-border);
+
+    &__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    &__emoji {
+      width: 45px;
+      height: 45px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border-radius: 50%;
+    }
+
+    &__text {
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__type {
+      font-style: normal;
+      font-weight: 700;
+      margin-left: 4px;
+      opacity: 0.7;
+    }
+
+    &__meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__tags {
+      font-weight: 600;
+      color: var(--rarity-color, #fff);
+    }
+
+    &__sep {
+      opacity: 0.4;
+    }
+
+    &__point {
+      flex-shrink: 0;
+      font-size: 18px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+
+      &.plus {
+        color: #4ade80;
+        text-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+      }
+      &.minus {
+        color: #f87171;
+        text-shadow: 0 0 6px rgba(248, 113, 113, 0.5);
+      }
+    }
+
+    // type 라벨은 D(arcade)에서만 노출
+    &__type {
+      display: none;
+    }
+  }
+
+  .dlog-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 48px 0;
+    color: rgba(255, 255, 255, 0.4);
+
+    i {
+      font-size: 38px;
+    }
+
+    span {
+      font-size: 13px;
+      font-family: "Pretendard", sans-serif;
+    }
+  }
+}
+
+// ============================================
+// 후보 B — LEDGER : 거래내역서형 데이터 테이블
+// (완전히 다른 레이아웃 — 컬럼형 statement)
+// ============================================
+.section-modal-detail-log.dlog--ledger {
+  --dlog-cyan: #4cc9f0;
+  --dlog-violet: #7b8cff;
+  --dlog-gold: #ffd166;
+
+  background:
+    radial-gradient(110% 70% at 50% 0%, rgba(76, 201, 240, 0.1), transparent 55%),
+    linear-gradient(180deg, #11151f 0%, #0a0d14 100%);
+  border-color: rgba(255, 255, 255, 0.14);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, var(--dlog-cyan), transparent);
+  }
+
+  // 영수증 무드: 히어로를 납작한 요약 바로
+  .dlog-hero {
+    border-radius: 10px;
+  }
+
+  .dlog-tab,
+  .dlog-switch__btn {
+    border-radius: 8px;
+  }
+
+  // ── 본문 = 테이블 ──
+  .dlog-feed {
+    padding: 0 18px 18px;
+  }
+
+  .dlog-ledger {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+    font-family: "Pretendard", sans-serif;
+  }
+
+  // 컬럼 폭: 시간 / 종류 / 이유 / 관련라인 / 개수
+  $dlog-cols: 74px 70px minmax(0, 1fr) 132px 64px;
+
+  .dlog-ledger__head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: $dlog-cols;
+    gap: 8px;
+    padding: 11px 14px;
+    background: linear-gradient(180deg, #1b2231, #141a26);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+
+    .ta-r {
+      text-align: right;
+    }
+  }
+
+  .dlog-ledger__row {
+    display: grid;
+    grid-template-columns: $dlog-cols;
+    gap: 8px;
+    align-items: center;
+    padding: 11px 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+    transition: background 0.15s ease;
+
+    &:nth-child(even) {
+      background: rgba(255, 255, 255, 0.018);
+    }
+
+    &:hover {
+      background: rgba(76, 201, 240, 0.07);
+    }
+
+    // 등급 → 좌측 종류칸 색 강조
+    &.rarity-rare {
+      --rarity-color: var(--dlog-cyan);
+    }
+    &.rarity-epic {
+      --rarity-color: var(--dlog-violet);
+    }
+    &.rarity-legendary {
+      --rarity-color: var(--dlog-gold);
+      background: rgba(255, 209, 102, 0.06);
+    }
+    &.rarity-common {
+      --rarity-color: #9aa6c2;
+    }
+
+    .col-time {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+
+      b {
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      small {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+
+    .col-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: color-mix(in srgb, var(--rarity-color, #fff) 70%, #fff);
+
+      img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
+    }
+
+    .col-reason {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      b {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #fff;
+
+        > i {
+          font-size: 15px;
+          color: var(--rarity-color, #fff);
+          flex-shrink: 0;
+        }
+      }
+
+      small {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &__cat {
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      &__combo {
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--dlog-gold);
+      }
+    }
+
+    .col-line {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .col-amt {
+      text-align: right;
+      font-size: 17px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: var(--dlog-green);
+    }
+
+    &.is-loss .col-amt {
+      color: var(--dlog-red);
+    }
+  }
+
+  .dlog-ledger__foot {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #141a26, #1b2231);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+
+    &-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    &-types {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    &-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+
+      img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+      }
+      b {
+        color: #fff;
+        font-weight: 800;
+      }
+    }
+
+    &-total {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.5);
+
+      b {
+        margin-left: 4px;
+        font-size: 20px;
+        font-weight: 900;
+        color: var(--dlog-gold);
+        text-shadow: 0 0 16px rgba(255, 209, 102, 0.4);
+      }
+    }
+  }
+}
+
+// ============================================
+// 후보 C — CHAMPION : 위클리 랭킹 세부(GRAND FINALE) 무드
+// 다크 골드 + Cinzel/Orbitron + 토너먼트 전광판.
+// ============================================
+.section-modal-detail-log.dlog--champion {
+  --dlog-cyan: #00f0ff;
+  --dlog-violet: #bd00ff;
+  --dlog-gold: #ffd76a;
+  --cm-gold: #d4af37;
+  --cm-border: rgba(212, 175, 55, 0.3);
+
+  color: #f1f5f9;
+  background-color: #070503;
+  background-image:
+    radial-gradient(ellipse 95% 55% at 50% -8%, rgba(212, 175, 55, 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 50% 116%, rgba(170, 124, 17, 0.16) 0%, transparent 55%),
+    linear-gradient(to bottom, rgba(8, 6, 3, 0.92) 0%, rgba(6, 5, 3, 0.97) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 70px rgba(0, 0, 0, 0.6);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, var(--cm-gold), var(--dlog-gold), var(--cm-gold), transparent);
+    height: 2px;
+    opacity: 0.9;
+  }
+
+  // 헤더 — 골드 토너먼트
+  .dlog-header__icon {
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ffe5a3, #d4af37 55%, #aa7c11);
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+    i {
+      color: #2a1d05;
+    }
+  }
+  .dlog-header__text h3 {
+    font-family: "Cinzel Decorative", "Cinzel", serif;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #ffe5a3 0%, #ffd76a 45%, #aa7c11 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dlog-header__week {
+    font-family: "Orbitron", sans-serif;
+    color: var(--dlog-gold);
+    border-color: rgba(212, 175, 55, 0.55);
+    background: rgba(212, 175, 55, 0.1);
+  }
+
+  // 히어로 — 전광판 패널
+  .dlog-hero {
+    border-radius: 14px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background:
+      linear-gradient(135deg, rgba(212, 175, 55, 0.14), rgba(0, 0, 0, 0.2)),
+      rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+  .dlog-hero__total-label,
+  .dlog-hero__gauge-head span {
+    font-family: "Orbitron", sans-serif;
+  }
+  .dlog-hero__total-value em {
+    font-family: "Cinzel", serif;
+    color: var(--dlog-gold);
+    text-shadow: 0 0 26px rgba(255, 215, 106, 0.55);
+  }
+  .dlog-hero__gauge-head strong {
+    color: var(--dlog-gold);
+  }
+  .dlog-hero__gauge-fill {
+    background: linear-gradient(90deg, #ffe5a3, #d4af37, #aa7c11);
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.6);
+  }
+
+  .dlog-tab.is-active,
+  .dlog-switch__btn.is-active {
+    color: #2a1d05;
+    background: linear-gradient(135deg, #ffe5a3, #d4af37 55%, #aa7c11);
+    box-shadow: 0 3px 14px rgba(212, 175, 55, 0.45);
+  }
+
+  // 타임라인 라인 골드
+  .dlog-feed__line {
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.6), rgba(170, 124, 17, 0.3), transparent);
+  }
+
+  // 카드 — 가죽/골드 프레임
+  .dlog-card {
+    border-radius: 12px;
+    background:
+      linear-gradient(160deg, rgba(212, 175, 55, 0.08), rgba(0, 0, 0, 0.25));
+    border: 1px solid rgba(212, 175, 55, 0.28);
+
+    &__title {
+      font-family: "Cinzel", "Noto Sans KR", serif;
+      letter-spacing: 0.3px;
+    }
+
+    &__node {
+      box-shadow: 0 0 0 4px #0a0703, 0 0 12px var(--rarity-color, var(--cm-gold));
+    }
+
+    // 등급 색을 골드 토너먼트 팔레트로 재매핑
+    &.rarity-common {
+      --rarity-color: #c9b07a;
+    }
+    &.rarity-rare {
+      --rarity-color: #00f0ff;
+    }
+    &.rarity-epic {
+      --rarity-color: #bd00ff;
+    }
+    &.rarity-legendary {
+      --rarity-color: var(--dlog-gold);
+      border-color: rgba(212, 175, 55, 0.6);
+      box-shadow:
+        inset 0 0 28px rgba(212, 175, 55, 0.18),
+        0 6px 26px rgba(212, 175, 55, 0.22);
+    }
+  }
+}
+
+// ============================================
+// 후보 A — SCROLL : 골드 두루마리 "포인트 획득 내역" (목업 1)
+// ============================================
+.section-modal-detail-log.dlog--scroll {
+  --dlog-cyan: #d4af37;
+  --dlog-violet: #d4af37;
+  --dlog-gold: #d4af37;
+  --dlog-panel: linear-gradient(90deg, #3d3935 0%, #2a2622 100%);
+  --dlog-border: #5a544d;
+
+  color: #f5e6ca;
+  background: #2d2a26;
+  border: 3px solid #d4af37;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  }
+
+  .dlog-header__icon {
+    background: linear-gradient(135deg, #f0d98a, #d4af37 55%, #aa7c11);
+    i {
+      color: #2d2a26;
+    }
+  }
+  .dlog-header__text h3 {
+    color: #d4af37;
+    background: none;
+    -webkit-text-fill-color: #d4af37;
+    text-shadow: 1px 1px 2px #000;
+  }
+  .dlog-header__text p {
+    color: #b8a68b;
+  }
+  .dlog-header__week {
+    color: #d4af37;
+    border-color: rgba(212, 175, 55, 0.55);
+    background: rgba(212, 175, 55, 0.1);
+  }
+
+  .dlog-hero {
+    border-color: rgba(212, 175, 55, 0.35);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(0, 0, 0, 0.2));
+  }
+  .dlog-hero__total-value em {
+    color: #d4af37;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+
+  // 행 — 목업 1 스타일
+  .dlog-row {
+    background: linear-gradient(90deg, #3d3935 0%, #2a2622 100%);
+    border: 1px solid #5a544d;
+
+    &__name {
+      color: #fff;
+    }
+    &__meta {
+      color: #b8a68b;
+    }
+    &__tags {
+      color: #d4af37;
+      font-weight: 500;
+    }
+
+    // 원형 이모지 아이콘 — 종류별 배경색 + 골드 테두리
+    &__emoji {
+      border: 2px solid #d4af37;
+    }
+    &[data-type="단감"] .dlog-row__emoji {
+      background: #e67e22;
+    }
+    &[data-type="어흥"] .dlog-row__emoji {
+      background: #c0392b;
+    }
+    &[data-type="인절미"] .dlog-row__emoji {
+      background: #f1c40f;
+    }
+  }
+}
+
+// ============================================
+// 후보 D — ARCADE : 블루 게임 UI "Point History" (목업 2)
+// ============================================
+.section-modal-detail-log.dlog--arcade {
+  --dlog-cyan: #ffdb58;
+  --dlog-violet: #7a7aae;
+  --dlog-gold: #ffdb58;
+  --dlog-border: #5a5a8a;
+
+  color: #d0d0e1;
+  background: #2a2a40;
+  border: 4px solid #4a4a75;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #7a7aae, #ffdb58, #7a7aae, transparent);
+  }
+
+  .dlog-header {
+    border-bottom: 2px solid #4a4a75;
+  }
+  .dlog-header__icon {
+    border-radius: 8px;
+    background: #232338;
+    border: 2px solid #7a7aae;
+    i {
+      color: #ffdb58;
+    }
+  }
+  .dlog-header__text h3 {
+    color: #fff;
+    background: none;
+    -webkit-text-fill-color: #fff;
+    text-transform: uppercase;
+  }
+
+  .dlog-hero {
+    border-color: #4a4a75;
+    background: #363654;
+  }
+  .dlog-hero__total-value em {
+    color: #ffdb58;
+    text-shadow: 0 0 18px rgba(255, 219, 88, 0.5);
+  }
+  .dlog-tab,
+  .dlog-switch__btn {
+    border-radius: 8px;
+  }
+
+  // 행 — 목업 2 스타일 (사각 아이콘 박스 + 노란 이름)
+  .dlog-row {
+    background: #363654;
+    border: 2px solid #5a5a8a;
+    border-radius: 10px;
+
+    &__emoji {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      background: #232338;
+      border: 2px solid #7a7aae;
+      font-size: 24px;
+    }
+    &__name {
+      color: #ffdb58;
+    }
+    &__type {
+      display: inline; // D 에서만 종류 라벨 노출
+      color: #ffdb58;
+    }
+    &__meta {
+      color: #a0a0c0;
+    }
+    &__tags {
+      color: #a0a0c0;
+    }
+    &__point {
+      font-size: 19px;
+      &.plus {
+        color: #50ff50;
+        text-shadow: 0 0 6px rgba(80, 255, 80, 0.5);
+      }
+      &.minus {
+        color: #ff5050;
+        text-shadow: 0 0 6px rgba(255, 80, 80, 0.5);
+      }
+    }
+  }
+}
+
+// ============================================
+// 후보 E — RELIC : 우드/판타지 "History Ledger" (목업 3)
+// ============================================
+.section-modal-detail-log.dlog--relic {
+  --dlog-cyan: #d4af37;
+  --dlog-violet: #8b7355;
+  --dlog-gold: #d4af37;
+  --dlog-border: #5c4a35;
+
+  color: #dcd0bc;
+  font-family: "Georgia", "Noto Sans KR", serif;
+  background: #2a2520;
+  border: 8px solid #5c4a35;
+  border-image: linear-gradient(to bottom, #8b7355, #3e3325) 30;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(0, 0, 0, 0.5);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #8b7355, #d4af37, #8b7355, transparent);
+  }
+
+  .dlog-header {
+    border-bottom: 2px solid #5c4a35;
+  }
+  .dlog-header__icon {
+    border-radius: 4px;
+    background: linear-gradient(135deg, #8b7355, #3e3325);
+    border: 1px solid #5c4a35;
+    i {
+      color: #d4af37;
+    }
+  }
+  .dlog-header__text h3 {
+    font-family: "Georgia", serif;
+    color: #d4af37;
+    background: none;
+    -webkit-text-fill-color: #d4af37;
+    text-shadow: 2px 2px 2px #000;
+  }
+  .dlog-header__text p {
+    color: #a69a8a;
+  }
+  .dlog-header__week {
+    color: #d4af37;
+    border-color: #5c4a35;
+    background: rgba(139, 115, 85, 0.2);
+  }
+
+  .dlog-hero {
+    border: 2px solid #4a3e30;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .dlog-hero__total-value em {
+    color: #d4af37;
+  }
+
+  // 리스트 컨테이너 — 양각 inset 프레임
+  .dlog-rows {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border: 2px inset #4a3e30;
+    border-radius: 2px;
+  }
+
+  // 행 — 목업 3 스타일 (아이콘 없음, 양피지 카드)
+  .dlog-row {
+    background: linear-gradient(90deg, #3a322a, #2a2520);
+    border: 1px solid #5c4a35;
+    border-radius: 0;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
+    &__emoji {
+      display: none; // E 는 아이콘 미사용
+    }
+    &__name {
+      color: #f4e4bc;
+      font-family: "Georgia", serif;
+    }
+    &__meta {
+      color: #a69a8a;
+    }
+    &__tags {
+      color: #a69a8a;
+    }
+    &__point {
+      font-family: "Arial", sans-serif;
+      &.plus {
+        color: #88cc88;
+        text-shadow: none;
+      }
+      &.minus {
+        color: #cc8888;
+        text-shadow: none;
+      }
+    }
+  }
+}
+
+// ============================================
+// .dv — 후보별 전체 레이아웃 컨테이너 + 공용 필터
+// (공통 헤더/히어로를 없애고 각 후보가 자기 레이아웃을 가진다)
+// ============================================
+.section-modal-detail-log.dlog {
+  .dv {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 18px;
+  }
+
+  // 공용 필터 (위치/색은 후보가 조정)
+  .dlog-filter {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+
+    &__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.55);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.15s ease;
+
+      i {
+        font-size: 14px;
+      }
+      &:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      &.is-active {
+        color: #0c0e1a;
+        background: var(--dlog-cyan);
+        border-color: transparent;
+      }
+    }
+  }
+
+  // 스크롤 영역 공통 여백
+  .detail-log-modal-body {
+    padding-right: 4px;
+  }
+}
+
+// ============================================
+// 액트 로그 테이블 (디자인 A/B/K 공용)
+// 주차·전체합산을 상단 고정, 발생 시점 순(월→토)으로
+// 얇은 행 테이블을 그린다. 컬럼이 많아 가로 스크롤 허용.
+// ============================================
+.section-modal-detail-log.dlog {
+  .alog-host {
+    gap: 0;
+  }
+
+  // 상단 고정 바 — 주차 + 전체 합산(A/B/C)
+  .alog__bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 9px 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--dlog-border);
+  }
+  .alog__week {
+    font-family: "Chakra Petch", "Jua", "Noto Sans KR", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    padding: 4px 13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--dlog-border);
+  }
+  // 결과 아이콘 상단 지표(범례)
+  .alog__legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    i {
+      font-size: 15px;
+      line-height: 1;
+    }
+    .lg-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: rgba(255, 255, 255, 0.5);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--dlog-border);
+    }
+    .lg-ok i {
+      color: var(--dlog-green);
+    }
+    .lg-fail i {
+      color: var(--dlog-red);
+    }
+  }
+
+  .alog__totals {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .alog__tot {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--dlog-border);
+
+    b {
+      font-size: 14px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    &.a b {
+      color: var(--dlog-cyan);
+    }
+    &.b b {
+      color: var(--dlog-violet);
+    }
+    &.c b {
+      color: var(--dlog-gold);
+    }
+  }
+
+  // 표 영역 — 컬럼이 많아 가로/세로 모두 스크롤
+  .alog__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .alog__table {
+    min-width: 884px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .alog__row {
+    display: grid;
+    grid-template-columns:
+      minmax(108px, 1.3fr) // 액트명
+      64px // 결과
+      94px // 소속 허브
+      minmax(96px, 1fr) // 소속 라인
+      52px // 소요(m)
+      136px // 관련 포인트
+      52px // 크루
+      96px // 발생 시점
+      96px; // 체크 시점
+    gap: 8px;
+    align-items: center;
+    padding: 6px 10px; // 얇은 행 높이
+    border-radius: 7px;
+    font-size: 11.5px;
+    line-height: 1.25;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--dlog-border);
+
+    &--head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 7px 10px;
+      border-radius: 0;
+      background: var(--dlog-bg);
+      border: none;
+      border-bottom: 1px solid var(--dlog-border);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: rgba(255, 255, 255, 0.5);
+
+      .ta-r {
+        text-align: right;
+      }
+    }
+
+    &.is-fail {
+      border-color: rgba(255, 107, 129, 0.35);
+      background: rgba(255, 107, 129, 0.06);
+    }
+  }
+
+  .al-name {
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .al-res {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 17px;
+      line-height: 1;
+    }
+    &.ok i {
+      color: var(--dlog-green);
+    }
+    &.fail i {
+      color: var(--dlog-red);
+    }
+  }
+  .al-hub {
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .al-line {
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .al-dur {
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .al-pts {
+    display: inline-flex;
+    gap: 4px;
+
+    .p {
+      font-size: 10px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .p-a {
+      color: var(--dlog-cyan);
+      background: rgba(67, 231, 255, 0.12);
+    }
+    .p-b {
+      color: var(--dlog-violet);
+      background: rgba(168, 116, 255, 0.12);
+    }
+    .p-c {
+      color: var(--dlog-gold);
+      background: rgba(255, 207, 92, 0.12);
+    }
+    .p.is-neg {
+      color: var(--dlog-red);
+      background: rgba(255, 107, 129, 0.14);
+    }
+  }
+  .al-crew {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 0;
+    border-radius: 5px;
+
+    &.crew-req {
+      color: var(--dlog-red);
+      background: rgba(255, 107, 129, 0.14);
+    }
+    &.crew-opt {
+      color: var(--dlog-cyan);
+      background: rgba(67, 231, 255, 0.12);
+    }
+    &.crew-pick {
+      color: var(--dlog-gold);
+      background: rgba(255, 207, 92, 0.14);
+    }
+    &.crew-none {
+      color: rgba(255, 255, 255, 0.45);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+  .al-when {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+
+    b {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    small {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  // 진입 stagger
+  &.is-entered .alog__row:not(.alog__row--head) {
+    animation: dlogRowIn 0.3s ease both;
+    animation-delay: calc(var(--i, 0) * 24ms);
+  }
+
+  // ── 콘솔 로그 피드 구조 (H/K 공용) — 팔레트는 각 variant에서 분기 ──
+  .dlog-aterm {
+    font-family: "SF Mono", "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+
+    // 헤더/데이터가 공유하는 컬럼 그리드 — 일렬 정렬용
+    // (발생시점 / 액트명 / 결과 / 허브 / 라인 / 소요 / 포인트 / 크루 / 체크시점)
+    --aterm-cols: 146px minmax(116px, 1fr) 78px 94px 86px 92px minmax(230px, 1.3fr) 74px 146px;
+
+    &__intro {
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 6px;
+
+      .prompt {
+        font-weight: 800;
+      }
+      .muted {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    // 컬럼(인덱스)명 헤더 — 로그 상단 고정
+    &__cols {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: var(--aterm-cols);
+      gap: 16px;
+      align-items: center;
+      font-weight: 800;
+      font-size: 10.5px;
+      line-height: 1.25;
+      letter-spacing: 0.2px;
+      padding: 6px 8px 7px;
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.55);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      background: var(--dlog-bg);
+
+      > span {
+        text-align: center;
+        white-space: nowrap;
+      }
+    }
+
+    &__line {
+      display: grid;
+      grid-template-columns: var(--aterm-cols);
+      gap: 16px;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 5px;
+      border-left: 2px solid transparent;
+
+      > span {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+      }
+
+      .a-time {
+        font-variant-numeric: tabular-nums;
+      }
+      .a-res {
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        background: none !important;
+        padding: 0;
+
+        i {
+          font-size: 17px;
+          line-height: 1;
+        }
+      }
+      .a-name {
+        font-weight: 700;
+      }
+      .a-dur {
+        font-variant-numeric: tabular-nums;
+      }
+      .a-pts {
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        overflow: visible;
+
+        em {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-style: normal;
+
+          img {
+            width: 15px;
+            height: 15px;
+            object-fit: contain;
+          }
+        }
+      }
+      .a-crew {
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 9px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+
+        &.crew-req {
+          color: #ff6b81;
+          background: rgba(255, 107, 129, 0.14);
+          border-color: rgba(255, 107, 129, 0.45);
+        }
+        &.crew-opt {
+          color: #43e7ff;
+          background: rgba(67, 231, 255, 0.12);
+          border-color: rgba(67, 231, 255, 0.4);
+        }
+        &.crew-pick {
+          color: #ffcf5c;
+          background: rgba(255, 207, 92, 0.14);
+          border-color: rgba(255, 207, 92, 0.45);
+        }
+        &.crew-none {
+          color: rgba(255, 255, 255, 0.5);
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(255, 255, 255, 0.18);
+        }
+      }
+      .a-chk {
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    &__end {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .prompt {
+        font-weight: 800;
+      }
+      .cursor {
+        display: inline-block;
+        width: 9px;
+        height: 15px;
+        animation: dlogTermBlink 1s steps(1) infinite;
+      }
+    }
+  }
+}
+
+// 주간 결과 요약 패널 (D DASH 무드 — H 상단). 강조색은 var(--dlog-cyan) 사용.
+.section-modal-detail-log.dlog {
+  .alog-sum {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--dlog-border);
+
+    &__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    &__id {
+      h4 {
+        margin: 0;
+        font-family: "Black Han Sans", "Jua", "Noto Sans KR", sans-serif;
+        font-size: 23px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        color: #fff;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      }
+      p {
+        margin: 3px 0 0;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+    &__week {
+      flex-shrink: 0;
+      font-family: "Chakra Petch", "Jua", "Noto Sans KR", sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #0c0e1a;
+      padding: 6px 15px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--dlog-cyan), var(--dlog-violet) 60%, var(--dlog-gold));
+      border: none;
+      box-shadow:
+        0 4px 14px rgba(67, 231, 255, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    &__hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    &__total {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .lbl {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .val {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+
+        em {
+          font-size: 30px;
+          font-weight: 900;
+          font-style: normal;
+          line-height: 1;
+          color: var(--dlog-cyan);
+        }
+        small {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+    &__badges {
+      display: inline-flex;
+      gap: 8px;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 5px 10px;
+        border-radius: 999px;
+      }
+      .b-streak {
+        color: #ffb347;
+        background: rgba(255, 179, 71, 0.12);
+      }
+      .b-rank.up {
+        color: var(--dlog-green);
+        background: rgba(74, 222, 128, 0.12);
+      }
+      .b-rank.down {
+        color: var(--dlog-red);
+        background: rgba(255, 107, 129, 0.12);
+      }
+    }
+
+    // 종류별 결과 — F(DASH)처럼 큼직한 카드
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    &__stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 8px 9px;
+      border-radius: 11px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--dlog-border);
+
+      img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+      }
+      em {
+        font-style: normal;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      small {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .bar {
+        width: 100%;
+        margin-top: 4px;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+
+        i {
+          display: block;
+          height: 100%;
+          border-radius: inherit;
+          background: linear-gradient(90deg, var(--dlog-cyan), var(--dlog-violet));
+          transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+        }
+      }
+    }
+
+    // 액트 결과 요약 (성공/실패 개수 + 비율 바)
+    &__result {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--dlog-border);
+
+      .rs-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .rs-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-family: "Jua", "Black Han Sans", "Noto Sans KR", sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+        color: #fff;
+
+        i {
+          font-size: 20px;
+          color: var(--dlog-cyan);
+        }
+      }
+      .rs-rate {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+
+        b {
+          margin-left: 3px;
+          font-size: 16px;
+          font-weight: 900;
+          color: var(--dlog-green);
+          font-variant-numeric: tabular-nums;
+        }
+      }
+
+      .rs-bar {
+        position: relative;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255, 107, 129, 0.22);
+        overflow: hidden;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+
+        i {
+          position: relative;
+          display: block;
+          height: 100%;
+          border-radius: inherit;
+          background:
+            repeating-linear-gradient(
+              45deg,
+              rgba(255, 255, 255, 0.22) 0,
+              rgba(255, 255, 255, 0.22) 8px,
+              transparent 8px,
+              transparent 16px
+            ),
+            linear-gradient(90deg, var(--dlog-green), var(--dlog-cyan));
+          background-size:
+            32px 100%,
+            100% 100%;
+          box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
+          transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+          animation: atermBarFlow 0.7s linear infinite;
+
+          // 진행 끝단 반짝이는 광택 (차오르는 느낌)
+          &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, transparent 60%, rgba(255, 255, 255, 0.55));
+            animation: atermBarPulse 1.6s ease-in-out infinite;
+          }
+        }
+      }
+
+      .rs-legend {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.55);
+
+        > span {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+        }
+        i {
+          font-size: 13px;
+        }
+        b {
+          font-weight: 900;
+          font-variant-numeric: tabular-nums;
+        }
+        .lg-ok {
+          i {
+            color: var(--dlog-green);
+          }
+          b {
+            color: var(--dlog-green);
+          }
+        }
+        .lg-fail {
+          i {
+            color: var(--dlog-red);
+          }
+          b {
+            color: var(--dlog-red);
+          }
+        }
+        .rs-total {
+          margin-left: auto;
+          color: rgba(255, 255, 255, 0.45);
+        }
+      }
+    }
+  }
+}
+
+// A(SCROLL) 골드 톤 — 상단 바/헤더 강조
+.section-modal-detail-log.dlog--scroll {
+  .alog__bar {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.08);
+  }
+  .alog__week {
+    color: #2d2a26;
+    background: #d4af37;
+    border-color: #d4af37;
+  }
+  .alog__row--head {
+    color: #d4af37;
+  }
+  .alog__tot {
+    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.06);
+
+    &.a b,
+    &.b b,
+    &.c b {
+      color: #ffd166;
+    }
+  }
+
+  // 골든 두루마리 톤 콘솔 로그 + "따다다닥" 스탬프 연출
+  .dlog-aterm {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 12.5px;
+    line-height: 1.7;
+
+    &__intro {
+      color: rgba(212, 175, 55, 0.55);
+      .prompt {
+        color: #d4af37;
+      }
+      .muted {
+        color: rgba(245, 230, 200, 0.4);
+      }
+    }
+    &__end {
+      .prompt {
+        color: #d4af37;
+      }
+      .cursor {
+        background: #d4af37;
+      }
+    }
+    &__cols {
+      color: #d4af37;
+      border-bottom-color: rgba(212, 175, 55, 0.35);
+    }
+
+    &__line {
+      border-bottom: 1px dashed rgba(212, 175, 55, 0.16);
+      border-radius: 0;
+
+      &:hover {
+        background: rgba(212, 175, 55, 0.08);
+      }
+      &.is-fail {
+        border-left-color: #ff6b81;
+        background: rgba(255, 107, 129, 0.06);
+      }
+
+      .a-time,
+      .a-chk {
+        color: rgba(245, 230, 200, 0.45);
+      }
+      .a-res.ok {
+        color: #2d2a26;
+        background: #d4af37;
+      }
+      .a-res.fail {
+        color: #ff6b81;
+        background: rgba(255, 107, 129, 0.14);
+      }
+      .a-name {
+        color: #f5e6c8;
+        font-weight: 800;
+      }
+      .a-hub {
+        color: #f5e6c8;
+      }
+      .a-line {
+        color: rgba(212, 175, 55, 0.7);
+      }
+      .a-dur {
+        color: #ffd166;
+      }
+      .a-pts {
+        .p-a,
+        .p-b,
+        .p-c {
+          color: #e9c66a;
+        }
+        .is-neg {
+          color: #ff6b81;
+        }
+      }
+      .a-crew {
+        color: rgba(212, 175, 55, 0.65);
+      }
+    }
+  }
+
+  // 한 줄씩 빠르게 찍히는 스탬프 — 따다다닥
+  &.is-entered .dlog-aterm__line {
+    animation: dlogStamp 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+}
+
+@keyframes dlogStamp {
+  0% {
+    opacity: 0;
+    transform: translateY(-7px) scale(1.07);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ── A : SCROLL 레이아웃 ──
+.section-modal-detail-log.dlog--scroll {
+  .dv-scroll__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 2px 0 14px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #d4af37;
+    text-shadow: 1px 1px 2px #000;
+
+    b {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #2d2a26;
+      background: #d4af37;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+  }
+  .dlog-filter {
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .dv-scroll__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── B : LEDGER 레이아웃 ──
+.section-modal-detail-log.dlog--ledger {
+  .dv-ledger__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 2px 0 12px;
+  }
+  .dv-ledger__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+
+    i {
+      color: var(--dlog-cyan);
+      font-size: 18px;
+    }
+  }
+  .dv-ledger__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── C : CHAMPION 레이아웃 ──
+.section-modal-detail-log.dlog--champion {
+  .dv-champ__banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0 14px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  }
+  .dv-champ__crest {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ffe5a3, #d4af37 55%, #aa7c11);
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+
+    i {
+      font-size: 24px;
+      color: #2a1d05;
+    }
+  }
+  .dv-champ__titles {
+    h3 {
+      margin: 0;
+      font-family: "Cinzel Decorative", "Cinzel", serif;
+      font-size: 19px;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, #ffe5a3 0%, #ffd76a 45%, #aa7c11 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+  .dv-champ__total {
+    margin-left: auto;
+    font-family: "Cinzel", serif;
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--dlog-gold);
+    text-shadow: 0 0 24px rgba(255, 215, 106, 0.5);
+
+    small {
+      font-size: 13px;
+      margin-left: 3px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+  .dlog-filter {
+    margin-bottom: 12px;
+  }
+  .dlog-filter__btn.is-active {
+    color: #2a1d05;
+    background: linear-gradient(135deg, #ffe5a3, #d4af37 55%, #aa7c11);
+  }
+  .dv-champ__feed {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── D : ARCADE 레이아웃 ──
+.section-modal-detail-log.dlog--arcade {
+  .dv-arcade__head {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    padding: 2px 0 12px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #4a4a75;
+  }
+  .dlog-filter {
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .dlog-filter__btn.is-active {
+    color: #232338;
+    background: #ffdb58;
+  }
+  .dv-arcade__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── E : RELIC 레이아웃 ──
+.section-modal-detail-log.dlog--relic {
+  .dv-relic__head {
+    text-align: center;
+    font-family: "Georgia", serif;
+    font-size: 1.55rem;
+    color: #d4af37;
+    text-shadow: 2px 2px 2px #000;
+    padding: 2px 0 12px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #5c4a35;
+  }
+  .dlog-filter {
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .dlog-filter__btn.is-active {
+    color: #2a2520;
+    background: #d4af37;
+  }
+  .dv-relic__frame {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── F : DASH 레이아웃 (요약 대시보드) ──
+.section-modal-detail-log.dlog--dash {
+  .dv-dash {
+    gap: 0;
+  }
+  .dv-dash__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 2px;
+  }
+  .dv-dash__id {
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+  }
+  .dv-dash__week {
+    flex-shrink: 0;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--dlog-gold);
+    border: 1px solid rgba(255, 207, 92, 0.45);
+    border-radius: 999px;
+    background: rgba(255, 207, 92, 0.08);
+  }
+
+  .dv-dash__hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid var(--dlog-border);
+    background: linear-gradient(135deg, rgba(168, 116, 255, 0.16), rgba(67, 231, 255, 0.07));
+  }
+  .dv-dash__total {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    .lbl {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .val {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      em {
+        font-style: normal;
+        font-size: 44px;
+        font-weight: 900;
+        line-height: 1;
+        color: var(--dlog-gold);
+        text-shadow: 0 0 24px rgba(255, 207, 92, 0.5);
+      }
+      small {
+        font-size: 15px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+  .dv-dash__badges {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .b-streak {
+      color: #ff9a5c;
+    }
+    .b-rank.up {
+      color: #4ade80;
+    }
+    .b-rank.down {
+      color: #ff6b81;
+    }
+  }
+
+  .dv-dash__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .dv-dash__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    em {
+      font-style: normal;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+    small {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .bar {
+      width: 100%;
+      height: 5px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      i {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--dlog-cyan), var(--dlog-violet));
+        transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+      }
+    }
+  }
+
+  .dv-dash__gauge {
+    margin-top: 12px;
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      strong {
+        color: var(--dlog-cyan);
+        font-size: 14px;
+      }
+    }
+    .track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--dlog-cyan), var(--dlog-violet));
+      box-shadow: 0 0 12px rgba(67, 231, 255, 0.5);
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+    }
+  }
+
+  .dv-dash__recent {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+
+    .rhead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .rlist {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+  }
+
+  // 대시보드 행 — 종류별 이모지 배경
+  .dlog-row__emoji {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+// ============================================
+// 후보 G — NEON : 글래스모피즘 게임 패널 (목업)
+// ============================================
+.section-modal-detail-log.dlog--neon {
+  --dlog-cyan: #00f2ff;
+  --dlog-violet: #a0a0ff;
+  --dlog-gold: #00f2ff;
+  --dlog-border: rgba(255, 255, 255, 0.1);
+
+  color: #fff;
+  background: linear-gradient(135deg, #2a114d 0%, #1e0a33 100%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 0 50px rgba(0, 242, 255, 0.22), inset 0 0 24px rgba(255, 255, 255, 0.05);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #00f2ff, transparent);
+  }
+
+  .dv-neon__head {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #00f2ff;
+    text-shadow: 0 0 16px rgba(0, 242, 255, 0.6);
+    padding: 2px 0 16px;
+  }
+  .dlog-filter {
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .dlog-filter__btn.is-active {
+    color: #0f051a;
+    background: #00f2ff;
+    box-shadow: 0 0 14px rgba(0, 242, 255, 0.5);
+  }
+  .dv-neon__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  // 글래스 카드
+  .dlog-row {
+    border-radius: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease, background 0.2s ease;
+
+    &:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &__emoji {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    &__name {
+      font-weight: 600;
+      color: #fff;
+    }
+    &__tags {
+      color: #a0a0ff;
+    }
+    &__meta {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    &__point {
+      font-size: 1.1rem;
+      font-weight: 900;
+      &.plus {
+        color: #00ff9d;
+        text-shadow: 0 0 10px #00ff9d;
+      }
+      &.minus {
+        color: #ff0055;
+        text-shadow: 0 0 10px #ff0055;
+      }
+    }
+  }
+}
+
+// ============================================
+// 후보 H — TERMINAL : 콘솔 로그 (라인 기반, 모노스페이스)
+// 이전 후보들과 가장 색다른 레이아웃.
+// ============================================
+.section-modal-detail-log.dlog--terminal {
+  --dlog-cyan: #39ff14;
+  --dlog-violet: #39ff14;
+  --dlog-gold: #39ff14;
+
+  color: #cfe9c9;
+  font-family: "SF Mono", "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+  background: #060a06;
+  border: 1px solid rgba(57, 255, 20, 0.35);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 60px rgba(0, 0, 0, 0.6);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #39ff14, transparent);
+    opacity: 0.6;
+  }
+
+  // 미세 스캔라인
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.03) 0 1px, transparent 1px 3px);
+    z-index: 4;
+  }
+
+  .dv-term__bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(57, 255, 20, 0.25);
+  }
+  .dv-term__dots {
+    display: inline-flex;
+    gap: 6px;
+    i {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      &:nth-child(1) {
+        background: #ff5f56;
+      }
+      &:nth-child(2) {
+        background: #ffbd2e;
+      }
+      &:nth-child(3) {
+        background: #27c93f;
+      }
+    }
+  }
+  .dv-term__path {
+    font-size: 13px;
+    color: rgba(57, 255, 20, 0.7);
+  }
+
+  .dlog-filter {
+    margin-bottom: 12px;
+  }
+  .dlog-filter__btn {
+    border-radius: 4px;
+    font-family: inherit;
+    color: rgba(57, 255, 20, 0.6);
+    background: rgba(57, 255, 20, 0.06);
+    border-color: rgba(57, 255, 20, 0.25);
+    &.is-active {
+      color: #060a06;
+      background: #39ff14;
+    }
+  }
+
+  .dv-term__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .dlog-term {
+    font-size: 13px;
+    line-height: 1.7;
+
+    &__intro {
+      color: rgba(57, 255, 20, 0.55);
+      margin-bottom: 6px;
+      .prompt {
+        color: #39ff14;
+        font-weight: 700;
+      }
+      .muted {
+        color: rgba(207, 233, 201, 0.4);
+      }
+    }
+
+    &__line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      padding: 3px 6px;
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(57, 255, 20, 0.07);
+      }
+
+      .t-time {
+        color: rgba(207, 233, 201, 0.45);
+      }
+      .t-amt {
+        font-weight: 800;
+        min-width: 46px;
+        &.plus {
+          color: #5dff9b;
+        }
+        &.minus {
+          color: #ff5d7a;
+        }
+      }
+      .t-type {
+        color: #ffd166;
+      }
+      .t-arrow {
+        color: rgba(57, 255, 20, 0.5);
+      }
+      .t-title {
+        color: #eafff0;
+      }
+      .t-tag {
+        color: rgba(160, 160, 255, 0.7);
+      }
+    }
+
+    &__end {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      .prompt {
+        color: #39ff14;
+        font-weight: 700;
+      }
+      .cursor {
+        display: inline-block;
+        width: 9px;
+        height: 16px;
+        background: #39ff14;
+        animation: dlogTermBlink 1s steps(1) infinite;
+      }
+    }
+  }
+
+  // 액트 인덱스 콘솔 피드 — 그린 터미널 팔레트
+  .alog__bar {
+    border-color: rgba(57, 255, 20, 0.3);
+    background: rgba(57, 255, 20, 0.05);
+  }
+  .alog__week {
+    color: #060a06;
+    background: #39ff14;
+    border-color: #39ff14;
+  }
+  .alog__tot {
+    border-color: rgba(57, 255, 20, 0.3);
+    background: rgba(57, 255, 20, 0.05);
+    color: rgba(207, 233, 201, 0.7);
+
+    &.a b,
+    &.b b,
+    &.c b {
+      color: #5dff9b;
+    }
+  }
+
+  .dlog-aterm {
+    font-size: 12.5px;
+    line-height: 1.7;
+
+    &__intro .prompt,
+    &__end .prompt {
+      color: #39ff14;
+    }
+    &__end .cursor {
+      background: #39ff14;
+    }
+    &__cols {
+      color: rgba(57, 255, 20, 0.75);
+      border-bottom-color: rgba(57, 255, 20, 0.3);
+      background: #060a06;
+    }
+
+    &__line {
+      &:hover {
+        background: rgba(57, 255, 20, 0.07);
+      }
+      &.is-fail {
+        border-left-color: #ff5d7a;
+        background: rgba(255, 93, 122, 0.07);
+      }
+
+      .a-time,
+      .a-chk {
+        color: rgba(207, 233, 201, 0.45);
+      }
+      .a-res.ok {
+        color: #5dff9b;
+        background: rgba(93, 255, 155, 0.12);
+      }
+      .a-res.fail {
+        color: #ff5d7a;
+        background: rgba(255, 93, 122, 0.14);
+      }
+      .a-name {
+        color: #eafff0;
+      }
+      .a-hub {
+        color: #eafff0;
+      }
+      .a-line {
+        color: rgba(57, 255, 20, 0.6);
+      }
+      .a-dur {
+        color: #ffd166;
+      }
+      .a-pts {
+        .p-a,
+        .p-b,
+        .p-c {
+          color: #5dff9b;
+        }
+        .is-neg {
+          color: #ff5d7a;
+        }
+      }
+      .a-crew {
+        color: rgba(160, 200, 160, 0.75);
+      }
+    }
+  }
+
+  &.is-entered .dlog-aterm__line {
+    animation: dlogRowIn 0.28s ease both;
+    animation-delay: calc(var(--i, 0) * 22ms);
+  }
+}
+
+@keyframes atermBarFlow {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      32px 0,
+      0 0;
+  }
+}
+
+@keyframes atermBarPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes dlogTermBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+// ============================================
+// 후보 I — FINALE : 시상식 방송 (weekly-ranking F 무드)
+// ============================================
+.section-modal-detail-log.dlog--finale {
+  --dlog-cyan: #00f0ff;
+  --dlog-violet: #bd00ff;
+  --dlog-gold: #ffd76a;
+
+  color: #f1f5f9;
+  background-color: #060409;
+  background-image:
+    radial-gradient(ellipse 95% 55% at 50% -8%, rgba(212, 175, 55, 0.24) 0%, transparent 60%),
+    radial-gradient(circle at 50% 116%, rgba(189, 0, 255, 0.14) 0%, transparent 55%),
+    linear-gradient(to bottom, rgba(8, 6, 3, 0.92), rgba(6, 5, 3, 0.97));
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), inset 0 0 70px rgba(0, 0, 0, 0.6);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #00f0ff, #bd00ff, #ffd76a, transparent);
+    opacity: 0.9;
+  }
+
+  .dv-finale__hero {
+    position: relative;
+    text-align: center;
+    padding: 16px 14px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    background: linear-gradient(120deg, rgba(0, 240, 255, 0.12), rgba(189, 0, 255, 0.12), rgba(255, 215, 106, 0.12));
+    overflow: hidden;
+  }
+  .dv-finale__tag {
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--dlog-gold);
+  }
+  .dv-finale__title {
+    margin: 4px 0;
+    font-family: "Cinzel Decorative", "Cinzel", serif;
+    font-size: 26px;
+    background: linear-gradient(135deg, #ffe5a3, #ffd76a 50%, #aa7c11);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dv-finale__total {
+    display: block;
+    font-family: "Cinzel", serif;
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--dlog-gold);
+    text-shadow: 0 0 24px rgba(255, 215, 106, 0.5);
+    small {
+      font-size: 13px;
+      margin-left: 3px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .dv-finale__podium {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 12px;
+  }
+  .dv-finale__pod {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 12px 6px;
+    border-radius: 12px;
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+
+    .medal {
+      font-size: 22px;
+    }
+    .pod-emoji {
+      font-size: 20px;
+    }
+    .pod-title {
+      font-size: 11px;
+      text-align: center;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .pod-amt {
+      font-weight: 900;
+      color: var(--dlog-gold);
+    }
+
+    &.place-1 {
+      transform: translateY(-6px) scale(1.05);
+      border-color: rgba(212, 175, 55, 0.6);
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.25);
+    }
+  }
+
+  .dlog-filter {
+    margin-bottom: 12px;
+  }
+  .dlog-filter__btn.is-active {
+    color: #2a1d05;
+    background: linear-gradient(135deg, #ffe5a3, #d4af37 55%, #aa7c11);
+  }
+  .dv-finale__feed {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  // 골드 표 (시상식 내역)
+  .dlog-ftab {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dlog-ftab__row {
+    display: grid;
+    grid-template-columns: 60px 64px minmax(0, 1fr) 64px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: linear-gradient(160deg, rgba(212, 175, 55, 0.08), rgba(0, 0, 0, 0.25));
+    border: 1px solid rgba(212, 175, 55, 0.24);
+
+    &--head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 9px 12px;
+      border-radius: 0;
+      background: #0b0805;
+      border: none;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: rgba(255, 215, 106, 0.7);
+      text-transform: uppercase;
+
+      .ta-r {
+        text-align: right;
+      }
+    }
+
+    // 등급 색
+    &.rarity-rare {
+      --rarity-color: #00f0ff;
+    }
+    &.rarity-epic {
+      --rarity-color: #bd00ff;
+    }
+    &.rarity-common {
+      --rarity-color: #c9b07a;
+    }
+    &.rarity-legendary {
+      --rarity-color: var(--dlog-gold);
+      border-color: rgba(212, 175, 55, 0.55);
+      box-shadow: inset 0 0 18px rgba(212, 175, 55, 0.14);
+    }
+
+    &:hover {
+      border-color: color-mix(in srgb, var(--rarity-color, #d4af37) 55%, transparent);
+    }
+  }
+
+  .ft-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--rarity-color, #fff) 75%, #fff);
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+  }
+  .ft-time {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    b {
+      font-size: 13px;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+    small {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+  .ft-name {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    b {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Cinzel", "Noto Sans KR", serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+    small {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .ft-cat {
+    font-style: normal;
+    font-family: "Pretendard", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 5px;
+    background: rgba(212, 175, 55, 0.18);
+    color: #ffe08a;
+  }
+  .ft-combo {
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--dlog-gold);
+  }
+  .ft-amt {
+    text-align: right;
+    font-size: 17px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    color: #5dff9b;
+    text-shadow: 0 0 12px rgba(93, 255, 155, 0.4);
+
+    &.is-loss {
+      color: #ff6b81;
+      text-shadow: 0 0 12px rgba(255, 107, 129, 0.4);
+    }
+  }
+}
+
+// ============================================
+// 후보 J — LEADERBOARD : 리그 리더보드 (E 우드 톤)
+// ============================================
+.section-modal-detail-log.dlog--leaderboard {
+  --dlog-cyan: #d4af37;
+  --dlog-gold: #d4af37;
+  --dlog-border: #5c4a35;
+
+  color: #dcd0bc;
+  font-family: "Georgia", "Noto Sans KR", serif;
+  background: #2a2520;
+  border: 8px solid #5c4a35;
+  border-image: linear-gradient(to bottom, #8b7355, #3e3325) 30;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(0, 0, 0, 0.5);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #8b7355, #d4af37, #8b7355, transparent);
+  }
+
+  .dv-lb__head {
+    text-align: center;
+    font-family: "Georgia", serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #d4af37;
+    text-shadow: 2px 2px 2px #000;
+    padding: 2px 0 12px;
+
+    &-sub {
+      display: block;
+      margin-top: 3px;
+      font-family: "Pretendard", sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.5px;
+      color: #a69a8a;
+      text-shadow: none;
+    }
+  }
+  .dv-lb__tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .dv-lb__tab {
+    flex: 1 1 auto;
+    padding: 7px 8px;
+    font-family: inherit;
+    font-size: 12px;
+    border-radius: 4px;
+    color: #a69a8a;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid #5c4a35;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      color: #f4e4bc;
+    }
+    &.is-active {
+      color: #2a2520;
+      background: #d4af37;
+      font-weight: 700;
+      border-color: #d4af37;
+    }
+  }
+  .dv-lb__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .dv-lb__table {
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px inset #4a3e30;
+  }
+  .dv-lb__row {
+    display: grid;
+    grid-template-columns: 38px 1fr 92px;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 6px;
+    border-bottom: 1px solid rgba(92, 74, 53, 0.5);
+
+    &--head {
+      font-size: 11px;
+      color: #a69a8a;
+      .ta-r {
+        text-align: right;
+      }
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  .lb-rank {
+    text-align: center;
+    font-family: "Arial", sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #d4af37;
+  }
+  .rank-1 .lb-rank {
+    color: #ffe08a;
+    text-shadow: 0 0 10px rgba(255, 215, 106, 0.5);
+  }
+  .lb-crew {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    b {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #f4e4bc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lb-type {
+      font-style: normal;
+      font-family: "Pretendard", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      color: #2a2520;
+      background: #d4af37;
+      flex-shrink: 0;
+    }
+    small {
+      font-size: 11px;
+      color: #a69a8a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lb-bar {
+      height: 4px;
+      margin-top: 3px;
+      border-radius: 2px;
+      background: rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      i {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, #8b7355, #d4af37);
+        transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+      }
+    }
+  }
+  .lb-rec {
+    text-align: right;
+    font-family: "Arial", sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #88cc88;
+
+    &.is-loss {
+      color: #cc8888;
+    }
+  }
+  // 상위 3위 강조
+  .rank-2 .lb-rank {
+    color: #e6e0d2;
+  }
+  .rank-3 .lb-rank {
+    color: #d8b27a;
+  }
+
+  .dv-lb__team {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #5c4a35;
+    background: linear-gradient(90deg, #3a322a, #2a2520);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  }
+  .dv-lb__team-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .t-name {
+      font-weight: 700;
+      color: #f4e4bc;
+    }
+    .t-win {
+      font-family: "Arial", sans-serif;
+      font-weight: 700;
+      color: #88cc88;
+    }
+  }
+  .dv-lb__team-leader {
+    margin: 6px 0 10px;
+    font-size: 12px;
+    color: #a69a8a;
+    line-height: 1.4;
+  }
+  .dv-lb__team-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    span {
+      font-size: 12px;
+      color: #a69a8a;
+      b {
+        margin-left: 4px;
+        color: #f4e4bc;
+      }
+    }
+  }
+
+  .dv-lb__comment {
+    padding: 12px;
+    border-left: 3px solid #d4af37;
+    background: rgba(0, 0, 0, 0.25);
+    &-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #d4af37;
+    }
+    p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #dcd0bc;
+    }
+  }
+}
+
+// ============================================
+// 후보 K — CASINO : 네온 베가스 잭팟 (weekly-ranking G 무드)
+// ============================================
+.section-modal-detail-log.dlog--casino {
+  --dlog-cyan: #2fe6ff;
+  --dlog-violet: #d63cff;
+  --dlog-gold: #ffce4f;
+  --dlog-border: rgba(150, 110, 230, 0.28);
+
+  color: #ece8ff;
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(139, 61, 255, 0.2), transparent 60%),
+    radial-gradient(800px 460px at 0% 30%, rgba(214, 60, 255, 0.14), transparent 60%),
+    linear-gradient(180deg, #0c0a18, #141026);
+  border: 1px solid rgba(150, 110, 230, 0.32);
+  box-shadow: 0 0 50px rgba(214, 60, 255, 0.22), inset 0 0 24px rgba(0, 0, 0, 0.4);
+
+  &::before {
+    background: linear-gradient(90deg, transparent, #d63cff, #2fe6ff, #ffce4f, transparent);
+  }
+
+  .dv-casino__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0 14px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(150, 110, 230, 0.22);
+  }
+  .dv-casino__sign {
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #ffce4f;
+    text-shadow: 0 0 14px rgba(255, 206, 79, 0.6);
+  }
+  .dv-casino__total {
+    font-size: 24px;
+    font-weight: 900;
+    color: #36e29a;
+    text-shadow: 0 0 14px rgba(54, 226, 154, 0.5);
+    small {
+      font-size: 12px;
+      margin-left: 3px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+  }
+  .dlog-filter__btn.is-active {
+    color: #0c0a18;
+    background: linear-gradient(135deg, #d63cff, #2fe6ff);
+  }
+  .dv-casino__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  // 네온 콘솔 로그 피드 (H 무드 + 카지노 네온 팔레트)
+  .dlog-aterm {
+    font-family: "SF Mono", "JetBrains Mono", "D2Coding", ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.65;
+
+    &__intro {
+      color: rgba(236, 232, 255, 0.45);
+      margin-bottom: 6px;
+
+      .prompt {
+        color: #2fe6ff;
+        font-weight: 800;
+      }
+      .muted {
+        color: rgba(236, 232, 255, 0.35);
+      }
+    }
+    &__cols {
+      color: rgba(236, 232, 255, 0.7);
+      border-bottom-color: rgba(150, 110, 230, 0.3);
+      background: #141026;
+    }
+
+    &__line {
+      &:hover {
+        background: rgba(150, 110, 230, 0.1);
+      }
+      &.is-fail {
+        border-left-color: #ff4d7d;
+        background: rgba(255, 77, 125, 0.06);
+      }
+
+      .a-time {
+        color: rgba(236, 232, 255, 0.45);
+      }
+      .a-res {
+        &.ok {
+          color: #36e29a;
+          background: rgba(54, 226, 154, 0.12);
+        }
+        &.fail {
+          color: #ff4d7d;
+          background: rgba(255, 77, 125, 0.14);
+        }
+      }
+      .a-name {
+        color: #fff;
+        font-weight: 700;
+      }
+      .a-hub {
+        color: #fff;
+      }
+      .a-line {
+        color: rgba(201, 191, 232, 0.7);
+      }
+      .a-dur {
+        color: #ffce4f;
+        font-variant-numeric: tabular-nums;
+      }
+      .a-pts {
+        display: inline-flex;
+        gap: 5px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+
+        .p-a {
+          color: #2fe6ff;
+        }
+        .p-b {
+          color: #d63cff;
+        }
+        .p-c {
+          color: #ffce4f;
+        }
+        .is-neg {
+          color: #ff4d7d;
+        }
+      }
+      .a-crew {
+        color: rgba(160, 160, 255, 0.75);
+      }
+      .a-chk {
+        color: rgba(236, 232, 255, 0.4);
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    &__end {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .prompt {
+        color: #2fe6ff;
+        font-weight: 800;
+      }
+      .cursor {
+        display: inline-block;
+        width: 9px;
+        height: 15px;
+        background: #2fe6ff;
+        animation: dlogTermBlink 1s steps(1) infinite;
+      }
+    }
+  }
+
+  &.is-entered .dlog-aterm__line {
+    animation: dlogRowIn 0.28s ease both;
+    animation-delay: calc(var(--i, 0) * 22ms);
+  }
+
+  // 카지노 보드 표 (위클리 리그 카지노 무드)
+  .dlog-cas {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dlog-cas__row {
+    display: grid;
+    grid-template-columns: 58px 62px minmax(0, 1fr) 50px 78px 54px;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    background: rgba(34, 24, 60, 0.7);
+    border: 1px solid rgba(150, 110, 230, 0.22);
+
+    &--head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 0;
+      background: #141026;
+      border: none;
+      border-bottom: 1px solid rgba(150, 110, 230, 0.3);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #9b93c0;
+      text-transform: uppercase;
+
+      .ta-r {
+        text-align: right;
+      }
+      .ta-c {
+        text-align: center;
+      }
+    }
+
+    &.is-loss {
+      border-color: rgba(255, 77, 125, 0.3);
+    }
+  }
+
+  .cas-league {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+    color: #ece8ff;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+  }
+  [data-type="단감"] .cas-league .dot {
+    background: #ffce4f;
+    box-shadow: 0 0 8px rgba(255, 206, 79, 0.6);
+  }
+  [data-type="어흥"] .cas-league .dot {
+    background: #ff4d7d;
+    box-shadow: 0 0 8px rgba(255, 77, 125, 0.6);
+  }
+  [data-type="인절미"] .cas-league .dot {
+    background: #2fe6ff;
+    box-shadow: 0 0 8px rgba(47, 230, 255, 0.6);
+  }
+
+  .cas-time {
+    color: #9b93c0;
+    font-variant-numeric: tabular-nums;
+  }
+  .cas-name {
+    color: #ece8ff;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cas-week {
+    color: #c9bfe8;
+  }
+  .cas-mult {
+    text-align: right;
+    font-weight: 800;
+    color: #ffce4f;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 8px rgba(255, 206, 79, 0.4);
+  }
+  .cas-res {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 0;
+    border-radius: 6px;
+
+    &.win {
+      color: #36e29a;
+      background: rgba(54, 226, 154, 0.12);
+    }
+    &.fail {
+      color: #ff4d7d;
+      background: rgba(255, 77, 125, 0.12);
+    }
+  }
+}
+
+@keyframes dlogRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dlogCardIn {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes dlogPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes dlogShine {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -150% 0;
   }
 }
 
