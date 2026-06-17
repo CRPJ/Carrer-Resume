@@ -83,18 +83,21 @@ type Team = {
   mvpComment: string; // 팀장 멘트(~100자)
   emblem: string;
 };
+// MVP 우수 크루 아바타 — 로봇(크루 목록)·팀장(adventurer)과 다른 스타일(micah) + 골드 그라데이션 배경
+const mvpFace = (seed: string) =>
+  `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(seed)}&radius=50&backgroundType=gradientLinear&backgroundColor=ffd76a,c7902a`;
 const TEAMS: Team[] = [
   {
     name: "알파팀",
     captain: "이순신", captainAcad: "한국대 컴퓨터공학 19학번",
     captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Yi-Sunsin&backgroundType=gradientLinear&backgroundColor=ffd76a,ff9d3f",
     growthAvg: 88,
-    parts: "백엔드 · 인프라 · 데이터",
+    parts: "백엔드 · 데이터",
     partLeads: 3, agents: 4, totalCrews: 14, restCrews: 2, successCrews: 9, failCrews: 3, normalCrews: 7,
     projectGoal: "결제 자동화 백엔드 아키텍처 MVP 출시 및 부하 테스트 통과",
     overview: "백엔드 자동화 전장에서 크루 전원이 완벽한 동기화에 성공, 핵심 마일스톤을 일정보다 앞당겨 클리어했습니다.",
     mvpName: "홍길동", mvpComment: "한 주 내내 새벽까지 인프라 장애를 붙잡고 끝내 무중단 배포 파이프라인을 완성했습니다. 알파의 자랑입니다.",
-    emblem: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("홍길동"),
   },
   {
     name: "베타팀",
@@ -106,7 +109,7 @@ const TEAMS: Team[] = [
     projectGoal: "사용자 온보딩 플로우 리뉴얼 및 디자인 시스템 v2 적용",
     overview: "중간 단계 API 연동 결전에서 에러 오버플로우가 발생해 일부 퀘스트가 지연됐지만, 후반 리커버리로 절반 이상을 회복했습니다.",
     mvpName: "성춘향", mvpComment: "막힌 디자인 토큰 구조를 하루 만에 갈아엎고 팀 전체 작업 속도를 끌어올렸습니다. 위기의 순간 베타를 구했어요.",
-    emblem: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("성춘향"),
   },
   {
     name: "감마팀",
@@ -118,31 +121,31 @@ const TEAMS: Team[] = [
     projectGoal: "추천 모델 v3 학습 파이프라인 구축 및 오프라인 지표 10% 개선",
     overview: "데이터 라벨링 병목을 자동화로 돌파하며 모델 실험 사이클을 두 배로 단축, 안정적인 성장세를 이어간 한 주였습니다.",
     mvpName: "안중근", mvpComment: "라벨링 자동화 스크립트로 팀 전체 시간을 수십 시간 아껴줬습니다. 감마의 숨은 엔진이었습니다.",
-    emblem: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("안중근"),
   },
   {
     name: "델타팀",
     captain: "신사임당", captainAcad: "연세대 디자인공학 20학번",
     captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Shin-Saimdang&backgroundType=gradientLinear&backgroundColor=ff3df5,bd00ff",
     growthAvg: 81,
-    parts: "프로덕트 · UX · 리서치",
+    parts: "프로덕트 · UX ",
     partLeads: 2, agents: 3, totalCrews: 10, restCrews: 1, successCrews: 7, failCrews: 2, normalCrews: 5,
     projectGoal: "프로덕트 분석 대시보드 구축 및 핵심 지표 자동 리포팅",
     overview: "사용자 인터뷰 12건을 한 주에 소화하며 가설 검증 속도를 끌어올렸고, 데이터 기반 의사결정 루틴을 정착시켰습니다.",
     mvpName: "정약용", mvpComment: "흩어진 지표를 한 화면에 모은 대시보드로 모두의 회의 시간을 절반으로 줄였습니다. 델타의 등대였어요.",
-    emblem: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("정약용"),
   },
   {
     name: "엡실론팀",
     captain: "장영실", captainAcad: "카이스트 기계공학 19학번",
     captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Jang-Yeongsil&backgroundType=gradientLinear&backgroundColor=ff6b00,ffd76a",
     growthAvg: 69,
-    parts: "임베디드 · 하드웨어",
+    parts: "하드웨어",
     partLeads: 2, agents: 2, totalCrews: 9, restCrews: 2, successCrews: 5, failCrews: 2, normalCrews: 5,
     projectGoal: "IoT 센서 펌웨어 안정화 및 OTA 업데이트 체계 구축",
     overview: "하드웨어 수급 지연 속에서도 시뮬레이터로 개발을 병행해 일정을 사수, 핵심 펌웨어를 안정화했습니다.",
     mvpName: "최무선", mvpComment: "부품이 없는 상황에서 시뮬레이션 환경을 직접 구축해 팀을 멈추지 않게 했습니다. 진짜 해결사입니다.",
-    emblem: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("최무선"),
   },
   {
     name: "제타팀",
@@ -154,19 +157,19 @@ const TEAMS: Team[] = [
     projectGoal: "임상 데이터 파이프라인 정제 및 이상치 탐지 모델 PoC",
     overview: "데이터 품질 이슈로 초반 고전했으나, 정제 규칙을 표준화하며 후반 모델 정확도를 끌어올렸습니다.",
     mvpName: "이제마", mvpComment: "지저분한 임상 데이터를 끈질기게 정제해 모델이 돌아가게 만들었습니다. 제타의 뚝심.",
-    emblem: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("이제마"),
   },
   {
     name: "에타팀",
     captain: "김홍도", captainAcad: "홍익대 시각디자인 20학번",
     captainPhoto: "https://api.dicebear.com/7.x/adventurer/svg?seed=Kim-Hongdo&backgroundType=gradientLinear&backgroundColor=ffe6a0,c7902a",
     growthAvg: 92,
-    parts: "브랜드 · 모션 · 콘텐츠",
+    parts: "브랜드 · 콘텐츠",
     partLeads: 3, agents: 4, totalCrews: 13, restCrews: 1, successCrews: 10, failCrews: 1, normalCrews: 6,
     projectGoal: "리그 브랜드 리뉴얼 및 시즌 모션 그래픽 패키지 제작",
     overview: "브랜드 가이드 전면 개편과 모션 패키지를 동시에 완주, 한 주 만에 시즌 비주얼을 통일했습니다.",
     mvpName: "신윤복", mvpComment: "밤새 모션 12종을 뽑아내며 시즌 무드를 단숨에 끌어올렸습니다. 에타의 예술혼.",
-    emblem: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("신윤복"),
   },
   {
     name: "세타팀",
@@ -178,7 +181,7 @@ const TEAMS: Team[] = [
     projectGoal: "학습 진도 추적 API 고도화 및 알림 시스템 도입",
     overview: "휴식 인원이 많은 주였지만 핵심 인력이 알림 시스템을 안정적으로 출시하며 평균을 지켜냈습니다.",
     mvpName: "최항", mvpComment: "적은 인원으로 알림 시스템을 완성도 높게 출시했습니다. 세타의 기둥.",
-    emblem: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80",
+    emblem: mvpFace("최항"),
   },
 ];
 
@@ -189,7 +192,7 @@ type Crew = {
   key: string;
   rank: number;        // 1·2·3 = 메달, 그 외 = 순위권 밖(일반)
   name: string;
-  grade: string;       // 예: "어흥 [TIGER MASTER]"
+  grade: string;       // 예: "정1품 | 이달의 최우수 크루"
   aura: CrewAura;
   univ: string;
   dept: string;
@@ -199,6 +202,7 @@ type Crew = {
   wcount: number;      // 누적 주차 (W-12)
   success: boolean;
   photo: string;
+  review: string;      // 위클리 리뷰 (운영진 코멘트)
   stats: CrewStat[];   // 5개 — 첫 번째(주차 성장률)가 핵심 하이라이트
 };
 
@@ -210,40 +214,49 @@ const mkStats = (g: number, info: number, skill: number, exp: number, career: nu
   { label: "실무 경력", icon: "💎", pct: career, delta: Math.round(career * 0.1) },
 ];
 
+// 3D 로봇 아바타(DiceBear bottts) — 시드로 크루마다 고유 생성
+const avatar = (seed: string) =>
+  `https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(seed)}&radius=50&backgroundColor=1a1410,231c12,2a2118`;
+
 const CREWS: Crew[] = [
   {
-    key: "self", rank: 1, name: "이순신", grade: "어흥 [TIGER MASTER]", aura: "eoheung",
+    key: "self", rank: 1, name: "이순신", grade: "정1품 | 이달의 최우수 크루", aura: "eoheung",
     univ: "해양 제국 대학교", dept: "항해전술 전공", role: "CRITICAL HITTER",
     team: "ALPHA", status: "주차 활동", wcount: 12, success: true,
-    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    photo: avatar("이순신"),
+    review: "전 영역에서 최고 성장폭을 기록. 팀 리딩과 실무 역량이 발군으로, 이번 주차 챔피언에 부족함이 없음.",
     stats: mkStats(94, 85, 99, 76, 60),
   },
   {
-    key: "hong", rank: 2, name: "홍길동", grade: "단감 [SWEET ELITE]", aura: "dangam",
+    key: "hong", rank: 2, name: "홍길동", grade: "정2품 | 주차 성장 1위", aura: "dangam",
     univ: "고대 정령 대학교", dept: "마법연산 전공", role: "SPEED RUNNER",
     team: "BETA", status: "주차 활동", wcount: 8, success: true,
-    photo: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=150&q=80",
+    photo: avatar("홍길동"),
+    review: "꾸준한 성장세 유지. 정보 습득 속도가 특히 빨라 주차 미션을 조기 완수함.",
     stats: mkStats(79, 62, 80, 55, 40),
   },
   {
-    key: "chun", rank: 3, name: "성춘향", grade: "인절미 [JADE GUARD]", aura: "injeol",
+    key: "chun", rank: 3, name: "성춘향", grade: "정3품 | 포럼 최다 진행자", aura: "injeol",
     univ: "달빛 예술 대학교", dept: "멀티미디어디자인 전공", role: "SUPPORTER",
     team: "GAMMA", status: "주차 활동", wcount: 6, success: true,
-    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    photo: avatar("성춘향"),
+    review: "포럼 운영과 협업 기여도가 높음. 팀 내 서포트 역할을 안정적으로 수행함.",
     stats: mkStats(73, 70, 68, 58, 45),
   },
   {
-    key: "sim", rank: 4, name: "심청이", grade: "단감 [MEMBER]", aura: "dangam",
+    key: "sim", rank: 4, name: "심청이", grade: "정5품 | 신규 크루 멘토", aura: "dangam",
     univ: "심해 해저 대학교", dept: "자원인양 전공", role: "MEMBER",
     team: "DELTA", status: "주차 활동", wcount: 4, success: true,
-    photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
+    photo: avatar("심청이"),
+    review: "신규 합류 후 적응 양호. 기초 미션을 성실히 수행 중이며 다음 주차 성장이 기대됨.",
     stats: mkStats(34, 20, 41, 12, 10),
   },
   {
-    key: "bae", rank: 5, name: "배수아", grade: "어흥 [RESTING]", aura: "eoheung",
+    key: "bae", rank: 5, name: "배수아", grade: "종5품 | 이번 주 휴식 중", aura: "eoheung",
     univ: "북풍 설원 대학교", dept: "빙결마법 전공", role: "MEMBER",
     team: "BETA", status: "주차 휴식", wcount: 9, success: false,
-    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+    photo: avatar("배수아"),
+    review: "이번 주차 휴식 신청. 누적 활동 이력은 양호하며 다음 주차 복귀 예정.",
     stats: mkStats(0, 0, 0, 0, 0),
   },
   // 페이지네이션 시연용 대량 더미 (curated 5명 + 생성 45명 = 50명)
@@ -253,17 +266,27 @@ const CREWS: Crew[] = [
     const UNIVS = ["가온 대학교", "청운 대학교", "서리 대학교", "북천 대학교", "해솔 대학교", "미르 대학교", "노을 대학교"];
     const DEPTS = ["전산학", "소프트웨어공학", "데이터과학", "디자인공학", "산업공학", "바이오공학", "정보보안", "미디어학"];
     const ROLES = ["ATTACKER", "SUPPORTER", "BUILDER", "SCOUT", "HEALER", "STRATEGIST", "MEMBER"];
-    const TITLES = ["WARRIOR", "KNIGHT", "RANGER", "MAGE", "GUARDIAN", "ROGUE", "ELITE", "MEMBER"];
+    // 품계: 순위가 낮을수록(상위권) 높은 품계
+    const PUMGYE = ["정1품", "종1품", "정2품", "종2품", "정3품", "종3품", "정4품", "종4품", "정5품", "종5품", "정6품", "종6품", "정7품", "종7품", "정8품", "종8품", "정9품", "종9품"];
+    // 수식어(공로/활동 타이틀)
+    const TITLES = ["주차 미션 완수", "스터디 개근왕", "과제 제출 1위", "발표 최다 참여", "프로젝트 리더", "출석 우수 크루", "신규 크루 멘토", "성실 활동 크루", "포럼 답변왕", "신입 기대주"];
+    const REST_TITLES = ["이번 주 휴식 중", "재정비 주차", "휴식 신청 크루"];
+    // 위클리 리뷰 풀 (운영진 코멘트)
+    const REVIEWS = [
+      "주차 미션을 무리 없이 완수. 실무 역량 성장이 꾸준함.",
+      "정보 습득과 과제 제출 속도가 빠름. 다음 주차도 기대됨.",
+      "협업 기여도가 높고 포럼 참여가 활발함.",
+      "기본기에 충실한 한 주. 출석과 성실도가 돋보임.",
+      "성장폭은 다소 완만하나 안정적으로 활동을 이어감.",
+      "프로젝트 주도성이 좋음. 팀 내 영향력이 점차 커지는 중.",
+      "신규 합류 후 적응 양호. 기초 미션을 착실히 수행함.",
+    ];
+    const REST_REVIEWS = [
+      "이번 주차 휴식. 다음 주차 복귀 예정.",
+      "재정비 주차로 활동 집계 제외. 누적 이력은 양호.",
+    ];
     const TEAMS_K = ["ALPHA", "BETA", "GAMMA", "DELTA", "EPSILON", "ZETA", "ETA", "THETA", "IOTA", "KAPPA"];
     const LGS: { aura: CrewAura; ko: string }[] = [{ aura: "dangam", ko: "단감" }, { aura: "injeol", ko: "인절미" }, { aura: "eoheung", ko: "어흥" }];
-    const PHOTOS = [
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
-      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=150&q=80",
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&q=80",
-      "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=150&q=80",
-    ];
     return Array.from({ length: 45 }, (_, k) => {
       const i = k + 6;
       const lg = LGS[k % LGS.length];
@@ -275,12 +298,14 @@ const CREWS: Crew[] = [
       const career = rest ? 0 : Math.round(10 + seeded(i + 4) * 60);
       return {
         key: `g${i}`, rank: i, name: NAMES[k % NAMES.length],
-        grade: `${lg.ko} [${TITLES[k % TITLES.length]}]`, aura: lg.aura,
+        grade: `${PUMGYE[Math.min(PUMGYE.length - 1, Math.floor((i - 1) / 3))]} | ${rest ? REST_TITLES[k % REST_TITLES.length] : TITLES[k % TITLES.length]}`, aura: lg.aura,
         univ: UNIVS[k % UNIVS.length], dept: `${DEPTS[k % DEPTS.length]} 전공`,
         role: ROLES[k % ROLES.length], team: TEAMS_K[k % TEAMS_K.length],
         status: (rest ? "주차 휴식" : "주차 활동") as Crew["status"],
         wcount: 1 + (i % 13), success: !rest && seeded(i + 5) > 0.28,
-        photo: PHOTOS[k % PHOTOS.length], stats: mkStats(g, info, skill, exp, career),
+        photo: avatar(`${NAMES[k % NAMES.length]}-${i}`),
+        review: rest ? REST_REVIEWS[k % REST_REVIEWS.length] : REVIEWS[k % REVIEWS.length],
+        stats: mkStats(g, info, skill, exp, career),
       };
     });
   })(),
@@ -293,25 +318,18 @@ const ALLIANCE_FILTERS = ["전체", "ALPHA", "BETA", "GAMMA", "DELTA"] as const;
 /* ═══════════ 우수 크루 TOP 10 쇼케이스 (엘리트 카드) ═══════════ */
 type EliteLeague = "dangam" | "injeol" | "eoheung";
 type Elite = { rank: number; name: string; grade: string; league: EliteLeague; emblem: string; rate: number; photo: string };
-const ELITE_PHOTOS = [
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
-  "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=160&q=80",
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=160&q=80",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80",
-];
 const ELITE_EMBLEM: Record<EliteLeague, string> = { dangam: "🍊", injeol: "🍡", eoheung: "🐯" };
 const ELITES: Elite[] = [
-  { rank: 1, name: "이순신", grade: "정1품 영의정", league: "eoheung", rate: 98, photo: ELITE_PHOTOS[0], emblem: ELITE_EMBLEM.eoheung },
-  { rank: 2, name: "발라카스 지원", grade: "정1품 인절미대장", league: "injeol", rate: 95, photo: ELITE_PHOTOS[1], emblem: ELITE_EMBLEM.injeol },
-  { rank: 3, name: "김철수", grade: "정1품 단감킹", league: "dangam", rate: 92, photo: ELITE_PHOTOS[2], emblem: ELITE_EMBLEM.dangam },
-  { rank: 4, name: "이영희", grade: "정2품 우의정", league: "dangam", rate: 88, photo: ELITE_PHOTOS[3], emblem: ELITE_EMBLEM.dangam },
-  { rank: 5, name: "최지원", grade: "종1품 인절미가드", league: "injeol", rate: 84, photo: ELITE_PHOTOS[4], emblem: ELITE_EMBLEM.injeol },
-  { rank: 6, name: "박민수", grade: "정3품 단감소드", league: "dangam", rate: 80, photo: ELITE_PHOTOS[2], emblem: ELITE_EMBLEM.dangam },
-  { rank: 7, name: "윤도현", grade: "정3품 인절미전사", league: "injeol", rate: 76, photo: ELITE_PHOTOS[1], emblem: ELITE_EMBLEM.injeol },
-  { rank: 8, name: "정해린", grade: "정4품 단감레인저", league: "dangam", rate: 72, photo: ELITE_PHOTOS[3], emblem: ELITE_EMBLEM.dangam },
-  { rank: 9, name: "강하늘", grade: "종3품 인절미클레릭", league: "injeol", rate: 67, photo: ELITE_PHOTOS[0], emblem: ELITE_EMBLEM.injeol },
-  { rank: 10, name: "배수아", grade: "종5품 어흥워든", league: "eoheung", rate: 61, photo: ELITE_PHOTOS[4], emblem: ELITE_EMBLEM.eoheung },
+  { rank: 1, name: "이순신", grade: "정1품 영의정", league: "eoheung", rate: 98, photo: avatar("이순신"), emblem: ELITE_EMBLEM.eoheung },
+  { rank: 2, name: "발라카스 지원", grade: "정1품 인절미대장", league: "injeol", rate: 95, photo: avatar("발라카스 지원"), emblem: ELITE_EMBLEM.injeol },
+  { rank: 3, name: "김철수", grade: "정1품 단감킹", league: "dangam", rate: 92, photo: avatar("김철수"), emblem: ELITE_EMBLEM.dangam },
+  { rank: 4, name: "이영희", grade: "정2품 우의정", league: "dangam", rate: 88, photo: avatar("이영희"), emblem: ELITE_EMBLEM.dangam },
+  { rank: 5, name: "최지원", grade: "종1품 인절미가드", league: "injeol", rate: 84, photo: avatar("최지원"), emblem: ELITE_EMBLEM.injeol },
+  { rank: 6, name: "박민수", grade: "정3품 단감소드", league: "dangam", rate: 80, photo: avatar("박민수"), emblem: ELITE_EMBLEM.dangam },
+  { rank: 7, name: "윤도현", grade: "정3품 인절미전사", league: "injeol", rate: 76, photo: avatar("윤도현"), emblem: ELITE_EMBLEM.injeol },
+  { rank: 8, name: "정해린", grade: "정4품 단감레인저", league: "dangam", rate: 72, photo: avatar("정해린"), emblem: ELITE_EMBLEM.dangam },
+  { rank: 9, name: "강하늘", grade: "종3품 인절미클레릭", league: "injeol", rate: 67, photo: avatar("강하늘"), emblem: ELITE_EMBLEM.injeol },
+  { rank: 10, name: "배수아", grade: "종5품 어흥워든", league: "eoheung", rate: 61, photo: avatar("배수아"), emblem: ELITE_EMBLEM.eoheung },
 ];
 
 // 우수 크루 쇼케이스 — 필터 카테고리 (ELITE 카드로 렌더)
@@ -327,20 +345,20 @@ const ELITE_CATS: EliteCat[] = [
   },
   {
     key: "dan", label: "단감 우수", icon: "🍊",
-    items: DANGAM_TOP.map((r, i) => ({ key: `dan${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "dangam", emblem: "🍊", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+    items: DANGAM_TOP.map((r) => ({ key: `dan${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "dangam", emblem: "🍊", val: r.val, tier: toTier(r.pct), photo: avatar(r.name) })),
   },
   {
     key: "injeol", label: "인절미 우수", icon: "🍡",
-    items: INJEOL_TOP.map((r, i) => ({ key: `inj${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "injeol", emblem: "🍡", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+    items: INJEOL_TOP.map((r) => ({ key: `inj${r.rank}`, rank: r.rank, name: r.name, grade: r.meta, league: "injeol", emblem: "🍡", val: r.val, tier: toTier(r.pct), photo: avatar(r.name) })),
   },
   {
     key: "growth", label: "성장률 TOP", icon: "📈",
-    items: GROWTH_TOP.map((r, i) => ({ key: `grw${r.rank}`, rank: r.rank, name: r.name, grade: `${r.meta} 리그`, league: "growth", emblem: "📈", val: r.val, tier: toTier(r.pct), photo: ELITE_PHOTOS[i % ELITE_PHOTOS.length] })),
+    items: GROWTH_TOP.map((r) => ({ key: `grw${r.rank}`, rank: r.rank, name: r.name, grade: `${r.meta} 리그`, league: "growth", emblem: "📈", val: r.val, tier: toTier(r.pct), photo: avatar(r.name) })),
   },
   {
     key: "jeong", label: "품계 정승", icon: "⚖️",
     items: JEONGSEUNG.flatMap((j, gi) =>
-      j.names.split(" · ").map((nm, ni) => ({ key: `jng${gi}_${ni}`, rank: gi + 1, name: nm, grade: j.grade, league: "jeong" as const, emblem: "👑", val: "정승", tier: 5, photo: ELITE_PHOTOS[(gi + ni) % ELITE_PHOTOS.length] })),
+      j.names.split(" · ").map((nm, ni) => ({ key: `jng${gi}_${ni}`, rank: gi + 1, name: nm, grade: j.grade, league: "jeong" as const, emblem: "👑", val: "정승", tier: 5, photo: avatar(nm) })),
     ),
   },
 ];
@@ -458,7 +476,15 @@ export default function ChampionTheme({ card, detail }: Props) {
   const [allianceIdx, setAllianceIdx] = useState(0);
   const [crewPage, setCrewPage] = useState(0);
   const [modalCrew, setModalCrew] = useState<Crew | null>(null);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  // 확인(검증) 더미 — 일부 크루는 미리 확인 완료 상태로 표시 ('self'는 어드민 날인 흐름으로 처리)
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    const CHECK_PATTERN = [false, true, true, false, true, true, false, true, false, true, true, false];
+    const init: Record<string, boolean> = {};
+    CREWS.forEach((c, idx) => {
+      if (c.key !== "self" && CHECK_PATTERN[idx % CHECK_PATTERN.length]) init[c.key] = true;
+    });
+    return init;
+  });
   const [adminDone, setAdminDone] = useState(false);
   const [adminConfirming, setAdminConfirming] = useState(false);
 
@@ -509,7 +535,7 @@ export default function ChampionTheme({ card, detail }: Props) {
         <header className="champ-hero" data-rise>
           <video
             className="champ-hero__video"
-            src="/videos/quest-banner.mp4"
+            src="/videos/championship-hero.mp4"
             autoPlay
             loop
             muted
@@ -646,8 +672,7 @@ export default function ChampionTheme({ card, detail }: Props) {
 
               {/* [1.11] 퀘스트 달성률 — 전체 성장 성공율(승률) */}
               <div className="champ-quest__clear">
-                <span className="champ-qtag champ-qtag--abs">1.11</span>
-                <div className="champ-quest__clear-cap">QUEST CLEAR RATE · 평균 성장 성공율</div>
+                <div className="champ-quest__clear-cap">🎯 QUEST CLEAR RATE · 평균 성장 성공율</div>
                 <div className="champ-quest__clear-row">
                   <div className="champ-quest__clear-bar" data-grow="x">
                     <span
@@ -662,8 +687,7 @@ export default function ChampionTheme({ card, detail }: Props) {
               {/* [1.10] 월드 루머 게시판 — 주차 사회 소식 3개 */}
               <div className="champ-rumor">
                 <div className="champ-rumor__head">
-                  <span className="champ-qtag">1.10</span>
-                  <span className="champ-rumor__head-name">📜 WORLD RUMORS · 주차 사회 소식</span>
+                  <span className="champ-rumor__head-name">📜 WORLD ISSUE · 주차 사회 소식</span>
                 </div>
                 <ul className="champ-rumor__list">
                   {detail.socialNews.map((n, i) => (
@@ -867,6 +891,7 @@ export default function ChampionTheme({ card, detail }: Props) {
             <div className="champ-arena__heading">
               <h2 className="champ-arena__title">HALL OF CHAMPIONS</h2>
               <span className="champ-arena__sub">SECTION 2 · 크루 &amp; 팀</span>
+              <span className="champ-arena__period">⏳ {card.weekNumber}주차 · {card.dateRangeText}</span>
             </div>
             <span className="champ-arena__rune">⚜</span>
           </div>
@@ -892,7 +917,7 @@ export default function ChampionTheme({ card, detail }: Props) {
               ))}
             </div>
             <div className="champ-ctrl__group">
-              <span className="champ-ctrl__lbl">ALLIANCE</span>
+              <span className="champ-ctrl__lbl">TEAM</span>
               {ALLIANCE_FILTERS.map((f, i) => (
                 <button key={f} className={`champ-gbtn ${allianceIdx === i ? "is-active" : ""}`} onClick={() => { setAllianceIdx(i); setCrewPage(0); }}>{f}</button>
               ))}
@@ -936,9 +961,14 @@ export default function ChampionTheme({ card, detail }: Props) {
 
                   {/* 소속 메타 */}
                   <div className="champ-cc__meta">
-                    <div className="champ-cc__univ">{c.univ}</div>
-                    <div className="champ-cc__dept">{c.dept}</div>
-                    <span className="champ-cc__role">{c.role}</span>
+                    <div className="champ-cc__school">
+                      <span className="champ-cc__univ">{c.univ}</span>
+                      <span className="champ-cc__dept">{c.dept}</span>
+                    </div>
+                    <div className="champ-cc__tags">
+                      <span className="champ-cc__team">{c.team} 팀</span>
+                      <span className="champ-cc__role">{c.role}</span>
+                    </div>
                   </div>
 
                   {/* 타임라인 */}
@@ -947,7 +977,21 @@ export default function ChampionTheme({ card, detail }: Props) {
                     <div className={`champ-cc__pill ${c.success ? "" : "is-rest"}`}>{c.success ? "GROWTH" : "REST"}</div>
                   </div>
 
-                  {/* 스탯 매트릭스 */}
+                  {/* 위클리 리뷰 — 신원 줄 우측 빈 공간 채움 */}
+                  <div className="champ-cc__review">
+                    <span className="champ-cc__review-k">위클리 리뷰</span>
+                    <p className="champ-cc__review-t" title={c.review}>{c.review}</p>
+                  </div>
+
+                  {/* 검증 도장 / 클릭 안내 */}
+                  <div className="champ-cc__seal">
+                    {isChecked
+                      ? <span className="champ-cc__adminbadge">확인 완료</span>
+                      : <span className="champ-cc__hint">클릭하여 확인 ▸</span>}
+                    <div className={`champ-cc__check ${isChecked ? "is-on" : ""}`}>{isChecked ? "確" : ""}</div>
+                  </div>
+
+                  {/* 스탯 매트릭스 (다음 줄 전체폭) */}
                   <div className="champ-cc__stats">
                     {c.stats.map((s, si) => (
                       <div key={si} className={`champ-cc__stat ${si === 0 ? "is-epic" : ""}`}>
@@ -955,12 +999,6 @@ export default function ChampionTheme({ card, detail }: Props) {
                         <span className="champ-cc__s-value">{isOngoing ? "N" : `${s.pct}% (+${s.delta})`}</span>
                       </div>
                     ))}
-                  </div>
-
-                  {/* 검증 인장 */}
-                  <div className="champ-cc__seal">
-                    {isChecked && <span className="champ-cc__adminbadge">행정 확인</span>}
-                    <div className="champ-cc__check">✔</div>
                   </div>
                 </div>
               );
@@ -1008,7 +1046,7 @@ export default function ChampionTheme({ card, detail }: Props) {
             <span className="champ-decree__rune">⚜</span>
             <div className="champ-decree__heading">
               <h2 className="champ-decree__title">ROYAL DECREE</h2>
-              <span className="champ-decree__sub">SECTION 4 · 어명 · 행정 처리</span>
+              <span className="champ-decree__sub">SECTION 4 ·  행정 처리</span>
             </div>
             <span className="champ-decree__rune">⚜</span>
           </div>
@@ -1020,14 +1058,15 @@ export default function ChampionTheme({ card, detail }: Props) {
               <div className="champ-edict__head">
                 <span className="champ-edict__crest" aria-hidden="true">㊞</span>
                 <div className="champ-edict__headtxt">
-                  <span className="champ-edict__kicker">EDICT · 4.1 행정 칙령</span>
+                  <span className="champ-edict__kicker">행정 처리란? 그게 몬가요?</span>
                   <span className="champ-edict__lead">이번 주차의 기록을 갈무리하여 봉(封)합니다.</span>
                 </div>
               </div>
               <p className="champ-edict__body">
                 로그인 후 <strong>본인 위클리 카드</strong>에서 행정 처리를 <strong>확인·날인</strong>해 주세요.
                 확인은 <strong>당일 20:00</strong>까지, 모든 행정 봉인은 <strong>금요일 14:00</strong>까지 마쳐 주시면 됩니다.
-                집계에 오차·이의가 있으면 <strong>상소함</strong>에 조정 문의를 남겨 주세요 — <strong>당일 22:00</strong>까지 접수됩니다.
+                <br/>
+                집계에 오차·이의가 있으면 <strong>상소함</strong>에 조정 문의를 남겨 주세요😉 — <strong>당일 22:00</strong>까지 접수됩니다.
               </p>
               <div className="champ-edict__deadlines">
                 <span className="champ-dl"><span className="champ-dl__wax" aria-hidden="true">封</span><b>20:00</b>당일 제출·확인</span>
@@ -1139,7 +1178,7 @@ export default function ChampionTheme({ card, detail }: Props) {
           {/* [4.4] 증표 감정소 — 증빙 예시 & 양식 */}
           <div className="champ-sub2">
             <span className="champ-sub2__rune">🔍</span>
-            <h3 className="champ-sub2__title">證票 鑑定所 · 증표 감정소 · 증빙 예시 &amp; 양식</h3>
+            <h3 className="champ-sub2__title"> 상소(문의) 예시 &amp; 양식</h3>
             <span className="champ-sub2__tag">4.4</span>
           </div>
           <div className="champ-evid2">
@@ -1150,7 +1189,7 @@ export default function ChampionTheme({ card, detail }: Props) {
               </div>
               <ul className="champ-ex2__list">
                 <li><b>캡처</b> 작업 화면 전체가 또렷하게 보임</li>
-                <li><b>행동</b> 커밋·PR·산출물 등 구체 행동이 드러남</li>
+                <li><b>행동</b> 크루의 행동이 구체 행동이 드러남</li>
                 <li><b>날짜</b> 캡처에 날짜·시각이 함께 표시됨</li>
               </ul>
             </div>
@@ -1192,11 +1231,11 @@ export default function ChampionTheme({ card, detail }: Props) {
             <h3 className="champ-modal__name">{modalCrew.name}</h3>
             <p className="champ-modal__rank">{modalCrew.grade} // {modalCrew.team} 팀 · {card.weekNumber}주차</p>
             <p className="champ-modal__quote">
-              검증 마법 서명 시 대시보드 크루 보드판에 영구적인 주차 완료 에메랄드 각인 인장이 부여됩니다.
+             크루 본인은, 본 주차 내역 확인 후 이상이 없으신 경우 00시까지 체킹해주시기 바랍니다.
             </p>
             <div className="champ-modal__btns">
               <button className="champ-btn" onClick={() => setModalCrew(null)}>닫기</button>
-              <button className="champ-btn champ-btn--ok" onClick={authorizeCard}>검증 승인 (OK)</button>
+              <button className="champ-btn champ-btn--ok" onClick={authorizeCard}>주차 확인 완료!</button>
             </div>
           </div>
         )}

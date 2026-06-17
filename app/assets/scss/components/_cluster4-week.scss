@@ -15677,6 +15677,48 @@
   }
 }
 
+// 체크 큐브 — 아이소 각도로 좌우 살짝 스윙(빛 받기) + 그림자/체크 펄스
+@keyframes alogCubeSpin {
+  0%,
+  100% {
+    transform: rotateX(-22deg) rotateY(28deg);
+  }
+  50% {
+    transform: rotateX(-22deg) rotateY(44deg);
+  }
+}
+@keyframes alogCubeShadow {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(0.82);
+    opacity: 0.72;
+  }
+}
+@keyframes alogCubeCheck {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(127, 240, 255, 0.7));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(127, 240, 255, 1));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-modal-detail-log.dlog .alog-sum__logo .cube {
+    // 정지 시에도 입체 각도는 유지
+    animation: none;
+    transform: rotateX(-22deg) rotateY(36deg);
+  }
+  .section-modal-detail-log.dlog .alog-sum__logo::after,
+  .section-modal-detail-log.dlog .alog-sum__logo .cube__face--right i {
+    animation: none;
+  }
+}
+
 // 주간 결과 요약 패널 (D DASH 무드 — H 상단). 강조색은 var(--dlog-cyan) 사용.
 .section-modal-detail-log.dlog {
   .alog-sum {
@@ -15693,7 +15735,85 @@
       justify-content: space-between;
       gap: 10px;
     }
+    // 로고 + 타이틀 락업 (좌측 비는 자리 채움)
+    &__brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+    // 진짜 입체 체크 큐브 (이미지 없이 CSS만) — 상/좌/우 3면 음영 + 앞면 ✓
+    &__logo {
+      --cs: 30px; // 큐브 한 변
+      --h: calc(var(--cs) / 2);
+      position: relative;
+      flex-shrink: 0;
+      width: 56px;
+      height: 54px;
+      perspective: 420px;
+
+      // 바닥 그림자
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 2px;
+        width: 38px;
+        height: 12px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 70%);
+        filter: blur(1.5px);
+        animation: alogCubeShadow 5s ease-in-out infinite;
+      }
+
+      .cube {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: var(--cs);
+        height: var(--cs);
+        margin: calc(var(--cs) / -2);
+        transform-style: preserve-3d;
+        // 좌우로 살짝 흔들며 빛을 받게 — 입체감 강조
+        animation: alogCubeSpin 5s ease-in-out infinite;
+      }
+      .cube__face {
+        position: absolute;
+        inset: 0;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+        backface-visibility: hidden;
+      }
+      // 상면 — 가장 밝게
+      .cube__face--top {
+        transform: rotateX(90deg) translateZ(var(--h));
+        background: linear-gradient(135deg, #7ff0ff, var(--dlog-cyan) 55%, var(--dlog-violet));
+      }
+      // 좌면 — 가장 어둡게
+      .cube__face--left {
+        transform: rotateY(-90deg) translateZ(var(--h));
+        background: linear-gradient(160deg, #1f4f88, #34206e 90%);
+      }
+      // 우면(정면 역할) — 중간 + 체크
+      .cube__face--right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateZ(var(--h));
+        background: linear-gradient(150deg, var(--dlog-cyan), var(--dlog-violet) 85%);
+
+        i {
+          font-size: 19px;
+          font-weight: 900;
+          color: #fff;
+          filter: drop-shadow(0 0 6px rgba(127, 240, 255, 0.9));
+          animation: alogCubeCheck 5s ease-in-out infinite;
+        }
+      }
+    }
     &__id {
+      min-width: 0;
       h4,
       h2 {
         margin: 0;
@@ -16925,7 +17045,7 @@
       }
       &.is-fail {
         border-left-color: #ff5d7a;
-        background: rgba(255, 93, 122, 0.07);
+        background: rgba(255, 93, 122, 0.18);
       }
 
       // 발생/체크 시점 — 본문 Space Mono 와 다르게, 더 얇은 IBM Plex Mono 300 으로.

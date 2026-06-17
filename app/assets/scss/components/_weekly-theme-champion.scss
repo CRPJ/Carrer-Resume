@@ -1055,6 +1055,13 @@
     font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.72rem;
     color: #c9b27a; letter-spacing: 2px;
   }
+  .champ-arena__period {
+    display: inline-block; margin-top: 10px;
+    font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 0.86rem;
+    color: #f5eedc; letter-spacing: 0.5px;
+    padding: 4px 14px; border: 1px solid rgba(179, 147, 89, 0.4); border-radius: 2px;
+    background: rgba(0, 0, 0, 0.35);
+  }
 
   // 서브 섹션 헤더
   .champ-sub2 {
@@ -1528,7 +1535,7 @@
     &--rank2 { border: 2px solid $rank2; background: linear-gradient(90deg, rgba(28,32,36,0.95) 0%, rgba(12,10,15,0.8) 100%); box-shadow: 0 0 20px rgba(225,228,230,0.15), inset 0 0 25px rgba(225,228,230,0.07); }
     &--rank3 { border: 2px solid $rank3; background: linear-gradient(90deg, rgba(38,25,15,0.95) 0%, rgba(12,10,15,0.8) 100%); box-shadow: 0 0 15px rgba(205,127,50,0.15), inset 0 0 20px rgba(205,127,50,0.07); }
 
-    &.is-verified { border-color: #00ff66; .champ-cc__check { display: block; } }
+    &.is-verified { border-color: rgba(0, 200, 90, 0.5); }
 
     // 랭킹 배지
     &__rank { min-width: 52px; text-align: center; font-family: 'Cinzel', serif; font-weight: 900; }
@@ -1548,7 +1555,7 @@
     &--rank1 &__avatar { border-color: $rank1; box-shadow: 0 0 12px $rank1; }
 
     // 프로필
-    &__profile { min-width: 150px; flex-grow: 1; }
+    &__profile { min-width: 150px; flex-shrink: 0; }
     // 크루명 — 골드 Cinzel과 어울리는 한글 명조(우아한 세리프)
     &__name { font-family: 'Nanum Myeongjo', serif; font-size: 1.34rem; font-weight: 800; color: #fff; }
     &__grade { font-family: 'Cinzel', serif; font-size: 0.68rem; font-weight: bold; margin-top: 4px; letter-spacing: 1px; color: #b39359; }
@@ -1558,12 +1565,20 @@
 
     // 메타 — 대학/전공도 한글 명조로 (Cinzel 골드와 톤 통일)
     &__meta { min-width: 140px; font-size: 0.8rem; line-height: 1.55; }
+    &__school { display: flex; align-items: baseline; flex-wrap: nowrap; white-space: nowrap; }
     &__univ { font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 0.9rem; color: #f5eedc; }
-    &__dept { font-family: 'Nanum Myeongjo', serif; font-weight: 400; font-size: 0.8rem; color: #a99f8a; }
+    &__dept {
+      font-family: 'Nanum Myeongjo', serif; font-weight: 400; font-size: 0.8rem; color: #a99f8a;
+      &::before { content: "·"; margin: 0 6px; color: #5a5343; }
+    }
+    &__tags {
+      display: flex; flex-wrap: wrap; align-items: center; margin-top: 7px;
+      font-family: 'Cinzel', serif; font-size: 0.66rem; font-weight: 700;
+    }
+    &__team { color: #5fe0c0; letter-spacing: 0.5px; }
     &__role {
-      display: inline-block; margin-top: 4px;
-      background: rgba(255, 215, 0, 0.07); border: 1px solid var(--gold-dark, #3a2e1a);
-      padding: 1px 6px; font-size: 0.6rem; color: #b39359; font-family: 'Cinzel', serif;
+      color: #c2a463; letter-spacing: 0.5px;
+      &::before { content: "·"; margin: 0 7px; color: #5a5343; font-weight: 400; }
     }
 
     // 타임라인
@@ -1575,32 +1590,93 @@
       &.is-rest { border-color: #6b7280; background: rgba(107, 114, 128, 0.12); color: #9aa3b2; }
     }
 
-    // 스탯 매트릭스
-    &__stats { display: flex; flex-wrap: wrap; gap: 8px; min-width: 440px; flex-grow: 2;
-      @media (max-width: 720px) { min-width: 100%; } }
+    // 스탯 매트릭스 — 컴팩트 박스, 항상 전체폭 자기 줄에 고정(카드 간 정렬 일관)
+    &__stats { display: flex; flex-wrap: nowrap; gap: 6px; flex-basis: 100%; width: 100%;
+      @media (max-width: 720px) { flex-wrap: wrap; } }
     &__stat {
-      background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(179, 147, 89, 0.12);
-      padding: 8px 12px; min-width: 78px; flex-grow: 1; text-align: center; border-radius: 2px;
-      &.is-epic { border-color: #b39359; background: linear-gradient(180deg, rgba(255,215,0,0.08) 0%, transparent 100%); }
+      background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(179, 147, 89, 0.12);
+      padding: 6px 8px; flex: 1 1 0; min-width: 66px; text-align: center; border-radius: 3px;
+      &.is-epic { border-color: #b39359; background: linear-gradient(180deg, rgba(255, 215, 0, 0.08) 0%, transparent 100%); }
     }
-    &__s-label { font-size: 0.6rem; color: #7e7769; display: block; margin-bottom: 2px; }
+    &__s-label { font-size: 0.62rem; color: #9a917d; display: block; margin-bottom: 2px; letter-spacing: -0.02em; }
     &__s-icon { margin-right: 2px; color: #b39359; }
-    &__s-value { font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: bold; color: #fff; }
-    &__stat.is-epic &__s-value { color: $rank1; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); font-size: 0.82rem; }
+    &__s-value { font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: bold; color: #f3ead0; }
+    &__stat.is-epic &__s-value { color: $rank1; text-shadow: 0 0 8px rgba(255, 215, 0, 0.55); font-size: 0.92rem; }
     &--rank1 &__stat.is-epic { border-color: $rank1; background: rgba(255, 215, 0, 0.15); }
 
-    // 검증 인장
-    &__seal { min-width: 38px; text-align: right; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    // 검증 인장 / 클릭 안내
+    &__seal { min-width: 56px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
     &__adminbadge {
-      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.58rem;
-      color: #00ff66; border: 1px solid #00ff66; border-radius: 4px;
-      padding: 2px 6px; white-space: nowrap; background: rgba(0, 255, 102, 0.1);
+      font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 0.58rem;
+      color: #ffcf6b; border: 1px solid rgba(224, 162, 58, 0.55); border-radius: 4px;
+      padding: 2px 6px; white-space: nowrap; background: rgba(224, 162, 58, 0.12);
     }
+    &__hint {
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.54rem;
+      color: #b39359; letter-spacing: 0.5px; white-space: nowrap; opacity: 0.9;
+    }
+    // 미확인: 점선 빈 동그라미(클릭 유도) / 확인: 골드 도장(確)
     &__check {
-      width: 32px; height: 32px; line-height: 30px; text-align: center;
-      border: 1px solid #00ff66; background: rgba(0, 255, 102, 0.15);
-      color: #00ff66; border-radius: 50%; font-size: 0.8rem; font-weight: bold;
-      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4); display: none; margin-left: auto;
+      width: 34px; height: 34px; text-align: center;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px dashed rgba(179, 147, 89, 0.55); background: rgba(0, 0, 0, 0.3);
+      color: transparent; border-radius: 50%; font-size: 0.8rem; font-weight: bold;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      &.is-on {
+        font-family: 'Nanum Myeongjo', serif; font-size: 1.05rem;
+        border: 2px solid #e0a23a; background: rgba(224, 162, 58, 0.16);
+        color: #ffcf6b; border-radius: 50%;
+        text-shadow: 0 0 6px rgba(255, 184, 77, 0.6);
+        box-shadow: 0 0 10px rgba(224, 162, 58, 0.4), inset 0 0 6px rgba(224, 162, 58, 0.25);
+        transform: rotate(-9deg);
+      }
+    }
+    &:hover &__check:not(.is-on) { border-color: $rank1; box-shadow: 0 0 10px rgba(255, 215, 0, 0.25); }
+
+    // 위클리 리뷰 — 신원 줄 우측, 라벨(상단) + 내용(아랫줄) 2단 / 내용은 1줄 말줄임
+    &__review {
+      position: relative;
+      flex: 1 1 0; min-width: 0; align-self: stretch; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: center; gap: 6px;
+      padding: 8px 16px 8px 22px;
+      background: linear-gradient(90deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0.02) 42%, transparent 78%);
+      border-radius: 0 5px 5px 0;
+      // 발광 골드 액센트 바
+      &::before {
+        content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px;
+        background: linear-gradient(180deg, transparent, $rank1 16%, $rank1 84%, transparent);
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
+      }
+      @media (max-width: 720px) {
+        flex-basis: 100%; min-width: 100%; padding: 10px 0 0;
+        border-top: 1px solid rgba(179, 147, 89, 0.2); background: none; border-radius: 0;
+        &::before { display: none; }
+      }
+    }
+    // 라벨 — 골드 스몰캡 헤더 + 후행 헤어라인
+    &__review-k {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.7rem; letter-spacing: 1.6px;
+      text-transform: uppercase; white-space: nowrap;
+      color: #ffd483;
+      &::before {
+        content: "✦"; flex-shrink: 0; color: #ffd76a; font-size: 0.72rem;
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.65));
+      }
+      &::after {
+        content: ""; flex: 1 1 auto; height: 1px;
+        background: linear-gradient(90deg, rgba(255, 215, 0, 0.4), transparent);
+      }
+    }
+    &__review-t {
+      margin: 0; width: 100%; max-width: 100%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-family: 'Nanum Myeongjo', serif; font-style: italic; font-size: 0.96rem; line-height: 1.5;
+      color: #ece2c8;
+      &::before {
+        content: "\201C"; font-family: 'Cinzel', serif; font-style: normal; font-weight: 700;
+        font-size: 1.1rem; color: $rank1; margin-right: 4px; vertical-align: -0.12em; opacity: 0.85;
+      }
     }
   }
 
@@ -1889,11 +1965,25 @@
     &__imgwrap img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) contrast(1.05); }
     &__tag {
       position: absolute; top: 10px; left: 10px;
-      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.72rem; letter-spacing: 1px;
-      padding: 4px 10px; border-radius: 5px; color: #0d0a06;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.82rem; letter-spacing: 0.8px;
+      padding: 6px 13px; border-radius: 7px; color: #0d0a06;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.35);
     }
-    &--ok &__tag { background: linear-gradient(180deg, #aef5c2, #00d65a); box-shadow: 0 0 12px rgba(0, 214, 90, 0.5); }
-    &--no &__tag { background: linear-gradient(180deg, #ffb0a6, #ff4d3d); color: #fff; box-shadow: 0 0 12px rgba(255, 77, 61, 0.5); }
+    &__tag::before { font-size: 0.92rem; font-weight: 900; }
+    &--ok &__tag {
+      background: linear-gradient(180deg, #aef5c2, #00d65a);
+      box-shadow: 0 3px 16px rgba(0, 214, 90, 0.7), inset 0 0 6px rgba(255, 255, 255, 0.45);
+      &::before { content: "✓"; }
+    }
+    &--no &__tag {
+      background: linear-gradient(180deg, #ffb0a6, #ff4d3d); color: #fff;
+      border-color: rgba(255, 255, 255, 0.5);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 3px 16px rgba(255, 77, 61, 0.7), inset 0 0 6px rgba(255, 255, 255, 0.3);
+      &::before { content: "✕"; }
+    }
     &__list {
       list-style: none; margin: 0; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px;
       font-family: 'Noto Sans KR', sans-serif; font-size: 0.8rem; color: #ecdcc2; line-height: 1.5;

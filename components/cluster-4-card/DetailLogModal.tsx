@@ -274,9 +274,21 @@ const DetailLogModal: React.FC<DetailLogModalProps> = ({ show, onHide }) => {
   const renderActSummary = () => (
     <div className="alog-sum">
       <div className="alog-sum__top">
-        <div className="alog-sum__id">
-          <h2>Weekly Act Log</h2>
-          <p>한 주간 수행한 액트 · {ACT_ROWS.length}건</p>
+        <div className="alog-sum__brand">
+          {/* 진짜 입체 체크 큐브 — 완수한 액트(✓). 상/좌/우 3면 음영 (CSS-only 3D) */}
+          <span className="alog-sum__logo" aria-hidden>
+            <span className="cube">
+              <span className="cube__face cube__face--top" />
+              <span className="cube__face cube__face--left" />
+              <span className="cube__face cube__face--right">
+                <i className="ti ti-check" />
+              </span>
+            </span>
+          </span>
+          <div className="alog-sum__id">
+            <h2>Weekly Act Log</h2>
+            <p>한 주간 수행한 액트 · {ACT_ROWS.length}건</p>
+          </div>
         </div>
         <span className="alog-sum__week">
           {ACT_LOG_SUMMARY.seasonLabel} {ACT_LOG_SUMMARY.weekLabel}
